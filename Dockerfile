@@ -12,7 +12,7 @@ ENV COMPOSER_MEMORY_LIMIT=-1
 WORKDIR /app
 COPY . /app
 
-RUN composer update --ignore-platform-reqs
+RUN composer update --ignore-platform-reqs --optimize-autoloader --no-interaction --prefer-dist
 RUN composer require kalnoy/nestedset --ignore-platform-reqs
 RUN composer require doctrine/dbal --ignore-platform-reqs
 RUN composer require awobaz/compoships --ignore-platform-reqs
