@@ -51,7 +51,7 @@ class ConversationExport implements FromCollection, WithHeadings, WithMapping, W
                 $emp ? $emp->level2_division : '',
                 $emp ? $emp->level3_branch : '',
                 $emp ? $emp->level4 : '',
-                $data->reportingManager->name,
+                $data->reportingManager ? $data->reportingManager->name : '',
             ];
 
 
@@ -59,8 +59,8 @@ class ConversationExport implements FromCollection, WithHeadings, WithMapping, W
 
             $emp = EmployeeDemo::where('guid', $data->user->guid)->first();
 
-            $signoff_user = User::where('id', $data->signoff_user_id)->first();
-            $signoff_supervisor = User::where('id', $data->supervisor_signoff_id)->first();
+            // $signoff_user = User::where('id', $data->signoff_user_id)->first();
+            // $signoff_supervisor = User::where('id', $data->supervisor_signoff_id)->first();
 
                 return [
                     
@@ -73,8 +73,8 @@ class ConversationExport implements FromCollection, WithHeadings, WithMapping, W
                     $data->next_due_date,
 
                     implode(', ', $data->conversationParticipants->pluck('participant.name')->toArray() ),
-                    $signoff_user ? $signoff_user->name : '',
-                    $signoff_supervisor ? $signoff_supervisor->name : '',
+                    $data->signoff_user ? $data->signoff_user->name : '',
+                    $data->signoff_supervisor ? $data->signoff_supervisor->name : '',
 
                     $emp ? $emp->organization : '',
                     $emp ? $emp->level1_program : '',
@@ -93,13 +93,13 @@ class ConversationExport implements FromCollection, WithHeadings, WithMapping, W
         if ($this->chart == 1) {
             return ["Employee ID", "Employee Name", "Email",
                 "Next Conversation Due",
-                "Organization", "Program", "Division", "Branch", "Level 4", "Reporting To",
+                "Organization", "Level 1", "Level 2", "Level 3", "Level 4", "Reporting To",
             ];
         } else {
             return ["id", "Topic", "Employee ID", "Employee Name", "Email",
                 "Conversation Due Date", "Conversation Participant",
                 "Employee Sign-Off", "Supervisor Sign-off", 
-                "Organization", "Program", "Division", "Branch", "Level 4",
+                "Organization", "Level 1", "Level 2", "Level 3", "Level 4",
             ];
         }
     }

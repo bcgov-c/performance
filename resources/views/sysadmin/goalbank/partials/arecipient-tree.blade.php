@@ -1,7 +1,7 @@
 
 <div class="card px-3 pb-3">
 
-    @error('userCheck')                
+    @error('auserCheck')                
     <div class="p-0">
     <span class="text-danger">
         {{  'The recipient is required.'  }}
@@ -9,120 +9,120 @@
     </div>
     @enderror
 
-@if ($orgs->count() > 0)
+@if ($aorgs->count() > 0)
     <div class="p-0">
         <div class="accordion-option">
             <a href="javascript:void(0)" class="toggle-accordion" 
-            accordion-id="#accordion"></a>
+            accordion-id="#aaccordion"></a>
         </div>
     </div>
 
     
-    <div id="accordion-level0">
-        @foreach($orgs as $org)
+    <div id="aaccordion-level0">
+        @foreach($aorgs as $org)
         <div class="card">
             @if ($org->children->count() > 0 )    
-            <div class="card-header" id="heading-{{ $org->id }}">
+            <div class="card-header" id="aheading-{{ $org->id }}">
                 <h6 class="mb-0">
                 
-                <a role="button" data-toggle="collapse" href="#collapse-{{ $org->id }}" aria-expanded="false" class="collapsed"
+                <a role="button" data-toggle="collapse" href="#acollapse-{{ $org->id }}" aria-expanded="false" class="collapsed"
                             aria-controls="collapse-{{ $org->id }}">
-                    <input pid="" class="" type="checkbox"  id="orgCheck{{ $org->id }}" name="orgCheck[]" 
-                        {{ (is_array(old('orgCheck')) and in_array($org->id, old('orgCheck'))) ? ' checked' : '' }}
+                    <input pid="" class="" type="checkbox"  id="aorgCheck{{ $org->id }}" name="aorgCheck[]" 
+                        {{ (is_array(old('aorgCheck')) and in_array($org->id, old('aorgCheck'))) ? ' checked' : '' }}
                         value="{{ $org->id }}">    
                         <span class="pr-2">{{ $org->name }}</span>
-                    <span class="badge badge-pill badge-primary">{{ $countByOrg[$org->id] }}</span>
+                    <span class="badge badge-pill badge-primary">{{ $acountByOrg[$org->id] }}</span>
                 </a>
                 </h6>
             </div>
 
-            <div id="collapse-{{ $org->id }}" class="collapse" data-parent="#accordion-level0" aria-labelledby="heading-{{ $org->id }}">
+            <div id="acollapse-{{ $org->id }}" class="collapse" data-parent="#aaccordion-level0" aria-labelledby="aheading-{{ $org->id }}">
                 <div class="card-body">
                     {{--  Nested PROGRAM - Start  --}}
-                    <div id="accordion-1">
+                    <div id="aaccordion-1">
                         @foreach($org->children as $program)
                         <div class="card">
                             @if ($program->children->count() > 0 )    
-                            <div class="card-header" id="heading-{{ $program->id }}">
+                            <div class="card-header" id="aheading-{{ $program->id }}">
                                 <h6 class="mb-0">
                                 <a role="button" data-toggle="collapse" 
-                                    href="#collapse-{{ $program->id }}" aria-expanded="false" 
+                                    href="#acollapse-{{ $program->id }}" aria-expanded="false" 
                                     class="{{ $program->children->count() == 0 ? 'disabled' : '' }} collapsed"
-                                            aria-controls="collapse-{{ $program->id }}">
-                                        <input pid="{{ $org->id }}"  class="" type="checkbox"  id="orgCheck{{ $program->id }}" 
-                                            {{ (is_array(old('orgCheck')) and in_array($program->id, old('orgCheck'))) ? ' checked' : '' }}
-                                            name="orgCheck[]" value="{{ $program->id }}"> 
+                                            aria-controls="acollapse-{{ $program->id }}">
+                                        <input pid="{{ $org->id }}"  class="" type="checkbox"  id="aorgCheck{{ $program->id }}" 
+                                            {{ (is_array(old('aorgCheck')) and in_array($program->id, old('aorgCheck'))) ? ' checked' : '' }}
+                                            name="aorgCheck[]" value="{{ $program->id }}"> 
                                         <span class="pr-1">{{ $program->name }}</span>
-                                        <span class="badge badge-pill badge-primary">{{ $countByOrg[$program->id] }}</span>
+                                        <span class="badge badge-pill badge-primary">{{ $acountByOrg[$program->id] }}</span>
                                 </a>
                                 </h6>
                             </div>
 
-                            <div id="collapse-{{ $program->id }}" class="collapse" data-parent="#accordion-1" aria-labelledby="heading-{{ $program->id }}">
+                            <div id="acollapse-{{ $program->id }}" class="collapse" data-parent="#aaccordion-1" aria-labelledby="aheading-{{ $program->id }}">
                                 <div class="card-body">
                                     {{--  Nested DIVISION - Start  --}}
-                                    <div id="accordion-2">
+                                    <div id="aaccordion-2">
                                         @foreach($program->children as $division)
                                         <div class="card">
                                             @if ($division->children->count() > 0 )    
-                                            <div class="card-header" id="heading-{{ $division->id }}">
+                                            <div class="card-header" id="aheading-{{ $division->id }}">
                                                 <h6 class="mb-0">
-                                                <a role="button" data-toggle="collapse" href="#collapse-{{ $division->id }}" aria-expanded="false" class="collapsed"
-                                                            aria-controls="collapse-{{ $division->id }}">
-                                                    <input pid="{{ $program->id }}" class="" type="checkbox"  id="orgCheck{{ $division->id }}" name="orgCheck[]" 
-                                                        {{ (is_array(old('orgCheck')) and in_array($division->id, old('orgCheck'))) ? ' checked' : '' }}
+                                                <a role="button" data-toggle="collapse" href="#acollapse-{{ $division->id }}" aria-expanded="false" class="collapsed"
+                                                            aria-controls="acollapse-{{ $division->id }}">
+                                                    <input pid="{{ $program->id }}" class="" type="checkbox"  id="aorgCheck{{ $division->id }}" name="aorgCheck[]" 
+                                                        {{ (is_array(old('aorgCheck')) and in_array($division->id, old('aorgCheck'))) ? ' checked' : '' }}
                                                         value="{{ $division->id }}">
                                                     <span class="pr-1">{{ $division->name }}</span>
-                                                    <span class="badge badge-pill badge-primary">{{ $countByOrg[$division->id] }}</span>
+                                                    <span class="badge badge-pill badge-primary">{{ $acountByOrg[$division->id] }}</span>
                                                 </a>
                                                 </h6>
                                             </div>    
                                         
-                                            <div id="collapse-{{ $division->id }}" class="collapse" data-parent="#accordion-2" aria-labelledby="heading-{{ $division->id }}">
+                                            <div id="acollapse-{{ $division->id }}" class="collapse" data-parent="#aaccordion-2" aria-labelledby="aheading-{{ $division->id }}">
                                                 <div class="card-body">
                                                     {{-- Nested BRANCH - Start --}}
-                                                    <div id="accordion-3">
+                                                    <div id="aaccordion-3">
                                                         @foreach($division->children as $branch)
                                                         <div class="card">
                                                             @if ($branch->children->count() > 0 )    
-                                                                <div class="card-header" id="heading-{{ $branch->id }}">
+                                                                <div class="card-header" id="aheading-{{ $branch->id }}">
                                                                     <h6 class="mb-0">
-                                                                    <a role="button" data-toggle="collapse" href="#collapse-{{ $branch->id }}" aria-expanded="false" class="collapsed"
-                                                                                aria-controls="collapse-{{ $branch->id }}">
-                                                                        <input pid="{{ $division->id }}" class="" type="checkbox"  id="orgCheck{{ $branch->id }}" name="orgCheck[]" 
-                                                                        {{ (is_array(old('orgCheck')) and in_array($branch->id, old('orgCheck'))) ? ' checked' : '' }}
+                                                                    <a role="button" data-toggle="collapse" href="#acollapse-{{ $branch->id }}" aria-expanded="false" class="collapsed"
+                                                                                aria-controls="acollapse-{{ $branch->id }}">
+                                                                        <input pid="{{ $division->id }}" class="" type="checkbox"  id="aorgCheck{{ $branch->id }}" name="aorgCheck[]" 
+                                                                        {{ (is_array(old('aorgCheck')) and in_array($branch->id, old('aorgCheck'))) ? ' checked' : '' }}
                                                                             value="{{ $branch->id }}">
                                                                         <span class="pr-1">{{ $branch->name }}</span>
-                                                                        <span class="badge badge-pill badge-primary">{{ $countByOrg[$branch->id] }}</span>
+                                                                        <span class="badge badge-pill badge-primary">{{ $acountByOrg[$branch->id] }}</span>
                                                                     </a>
                                                                     </h6> 
                                                                 </div>
-                                                                <div id="collapse-{{ $branch->id }}" class="collapse" data-parent="#accordion-3" aria-labelledby="heading-{{ $branch->id }}">
+                                                                <div id="acollapse-{{ $branch->id }}" class="collapse" data-parent="#aaccordion-3" aria-labelledby="aheading-{{ $branch->id }}">
                                                                     <div class="card-body">
                                                                         {{--  Nested LEVEL4 - Start --}}
-                                                                        <div id="accordion-4">
+                                                                        <div id="aaccordion-4">
                                                                             @foreach($branch->children as $level4)
                                                                                 <div class="card" style="margin-bottom: 0 !important;">
-                                                                                    <div class="card-header employees" id="heading-{{ $level4->id }}">
+                                                                                    <div class="card-header employees" id="aheading-{{ $level4->id }}">
                                                                                         <h6 class="mb-0">
-                                                                                            <a role="button" data-toggle="collapse" href="#collapse-{{ $level4->id }}" aria-expanded="false" class="collapsed"
-                                                                                                aria-controls="collapse-{{ $level4->id }}" data="{{ $level4->id }}">
-                                                                                            <input pid="{{ $branch->id }}"  class="" type="checkbox"  id="orgCheck{{ $level4->id }}" name="orgCheck[]" 
-                                                                                            {{ (is_array(old('orgCheck')) and in_array($level4->id, old('orgCheck'))) ? ' checked' : '' }}
+                                                                                            <a role="button" data-toggle="collapse" href="#acollapse-{{ $level4->id }}" aria-expanded="false" class="collapsed"
+                                                                                                aria-controls="acollapse-{{ $level4->id }}" data="{{ $level4->id }}">
+                                                                                            <input pid="{{ $branch->id }}"  class="" type="checkbox"  id="aorgCheck{{ $level4->id }}" name="aorgCheck[]" 
+                                                                                            {{ (is_array(old('aorgCheck')) and in_array($level4->id, old('aorgCheck'))) ? ' checked' : '' }}
                                                                                             value="{{ $level4->id }}">
                                                                                             <span class="pr-1">{{ $level4->name }}</span>
-                                                                                            <span class="badge clickable badge-pill badge-primary">{{ $countByOrg[$level4->id] }}</span>
+                                                                                            <span class="badge clickable badge-pill badge-primary">{{ $acountByOrg[$level4->id] }}</span>
                                                                                         </a>
                                                                                         </h6>
                                                                                     </div>
                                                                                 </div>
 
                                                                                 {{-- level4 -- Employee Listing - Start --}}                                              
-                                                                                <div id="collapse-{{ $level4->id }}" class="collapse" data-parent="#accordion-4" aria-labelledby="heading-{{ $level4->id }}">
-                                                                                    <div class="mt-2 fas fa-spinner fa-spin fa-3x fa-fw loading-spinner" role="status" style="display:none">
+                                                                                <div id="acollapse-{{ $level4->id }}" class="collapse" data-parent="#aaccordion-4" aria-labelledby="aheading-{{ $level4->id }}">
+                                                                                    {{-- <div class="mt-2 fas fa-spinner fa-spin fa-3x fa-fw loading-spinner" role="status" style="display:none">
                                                                                         <span class="sr-only">Loading...</span>
-                                                                                    </div>
-                                                                                    <div class="card-header employee-list" id="employees-{{ $level4->id }}" value="{{ $level4->id }}"></div>
+                                                                                    </div> --}}
+                                                                                    <div class="card-header employee-list" id="aemployees-{{ $level4->id }}" value="{{ $level4->id }}"></div>
                                                                                 </div>
                                                                                 {{-- LEVEL4 -- Employee Listing - End --}}                                                                                         
 
@@ -132,23 +132,23 @@
                                                                     </div>
                                                                 </div>
                                                             @else
-                                                                <div class="card-header employees" id="heading-{{ $branch->id }}">
+                                                                <div class="card-header employees" id="aheading-{{ $branch->id }}">
                                                                     <h6 class="mb-0">
-                                                                    <a role="button" data-toggle="collapse" href="#collapse-{{ $branch->id }}" aria-expanded="false" class="collapsed"
-                                                                        aria-controls="collapse-{{ $branch->id }}" data="{{ $branch->id }}">
-                                                                        <input pid="{{ $division->id }}" class="" type="checkbox"  id="orgCheck{{ $branch->id }}" name="orgCheck[]" 
+                                                                    <a role="button" data-toggle="collapse" href="#acollapse-{{ $branch->id }}" aria-expanded="false" class="collapsed"
+                                                                        aria-controls="acollapse-{{ $branch->id }}" data="{{ $branch->id }}">
+                                                                        <input pid="{{ $division->id }}" class="" type="checkbox"  id="aorgCheck{{ $branch->id }}" name="aorgCheck[]" 
                                                                             {{ (is_array(old('orgCheck')) and in_array($branch->id, old('orgCheck'))) ? ' checked' : '' }}
                                                                                 value="{{ $branch->id }}">
                     
                                                                         <span class="pr-1">{{ $branch->name }}</span>
-                                                                        <span class="badge clickable badge-pill badge-primary">{{ $countByOrg[$branch->id] }}</span>
+                                                                        <span class="badge clickable badge-pill badge-primary">{{ $acountByOrg[$branch->id] }}</span>
                                                                     </a>
                                                                     </h6>                                                                
                                                                 </div>
 
                                                                 {{-- BRANCH -- Employee Listing - Start --}}                                                                                         
-                                                                <div id="collapse-{{ $branch->id }}" class="collapse" data-parent="#accordion-3" aria-labelledby="heading-{{ $branch->id }}">
-                                                                    <div class="card-header employee-list" id="employees-{{ $branch->id }}" value="{{ $branch->id }}"></div>
+                                                                <div id="acollapse-{{ $branch->id }}" class="collapse" data-parent="#aaccordion-3" aria-labelledby="aheading-{{ $branch->id }}">
+                                                                    <div class="card-header employee-list" id="aemployees-{{ $branch->id }}" value="{{ $branch->id }}"></div>
                                                                 </div>
                                                                 {{-- BRANCH -- Employee Listing - End --}}                                                                                         
                                                             @endif  
@@ -161,24 +161,24 @@
 
                                             @else
 
-                                            <div class="card-header employees" id="heading-{{ $division->id }}">
+                                            <div class="card-header employees" id="aheading-{{ $division->id }}">
                                                 <h6 class="mb-0">
-                                                <a role="button" data-toggle="collapse" href="#collapse-{{ $division->id }}" aria-expanded="false" class="collapsed"
-                                                    aria-controls="collapse-{{ $division->id }}" data="{{ $division->id }}">
+                                                <a role="button" data-toggle="collapse" href="#acollapse-{{ $division->id }}" aria-expanded="false" class="collapsed"
+                                                    aria-controls="acollapse-{{ $division->id }}" data="{{ $division->id }}">
 
-                                                    <input pid="{{ $program->id }}" class="" type="checkbox"  id="orgCheck{{ $division->id }}" name="orgCheck[]" 
-                                                      {{ (is_array(old('orgCheck')) and in_array($division->id, old('orgCheck'))) ? ' checked' : '' }}
+                                                    <input pid="{{ $program->id }}" class="" type="checkbox"  id="aorgCheck{{ $division->id }}" name="aorgCheck[]" 
+                                                      {{ (is_array(old('aorgCheck')) and in_array($division->id, old('aorgCheck'))) ? ' checked' : '' }}
                                                        value="{{ $division->id }}">
 
                                                     <span class="pr-1">{{ $division->name }}</span>
-                                                    <span class="badge clickable badge-pill badge-primary">{{ $countByOrg[$division->id] }}</span>
+                                                    <span class="badge clickable badge-pill badge-primary">{{ $acountByOrg[$division->id] }}</span>
                                                 </a>
                                                 </h6>
                                             </div>
 
                                             {{-- DIVISION -- Employee Listing - Start --}}                                                                                         
-                                            <div id="collapse-{{ $division->id }}" class="collapse" data-parent="#accordion-2" aria-labelledby="heading-{{ $division->id }}">
-                                                <div class="card-header employee-list" id="employees-{{ $division->id }}" value="{{ $division->id }}"></div>
+                                            <div id="acollapse-{{ $division->id }}" class="collapse" data-parent="#aaccordion-2" aria-labelledby="aheading-{{ $division->id }}">
+                                                <div class="card-header employee-list" id="aemployees-{{ $division->id }}" value="{{ $division->id }}"></div>
                                             </div>
                                             {{-- DIVISION -- Employee Listing - End --}}                                                                                         
 
@@ -190,24 +190,24 @@
                                 </div>
                             </div>
                             @else
-                            <div class="card-header employees" id="heading-{{ $program->id }}">
+                            <div class="card-header employees" id="aheading-{{ $program->id }}">
                                 <h6 class="mb-0">
-                                <a role="button" data-toggle="collapse" href="#collapse-{{ $program->id }}" aria-expanded="false" class="collapsed"
-                                    aria-controls="collapse-{{ $program->id }}" data="{{ $program->id }}">
+                                <a role="button" data-toggle="collapse" href="#acollapse-{{ $program->id }}" aria-expanded="false" class="collapsed"
+                                    aria-controls="acollapse-{{ $program->id }}" data="{{ $program->id }}">
 
-                                    <input pid="{{ $org->id }}" class="" type="checkbox"  id="orgCheck{{ $program->id }}" name="orgCheck[]" 
-                                        {{ (is_array(old('orgCheck')) and in_array($program->id, old('orgCheck'))) ? ' checked' : '' }}
+                                    <input pid="{{ $org->id }}" class="" type="checkbox"  id="aorgCheck{{ $program->id }}" name="aorgCheck[]" 
+                                        {{ (is_array(old('aorgCheck')) and in_array($program->id, old('aorgCheck'))) ? ' checked' : '' }}
                                         value="{{ $program->id }}">
 
                                     <span class="pr-1">{{ $program->name }}</span>
-                                    <span class="badge clickable badge-pill badge-primary">{{ $countByOrg[$program->id] }}</span>
+                                    <span class="badge clickable badge-pill badge-primary">{{ $acountByOrg[$program->id] }}</span>
                                 </a>
                                 </h6>
                             </div>
 
                             {{-- PROGRAM -- Employee Listing - Start --}}                                                                                         
-                            <div id="collapse-{{ $program->id }}" class="collapse" data-parent="#accordion-1" aria-labelledby="heading-{{ $program->id }}">
-                                <div class="card-header employee-list" id="employees-{{ $program->id }}" value="{{ $program->id }}"></div>
+                            <div id="acollapse-{{ $program->id }}" class="collapse" data-parent="#aaccordion-1" aria-labelledby="aheading-{{ $program->id }}">
+                                <div class="card-header employee-list" id="aemployees-{{ $program->id }}" value="{{ $program->id }}"></div>
                             </div>
                             {{-- PROGRAM -- Employee Listing - End --}}                                                                                         
 
@@ -221,16 +221,16 @@
 
             @else
             <h1>Test</h1>
-            <div class="card-header" id="heading-{{ $org->id }}">
+            <div class="card-header" id="aheading-{{ $org->id }}">
                 <h6 class="mb-0">
                 <a role="button" class="disabled collapsed">
 
-                    <input pid="" class="" type="checkbox"  id="orgCheck{{ $org->id }}" name="orgCheck[]" 
-                        {{ (is_array(old('orgCheck')) and in_array($org->id, old('orgCheck'))) ? ' checked' : '' }}
+                    <input pid="" class="" type="checkbox"  id="aorgCheck{{ $org->id }}" name="aorgCheck[]" 
+                        {{ (is_array(old('aorgCheck')) and in_array($org->id, old('aorgCheck'))) ? ' checked' : '' }}
                         value="{{ $org->id }}">
 
                     <span class="pr-1">{{ $org->name }}</span>
-                    <span class="badge clickable badge-pill badge-primary">{{ $countByOrg[$org->id] }}</span>
+                    <span class="badge clickable badge-pill badge-primary">{{ $acountByOrg[$org->id] }}</span>
                     <span class="expandable btn btn-sm btn-secondary">see all employees</span>
                 </a>
                     <div >
@@ -343,20 +343,20 @@
 <script>
 $(document).ready(function() {
 
-    g_employees_by_org = {!!json_encode($empIdsByOrgId)!!};      
+    ag_employees_by_org = {!!json_encode($aempIdsByOrgId)!!};      
 
-    list = $("input[type=checkbox]:checked");
+    alist = $("input[type=checkbox]:checked");
 
-    $.each(list, function( index, item ) {
+    $.each(alist, function( index, item ) {
 
         pid = $(item).attr('pid');
 
         do {
-            value = '#orgCheck' + pid;
+            value = '#aorgCheck' + pid;
             //console.log(  value );
-            toggle_indeterminate( value );
+            atoggle_indeterminate( value );
             //console.log("parent : " + pid);                
-            pid = $('#orgCheck' + pid).attr('pid');    
+            pid = $('#aorgCheck' + pid).attr('pid');    
         } 
         while (pid);
 
@@ -365,7 +365,7 @@ $(document).ready(function() {
 
 
     // Set parent checkbox
-    function toggle_indeterminate( prev_input ) {
+    function atoggle_indeterminate( prev_input ) {
 
         prev_location = $(prev_input).parent().attr('href');
         total = $(prev_location).find('input').length;
@@ -384,9 +384,9 @@ $(document).ready(function() {
 
     }
 
-    function load_employees_on_node( tree_id ) {
+    function aload_employees_on_node( tree_id ) {
 
-        var target = '#employees-' + tree_id;
+        var target = '#aemployees-' + tree_id;
         
         if($.trim($(target).html())=='') {
             $.ajax({
@@ -394,27 +394,26 @@ $(document).ready(function() {
                 type: 'GET',
                 data: $("#notify-form").serialize(),
                 dataType: 'html',
-                beforeSend: function() {
-                    //$('#pageLoader').show();  
-                    $(".loading-spinner").show();                    
-                },
+                // beforeSend: function() {
+                //     //$('#pageLoader').show();  
+                //     $(".loading-spinner").show();                    
+                // },
                 success: function (result) {
                     $(target).html(''); 
                     $(target).html(result);
 
-                    nodes = $(target).find('input:checkbox');
-                    $.each( nodes, function( index, chkbox ) {
-                        console.log( chkbox.value )
-						if (g_selected_employees.includes(chkbox.value)) {
+                    anodes = $(target).find('input:checkbox');
+                    $.each( anodes, function( index, chkbox ) {
+						if (ag_selected_employees.includes(chkbox.value)) {
 							$(chkbox).prop('checked', true);
                         } 
                     });
 
                 },
-                complete: function() {
-                    //$('#pageLoader').hide();  
-                    $(".loading-spinner").hide();
-                },
+                // complete: function() {
+                //     //$('#pageLoader').hide();  
+                //     $(".loading-spinner").hide();
+                // },
                 error: function () {
                     alert("error");
                     $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
@@ -423,13 +422,13 @@ $(document).ready(function() {
         }
     }
 
-    $("#accordion-level0 .card-header.employees").on("click","a", function(e) 
+    $("#aaccordion-level0 .card-header.employees").on("click","a", function(e) 
     {
         var tree_id = $(this).attr('data');
-        load_employees_on_node(tree_id);
+        aload_employees_on_node(tree_id);
     });
 
-    $("#accordion-level0 .card-header").on("click","a", function(e) {
+    $("#aaccordion-level0 .card-header").on("click","a", function(e) {
         //e.preventDefault(); 	
 
         if (e.target.tagName != "INPUT") {
@@ -456,34 +455,34 @@ $(document).ready(function() {
                 //if no employee class, then have to add all 
                 
                 // User level checkbox 
-                if ( $(e.target).attr('name') == 'userCheck[]') {
+                if ( $(e.target).attr('name') == 'auserCheck[]') {
                     emp_id = $(e.target).val();  
-                    if (!g_selected_employees.includes(emp_id)) {
-                            g_selected_employees.push( emp_id );    
+                    if (!ag_selected_employees.includes(emp_id)) {
+                            ag_selected_employees.push( emp_id );    
                     } 
                 }
 
-                node  = $(e.target).val();
-                if (g_employees_by_org.hasOwnProperty( node )) {
-                    $.each(g_employees_by_org[ node  ], function(index, emp) {
-                        if (!g_selected_employees.includes(emp.employee_id)) {
-                            g_selected_employees.push( emp.employee_id );    
+                anode  = $(e.target).val();
+                if (ag_employees_by_org.hasOwnProperty( anode )) {
+                    $.each(ag_employees_by_org[ anode  ], function(index, emp) {
+                        if (!ag_selected_employees.includes(emp.employee_id)) {
+                            ag_selected_employees.push( emp.employee_id );    
                         } 
                     })  
                 }
 
-                nodes = $(location).find('input:checkbox')
-                $.each( nodes, function( index, chkbox ) {
-                    if (g_employees_by_org.hasOwnProperty(chkbox.value)) {
-                        $.each(g_employees_by_org[chkbox.value], function(index, emp) {
-                            if (!g_selected_employees.includes(emp.employee_id)) {
-                                g_selected_employees.push( emp.employee_id );    
+                anodes = $(location).find('input:checkbox')
+                $.each( anodes, function( index, chkbox ) {
+                    if (ag_employees_by_org.hasOwnProperty(chkbox.value)) {
+                        $.each(ag_employees_by_org[chkbox.value], function(index, emp) {
+                            if (!ag_selected_employees.includes(emp.employee_id)) {
+                                ag_selected_employees.push( emp.employee_id );    
                             }
                         })
                     } else {
                         if (chkbox.name == 'userCheck[]') {
-                            if (!g_selected_employees.includes(chkbox.value)) {
-                                g_selected_employees.push( chkbox.value);    
+                            if (!ag_selected_employees.includes(chkbox.value)) {
+                                ag_selected_employees.push( chkbox.value);    
                             }
                         }
                     }
@@ -504,35 +503,35 @@ $(document).ready(function() {
                 // User level checkbox 
                 if ( $(e.target).attr('name') == 'userCheck[]') {
                     emp_id = $(e.target).val();  
-                    var index = $.inArray(emp_id, g_selected_employees);
+                    var index = $.inArray(emp_id, ag_selected_employees);
                     if (index > -1) {
-                        g_selected_employees.splice( index, 1 );
+                        ag_selected_employees.splice( index, 1 );
                     }
                 }
 
-                node = $(e.target).val();
-                if (g_employees_by_org.hasOwnProperty( node )) {
-                    $.each(g_employees_by_org[ node  ], function(index, emp) {
-                        if (!g_selected_employees.includes(emp.employee_id)) {
-                            g_selected_employees.push( emp.employee_id );    
+                anode = $(e.target).val();
+                if (ag_employees_by_org.hasOwnProperty( anode )) {
+                    $.each(ag_employees_by_org[ anode  ], function(index, emp) {
+                        if (!ag_selected_employees.includes(emp.employee_id)) {
+                            ag_selected_employees.push( emp.employee_id );    
                         } 
                     })  
                 }
 
-                nodes = $(location).find('input:checkbox');
-                $.each( nodes, function( index, chkbox ) {
-                    if (g_employees_by_org.hasOwnProperty(chkbox.value)) {
-                        $.each(g_employees_by_org[chkbox.value], function(index, emp) {
-                            var index = $.inArray(emp.employee_id, g_selected_employees);
+                anodes = $(location).find('input:checkbox');
+                $.each( anodes, function( index, chkbox ) {
+                    if (ag_employees_by_org.hasOwnProperty(chkbox.value)) {
+                        $.each(ag_employees_by_org[chkbox.value], function(index, emp) {
+                            var index = $.inArray(emp.employee_id, ag_selected_employees);
                             if (index > -1) {
-                                g_selected_employees.splice( index, 1 );
+                                ag_selected_employees.splice( index, 1 );
                             }
                         })
                     } else {
                         if (chkbox.name == 'userCheck[]') {
-                            var index = $.inArray(chkbox.value, g_selected_employees);
+                            var index = $.inArray(chkbox.value, ag_selected_employees);
                             if (index > -1) {
-                                g_selected_employees.splice( index, 1 );
+                                ag_selected_employees.splice( index, 1 );
                             }
                         }
                     }
@@ -540,15 +539,15 @@ $(document).ready(function() {
                 
             }      
 
-            //console.log( g_selected_employees);     
+            // console.log( ag_selected_employees);     
 
             pid = $(this).find('input:first').attr('pid');
             do {
-                value = '#orgCheck' + pid;
+                value = '#aorgCheck' + pid;
                 //console.log(  value );
-                toggle_indeterminate( value );
+                atoggle_indeterminate( value );
                 //console.log("parent : " + pid);                
-                pid = $('#orgCheck' + pid).attr('pid');    
+                pid = $('#aorgCheck' + pid).attr('pid');    
             } 
             while (pid);
 
@@ -556,7 +555,7 @@ $(document).ready(function() {
 
     });
 
-    $("#accordion-level0").on('shown.bs.collapse', function () {
+    $("#aaccordion-level0").on('shown.bs.collapse', function () {
         // do something
         el = $('a.toggle-accordion');
         if ( !el.hasClass("active")) {
@@ -564,7 +563,7 @@ $(document).ready(function() {
         }
     });
 
-    $("#accordion-level0").on('hidden.bs.collapse', function () {
+    $("#aaccordion-level0").on('hidden.bs.collapse', function () {
         
         count = $('div.collapse.show').length;
         if (count == 0) {
@@ -575,19 +574,19 @@ $(document).ready(function() {
         }
     });
 
-    $(".toggle-accordion").on("click", function(e) {
+    $("#atoggle-accordion").on("click", function(e) {
 
         b_active =  $( e.target ).hasClass( "active" );
         
         if (b_active) {
-            nodes = $('div.collapse.show');
+            anodes = $('div.collapse.show');
             $.each( nodes, function( index, item ) {
                 $(item).collapse('hide');
             });
             $( e.target ).removeClass( "active" );
         } else {
-            nodes = $('div.collapse');
-            $.each( nodes, function( index, item ) {
+            anodes = $('div.collapse');
+            $.each( anodes, function( index, item ) {
                 $(item).collapse('show');
             });
             $( e.target ).addClass( "active" );

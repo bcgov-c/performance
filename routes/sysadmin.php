@@ -1,7 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SysadminController;
-use App\Http\Controllers\CurrentEmployeesController;
 use App\Http\Controllers\PastEmployeesController;
 // use App\Http\Controllers\CreateAccessController;
 use App\Http\Controllers\GenericTemplateController;
@@ -9,15 +9,16 @@ use App\Http\Controllers\GenericTemplateController;
 // use App\Http\Controllers\ManageExistingSharesController;
 // use App\Http\Controllers\ManageExistingExcusedController;
 // use App\Http\Controllers\ManageGoalBankController;
-use App\Http\Controllers\SysAdmin\UnlockConversationController;
+use App\Http\Controllers\CurrentEmployeesController;
 use App\Http\Controllers\SysAdmin\GoalBankController;
 use App\Http\Controllers\SysAdmin\NotificationController;
-use App\Http\Controllers\SysAdmin\ExcuseEmployeesController;
-// use App\Http\Controllers\SysAdmin\ExcusedEmployeesController;
-use App\Http\Controllers\SysAdmin\AccessPermissionsController;
 use App\Http\Controllers\SysAdmin\EmployeeSharesController;
+// use App\Http\Controllers\SysAdmin\ExcusedEmployeesController;
+use App\Http\Controllers\SysAdmin\ExcuseEmployeesController;
+use App\Http\Controllers\SysAdmin\StatisticsReportController;
 // use App\Http\Controllers\SysAdmin\SharedEmployeesController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SysAdmin\AccessPermissionsController;
+use App\Http\Controllers\SysAdmin\UnlockConversationController;
 
 
 Route::group(['middleware' => ['role:Sys Admin']], function () {
@@ -74,10 +75,21 @@ Route::group(['middleware' => ['role:Sys Admin']], function () {
     });
 
 
-    Route::get('sysadmin/statistics/goalsummary', [SysadminController::class, 'goalsummary'])->name('sysadmin.statistics.goalsummary');
-    Route::get('sysadmin/statistics/conversationsummary', [SysadminController::class, 'conversationsummary'])->name('sysadmin.statistics.conversationsummary');
-    Route::get('sysadmin/statistics/sharedsummary', [SysadminController::class, 'sharedsummary'])->name('sysadmin.statistics.sharedsummary');
-    Route::get('sysadmin/statistics/excusedsummary', [SysadminController::class, 'excusedsummary'])->name('sysadmin.statistics.excusedsummary');
+    // Route::get('sysadmin/statistics/goalsummary', [SysadminController::class, 'goalsummary'])->name('sysadmin.statistics.goalsummary');
+    // Route::get('sysadmin/statistics/conversationsummary', [SysadminController::class, 'conversationsummary'])->name('sysadmin.statistics.conversationsummary');
+    // Route::get('sysadmin/statistics/sharedsummary', [SysadminController::class, 'sharedsummary'])->name('sysadmin.statistics.sharedsummary');
+    // Route::get('sysadmin/statistics/excusedsummary', [SysadminController::class, 'excusedsummary'])->name('sysadmin.statistics.excusedsummary');
+    Route::get('sysadmin/statistics/goalsummary', [StatisticsReportController::class, 'goalsummary'])->name('sysadmin.statistics.goalsummary');
+    Route::get('sysadmin/statistics/goalsummary-export', [StatisticsReportController::class, 'goalSummaryExport'])->name('sysadmin.statistics.goalsummary.export');
+    Route::get('sysadmin/statistics/conversationsummary', [StatisticsReportController::class, 'conversationsummary'])->name('sysadmin.statistics.conversationsummary');
+    Route::get('sysadmin/statistics/conversationsummary-export', [StatisticsReportController::class, 'conversationSummaryExport'])->name('sysadmin.statistics.conversationsummary.export');
+    Route::get('sysadmin/statistics/sharedsummary', [StatisticsReportController::class, 'sharedsummary'])->name('sysadmin.statistics.sharedsummary');
+    Route::get('sysadmin/statistics/sharedsummary-export', [StatisticsReportController::class, 'sharedSummaryExport'])->name('sysadmin.statistics.sharedsummary.export');
+    Route::get('sysadmin/statistics/excusedsummary', [StatisticsReportController::class, 'excusedsummary'])->name('sysadmin.statistics.excusedsummary');
+    Route::get('sysadmin/statistics/excusedsummary-export', [StatisticsReportController::class, 'excusedSummaryExport'])->name('sysadmin.statistics.excusedsummary.export');
+
+
+
     Route::get('sysadmin/switch-identity', [SysadminController::class, 'switchIdentity'])->name('sysadmin.switch-identity');
     Route::get('sysadmin/get-identities', [SysadminController::class, 'getIdentities'])->name('sysadmin.get-identities');
     Route::get('sysadmin/switch-identity-action', [SysadminController::class, 'switchIdentityAction'])->name('sysadmin.switch-identity-action');
@@ -106,24 +118,40 @@ Route::group(['middleware' => ['role:Sys Admin']], function () {
         Route::post('/sysadmin/goalbank/addnewgoal', [GoalBankController::class, 'addnewgoal'])->name('sysadmin.goalbank.addnewgoal');
         Route::get('/sysadmin/goalbank/savenewgoal', [GoalBankController::class, 'savenewgoal'])->name('sysadmin.goalbank.savenewgoalget');
         Route::post('/sysadmin/goalbank/savenewgoal', [GoalBankController::class, 'savenewgoal'])->name('sysadmin.goalbank.savenewgoal');
+
         Route::get('/sysadmin/goalbank/org-tree', [GoalBankController::class,'loadOrganizationTree']);
         Route::get('/sysadmin/goalbank/org-organizations', [GoalBankController::class,'getOrganizations']);
         Route::get('/sysadmin/goalbank/org-programs', [GoalBankController::class,'getPrograms']);
         Route::get('/sysadmin/goalbank/org-divisions', [GoalBankController::class,'getDivisions']);
         Route::get('/sysadmin/goalbank/org-branches', [GoalBankController::class,'getBranches']);
         Route::get('/sysadmin/goalbank/org-level4', [GoalBankController::class,'getLevel4']);
+        Route::get('/sysadmin/goalbank/employees/{id}', [GoalBankController::class,'getEmployees']);
+        Route::get('/sysadmin/goalbank/employee-list', [GoalBankController::class, 'getDatatableEmployees'])->name('sysadmin.goalbank.employee.list');
+
+        Route::get('/sysadmin/goalbank/aorg-tree', [GoalBankController::class,'aloadOrganizationTree']);
+        Route::get('/sysadmin/goalbank/aorg-organizations', [GoalBankController::class,'agetOrganizations']);
+        Route::get('/sysadmin/goalbank/aorg-programs', [GoalBankController::class,'agetPrograms']);
+        Route::get('/sysadmin/goalbank/aorg-divisions', [GoalBankController::class,'agetDivisions']);
+        Route::get('/sysadmin/goalbank/aorg-branches', [GoalBankController::class,'agetBranches']);
+        Route::get('/sysadmin/goalbank/aorg-level4', [GoalBankController::class,'agetLevel4']);
+        Route::get('/sysadmin/goalbank/aemployees/{id}', [GoalBankController::class,'agetEmployees']);
+        Route::get('/sysadmin/goalbank/aemployee-list', [GoalBankController::class, 'agetDatatableEmployees'])->name('sysadmin.goalbank.aemployee.list');
+
         Route::get('/sysadmin/goalbank/eorg-tree', [GoalBankController::class,'eloadOrganizationTree']);
         Route::get('/sysadmin/goalbank/eorg-organizations', [GoalBankController::class,'egetOrganizations']);
         Route::get('/sysadmin/goalbank/eorg-programs', [GoalBankController::class,'egetPrograms']);
         Route::get('/sysadmin/goalbank/eorg-divisions', [GoalBankController::class,'egetDivisions']);
         Route::get('/sysadmin/goalbank/eorg-branches', [GoalBankController::class,'egetBranches']);
         Route::get('/sysadmin/goalbank/eorg-level4', [GoalBankController::class,'egetLevel4']);
+        Route::get('/sysadmin/goalbank/eemployees/{id}', [GoalBankController::class,'egetEmployees']);
+        Route::get('/sysadmin/goalbank/eemployee-list', [GoalBankController::class, 'egetDatatableEmployees'])->name('sysadmin.goalbank.eemployee.list');
+
         Route::get('/sysadmin/goalbank/manageexistinggoal', [GoalBankController::class, 'manageindex'])->name('sysadmin.goalbank.manageindex');
         Route::get('/sysadmin/goalbank/managegetlist', [GoalBankController::class, 'managegetList'])->name('sysadmin.goalbank.managegetlist');
         Route::get('/sysadmin/goalbank/getgoalorgs/{goal_id}', [GoalBankController::class, 'getgoalorgs'])->name('sysadmin.goalbank.getgoalorgs');
         Route::get('/sysadmin/goalbank/getgoalinds/{goal_id}', [GoalBankController::class, 'getgoalinds'])->name('sysadmin.goalbank.getgoalinds');
-        Route::get('/sysadmin/goalbank/employees/{id}', [GoalBankController::class,'getEmployees']);
-        Route::get('/sysadmin/goalbank/employee-list', [GoalBankController::class, 'getDatatableEmployees'])->name('sysadmin.goalbank.employee.list');
+        // Route::get('/sysadmin/goalbank/employee-list/{loaded?}', [GoalBankController::class, 'getDatatableEmployees'])->name('sysadmin.goalbank.employee.list');
+        // Route::get('/sysadmin/goalbank/employee-listempty', [GoalBankController::class, 'getDatatableEmployeesEmpty'])->name('sysadmin.goalbank.employee.listempty');
     });
 
 

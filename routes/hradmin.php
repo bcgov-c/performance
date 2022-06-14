@@ -66,24 +66,38 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::post('/hradmin/goalbank/addnewgoal', [GoalBankController::class, 'addnewgoal'])->name('hradmin.goalbank.addnewgoal');
         Route::get('/hradmin/goalbank/savenewgoal', [GoalBankController::class, 'savenewgoal'])->name('hradmin.goalbank.savenewgoalget');
         Route::post('/hradmin/goalbank/savenewgoal', [GoalBankController::class, 'savenewgoal'])->name('hradmin.goalbank.savenewgoal');
+        
         Route::get('/hradmin/goalbank/org-tree', [GoalBankController::class,'loadOrganizationTree']);
         Route::get('/hradmin/goalbank/org-organizations', [GoalBankController::class,'getOrganizations']);
         Route::get('/hradmin/goalbank/org-programs', [GoalBankController::class,'getPrograms']);
         Route::get('/hradmin/goalbank/org-divisions', [GoalBankController::class,'getDivisions']);
         Route::get('/hradmin/goalbank/org-branches', [GoalBankController::class,'getBranches']);
         Route::get('/hradmin/goalbank/org-level4', [GoalBankController::class,'getLevel4']);
+        Route::get('/hradmin/goalbank/employees/{id}', [GoalBankController::class,'getEmployees']);
+        Route::get('/hradmin/goalbank/employee-list', [GoalBankController::class, 'getDatatableEmployees'])->name('hradmin.goalbank.employee.list');
+
+        Route::get('/hradmin/goalbank/aorg-tree', [GoalBankController::class,'aloadOrganizationTree']);
+        Route::get('/hradmin/goalbank/aorg-organizations', [GoalBankController::class,'agetOrganizations']);
+        Route::get('/hradmin/goalbank/aorg-programs', [GoalBankController::class,'agetPrograms']);
+        Route::get('/hradmin/goalbank/aorg-divisions', [GoalBankController::class,'agetDivisions']);
+        Route::get('/hradmin/goalbank/aorg-branches', [GoalBankController::class,'agetBranches']);
+        Route::get('/hradmin/goalbank/aorg-level4', [GoalBankController::class,'agetLevel4']);
+        Route::get('/hradmin/goalbank/aemployees/{id}', [GoalBankController::class,'agetEmployees']);
+        Route::get('/hradmin/goalbank/aemployee-list', [GoalBankController::class, 'agetDatatableEmployees'])->name('hradmin.goalbank.aemployee.list');
+
         Route::get('/hradmin/goalbank/eorg-tree', [GoalBankController::class,'eloadOrganizationTree']);
         Route::get('/hradmin/goalbank/eorg-organizations', [GoalBankController::class,'egetOrganizations']);
         Route::get('/hradmin/goalbank/eorg-programs', [GoalBankController::class,'egetPrograms']);
         Route::get('/hradmin/goalbank/eorg-divisions', [GoalBankController::class,'egetDivisions']);
         Route::get('/hradmin/goalbank/eorg-branches', [GoalBankController::class,'egetBranches']);
         Route::get('/hradmin/goalbank/eorg-level4', [GoalBankController::class,'egetLevel4']);
+        Route::get('/hradmin/goalbank/eemployees/{id}', [GoalBankController::class,'egetEmployees']);
+        Route::get('/hradmin/goalbank/eemployee-list', [GoalBankController::class, 'egetDatatableEmployees'])->name('hradmin.goalbank.eemployee.list');
+
         Route::get('/hradmin/goalbank/manageexistinggoal', [GoalBankController::class, 'manageindex'])->name('hradmin.goalbank.manageindex');
         Route::get('/hradmin/goalbank/managegetlist', [GoalBankController::class, 'managegetList'])->name('hradmin.goalbank.managegetlist');
         Route::get('/hradmin/goalbank/getgoalorgs/{goal_id}', [GoalBankController::class, 'getgoalorgs'])->name('hradmin.goalbank.getgoalorgs');
         Route::get('/hradmin/goalbank/getgoalinds/{goal_id}', [GoalBankController::class, 'getgoalinds'])->name('hradmin.goalbank.getgoalinds');
-        Route::get('/hradmin/goalbank/employees/{id}', [GoalBankController::class,'getEmployees']);
-        Route::get('/hradmin/goalbank/employee-list', [GoalBankController::class, 'getDatatableEmployees'])->name('hradmin.goalbank.employee.list');
     });
 
 

@@ -387,7 +387,12 @@ return [
                     'text' => 'Switch Identity',
                     'url'  => 'sysadmin/switch-identity',
                     'active' => ['sysadmin/switch-identity/*']
-                ]
+                ],
+                [
+                    'text' => 'Statistic and Reports',
+                    'url'  => 'sysadmin/statistics/goalsummary',
+                    'active' => ['sysadmin/statistics/*']
+                ],
             ],
         ],
         [

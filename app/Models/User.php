@@ -136,7 +136,7 @@ class User extends Authenticatable
 
     public function excuseReason()
     {
-        return $this->belongsTo('App\Models\ExcusedReason')->select('name', 'id');
+        return $this->belongsTo('App\Models\ExcusedReason','excused_reason_id','id')->select('name', 'id');
     }
 
     public function reportingManager() {
@@ -210,6 +210,11 @@ class User extends Authenticatable
           }
         }
         return $result;
+    }
+
+    public function sharedWith()
+    {
+        return $this->hasMany('App\Models\SharedProfile','shared_id','id');
     }
 
 }

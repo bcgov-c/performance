@@ -47,8 +47,7 @@ class UserGoalCountExport implements FromCollection, WithHeadings, WithMapping, 
             $emp ? $emp->level2_division : '',
             $emp ? $emp->level3_branch : '',
             $emp ? $emp->level4 : '',
-            $user->reportingManager->name,
-
+            $user->reportingManager ? $user->reportingManager->name : '',
         ];
     }
 
@@ -56,7 +55,7 @@ class UserGoalCountExport implements FromCollection, WithHeadings, WithMapping, 
     public function headings(): array
     {
         return ["Employee ID", "Name", "Email", 'Active Goals Count', 
-                "Organziation", "Program", "Division", "Branch", "Level 4", "Reporting To",
+                "Organziation", "Level 1", "Level 2", "Level 3", "Level 4", "Reporting To",
             ];
     }
 }

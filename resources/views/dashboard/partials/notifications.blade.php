@@ -145,12 +145,12 @@
                     }
                 });
 
-                $('[data-toggle=confirmation]').confirmation({
-                    rootSelector: '[data-toggle=confirmation]',
-                    onConfirm: function (event, element) {
-                        element.trigger('confirm');
-                    }
-                });
+                // $('[data-toggle=confirmation]').confirmation({
+                //     rootSelector: '[data-toggle=confirmation]',
+                //     onConfirm: function (event, element) {
+                //         element.trigger('confirm');
+                //     }
+                // });
                 $(document).on('confirm', function (e) {
                     var ele = e.target;
                     e.preventDefault();
