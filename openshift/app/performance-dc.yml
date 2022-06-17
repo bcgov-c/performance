@@ -76,7 +76,7 @@ objects:
       labels:
         service: '${APP_NAME}'
     spec:
-      replicas: 1
+      replicas: '${{REPLICA_COUNT}}'
       selector:
         deploymentconfig: '${APP_NAME}'
       strategy:
@@ -85,7 +85,7 @@ objects:
           updatePeriodSeconds: 1
           intervalSeconds: 1
           timeoutSeconds: 600
-          maxUnavailable: 25%
+          maxUnavailable: 1
           maxSurge: 25%
       template:
         metadata:
@@ -108,10 +108,10 @@ objects:
               resources:
                 limits:
                   memory: '${PERFORMANCE_MEMORY_LIMIT}'
-                  cpu: 500m
+                  cpu: 1500m
                 requests:
-                  memory: '${PERFORMANCE_MEMORY_LIMIT}'
-                  cpu: 100m
+                  memory: 2Gi
+                  cpu: 750m
               env:
                 - name: APP_NAME
                   value: '${APP_NAME}'
@@ -291,3 +291,7 @@ parameters:
     name: GITHUB_AUTH_TOKEN
     required: true
     value: '${GITHUB_AUTH_TOKEN}'
+  - description: No. of replicas
+    displayName: Number of Replicas
+    name: REPLICA_COUNT
+    required: true

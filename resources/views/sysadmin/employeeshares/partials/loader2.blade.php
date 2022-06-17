@@ -97,55 +97,47 @@
 
         $(document).ready(function() {
 
+
             $('#edd_level0').change(function (e){
                 e.preventDefault();
-                console.log('#edd_level0.change');
             });
 
             $('#edd_level1').change(function (e){
                 e.preventDefault();
-                console.log('#edd_level1.change');
             });
 
             $('#edd_level2').change(function (e){
                 e.preventDefault();
-                console.log('#edd_level2.change');
             });
 
             $('#edd_level3').change(function (e){
                 e.preventDefault();
-                console.log('#edd_level3.change');
             });
 
             $('#edd_level4').change(function (e){
                 e.preventDefault();
-                console.log('#edd_level4.change');
                 $('#ebtn_search').click();
             });
 
             $('#ecriteria').change(function (e){
                 e.preventDefault();
-                console.log('#ecriteria.change');
                 $('#ebtn_search').click();
             });
 
             $('#esearch_text').change(function (e){
                 e.preventDefault();
-                console.log('#esearch_text.change');
                $('#ebtn_search').click();
             });
 
             $('#esearch_text').keydown(function (e){
                 if (e.keyCode == 13) {
                     e.preventDefault();
-                    console.log('#esearch_text.keydown');
                     $('#ebtn_search').click();
                 }
             });
 
             $('#ebtn_search_reset').click(function (e){
                 e.preventDefault();
-                console.log('#ebtn_search_reset.click');
                 $('#ecriteria').val('all');
                 $('#esearch_text').val(null);
                 $('#edd_level0').val(null).trigger('change');
@@ -277,7 +269,6 @@
             
             $('#edd_level0').on('select2:select', function (e) {
                 e.preventDefault();
-                console.log('#edd_level0.select2:select');
                 $('#edd_level1').val(null).trigger('change');
                 $('#edd_level2').val(null).trigger('change');
                 $('#edd_level3').val(null).trigger('change');
@@ -286,7 +277,6 @@
 
             $('#edd_level1').on('select2:select', function (e) {
                 e.preventDefault();
-                console.log('#edd_level1.select2:select');
                 $('#edd_level2').val(null).trigger('change');
                 $('#edd_level3').val(null).trigger('change');
                 $('#edd_level4').val(null).trigger('change');
@@ -294,14 +284,12 @@
 
             $('#edd_level2').on('select2:select', function (e) {
                 e.preventDefault();
-                console.log('#edd_level2.select2:select');
                 $('#edd_level3').val(null).trigger('change');
                 $('#edd_level4').val(null).trigger('change');
             });
 
             $('#edd_level3').on('select2:select', function (e) {
                 e.preventDefault();
-                console.log('#edd_level3.select2:select');
                 $('#edd_level4').val(null).trigger('change');
             });
 
@@ -312,7 +300,6 @@
 
             $('#edd_level0').on('select2:unselect', function (e) {
                 e.preventDefault();
-                console.log('#edd_level0.select2:unselect');
                 $('#edd_level0').val(null).trigger('change');
                 $('#edd_level1').val(null).trigger('change');
                 $('#edd_level2').val(null).trigger('change');
@@ -322,7 +309,6 @@
 
             $('#edd_level1').on('select2:unselect', function (e) {
                 e.preventDefault();
-                console.log('#edd_level1.select2:unselect');
                 $('#edd_level1').val(null).trigger('change');
                 $('#edd_level2').val(null).trigger('change');
                 $('#edd_level3').val(null).trigger('change');
@@ -331,7 +317,6 @@
 
             $('#edd_level2').on('select2:unselect', function (e) {
                 e.preventDefault();
-                console.log('#edd_level2.select2:unselect');
                 $('#edd_level2').val(null).trigger('change');
                 $('#edd_level3').val(null).trigger('change');
                 $('#edd_level4').val(null).trigger('change');
@@ -339,14 +324,12 @@
 
             $('#edd_level3').on('select2:unselect', function (e) {
                 e.preventDefault();
-                console.log('#edd_level3.select2:unselect');
                 $('#edd_level3').val(null).trigger('change');
                 $('#edd_level4').val(null).trigger('change');
             });
 
             $('#edd_level4').on('select2:unselect', function (e) {
                 e.preventDefault();
-                console.log('#edd_level4.select2:unselect');
                 $('#edd_level4').val(null).trigger('change');
                 $('#ebtn_search').click();
             });

@@ -390,7 +390,7 @@ $(document).ready(function() {
         
         if($.trim($(target).html())=='') {
             $.ajax({
-                url: '/hradmin/employeeshares/employees/' + tree_id,
+                url: '/sysadmin/notifications/employees/' + tree_id,
                 type: 'GET',
                 data: $("#notify-form").serialize(),
                 dataType: 'html',
@@ -409,6 +409,7 @@ $(document).ready(function() {
 							$(chkbox).prop('checked', true);
                         } 
                     });
+
                 },
                 complete: function() {
                     //$('#pageLoader').hide();  

@@ -19,9 +19,6 @@
                 <table class="table table-bordered admintable" id="admintable" name="admintable" style="width: 100%; overflow-x: auto; "></table>
             </div>
             <div class="modal-footer p-3">
-                {{-- <div class="col">
-                    <button id="removeButton" name="removeButton" type="button" class="btn btn-outline-danger float-left" onClick="return confirm('Are you sure?')" aria-label="Remove All Shares">Remove All Shares</button>
-                </div> --}}
                 <div class="col">
                     <button id="cancelButton" name="cancelButton" type="button" class="btn btn-secondary float-right" style="margin:5px;" data-dismiss="modal" aria-label="Close">Close</button>                    
                 </div>
@@ -37,33 +34,28 @@
             var username = button.data('username');
             $('#shareDetailLabel').text('Edit Employee Shares by '+username);
             $('#paragraph').text('Below are Goal(s) and/or Conversation(s) shared by '+username+'.');
-            $('#admintable').show();
-            $('#admintable').DataTable ( {
-                processing: true,
-                serverSide: false,
-                scrollX: true,
-                stateSave: false,
-                deferRender: false,
-                ajax: {
-                    type: 'GET',
-                    url: "/sysadmin/employeeshares/manageindexviewshares/"+user_id,
-                },                        
-                columns: [
-                    {title: 'Item Type', ariaTitle: 'Item Type', target: 0, type: 'string', data: 'item_type', name: 'item_type', searchable: false, className: 'dt-nowrap'},
-                    {title: 'Shared With ID', ariaTitle: 'Shared With ID', target: 0, type: 'string', data: 'employee_id2', name: 'employee_id2', searchable: true, className: 'dt-nowrap'},
-                    {title: 'Shared With Name', ariaTitle: 'Shared With Name', target: 0, type: 'string', data: 'employee_name2', name: 'employee_name2', searchable: true, className: 'dt-nowrap'},
-                    {title: 'Action', ariaTitle: 'Action', target: 0, type: 'num', data: 'action', name: 'action', searchable: false, className: 'dt-nowrap'},
-                    {title: 'Item ID', ariaTitle: 'Item ID', target: 0, type: 'string', data: 'item_id', name: 'item_id', searchable: false, visible: false, className: 'dt-nowrap'},
-                    {title: 'Participant ID', ariaTitle: 'Participant ID', target: 0, type: 'string', data: 'part_id', name: 'part_id', searchable: false, visible: false, className: 'dt-nowrap'},
-                    {title: 'Shared With User ID', ariaTitle: 'Shared With User ID', target: 0, type: 'string', data: 'shared_with_id', visible: false, name: 'shared_with_id', searchable: true, className: 'dt-nowrap'},
-                ],  
-            } );
-        });
-        $('#editModal').on('hidden.bs.modal', function(e) {
-            if($.fn.dataTable.isDataTable('#admintable')) {
-                $('#admintable').DataTable().clear();
-                $('#admintable').DataTable().destroy();
-                $('#admintable').empty();
+            if ($.fn.dataTable.isDataTable('#admintable')) {
+                $('#admintable').DataTable().rows().invalidate().draw();
+            } else {
+                $('#admintable').show();
+                $('#admintable').DataTable ( {
+                    processing: true,
+                    serverSide: false,
+                    scrollX: true,
+                    stateSave: false,
+                    deferRender: false,
+                    stripeClasses: ['odd-row', 'even-row'],
+                    ajax: {
+                        type: 'GET',
+                        url: "/sysadmin/employeeshares/manageindexviewshares/"+user_id,
+                    },                        
+                    columns: [
+                        {title: 'Shared With ID', ariaTitle: 'Shared With ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', searchable: true, className: 'dt-nowrap'},
+                        {title: 'Shared With Name', ariaTitle: 'Shared With Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', searchable: true, className: 'dt-nowrap'},
+                        {title: 'Action', ariaTitle: 'Action', target: 0, type: 'num', data: 'action', name: 'action', searchable: false, className: 'dt-nowrap'},
+                        {title: 'Shared With User ID', ariaTitle: 'Shared With User ID', target: 0, type: 'string', data: 'shared_with_id', visible: false, name: 'shared_with_id', searchable: true, className: 'dt-nowrap'},
+                    ],  
+                } );
             }
         });
     </script>

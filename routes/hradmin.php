@@ -1,12 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-// use App\Http\Controllers\TestController;
 use App\Http\Controllers\MyOrgController;
 use App\Http\Controllers\HRadminController;
-// use App\Http\Controllers\HRAdmin\HRGoalController;
 use App\Http\Controllers\GenericTemplateController;
-// use App\Http\Controllers\SharedEmployeesController;
 use App\Http\Controllers\HRAdmin\NotificationController;
 use App\Http\Controllers\HRAdmin\MyOrganizationController;
 use App\Http\Controllers\HRAdmin\StatisticsReportController;
@@ -39,15 +36,11 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
     });
 
 
-    // Route::get('hradmin/shared/shareemployee', [HRadminController::class, 'shareemployee'])->name('hradmin.shared.shareemployee');
-    // Route::get('hradmin/shared/manageshares', [HRadminController::class, 'manageshares'])->name('hradmin.shared.manageshares');
-
-
     //Goal Bank
     Route::group(['middleware' => ['auth']], function() {    
         Route::get('/hradmin/goalbank', [GoalBankController::class, 'createindex'])->name('hradmin.goalbank');
-        Route::get('/hradmin/goalbank/createindex', [GoalBankController::class, 'createindex'])->name('hradmin.goalbank.createindex');
-        Route::post('/hradmin/goalbank/createindex', [GoalBankController::class, 'createindex'])->name('hradmin.goalbank.search');
+        Route::get('/hradmin/goalbank/creategoal', [GoalBankController::class, 'createindex'])->name('hradmin.goalbank.createindex');
+        Route::post('/hradmin/goalbank/creategoal', [GoalBankController::class, 'createindex'])->name('hradmin.goalbank.search');
         Route::get('/hradmin/goalbank/editpage/{id}', [GoalBankController::class, 'editpage'])->name('hradmin.goalbank.editpage');
         Route::post('/hradmin/goalbank/editpage/{id}', [GoalBankController::class, 'editpage'])->name('hradmin.goalbank.editpagepost');
         Route::get('/hradmin/goalbank/editone/{id}', [GoalBankController::class, 'editone'])->name('hradmin.goalbank.editone');
@@ -94,7 +87,7 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('/hradmin/goalbank/eemployees/{id}', [GoalBankController::class,'egetEmployees']);
         Route::get('/hradmin/goalbank/eemployee-list', [GoalBankController::class, 'egetDatatableEmployees'])->name('hradmin.goalbank.eemployee.list');
 
-        Route::get('/hradmin/goalbank/manageexistinggoal', [GoalBankController::class, 'manageindex'])->name('hradmin.goalbank.manageindex');
+        Route::get('/hradmin/goalbank/managegoals', [GoalBankController::class, 'manageindex'])->name('hradmin.goalbank.manageindex');
         Route::get('/hradmin/goalbank/managegetlist', [GoalBankController::class, 'managegetList'])->name('hradmin.goalbank.managegetlist');
         Route::get('/hradmin/goalbank/getgoalorgs/{goal_id}', [GoalBankController::class, 'getgoalorgs'])->name('hradmin.goalbank.getgoalorgs');
         Route::get('/hradmin/goalbank/getgoalinds/{goal_id}', [GoalBankController::class, 'getgoalinds'])->name('hradmin.goalbank.getgoalinds');
@@ -103,8 +96,8 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
 
     //Shared Employees
     Route::group(['middleware' => ['auth']], function() {    
-        Route::get('/hradmin/employeeshares/addindex', [EmployeeSharesController::class, 'addindex'])->name('hradmin.employeeshares.addindex');
-        Route::post('/hradmin/employeeshares/addindex', [EmployeeSharesController::class, 'addindex'])->name('hradmin.employeeshares.addindexpost');
+        // Route::get('/hradmin/employeeshares/addindex', [EmployeeSharesController::class, 'addindex'])->name('hradmin.employeeshares.addindex');
+        // Route::post('/hradmin/employeeshares/addindex', [EmployeeSharesController::class, 'addindex'])->name('hradmin.employeeshares.addindexpost');
         Route::post('/hradmin/employeeshares/saveall', [EmployeeSharesController::class, 'saveall'])->name('hradmin.employeeshares.saveall');
 
         Route::get('/hradmin/employeeshares/manageindex', [EmployeeSharesController::class, 'manageindex'])->name('hradmin.employeeshares.manageindex');
@@ -127,18 +120,11 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('/hradmin/employeeshares/eorg-branches', [EmployeeSharesController::class,'egetBranches']);
         Route::get('/hradmin/employeeshares/eorg-level4', [EmployeeSharesController::class,'egetLevel4']);
         Route::get('/hradmin/employeeshares/eemployee-list', [EmployeeSharesController::class, 'egetDatatableEmployees'])->name('hradmin.employeeshares.eemployee.list');
+
+        Route::get('/hradmin/employeeshares/addnew', [EmployeeSharesController::class, 'addnew'])->name('hradmin.employeeshares.addnew');
+
 });
   
-    Route::get('hradmin/excused/excuseemployee', [HRadminController::class, 'excuseemployee'])->name('hradmin.excused.excuseemployee');
-    Route::get('hradmin/excused/manageexcused', [HRadminController::class, 'manageexcused'])->name('hradmin.excused.manageexcused');
-    // Route::get('hradmin/goals/addgoal', [HRadminController::class, 'addgoal'])->name('hradmin.goals.addgoal');
-    // Route::get('hradmin/goals/goal-bank', [HRadminController::class, 'addgoal'])->name('hradmin.goals.goal-bank');
-    // Route::get('hradmin/goals/goal-edit/{id}', [HRadminController::class, 'goaledit'])->name('hradmin.goals.goal-edit');
-    // Route::post('hradmin/goals/goaladd', [HRadminController::class, 'goaladd'])->name('hradmin.goals.goaladd');
-    // Route::post('hradmin/goals/goalupdate/{id}', [HRadminController::class, 'goalupdate'])->name('hradmin.goals.goalupdate');
-
-
-
     Route::get('/hradmin/notifications', [NotificationController::class, 'index'])->name('hradmin.notifications');
     Route::get('/hradmin/notifications/detail/{notification_id}', [NotificationController::class, 'show']);
     Route::get('/hradmin/notifications/notify', [NotificationController::class, 'notify'])->name('hradmin.notifications.notify');

@@ -98,53 +98,44 @@
 
             $('#dd_level0').change(function (e){
                 e.preventDefault();
-                console.log('#dd_level0.change');
             });
 
             $('#dd_level1').change(function (e){
                 e.preventDefault();
-                console.log('#dd_level1.change');
             });
 
             $('#dd_level2').change(function (e){
                 e.preventDefault();
-                console.log('#dd_level2.change');
             });
 
             $('#dd_level3').change(function (e){
                 e.preventDefault();
-                console.log('#dd_level3.change');
             });
 
             $('#dd_level4').change(function (e){
                 e.preventDefault();
-                console.log('#dd_level4.change');
                 $('#btn_search').click();
             });
 
             $('#criteria').change(function (e){
                 e.preventDefault();
-                console.log('#criteria.change');
                 $('#btn_search').click();
             });
 
             $('#search_text').change(function (e){
                 e.preventDefault();
-                console.log('#search_text.change');
                 $('#btn_search').click();
             });
 
             $('#search_text').keydown(function (e){
                 if (e.keyCode == 13) {
                     e.preventDefault();
-                    console.log('#search_text.keydown');
                     $('#btn_search').click();
                 }
             });
 
             $('#btn_search_reset').click(function (e){
                 e.preventDefault();
-                console.log('#btn_search_reset.click');
                 $('#criteria').val('all');
                 $('#search_text').val(null);
                 $('#dd_level0').val(null).trigger('change');
@@ -276,7 +267,6 @@
             
             $('#dd_level0').on('select2:select', function (e) {
                 e.preventDefault();
-                console.log('#dd_level0.select2:select');
                 $('#dd_level1').val(null).trigger('change');
                 $('#dd_level2').val(null).trigger('change');
                 $('#dd_level3').val(null).trigger('change');
@@ -285,7 +275,6 @@
 
             $('#dd_level1').on('select2:select', function (e) {
                 e.preventDefault();
-                console.log('#dd_level1.select2:select');
                 $('#dd_level2').val(null).trigger('change');
                 $('#dd_level3').val(null).trigger('change');
                 $('#dd_level4').val(null).trigger('change');
@@ -293,14 +282,12 @@
 
             $('#dd_level2').on('select2:select', function (e) {
                 e.preventDefault();
-                console.log('#dd_level2.select2:select');
                 $('#dd_level3').val(null).trigger('change');
                 $('#dd_level4').val(null).trigger('change');
             });
 
             $('#dd_level3').on('select2:select', function (e) {
                 e.preventDefault();
-                console.log('#dd_level3.select2:select');
                 $('#dd_level4').val(null).trigger('change');
             });
 
@@ -350,44 +337,6 @@
                 $('#btn_search').click();
             });
 
-            $('#employee-list-table tbody').on( 'click', 'input:checkbox', function () {
-
-                // if the input checkbox is selected 
-                var id = this.value;
-                var index = $.inArray(id, g_selected_employees);
-                if(this.checked) {
-                    g_selected_employees.push( id );
-                } else {
-                    g_selected_employees.splice( index, 1 );
-                }
-
-                // update the check all checkbox status 
-                if (g_selected_employees.length == 0) {
-                    $('#employee-list-select-all').prop("checked", false);
-                    $('#employee-list-select-all').prop("indeterminate", false);   
-                } else if (g_selected_employees.length == g_matched_employees.length) {
-                    $('#employee-list-select-all').prop("checked", true);
-                    $('#employee-list-select-all').prop("indeterminate", false);   
-                } else {
-                    $('#employee-list-select-all').prop("checked", false);
-                    $('#employee-list-select-all').prop("indeterminate", true);    
-                }
-            });
-
-            // Handle click on "Select all" control
-            $('#employee-list-select-all').on('click', function() {
-                // Check/uncheck all checkboxes in the table
-                $('#employee-list-table tbody input:checkbox').prop('checked', this.checked);
-                if (this.checked) {
-                    g_selected_employees = g_matched_employees.map((x) => x);
-                    $('#employee-list-select-all').prop("checked", true);
-                    $('#employee-list-select-all').prop("indeterminate", false);    
-                } else {
-                    g_selected_employees = [];
-                    $('#employee-list-select-all').prop("checked", false);
-                    $('#employee-list-select-all').prop("indeterminate", false);    
-                }    
-            });
         });
 
     </script>

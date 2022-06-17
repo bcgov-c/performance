@@ -82,7 +82,6 @@ class PastEmployeesController extends Controller
             // $query = User::withoutGlobalScopes()
             $query = DB::table('users')
             ->leftjoin('employee_demo', 'users.guid', '=', 'employee_demo.guid')
-            // ->wherenotin('employee_status', ['A', 'L', 'P', 'S'])
             ->whereNotNull('employee_demo.date_deleted')
             ->when($level0, function($q) use($level0) {return $q->where('organization', $level0->name);})
             ->when($level1, function($q) use($level1) {return $q->where('level1_program', $level1->name);})
@@ -90,14 +89,14 @@ class PastEmployeesController extends Controller
             ->when($level3, function($q) use($level3) {return $q->where('level3_branch', $level3->name);})
             ->when($level4, function($q) use($level4) {return $q->where('level4', $level4->name);})
             ->when($request->criteria == 'name', function($q) use($request){return $q->where('employee_name', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_id', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'job', function($q) use($request){return $q->where('job_title', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'dpt', function($q) use($request){return $q->where('deptid', 'like', "%" . $request->search_text . "%");})
             ->when([$request->criteria == 'all', $request->search_text], function($q) use ($request) 
             {
                 return $q->where(function ($query2) use ($request) 
                 {
-                    $query2->where('employee_id', 'like', "%" . $request->search_text . "%")
+                    $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
                     ->orWhere('employee_name', 'like', "%" . $request->search_text . "%")
                     ->orWhere('job_title', 'like', "%" . $request->search_text . "%")
                     ->orWhere('deptid', 'like', "%" . $request->search_text . "%");

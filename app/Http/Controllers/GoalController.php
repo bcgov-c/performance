@@ -470,6 +470,8 @@ class GoalController extends Controller
     public function showForLibrary(Request $request, $id) {
         if ($request->has("add") && $request->add) {
             $showAddBtn = true;
+        } else {
+            $showAddBtn = false;
         }
         $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->find($id);
         return view('goal.partials.show', compact('goal', 'showAddBtn'));

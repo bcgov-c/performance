@@ -1,165 +1,79 @@
 <x-side-layout title="{{ __('Dashboard') }}">
     <div name="header" class="container-header p-n2 "> 
         <div class="container-fluid">
-            <h3>Goal Bank</h3>
-            @include('sysadmin.goalbank.partials.tabs')
+            <h3>Employee Share</h3>
         </div>
     </div>
+
+	<small><a href=" {{ route('hradmin.employeeshare.manageindex') }}" class="btn btn-md btn-primary"><i class="fa fa-arrow-left"></i> Back to Manage Existing Employee Shares</a></small>
+
+	<br><br>
+
+	<h4>Edit: {{ $goaldetail->title }}</h4>
 
 	<p class="px-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tincidunt, nibh nec interdum fermentum, est metus rutrum elit, in molestie ex massa ut urna. Duis dignissim tortor ipsum, dignissim rutrum quam gravida sed. Mauris auctor malesuada luctus. Praesent vitae ante et diam gravida lobortis. Donec eleifend euismod scelerisque. Curabitur laoreet erat sit amet tortor rutrum tristique. Sed lobortis est ac mauris lobortis euismod. Morbi tincidunt porta orci eu elementum. Donec lorem lacus, hendrerit a augue sed, tempus rhoncus arcu. Praesent a enim vel eros elementum porta. Nunc ut leo eu augue dapibus efficitur ac ac risus. Maecenas risus tellus, tincidunt vitae finibus vel, ornare vel neque. Curabitur imperdiet orci ac risus tempor semper. Integer nec varius urna, sit amet rhoncus diam. Aenean finibus, sapien eu placerat tristique, sapien dui maximus neque, id tempor dui magna eget lorem. Suspendisse egestas mauris non feugiat bibendum.</p>
 	<p class="px-3">Cras quis augue quis risus auctor facilisis quis ac ligula. Fusce vehicula consequat dui, et egestas augue sodales aliquam. In hac habitasse platea dictumst. Curabitur sit amet nulla nibh. Morbi mollis malesuada diam ut egestas. Pellentesque blandit placerat nisi ac facilisis. Vivamus consequat, nisl a lacinia ultricies, velit leo consequat magna, sit amet condimentum justo nibh id nisl. Quisque mattis condimentum cursus. Nullam eget congue augue, a molestie leo. Aenean sollicitudin convallis arcu non maximus. Curabitur ut lacinia nisi. Nam cursus venenatis lacus aliquet dapibus. Nulla facilisi.</p>
 
-	<form id="notify-form" action="{{ route('sysadmin.goalbank.savenewgoal') }}" method="post">
+	<form id="notify-form" action="{{ route('hradmin.employeeshare.updategoal') }}" method="post">
 		@csrf
 
-        <div class="container-fluid">
-			<br>
-			<h6 class="text-bold">Step 1. Enter Goal Details</h6>
-			<br>
+		<br>
+		<h6 class="text-bold">Step 1. Update Goal Details</h6>
+		<br>
 
-			<div class="row">
-				<div class="col col-md-2">
-					<b> Goal Type </b>
-					<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="{{$type_desc_str}}"> </i>
-					<x-dropdown id="goal_type_id" :list="$goalTypes" name="goal_type_id" data-toggle="tooltip" />
-				</div>
-				<div class="col col-md-8">
-					<x-input label="Goal Title" name="title" tooltip='A short title (1-3 words) used to reference the goal throughout the Performance Development Platform.' />
+		<div class="row">
+			<div class="col m-2">
+				<x-dropdown :list="$goalTypes" label="Goal Type" name="goal_type_id" :selected="$goaldetail->goal_type_id" />
+			</div>
+			<div class="col m-2">
+				<x-input label="Goal Title" name="title" tooltip='A short title (1-3 words) used to reference the goal throughout the Performance platform.' :value="$goaldetail->title" />
 					<small class="text-danger error-title"></small>
-				</div>
-				<div class="col col-md-2">
-					<x-dropdown :list="$mandatoryOrSuggested" label="Mandatory/Suggested" name="is_mandatory" :selected="request()->is_mandatory"></x-dropdown>
-				</div>
 			</div>
-
-
-
-
-			<div class="row">
-				<div class="col-md-2">
-					<b> Tags </b>
-					<!-- <i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="A concise opening statement of what you plan"> </i> -->
-					<i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resource/goal-setting?t=4' target=\'_blank\'>View full list of tag description.</a>"></i>					
-					{{-- <div> --}}
-					<x-dropdown :list="$tags" data-tooltip-trigger='hover' data-toggle="tooltip" name="tag_ids[]" id="tags" class="tags" multiple/>
-					{{-- </div> --}}
-					{{-- <small  class="text-danger error-tag_ids"></small> --}}
-				</div>
+			<div class="col m-2">
+				<x-dropdown :list="$mandatoryOrSuggested" label="Mandatory/Suggested" name="is_mandatory" :selected="$goaldetail->goal_type_id" ></x-dropdown>
 			</div>
-
-
-
-
-
-			<b>Goal Description</b>
-			<p>
-			Each goal should include a description of <b>WHAT</b>  
-			<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".'> </i> 
-			you will accomplish, <b>WHY</b> 
-			<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> 
-			it is important,, and <b>HOW</b> 
-			<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> 
-			you will achieve it. 
-			</p>
-
-			<div class="row">
-				<div class="col">
-					<x-textarea id="what" name="what"/>
+		</div>
+		<div class="row">
+			<div class="col m-2">
+				<x-dropdown :list="$tags" label="Tags" name="tag_ids[]" :selected="array_column($goaldetail->tags->toArray(), 'id')" class="tags" multiple />
+				<small  class="text-danger error-tag_ids"></small>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col m-2">
+				<x-textarea label="Description" name="what" tooltip='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative MyPerformance sessions to ministry audiences".' :value="$goaldetail->what" />
 					<small class="text-danger error-what"></small>
-				</div>
 			</div>
-			<div class="row">
-				<div class="col">
-					<x-textarea label="Measures of Success" name="measure_of_success" tooltip='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"'/>
+		</div>
+		<div class="row">
+			<div class="col m-2">
+				<x-textarea label="Measures of Success" name="measure_of_success" tooltip='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"' :value="$goaldetail->measure_of_success" />
 					<small class="text-danger error-measure_of_success"></small>
-				</div>
 			</div>
-			<div class="row">
-				<div class="col col-md-2">
-					<x-input label="Start Date " class="error-start" type="date" name="start_date"  />
-					<small  class="text-danger error-start_date"></small>
-				</div>
-				<div class="col col-md-2">
-					<x-input label="End Date " class="error-target" type="date" name="target_date"  />
-					<small  class="text-danger error-target_date"></small>
+		</div>
+		<div class="row">
+			<div class="col m-2">
+				<x-input label="Start Date " class="error-start" type="date" name="start_date" :value="$goaldetail->start_date ? $goaldetail->start_date->format('Y-m-d') : ''" />
+				<small  class="text-danger error-start_date"></small>
+			</div>
+			<div class="col m-2">
+				<x-input label="End Date " class="error-target" type="date" name="target_date" :value="$goaldetail->target_date ? $goaldetail->target_date->format('Y-m-d') : ''" />
+				<small  class="text-danger error-target_date"></small>
+			</div>
+		</div>
+
+		<div class="card m-2">
+			<div class="card-body">
+				<label label="Current Audience" name="current_audience" > Current Organizational Audience </label>
+				@include('hradmin.goalbank.partials.filter')
+				<div class="p-3">  
+					<table class="table table-bordered currenttable" id="currenttable" style="width: 100%; overflow-x: auto; "></table>
 				</div>
 			</div>
 		</div>
 
-        <div class="container-fluid">
-			<br>
-			<h6 class="text-bold">Step 2. Select audience</h6>
-			<br>
-
-			<div class="card col-md-4" >
-				<div class="card-body">
-					<div class="row">
-						<div class="col">
-							<label>
-								<input type="radio" id="opt_audience1" name="opt_audience" value="byEmp" checked> Individual(s)
-							</label>
-						</div>
-						<div class="col">
-							<label>
-								<input type="radio" id="opt_audience2" name="opt_audience" value="byOrg"> Business Unit(s)
-							</label>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<input type="hidden" id="selected_emp_ids" name="selected_emp_ids" value="">
-			<input type="hidden" id="selected_org_nodes" name="selected_org_nodes" value="">
-			<input type="hidden" id="eselected_emp_ids" name="eselected_emp_ids" value="">
-			<input type="hidden" id="eselected_org_nodes" name="eselected_org_nodes" value="">
-
-			@include('sysadmin.goalbank.partials.filter')
-			@include('sysadmin.goalbank.partials.filter2')
-
-			<div class="pl-2" id='itemgroup1'>
-				<nav>
-					<div class="nav nav-tabs" id="nav-tab" role="tablist">
-						<a class="nav-item nav-link active" id="nav-list-tab" data-toggle="tab" href="#nav-list" role="tab" aria-controls="nav-list" aria-selected="true">List</a>
-						<a class="nav-item nav-link" id="nav-tree-tab" data-toggle="tab" href="#nav-tree" role="tab" aria-controls="nav-tree" aria-selected="false">Tree</a>
-					</div>
-				</nav>
-				<div class="tab-content" id="nav-tabContent">
-					<div class="tab-pane fade show active" id="nav-list" role="tabpanel" aria-labelledby="nav-list-tab">
-						@include('sysadmin.goalbank.partials.recipient-list')
-					</div>
-					<div class="tab-pane fade" id="nav-tree" role="tabpanel" aria-labelledby="nav-tree-tab" loaded="">
-						<div class="mt-2 fas fa-spinner fa-spin fa-3x fa-fw loading-spinner" id="tree-loading-spinner" role="status" style="display:none">
-							<span class="sr-only">Loading...</span>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="pl-2" id='itemgroup2'>
-				<nav>
-					<div class="nav nav-tabs" id="enav-tab" role="tablist">
-						<a class="nav-item nav-link" id="enav-tree-tab" data-toggle="tab" href="#enav-tree" role="tab" aria-controls="enav-tree" aria-selected="false">Tree</a>
-					</div>
-				</nav>
-				<div id="enav-tree" aria-labelledby="enav-tree-tab" loaded="loaded">
-					<div class="mt-2 fas fa-spinner fa-spin fa-3x fa-fw loading-spinner" id="etree-loading-spinner" role="status" style="display:none">
-						<span class="sr-only">Loading...</span>
-					</div>
-				</div>
-			</div>
-		</div>
-
-        <div class="container-fluid">
-			<br>
-			<h6 class="text-bold">Step 3. Finish</h6>
-			<br>
-			<div class="row">
-				<div class="col-md-3 mb-2">
-					<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveChangesModal()" name="btn_confirm" value="btn_confirm">Add Goal</button>
-					<button class="btn btn-secondary mt-2">Cancel</button>
-				</div>
-			</div>
-		</div>
+		<input type="hidden" id="selected_emp_ids" name="selected_emp_ids" value="">
+		<input type="hidden" id="goal_id" name="goal_id" value={{$goaldetail->id}}>
 
 		<!----modal starts here--->
 		<div id="saveGoalModal" class="modal" role='dialog'>
@@ -168,14 +82,14 @@
 					<div class="modal-header">
 						<h5 class="modal-title">Confirmation</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
+						    <span aria-hidden="true">&times;</span>
 						</button>
 					</div>
 					<div class="modal-body">
-						<p>Default ?</p>
+						<p>Are you sure to send out this message ?</p>
 					</div>
 					<div class="modal-footer">
-						<button class="btn btn-primary mt-2" type="submit" id="btn_send" name="btn_send" value="btn_send">Add New Goal</button>
+						<button class="btn btn-primary mt-2" type="submit" name="btn_send" value="btn_send">Update Goal</button>
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
 					</div>
 					
@@ -183,12 +97,37 @@
 			</div>
 		</div>
 		<!--Modal ends here--->	
+	
+
+		<br>
+		<h6 class="text-bold">Step 2. Select additional organizational audience</h6>
+		<br>
+
+		<input type="hidden" id="selected_org_nodes" name="selected_org_nodes" value="">
+
+		@include('hradmin.goalbank.partials.filter2')
+
+		<div id="enav-tree" aria-labelledby="enav-tree-tab" loaded="loaded">
+			<div class="mt-2 fas fa-spinner fa-spin fa-3x fa-fw loading-spinner" id="etree-loading-spinner" role="status" style="display:none">
+				<span class="sr-only">Loading...</span>
+			</div>
+		</div>
+
+		<br>
+		<h6 class="text-bold">Step 3. Finish</h6>
+		<br>
+
+		<div class="col-md-3 mb-2">
+			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveChangesModal()" name="btn_send" value="btn_send">Save Changes</button>
+			<button class="btn btn-secondary mt-2">Cancel</button>
+		</div>
 
 	</form>
 
 	<h6 class="m-20">&nbsp;</h6>
 	<h6 class="m-20">&nbsp;</h6>
 	<h6 class="m-20">&nbsp;</h6>
+
 
     @push('css')
         <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}">
@@ -232,101 +171,145 @@
 		</style>
 	</x-slot>
 
-
 	<x-slot name="js">
-
 		<script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
 		<script src="//cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
-		<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-		<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
-		
-
-		<script>				
-				$('body').popover({
-					selector: '[data-toggle]',
-					trigger: 'click',
-				});
-                
-				$('.modal').popover({
-					selector: '[data-toggle-select]',
-					trigger: 'click',
-				});
-
-
-				$(".tags").multiselect({
-                	enableFiltering: true,
-                	enableCaseInsensitiveFiltering: true,
-					nonSelectedText: null,
-            	});
-
-		</script>
-
 
 		<script>
 			let g_matched_employees = {!!json_encode($matched_emp_ids)!!};
 			let g_selected_employees = {!!json_encode($old_selected_emp_ids)!!};
 			let g_selected_orgnodes = {!!json_encode($old_selected_org_nodes)!!};
-			let eg_selected_orgnodes = {!!json_encode($eold_selected_org_nodes)!!};
 			let g_employees_by_org = [];
 
-			function confirmSaveChangesModal() {
-				let count = 0;
-				if($('#opt_audience1').prop('checked')) {
-					count = g_selected_employees.length;
-				};
-				if($('#opt_audience2').prop('checked')) {
-					count = g_selected_orgnodes.length;
-				};
+			function confirmSaveChangesModal(){
+				count = g_selected_orgnodes.length;
 				if (count == 0) {
-					$('#saveGoalModal .modal-body p').html('Are you sure to create goal without an audience?');
+					$('#saveGoalModal .modal-body p').html('Are you sure to update goal without additional audience?');
 				} else {
-					$('#saveGoalModal .modal-body p').html('Are you sure to create goal and assign to selected audience?');
+					$('#saveGoalModal .modal-body p').html('Are you sure to update goal and assign to selected additional audience?');
 				}
 				$('#saveGoalModal').modal();
 			}
 
 			$(document).ready(function(){
 
+				$('#blank5th').hide();
+				$('#criteria_group').hide();
+				$('#search_text_group').hide();
 				$('#eblank5th').hide();
 				$('#ecriteria_group').hide();
 				$('#esearch_text_group').hide();
 
-				switchTree();
-
-				function switchTree(){
-					if($('#opt_audience2').prop('checked')) {
-						$('#filter1').hide();
-						$('#nav-tab').hide();
-						$('#nav-tabContent').hide();
-						$('#nav-list').hide();
-						$('#nav-tree').hide();
-						
-						$('#filter2').show();
-						$('#enav-tab').show();
-						$('#enav-tree').show();
-					} else {
-						$('#filter1').show();
-						$('#nav-tab').show();
-						$('#nav-tabContent').show();
-						$('#nav-list').show();
-						$('#nav-tree').show();
-						
-						$('#filter2').hide();
-						$('#enav-tab').hide();
-						$('#enav-tree').hide();
+				var table = $('#currenttable').DataTable
+				(
+					{
+						processing: true,
+						serverSide: true,
+						scrollX: true,
+						stateSave: true,
+						deferRender: true,
+						ajax: {
+							url: "{{ route('hradmin.goalbank.getgoalorgs', $goaldetail->id) }}",
+							data: function(d) {
+								d.dd_level0 = $('#dd_level0').val();
+								d.dd_level1 = $('#dd_level1').val();
+								d.dd_level2 = $('#dd_level2').val();
+								d.dd_level3 = $('#dd_level3').val();
+								d.dd_level4 = $('#dd_level4').val();
+								d.criteria = $('#criteria').val();
+								d.search_text = $('#search_text').val();
+							}
+						},
+						columns: [
+							{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', searchable: true},
+							{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', searchable: true},
+							{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', searchable: true},
+							{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', searchable: true},
+							{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true},
+							{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},
+							{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id', name: 'goal_id', searchable: false, visible: false},
+							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'num', data: 'id', name: 'id', searchable: false, visible: false},
+						]
 					}
-				}
+				);
 
-				$("#opt_audience1").change(function (e){
+				$('#delete_org').click(function(e) {
 					e.preventDefault();
-					switchTree();
+					dd('button clicked');
+					$('#btn_search').hide();
 				});
 
-				$("#opt_audience2").change(function (e){
+				$('#btn_search').click(function(e) {
 					e.preventDefault();
-					switchTree();
+					$('#currenttable').DataTable().destroy();
+					$('#currenttable').empty();
+					$('#currenttable').DataTable(
+						{
+							processing: true,
+							serverSide: true,
+							scrollX: true,
+							stateSave: true,
+							deferRender: true,
+							ajax: {
+								url: "{{ route('hradmin.goalbank.getgoalorgs', $goaldetail->id) }}",
+								type: 'GET',
+								data: function(d) {
+									d.dd_level0 = $('#dd_level0').val();
+									d.dd_level1 = $('#dd_level1').val();
+									d.dd_level2 = $('#dd_level2').val();
+									d.dd_level3 = $('#dd_level3').val();
+									d.dd_level4 = $('#dd_level4').val();
+									d.criteria = $('#criteria').val();
+									d.search_text = $('#search_text').val();
+								}
+							},
+							columns: [
+								{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', searchable: true},
+								{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', searchable: true},
+								{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', searchable: true},
+								{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', searchable: true},
+								{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true},
+								{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},
+								{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id', name: 'goal_id', searchable: false, visible: false},
+							]
+						}
+					);
 				});
 
+				$('#dd_level0').change(function (e){
+					e.preventDefault();
+					$('#btn_search').click();
+				});
+
+				$('#dd_level1').change(function (e){
+					e.preventDefault();
+					$('#btn_search').click();
+				});
+
+				$('#dd_level2').change(function (e){
+					e.preventDefault();
+					$('#btn_search').click();
+				});
+
+				$('#dd_level3').change(function (e){
+					e.preventDefault();
+					$('#btn_search').click();
+				});
+				$('#dd_level4').change(function (e){
+					e.preventDefault();
+					$('#btn_search').click();
+				});
+
+				$('#btn_search_reset').click(function(e) {
+					e.preventDefault();
+					$('#search_text').val(null);
+					$('#dd_level0').val(null);
+					$('#dd_level1').val(null);
+					$('#dd_level2').val(null);
+					$('#dd_level3').val(null);
+					$('#dd_level4').val(null);
+					$('#btn_search').click();
+        		});
 
 				$(".tags").multiselect({
                 	enableFiltering: true,
@@ -344,7 +327,6 @@
 
 				$('#notify-form').submit(function() {
 					// console.log('Search Button Clicked');			
-
 					// assign back the selected employees to server
 					var text = JSON.stringify(g_selected_employees);
 					$('#selected_emp_ids').val( text );
@@ -353,17 +335,17 @@
 					return true; // return false to cancel form action
 				});
 
-				// Tab  -- LIST Page  activate
-				$("#nav-list-tab").on("click", function(e) {
-					table  = $('#employee-list-table').DataTable();
-					table.rows().invalidate().draw();
-				});
-
 				CKEDITOR.replace('what', {
 					toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ],disableNativeSpellChecker: false});
 
 				CKEDITOR.replace('measure_of_success', {
 					toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ],disableNativeSpellChecker: false});
+
+			// Tab  -- LIST Page  activate
+				$("#nav-list-tab").on("click", function(e) {
+					table  = $('#employee-list-table').DataTable();
+					table.rows().invalidate().draw();
+				});
 
 				// Tab  -- TREE activate
 				$("#nav-tree-tab").on("click", function(e) {
@@ -374,15 +356,21 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                                    url: '/sysadmin/goalbank/org-tree',
+                                    url: '/hradmin/goalbank/org-tree',
                                     type: 'GET',
                                     data: $("#notify-form").serialize(),
                                     dataType: 'html',
+                                    beforeSend: function() {
+                                        $("#tree-loading-spinner").show();                    
+                                    },
                                     success: function (result) {
                                         $(target).html(''); 
                                         $(target).html(result);
 
                                         $('#nav-tree').attr('loaded','loaded');
+                                    },
+                                    complete: function() {
+                                        $(".tree-loading-spinner").hide();
                                     },
                                     error: function () {
                                         alert("error");
@@ -400,8 +388,7 @@
                             redrawTreeCheckboxes();
                         }
                     } else {
-						// alert("error");
-                        $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Tree result is too big.  Please apply organization filter before clicking on Tree.');
+						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Tree result is too big.  Please apply organization filter before clicking on Tree.');
 					}
 				});
 
@@ -447,12 +434,12 @@
 					$.each( enodes, function( index, chkbox ) {
 						if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
 							eall_emps = eg_employees_by_org[ chkbox.value ].map( function(x) {return x.employee_id} );
-							b = eall_emps.every(v=> eg_selected_orgnodes.indexOf(v) !== -1);
+							b = eall_emps.every(v=> g_selected_orgnodes.indexOf(v) !== -1);
 
-							if (eall_emps.every(v=> eg_selected_orgnodes.indexOf(v) !== -1)) {
+							if (eall_emps.every(v=> g_selected_orgnodes.indexOf(v) !== -1)) {
 								$(chkbox).prop('checked', true);
 								$(chkbox).prop("indeterminate", false);
-							} else if (eall_emps.some(v=> eg_selected_orgnodes.indexOf(v) !== -1)) {
+							} else if (eall_emps.some(v=> g_selected_orgnodes.indexOf(v) !== -1)) {
 								$(chkbox).prop('checked', false);
 								$(chkbox).prop("indeterminate", true);
 							} else {
@@ -461,7 +448,7 @@
 							}
 						} else {
 							if ( $(chkbox).attr('name') == 'userCheck[]') {
-								if (eg_selected_orgnodes.includes(chkbox.value)) {
+								if (g_selected_orgnodes.includes(chkbox.value)) {
 									$(chkbox).prop('checked', true);
 								} else {
 									$(chkbox).prop('checked', false);
@@ -552,92 +539,26 @@
 					}
 				}
 
-				$('#btn_search').click(function(e) {
+				$('#edd_level0').change(function (e){
 					e.preventDefault();
-					user_selected = [];
-					$('#employee-list-table').DataTable().rows().invalidate().draw();
+					$('#ebtn_search').click();
 				});
 
-				// Handle click on "Select all" control
-				$('#employee-list-select-all').on('click', function() {
-					// Check/uncheck all checkboxes in the table
-					$('#employee-list-table tbody input:checkbox').prop('checked', this.checked);
-					if (this.checked) {
-						g_selected_employees = g_matched_employees.map((x) => x);
-						$('#employee-list-select-all').prop("checked", true);
-						$('#employee-list-select-all').prop("indeterminate", false);    
-					} else {
-						g_selected_employees = [];
-						$('#employee-list-select-all').prop("checked", false);
-						$('#employee-list-select-all').prop("indeterminate", false);    
-					}    
-				});
-
-				$('#dd_level0').change(function (e){
+				$('#edd_level1').change(function (e){
 					e.preventDefault();
+					$('#ebtn_search').click();
 				});
 
-				$('#dd_level1').change(function (e){
+				$('#edd_level2').change(function (e){
 					e.preventDefault();
+					$('#ebtn_search').click();
 				});
 
-				$('#dd_level2').change(function (e){
+				$('#edd_level3').change(function (e){
 					e.preventDefault();
+					$('#ebtn_search').click();
 				});
-
-				$('#dd_level3').change(function (e){
-					e.preventDefault();
-				});
-
-				$('#dd_level4').change(function (e){
-					e.preventDefault();
-					$('#btn_search').click();
-				});
-
-				$('#criteria').change(function (e){
-					e.preventDefault();
-					$('#btn_search').click();
-				});
-
-				$('#search_text').change(function (e){
-					e.preventDefault();
-					$('#btn_search').click();
-				});
-
-				$('#search_text').keydown(function (e){
-					if (e.keyCode == 13) {
-						e.preventDefault();
-						$('#btn_search').click();
-					}
-				});
-
-				$('#btn_search_reset').click(function (e){
-					e.preventDefault();
-					$('#criteria').val('all');
-					$('#search_text').val(null);
-					$('#dd_level0').val(null).trigger('change');
-					$('#dd_level1').val(null).trigger('change');
-					$('#dd_level2').val(null).trigger('change');
-					$('#dd_level3').val(null).trigger('change');
-					$('#dd_level4').val(null).trigger('change');
-				});
-
-				$('#edd_level0').change(function (e) {
-					e.preventDefault();
-				});
-
-				$('#edd_level1').change(function (e) {
-					e.preventDefault();
-				});
-
-				$('#edd_level2').change(function (e) {
-					e.preventDefault();
-				});
-
-				$('#edd_level3').change(function (e) {
-					e.preventDefault();
-				});
-				$('#edd_level4').change(function (e) {
+				$('#edd_level4').change(function (e){
 					e.preventDefault();
 					$('#ebtn_search').click();
 				});
@@ -653,29 +574,22 @@
 					$('#ebtn_search').click();
        			});
 
-                $(window).on('beforeunload', function(){
-                    $('#pageLoader').show();
-                });
-
-                $(window).resize(function(){
-                    location.reload();
-                    return;
-                });
-
 				$('#ebtn_search').click(function(e) {
-					e.preventDefault();
 					target = $('#enav-tree'); 
 					ddnotempty = $('#edd_level0').val() + $('#edd_level1').val() + $('#edd_level2').val() + $('#edd_level3').val() + $('#edd_level4').val();
 					if(ddnotempty) {
 						// To do -- ajax called to load the tree
 						$.when( 
 							$.ajax({
-								url: '/sysadmin/goalbank/eorg-tree',
+								url: '/hradmin/goalbank/eorg-tree',
 								// url: $url,
 								type: 'GET',
 								data: $("#notify-form").serialize(),
 								dataType: 'html',
 
+								beforeSend: function() {
+									$("#etree-loading-spinner").show();                    
+								},
 
 								success: function (result) {
 									$('#enav-tree').html(''); 
@@ -683,6 +597,9 @@
 									$('#enav-tree').attr('loaded','loaded');
 								},
 
+								complete: function() {
+									$("#etree-loading-spinner").hide();
+								},
 
 								error: function () {
 									alert("error");
@@ -700,51 +617,17 @@
 					}
 				});
 
-				$(window).on('beforeunload', function(){
-					$('#pageLoader').show();
-				});
-
-				$(window).resize(function(){
-					location.reload();
-					return;
-				});
-
-
-				$('body').popover({
-					selector: '[data-toggle]',
-					trigger: 'hover',
-				});
-        
-				$('.modal').popover({
-					selector: '[data-toggle-select]',
-					trigger: 'click',
-				});
-
-
-
-
-
-
-
-
 			});
 
-			// Model -- Confirmation Box
+			$(window).on('beforeunload', function(){
+				$('#pageLoader').show();
+			});
 
-			var modalConfirm = function(callback) {
-				$("#btn-confirm").on("click", function(){
-					$("#mi-modal").modal('show');
-				});
-				$("#modal-btn-si").on("click", function(){
-					callback(true);
-					$("#mi-modal").modal('hide');
-				});
-				
-				$("#modal-btn-no").on("click", function(){
-					callback(false);
-					$("#mi-modal").modal('hide');
-				});
-			};
+			$(window).resize(function(){
+				location.reload();
+				return;
+			});
+
 
 		</script>
 	</x-slot>

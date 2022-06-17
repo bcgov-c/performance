@@ -17,7 +17,6 @@
                 </div>
                 <div class="col-6">
                     <x-input-modal label="Goal Title" name="title"  tooltip='A short title (1-3 words) used to reference the goal throughout the Performance platform.' />
-                    <!-- <small class="text-danger error-title"></small> -->
                 </div>                
                 <div class="col-sm-6">
                         <x-xdropdown :list="$tags" label="Tags" name="tag_ids[]"  class="tags" tooltipField="description" displayField="name" multiple/>
@@ -36,10 +35,10 @@
                     <small class="text-danger error-measure_of_success"></small>
                 </div>
                 <div class="col-sm-6">
-                    <x-input label="Start Date" type="date" name="start_date" />
+                    <x-input label="Start Date" type="date" name="start_date" id="start_date" />
                 </div>
                 <div class="col-sm-6">
-                    <x-input label="End Date" type="date" name="target_date" />
+                    <x-input label="End Date" type="date" name="target_date" id="target_date" />
                 </div>
                 <div class="col-6">
                     <label>
@@ -148,3 +147,5 @@
         });
     </script>
 @endpush
+
+

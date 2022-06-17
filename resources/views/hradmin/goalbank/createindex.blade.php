@@ -19,25 +19,36 @@
 
 			<div class="row">
 				<div class="col col-md-2">
-					<x-dropdown :list="$goalTypes" label="Goal Type" name="goal_type_id" />
+					<b> Goal Type </b>
+					<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="{{$type_desc_str}}"> </i>
+					<x-dropdown :list="$goalTypes" id="goaltypeid" name="goal_type_id" data-toggle="tooltip" />
 				</div>
 				<div class="col col-md-8">
-					<x-input label="Goal Title" name="title" tooltip='A short title (1-3 words) used to reference the goal throughout the Performance platform.' />
+					<x-input label="Goal Title" name="title" tooltip='A short title (1-3 words) used to reference the goal throughout the Performance Development Platform.' />
 					<small class="text-danger error-title"></small>
 				</div>
 				<div class="col col-md-2">
-					<x-dropdown :list="$mandatoryOrSuggested" label="Mandatory/Suggested" name="is_mandatory" :selected="request()->is_mandatory"></x-dropdown>
+					<x-dropdown :list="$mandatoryOrSuggested" label="Mandatory/Suggested" id="mandatoryid" name="is_mandatory" :selected="request()->is_mandatory"></x-dropdown>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-md-2">
-					<x-dropdown :list="$tags" label="Tags" name="tag_ids[]" class="tags" multiple/>
+					<b> Tags </b>
+					<i class="fa fa-info-circle" id="tag_img" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resource/goal-setting?t=4' target=\'_blank\'>View full list of tag description.</a>"></i>					
+					<x-dropdown :list="$tags" name="tag_ids[]" id="tags" class="tags" multiple/>
 					<small  class="text-danger error-tag_ids"></small>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col">
-					<x-textarea label="Description" name="what" tooltip='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative MyPerformance sessions to ministry audiences".'  />
+
+			<b> Goal Description </b>
+			<p>Each goal should include a description of <b>WHAT</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".'> </i> 
+			you will accomplish, <b>WHY</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> 
+			it is important, and <b>HOW</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> 
+			you will achieve it.</p>
+
+			<div class="row">				
+				<div class="col">										
+					<x-textarea id="what" name="what" />															
 					<small class="text-danger error-what"></small>
 				</div>
 			</div>
@@ -210,8 +221,8 @@
 
 		<script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
 		<script src="//cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
-
-		<script>
+	
+		<script>			
 			let g_matched_employees = {!!json_encode($matched_emp_ids)!!};
 			let g_selected_employees = {!!json_encode($old_selected_emp_ids)!!};
 			let g_selected_orgnodes = {!!json_encode($old_selected_org_nodes)!!};
@@ -235,7 +246,7 @@
 			}
 
 			$(document).ready(function(){
-
+			 	        	
 				$('#eblank5th').hide();
 				$('#ecriteria_group').hide();
 				$('#esearch_text_group').hide();
@@ -276,10 +287,20 @@
 					switchTree();
 				});
 
+				$('body').popover({
+            		selector: '[data-toggle]',
+            		trigger: 'click'
+        		});
 
+				$('.modal').popover({
+            		selector: '[data-toggle-select]',
+            		trigger: 'click',
+        		});
+				
 				$(".tags").multiselect({
                 	enableFiltering: true,
-                	enableCaseInsensitiveFiltering: true
+                	enableCaseInsensitiveFiltering: true,
+					nonSelectedText: ''
             	});
 
 				$('#pageLoader').hide();

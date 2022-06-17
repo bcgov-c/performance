@@ -36,4 +36,10 @@ class CreateGoalRequest extends FormRequest
             'tag_ids.*' => 'exists:tags,id'
         ];
     }
+    
+    public function messages() {
+        return [
+            'what.required' => 'The description field is required'
+        ];
+    }
 }

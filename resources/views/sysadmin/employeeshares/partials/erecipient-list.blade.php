@@ -145,44 +145,44 @@
             // });
 
 
-            $('#eemployee-list-table tbody').on( 'click', 'input:checkbox', function () {
+            // $('#eemployee-list-table tbody').on( 'click', 'input:checkbox', function () {
 
-                // if the input checkbox is selected 
-                var id = this.value;
-                var index = $.inArray(id, eg_selected_employees);
-                if(this.checked) {
-                    eg_selected_employees.push( id );
-                } else {
-                    eg_selected_employees.splice( index, 1 );
-                }
+            //     // if the input checkbox is selected 
+            //     var id = this.value;
+            //     var index = $.inArray(id, eg_selected_employees);
+            //     if(this.checked) {
+            //         eg_selected_employees.push( id );
+            //     } else {
+            //         eg_selected_employees.splice( index, 1 );
+            //     }
 
-                // update the check all checkbox status 
-                if (eg_selected_employees.length == 0) {
-                    $('#eemployee-list-select-all').prop("checked", false);
-                    $('#eemployee-list-select-all').prop("indeterminate", false);   
-                } else if (eg_selected_employees.length == eg_matched_employees.length) {
-                    $('#eemployee-list-select-all').prop("checked", true);
-                    $('#eemployee-list-select-all').prop("indeterminate", false);   
-                } else {
-                    $('#eemployee-list-select-all').prop("checked", false);
-                    $('#eemployee-list-select-all').prop("indeterminate", true);    
-                }
-            });
+            //     // update the check all checkbox status 
+            //     if (eg_selected_employees.length == 0) {
+            //         $('#eemployee-list-select-all').prop("checked", false);
+            //         $('#eemployee-list-select-all').prop("indeterminate", false);   
+            //     } else if (eg_selected_employees.length == eg_matched_employees.length) {
+            //         $('#eemployee-list-select-all').prop("checked", true);
+            //         $('#eemployee-list-select-all').prop("indeterminate", false);   
+            //     } else {
+            //         $('#eemployee-list-select-all').prop("checked", false);
+            //         $('#eemployee-list-select-all').prop("indeterminate", true);    
+            //     }
+            // });
 
-            // Handle click on "Select all" control
-            $('#eemployee-list-select-all').on('click', function() {
-                // Check/uncheck all checkboxes in the table
-                $('#eemployee-list-table tbody input:checkbox').prop('checked', this.checked);
-                if (this.checked) {
-                    eg_selected_employees = eg_matched_employees.map((x) => x);
-                    $('#eemployee-list-select-all').prop("checked", true);
-                    $('#eemployee-list-select-all').prop("indeterminate", false);    
-                } else {
-                    eg_selected_employees = [];
-                    $('#eemployee-list-select-all').prop("checked", false);
-                    $('#eemployee-list-select-all').prop("indeterminate", false);    
-                }    
-            });
+            // // Handle click on "Select all" control
+            // $('#eemployee-list-select-all').on('click', function() {
+            //     // Check/uncheck all checkboxes in the table
+            //     $('#eemployee-list-table tbody input:checkbox').prop('checked', this.checked);
+            //     if (this.checked) {
+            //         eg_selected_employees = eg_matched_employees.map((x) => x);
+            //         $('#eemployee-list-select-all').prop("checked", true);
+            //         $('#eemployee-list-select-all').prop("indeterminate", false);    
+            //     } else {
+            //         eg_selected_employees = [];
+            //         $('#eemployee-list-select-all').prop("checked", false);
+            //         $('#eemployee-list-select-all').prop("indeterminate", false);    
+            //     }    
+            // });
 
         });
 

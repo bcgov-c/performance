@@ -298,3 +298,20 @@
         </script>
     @endpush
 </x-side-layout>
+
+
+<script>    
+        $( "#start_date" ).change(function() {
+            var start_date = $( "#start_date" ).val();
+            $( "#target_date" ).attr("min",start_date);            
+        });
+        
+        $( "#target_date" ).change(function() {
+            var start_date = $( "#start_date" ).val();
+            if (start_date === '') {
+                alert('Please choose start date first.');
+                $( "#target_date" ).val('');
+            }           
+        });
+        
+</script>    

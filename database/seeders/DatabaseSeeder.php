@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ExcusedReasonSeeder::class);
         $this->call(AccessLevelsSeeder::class);
         $this->call(RoleSeeder_Add_Longnames::class);
+        $this->call(SharedElementSeeder::class);
 
 
         // Seeder for Test Environment

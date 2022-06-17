@@ -296,7 +296,7 @@ return [
                 ],
                 [
                     'text' => 'Share Employees',
-                    'url'  => 'hradmin/employeeshares/addindex',
+                    'url'  => 'hradmin/employeeshares/addnew',
                     'active' => ['hradmin/employeeshares/*']
                 ],
                 [
@@ -306,7 +306,7 @@ return [
                 ],
                 [
                     'text' => 'Goal Bank',
-                    'url'  => 'hradmin/goalbank/createindex',
+                    'url'  => 'hradmin/goalbank/creategoal',
                     'active' => ['hradmin/goalbank/*']
                 ],
                 // [
@@ -335,21 +335,11 @@ return [
                     'url'  => 'sysadmin/employees/currentemployees',
                     'active' => ['sysadmin/employees/*']
                 ],
-                // [
-                //     'text' => 'Share Employees (Old)',
-                //     'url'  => 'sysadmin/shared/shareemployee',
-                //     'active' => ['sysadmin/shared/*']
-                // ],
                 [
                     'text' => 'Share Employees',
-                    'url'  => 'sysadmin/employeeshares/addindex',
+                    'url'  => 'sysadmin/employeeshares/addnew',
                     'active' => ['sysadmin/employeeshares/*']
                 ],
-                // [
-                //     'text' => 'Excuse Employees (Old)',
-                //     'url'  => 'sysadmin/excused/excuseemployee',
-                //     'active' => ['sysadmin/excused/*']
-                // ],
                 [
                     'text' => 'Excuse Employees',
                     'url'  => 'sysadmin/excuseemployees/addindex',
@@ -357,7 +347,7 @@ return [
                 ],
                 [
                     'text' => 'Goal Bank',
-                    'url'  => 'sysadmin/goalbank/createindex',
+                    'url'  => 'sysadmin/goalbank/creategoal',
                     'active' => ['sysadmin/goalbank/*']
                 ],
                 [
@@ -372,11 +362,6 @@ return [
                 //     'text' => 'Notifications',
                 //     'url'  => 'sysadmin/notifications',
                 //     'active' => ['sysadmin/notifications/*']
-                // ],
-                // [
-                //     'text' => 'Access and Permissions (Old)',
-                //     'url'  => 'sysadmin/access/createaccess',
-                //     'active' => ['sysadmin/access/*']
                 // ],
                 [
                     'text' => 'Access and Permissions',
@@ -402,13 +387,6 @@ return [
             'icon' => 'fas fa-fw fa-book',
             'active' => ['resource/*']
         ],
-        // [
-        //     'role' => 'listitem',
-        //     'text' => 'POC',
-        //     'url'  => 'poc/bidashboard',
-        //     'icon' => 'fas fa-fw fa-lightbulb',
-        //     'active' => ['POC/*']
-        // ]
     ],
 
     /*

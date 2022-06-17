@@ -57,16 +57,16 @@
                         value="{{ old('esearch_text') }}" placeholder="Search Text">
             </div>
             <div class="form-group col-md-2 p-3" style="text-align:left; vertical-align:bottom;">
-                <div class="form-group row"> </div>
                 <div class="form-group row">
-                    <span class="float-left float-bottom align-self-end" style="float: left; vertical-align: bottom;">  
-                        <button type="submit" class="align-self-end btn btn-primary" formaction="{{ route('hradmin.employeeshares.addindex') }}" name="ebtn_search">Filter</button>
-                        <button type="button" class="align-self-end btn btn-secondary" id="ebtn_search_reset" name="ebtn_reset" value="ebtn_reset">Reset</button>
-                    </span>
+                </div>
+                <div class="form-group row">
+                    <span class="float-left float-bottom">  
+                        <button type="button" class="btn btn-primary" id="ebtn_search" name="ebtn_search">Filter</button>
+                        <button type="button" class="btn btn-secondary" id="ebtn_search_reset" name="ebtn_search_reset" value="ebtn_reset">Reset</button>
+                        </span>
                 </div>
             </div>
       </div>
-
 </div>
 
 
@@ -95,7 +95,60 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-    $('#edd_level0').select2({
+
+$(document).ready(function() {
+
+
+$('#edd_level0').change(function (e){
+    e.preventDefault();
+});
+
+$('#edd_level1').change(function (e){
+    e.preventDefault();
+});
+
+$('#edd_level2').change(function (e){
+    e.preventDefault();
+});
+
+$('#edd_level3').change(function (e){
+    e.preventDefault();
+});
+
+$('#edd_level4').change(function (e){
+    e.preventDefault();
+    $('#ebtn_search').click();
+});
+
+$('#ecriteria').change(function (e){
+    e.preventDefault();
+    $('#ebtn_search').click();
+});
+
+$('#esearch_text').change(function (e){
+    e.preventDefault();
+   $('#ebtn_search').click();
+});
+
+$('#esearch_text').keydown(function (e){
+    if (e.keyCode == 13) {
+        e.preventDefault();
+        $('#ebtn_search').click();
+    }
+});
+
+$('#ebtn_search_reset').click(function (e){
+    e.preventDefault();
+    $('#ecriteria').val('all');
+    $('#esearch_text').val(null);
+    $('#edd_level0').val(null).trigger('change');
+    $('#edd_level1').val(null).trigger('change');
+    $('#edd_level2').val(null).trigger('change');
+    $('#edd_level3').val(null).trigger('change');
+    $('#edd_level4').val(null).trigger('change');
+});
+
+$('#edd_level0').select2({
         placeholder: 'Select Organization',
         allowClear: true,
         ajax: {
@@ -216,7 +269,7 @@
     });
     
     $('#edd_level0').on('select2:select', function (e) {
-        // Do something
+        e.preventDefault();
         $('#edd_level1').val(null).trigger('change');
         $('#edd_level2').val(null).trigger('change');
         $('#edd_level3').val(null).trigger('change');
@@ -224,39 +277,65 @@
     });
 
     $('#edd_level1').on('select2:select', function (e) {
-        // Do something
+        e.preventDefault();
         $('#edd_level2').val(null).trigger('change');
         $('#edd_level3').val(null).trigger('change');
         $('#edd_level4').val(null).trigger('change');
     });
 
     $('#edd_level2').on('select2:select', function (e) {
-        // Do something
+        e.preventDefault();
         $('#edd_level3').val(null).trigger('change');
         $('#edd_level4').val(null).trigger('change');
     });
 
     $('#edd_level3').on('select2:select', function (e) {
-        // Do something
+        e.preventDefault();
         $('#edd_level4').val(null).trigger('change');
     });
 
-    // $('#ebtn_search').click(function() {
-    //     $('#edd_level0').val(null).trigger('change');
-    //     $('#edd_level1').val(null).trigger('change');
-    //     $('#edd_level2').val(null).trigger('change');
-    //     $('#edd_level3').val(null).trigger('change');
-    //     $('#edd_level4').val(null).trigger('change');
-    // });
+    $('#edd_level4').on('select2:select', function (e) {
+                e.preventDefault();
+                console.log('#edd_level4.select2:select');
+            });
 
-    $('#ebtn_search_reset').click(function() {
+            $('#edd_level0').on('select2:unselect', function (e) {
+                e.preventDefault();
         $('#edd_level0').val(null).trigger('change');
         $('#edd_level1').val(null).trigger('change');
         $('#edd_level2').val(null).trigger('change');
         $('#edd_level3').val(null).trigger('change');
         $('#edd_level4').val(null).trigger('change');
-        $('#esearch_text').val(null);
     });
+
+$('#edd_level1').on('select2:unselect', function (e) {
+    e.preventDefault();
+    $('#edd_level1').val(null).trigger('change');
+    $('#edd_level2').val(null).trigger('change');
+    $('#edd_level3').val(null).trigger('change');
+    $('#edd_level4').val(null).trigger('change');
+});
+
+$('#edd_level2').on('select2:unselect', function (e) {
+    e.preventDefault();
+    $('#edd_level2').val(null).trigger('change');
+    $('#edd_level3').val(null).trigger('change');
+    $('#edd_level4').val(null).trigger('change');
+});
+
+$('#edd_level3').on('select2:unselect', function (e) {
+    e.preventDefault();
+    $('#edd_level3').val(null).trigger('change');
+    $('#edd_level4').val(null).trigger('change');
+});
+
+$('#edd_level4').on('select2:unselect', function (e) {
+    e.preventDefault();
+    $('#edd_level4').val(null).trigger('change');
+    $('#ebtn_search').click();
+});
+
+});
 
     </script>
 

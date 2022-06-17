@@ -4,15 +4,13 @@
                 <a href="{{route("goal.show", $goal->id)}}" class="p-2">
                     <p class="card-title">
                         {{ $goal->start_date_human}}
-                            <span class="mx-4"><x-svg-icon icon="arrow-right" /></span>
+                            <span class="mx-4">&#8212;</span>
                         {{ $goal->target_date_human}}
                     </p>
                 </a>
                 <div class="flex-fill"></div>
-                @if ($allowEditModal ?? false)
-                    <x-button icon='edit' class="text-light edit-suggested-goal" data-goal-id="{{$goal->id}}" aria-label="Edit button" data-toggle="modal" data-target="#edit-suggested-goal-modal"></x-button>
-                @endif
-                @if (($type ?? '') !== 'supervisor' && !$disableEdit)
+                
+                @if (($type ?? '') !== 'supervisor' && !$disableEdit && 1 == 0)
                 <form id="delete-goal-{{$goal->id}}" action="{{ route('goal.destroy', $goal->id)}}" method="POST" onsubmit="return confirm('{{ $goalDeleteConfirmationText ?? 'Are you sure you want to permanently delete this goal?' }}')">
                     @csrf
                     @method('DELETE')
@@ -22,10 +20,11 @@
             </div>
         </div>
         <div class="card-body" style="min-height:135px">
-            <a href="{{route("goal.show", $goal->id)}}" class="text-dark">
+            <a href="{{route("goal.show", $goal->id)}}">
                 <p class="h5">
                     {{ $goal->title }}
                 </p>
+            </a>    
                 <!-- <p>
                     {{ $goal->what }}
                 </p> -->
@@ -33,7 +32,7 @@
                     <b>Goal Type:&nbsp;&nbsp;&nbsp;</b>{{ $goal->goaltype->name}}<br>
                     <b>Created by:&nbsp;&nbsp;&nbsp;</b>{{ $goal->originalCreatedBy ? $goal->originalCreatedBy->name : $goal->user->name }}<br>
                 </p>
-            </a>
+            
         </div>
         @if ($goal->last_supervisor_comment == 'Y' and (session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
           <div class="alert alert-default-warning alert-dismissible">
@@ -51,25 +50,36 @@
                 <!-- <b>Goal created by:&nbsp;</b>{{ $goal->user->name}} <br> -->
                 @if($goal->is_library)
                 <div class="flex-fill"></div>
+                <span style="float:right">
                 <form id="delete-goal-{{$goal->id}}" action="{{ route('goal.destroy', $goal->id)}}" method="POST" onsubmit="return confirm('{{ $goalDeleteConfirmationText ?? 'Are you sure you want to permanently delete this goal?' }}')">
                     @csrf
                     @method('DELETE')
                     <x-button size="md" icon='trash' class="ml-1 text-light" aria-label="Delete button" tooltip="Click to permanently delete this goal" style="danger"></x-button>
                 </form>
+                </span>
                 @endif
             </div>
 
             @if(!$goal->is_library)
             <div>
-                @if(($type ?? '') !== 'supervisor' && !$disableEdit)
+                @if(($type ?? '') !== 'supervisor' && !$disableEdit)                    
+                    Status: 
                     @include('goal.partials.status-change')
                 @else
                     <x-goal-status :status="$goal->status"></x-goal-status>
                 @endif
-                <x-button
-                :href='route("goal.show", $goal->id)'
-                :tooltip="__('Click to view the details of this goal.')"
-                tooltipPosition="bottom" class="ml-2">{{__('View')}}</x-button>
+                <span style="float: right">
+                <form id="delete-goal-{{$goal->id}}" action="{{ route('goal.destroy', $goal->id)}}" method="POST" onsubmit="return confirm('{{ $goalDeleteConfirmationText ?? 'Are you sure you want to permanently delete this goal?' }}')">
+                    @csrf
+                    @method('DELETE')
+                    <x-button size="md" icon='trash' class="ml-1 text-light" aria-label="Delete button" tooltip="Click to permanently delete this goal" style="danger"></x-button>
+                    <x-button
+                    :href='route("goal.show", $goal->id)'
+                    :tooltip="__('Click to view the details of this goal.')"
+                    tooltipPosition="bottom" class="ml-2">{{__('View')}}</x-button>
+                    </span>
+                </form>  
+                
             </div>
             @endif
             
@@ -103,7 +113,9 @@
                     @endif
                 @endforeach
             </select>
+            <span style="float:right">
             <x-button size="md" type="button" icon='trash' class="ml-1 text-light" aria-label="Delete button" tooltip="Click to permanently delete this goal" style="danger" data-action="delete-goal" data-goal-id="{{$goal->id}}" data-confirmation="{{ $goalDeleteConfirmationText ?? 'Are you sure you want to permanently delete this goal?' }}"></x-button>
+            </span>
             @endif
 
         </div>

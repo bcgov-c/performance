@@ -5,6 +5,9 @@ namespace App\Http\Controllers\HRAdmin;
 
 
 use App\Models\User;
+use App\Models\Goal;
+use App\Models\Conversation;
+use App\Models\ConversationParticipant;
 use App\Models\EmployeeDemo;
 use Illuminate\Http\Request;
 use App\Models\NotificationLog;
@@ -21,6 +24,131 @@ use Illuminate\Validation\ValidationException;
 
 class EmployeeSharesController extends Controller
 {
+
+    public function addnew(Request $request) 
+    {
+        $errors = session('errors');
+
+        $old_selected_emp_ids = [];
+        $eold_selected_emp_ids = []; 
+        $old_selected_org_nodes = []; 
+        $eold_selected_org_nodes = []; 
+
+
+        if ($errors) {
+            $old = session()->getOldInput();
+
+            $request->dd_level0 = isset($old['dd_level0']) ? $old['dd_level0'] : null;
+            $request->dd_level1 = isset($old['dd_level1']) ? $old['dd_level1'] : null;
+            $request->dd_level2 = isset($old['dd_level2']) ? $old['dd_level2'] : null;
+            $request->dd_level3 = isset($old['dd_level3']) ? $old['dd_level3'] : null;
+            $request->dd_level4 = isset($old['dd_level4']) ? $old['dd_level4'] : null;
+
+            $request->criteria = isset($old['criteria']) ? $old['criteria'] : null;
+            $request->search_text = isset($old['search_text']) ? $old['search_text'] : null;
+            
+            $request->orgCheck = isset($old['orgCheck']) ? $old['orgCheck'] : null;
+            $request->userCheck = isset($old['userCheck']) ? $old['userCheck'] : null;
+
+            $old_selected_emp_ids = isset($old['selected_emp_ids']) ? json_decode($old['selected_emp_ids']) : [];
+            $old_selected_org_nodes = isset($old['selected_org_nodes']) ? json_decode($old['selected_org_nodes']) : [];
+
+            $request->edd_level0 = isset($old['edd_level0']) ? $old['edd_level0'] : null;
+            $request->edd_level1 = isset($old['edd_level1']) ? $old['edd_level1'] : null;
+            $request->edd_level2 = isset($old['edd_level2']) ? $old['edd_level2'] : null;
+            $request->edd_level3 = isset($old['edd_level3']) ? $old['edd_level3'] : null;
+            $request->edd_level4 = isset($old['edd_level4']) ? $old['edd_level4'] : null;
+
+            $request->ecriteria = isset($old['ecriteria']) ? $old['ecriteria'] : null;
+            $request->esearch_text = isset($old['esearch_text']) ? $old['esearch_text'] : null;
+            
+            $request->eorgCheck = isset($old['eorgCheck']) ? $old['eorgCheck'] : null;
+            $request->euserCheck = isset($old['euserCheck']) ? $old['euserCheck'] : null;
+
+            $eold_selected_emp_ids = isset($old['eselected_emp_ids']) ? json_decode($old['eselected_emp_ids']) : [];
+            $eold_selected_org_nodes = isset($old['eselected_org_nodes']) ? json_decode($old['eselected_org_nodes']) : [];
+        }
+
+        // no validation and move filter variable to old 
+        if ($request->btn_search) {
+            session()->put('_old_input', [
+                'dd_level0' => $request->dd_level0,
+                'dd_level1' => $request->dd_level1,
+                'dd_level2' => $request->dd_level2,
+                'dd_level3' => $request->dd_level3,
+                'dd_level4' => $request->dd_level4,
+                'jobtitle_' => $request->jobcode_desc,
+                'active_since' => $request->active_since,
+                'criteria' => $request->criteria,
+                'search_text' => $request->search_text,
+                'orgCheck' => $request->orgCheck,
+                'userCheck' => $request->userCheck,
+            ]);
+        }
+
+        // no validation and move filter variable to old 
+        if ($request->ebtn_search) {
+            session()->put('_old_input', [
+                'edd_level0' => $request->edd_level0,
+                'edd_level1' => $request->edd_level1,
+                'edd_level2' => $request->edd_level2,
+                'edd_level3' => $request->edd_level3,
+                'edd_level4' => $request->edd_level4,
+                'ejob_titles' => $request->ejobcode_desc,
+                'eactive_since' => $request->eactive_since,
+                'ecriteria' => $request->ecriteria,
+                'esearch_text' => $request->esearch_text,
+                'eorgCheck' => $request->eorgCheck,
+                'euserCheck' => $request->euserCheck,
+            ]);
+        }
+
+        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
+        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
+        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
+        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
+        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+
+        $elevel0 = $request->edd_level0 ? OrganizationTree::where('id', $request->edd_level0)->first() : null;
+        $elevel1 = $request->edd_level1 ? OrganizationTree::where('id', $request->edd_level1)->first() : null;
+        $elevel2 = $request->edd_level2 ? OrganizationTree::where('id', $request->edd_level2)->first() : null;
+        $elevel3 = $request->edd_level3 ? OrganizationTree::where('id', $request->edd_level3)->first() : null;
+        $elevel4 = $request->edd_level4 ? OrganizationTree::where('id', $request->edd_level4)->first() : null;
+
+        $request->session()->flash('level0', $level0);
+        $request->session()->flash('level1', $level1);
+        $request->session()->flash('level2', $level2);
+        $request->session()->flash('level3', $level3);
+        $request->session()->flash('level4', $level4);
+        $request->session()->flash('userCheck', $request->userCheck);  // Dynamic load 
+        
+        $request->session()->flash('elevel0', $elevel0);
+        $request->session()->flash('elevel1', $elevel1);
+        $request->session()->flash('elevel2', $elevel2);
+        $request->session()->flash('elevel3', $elevel3);
+        $request->session()->flash('elevel4', $elevel4);
+        $request->session()->flash('euserCheck', $request->euserCheck);  // Dynamic load 
+        
+
+        // Matched Employees 
+        $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
+        $edemoWhere = $this->ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4);
+        $sql = clone $demoWhere; 
+        $matched_emp_ids = $sql->select([ 'employee_id', 'employee_name', 'jobcode_desc', 'employee_email', 
+                'employee_demo.organization', 'employee_demo.level1_program', 'employee_demo.level2_division',
+                'employee_demo.level3_branch','employee_demo.level4', 'employee_demo.deptid'])
+                ->orderBy('employee_id')
+                ->pluck('employee_demo.employee_id');        
+                $ematched_emp_ids = clone $matched_emp_ids;
+        // $alert_format_list = NotificationLog::ALERT_FORMAT;
+        $criteriaList = $this->search_criteria_list();
+        $ecriteriaList = $this->search_criteria_list();
+        
+        $sharedElements = array("A" => "All", "C" => "Conversation", "G" => "Goals" );
+
+        return view('hradmin.employeeshares.addnew', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes', 'sharedElements') );
+    
+    }
 
     public function addindex(Request $request) 
     {
@@ -123,7 +251,7 @@ class EmployeeSharesController extends Controller
         $matched_emp_ids = $sql->select([ 
             'employee_demo.employee_id'
             , 'employee_demo.employee_name'
-            , 'employee_demo.job_title'
+            , 'employee_demo.jobcode_desc'
             , 'employee_demo.employee_email'
             , 'employee_demo.organization'
             , 'employee_demo.level1_program'
@@ -131,7 +259,7 @@ class EmployeeSharesController extends Controller
             , 'employee_demo.level3_branch'
             , 'employee_demo.level4'
             , 'employee_demo.deptid'
-            , 'employee_demo.job_title'])
+            , 'employee_demo.jobcode_desc'])
         ->orderBy('employee_id')
         ->pluck('employee_demo.employee_id');        
 
@@ -140,7 +268,7 @@ class EmployeeSharesController extends Controller
         $ematched_emp_ids = $esql->select([ 
             'employee_demo.employee_id as eemployee_id'
             , 'employee_demo.employee_name as eemployee_name'
-            , 'employee_demo.job_title as ejob_title'
+            , 'employee_demo.jobcode_desc as ejobcode_desc'
             , 'employee_demo.employee_email as eemployee_email'
             , 'employee_demo.organization as eorganization'
             , 'employee_demo.level1_program as elevel1_program'
@@ -148,18 +276,87 @@ class EmployeeSharesController extends Controller
             , 'employee_demo.level3_branch as elevel3_branch'
             , 'employee_demo.level4 as elevel4'
             , 'employee_demo.deptid as edeptid'
-            , 'employee_demo.job_title as ejob_title'])
+            ])
         ->orderBy('eemployee_id')
         ->pluck('eemployee_id');        
         
         $criteriaList = $this->search_criteria_list();
         $ecriteriaList = $this->search_criteria_list();
 
+        $sharedElements = array("A" => "All", "C" => "Conversation", "G" => "Goals" );
+
         return view('hradmin.employeeshares.addindex', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes') );
     }
 
     public function saveall(Request $request) {
 
+        $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
+        $eselected_emp_ids = $request->eselected_emp_ids ? json_decode($request->eselected_emp_ids) : [];
+        $request->userCheck = $selected_emp_ids;
+        $request->euserCheck = $eselected_emp_ids;
+        $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
+        $eselected_org_nodes = $request->eselected_org_nodes ? json_decode($request->eselected_org_nodes) : [];
+
+        $current_user = User::find(Auth::id());
+
+        $employee_ids = ($request->userCheck) ? $request->userCheck : [];
+
+        $eeToShare = EmployeeDemo::select('users.id')
+            ->join('users', 'employee_demo.guid', 'users.guid')
+            ->whereIn('employee_demo.employee_id', $selected_emp_ids )
+            ->distinct()
+            ->select ('users.id')
+            ->orderBy('employee_demo.employee_name')
+            ->get() ;
+
+        $shareTo = EmployeeDemo::select('users.id')
+            ->join('users', 'employee_demo.guid', 'users.guid')
+            ->whereIn('employee_demo.employee_id', $eselected_emp_ids )
+            ->distinct()
+            ->select ('users.id')
+            ->orderBy('employee_demo.employee_name')
+            ->get() ;
+
+        $elements = $request->elements;
+        $reason = $request->reason;
+
+        foreach ($eeToShare as $eeOne) {
+            foreach ($shareTo as $toOne) {
+                //skip if same
+                if ($eeOne->id <> $toOne->id) {
+                    if ($elements == 'A' || $elements == 'G') {
+                        $goals = Goal::select('id')
+                            ->where('user_id', '=', $eeOne->id)
+                            ->where('status', '=', 'active')
+                            ->get ();
+                        foreach ($goals as $goal) {
+                            $result = DB::table('goals_shared_with')
+                            ->updateOrInsert(
+                                ['goal_id' => $goal->id
+                                , 'user_id' => $toOne->id],
+                                ['reason' => $reason]
+                            );
+                        }
+                    }
+
+                    if ($elements == 'A' || $elements == 'C') {
+                        $conversations = Conversation::select('id')
+                        ->where('user_id', '=', $eeOne->id)
+                        ->get ();
+                        foreach ($conversations as $conv) {
+                            $result = ConversationParticipant::updateOrInsert(
+                                ['conversation_id' => $conv->id
+                                , 'participant_id' => $toOne->id],
+                                ['reason' => $reason]
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        return redirect()->route('hradmin.employeeshares.addnew')
+            ->with('success', 'Share user goal/conversation successful.');
     }
 
     public function loadOrganizationTree(Request $request) {
@@ -210,7 +407,6 @@ class EmployeeSharesController extends Controller
         if($request->ajax()){
             return view('hradmin.employeeshares.partials.recipient-tree', compact('orgs','countByOrg','empIdsByOrgId') );
         } 
-
     }
 
 
@@ -275,15 +471,12 @@ class EmployeeSharesController extends Controller
             $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
             $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
             $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
-    
             $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
-
             $sql = clone $demoWhere; 
-
             $employees = $sql->select([ 
                 'employee_id'
                 , 'employee_name'
-                , 'job_title'
+                , 'jobcode_desc'
                 , 'employee_email'
                 , 'employee_demo.organization'
                 , 'employee_demo.level1_program'
@@ -292,7 +485,6 @@ class EmployeeSharesController extends Controller
                 , 'employee_demo.level4'
                 , 'employee_demo.deptid'
             ]);
-
             return Datatables::of($employees)
                 ->addColumn('select_users', static function ($employee) {
                         return '<input pid="1335" type="checkbox" id="userCheck'. 
@@ -303,37 +495,31 @@ class EmployeeSharesController extends Controller
     }
 
     public function egetDatatableEmployees(Request $request) {
-
-
         if($request->ajax()){
-
             $elevel0 = $request->edd_level0 ? OrganizationTree::where('id', $request->edd_level0)->first() : null;
             $elevel1 = $request->edd_level1 ? OrganizationTree::where('id', $request->edd_level1)->first() : null;
             $elevel2 = $request->edd_level2 ? OrganizationTree::where('id', $request->edd_level2)->first() : null;
             $elevel3 = $request->edd_level3 ? OrganizationTree::where('id', $request->edd_level3)->first() : null;
             $elevel4 = $request->edd_level4 ? OrganizationTree::where('id', $request->edd_level4)->first() : null;
-    
             $edemoWhere = $this->ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4);
-
             $esql = clone $edemoWhere; 
-
             $eemployees = $esql->select([ 
                 'employee_demo.employee_id as eemployee_id'
                 , 'employee_demo.employee_name as eemployee_name'
-                , 'employee_demo.job_title as ejob_title'
+                , 'employee_demo.jobcode_desc as ejobcode_desc'
                 , 'employee_demo.employee_email as eemployee_email'
                 , 'employee_demo.organization as eorganization'
                 , 'employee_demo.level1_program as elevel1_program'
                 , 'employee_demo.level2_division as elevel2_division'
                 , 'employee_demo.level3_branch as elevel3_branch'
                 , 'employee_demo.level4 as elevel4'
-                , 'employee_demo.deptid as edeptid']);
-
+                , 'employee_demo.deptid as edeptid'
+            ]);
             return Datatables::of($eemployees)
                 ->addColumn('eselect_users', static function ($eemployee) {
                         return '<input pid="1335" type="checkbox" id="euserCheck'. 
-                            $eemployee->employee_id .'" name="userCheck[]" value="'. $eemployee->employee_id .'" class="dt-body-center">';
-                })->rawColumns(['eselect_users','action'])
+                        $eemployee->employee_id .'" name="euserCheck[]" value="'. $eemployee->eemployee_id .'" class="dt-body-center">';
+                    })->rawColumns(['eselect_users','action'])
                 ->make(true);
         }
     }
@@ -343,7 +529,6 @@ class EmployeeSharesController extends Controller
         $search = $request->search;
         $users =  User::whereRaw("lower(name) like '%". strtolower($search)."%'")
                     ->whereNotNull('email')->paginate();
-
         return ['data'=> $users];
     }
 
@@ -947,7 +1132,7 @@ class EmployeeSharesController extends Controller
                 
                 return $query->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->search_text) . "%'")
                     ->orWhereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->search_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.job_title) LIKE '%" . strtolower($request->search_text) . "%'")
+                    ->orWhereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->search_text) . "%'")
                     ->orWhereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
             });
         })
@@ -958,7 +1143,7 @@ class EmployeeSharesController extends Controller
             return $q->whereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->search_text) . "%'");
         })
         ->when( $request->search_text && $request->criteria == 'job', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.job_title) LIKE '%" . strtolower($request->search_text) . "%'");
+            return $q->whereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->search_text) . "%'");
         })
         ->when( $request->search_text && $request->criteria == 'dpt', function ($q) use($request) {
             return $q->whereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
@@ -991,6 +1176,27 @@ class EmployeeSharesController extends Controller
         })
         ->when( $elevel4, function ($q) use($elevel4) {
             return $q->where('employee_demo.level4', $elevel4->name);
+        })
+        ->when( $request->esearch_text && $request->ecriteria == 'all', function ($q) use($request) {
+            $q->where(function($query) use ($request) {
+                
+                return $query->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->esearch_text) . "%'")
+                    ->orWhereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->esearch_text) . "%'")
+                    ->orWhereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->esearch_text) . "%'")
+                    ->orWhereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->esearch_text) . "%'");
+            });
+        })
+        ->when( $request->esearch_text && $request->ecriteria == 'emp', function ($q) use($request) {
+            return $q->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->esearch_text) . "%'");
+        })
+        ->when( $request->esearch_text && $request->ecriteria == 'name', function ($q) use($request) {
+            return $q->whereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->esearch_text) . "%'");
+        })
+        ->when( $request->esearch_text && $request->ecriteria == 'job', function ($q) use($request) {
+            return $q->whereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->esearch_text) . "%'");
+        })
+        ->when( $request->esearch_text && $request->ecriteria == 'dpt', function ($q) use($request) {
+            return $q->whereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->esearch_text) . "%'");
         });
         return $edemoWhere;
     }
@@ -1043,22 +1249,22 @@ class EmployeeSharesController extends Controller
 
     protected function ebaseFilteredSQLs($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4) {
         // Base Where Clause
-        $demoWhere = $this->ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4);
+        $edemoWhere = $this->ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4);
 
-        $esql_level0 = clone $demoWhere; 
+        $esql_level0 = clone $edemoWhere; 
         $esql_level0->join('organization_trees', function($join) use($elevel0) {
             $join->on('employee_demo.organization', '=', 'organization_trees.organization')
                 ->where('organization_trees.level', '=', 0);
             });
             
-        $esql_level1 = clone $demoWhere; 
+        $esql_level1 = clone $edemoWhere; 
         $esql_level1->join('organization_trees', function($join) use($elevel0, $elevel1) {
             $join->on('employee_demo.organization', '=', 'organization_trees.organization')
                 ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
                 ->where('organization_trees.level', '=', 1);
             });
             
-        $esql_level2 = clone $demoWhere; 
+        $esql_level2 = clone $edemoWhere; 
         $esql_level2->join('organization_trees', function($join) use($elevel0, $elevel1, $elevel2) {
             $join->on('employee_demo.organization', '=', 'organization_trees.organization')
                 ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
@@ -1066,7 +1272,7 @@ class EmployeeSharesController extends Controller
                 ->where('organization_trees.level', '=', 2);    
             });    
             
-        $esql_level3 = clone $demoWhere; 
+        $esql_level3 = clone $edemoWhere; 
         $esql_level3->join('organization_trees', function($join) use($elevel0, $elevel1, $elevel2, $elevel3) {
             $join->on('employee_demo.organization', '=', 'organization_trees.organization')
                 ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
@@ -1075,7 +1281,7 @@ class EmployeeSharesController extends Controller
                 ->where('organization_trees.level', '=', 3);    
             });
             
-        $esql_level4 = clone $demoWhere; 
+        $esql_level4 = clone $edemoWhere; 
         $esql_level4->join('organization_trees', function($join) use($elevel0, $elevel1, $elevel2, $elevel3, $elevel4) {
             $join->on('employee_demo.organization', '=', 'organization_trees.organization')
                 ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
@@ -1133,8 +1339,9 @@ class EmployeeSharesController extends Controller
         $request->session()->flash('level4', $level4);
 
         $criteriaList = $this->search_criteria_list();
+        $sharedElements = array("A" => "All", "C" => "Conversation", "G" => "Goals" );
 
-        return view('hradmin.employeeshares.manageindex', compact ('request', 'criteriaList'));
+        return view('hradmin.employeeshares.manageindex', compact ('request', 'criteriaList', 'sharedElements'));
     }
 
     public function manageindexlist(Request $request) {
@@ -1145,8 +1352,9 @@ class EmployeeSharesController extends Controller
             $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
             $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
 
-            $query = User::withoutGlobalScopes()
-            ->join('shared_profiles', 'shared_profiles.shared_id', '=', 'users.id')
+            $queryConv = User::withoutGlobalScopes()
+            ->join('conversations', 'conversations.user_id', '=', 'users.id')
+            ->join('conversation_participants', 'conversation_participants.conversation_id', '=', 'conversations.id')
             ->leftjoin('employee_demo', 'users.guid', '=', 'employee_demo.guid')
             ->when($level0, function($q) use($level0) {return $q->where('organization', $level0->name);})
             ->when($level1, function($q) use($level1) {return $q->where('level1_program', $level1->name);})
@@ -1154,15 +1362,15 @@ class EmployeeSharesController extends Controller
             ->when($level3, function($q) use($level3) {return $q->where('level3_branch', $level3->name);})
             ->when($level4, function($q) use($level4) {return $q->where('level4', $level4->name);})
             ->when($request->criteria == 'name', function($q) use($request){return $q->where('employee_name', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_id', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'job', function($q) use($request){return $q->where('job_title', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'job', function($q) use($request){return $q->where('jobcode_desc', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'dpt', function($q) use($request){return $q->where('deptid', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'all', function($q) use ($request) {
                 return $q->where(function ($query2) use ($request) {
                     if($request->search_text) {
-                        $query2->where('employee_id', 'like', "%" . $request->search_text . "%")
+                        $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
                         ->orWhere('employee_name', 'like', "%" . $request->search_text . "%")
-                        ->orWhere('job_title', 'like', "%" . $request->search_text . "%")
+                        ->orWhere('jobcode_desc', 'like', "%" . $request->search_text . "%")
                         ->orWhere('deptid', 'like', "%" . $request->search_text . "%");
                     }
                 });
@@ -1170,7 +1378,7 @@ class EmployeeSharesController extends Controller
             ->select (
                 'employee_demo.employee_id',
                 'employee_demo.employee_name', 
-                'employee_demo.job_title',
+                'employee_demo.jobcode_desc',
                 'employee_demo.organization',
                 'employee_demo.level1_program',
                 'employee_demo.level2_division',
@@ -1178,7 +1386,7 @@ class EmployeeSharesController extends Controller
                 'employee_demo.level4',
                 'employee_demo.deptid',
                 'users.id as user_id',
-                'shared_profiles.id as shared_id',
+                'conversations.id as item_id',
             );
             return Datatables::of($query)
             ->addIndexColumn()
@@ -1213,16 +1421,15 @@ class EmployeeSharesController extends Controller
             ->when($level3, function($q) use($level3) {return $q->where('level3_branch', $level3->name);})
             ->when($level4, function($q) use($level4) {return $q->where('level4', $level4->name);})
             ->when($request->criteria == 'name', function($q) use($request){return $q->where('employee_name', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_id', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'job', function($q) use($request){return $q->where('job_title', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'job', function($q) use($request){return $q->where('jobcode_desc', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'dpt', function($q) use($request){return $q->where('deptid', 'like', "%" . $request->search_text . "%");})
-            // ->when([$request->criteria == 'all', $request->search_text], function($q) use ($request) 
             ->when($request->criteria == 'all', function($q) use ($request) {
                 return $q->where(function ($query2) use ($request) {
                     if($request->search_text) {
-                        $query2->where('employee_id', 'like', "%" . $request->search_text . "%")
+                        $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
                         ->orWhere('employee_name', 'like', "%" . $request->search_text . "%")
-                        ->orWhere('job_title', 'like', "%" . $request->search_text . "%")
+                        ->orWhere('jobcode_desc', 'like', "%" . $request->search_text . "%")
                         ->orWhere('deptid', 'like', "%" . $request->search_text . "%");
                     }
                 });
@@ -1231,55 +1438,133 @@ class EmployeeSharesController extends Controller
                 'employee_demo.employee_id',
                 'employee_demo.employee_name', 
                 'users.email',
-                'employee_demo.job_title',
+                'employee_demo.jobcode_desc',
                 'employee_demo.organization',
                 'employee_demo.level1_program',
                 'employee_demo.level2_division',
                 'employee_demo.level3_branch',
                 'employee_demo.level4',
                 'employee_demo.deptid',
-                'model_has_roles.role_id',
-                'model_has_roles.reason',
-                'roles.longname',
-                'model_has_roles.model_id',
-            );
-            return Datatables::of($query)
+                'users.id as user_id',
+                'goals.id as item_id',
+            )
+            ->selectRaw('"Goal" as item_type')
+            ->distinct();
+            $both = $queryConv->union($queryGoal); 
+            return Datatables::of($both)
             ->addIndexColumn()
-            ->addcolumn('action', function($row){
-                return '<button 
-                class="btn btn-xs btn-primary modalbutton" 
-                role="button" 
-                data-roleid="' . $row->role_id . '" 
-                data-modelid="' . $row->model_id . '" 
-                data-reason="' . $row->reason . '" 
-                data-email="' . $row->email . '" 
-                data-longname="' . $row->longname . '" 
-                data-toggle="modal"
-                data-target="#editModal"
-                role="button">Update</button>';
+            ->addcolumn('action', function($row) {
+                $btn = '<button class="btn btn-xs btn-primary modalbutton" role="button" data-userid="' . $row->user_id . '" data-username="' . $row->employee_name . '" data-toggle="modal" data-target="#editModal" role="button">Edit</button>';
+                $btn = $btn . '&nbsp;&nbsp;&nbsp;<a href="' . route('hradmin.employeeshares.deleteshare', ['type' => $row->item_type, 'id' => $row->item_id]) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->item_type . '_' . $row->id .'"><i class="fa fa-trash"></i></a>';
+                return $btn;
             })
             ->rawColumns(['action'])
             ->make(true);
         }
     }
 
-    public function getAdminOrgs(Request $request, $model_id) {
+    public function manageindexviewshares(Request $request, $id) {
         if ($request->ajax()) {
-            $query = AdminOrg::where('user_id', '=', $model_id)
-            ->where('version', '=', '1')
+            $queryConv = User::withoutGlobalScopes()
+            ->join('conversations', 'conversations.user_id', '=', 'users.id')
+            ->join('conversation_participants', 'conversation_participants.conversation_id', '=', 'conversations.id')
+            ->join('users as u2', 'conversation_participants.participant_id', '=', 'u2.id')
+            ->leftjoin('employee_demo', 'users.guid', '=', 'employee_demo.guid')
+            ->leftjoin('employee_demo as ed2', 'u2.guid', '=', 'ed2.guid')
+            ->where('users.id', '=', $id)
             ->select (
-                'organization',
-                'level1_program',
-                'level2_division',
-                'level3_branch',
-                'level4',
-                'user_id',
-            );
-            return Datatables::of($query)
+                'employee_demo.employee_id',
+                'employee_demo.employee_name', 
+                'users.id as user_id',
+                'conversations.id as item_id',
+                'u2.id as shared_with_id',
+                'ed2.employee_id as employee_id2',
+                'ed2.employee_name as employee_name2',
+                'conversation_participants.participant_id as part_id',
+            )
+            ->selectRaw('"Conversation" as item_type')
+            ->distinct();
+            $queryGoal = User::withoutGlobalScopes()
+            ->join('goals', 'goals.user_id', '=', 'users.id')
+            ->join('goals_shared_with', 'goals_shared_with.goal_id', '=', 'goals.id')
+            ->join('users as u2', 'goals_shared_with.user_id', '=', 'u2.id')
+            ->leftjoin('employee_demo', 'users.guid', '=', 'employee_demo.guid')
+            ->leftjoin('employee_demo as ed2', 'u2.guid', '=', 'ed2.guid')
+            ->select (
+                'employee_demo.employee_id',
+                'employee_demo.employee_name', 
+                'users.id as user_id',
+                'goals.id as item_id',
+                'u2.id as shared_with_id',
+                'ed2.employee_id as employee_id2',
+                'ed2.employee_name as employee_name2',
+                'goals.id as part_id',
+            )
+            ->where('users.id', '=', $id)
+            ->selectRaw('"Goal" as item_type')
+            ->distinct();
+            $data = $queryConv->union($queryGoal); 
+            return Datatables::of($data)
             ->addIndexColumn()
+            ->addcolumn('action', function($row) {
+                $btn = '<a href="' . route('hradmin.employeeshares.deleteitem', ['type' => $row->item_type, 'id' => $row->item_id, 'part' => $row->part_id]) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->item_type . '_' . $row->id . '_' . $row->part_id .'"><i class="fa fa-trash"></i></a>';
+                return $btn;
+            })
+            ->rawColumns(['action'])
             ->make(true);
-        }
+        };
+        // return $both;
     }
+
+
+    private function getDropdownValues(&$mandatoryOrSuggested) {
+        $mandatoryOrSuggested = [
+            [
+                "id" => '',
+                "name" => 'Any'
+            ],
+            [
+                "id" => '1',
+                "name" => 'Mandatory'
+            ],
+            [
+                "id" => '0',
+                "name" => 'Suggested'
+            ]
+        ];
+
+    }
+
+    public function deleteshare(Request $request, $type, $id) {
+        if($type == 'Goal') {
+            $query1 = DB::table('goals_shared_with')
+            ->where('id', '=', $id)
+            ->delete();
+        }
+        if($type == 'Conversation') {
+            $query2 = DB::table('conversation_participants')
+            ->where('conversation_id', '=', $id)
+            ->delete();
+        }
+        return redirect()->back();
+    }
+
+    public function deleteitem(Request $request, $type, $id, $part) {
+        if($type == 'Goal') {
+            $query1 = DB::table('goals_shared_with')
+            ->where('id', '=', $id)
+            ->delete();
+        }
+        if($type == 'Conversation') {
+            $query2 = DB::table('conversation_participants')
+            ->where('conversation_id', '=', $id)
+            ->where('participant_id', '=', $part)
+            ->delete();
+        }
+        return redirect()->back();
+    }
+
+    // public function getAdminOrgs(Request $request, $model_id) {
 
     /**
      * Show the form for editing the specified resource.
@@ -1302,38 +1587,6 @@ class EmployeeSharesController extends Controller
         return view('hradmin.employeeshares.partials.access-edit-modal', compact('roles', 'access', 'email'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function manageUpdate(Request $request) {
-        // if($request->accessselect) {
-        //     if($request->accessselect == 4) {
-        //         $query = DB::table('model_has_roles')
-        //         ->where('model_id', '=', $request->model_id)
-        //         ->whereIn('role_id', [3, 4])
-        //         ->update(['role_id' => $request->accessselect, 'reason' => $request->reason]);
-        //         $orgs = DB::table('admin_orgs')
-        //         ->where('user_id', '=', $request->input('model_id'))
-        //         ->delete();
-        //     }
-        //     if($request->accessselect == 3) {
-        //         $query = DB::table('model_has_roles')
-        //         ->where('model_id', '=', $request->model_id)
-        //         ->where('role_id', 3)
-        //         ->update(['reason' => $request->reason]);
-        //     }
-        // } else {
-        //     $query = DB::table('model_has_roles')
-        //     ->where('model_id', '=', $request->model_id)
-        //     ->update(['reason' => $request->reason]);
-        // }
-
-        return redirect()->back();
-    }
 
     /**
      * Remove the specified resource from storage.

@@ -39,6 +39,8 @@ class User extends Authenticatable
         'last_sync_at',
     ];
 
+    public $timestamps = true;
+
     /**
      * The attributes that should be hidden for arrays.
      *
