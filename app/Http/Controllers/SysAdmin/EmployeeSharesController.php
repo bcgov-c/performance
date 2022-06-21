@@ -9,6 +9,7 @@ use App\Models\Goal;
 use App\Models\Conversation;
 use App\Models\SharedElement;
 use App\Models\EmployeeShare;
+use App\Models\SharedProfile;
 use App\Models\ConversationParticipant;
 use App\Models\EmployeeDemo;
 use Illuminate\Http\Request;
@@ -144,10 +145,8 @@ class EmployeeSharesController extends Controller
         // $alert_format_list = NotificationLog::ALERT_FORMAT;
         $criteriaList = $this->search_criteria_list();
         $ecriteriaList = $this->search_criteria_list();
-        
-        $sharedElements = SharedElement::select('id', 'name')->get('name', 'id');
 
-        return view('sysadmin.employeeshares.addnew', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes', 'sharedElements') );
+        return view('sysadmin.employeeshares.addnew', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes') );
     
     }
 
@@ -317,23 +316,30 @@ class EmployeeSharesController extends Controller
             ->orderBy('employee_demo.employee_name')
             ->get() ;
 
-        $elements = $request->input_elements;
+        if ($request->input_elements == 0) {
+            $elements = array("1", "2");
+        } else if ($request->input_elements == 1) {
+            $elements = array("1");
+        } else {
+            $elements = array("2");
+        }
+
         $reason = $request->input_reason;
 
         foreach ($eeToShare as $eeOne) {
             foreach ($shareTo as $toOne) {
                 //skip if same
                 if ($eeOne->id <> $toOne->id) {
-                    $result = EmployeeShare::updateOrInsert(
-                        ['user_id' => $eeOne->id
-                        , 'shared_with_id' => $toOne->id],
-                        ['shared_element_id' => $elements
-                        , 'reason' => $reason]
+                    $result = SharedProfile::updateOrCreate(
+                        ['shared_id' => $eeOne->id
+                        , 'shared_with' => $toOne->id],
+                        ['shared_item' => $elements
+                        , 'comment' => $reason
+                        , 'shared_by' => $current_user->id]
                     );
                 }
             }
         }
-
         return redirect()->route('sysadmin.employeeshares.addnew')
             ->with('success', 'Share user goal/conversation successful.');
     }
@@ -1057,30 +1063,38 @@ class EmployeeSharesController extends Controller
             $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
 
             $query = User::withoutGlobalScopes()
-            ->join('employee_shares', 'employee_shares.user_id', '=', 'users.id')
+            ->join('shared_profiles', 'shared_profiles.shared_id', '=', 'users.id')
             ->leftjoin('employee_demo', 'users.guid', '=', 'employee_demo.guid')
-            ->when($level0, function($q) use($level0) {return $q->where('organization', $level0->name);})
-            ->when($level1, function($q) use($level1) {return $q->where('level1_program', $level1->name);})
-            ->when($level2, function($q) use($level2) {return $q->where('level2_division', $level2->name);})
-            ->when($level3, function($q) use($level3) {return $q->where('level3_branch', $level3->name);})
-            ->when($level4, function($q) use($level4) {return $q->where('level4', $level4->name);})
-            ->when($request->criteria == 'name', function($q) use($request){return $q->where('employee_name', 'like', "%" . $request->search_text . "%");})
+            ->leftjoin('users as u2', 'u2.id', '=', 'shared_profiles.shared_with')
+            ->leftjoin('employee_demo as e2', 'u2.guid', '=', 'e2.guid')
+            ->leftjoin('users as cc', 'cc.id', '=', 'shared_profiles.shared_by')
+            ->leftjoin('employee_demo as ec', 'cc.guid', '=', 'ec.guid')
+            ->when($level0, function($q) use($level0) {return $q->where('employee_demo.organization', $level0->name);})
+            ->when($level1, function($q) use($level1) {return $q->where('employee_demo.level1_program', $level1->name);})
+            ->when($level2, function($q) use($level2) {return $q->where('employee_demo.level2_division', $level2->name);})
+            ->when($level3, function($q) use($level3) {return $q->where('employee_demo.level3_branch', $level3->name);})
+            ->when($level4, function($q) use($level4) {return $q->where('employee_demo.level4', $level4->name);})
+            ->when($request->criteria == 'name', function($q) use($request){return $q->where('employee_demo.employee_name', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'job', function($q) use($request){return $q->where('jobcode_desc', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'dpt', function($q) use($request){return $q->where('deptid', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'job', function($q) use($request){return $q->where('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'dpt', function($q) use($request){return $q->where('employee_demo.deptid', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'all', function($q) use ($request) {
                 return $q->where(function ($query2) use ($request) {
                     if($request->search_text) {
                         $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
-                        ->orWhere('employee_name', 'like', "%" . $request->search_text . "%")
-                        ->orWhere('jobcode_desc', 'like', "%" . $request->search_text . "%")
-                        ->orWhere('deptid', 'like', "%" . $request->search_text . "%");
+                        ->orWhere('employee_demo.employee_name', 'like', "%" . $request->search_text . "%")
+                        ->orWhere('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%")
+                        ->orWhere('employee_demo.deptid', 'like', "%" . $request->search_text . "%");
                     }
                 });
             })
             ->select (
                 'employee_demo.employee_id',
                 'employee_demo.employee_name', 
+                'e2.employee_id as delegate_ee_id',
+                'e2.employee_name as delegate_ee_name',
+                'u2.name as alternate_delegate_name',
+                'shared_profiles.shared_item',
                 'employee_demo.jobcode_desc',
                 'employee_demo.organization',
                 'employee_demo.level1_program',
@@ -1088,17 +1102,30 @@ class EmployeeSharesController extends Controller
                 'employee_demo.level3_branch',
                 'employee_demo.level4',
                 'employee_demo.deptid',
-                'employee_shares.user_id',
+                'ec.employee_name as created_name',
+                'shared_profiles.created_at',
+                'shared_profiles.updated_at',
+                'shared_profiles.id as shared_profile_id',
             )
-            ->groupBy('employee_shares.user_id');
+            ->orderBy('employee_demo.employee_id')
+            ->orderBy('delegate_ee_id');
             return Datatables::of($query)
             ->addIndexColumn()
+            ->editColumn('shared_item', function ($row) {
+                $dcode = json_decode ($row->shared_item);
+                return count($dcode) == 2 ? 'All' : ($dcode[0] == 1 ? 'Goal' : 'Conversation');
+            })
+            ->editColumn('created_at', function ($row) {
+                return $row->created_at ? $row->created_at->format('M d, Y H:i:s') : null;
+            })
+            ->editColumn('updated_at', function ($row) {
+                return $row->updated_at ? $row->updated_at->format('M D, Y H:i:s') : null;
+            })
             ->addcolumn('action', function($row) {
-                $btn = '<button class="btn btn-xs btn-primary modalbutton" role="button" data-userid="' . $row->user_id . '" data-username="' . $row->employee_name . '" data-toggle="modal" data-target="#editModal" role="button">Edit</button>';
-                $btn = $btn . '&nbsp;&nbsp;&nbsp;<a href="' . route('sysadmin.employeeshares.deleteshare', $row->user_id) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->user_id .'"><i class="fa fa-trash"></i></a>';
+                $btn = '<a href="' . route('sysadmin.employeeshares.deleteshare', ['id' => $row->shared_profile_id]) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="' . $row->shared_profile_id . '"><i class="fa fa-trash"></i></a>';
                 return $btn;
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['created_at', 'updated_at', 'action'])
             ->make(true);
         }
     }
@@ -1107,14 +1134,16 @@ class EmployeeSharesController extends Controller
         if ($request->ajax()) {
             $query = User::withoutGlobalScopes()
             ->join('employee_shares', 'employee_shares.user_id', '=', 'users.id')
-            ->join('users as u2', 'employee_shares.shared_with_id', '=', 'u2.id')
+            ->leftjoin('users as u2', 'employee_shares.shared_with_id', '=', 'u2.id')
             ->leftjoin('employee_demo', 'users.guid', '=', 'employee_demo.guid')
             ->leftjoin('employee_demo as ed2', 'u2.guid', '=', 'ed2.guid')
+            ->leftjoin('shared_elements', 'shared_elements.id', '=', 'employee_shares.shared_element_id')
             ->where('users.id', '=', $id)
             ->select (
                 'ed2.employee_id',
                 'ed2.employee_name', 
                 'users.id as user_id',
+                'shared_elements.name as element_name',
                 'u2.id as shared_with_id',
             )
             ->distinct();
@@ -1149,8 +1178,11 @@ class EmployeeSharesController extends Controller
     }
 
     public function deleteshare(Request $request, $id) {
-        $query1 = DB::table('employee_shares')
-        ->where('user_id', '=', $id)
+        // $query1 = DB::table('employee_shares')
+        // ->where('user_id', '=', $id)
+        // ->delete();
+        $query1 = DB::table('shared_profiles')
+        ->where('id', '=', $id)
         ->delete();
         return redirect()->back();
     }

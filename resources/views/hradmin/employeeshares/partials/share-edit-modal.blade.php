@@ -41,14 +41,16 @@
                 scrollX: true,
                 stateSave: false,
                 deferRender: false,
+                stripeClasses: ['odd-row', 'even-row'],
                 ajax: {
                     type: 'GET',
                     url: hradmin/employeeshares/manageindexviewshares/"+user_id,
                 },                        
                 columns: [
                     {title: 'Item Type', ariaTitle: 'Item Type', target: 0, type: 'string', data: 'item_type', name: 'item_type', searchable: false, className: 'dt-nowrap'},
-                    {title: 'Shared With ID', ariaTitle: 'Shared With ID', target: 0, type: 'string', data: 'employee_id2', name: 'employee_id2', searchable: true, className: 'dt-nowrap'},
-                    {title: 'Shared With Name', ariaTitle: 'Shared With Name', target: 0, type: 'string', data: 'employee_name2', name: 'employee_name2', searchable: true, className: 'dt-nowrap'},
+                    {title: 'Delegate ID', ariaTitle: 'Delegate ID', target: 0, type: 'string', data: 'employee_id2', name: 'employee_id2', searchable: true, className: 'dt-nowrap'},
+                    {title: 'Delegate Name', ariaTitle: 'Delegate Name', target: 0, type: 'string', data: 'employee_name2', name: 'employee_name2', searchable: true, className: 'dt-nowrap'},
+                    {title: 'Shared Elements', ariaTitle: 'Shared Elements', target: 0, type: 'string', data: 'element_name', name: 'element_name', searchable: true, className: 'dt-nowrap'},
                     {title: 'Action', ariaTitle: 'Action', target: 0, type: 'num', data: 'action', name: 'action', searchable: false, className: 'dt-nowrap'},
                     {title: 'Item ID', ariaTitle: 'Item ID', target: 0, type: 'string', data: 'item_id', name: 'item_id', searchable: false, visible: false, className: 'dt-nowrap'},
                     {title: 'Participant ID', ariaTitle: 'Participant ID', target: 0, type: 'string', data: 'part_id', name: 'part_id', searchable: false, visible: false, className: 'dt-nowrap'},

@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\GoalType;
 use App\Models\LinkedGoal;
 use App\Models\GoalComment;
+use App\Models\EmployeeShare;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Scopes\NonLibraryScope;
@@ -35,7 +36,7 @@ class GoalController extends Controller
         $goaltypes = GoalType::all()->toArray();
         $tags = Tag::all()->toArray();
         $user = User::find($authId);
-        
+
         $myTeamController = new MyTeamController(); 
         $employees = $myTeamController->myEmployeesAjax();
 
@@ -43,6 +44,16 @@ class GoalController extends Controller
         ->with('user')
         ->with('goalType');
         $type = 'past';
+        
+        // $adminShared=EmployeeShare::select('shared_with_id')
+        // ->where('user_id', '=', $authId)
+        // ->whereIn('shared_element_id', ['B', 'G'])
+        // ->pluck('shared_with_id');
+
+        // $adminemps = User::select('users.*')
+        // ->whereIn('users.id', $adminShared)->get();
+
+        // $employees = $employees->merge($adminemps);
         
         $type_desc_arr = array();
         foreach($goaltypes as $goalType) {

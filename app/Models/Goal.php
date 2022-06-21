@@ -99,6 +99,13 @@ class Goal extends Model implements Auditable
     return $this->belongsToMany('App\Models\User', 'goals_shared_with', 'goal_id', 'user_id')->withTimestamps();
   }
 
+  public function sharedWithThruAdmin()
+  {
+      return $this->join('employee_shares', 'goals.user_id', '=', 'employee_shares.user_id')
+      ->whereIn('employee_shares.shared_element_id', ['B', 'G'])
+      ->belongsToMany('App\Models\User', 'goals_shared_with', 'goal_id', 'shared_with_id')->withTimestamps();
+  }
+
   public function tags()
   {
     return $this->belongsToMany(Tag::class, 'goal_tags')->withTimestamps();

@@ -16,4 +16,11 @@ class EmployeeShare extends Model
         'shared_element_id',
         'reason'
     ];
+
+    public function sharedWith()
+    {
+        return $this->belongsToMany('App\Models\User', 'employee_shares', 'shared_with_id', 'user_id')->withTimestamps();
+    }
+
+
 }

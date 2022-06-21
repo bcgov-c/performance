@@ -13,6 +13,7 @@ use App\Models\ConversationTopic;
 use App\Models\ExcusedReason;
 use App\Models\Goal;
 use App\Models\GoalType;
+use App\Models\EmployeeShare;
 use App\Models\Participant;
 use App\Models\SharedProfile;
 use App\Models\User;
@@ -43,7 +44,15 @@ class MyTeamController extends Controller
             ->with('sharedWith')
             ->with('goalType')->get();
         $employees = $this->myEmployeesAjax();
-        // dd($goals[0]->sharedWith);
+
+        // $adminShared=EmployeeShare::select('shared_with_id')
+        // ->where('user_id', '=', Auth::id())
+        // ->whereIn('shared_element_id', ['B', 'G'])
+        // ->pluck('shared_with_id');
+        // $adminemps = User::select('users.*')
+        // ->whereIn('users.id', $adminShared)->get();
+        // $employees = $employees->merge($adminemps);
+
         $type = 'upcoming'; // Allow Editing
         $showSignoff = false;
         $myEmpTable = $myEmployeesDataTable->html();
@@ -67,7 +76,7 @@ class MyTeamController extends Controller
                 $i++;
             }
         }
-        
+
         $shared_employees = DB::table('shared_profiles')
                     ->select('shared_profiles.shared_id', 'users.name')
                     ->join('users', 'users.id', '=', 'shared_profiles.shared_id')

@@ -78,16 +78,18 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col col-2">
-                            <label for='elements' title='Elements to Share Tooltip'>Elements to Share
+                           <label for='elements' title='Items to Share Tooltip'>Items to Share
                                 <select name="input_elements" class="form-control" id="input_elements" >
-                                    @foreach($sharedElements as $shareElement)
-                                        <option value = {{ $shareElement->id }} > {{ $shareElement->name }} </option>
-                                    @endforeach
+                                    <option value = 0 > Both </option>
+                                    <option value = 1 > Goal </option>
+                                    <option value = 2 > Conversation </option>
                                 </select>
+ 					            <small  class="text-danger error-target_date"></small>
                             </label>
-                        </div>
+                       </div>
                         <div class="col col-10">
                             <x-input id="reason" name="input_reason" label="Reason for sharing" data-toggle="tooltip" data-placement="top" data-trigger="manual" tooltip="Reason tooltip"/>
+					        <small  class="text-danger error-target_date"></small>
                         </div>
                     </div>
                 </div>
@@ -135,6 +137,7 @@
 
     <x-slot name="css">
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        {{-- <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}"> --}}
     </x-slot>
 
     <x-slot name="js">
@@ -162,6 +165,12 @@
 
 
             $(document).ready(function(){
+
+                // $(".items-to-share-edit").multiselect({
+                //     allSelectedText: 'All',
+                //     selectAllText: 'All',
+                //     includeSelectAllOption: true
+                // });
 
                 $('#employee-list-table').DataTable( {
                     scrollX: true,

@@ -44,14 +44,14 @@
                     scrollX: true,
                     stateSave: false,
                     deferRender: false,
-                    stripeClasses: ['odd-row', 'even-row'],
                     ajax: {
                         type: 'GET',
                         url: "/sysadmin/employeeshares/manageindexviewshares/"+user_id,
                     },                        
                     columns: [
-                        {title: 'Shared With ID', ariaTitle: 'Shared With ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', searchable: true, className: 'dt-nowrap'},
-                        {title: 'Shared With Name', ariaTitle: 'Shared With Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', searchable: true, className: 'dt-nowrap'},
+                        {title: 'Delegate ID', ariaTitle: 'Delegate ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', searchable: true, className: 'dt-nowrap'},
+                        {title: 'Delegate Name', ariaTitle: 'Delegate Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', searchable: true, className: 'dt-nowrap'},
+                        {title: 'Shared Elements', ariaTitle: 'Shared Elements', target: 0, type: 'string', data: 'element_name', name: 'element_name', searchable: true, className: 'dt-nowrap'},
                         {title: 'Action', ariaTitle: 'Action', target: 0, type: 'num', data: 'action', name: 'action', searchable: false, className: 'dt-nowrap'},
                         {title: 'Shared With User ID', ariaTitle: 'Shared With User ID', target: 0, type: 'string', data: 'shared_with_id', visible: false, name: 'shared_with_id', searchable: true, className: 'dt-nowrap'},
                     ],  
