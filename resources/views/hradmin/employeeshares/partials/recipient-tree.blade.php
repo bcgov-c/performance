@@ -409,7 +409,6 @@ $(document).ready(function() {
 							$(chkbox).prop('checked', true);
                         } 
                     });
-
                 },
                 complete: function() {
                     //$('#pageLoader').hide();  

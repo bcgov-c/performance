@@ -62,6 +62,7 @@ $(function() {
 	var	pie_basic_1_data = {!!json_encode( $data['chart1'] )!!};
 
 	var allCharts = [];
+	var export_url = '{{ route('hradmin.statistics.sharedsummary.export') }}';
 
 	function createChart(divId, myData) {
 
@@ -110,9 +111,8 @@ $(function() {
 							ids =  myChart.getModel().option.ids;
 							chart_id = myChart.getModel().option.chart_id;
 							
-							let _url = '{{ route('hradmin.statistics.sharedsummary.export')}}' 
-								+ '?chart=' + chart_id + '&ids=' + ids;
-								window.location.href = _url;
+							let _url = export_url + '?chart=' + chart_id; //  + '&ids=' + ids;
+							window.location.href = _url;
 						}
 					},
 				}
@@ -227,9 +227,8 @@ $(function() {
 
 			// prepare the parameters for calling export on difference segments
 			chart_id = myChart.getModel().option.chart_id;
-			let _url = '{{ route('hradmin.statistics.sharedsummary.export')}}' 
-							+ '?chart=' + chart_id + '&ids=' + params.data.ids;
-				window.location.href = _url;
+			let _url = export_url + '?chart=' + chart_id + '&legend=' + params.data.legend;
+			window.location.href = _url;
 
 		});
 

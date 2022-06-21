@@ -127,6 +127,8 @@ class SyncUserProfile extends Command
                 if ( strtolower(trim($user->email)) == strtolower(trim($employee->employee_email)) )  {
                     
                     //$user->email = $employee->employee_email;
+                    $user->employee_id = $employee->employee_id;
+                    $user->empl_record = $employee->empl_record;
                     //$user->reporting_to = $reporting_to;
                     $user->joining_date = $employee->position_start_date;
                     $user->acctlock = $employee->date_deleted ? true : false;
@@ -148,6 +150,8 @@ class SyncUserProfile extends Command
                 if ( strtolower(trim($user->email)) == strtolower(trim($employee->employee_email)) &&
                         (!($user->guid)) )  {
                     $user->guid = $employee->guid;
+                    $user->employee_id = $employee->employee_id;
+                    $user->empl_record = $employee->empl_record;
                     //$user->reporting_to = $reporting_to;
                     $user->joining_date = $employee->position_start_date;
                     $user->last_sync_at = $new_sync_at;
@@ -160,6 +164,8 @@ class SyncUserProfile extends Command
                   'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name,
                   'email' => $employee->employee_email,
                   //'reporting_to' => $reporting_to,
+                  'employee_id' => $employee->employee_id,
+                  'empl_record' => $employee->empl_record,
                   'joining_date' => $employee->position_start_date,
                   'password' => $password,
                   'acctlock' => $employee->date_deleted ? true : false,

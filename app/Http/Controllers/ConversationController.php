@@ -10,6 +10,7 @@ use App\Models\Conversation;
 use App\Models\ConversationParticipant;
 use App\Models\ConversationTopic;
 use App\Models\Participant;
+use App\Models\EmployeeShare;
 use App\Models\SharedProfile;
 use App\Models\User;
 use App\Models\EmployeeDemo;
@@ -396,6 +397,15 @@ class ConversationController extends Controller
         $reportingManager = $user->reportingManager()->get();
         $sharedProfile = SharedProfile::where('shared_with', Auth::id())->with('sharedUser')->get()->pluck('sharedUser');
         $participants = $participants->toBase()->merge($reportingManager)->merge($sharedProfile);
+
+        // $adminShared=EmployeeShare::select('shared_with_id')
+        // ->where('user_id', '=', Auth::id())
+        // ->whereIn('shared_element_id', ['B', 'C'])
+        // ->pluck('shared_with_id');
+        // $adminemps = User::select('users.*')
+        // ->whereIn('users.id', $adminShared)->get('id', 'name');
+        // $participants = $participants->toBase()->merge($adminemps);
+
         return view('conversation.partials.template-detail-modal-body', compact('template','allTemplates','participants','reportingManager'));
     }
 }

@@ -97,127 +97,47 @@
 
         $(document).ready(function() {
 
-            $('#ebtn_search').click(function(e) {
-                e.preventDefault();
-                console.log('#ebtn_search.click');
-                $('#enav-tab').show();
-				$('#enav-tabContent').show();
-                var euser_selected = [];
-                if($.fn.dataTable.isDataTable('#eemployee-list-table')) {
-                    $('#eemployee-list-table').DataTable().clear();
-                    $('#eemployee-list-table').DataTable().destroy();
-                    $('#eemployee-list-table').empty();
-                }
-                $('#eemployee-list-table').DataTable( {
-                    "scrollX": true,
-                    retrieve: true,
-                    "searching": false,
-                    processing: true,
-                    serverSide: true,
-                    select: true,
-                    'order': [[1, 'asc']],
-                    ajax: {
-                        url: '{{ route('sysadmin.employeeshares.eemployee.list') }}',
-                        data: function (d) {
-                            d.edd_level0 = $('#edd_level0').val();
-                            d.edd_level1 = $('#edd_level1').val();
-                            d.edd_level2 = $('#edd_level2').val();
-                            d.edd_level3 = $('#edd_level3').val();
-                            d.edd_level4 = $('#edd_level4').val();
-                            d.ecriteria = $('#ecriteria').val();
-                            d.esearch_text = $('#esearch_text').val();
-                        }
-                    },
-                    "fnDrawCallback": function() {
-                        list = ( $('#eemployee-list-table input:checkbox') );
-                        $.each(list, function( index, item ) {
-                            var index = $.inArray( item.value , eg_selected_employees);
-                            if ( index === -1 ) {
-                                $(item).prop('checked', false); // unchecked
-                            } else {
-                                $(item).prop('checked', true);  // checked 
-                            }
-                        });
-                        // update the check all checkbox status 
-                        if (eg_selected_employees.length == 0) {
-                            $('#eemployee-list-select-all').prop("checked", false);
-                            $('#eemployee-list-select-all').prop("indeterminate", false);   
-                        } else if (eg_selected_employees.length == eg_matched_employees.length) {
-                            $('#eemployee-list-select-all').prop("checked", true);
-                            $('#eemployee-list-select-all').prop("indeterminate", false);   
-                        } else {
-                            $('#eemployee-list-select-all').prop("checked", false);
-                            $('#eemployee-list-select-all').prop("indeterminate", true);    
-                        }
-                    },
-                    "rowCallback": function( row, data ) {
-                    },
-                    columns: [
-                        {title: '<input name="select_all" value="1" id="eemployee-list-select-all" type="checkbox" />', ariaTitle: 'eemployee-list-select-all', target: 0, type: 'string', data: 'eselect_users', name: 'eselect_users', orderable: false, searchable: false},
-                        {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'eemployee_id', name: 'eemployee_id', className: 'dt-nowrap'},
-                        {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'eemployee_name', name: 'eemployee_name', className: 'dt-nowrap'},
-                        {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'ejobcode_desc', name: 'ejobcode_desc', className: 'dt-nowrap'},
-                        {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'eemployee_email', name: 'eemployee_email', className: 'dt-nowrap'},
-                        {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'eorganization', name: 'eorganization', className: 'dt-nowrap'},
-                        {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'elevel1_program', name: 'elevel1_program', className: 'dt-nowrap'},
-                        {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'elevel2_division', name: 'elevel2_division', className: 'dt-nowrap'},
-                        {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'elevel3_branch', name: 'elevel3_branch', className: 'dt-nowrap'},
-                        {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'elevel4', name: 'elevel4', className: 'dt-nowrap'},
-                        {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'edeptid', name: 'edeptid', className: 'dt-nowrap'},
-                    ],
-                });
-
-            });
 
             $('#edd_level0').change(function (e){
                 e.preventDefault();
-                console.log('#edd_level0.change');
             });
 
             $('#edd_level1').change(function (e){
                 e.preventDefault();
-                console.log('#edd_level1.change');
             });
 
             $('#edd_level2').change(function (e){
                 e.preventDefault();
-                console.log('#edd_level2.change');
             });
 
             $('#edd_level3').change(function (e){
                 e.preventDefault();
-                console.log('#edd_level3.change');
             });
 
             $('#edd_level4').change(function (e){
                 e.preventDefault();
-                console.log('#edd_level4.change');
                 $('#ebtn_search').click();
             });
 
             $('#ecriteria').change(function (e){
                 e.preventDefault();
-                console.log('#ecriteria.change');
                 $('#ebtn_search').click();
             });
 
             $('#esearch_text').change(function (e){
                 e.preventDefault();
-                console.log('#esearch_text.change');
                $('#ebtn_search').click();
             });
 
             $('#esearch_text').keydown(function (e){
                 if (e.keyCode == 13) {
                     e.preventDefault();
-                    console.log('#esearch_text.keydown');
                     $('#ebtn_search').click();
                 }
             });
 
             $('#ebtn_search_reset').click(function (e){
                 e.preventDefault();
-                console.log('#ebtn_search_reset.click');
                 $('#ecriteria').val('all');
                 $('#esearch_text').val(null);
                 $('#edd_level0').val(null).trigger('change');
@@ -349,7 +269,6 @@
             
             $('#edd_level0').on('select2:select', function (e) {
                 e.preventDefault();
-                console.log('#edd_level0.select2:select');
                 $('#edd_level1').val(null).trigger('change');
                 $('#edd_level2').val(null).trigger('change');
                 $('#edd_level3').val(null).trigger('change');
@@ -358,7 +277,6 @@
 
             $('#edd_level1').on('select2:select', function (e) {
                 e.preventDefault();
-                console.log('#edd_level1.select2:select');
                 $('#edd_level2').val(null).trigger('change');
                 $('#edd_level3').val(null).trigger('change');
                 $('#edd_level4').val(null).trigger('change');
@@ -366,14 +284,12 @@
 
             $('#edd_level2').on('select2:select', function (e) {
                 e.preventDefault();
-                console.log('#edd_level2.select2:select');
                 $('#edd_level3').val(null).trigger('change');
                 $('#edd_level4').val(null).trigger('change');
             });
 
             $('#edd_level3').on('select2:select', function (e) {
                 e.preventDefault();
-                console.log('#edd_level3.select2:select');
                 $('#edd_level4').val(null).trigger('change');
             });
 
@@ -384,7 +300,6 @@
 
             $('#edd_level0').on('select2:unselect', function (e) {
                 e.preventDefault();
-                console.log('#edd_level0.select2:unselect');
                 $('#edd_level0').val(null).trigger('change');
                 $('#edd_level1').val(null).trigger('change');
                 $('#edd_level2').val(null).trigger('change');
@@ -394,7 +309,6 @@
 
             $('#edd_level1').on('select2:unselect', function (e) {
                 e.preventDefault();
-                console.log('#edd_level1.select2:unselect');
                 $('#edd_level1').val(null).trigger('change');
                 $('#edd_level2').val(null).trigger('change');
                 $('#edd_level3').val(null).trigger('change');
@@ -403,7 +317,6 @@
 
             $('#edd_level2').on('select2:unselect', function (e) {
                 e.preventDefault();
-                console.log('#edd_level2.select2:unselect');
                 $('#edd_level2').val(null).trigger('change');
                 $('#edd_level3').val(null).trigger('change');
                 $('#edd_level4').val(null).trigger('change');
@@ -411,14 +324,12 @@
 
             $('#edd_level3').on('select2:unselect', function (e) {
                 e.preventDefault();
-                console.log('#edd_level3.select2:unselect');
                 $('#edd_level3').val(null).trigger('change');
                 $('#edd_level4').val(null).trigger('change');
             });
 
             $('#edd_level4').on('select2:unselect', function (e) {
                 e.preventDefault();
-                console.log('#edd_level4.select2:unselect');
                 $('#edd_level4').val(null).trigger('change');
                 $('#ebtn_search').click();
             });

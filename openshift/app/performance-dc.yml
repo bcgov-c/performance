@@ -76,7 +76,7 @@ objects:
       labels:
         service: '${APP_NAME}'
     spec:
-      replicas: 2
+      replicas: '${{REPLICA_COUNT}}'
       selector:
         deploymentconfig: '${APP_NAME}'
       strategy:
@@ -291,3 +291,7 @@ parameters:
     name: GITHUB_AUTH_TOKEN
     required: true
     value: '${GITHUB_AUTH_TOKEN}'
+  - description: No. of replicas
+    displayName: Number of Replicas
+    name: REPLICA_COUNT
+    required: true

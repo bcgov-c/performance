@@ -13,6 +13,7 @@
 	<p class="px-3">To continue, please use the functions below to select the employee profiles that you would like to share,
 		the supervisor you would like to share the profiles with, which elements you would like to share, and your reason 
 		for sharing the profile.</p>
+		
 	<form id="notify-form" action="{{ route('sysadmin.employeeshares.saveall') }}" method="post">
 		@csrf
 
@@ -37,9 +38,9 @@
 						@include('sysadmin.employeeshares.partials.recipient-list')
 					</div>
 					<div class="tab-pane fade" id="nav-tree" role="tabpanel" aria-labelledby="nav-tree-tab" loaded="">
-						<div class="mt-2 fas fa-spinner fa-spin fa-3x fa-fw loading-spinner" id="tree-loading-spinner" role="status" style="display:none">
+						{{-- <div class="mt-2 fas fa-spinner fa-spin fa-3x fa-fw loading-spinner" id="tree-loading-spinner" role="status" style="display:none">
 							<span class="sr-only">Loading...</span>
-						</div>
+						</div> --}}
 					</div>
 				</div>
 			</div>
@@ -66,9 +67,9 @@
 						@include('sysadmin.employeeshares.partials.erecipient-list')
 					</div>
 					<div class="tab-pane fade" id="enav-tree" role="tabpanel" aria-labelledby="enav-tree-tab" loaded="">
-						<div class="mt-2 fas fa-spinner fa-spin fa-3x fa-fw loading-spinner" id="etree-loading-spinner" role="status" style="display:none">
+						{{-- <div class="mt-2 fas fa-spinner fa-spin fa-3x fa-fw loading-spinner" id="etree-loading-spinner" role="status" style="display:none">
 							<span class="sr-only">Loading...</span>
-						</div>
+						</div> --}}
 					</div>
 				</div>
 			</div>
@@ -84,11 +85,11 @@
 					<div class="row">
 						<div class="col col-2">
 							<label for='elements' title='Elements to Share Tooltip'>Elements to Share
-								<select name="elements" class="form-control" id="elements">
-									@foreach($sharedElements as $rid => $desc)
-										<option value = {{ $rid }} > {{ $desc }} </option>
-									@endforeach
-								</select>
+                                <select name="elements" class="form-control" id="elements">
+                                    @foreach($sharedElements as $shareElement)
+                                        <option value = {{ $shareElement->id }} > {{ $shareElement->name }} </option>
+                                    @endforeach
+                                </select>
 							</label>
 						</div>
 						<div class="col col-10">
@@ -109,34 +110,34 @@
 			</div>
 		</div>
 
+		<!----modal starts here--->
+		<div id="saveAllModal" class="modal" role='dialog'>
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Confirmation</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p>Are you sure to send out this message ?</p>
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-primary mt-2" type="submit" name="btn_send" value="btn_send">Share</button>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		<!--Modal ends here--->	
+
 	</form>
 
 	<h6 class="m-20">&nbsp;</h6>
 	<h6 class="m-20">&nbsp;</h6>
 	<h6 class="m-20">&nbsp;</h6>
-
-	<!----modal starts here--->
-	<div id="saveAllModal" class="modal" role='dialog'>
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Confirmation</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body">
-					<p>Are you sure to send out this message ?</p>
-				</div>
-				<div class="modal-footer">
-					<button class="btn btn-primary mt-2" type="submit" name="btn_send" value="btn_send">Share</button>
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-				</div>
-				
-			</div>
-		</div>
-	</div>
-	<!--Modal ends here--->	
 
 	<x-slot name="css">
 		<style>
@@ -177,6 +178,11 @@
 	</x-slot>
 
 	<x-slot name="js">
+		@push('js')
+
+		<script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+		<script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 		<script>
 			let g_matched_employees = {!!json_encode($matched_emp_ids)!!};
@@ -194,14 +200,234 @@
 				$('#saveAllModal').modal();
 			}
 
+			$('#employee-list-select-all').click(function() {
+					console.log('SDFGHJK');
+				});
+
+				$('#employee-list-select-all').on('click', function() {
+					console.log('DDSFGHJ');
+				});
+
+
+				$('#employee-list-select-all').on('change', function() {
+					console.log('YTFGHGBNHGB');
+				});
+
+
 			$(document).ready(function() {
 
 				$('#pageLoader').hide();
 
-				$('#nav-tab').hide();
-				$('#nav-tabContent').hide();
-				$('#enav-tab').hide();
-				$('#enav-tabContent').hide();
+				// $('#nav-tab').hide();
+				// $('#nav-tabContent').hide();
+				// $('#enav-tab').hide();
+				// $('#enav-tabContent').hide();
+
+
+				$('#employee-list-table').DataTable( {
+					scrollX: true,
+					retrieve: true,
+					searching: false,
+					processing: true,
+					serverSide: true,
+					select: true,
+					order: [[1, 'asc']],
+					ajax: {
+						url: '{{ route('sysadmin.employeeshares.employee.list') }}',
+						data: function (d) {
+							d.dd_level0 = $('#dd_level0').val();
+							d.dd_level1 = $('#dd_level1').val();
+							d.dd_level2 = $('#dd_level2').val();
+							d.dd_level3 = $('#dd_level3').val();
+							d.dd_level4 = $('#dd_level4').val();
+							d.criteria = $('#criteria').val();
+							d.search_text = $('#search_text').val();
+						}
+					},
+					"fnDrawCallback": function() {
+						list = ( $('#employee-list-table input:checkbox') );
+						$.each(list, function( index, item ) {
+							var index = $.inArray( item.value , g_selected_employees);
+							if ( index === -1 ) {
+								$(item).prop('checked', false); // unchecked
+							} else {
+								$(item).prop('checked', true);  // checked 
+							}
+						});
+						// update the check all status 
+						if (g_selected_employees.length == 0) {
+							$('#employee-list-select-all').prop("checked", false);
+							$('#employee-list-select-all').prop("indeterminate", false);   
+						} else if (g_selected_employees.length == g_matched_employees.length) {
+							$('#employee-list-select-all').prop("checked", true);
+							$('#employee-list-select-all').prop("indeterminate", false);   
+						} else {
+							$('#employee-list-select-all').prop("checked", false);
+							$('#employee-list-select-all').prop("indeterminate", true);    
+						}
+					},
+					"rowCallback": function( row, data ) {
+					},
+					columns: [
+						{title: '<input name="select_all" value="1" id="employee-list-select-all" type="checkbox" />', ariaTitle: 'employee-list-select-all', target: 0, type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
+						{title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', className: 'dt-nowrap'},
+						{title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', className: 'dt-nowrap'},
+						{title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', className: 'dt-nowrap'},
+						{title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'employee_email', className: 'dt-nowrap'},
+						{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', className: 'dt-nowrap'},
+						{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', className: 'dt-nowrap'},
+						{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', className: 'dt-nowrap'},
+						{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', className: 'dt-nowrap'},
+						{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', className: 'dt-nowrap'},
+						{title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', name: 'deptid', className: 'dt-nowrap'},
+					],
+				});
+
+
+
+				$('#btn_search').click(function(e) {
+					console.log('sysadmin - employeeshares - addindex.blade.php - #btn_search.click');
+					e.preventDefault();
+					// $('#nav-tab').show();
+					// $('#nav-tabContent').show();
+					var user_selected = [];
+					$('#employee-list-table').DataTable().rows().invalidate().draw();
+					// if($.fn.dataTable.isDataTable('#employee-list-table')) {
+					// 	$('#employee-list-table').DataTable().clear();
+					// 	$('#employee-list-table').DataTable().destroy();
+					// 	$('#employee-list-table').empty();
+					// }
+					// $('#employee-list-table').DataTable( {
+					// 	scrollX: true,
+					// 	retrieve: true,
+					// 	searching: false,
+					// 	processing: true,
+					// 	serverSide: true,
+					// 	select: true,
+					// 	order: [[1, 'asc']],
+					// 	ajax: {
+					// 		url: '{{ route('sysadmin.employeeshares.employee.list') }}',
+					// 		data: function (d) {
+					// 			d.dd_level0 = $('#dd_level0').val();
+					// 			d.dd_level1 = $('#dd_level1').val();
+					// 			d.dd_level2 = $('#dd_level2').val();
+					// 			d.dd_level3 = $('#dd_level3').val();
+					// 			d.dd_level4 = $('#dd_level4').val();
+					// 			d.criteria = $('#criteria').val();
+					// 			d.search_text = $('#search_text').val();
+					// 		}
+					// 	},
+					// 	"fnDrawCallback": function() {
+					// 		list = ( $('#employee-list-table input:checkbox') );
+					// 		$.each(list, function( index, item ) {
+					// 			var index = $.inArray( item.value , g_selected_employees);
+					// 			if ( index === -1 ) {
+					// 				$(item).prop('checked', false); // unchecked
+					// 			} else {
+					// 				$(item).prop('checked', true);  // checked 
+					// 			}
+					// 		});
+					// 		// update the check all checkbox status 
+					// 		if (g_selected_employees.length == 0) {
+					// 			$('#employee-list-select-all').prop("checked", false);
+					// 			$('#employee-list-select-all').prop("indeterminate", false);   
+					// 		} else if (g_selected_employees.length == g_matched_employees.length) {
+					// 			$('#employee-list-select-all').prop("checked", true);
+					// 			$('#employee-list-select-all').prop("indeterminate", false);   
+					// 		} else {
+					// 			$('#employee-list-select-all').prop("checked", false);
+					// 			$('#employee-list-select-all').prop("indeterminate", true);    
+					// 		}
+					// 	},
+					// 	"rowCallback": function( row, data ) {
+					// 	},
+					// 	columns: [
+					// 		{title: '<input name="select_all" value="1" id="employee-list-select-all" type="checkbox" />', ariaTitle: 'employee-list-select-all', target: 0, type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
+					// 		{title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', className: 'dt-nowrap'},
+					// 		{title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', className: 'dt-nowrap'},
+					// 		{title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', className: 'dt-nowrap'},
+					// 		{title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'employee_email', className: 'dt-nowrap'},
+					// 		{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', className: 'dt-nowrap'},
+					// 		{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', className: 'dt-nowrap'},
+					// 		{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', className: 'dt-nowrap'},
+					// 		{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', className: 'dt-nowrap'},
+					// 		{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', className: 'dt-nowrap'},
+					// 		{title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', name: 'deptid', className: 'dt-nowrap'},
+					// 	],
+					// });
+				});
+
+				$('#ebtn_search').click(function(e) {
+					e.preventDefault();
+					console.log('#ebtn_search.click');
+					$('#enav-tab').show();
+					$('#enav-tabContent').show();
+					var euser_selected = [];
+					if($.fn.dataTable.isDataTable('#eemployee-list-table')) {
+						$('#eemployee-list-table').DataTable().clear();
+						$('#eemployee-list-table').DataTable().destroy();
+						$('#eemployee-list-table').empty();
+					}
+					$('#eemployee-list-table').DataTable( {
+						scrollX: true,
+						retrieve: true,
+						searching: false,
+						processing: true,
+						serverSide: true,
+						select: true,
+						order: [[1, 'asc']],
+						ajax: {
+							url: '{{ route('sysadmin.employeeshares.eemployee.list') }}',
+							data: function (d) {
+								d.edd_level0 = $('#edd_level0').val();
+								d.edd_level1 = $('#edd_level1').val();
+								d.edd_level2 = $('#edd_level2').val();
+								d.edd_level3 = $('#edd_level3').val();
+								d.edd_level4 = $('#edd_level4').val();
+								d.ecriteria = $('#ecriteria').val();
+								d.esearch_text = $('#esearch_text').val();
+							}
+						},
+						"fnDrawCallback": function() {
+							list = ( $('#eemployee-list-table input:checkbox') );
+							$.each(list, function( index, item ) {
+								var index = $.inArray( item.value , eg_selected_employees);
+								if ( index === -1 ) {
+									$(item).prop('checked', false); // unchecked
+								} else {
+									$(item).prop('checked', true);  // checked 
+								}
+							});
+							// update the check all checkbox status 
+							if (eg_selected_employees.length == 0) {
+								$('#eemployee-list-select-all').prop("checked", false);
+								$('#eemployee-list-select-all').prop("indeterminate", false);   
+							} else if (eg_selected_employees.length == eg_matched_employees.length) {
+								$('#eemployee-list-select-all').prop("checked", true);
+								$('#eemployee-list-select-all').prop("indeterminate", false);   
+							} else {
+								$('#eemployee-list-select-all').prop("checked", false);
+								$('#eemployee-list-select-all').prop("indeterminate", true);    
+							}
+						},
+						"rowCallback": function( row, data ) {
+						},
+						columns: [
+							{title: '<input name="eselect_all" value="1" id="eemployee-list-select-all" type="checkbox" />', ariaTitle: 'eemployee-list-select-all', target: 0, type: 'string', data: 'eselect_users', name: 'eselect_users', orderable: false, searchable: false},
+							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'eemployee_id', name: 'eemployee_id', className: 'dt-nowrap'},
+							{title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'eemployee_name', name: 'eemployee_name', className: 'dt-nowrap'},
+							{title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'ejobcode_desc', name: 'ejobcode_desc', className: 'dt-nowrap'},
+							{title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'eemployee_email', name: 'eemployee_email', className: 'dt-nowrap'},
+							{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'eorganization', name: 'eorganization', className: 'dt-nowrap'},
+							{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'elevel1_program', name: 'elevel1_program', className: 'dt-nowrap'},
+							{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'elevel2_division', name: 'elevel2_division', className: 'dt-nowrap'},
+							{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'elevel3_branch', name: 'elevel3_branch', className: 'dt-nowrap'},
+							{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'elevel4', name: 'elevel4', className: 'dt-nowrap'},
+							{title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'edeptid', name: 'edeptid', className: 'dt-nowrap'},
+						],
+					});
+
+				});
 
 				$('#notify-form').keydown(function (e) {
 					if (e.keyCode == 13) {
@@ -229,9 +455,9 @@
 				$('#enotify-form').submit(function() {
 					// assign back the selected employees to server
 					var etext = JSON.stringify(eg_selected_employees);
-					$('#eselected_emp_ids').val( text );
+					$('#eselected_emp_ids').val( etext );
 					var etext2 = JSON.stringify(eg_selected_orgnodes);
-					$('#eselected_org_nodes').val( text2 );
+					$('#eselected_org_nodes').val( etext2 );
 					return true; // return false to cancel form action
 				});
 
@@ -244,8 +470,8 @@
 
 				// Tab  -- LIST Page  activate
 				$("#enav-list-tab").on("click", function(e) {
-					table  = $('#eemployee-list-table').DataTable();
-					table.rows().invalidate().draw();
+					etable  = $('#eemployee-list-table').DataTable();
+					etable.rows().invalidate().draw();
 				});
 
 				// Tab  -- TREE activate
@@ -322,11 +548,11 @@
                                 })
                             ).then(function( data, textStatus, jqXHR ) {
                                 //alert( jqXHR.status ); // Alerts 200
-                                nodes = $('#eaccordion-level0 input:checkbox');
-                                redrawTreeCheckboxes();	
+                                enodes = $('#eaccordion-level0 input:checkbox');
+                                eredrawTreeCheckboxes();	
                             }); 
                         } else {
-                            redrawTreeCheckboxes();
+                            eredrawTreeCheckboxes();
                         }
                     } else {
 						$(etarget).html('<i class="glyphicon glyphicon-info-sign"></i> Tree result is too big.  Please apply organization filter before clicking on Tree.');
@@ -452,9 +678,9 @@
 					var c_indeterminated = 0;
 					var c_checked = 0;
 					var c_unchecked = 0;
-					prev_location = $(prev_input).parent().attr('href');
-					nodes = $(prev_location).find("input:checkbox[name='eorgCheck[]']");
-					$.each( nodes, function( index, chkbox ) {
+					eprev_location = $(prev_input).parent().attr('href');
+					enodes = $(eprev_location).find("input:checkbox[name='eorgCheck[]']");
+					$.each( enodes, function( index, chkbox ) {
 						if (chkbox.checked) {
 							c_checked++;
 						} else if ( chkbox.indeterminate ) {
@@ -484,10 +710,10 @@
 				$('#pageLoader').show();
 			});
 
-			$(window).resize(function(){
-				location.reload();
-				return;
-			});
+			// $(window).resize(function(){
+			// 	location.reload();
+			// 	return;
+			// });
 
 			// Model -- Confirmation Box
 
@@ -507,6 +733,8 @@
 			// };
 
 		</script>
+		@endpush('js')
+
 	</x-slot>
 
 </x-side-layout>

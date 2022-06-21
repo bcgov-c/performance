@@ -170,13 +170,13 @@ class ExcuseEmployeesController extends Controller
             ->when($level3, function($q) use($level3) {return $q->where('level3_branch', $level3->name);})
             ->when($level4, function($q) use($level4) {return $q->where('level4', $level4->name);})
             ->when($request->criteria == 'name', function($q) use($request){return $q->where('employee_name', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_id', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'job', function($q) use($request){return $q->where('job_title', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'dpt', function($q) use($request){return $q->where('deptid', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'all', function($q) use ($request) {
                 return $q->where(function ($query2) use ($request) {
                     if($request->search_text) {
-                        $query2->where('employee_id', 'like', "%" . $request->search_text . "%")
+                        $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
                         ->orWhere('employee_name', 'like', "%" . $request->search_text . "%")
                         ->orWhere('job_title', 'like', "%" . $request->search_text . "%")
                         ->orWhere('deptid', 'like', "%" . $request->search_text . "%");
@@ -184,7 +184,7 @@ class ExcuseEmployeesController extends Controller
                 });
             })
             ->select (
-                'employee_id',
+                'employee_demo.employee_id',
                 'employee_name', 
                 'employee_demo.job_title',
                 'users.excused_start_date',

@@ -38,8 +38,8 @@ class ExcusedEmployeeExport implements FromCollection,WithHeadings, WithMapping,
     {
 
         $emp = EmployeeDemo::where('guid', $user->guid)->first();
-        $reason = ExcusedReason::where('id', $user->excused_reason_id)->first();
-        $reason_name = $reason ? $reason->name : '';
+        // $reason = ExcusedReason::where('id', $user->excused_reason_id)->first();
+        // $reason_name = $reason ? $reason->name : '';
 
         return [
             $emp ? $emp->employee_id : '',
@@ -48,7 +48,7 @@ class ExcusedEmployeeExport implements FromCollection,WithHeadings, WithMapping,
             $user->excused,
             $user->excused_start_date,
             $user->excused_end_date,
-            $reason_name,
+            $user->excuseReason ? $user->excuseReason->name : '',
             $emp ? $emp->organization : '',
             $emp ? $emp->level1_program : '',
             $emp ? $emp->level2_division : '',
@@ -64,7 +64,7 @@ class ExcusedEmployeeExport implements FromCollection,WithHeadings, WithMapping,
     {
         return ["Employee ID", "Employee Name", "Email",
             "Excused", "Excused Start Date", "Excused End Date", "Excused Reason",
-            "Organization", "Program", "Division", "Branch", "Level 4", "Reporting To",
+            "Organization", "Level 1", "Level 2", "Level 3", "Level 4", "Reporting To",
         ];
         
     }

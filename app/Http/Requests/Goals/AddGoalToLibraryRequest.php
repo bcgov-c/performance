@@ -41,7 +41,8 @@ class AddGoalToLibraryRequest extends FormRequest
 
     public function messages() {
         return [
-            'itemsToShare.required' => 'please select at least one employee'
+            'itemsToShare.required' => 'please select at least one employee',
+            'what.required' => 'The description field is required'
         ];
     }
 }

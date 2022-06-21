@@ -48,15 +48,15 @@ class StatisticsReportController extends Controller
 
         $data = array();
 
-        $reportee_ids = User::where('id', Auth::id() )->first()->allreportees->pluck('id')->toArray();
+        //$reportee_ids = User::where('id', Auth::id() )->first()->allreportees->pluck('id')->toArray();
+        $reportee_ids = $this->getReporteeIds();
 
         foreach($types as $type)
         {
             $goal_id = $type->id ? $type->id : '';
 
             $sql = User::select('id')
-                    ->whereIn('id', $reportee_ids) 
-                    ->where('acctlock', 0)
+                    ->whereIn('id', $reportee_ids)
                     ->withCount(['goals' => function($q) use($type, $reportee_ids) {
                         $q->where('status', 'active')
                             ->whereIn('user_id', $reportee_ids) 
@@ -81,7 +81,7 @@ class StatisticsReportController extends Controller
                 $subset = $users->whereBetween('goals_count', $range );
                 array_push( $data[$goal_id]['groups'], [ 'name' => $key, 'value' => $subset->count(), 
                              'goal_id' => $goal_id, 
-                             'ids' => $subset ? $subset->pluck('id')->toArray() : []
+                             //'ids' =>  $subset ? $subset->pluck('id')->toArray() : [],
                 ]);
             }
         }
@@ -92,12 +92,13 @@ class StatisticsReportController extends Controller
     public function goalSummaryExport(Request $request)
     {
 
-        $selected_ids = $request->ids ? explode(',', $request->ids) : [];
+        // $selected_ids = $request->ids ? explode(',', $request->ids) : [];
+        $reportee_ids = $this->getReporteeIds();
 
-        $sql = User::whereIn('id', $selected_ids)
-                ->withCount(['goals' => function($q) use($request, $selected_ids) {
+        $sql = User::whereIn('id', $reportee_ids)
+                ->withCount(['goals' => function($q) use($request, $reportee_ids) {
                         $q->where('status', 'active')
-                            ->whereIn('user_id', $selected_ids) 
+                            ->whereIn('user_id', $reportee_ids) 
                             ->when( $request->goal  , function ($query) use ($request) {
                                 return $query->where('goal_type_id', $request->goal);
                             });
@@ -123,13 +124,9 @@ class StatisticsReportController extends Controller
 
     public function conversationSummary(Request $request)
     {
-        $reportee_ids = User::where('id', Auth::id() )->first()->allreportees->pluck('id')->toArray();
-        // array_push($reportee_ids, Auth::id());
 
-        // array_push($reportee_ids, 120053);
-        // array_push($reportee_ids, 120007);
-        // array_push($reportee_ids, 120002);
-        // array_push($reportee_ids, 120011);
+        // $reportee_ids = User::where('id', Auth::id() )->first()->allreportees->pluck('id')->toArray();
+        $reportee_ids = $this->getReporteeIds();
 
         // Chart1 -- Overdue
         $sql_2 = User::selectRaw("* , 
@@ -158,10 +155,11 @@ class StatisticsReportController extends Controller
         {
             $subset = $next_due_users->whereBetween('overdue_in_days', $range );
             array_push( $data['chart1']['groups'],  [ 'name' => $key, 'value' => $subset->count(), 
-                            'ids' => $subset ? $subset->pluck('id')->toArray() : [] ]);
+                            // 'ids' => $subset ? $subset->pluck('id')->toArray() : [] 
+                        ]);
         }
 
-        // SQL for Chart 2 & 3
+        // SQL for Chart 2
         $sql = Conversation::selectRaw("* , 
                 DATEDIFF (
                     COALESCE (
@@ -174,15 +172,15 @@ class StatisticsReportController extends Controller
                         ) 
                 , DATE_ADD( DATE_FORMAT(sysdate(), '%Y-%m-%d'), INTERVAL -122 day) ) * -1
             as overdue_in_days") 
-        ->where(function($query) use ($reportee_ids) {
-                $query->whereIn('user_id', $reportee_ids)
-                    ->orWhereHas('conversationParticipants', function($query) use ($reportee_ids) {
-                        $query->whereIn('participant_id', $reportee_ids);
-                    });
-        })
-        //->whereIn('user_id', $reportee_ids)
+        // ->where(function($query) use ($reportee_ids) {
+        //         $query->whereIn('user_id', $reportee_ids)
+        //             ->orWhereHas('conversationParticipants', function($query) use ($reportee_ids) {
+        //                 $query->whereIn('participant_id', $reportee_ids);
+        //             });
+        // })
+        ->whereIn('user_id', $reportee_ids)
         ->where(function ($query)  {
-        return $query->whereNull('signoff_user_id')
+             return $query->whereNull('signoff_user_id')
                     ->orWhereNull('supervisor_signoff_id');
         });
         $conversations = $sql->get();
@@ -200,7 +198,8 @@ class StatisticsReportController extends Controller
         {
             $subset = $open_conversations->where('conversation_topic_id', $topic->id );
             array_push( $data['chart2']['groups'],  [ 'name' => $topic->name, 'value' => $subset->count(),
-                            'ids' => $subset ? $subset->pluck('id')->toArray() : []
+                            'topic_id' => $topic->id,
+                            // 'ids' => $subset ? $subset->pluck('id')->toArray() : []
                         ]);
         }    
 
@@ -209,12 +208,14 @@ class StatisticsReportController extends Controller
         $data['chart3']['title'] = 'Topic: Completed Conversations';
         $data['chart3']['legend'] = $topics->pluck('name')->toArray();
         $data['chart3']['groups'] = array();
-        $completed_conversations = Conversation::where(function($query) use ($reportee_ids) {
-            $query->whereIn('user_id', $reportee_ids)
-                ->orWhereHas('conversationParticipants', function($query) use ($reportee_ids) {
-                    $query->whereIn('participant_id', $reportee_ids);
-                });
-        })
+        
+        $completed_conversations = Conversation::whereIn('user_id', $reportee_ids)
+        //     ->where(function($query) use ($reportee_ids) {
+        //     $query->whereIn('user_id', $reportee_ids)
+        //         ->orWhereHas('conversationParticipants', function($query) use ($reportee_ids) {
+        //             $query->whereIn('participant_id', $reportee_ids);
+        //         });
+        // })
         ->where(function ($query)  {
                 return $query->whereNotNull('signoff_user_id')
                              ->whereNotNull('supervisor_signoff_id');
@@ -224,7 +225,8 @@ class StatisticsReportController extends Controller
         {
             $subset = $completed_conversations->where('conversation_topic_id', $topic->id );
             array_push( $data['chart3']['groups'],  [ 'name' => $topic->name, 'value' => $subset->count(), 
-                    'ids' => $subset ? $subset->pluck('id')->toArray() : []
+                    'topic_id' => $topic->id,
+                    // 'ids' => $subset ? $subset->pluck('id')->toArray() : []
                 ]);
         }    
 
@@ -235,35 +237,33 @@ class StatisticsReportController extends Controller
 
     public function conversationSummaryExport(Request $request)
     {
-        // dd($request);
-        $selected_ids = $request->ids ? explode(',', $request->ids) : [];
+        // $selected_ids = $request->ids ? explode(',', $request->ids) : [];
+        $reportee_ids = $this->getReporteeIds();
 
-        // Chart1 -- Overdue
-        // $sql = User::selectRaw('*,
-        //         DATE_ADD (
-        //             COALESCE (                       
-        //                 (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )
-        //                     from conversations A
-        //                 where A.user_id = users.id 
-        //                     and signoff_user_id is not null 
-        //                     and supervisor_signoff_id is not null),   joining_date 
-
-        //             ), INTERVAL 123 day) as next_due_date')
-        //         ->whereIn('id', $selected_ids);
-        $sql = User::selectRaw("*,
+        $sql_chart1 = User::selectRaw("*,
                     DATE_ADD( DATE_FORMAT( COALESCE (                       
                        (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )
                             from conversations A
                         where A.user_id = users.id 
                             and signoff_user_id is not null 
                             and supervisor_signoff_id is not null)
-                            ,joining_date), '%Y-%m-%d'), INTERVAL 122 day) as next_due_date")
-                ->whereIn('id', $selected_ids);
+                            ,joining_date), '%Y-%m-%d'), INTERVAL 122 day) as next_due_date,
+                    DATEDIFF (
+                        COALESCE (
+                            (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )  
+                                from conversations A 
+                            where A.user_id = users.id
+                                and signoff_user_id is not null      
+                                and supervisor_signoff_id is not null)
+                            , (joining_date) 
+                        ) 
+                    , DATE_ADD( DATE_FORMAT(sysdate(), '%Y-%m-%d'), INTERVAL -122 day) ) as overdue_in_days")                             
+                ->whereIn('id', $reportee_ids);
 
-        $next_due_users = $sql->get();
 
-        // Chart 2 and 3
-        $sql = Conversation::selectRaw('* , 
+
+        // Chart 2 
+        $sql_chart2 = Conversation::selectRaw('* , 
                     DATE_ADD(
                         COALESCE (
                             (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )  
@@ -274,24 +274,69 @@ class StatisticsReportController extends Controller
                             (select joining_date from users where id = conversations.user_id)
                         ), INTERVAL 122 day)
                     as next_due_date')
-                ->whereIn('id', $selected_ids)
-                ->with('topic');
+                ->whereRaw("DATEDIFF (
+                        COALESCE (
+                                (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )  
+                                    from conversations A 
+                                where A.user_id = conversations.user_id
+                                    and signoff_user_id is not null      
+                                    and supervisor_signoff_id is not null),
+                                (select joining_date from users where id = conversations.user_id)
+                            ) 
+                    , DATE_ADD( DATE_FORMAT(sysdate(), '%Y-%m-%d'), INTERVAL -122 day) ) < 0 ")
+                ->whereIn('user_id', $reportee_ids)
+                ->where(function ($query)  {
+                    return $query->whereNull('signoff_user_id')
+                            ->orWhereNull('supervisor_signoff_id');
+                })
+                ->when( $request->topic_id, function($q) use($request) {
+                    $q->where('conversations.conversation_topic_id', $request->topic_id);
+                }) 
+                ->with('topic:id,name')
+                ->with('signoff_user:id,name')
+                ->with('signoff_supervisor:id,name');
 
-        $conversations = $sql->get();
+        // Chart 3
+        $sql_chart3 = Conversation::whereIn('user_id', $reportee_ids)
+                // ->where(function($query) use ($reportee_ids) {
+                //     $query->whereIn('user_id', $reportee_ids)
+                //         ->orWhereHas('conversationParticipants', function($query) use ($reportee_ids) {
+                //             $query->whereIn('participant_id', $reportee_ids);
+                //         });
+                // })
+                ->where(function ($query)  {
+                        return $query->whereNotNull('signoff_user_id')
+                                    ->whereNotNull('supervisor_signoff_id');
+                })
+                ->when( $request->topic_id, function($q) use($request) {
+                    $q->where('conversations.conversation_topic_id', $request->topic_id);
+                }) 
+                ->with('topic:id,name')
+                ->with('signoff_user:id,name')
+                ->with('signoff_supervisor:id,name');
 
         $data = null;
         $filename = 'Conversations.xlsx';
         switch ($request->chart) {
             case 1:
                 $filename = 'Next Conversation Due.xlsx';
-                $data = $next_due_users;
+                $users = $sql_chart1->get();
+
+                if (array_key_exists($request->range, $this->overdue_groups) ) {
+                    $users = $users->whereBetween('overdue_in_days', $this->overdue_groups[$request->range]);  
+                }
+                $data = $users;
                 break;
             case 2:
                 $filename = 'Open Conversation By Topic.xlsx';
+
+                $conversations = $sql_chart2->get();
+              
                 $data = $conversations;
                 break;
             case 3:
                 $filename = 'Completed Conversation By Topic.xlsx';
+                $conversations = $sql_chart3->get();
                 $data = $conversations;
                 break;    
         }
@@ -303,8 +348,8 @@ class StatisticsReportController extends Controller
     public function sharedsummary(Request $request) 
     {
 
-
-        $reportee_ids = User::where('id', Auth::id() )->first()->allreportees->pluck('id')->toArray();
+        // $reportee_ids = User::where('id', Auth::id() )->first()->allreportees->pluck('id')->toArray();
+        $reportee_ids = $this->getReporteeIds();
 
         $sql = User::selectRaw("* ,
                 case when (select count(*) from shared_profiles A where A.shared_id = users.id) > 0 then 'Yes' else 'No' end as shared")
@@ -324,7 +369,8 @@ class StatisticsReportController extends Controller
         {
             $subset = $users->where('shared', $legend);
             array_push( $data['chart1']['groups'],  [ 'name' => $legend, 'value' => $subset->count(),
-                            'ids' => $subset ? $subset->pluck('id')->toArray() : []
+                            'legend' => $legend, 
+                            // 'ids' => $subset ? $subset->pluck('id')->toArray() : []
                         ]);
         }    
 
@@ -337,11 +383,19 @@ class StatisticsReportController extends Controller
     public function sharedSummaryExport(Request $request) 
     {
 
-      $selected_ids = $request->ids ? explode(',', $request->ids) : [];
+    //   $selected_ids = $request->ids ? explode(',', $request->ids) : [];
+      $reportee_ids = $this->getReporteeIds();
 
-      $sql = User::selectRaw("* ,
-          case when (select count(*) from shared_profiles A where A.shared_id = users.id) > 0 then 'Yes' else 'No' end as shared")
-              ->whereIn('id', $selected_ids);
+      $sql = User::selectRaw("users.*, 
+            case when (select count(*) from shared_profiles A where A.shared_id = users.id) > 0 then 'Yes' else 'No' end as shared")
+            ->whereIn('id', $reportee_ids)
+            ->when( $request->legend == 'Yes', function($q) use($request) {
+                $q->whereRaw(" (select count(*) from shared_profiles A where A.shared_id = users.id) > 0 ");
+            }) 
+            ->when( $request->legend == 'No', function($q) use($request) {
+                $q->whereRaw(" (select count(*) from shared_profiles A where A.shared_id = users.id) = 0 ");
+            }) 
+            ->with('sharedWith');
 
       $users = $sql->get();
 
@@ -355,9 +409,10 @@ class StatisticsReportController extends Controller
 
     public function excusedsummary(Request $request) {
 
-        $reportee_ids = User::where('id', Auth::id() )->first()->allreportees->pluck('id')->toArray();
+        // $reportee_ids = User::where('id', Auth::id() )->first()->allreportees->pluck('id')->toArray();
+        $reportee_ids = $this->getReporteeIds();
 
-        $sql = User::selectRaw("*, case when excused_start_date is not null then 'Yes' else 'No' end as excused")
+        $sql = User::selectRaw("*, case when date(SYSDATE()) between excused_start_date and excused_end_date then 'Yes' else 'No' end as excused")
             ->whereIn('id', $reportee_ids);
 
         $users = $sql->get();
@@ -369,12 +424,12 @@ class StatisticsReportController extends Controller
         $data['chart1']['legend'] = $legends;
         $data['chart1']['groups'] = array();
 
-        //$open_conversations = $conversations;
         foreach($legends as $legend)
         {
             $subset = $users->where('excused', $legend);
             array_push( $data['chart1']['groups'],  [ 'name' => $legend, 'value' => $subset->count(),
-                            'ids' => $subset ? $subset->pluck('id')->toArray() : []
+                            'legend' => $legend,
+                            // 'ids' => $subset ? $subset->pluck('id')->toArray() : []
                         ]);
         }    
 
@@ -386,14 +441,20 @@ class StatisticsReportController extends Controller
     } 
 
 
-    public function excusedSummaryExport(Request $request) {
+    public function excusedSummaryExport(Request $request) 
+    {
 
+      $reportee_ids = $this->getReporteeIds();
 
-      // dd($request);
-      $selected_ids = $request->ids ? explode(',', $request->ids) : [];
-
-      $sql = User::selectRaw("*, case when excused_start_date is not null then 'Yes' else 'No' end as excused")
-              ->whereIn('id', $selected_ids);
+      $sql = User::selectRaw("users.*, case when excused_start_date is not null then 'Yes' else 'No' end as excused")
+              ->whereIn('id', $reportee_ids)
+              ->when( $request->legend == 'Yes', function($q) use($request) {
+                $q->whereRaw(" ( date(SYSDATE()) between excused_start_date and excused_end_date) = TRUE ");
+                }) 
+              ->when( $request->legend == 'No', function($q) use($request) {
+                    $q->whereRaw(" ( date(SYSDATE()) between excused_start_date and excused_end_date) = FALSE ");
+                })
+              ->with('excuseReason') ;
 
       $users = $sql->get();
 
@@ -401,6 +462,24 @@ class StatisticsReportController extends Controller
       
       return Excel::download(new ExcusedEmployeeExport($users), $filename);
 
+    }
+
+    protected function getReporteeIds( )
+    {
+
+        $users = User::withoutGlobalScopes()
+        ->join('employee_demo', 'users.guid', '=', 'employee_demo.guid')
+        ->join('admin_orgs', function($join) {
+            $join->on('admin_orgs.organization', '=', 'employee_demo.organization')
+            ->on('admin_orgs.level1_program', '=', 'employee_demo.level1_program')
+            ->on('admin_orgs.level2_division', '=', 'employee_demo.level2_division')
+            ->on('admin_orgs.level3_branch', '=', 'employee_demo.level3_branch')
+            ->on('admin_orgs.level4', '=', 'employee_demo.level4');
+        })
+        ->where('admin_orgs.user_id', '=', Auth::id() )
+        ->pluck('users.id');
+
+        return $users->toArray() ;
 
     }
 

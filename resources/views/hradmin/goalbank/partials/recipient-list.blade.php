@@ -1,4 +1,4 @@
-<div class="card px-3 pb-3">
+<div class="card px-3 pb-3" id='listitem'>
     <div class="p-0">
         <div class="accordion-option">
             @error('userCheck')                
@@ -10,7 +10,7 @@
     </div>
 
 
-    <div class="card">
+    <div class="card" id="listdata">
         <div class="card-body">
             <h6></h6>
             <table class="table table-bordered" id="employee-list-table"></table>
@@ -40,13 +40,13 @@
             var user_selected = [];
 
             var oTable = $('#employee-list-table').DataTable({
-                "scrollX": true,
+                scrollX: true,
                 retrieve: true,
-                "searching": false,
+                searching: false,
                 processing: true,
                 serverSide: true,
                 select: true,
-                'order': [[1, 'asc']],
+                order: [[1, 'asc']],
                 ajax: {
                     url: '{!! route('hradmin.goalbank.employee.list') !!}',
                     data: function (d) {
@@ -60,9 +60,7 @@
                     }
                 },
                 "fnDrawCallback": function() {
-
                     list = ( $('#employee-list-table input:checkbox') );
-
                     $.each(list, function( index, item ) {
                         var index = $.inArray( item.value , g_selected_employees);
                         if ( index === -1 ) {
@@ -89,16 +87,16 @@
                 },
                 columns: [
                     {title: '<input name="select_all" value="1" id="employee-list-select-all" type="checkbox" />', ariaTitle: 'employee-list-select-all', target: 0, type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
-                    {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id'},
-                    {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name'},
-                    {title: 'Job Title', ariaTitle: 'Job Title', target: 0, type: 'string', data: 'job_title', name: 'job_title'},
-                    {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'employee_email' },
-                    {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization'},
-                    {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program'},
-                    {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division'},
-                    {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch'},
-                    {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4'},
-                    {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', data: 'deptid', name: 'deptid'},
+                    {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', className: 'dt-nowrap'},
+                    {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', className: 'dt-nowrap'},
+                    {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', className: 'dt-nowrap'},
+                    {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'employee_email', className: 'dt-nowrap'},
+                    {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', className: 'dt-nowrap'},
+                    {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', className: 'dt-nowrap'},
+                    {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', className: 'dt-nowrap'},
+                    {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', className: 'dt-nowrap'},
+                    {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', className: 'dt-nowrap'},
+                    {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', data: 'deptid', name: 'deptid', className: 'dt-nowrap'},
                 ],
             });
 
@@ -127,20 +125,21 @@
                 }
             });
 
-            // Handle click on "Select all" control
-            $('#employee-list-select-all').on('click', function() {
-                // Check/uncheck all checkboxes in the table
-                $('#employee-list-table tbody input:checkbox').prop('checked', this.checked);
-                if (this.checked) {
-                    g_selected_employees = g_matched_employees.map((x) => x);
-                    $('#employee-list-select-all').prop("checked", true);
-                    $('#employee-list-select-all').prop("indeterminate", false);    
-                } else {
-                    g_selected_employees = [];
-                    $('#employee-list-select-all').prop("checked", false);
-                    $('#employee-list-select-all').prop("indeterminate", false);    
-                }    
-            });
+            // // Handle click on "Select all" control
+            // $('#employee-list-select-all').on('click', function() {
+            //     console.log('Selected All');
+            //     // Check/uncheck all checkboxes in the table
+            //     $('#employee-list-table tbody input:checkbox').prop('checked', this.checked);
+            //     if (this.checked) {
+            //         g_selected_employees = g_matched_employees.map((x) => x);
+            //         $('#employee-list-select-all').prop("checked", true);
+            //         $('#employee-list-select-all').prop("indeterminate", false);    
+            //     } else {
+            //         g_selected_employees = [];
+            //         $('#employee-list-select-all').prop("checked", false);
+            //         $('#employee-list-select-all').prop("indeterminate", false);    
+            //     }    
+            // });
 
         });
 

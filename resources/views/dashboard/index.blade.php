@@ -9,7 +9,7 @@
         <div class="col-12 col-sm-4 col-md-4">
                 <strong>
                     My Current Supervisor
-                    <i class="fa fa-info-circle" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" data-content="{{ $supervisorTooltip }}"></i>
+                    <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="{{ $supervisorTooltip }}"></i>
                 </strong>
                 <div class="bg-white border-b rounded p-2 mt-2 shadow-sm">
                     <x-profile-pic></x-profile-pic>
@@ -19,7 +19,7 @@
             <div class="col-12 col-sm-4 col-md-4">
                 <strong>
                     My Profile is Shared with
-                    <i class="fa fa-info-circle" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" data-content="{{ $profilesharedTooltip }}"></i>
+                    <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="{{ $profilesharedTooltip }}"></i>
                 </strong>
                 <div class="bg-white border-b rounded p-2 mt-2 shadow-sm">
                     <button class="btn p-0" style="width:100%" data-toggle="modal" data-target="#profileSharedWithViewModal">

@@ -63,7 +63,7 @@ class SharedEmployeeExport implements FromCollection,WithHeadings, WithMapping, 
     {
         return ["Employee ID", "Employee Name", "Email",
             "Shared", "Shared with",
-            "Organization", "Program", "Division", "Branch", "Level 4", "Reporting To",
+            "Organization", "Level 1", "Level 2", "Level 3", "Level 4", "Reporting To",
         ];
         
     }

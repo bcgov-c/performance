@@ -13,6 +13,7 @@ use App\Models\ConversationTopic;
 use App\Models\ExcusedReason;
 use App\Models\Goal;
 use App\Models\GoalType;
+use App\Models\EmployeeShare;
 use App\Models\Participant;
 use App\Models\SharedProfile;
 use App\Models\User;
@@ -43,7 +44,15 @@ class MyTeamController extends Controller
             ->with('sharedWith')
             ->with('goalType')->get();
         $employees = $this->myEmployeesAjax();
-        // dd($goals[0]->sharedWith);
+
+        // $adminShared=EmployeeShare::select('shared_with_id')
+        // ->where('user_id', '=', Auth::id())
+        // ->whereIn('shared_element_id', ['B', 'G'])
+        // ->pluck('shared_with_id');
+        // $adminemps = User::select('users.*')
+        // ->whereIn('users.id', $adminShared)->get();
+        // $employees = $employees->merge($adminemps);
+
         $type = 'upcoming'; // Allow Editing
         $showSignoff = false;
         $myEmpTable = $myEmployeesDataTable->html();
@@ -67,7 +76,7 @@ class MyTeamController extends Controller
                 $i++;
             }
         }
-        
+
         $shared_employees = DB::table('shared_profiles')
                     ->select('shared_profiles.shared_id', 'users.name')
                     ->join('users', 'users.id', '=', 'shared_profiles.shared_id')
@@ -362,6 +371,15 @@ class MyTeamController extends Controller
             ->with('goalType')->get();
         $employees = $this->myEmployeesAjax();
         
+        $type_desc_arr = array();
+        foreach($goaltypes as $goalType) {
+            if(isset($goalType['description']) && isset($goalType['name'])) {                
+                $item = "<b>" . $goalType['name'] . " Goals</b> ". str_replace($goalType['name'] . " Goals","",$goalType['description']);
+                array_push($type_desc_arr, $item);
+            }
+        }
+        $type_desc_str = implode('<br/><br/>',$type_desc_arr);
+        
         $employees_list = array();
         $i = 0;
         if(count($employees)>0) {
@@ -397,7 +415,7 @@ class MyTeamController extends Controller
             ->with('goalType')
             ->paginate(8);
         $goalDeleteConfirmationText = "You are about to delete a suggested goal, meaning it will no longer be visible to your direct reports. Are you sure you want to continue?";
-        $viewData = compact('goals', 'goaltypes', 'tags', 'conversationTopics', 'participants', 'eReasons', 'employees', 'employees_list', 'type', 'suggestedGoals', 'disableEdit', 'allowEditModal', 'goalDeleteConfirmationText');
+        $viewData = compact('goals', 'goaltypes', 'type_desc_str', 'tags', 'conversationTopics', 'participants', 'eReasons', 'employees', 'employees_list', 'type', 'suggestedGoals', 'disableEdit', 'allowEditModal', 'goalDeleteConfirmationText');
         if (!$returnView) {
             return $viewData;
         }

@@ -222,4 +222,13 @@ class Conversation extends Model
         
     }
 
+    public function signoff_user() {
+        return $this->belongsTo(User::class, 'signoff_user_id');
+    }
+
+    public function signoff_supervisor() {
+        return $this->belongsTo(User::class, 'supervisor_signoff_id');
+    }
+
+
 }

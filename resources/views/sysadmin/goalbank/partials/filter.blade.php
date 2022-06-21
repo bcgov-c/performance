@@ -237,9 +237,6 @@
             $('#dd_level4').val(null).trigger('change');
         });
 
-
-
-
     </script>
 
 @endpush

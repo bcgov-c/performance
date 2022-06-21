@@ -39,7 +39,7 @@
         </div>
     </div>
     <!--Modal ends here--->	
-	
+    @include('goal.partials.goal-detail-modal')
 
 
 @push('css')
@@ -69,7 +69,6 @@
 @endpush
 
 @push('js')
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>  
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
     <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
@@ -79,6 +78,14 @@
             $('#saveGoalModal .modal-body p').html('Are you sure to delete goal?');
             $('#saveGoalModal').modal();
         }
+
+        function showModal ($id) {
+                $showAddBtn = false;
+                $.get('/goal/library/' + $id, function (data) {
+                    $("#goal-detail-modal").find('.data-placeholder').html(data);
+                    $("#goal-detail-modal").modal('show');
+                });
+            }
 
         $(document).ready(function() {
 
@@ -115,13 +122,31 @@
                     },
                     columns: 
                     [
-                        {title: 'Goal Title', ariaTitle: 'Goal Title', target: 0, type: 'string', data: 'title', name: 'title', searchable: true, className: 'dt-nowrap'},
-                        {title: 'Goal Type', ariaTitle: 'Goal Type', target: 0, type: 'string', data: 'goal_type_name', name: 'goal_type_name', searchable: false, className: 'dt-nowrap'},
-                        {title: 'Mandatory', ariaTitle: 'Mandatory', target: 0, type: 'string', data: 'mandatory', name: 'mandatory', searchable: false, className: 'dt-nowrap'},
-                        {title: 'Goal Creation Date', ariaTitle: 'Goal Creation Date', target: 0, type: 'date', data: 'created_at', name: 'created_at', searchable: true, className: 'dt-nowrap'},
-                        {title: 'Created By', ariaTitle: 'Created By', target: 0, type: 'string', data: 'creator_name', name: 'creator_name', searchable: false},
-                        {title: 'Audience', ariaTitle: 'Audience', target: 0, type: 'num', data: 'audience', name: 'audience', searchable: false, className: 'dt-nowrap'},
-                        {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false, className: 'dt-nowrap'},
+                        {title: 'Goal Title', ariaTitle: 'Goal Title', target: 0, type: 'string', data: 'title'
+                            , name: 'goal_type_name', searchable: false, className: 'dt-nowrap show-modal'
+                            , render: function(data, type, row) { return '<a href="#' + row.id + '" onclick="showModal(' + row.id 
+                            + ')" class="button edit-button">' + row.title + '</a>' }},
+                        {title: 'Goal Type', ariaTitle: 'Goal Type', target: 0, type: 'string', data: 'goal_type_name'
+                            , name: 'goal_type_name', searchable: false, className: 'dt-nowrap show-modal'
+                            , render: function(data, type, row) { return '<a href="#' + row.id + '" onclick="showModal(' + row.id 
+                            + ')" class="button edit-button">' + row.goal_type_name + '</a>' }},
+                        {title: 'Mandatory', ariaTitle: 'Mandatory', target: 0, type: 'string', data: 'mandatory'
+                            , name: 'mandatory', searchable: true, className: 'dt-nowrap show-modal'
+                            , render: function(data, type, row) { return '<a href="#' + row.id + '" onclick="showModal(' + row.id 
+                            + ')" class="button edit-button">' + row.mandatory + '</a>' }},
+                        {title: 'Goal Creation Date', ariaTitle: 'Goal Creation Date', target: 0, type: 'date', data: 'created_at'
+                            , name: 'created_at', searchable: true, className: 'dt-nowrap show-modal'
+                            , render: function(data, type, row) { return '<a href="#' + row.id + '" onclick="showModal(' + row.id 
+                            + ')" class="button edit-button">' + row.created_at + '</a>' }},
+                        {title: 'Created By', ariaTitle: 'Created By', target: 0, type: 'string', data: 'creator_name'
+                            , name: 'creator_name', searchable: true, className: 'dt-nowrap show-modal'
+                            , render: function(data, type, row) { return '<a href="#' + row.id + '" onclick="showModal(' + row.id 
+                            + ')" class="button edit-button">' + row.creator_name + '</a>' }},
+                        {title: 'Audience', ariaTitle: 'Audience', target: 0, type: 'num', data: 'audience'
+                            , name: 'audience', searchable: true, className: 'dt-nowrap show-modal'
+                            , render: function(data, type, row) { return '<a href="#' + row.id + '" onclick="showModal(' + row.id 
+                            + ')" class="button edit-button">' + row.audience + '</a>' }},
+                        {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},
                         {title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'string', data: 'id', name: 'id', searchable: false, visible: false},
                     ]
                 } );

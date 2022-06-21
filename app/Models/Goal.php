@@ -86,17 +86,24 @@ class Goal extends Model implements Auditable
   }
 
   public function getStartDateHumanAttribute() {
-    return ($this->start_date) ?  $this->start_date->format('F d, Y') : null;
+    return ($this->start_date) ?  $this->start_date->format('M d, Y') : null;
   }
 
   public function getTargetDateHumanAttribute()
   {
-    return ($this->target_date) ? $this->target_date->format('F d, Y') : null;
+    return ($this->target_date) ? $this->target_date->format('M d, Y') : null;
   }
 
   public function sharedWith()
   {
     return $this->belongsToMany('App\Models\User', 'goals_shared_with', 'goal_id', 'user_id')->withTimestamps();
+  }
+
+  public function sharedWithThruAdmin()
+  {
+      return $this->join('employee_shares', 'goals.user_id', '=', 'employee_shares.user_id')
+      ->whereIn('employee_shares.shared_element_id', ['B', 'G'])
+      ->belongsToMany('App\Models\User', 'goals_shared_with', 'goal_id', 'shared_with_id')->withTimestamps();
   }
 
   public function tags()

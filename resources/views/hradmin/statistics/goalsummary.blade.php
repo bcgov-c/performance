@@ -118,6 +118,7 @@ $(function()  {
 	var	pie_basic_4_data = {!!json_encode( $data[3] )!!};
 
 	var allCharts = [];
+	var export_url = '{{ route('hradmin.statistics.goalsummary.export') }}';
 
 	function createChart(divId, myData) {
 
@@ -166,8 +167,8 @@ $(function()  {
 							ids =  myChart.getModel().option.ids;
 							goal_id =  myChart.getModel().option.goal_type_id;
 							
-							let _url = '{{ route('hradmin.statistics.goalsummary.export')}}' 
-								+ '?goal=' + goal_id + '&ids=' + ids;
+							// let _url = '{{ route('hradmin.statistics.goalsummary.export')}}' 
+							let _url = export_url + '?goal=' + goal_id + '&ids=' + ids;
       						window.location.href = _url;
 						}
 					},
@@ -279,9 +280,10 @@ $(function()  {
 			// prepare the parameters for calling export on difference segments
 			// console.log(params.name + ' - '  + params.value + ' - ' +  ' - ' + params.data.goal_id) ;
 			goal_type_id = myChart.getModel().option.goal_type_id;
-			let _url = '{{ route('hradmin.statistics.goalsummary.export')}}' 
+			// let _url = '{{ route('hradmin.statistics.goalsummary.export')}}' 
+			//  let _url = '{{ route('hradmin.statistics.goalsummary.export')}}' 
 							// + '?goal=' + params.data.goal_id + '&range=' + params.name;
-							+ '?goal=' + goal_type_id + '&range=' + params.name  + '&ids=' + params.data.ids;
+			let _url = export_url + '?goal=' + goal_type_id + '&range=' + params.name  + '&ids=' + params.data.ids;
       		window.location.href = _url;
 
 
