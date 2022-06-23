@@ -9,7 +9,7 @@ use App\Http\Controllers\SysAdmin\GoalBankController;
 use App\Http\Controllers\SysAdmin\NotificationController;
 use App\Http\Controllers\SysAdmin\EmployeeSharesController;
 use App\Http\Controllers\SysAdmin\ExcuseEmployeesController;
-use App\Http\Controllers\SysAdmin\StatisticsReportController;
+use App\Http\Controllers\SysAdmin\SysadminStatisticsReportController;
 use App\Http\Controllers\SysAdmin\AccessPermissionsController;
 use App\Http\Controllers\SysAdmin\UnlockConversationController;
 
@@ -32,6 +32,9 @@ Route::group(['middleware' => ['role:Sys Admin']], function () {
 
     Route::get('sysadmin/employees/manageexistingshareslist', [ManageExistingSharesController::class, 'getList'])->name('sysadmin.employees.manageexistingshareslist');
   
+    Route::get('sysadmin/get-identities', [SysadminController::class, 'getIdentities'])->name('sysadmin.get-identities');
+    Route::get('sysadmin/switch-identity-action', [SysadminController::class, 'switchIdentityAction'])->name('sysadmin.switch-identity-action');
+    
 
     Route::group(['middleware' => ['auth']], function() 
     {    
@@ -45,22 +48,16 @@ Route::group(['middleware' => ['role:Sys Admin']], function () {
     });
 
 
-    Route::get('sysadmin/statistics/goalsummary', [StatisticsReportController::class, 'goalsummary'])->name('sysadmin.statistics.goalsummary');
-    Route::get('sysadmin/statistics/goalsummary-export', [StatisticsReportController::class, 'goalSummaryExport'])->name('sysadmin.statistics.goalsummary.export');
-    Route::get('sysadmin/statistics/conversationsummary', [StatisticsReportController::class, 'conversationsummary'])->name('sysadmin.statistics.conversationsummary');
-    Route::get('sysadmin/statistics/conversationsummary-export', [StatisticsReportController::class, 'conversationSummaryExport'])->name('sysadmin.statistics.conversationsummary.export');
-    Route::get('sysadmin/statistics/sharedsummary', [StatisticsReportController::class, 'sharedsummary'])->name('sysadmin.statistics.sharedsummary');
-    Route::get('sysadmin/statistics/sharedsummary-export', [StatisticsReportController::class, 'sharedSummaryExport'])->name('sysadmin.statistics.sharedsummary.export');
-    Route::get('sysadmin/statistics/excusedsummary', [StatisticsReportController::class, 'excusedsummary'])->name('sysadmin.statistics.excusedsummary');
-    Route::get('sysadmin/statistics/excusedsummary-export', [StatisticsReportController::class, 'excusedSummaryExport'])->name('sysadmin.statistics.excusedsummary.export');
+    Route::get('sysadmin/statistics/goalsummary', [SysadminStatisticsReportController::class, 'goalsummary'])->name('sysadmin.statistics.goalsummary');
+    Route::get('sysadmin/statistics/goalsummary-export', [SysadminStatisticsReportController::class, 'goalSummaryExport'])->name('sysadmin.statistics.goalsummary.export');
+    Route::get('sysadmin/statistics/conversationsummary', [SysadminStatisticsReportController::class, 'conversationsummary'])->name('sysadmin.statistics.conversationsummary');
+    Route::get('sysadmin/statistics/conversationsummary-export', [SysadminStatisticsReportController::class, 'conversationSummaryExport'])->name('sysadmin.statistics.conversationsummary.export');
+    Route::get('sysadmin/statistics/sharedsummary', [SysadminStatisticsReportController::class, 'sharedsummary'])->name('sysadmin.statistics.sharedsummary');
+    Route::get('sysadmin/statistics/sharedsummary-export', [SysadminStatisticsReportController::class, 'sharedSummaryExport'])->name('sysadmin.statistics.sharedsummary.export');
+    Route::get('sysadmin/statistics/excusedsummary', [SysadminStatisticsReportController::class, 'excusedsummary'])->name('sysadmin.statistics.excusedsummary');
+    Route::get('sysadmin/statistics/excusedsummary-export', [SysadminStatisticsReportController::class, 'excusedSummaryExport'])->name('sysadmin.statistics.excusedsummary.export');
 
 
-
-    Route::get('sysadmin/switch-identity', [SysadminController::class, 'switchIdentity'])->name('sysadmin.switch-identity');
-    Route::get('sysadmin/get-identities', [SysadminController::class, 'getIdentities'])->name('sysadmin.get-identities');
-    Route::get('sysadmin/switch-identity-action', [SysadminController::class, 'switchIdentityAction'])->name('sysadmin.switch-identity-action');
-    Route::get('sysadmin/identity-list', [SysadminController::class, 'identityList'])->name('sysadmin.identity-list');
- 
     //Goal Bank
     Route::group(['middleware' => ['auth']], function() {    
         Route::get('/sysadmin/goalbank', [GoalBankController::class, 'createindex'])->name('sysadmin.goalbank');
@@ -256,3 +253,10 @@ Route::get('sysadmin/level1/{id0}', 'App\Http\Controllers\SysadminController@get
 Route::get('sysadmin/level2/{id0}/{id1}', 'App\Http\Controllers\SysadminController@getOrgLevel2')->name('sysadmin.level2');
 Route::get('sysadmin/level3/{id0}/{id1}/{id2}', 'App\Http\Controllers\SysadminController@getOrgLevel3')->name('sysadmin.level3');
 Route::get('sysadmin/level4/{id0}/{id1}/{id2}/{id3}', 'App\Http\Controllers\SysadminController@getOrgLevel4')->name('sysadmin.level4');
+
+
+
+    
+Route::get('sysadmin/switch-identity', [SysadminController::class, 'switchIdentity'])->name('sysadmin.switch-identity');
+Route::get('sysadmin/identity-list', [SysadminController::class, 'identityList'])->name('sysadmin.identity-list');    
+ 
