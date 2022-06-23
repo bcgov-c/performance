@@ -11,11 +11,13 @@
                 <div class="flex-fill"></div>
                 
                 @if (($type ?? '') !== 'supervisor' && !$disableEdit && 1 == 0)
+                @if(!session()->has('view-profile-as'))
                 <form id="delete-goal-{{$goal->id}}" action="{{ route('goal.destroy', $goal->id)}}" method="POST" onsubmit="return confirm('{{ $goalDeleteConfirmationText ?? 'Are you sure you want to permanently delete this goal?' }}')">
                     @csrf
                     @method('DELETE')
                     <x-button icon='trash' class="text-light" aria-label="Delete button" tooltip="Click to permanently delete this goal"></x-button>
                 </form>
+                @endif
                 @endif
             </div>
         </div>
@@ -40,8 +42,10 @@
           </div>
         @endif
         <div class="card-footer align-items-center">
+            @if(!session()->has('view-profile-as')) 
             @if(Auth::user()->reporteesCount() > 0 && (request()->is('goal/current') || request()->is('goal/library')))
                 @include('goal.partials.goal-share-with-dropdown')
+            @endif
             @endif
             <div class="flex-fill"></div>
 
@@ -49,14 +53,16 @@
             <div>
                 <!-- <b>Goal created by:&nbsp;</b>{{ $goal->user->name}} <br> -->
                 @if($goal->is_library)
-                <div class="flex-fill"></div>
-                <span style="float:right">
+                <div class="flex-fill"></div>                
+                @if(!session()->has('view-profile-as'))  
+                <span style="float:right">  
                 <form id="delete-goal-{{$goal->id}}" action="{{ route('goal.destroy', $goal->id)}}" method="POST" onsubmit="return confirm('{{ $goalDeleteConfirmationText ?? 'Are you sure you want to permanently delete this goal?' }}')">
                     @csrf
                     @method('DELETE')
                     <x-button size="md" icon='trash' class="ml-1 text-light" aria-label="Delete button" tooltip="Click to permanently delete this goal" style="danger"></x-button>
                 </form>
                 </span>
+                @endif
                 @endif
             </div>
 
@@ -72,7 +78,9 @@
                 <form id="delete-goal-{{$goal->id}}" action="{{ route('goal.destroy', $goal->id)}}" method="POST" onsubmit="return confirm('{{ $goalDeleteConfirmationText ?? 'Are you sure you want to permanently delete this goal?' }}')">
                     @csrf
                     @method('DELETE')
+                    @if(!session()->has('view-profile-as'))  
                     <x-button size="md" icon='trash' class="ml-1 text-light" aria-label="Delete button" tooltip="Click to permanently delete this goal" style="danger"></x-button>
+                    @endif
                     <x-button
                     :href='route("goal.show", $goal->id)'
                     :tooltip="__('Click to view the details of this goal.')"
@@ -94,7 +102,9 @@
                         tooltipPosition="bottom">{{__('Copy')}}</x-button>
                 </form>
             @endif
+            
             @elseif (($cardDesign ?? 'default') === 'my-team')
+            @if(!session()->has('view-profile-as'))  
             <select class="form-control is-shared" id="is_shared_{{$goal->id}}"  name="is_shared[{{ $goal->id }}]" data-goal-id="{{ $goal->id }}" >
                 <option value="1" {{ count($goal->sharedWith) > 0 ? 'selected' : ''}}>Shared</option>
                 <option value="0" {{ count($goal->sharedWith) > 0 ? '' : 'selected'}}>Private</option>
@@ -116,8 +126,8 @@
             <span style="float:right">
             <x-button size="md" type="button" icon='trash' class="ml-1 text-light" aria-label="Delete button" tooltip="Click to permanently delete this goal" style="danger" data-action="delete-goal" data-goal-id="{{$goal->id}}" data-confirmation="{{ $goalDeleteConfirmationText ?? 'Are you sure you want to permanently delete this goal?' }}"></x-button>
             </span>
+            @endif               
             @endif
-
         </div>
         <!-- /.card-footer -->
     </div>

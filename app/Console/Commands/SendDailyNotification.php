@@ -77,7 +77,7 @@ class SendDailyNotification extends Command
         ];
 
         //  User - API https://graph.microsoft.com/v1.0/me/sendMail
-        $sendMailUrl = '/users/HRadministror1@extest.gov.bc.ca/sendMail';
+        $sendMailUrl = '/users/'.env('OAUTH_DEFAULT_SENDER_EMAIL').'/sendMail';
         $response = $graph->createRequest('POST', $sendMailUrl)
             ->addHeaders(['Prefer' => 'outlook.timezone="Pacific Standard Time"'])
             ->attachBody($newMessage)

@@ -17,7 +17,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\SharedEmployeeExport;
 use App\Exports\ExcusedEmployeeExport;
 
-class StatisticsReportController extends Controller
+class SysadminStatisticsReportController extends Controller
 {
     //
     private $groups;
@@ -46,7 +46,7 @@ class StatisticsReportController extends Controller
 
     Public function goalSummary_from_statement($goal_type_id)
     {
-        $from_stmt = "(select users.*, (select count(*) from goals where user_id = users.id
+        $from_stmt = "(select users.employee_id, users.empl_record, (select count(*) from goals where user_id = users.id
                         and status = 'active' and deleted_at is null and is_library = 0 ";
         if ($goal_type_id)                        
             $from_stmt .= " and goal_type_id =".  $goal_type_id ;
@@ -180,7 +180,7 @@ class StatisticsReportController extends Controller
     {
 
         // Chart1 -- Overdue
-        $sql_2 = User::selectRaw("users.*, employee_name, 
+        $sql_2 = User::selectRaw("users.employee_id, users.empl_record, employee_name, 
                             organization, level1_program, level2_division, level3_branch, level4,
                         DATEDIFF (
                             COALESCE (
@@ -554,7 +554,7 @@ class StatisticsReportController extends Controller
     public function sharedsummary(Request $request) 
     {
 
-        $sql = User::selectRaw("users.*,
+        $sql = User::selectRaw("users.employee_id, users.empl_record,
                 case when (select count(*) from shared_profiles A where A.shared_id = users.id) > 0 then 'Yes' else 'No' end as shared")
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
@@ -652,7 +652,7 @@ class StatisticsReportController extends Controller
     public function excusedsummary(Request $request) {
 
         
-        $sql = User::selectRaw("users.*, 
+        $sql = User::selectRaw("users.employee_id, users.empl_record, 
                     employee_name, organization, level1_program, level2_division, level3_branch, level4,
                     case when date(SYSDATE()) between excused_start_date and excused_end_date then 'Yes' else 'No' end as excused")
                     ->join('employee_demo', function($join) {

@@ -857,6 +857,20 @@ class SysadminController extends Controller
     } 
     
     public function switchIdentity(Request $request) {
+            $user = auth()->user();
+            $switched_userid = $user->id;
+            
+            $user_role = DB::table('model_has_roles')                        
+                        ->where('model_id', $switched_userid)
+                        ->where('role_id', 4)
+                        ->where('model_type', 'App\Models\User')
+                        ->get();
+            
+            if(count($user_role) == 0) {
+                return redirect()->to('/');
+                exit;
+            }
+        
         /*
             $search_user = $request->search_user;        
             if ($request->ajax()) {   

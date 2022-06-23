@@ -88,6 +88,7 @@ class SyncUserProfile extends Command
 
         // $new_sync_at = Carbon::now();
         // $last_sync_at = User::max('last_sync_at'); 
+        $last_sync_at = '1990-01-01';       // always do the full set
 
         $employees = EmployeeDemo::whereNotIn('guid', ['', ' '])
             ->whereNotIn('employee_email', ['', ' '])

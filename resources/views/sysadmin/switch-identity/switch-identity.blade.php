@@ -1,5 +1,6 @@
 @extends('sysadmin.layout')
 @section('tab-content')
+
 <div>
     <div class="h5 p-3">{{__('Pick a user')}}</div>
     <div class="card">
@@ -13,7 +14,15 @@
     {{$switchIdentityTable->scripts()}}
     <script>
         $(document).ready(function(){
-            $('[data-toggle="popover"]').popover(); 
+            $('[data-toggle="popover"]').popover();
         });
+        
+        $(window).bind("pageshow", function(event) {
+            if (event.originalEvent.persisted) {
+                window.location.reload() 
+            }
+        });
+        
+        
     </script>
 @endpush

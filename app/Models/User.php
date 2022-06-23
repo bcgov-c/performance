@@ -30,6 +30,8 @@ class User extends Authenticatable
         'samaccountname',
         'guid',
         'reporting_id',
+        'employee_id',
+        'empl_record',
         'excused_start_date',
         'excused_end_date',
         'excused_reason_id',
