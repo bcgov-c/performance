@@ -1,4 +1,3 @@
-@if(!session()->has('view-profile-as'))
 <li @isset($item['id']) id="{{ $item['id'] }}" @endisset class="nav-item has-treeview {{ $item['submenu_class'] }}">
 
     {{-- Menu toggler --}}
@@ -28,4 +27,3 @@
     </ul>
 
 </li>
-@endif
