@@ -99,7 +99,7 @@
     <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center">
         <span class="flex-fill"></span>
         <span>
-            <i class="icon fas fa-exclamation-circle"></i> You are logging in as {{auth()->user()->name}}'s account.
+            <i class="icon fas fa-exclamation-circle"></i> You are logged in as {{auth()->user()->name}}'s account.
         </span>
         <span class="flex-fill"></span>
 
