@@ -34,7 +34,7 @@
 			<div class="row">
 				<div class="col-md-2">
 					<b> Tags </b>
-					<i class="fa fa-info-circle" id="tag_img" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resource/goal-setting?t=4' target=\'_blank\'>View full list of tag description.</a>"></i>					
+                                        <i class="fa fa-info-circle" id="tag_img" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resource/goal-setting?t=4' target=\'_blank\'><u>View full list of tag descriptions.</u></a>"></i>					
 					<x-dropdown :list="$tags" name="tag_ids[]" id="tags" class="tags" multiple/>
 					<small  class="text-danger error-tag_ids"></small>
 				</div>
