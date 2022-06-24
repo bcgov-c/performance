@@ -848,8 +848,11 @@ class SysadminController extends Controller
         //$query = User::orderby('name','asc')->select('id','name','email');
          
         if ($request->has('new_user_id') && $request->new_user_id) {
-            $request->session()->put('existing_user_id', Auth::user()->id);
-            $request->session()->put('user_is_switched', true);
+            $switched = session('user_is_switched');
+            if(!$switched){
+                $request->session()->put('existing_user_id', Auth::user()->id);
+                $request->session()->put('user_is_switched', true);
+            }
             $newuserId = $request->new_user_id;
             Auth::loginUsingId($newuserId);
             return redirect()->to('/');
