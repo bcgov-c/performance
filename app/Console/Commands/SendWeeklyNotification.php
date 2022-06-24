@@ -71,7 +71,7 @@ class SendWeeklyNotification extends Command
             $nextDueDate = $user->joining_date ? $user->joining_date->addMonths(4) : '';
             $diff = 0;
         
-            if ($user->conversations->count() == 0 ) {
+            if ($user->conversations->whereNotNull('sign_off_time')->count() == 0 ) {
 
                 $nextDueDate = $user->joining_date ? $user->joining_date->addMonths(4) : '';
                 $text = "You must complete your first performance conversation by " . $nextDueDate->format('d-M-y');
@@ -82,14 +82,11 @@ class SendWeeklyNotification extends Command
                     $lastConv = conversation::getLastConv([], $user);
 
                     if ($lastConv) {
-                        $nextDueDate = $lastConv->sign_off_time->addMonths(4);
-                        $diff = Carbon::now()->diffInDays($lastConv->sign_off_time->addMonths(4), false);
                         if ($lastConv->sign_off_time->addMonths(4)->lt(Carbon::now())) {
-                            $text =  "You are required to complete a performance conversation every 4 months at minimum. You are overdue. Please complete a conversation as soon as possible.";
-
-                        } else { 
+                            $text = "You are required to complete a performance conversation every 4 months at minimum. You are overdue. Please complete a conversation as soon as possible.";
+                        } else {
                             $nextDueDate = $lastConv->sign_off_time->addMonths(4);
-                            // $diff = Carbon::now()->diffInMonths($lastConv->sign_off_time->addMonths(4), false);
+                            $diff = Carbon::now()->diffInMonths($lastConv->sign_off_time->addMonths(4), false);
                             $text = "Your next performance conversation is due by ". $lastConv->sign_off_time->addMonths(4)->format('d-M-y');
                         }
                     } else {
