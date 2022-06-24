@@ -126,7 +126,7 @@ class SendWeeklyNotification extends Command
         $sendMail->template = 'WEEKLY_OVERDUE_SUMMARY';
         array_push($sendMail->bindvariables, $listing);
         $response = $sendMail->sendMailWithGenericTemplate();
-        if ($response->getStatus() == 202) {
+        if ($response) {
             $this->info( 'Email was successfully sent.');
         }
 

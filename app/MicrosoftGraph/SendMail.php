@@ -163,7 +163,7 @@ class SendMail
                 'alert_type' => $this->alertType,
                 'alert_format' => $this->alertFormat,
                 'template_id' => $this->generic_template ? $this->generic_template->id : null,
-                'status' => $response->getStatus(), 
+                'status' => $bResult, 
                 'date_sent' => now(),
             ]);
 
