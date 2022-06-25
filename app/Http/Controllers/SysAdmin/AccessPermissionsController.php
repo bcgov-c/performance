@@ -5,7 +5,6 @@ namespace App\Http\Controllers\SysAdmin;
 
 
 use App\Models\User;
-use App\Jobs\SendEmailJob;
 use App\Models\AdminOrg;
 use App\Models\EmployeeDemo;
 use Illuminate\Http\Request;

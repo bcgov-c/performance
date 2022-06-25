@@ -6,6 +6,7 @@ use DateTime;
 use DateInterval;
 use DateTimeZone;
 use App\Models\User;
+use App\Mail\NotifyMail;
 use App\Models\GenericTemplate;
 use App\Models\NotificationLog;
 use Illuminate\Support\Facades\App;
@@ -45,6 +46,10 @@ class SendMail
     // Default email for Testing purpose (sent any email to this email)
     public $SendToTestAccount;  /* jpoon@extest.gov.bc.ca */
 
+    // Send the email using Queue
+    public $useQueue;  
+
+
     // Private property
     private $generic_template;  
     private $default_email_prod_region;  // Azure - principle name 
@@ -63,6 +68,7 @@ class SendMail
 
         $this->SendToTestEmail = "travis.clark@gov.bc.ca";
         
+        $this->useQueue = false;
 
         $this->alertType = 'N';  /* Notification */
         $this->alertFormat = 'E';   /* E = E-mail, A = In App */
@@ -139,18 +145,21 @@ class SendMail
 
         }
 
-        // Sending Message via SMTP 
-        Mail::html( $this->body , function($message) use($from, $a_toRecipients) {
-            if ($from) {
-                $message->from( $from );
-            }
-            $message->to( $a_toRecipients );
-            $message->subject(  $this->subject );
-        });  
+        // Send immediately or using Queue
+        if ($this->useQueue) {
+            Mail::to( $a_toRecipients )
+                ->cc( $a_ccRecipients )
+                ->bcc( $a_bccRecipients )   
+                ->queue(new NotifyMail($this->subject, $this->body ));
+        } else {
+            Mail::to( $a_toRecipients )
+                ->cc( $a_ccRecipients )
+                ->bcc( $a_bccRecipients )
+                ->send(new NotifyMail($this->subject, $this->body ));
+        }
 
          // check for failures
         $bResult = Mail::failures() ? false : true;
-
 
         if ($this->saveToLog) {
 

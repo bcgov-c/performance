@@ -11,7 +11,6 @@ use App\Models\Conversation;
 use Illuminate\Console\Command;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use App\Models\User;
-use App\Jobs\SendEmailJob;
 
 class SendWeeklyNotification extends Command
 {
@@ -123,20 +122,13 @@ class SendWeeklyNotification extends Command
         $sendMail = new \App\MicrosoftGraph\SendMail();
         $sendMail->toRecipients = [ $to->id ];
         $sendMail->alertFormat = 'E';
+        $sendMail->useQueue = false;
         $sendMail->template = 'WEEKLY_OVERDUE_SUMMARY';
         array_push($sendMail->bindvariables, $listing);
         $response = $sendMail->sendMailWithGenericTemplate();
         if ($response) {
             $this->info( 'Email was successfully sent.');
         }
-
-        // // Method 2: Using Queue
-        // $sendEmailJob = (new SendEmailJob())->delay( now()->addSeconds(1) );
-        // $sendEmailJob->bccRecipients = [ $to->id ];
-        // $sendEmailJob->template = 'WEEKLY_OVERDUE_SUMMARY';
-        // array_push($sendEmailJob->bindvariables, $listing);
-        // $sendEmailJob->alertFormat = 'E';
-        // $ret = dispatch($sendEmailJob);
 
     }
 

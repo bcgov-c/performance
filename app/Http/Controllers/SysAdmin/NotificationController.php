@@ -5,7 +5,6 @@ namespace App\Http\Controllers\SysAdmin;
 
 
 use App\Models\User;
-use App\Jobs\SendEmailJob;
 use App\Models\EmployeeDemo;
 use Illuminate\Http\Request;
 use App\Models\NotificationLog;
@@ -321,19 +320,6 @@ class NotificationController extends Controller
             return redirect()->route('sysadmin.notifications.notify')
                 ->with('success','Email with subject "' . $request->subject  . '" was successfully sent.');
         }
-
-        // Method 2: Using Queue
-        $sendEmailJob = (new SendEmailJob())->delay( now()->addSeconds(1) );
-        $sendEmailJob->bccRecipients = $bccRecipients->toArray();  // $request->recipients;
-        $sendEmailJob->sender_id = $request->sender_id;
-        $sendEmailJob->subject = $request->subject;
-        $sendEmailJob->body = $request->body;
-        $sendEmailJob->alertFormat = $request->alert_format;
-        $ret = dispatch($sendEmailJob);
-
-        return redirect()->route('sysadmin.notifications.notify')
-            ->with('success','Job for sending email with subject "' . $request->subject  . '" was successfully dispatched.');
-    
 
     }
 

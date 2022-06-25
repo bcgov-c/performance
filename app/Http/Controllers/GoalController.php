@@ -20,7 +20,6 @@ use App\Models\DashboardNotification;
 use App\Http\Requests\Goals\CreateGoalRequest;
 use App\Http\Requests\Goals\EditSuggestedGoalRequest;
 use App\MicrosoftGraph\SendMail;
-use App\Jobs\SendEmailJob;
 use App\Models\Tag;
 
 class GoalController extends Controller
