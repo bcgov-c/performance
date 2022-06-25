@@ -145,21 +145,25 @@ class SendMail
 
         }
 
+        $bResult = false;
         // Send immediately or using Queue
         if ($this->useQueue) {
             Mail::to( $a_toRecipients )
                 ->cc( $a_ccRecipients )
                 ->bcc( $a_bccRecipients )   
                 ->queue(new NotifyMail($this->subject, $this->body ));
+            // check for failures
+            $bResult = Mail::failures() ? false : true;
         } else {
             Mail::to( $a_toRecipients )
                 ->cc( $a_ccRecipients )
                 ->bcc( $a_bccRecipients )
                 ->send(new NotifyMail($this->subject, $this->body ));
+            // check for failures
+            $bResult = Mail::failures() ? false : true;
         }
 
-         // check for failures
-        $bResult = Mail::failures() ? false : true;
+        
 
         if ($this->saveToLog) {
 
@@ -168,7 +172,7 @@ class SendMail
                 'recipients' => (App::environment(['local'])) ? $this->SendToTestEmail : null,
                 'sender_id' => $this->sender_id,
                 'subject' => $this->subject,
-                'description' => $this->body,
+                'description' => addslashes($this->body),
                 'alert_type' => $this->alertType,
                 'alert_format' => $this->alertFormat,
                 'template_id' => $this->generic_template ? $this->generic_template->id : null,

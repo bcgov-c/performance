@@ -315,8 +315,8 @@ class NotificationController extends Controller
         $sendMail->subject = $request->subject;
         $sendMail->body = $request->body;
         $sendMail->alertFormat = $request->alert_format;
-        $response = $sendMail->sendMailWithoutGenericTemplate();
-        if ($response->getStatus() == 202) {
+        $success = $sendMail->sendMailWithoutGenericTemplate();
+        if ($success) {
             return redirect()->route('sysadmin.notifications.notify')
                 ->with('success','Email with subject "' . $request->subject  . '" was successfully sent.');
         }
