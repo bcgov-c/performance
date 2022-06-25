@@ -125,25 +125,25 @@ class SendMail
         $sender = User::where('id', $this->sender_id)->first();
         $from = $sender ? $sender->email : '';
 
-        if (App::environment(['production'])) {
-            // No special handling to avoid to send to the real users
-        } else {
+        // if (App::environment(['production'])) {
+        //     // No special handling to avoid to send to the real users
+        // } else {
 
-            /* replace the body with the send out message, and also override the recipients */
-            $this->body = "<h4>Note: The following message is the content was sent out from Performance application (Region: ". App::environment() .")</h4>".      
-                          "<hr>".
-                          "<p><b>From: </b>". $from . "</p>".
-                          "<p><b>To: </b>". implode('; ', $a_toRecipients->toArray() ). "</p>".
-                          "<p><b>CC: </b>". implode('; ', $a_ccRecipients->toArray() ). "</p>".
-                          "<p><b>Bcc: </b>". implode('; ', $a_bccRecipients->toArray() ). "</p>".
-                          "<p><b>Subject: </b>" . $this->subject . "</p>".
-                          "<p><b>Body : </b>" . $this->body . "</p>".
-                          "<hr>";
-            $this->subject = "Performance Application -- message sent out from (Region: ". App::environment() .") ";
+        //     /* replace the body with the send out message, and also override the recipients */
+        //     $this->body = "<h4>Note: The following message is the content was sent out from Performance application (Region: ". App::environment() .")</h4>".      
+        //                   "<hr>".
+        //                   "<p><b>From: </b>". $from . "</p>".
+        //                   "<p><b>To: </b>". implode('; ', $a_toRecipients->toArray() ). "</p>".
+        //                   "<p><b>CC: </b>". implode('; ', $a_ccRecipients->toArray() ). "</p>".
+        //                   "<p><b>Bcc: </b>". implode('; ', $a_bccRecipients->toArray() ). "</p>".
+        //                   "<p><b>Subject: </b>" . $this->subject . "</p>".
+        //                   "<p><b>Body : </b>" . $this->body . "</p>".
+        //                   "<hr>";
+        //     $this->subject = "Performance Application -- message sent out from (Region: ". App::environment() .") ";
 
-            $a_toRecipients = env('MAIL_TO_ADDRESS_FOR_TEST') ?? 'myphd2@gmail.com';
+        //     $a_toRecipients = env('MAIL_TO_ADDRESS_FOR_TEST') ?? 'myphd2@gmail.com';
 
-        }
+        // }
 
         $bResult = false;
         // Send immediately or using Queue
@@ -169,7 +169,7 @@ class SendMail
 
             // Insert Notification log
             $notification_log = NotificationLog::Create([  
-                'recipients' => (App::environment(['local'])) ? $this->SendToTestEmail : null,
+                'recipients' => ' ',        // Not in Use
                 'sender_id' => $this->sender_id,
                 'subject' => $this->subject,
                 'description' => addslashes($this->body),
