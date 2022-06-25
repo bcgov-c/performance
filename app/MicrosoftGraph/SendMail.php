@@ -140,7 +140,7 @@ class SendMail
         }
 
         // Sending Message via SMTP 
-        Mail::raw( $this->body , function($message) use($from, $a_toRecipients) {
+        Mail::html( $this->body , function($message) use($from, $a_toRecipients) {
             if ($from) {
                 $message->from( $from );
             }
