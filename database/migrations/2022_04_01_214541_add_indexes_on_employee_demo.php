@@ -17,7 +17,7 @@ class AddIndexesOnEmployeeDemo extends Migration
             //
             $table->index(['level1_program','level2_division', 'level3_branch', 'level4'], 'org_structure');
             $table->index(['organization']);
-            $table->index(['job_title']);
+            $table->index(['jobcode_desc']);
             $table->index(['employee_name']);
             $table->index(['deptid']);
             $table->index(['classification']);
@@ -36,7 +36,7 @@ class AddIndexesOnEmployeeDemo extends Migration
             //
             $table->dropIndex('org_structure');
             $table->dropIndex(['organization']);
-            $table->dropIndex(['job_title']);
+            $table->dropIndex(['jobcode_desc']);
             $table->dropIndex(['employee_name']);
             $table->dropIndex(['deptid']);
             $table->dropIndex(['classification']);

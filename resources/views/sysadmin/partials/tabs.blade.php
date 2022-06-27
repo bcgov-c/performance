@@ -1,12 +1,12 @@
 @if (request()->is('sysadmin/employees/*')) 
     <div class="d-flex justify-content-center justify-content-lg-start mb-2">
-        <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'sysadmin.employees.currentemployees' ? 'border-primary' : ''}}">
-            <x-button :href="route('sysadmin.employees.currentemployees')" style="">
+        <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'sysadmin.employees.currentlist' ? 'border-primary' : ''}}">
+            <x-button :href="route('sysadmin.employeelists.currentlist')" style="">
                 Current Employees
             </x-button>
         </div>
-        <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'sysadmin.employees.pastemployees' ? 'border-primary' : ''}}">
-            <x-button :href="route('sysadmin.employees.pastemployees')" style="">
+        <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'sysadmin.employees.pastlist' ? 'border-primary' : ''}}">
+            <x-button :href="route('sysadmin.employees.pastlist')" style="">
                 Past Employees
             </x-button>
         </div>

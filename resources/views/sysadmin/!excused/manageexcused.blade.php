@@ -49,7 +49,7 @@
                         <thead>
                             <tr>
                                 <th style="text-align: left; width: 500px; "> Employee Name</th>
-                                <th style="text-align: left; width: 250px; "> Job Title</th>
+                                <th style="text-align: left; width: 250px; "> Classification</th>
                                 <th style="text-align: left; width: 400px; "> Organization</th>
                                 <th style="text-align: left; width: 400px; "> Organization Level 1</th>
                                 <th style="text-align: left; width: 400px; "> Organization Level 2</th>

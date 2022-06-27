@@ -98,7 +98,7 @@ class MyOrganizationController extends Controller
             ->when($level4, function($q) use($level4) {return $q->where('employee_demo.level4', $level4->name);})
             ->when($request->criteria == 'id' && $request->search_text, function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'name' && $request->search_text, function($q) use($request){return $q->where('employee_demo.employee_name', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'job' && $request->search_text, function($q) use($request){return $q->where('employee_demo.job_title', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'job' && $request->search_text, function($q) use($request){return $q->where('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'dpt' && $request->search_text, function($q) use($request){return $q->where('employee_demo.deptid', 'like', "%" . $request->search_text . "%");})
             ->when([$request->criteria == 'all' && $request->search_text, $request->search_text], function($q) use ($request) 
             {
@@ -106,7 +106,7 @@ class MyOrganizationController extends Controller
                 {
                     $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
                     ->orWhere('employee_demo.employee_name', 'like', "%" . $request->search_text . "%")
-                    ->orWhere('employee_demo.job_title', 'like', "%" . $request->search_text . "%")
+                    ->orWhere('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%")
                     ->orWhere('employee_demo.deptid', 'like', "%" . $request->search_text . "%");
                 });
             })
@@ -114,7 +114,7 @@ class MyOrganizationController extends Controller
             (
                 'employee_demo.employee_id',
                 'employee_demo.employee_name', 
-                'employee_demo.job_title',
+                'employee_demo.jobcode_desc',
                 'employee_demo.organization',
                 'employee_demo.level1_program',
                 'employee_demo.level2_division',
@@ -409,7 +409,7 @@ class MyOrganizationController extends Controller
             'all' => 'All',
             'emp' => 'Employee ID', 
             'name'=> 'Employee Name',
-            'job' => 'Job Title', 
+            'job' => 'Classification', 
             'dpt' => 'Department ID'
         ];
     }
