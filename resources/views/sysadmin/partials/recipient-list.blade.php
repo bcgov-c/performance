@@ -19,7 +19,7 @@
                     <th><input name="select_all" value="1" id="employee-list-select-all" type="checkbox" /></th>
                     <th>Employee ID</th>
 					<th>Employee Name</th>
-                    <th>Job Title</th>
+                    <th>Classification</th>
 					<th>Email</th>
 					<th>Organization</th>
 					<th>Program</th>

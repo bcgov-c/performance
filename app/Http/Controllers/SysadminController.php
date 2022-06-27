@@ -39,15 +39,15 @@ class SysadminController extends Controller
         // $jobTitles = $this->getJobTitles();
 
         $query = DB::table('employee_demo')
-        ->select('employee_id', 'guid', 'employee_name', 'job_title', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'effdt', 'hire_dt')
+        ->select('employee_id', 'guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'effdt', 'hire_dt')
         ->wherein('employee_status', ['A', 'L', 'P', 'S']);
 
         $jobTitles = DB::table('employee_demo')
-        ->select('job_title as title', 'job_title')
+        ->select('jobcode_desc as title', 'jobcode_desc')
         ->wherein('employee_status', ['A', 'L', 'P', 'S'])
-        ->where(trim('job_title'), '<>', '')
-        ->groupby('job_title')
-        ->get('title', 'job_title');
+        ->where(trim('jobcode_desc'), '<>', '')
+        ->groupby('jobcode_desc')
+        ->get('title', 'jobcode_desc');
 
         if ($request->has('dd_level0') && $request->dd_level0 && $request->dd_level0 != 'all') {
             $query = $query->where('organization', $request->dd_level0);
@@ -70,7 +70,7 @@ class SysadminController extends Controller
         }
 
         if ($request->has('jobTitle') && $request->jobTitle && $request->jobTitle != 'all') {
-            $query = $query->where('job_title', $request->jobTitle);
+            $query = $query->where('jobcode_desc', $request->jobTitle);
         }
 
         if ($request->has('activeSince') && $request->activeSince) {
@@ -80,7 +80,7 @@ class SysadminController extends Controller
         if ($request->has('searchText') && $request->searchText) {
             $query = $query->where(function ($query2) use ($request) {
                 $query2->where('employee_name', 'like', "%" . $request->searchText . "%");
-                $query2->orWhere('job_title', 'like', "%" . $request->searchText . "%");
+                $query2->orWhere('jobcode_desc', 'like', "%" . $request->searchText . "%");
                 $query2->orWhere('position_title', 'like', "%" . $request->searchText . "%");
             });
         }
@@ -101,15 +101,15 @@ class SysadminController extends Controller
         // $jobTitles = $this->getJobTitles();
 
         $query = DB::table('employee_demo')
-        ->select('employee_id', 'guid', 'employee_name', 'job_title', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'effdt', 'hire_dt')
+        ->select('employee_id', 'guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'effdt', 'hire_dt')
         ->wherenotin('employee_status', ['A', 'L', 'P', 'S']);
 
         $jobTitles = DB::table('employee_demo')
-        ->select('job_title as title', 'job_title')
+        ->select('jobcode_desc as title', 'jobcode_desc')
         ->wherenotin('employee_status', ['A', 'L', 'P', 'S'])
-        ->where(trim('job_title'), '<>', '')
-        ->groupby('job_title')
-        ->get('title', 'job_title');
+        ->where(trim('jobcode_desc'), '<>', '')
+        ->groupby('jobcode_desc')
+        ->get('title', 'jobcode_desc');
 
         if ($request->has('dd_level0') && $request->dd_level0 && $request->dd_level0 != 'all') {
             $query = $query->where('organization', $request->dd_level0);
@@ -132,7 +132,7 @@ class SysadminController extends Controller
         }
 
         if ($request->has('jobTitle') && $request->jobTitle && $request->jobTitle != 'all') {
-            $query = $query->where('job_title', $request->jobTitle);
+            $query = $query->where('jobcode_desc', $request->jobTitle);
         }
 
         if ($request->has('inactiveSince') && $request->inactiveSince) {
@@ -193,7 +193,7 @@ class SysadminController extends Controller
         ->join('users', function($join){
             $join->on('employee_Demo.employee_id', '=', 'users.id');
         })
-        ->select('employee_id', 'employee_demo.guid', 'employee_name', 'job_title', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
+        ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
         // ->wherenotnull('excused_start_date')
         ;
 
@@ -275,7 +275,7 @@ class SysadminController extends Controller
         ->join('users', function($join){
             $join->on('employee_Demo.employee_id', '=', 'users.id');
         })
-        ->select('employee_id', 'employee_demo.guid', 'employee_name', 'job_title', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
+        ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
         ->wherenotnull('excused_start_date')
         ;
 
@@ -354,7 +354,7 @@ class SysadminController extends Controller
         ->join('users', function($join){
             $join->on('employee_Demo.employee_id', '=', 'users.id');
         })
-        ->select('employee_id', 'employee_demo.guid', 'employee_name', 'job_title', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4')
+        ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4')
         // ->wherenotnull('excused_start_date')
         ;
 
@@ -442,7 +442,7 @@ class SysadminController extends Controller
         ->leftjoin('users', function($join){
             $join->on('employee_Demo.employee_id', '=', 'users.id');
         })
-        ->select('employee_id', 'employee_demo.guid', 'employee_name', 'job_title', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
+        ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
         // ->wherenotnull('excused_start_date')
         ;
 
@@ -764,10 +764,10 @@ class SysadminController extends Controller
 
     public function getJobTitles() {
         $jobTitles = DB::table('employee_demo')
-        ->select(DB::raw("REPLACE (REPLACE (REPLACE (REPLACE (REPLACE (REPLACE (REPLACE (REPLACE (job_title, '.', ''), '\"', ''), '\'', ''), '-', ''), ',', ''), ' ', ''), '&', ''), '/', '') as pkey"), 'job_title')
-        ->where(trim('job_title'), '<>', '')
-        ->groupby('job_title')
-        ->pluck('pkey', 'job_title');
+        ->select(DB::raw("REPLACE (REPLACE (REPLACE (REPLACE (REPLACE (REPLACE (REPLACE (REPLACE (jobcode_desc, '.', ''), '\"', ''), '\'', ''), '-', ''), ',', ''), ' ', ''), '&', ''), '/', '') as pkey"), 'jobcode_desc')
+        ->where(trim('jobcode_desc'), '<>', '')
+        ->groupby('jobcode_desc')
+        ->pluck('pkey', 'jobcode_desc');
         return json_encode($jobTitles);
     }
 
@@ -848,8 +848,11 @@ class SysadminController extends Controller
         //$query = User::orderby('name','asc')->select('id','name','email');
          
         if ($request->has('new_user_id') && $request->new_user_id) {
-            $request->session()->put('existing_user_id', Auth::user()->id);
-            $request->session()->put('user_is_switched', true);
+            $switched = session('user_is_switched');
+            if(!$switched){
+                $request->session()->put('existing_user_id', Auth::user()->id);
+                $request->session()->put('user_is_switched', true);
+            }
             $newuserId = $request->new_user_id;
             Auth::loginUsingId($newuserId);
             return redirect()->to('/');
@@ -936,7 +939,7 @@ class SysadminController extends Controller
             'all' => 'All',
             'emp' => 'Employee ID', 
             'name'=> 'Employee Name',
-            'job' => 'Job Title', 
+            'job' => 'Classification', 
             'dpt' => 'Department ID'
         ];
     }
@@ -1087,7 +1090,7 @@ class SysadminController extends Controller
             ->when($level4, function($q) use($level4) {return $q->where('employee_demo.level4', $level4->name);})
             ->when($request->criteria == 'name', function($q) use($request){return $q->where('users.name', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'job', function($q) use($request){return $q->where('employee_demo.job_title', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'job', function($q) use($request){return $q->where('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'dpt', function($q) use($request){return $q->where('employee_demo.deptid', 'like', "%" . $request->search_text . "%");})
             ->when([$request->criteria == 'all', $request->search_text], function($q) use ($request) 
             {
@@ -1095,7 +1098,7 @@ class SysadminController extends Controller
                 {
                     $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
                     ->orWhere('employee_demo.employee_name', 'like', "%" . $request->search_text . "%")
-                    ->orWhere('employee_demo.job_title', 'like', "%" . $request->search_text . "%")
+                    ->orWhere('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%")
                     ->orWhere('employee_demo.deptid', 'like', "%" . $request->search_text . "%")
                     ->orWhere('users.name', 'like', "%" . $request->search_text . "%");
                 });
@@ -1106,7 +1109,7 @@ class SysadminController extends Controller
                 'users.name',      
                 'employee_demo.employee_id',
                 'employee_demo.employee_name', 
-                'employee_demo.job_title',
+                'employee_demo.jobcode_desc',
                 'employee_demo.organization',
                 'employee_demo.level1_program',
                 'employee_demo.level2_division',

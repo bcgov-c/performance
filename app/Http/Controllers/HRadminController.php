@@ -34,7 +34,7 @@ class HRadminController extends Controller
         $this->getSearchCriterias($crit);
 
         $query = DB::table('employee_demo as emp')
-        ->select('emp.employee_id', 'emp.guid', 'emp.employee_name', 'emp.job_title', 'emp.organization','emp.level1_program', 'emp.level2_division', 'emp.level3_branch', 'emp.level4', 'emp.deptid');
+        ->select('emp.employee_id', 'emp.guid', 'emp.employee_name', 'emp.jobcode_desc', 'emp.organization','emp.level1_program', 'emp.level2_division', 'emp.level3_branch', 'emp.level4', 'emp.deptid');
         // ->addselect(function ($aa){});
         // ->addselect(DB::raw("(select count(id) as goal_count from goals where user_id = emp.employee_id and status = 'active' group by user_id) as goal_count"));
 
@@ -227,7 +227,7 @@ class HRadminController extends Controller
         ->join('users', function($join){
             $join->on('employee_Demo.employee_id', '=', 'users.id');
         })
-        ->select('employee_id', 'employee_demo.guid', 'employee_name', 'job_title', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
+        ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
         // ->wherenotnull('excused_start_date')
         ;
 
@@ -333,7 +333,7 @@ class HRadminController extends Controller
         $this->getSearchCriterias($crit);
 
         $query = User::join('employee_demo', 'users.guid', 'employee_demo.guid')
-        ->select('employee_id', 'employee_demo.guid', 'employee_name', 'job_title', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
+        ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
         ->whereNotNull('excused_start_date');
         // ->get();
 
@@ -343,7 +343,7 @@ class HRadminController extends Controller
         // ->join('users', function($join){
         //     $join->on('employee_Demo.employee_id', '=', 'users.id');
         // })
-        // ->select('employee_id', 'employee_demo.guid', 'employee_name', 'job_title', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
+        // ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
         // ->wherenotnull('excused_start_date')
         // ;
 
@@ -435,7 +435,7 @@ class HRadminController extends Controller
             $data = User::select('*');
 
             $query = User::join('employee_demo', 'users.guid', 'employee_demo.guid')
-            ->select('employee_id', 'employee_demo.guid', 'employee_name', 'job_title', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
+            ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
             ->whereNotNull('excused_start_date');
     
             $query->when($request->dd_level0, function($q){return $q->where('organization', $request->dd_level0);});
@@ -627,10 +627,10 @@ class HRadminController extends Controller
 
     public function getJobTitles() {
         $jobTitles = DB::table('employee_demo')
-        ->select(DB::raw("REPLACE (REPLACE (REPLACE (REPLACE (REPLACE (REPLACE (REPLACE (REPLACE (job_title, '.', ''), '\"', ''), '\'', ''), '-', ''), ',', ''), ' ', ''), '&', ''), '/', '') as pkey"), 'job_title')
-        ->where(trim('job_title'), '<>', '')
-        ->groupby('job_title')
-        ->pluck('pkey', 'job_title');
+        ->select(DB::raw("REPLACE (REPLACE (REPLACE (REPLACE (REPLACE (REPLACE (REPLACE (REPLACE (jobcode_desc, '.', ''), '\"', ''), '\'', ''), '-', ''), ',', ''), ' ', ''), '&', ''), '/', '') as pkey"), 'jobcode_desc')
+        ->where(trim('jobcode_desc'), '<>', '')
+        ->groupby('jobcode_desc')
+        ->pluck('pkey', 'jobcode_desc');
         return json_encode($jobTitles);
     }
 

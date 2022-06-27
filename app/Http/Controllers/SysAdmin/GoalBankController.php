@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\Goals\CreateGoalRequest;
 use Carbon\Carbon;
@@ -36,11 +37,11 @@ class GoalBankController extends Controller
 
         $request->firstTime = true;
 
-        $old_selected_emp_ids = []; // $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
-        $old_selected_org_nodes = []; // $request->old_selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
+        $old_selected_emp_ids = []; 
+        $old_selected_org_nodes = []; 
 
-        $eold_selected_emp_ids = []; // $request->eselected_emp_ids ? json_decode($request->eselected_emp_ids) : [];
-        $eold_selected_org_nodes = []; // $request->eold_selected_org_nodes ? json_decode($request->eselected_org_nodes) : [];
+        $eold_selected_emp_ids = []; 
+        $eold_selected_org_nodes = [];
 
         if ($errors) {
             $old = session()->getOldInput();
@@ -179,7 +180,7 @@ class GoalBankController extends Controller
         }
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
 
-        return view('sysadmin.goalbank.createindex', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'type_desc_str') );
+        return view('shared.goalbank.createindex', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'type_desc_str') );
     }
 
 
@@ -290,7 +291,7 @@ class GoalBankController extends Controller
         ->whereIntegerInRaw('id', [3, 4])
         ->pluck('longname', 'id');
 
-        return view('sysadmin.goalbank.index', compact('criteriaList','matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'roles', 'goalTypes', 'mandatoryOrSuggested', 'tags') );
+        return view('shared.goalbank.index', compact('criteriaList','matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'roles', 'goalTypes', 'mandatoryOrSuggested', 'tags') );
     
     }
 
@@ -329,7 +330,7 @@ class GoalBankController extends Controller
             return Datatables::of($query)
             ->addIndexColumn()
             ->addcolumn('action', function($row) {
-                $btn = '<a href="/sysadmin/goalbank/deleteorg/' . $row->id . '" class="btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete Org" id="delete_org" value="'. $row->id .'"><i class="fa fa-trash"></i></a>';
+                $btn = '<a href="/shared/goalbank/deleteorg/' . $row->id . '" class="btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete Org" id="delete_org" value="'. $row->id .'"><i class="fa fa-trash"></i></a>';
                 return $btn;
             })
             ->rawColumns(['goal_type_name', 'created_by', 'action'])
@@ -465,7 +466,7 @@ class GoalBankController extends Controller
 
         $goaldetail = Goal::withoutGlobalScopes()->find($request->id);
 
-        return view('sysadmin.goalbank.editgoal', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'roles', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'goaldetail', 'request', 'goal_id') );
+        return view('shared.goalbank.editgoal', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'roles', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'goaldetail', 'request', 'goal_id') );
     
     }
 
@@ -610,7 +611,7 @@ class GoalBankController extends Controller
 
         $goaldetail = Goal::withoutGlobalScopes()->find($request->id);
 
-        return view('sysadmin.goalbank.editone', compact('criteriaList', 'acriteriaList', 'matched_emp_ids', 'amatched_emp_ids', 'old_selected_emp_ids', 'aold_selected_emp_ids', 'old_selected_org_nodes', 'aold_selected_org_nodes', 'goalTypes', 'mandatoryOrSuggested', 'amandatoryOrSuggested', 'tags', 'atags', 'goaldetail', 'request', 'goal_id') );
+        return view('shared.goalbank.editone', compact('criteriaList', 'acriteriaList', 'matched_emp_ids', 'amatched_emp_ids', 'old_selected_emp_ids', 'aold_selected_emp_ids', 'old_selected_org_nodes', 'aold_selected_org_nodes', 'goalTypes', 'mandatoryOrSuggested', 'amandatoryOrSuggested', 'tags', 'atags', 'goaldetail', 'request', 'goal_id') );
     
     }
 
@@ -673,11 +674,11 @@ class GoalBankController extends Controller
                     ['goal_id' => $resultrec->id
                     // , 'version' => '5'
                     , 'version' => '1'
-                    , 'organization' => $org1->organization
-                    , 'level1_program' => $org1->level1_program
-                    , 'level2_division' => $org1->level2_division
-                    , 'level3_branch' => $org1->level3_branch
-                    , 'level4' => $org1->level4
+                    , 'organization' => ($org1->organization ? $org1->organization : null)
+                    , 'level1_program' => ($org1->level1_program ? $org1->level1_program : null)
+                    , 'level2_division' => ($org1->level2_division ? $org1->level2_division : null)
+                    , 'level3_branch' => ($org1->level3_branch ? $org1->level3_branch : null)
+                    , 'level4' => ($org1->level4 ? $org1->level4 : null)
                     , 'created_at' => date('Y-m-d H:i:s')
                     , 'updated_at' => date('Y-m-d H:i:s') ],
                 );
@@ -686,7 +687,7 @@ class GoalBankController extends Controller
                 }
             }
         }
-        return redirect()->route('sysadmin.goalbank.createindex')
+        return redirect()->route(request()->segment(1).'.goalbank.createindex')
             ->with('success', 'Create new goal bank successful.');
     }
 
@@ -736,7 +737,7 @@ class GoalBankController extends Controller
         $empIdsByOrgId = $rows->groupBy('id')->all();
 
         if($request->ajax()){
-            return view('sysadmin.goalbank.partials.recipient-tree', compact('orgs','countByOrg','empIdsByOrgId') );
+            return view('shared.goalbank.partials.recipient-tree', compact('orgs','countByOrg','empIdsByOrgId') );
         } 
 
     }
@@ -787,7 +788,7 @@ class GoalBankController extends Controller
         $eempIdsByOrgId = $rows->groupBy('id')->all();
 
         if($request->ajax()){
-            return view('sysadmin.goalbank.partials.recipient-tree2', compact('eorgs','ecountByOrg','eempIdsByOrgId') );
+            return view('shared.goalbank.partials.recipient-tree2', compact('eorgs','ecountByOrg','eempIdsByOrgId') );
         } 
     
     }
@@ -837,7 +838,7 @@ class GoalBankController extends Controller
         $aempIdsByOrgId = $rows->groupBy('id')->all();
 
         if($request->ajax()){
-            return view('sysadmin.goalbank.partials.arecipient-tree', compact('aorgs','acountByOrg','aempIdsByOrgId') );
+            return view('shared.goalbank.partials.arecipient-tree', compact('aorgs','acountByOrg','aempIdsByOrgId') );
         } 
    
     }
@@ -1025,7 +1026,7 @@ class GoalBankController extends Controller
                 }
             }
 
-        return redirect()->route('sysadmin.goalbank.index')
+        return redirect()->route(request()->segment(1).'.goalbank.index')
             ->with('success', 'Add new goal successful.');
     }
 
@@ -1070,7 +1071,7 @@ class GoalBankController extends Controller
                 }
             }
 
-        return redirect()->route('sysadmin.goalbank.manageindex')
+        return redirect()->route(request()->segment(1).'.goalbank.manageindex')
             ->with('success', 'Goal update successful.');
 
     }
@@ -1116,7 +1117,7 @@ class GoalBankController extends Controller
             );
         }
 
-        return redirect()->route('sysadmin.goalbank.manageindex')
+        return redirect()->route(request()->segment(1).'.goalbank.manageindex')
             ->with('success', 'Goal update successful.');
 
     }
@@ -1287,7 +1288,7 @@ class GoalBankController extends Controller
 
         $parent_id = $id;
         
-        return view('sysadmin.goalbank.partials.employee', compact('parent_id', 'employees') ); 
+        return view('shared.goalbank.partials.employee', compact('parent_id', 'employees') ); 
     }
 
     public function egetOrganizations(Request $request) {
@@ -1443,7 +1444,7 @@ class GoalBankController extends Controller
 
         $eparent_id = $id;
         
-        return view('sysadmin.goalbank.partials.eemployee', compact('eparent_id', 'eemployees') ); 
+        return view('shared.goalbank.partials.eemployee', compact('eparent_id', 'eemployees') ); 
     }
 
 public function agetOrganizations(Request $request) {
@@ -1598,7 +1599,7 @@ public function agetOrganizations(Request $request) {
 
         $aparent_id = $id;
         
-        return view('sysadmin.goalbank.partials.aemployee', compact('aparent_id', 'aemployees') ); 
+        return view('shared.goalbank.partials.aemployee', compact('aparent_id', 'aemployees') ); 
     }
 
     protected function search_criteria_list() {
@@ -1904,7 +1905,7 @@ public function agetOrganizations(Request $request) {
             'cby'=> 'Created By',
         );
 
-        return view('sysadmin.goalbank.manageindex', compact ('request', 'criteriaList'));
+        return view('shared.goalbank.manageindex', compact ('request', 'criteriaList'));
     }
 
     public function managegetList(Request $request) {
@@ -1948,15 +1949,40 @@ public function agetOrganizations(Request $request) {
                 return $row->created_at ? $row->created_at->format('F d, Y') : null;
             })
             ->addColumn('audience', function ($row) {
-                return $row->sharedWith()->count();
+                return '<a href="'.route(request()->segment(1).'.goalbank.editone', $row->id).'" aria-label="Edit Goal For Individuals" value="'.$row->id.'">'.$row->sharedWith()->count().'</a>';
+            })
+            ->addColumn('org_audience', function ($row) {
+                $orgCount = GoalBankOrg::join('employee_demo', function($join) {
+                    $join->on('employee_demo.organization', '=', 'goal_bank_orgs.organization');
+                    $join->on('employee_demo.level1_program', '=', 'goal_bank_orgs.level1_program');
+                    $join->on('employee_demo.level2_division', '=', 'goal_bank_orgs.level2_division');
+                    // $join->on('employee_demo.level3_branch', '=', 'goal_bank_orgs.level3_branch');
+                    // $join->on('employee_demo.level4', '=', 'goal_bank_orgs.level4');
+                    // $join->on(function($orNull) {
+                    //     $orNull->when('employee_demo.level3_branch');
+                    //     $orNull->when('goal_bank_orgs.level3_branch');
+
+                        // $orNull->where('employee_demo.level3_branch', '=', 'goal_bank_orgs.level3_branch');
+                        // $orNull->Where(function ($andNull) {
+                            // $andNull->whereNull('employee_demo.level2_division');
+                            // $andNull->whereNull('goal_bank_orgs.level2_division');
+                        // });
+                    // });
+                    // $join->on('employee_demo.level3_branch', '=', 'goal_bank_orgs.level3_branch');
+                    // $join->on('employee_demo.level4', '=', 'goal_bank_orgs.level4');
+                })
+                ->where('goal_bank_orgs.goal_id', '=', $row->id)
+                ->whereNull('employee_demo.level3_branch')
+                ->whereNull('goal_bank_orgs.level3_branch')
+                // ->groupBy('goal_bank_orgs.id')
+                ->count();
+                return '<a href="'.route(request()->segment(1).'.goalbank.editpage', $row->id).'" aria-label="Edit Goal For Individuals" value="'.$row->id.'">'.$orgCount.'</a>';
             })
             ->addcolumn('action', function($row) {
-                $btn = '<a href="' . route('sysadmin.goalbank.editpage', $row->id) . '" class="view-modal btn btn-xs btn-primary" aria-label="Edit Goal for Organization" value="'. $row->id .'"><i class="fas fa-users"></i>&nbsp;Edit</a>';
-                $btn = $btn . '&nbsp;<a href="' . route('sysadmin.goalbank.editone', $row->id) . '" class="view-modal btn btn-xs btn-primary" aria-label="Edit Goal For Individuals" value="'. $row->id .'"><i class="fas fa-user-edit"></i>&nbsp;Edit</a>';
-                $btn = $btn . '&nbsp;&nbsp;&nbsp;<a href="/sysadmin/goalbank/deletegoal/' . $row->id . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->id .'"><i class="fa fa-trash"></i></a>';
+                $btn = '<a href="/'.request()->segment(1).'/goalbank/deletegoal/' . $row->id . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->id .'"><i class="fa fa-trash"></i></a>';
                 return $btn;
             })
-            ->rawColumns(['goal_type_name', 'created_by', 'action', 'title-link'])
+            ->rawColumns(['goal_type_name', 'created_by', 'audience', 'org_audience', 'action', 'title-link'])
             ->make(true);
         }
     }
@@ -1989,7 +2015,7 @@ public function agetOrganizations(Request $request) {
             return Datatables::of($query)
             ->addIndexColumn()
             ->addcolumn('action', function($row) {
-                $btn = '<a href="/sysadmin/goalbank/deleteindividual/' . $row->share_id . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_user" value="'. $row->share_id .'"><i class="fa fa-trash"></i></a>';
+                $btn = '<a href="'.request()->segment(1).'/goalbank/deleteindividual/' . $row->share_id . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_user" value="'. $row->share_id .'"><i class="fa fa-trash"></i></a>';
                 return $btn;
             })
             ->rawColumns(['action'])

@@ -30,7 +30,7 @@ class EmployeeDemo extends Model
         'classification',
         'deptid',
         'Jobcode',
-        'job_title',
+        'jobcode_desc',
         'position_number',
         'position_start_date',
         'manager_id',
