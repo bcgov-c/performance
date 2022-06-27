@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 
 
@@ -146,150 +147,11 @@ class EmployeeSharesController extends Controller
         $criteriaList = $this->search_criteria_list();
         $ecriteriaList = $this->search_criteria_list();
         
-        return view('hradmin.employeeshares.addnew', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes') );
+        return view('shared.employeeshares.addnew', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes') );
     
     }
 
-    public function addindex(Request $request) 
-    {
-
-        $errors = session('errors');
-
-        $old_selected_emp_ids = []; // $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
-        $old_selected_org_nodes = []; // $request->old_selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
-
-        $eold_selected_emp_ids = []; // $request->eselected_emp_ids ? json_decode($request->eselected_emp_ids) : [];
-        $eold_selected_org_nodes = []; // $request->eold_selected_org_nodes ? json_decode($request->eselected_org_nodes) : [];
-
-        if ($errors) {
-            $old = session()->getOldInput();
-
-            $request->dd_level0 = isset($old['dd_level0']) ? $old['dd_level0'] : null;
-            $request->dd_level1 = isset($old['dd_level1']) ? $old['dd_level1'] : null;
-            $request->dd_level2 = isset($old['dd_level2']) ? $old['dd_level2'] : null;
-            $request->dd_level3 = isset($old['dd_level3']) ? $old['dd_level3'] : null;
-            $request->dd_level4 = isset($old['dd_level4']) ? $old['dd_level4'] : null;
-
-            $request->criteria = isset($old['criteria']) ? $old['criteria'] : null;
-            $request->search_text = isset($old['search_text']) ? $old['search_text'] : null;
-            
-            $request->orgCheck = isset($old['orgCheck']) ? $old['orgCheck'] : null;
-            $request->userCheck = isset($old['userCheck']) ? $old['userCheck'] : null;
-
-            $old_selected_emp_ids = isset($old['selected_emp_ids']) ? json_decode($old['selected_emp_ids']) : [];
-            $old_selected_org_nodes = isset($old['selected_org_nodes']) ? json_decode($old['selected_org_nodes']) : [];
-
-            $request->edd_level0 = isset($old['edd_level0']) ? $old['edd_level0'] : null;
-            $request->edd_level1 = isset($old['edd_level1']) ? $old['edd_level1'] : null;
-            $request->edd_level2 = isset($old['edd_level2']) ? $old['edd_level2'] : null;
-            $request->edd_level3 = isset($old['edd_level3']) ? $old['edd_level3'] : null;
-            $request->edd_level4 = isset($old['edd_level4']) ? $old['edd_level4'] : null;
-
-            $request->ecriteria = isset($old['ecriteria']) ? $old['ecriteria'] : null;
-            $request->esearch_text = isset($old['esearch_text']) ? $old['esearch_text'] : null;
-            
-            $request->eorgCheck = isset($old['eorgCheck']) ? $old['eorgCheck'] : null;
-            $request->euserCheck = isset($old['euserCheck']) ? $old['euserCheck'] : null;
-
-            $eold_selected_emp_ids = isset($old['eselected_emp_ids']) ? json_decode($old['eselected_emp_ids']) : [];
-            $eold_selected_org_nodes = isset($old['eselected_org_nodes']) ? json_decode($old['eselected_org_nodes']) : [];
-        }
-
-        // no validation and move filter variable to old 
-        if ($request->btn_search || $request->ebtn_search) {
-            session()->put('_old_input', [
-                'dd_level0' => $request->dd_level0,
-                'dd_level1' => $request->dd_level1,
-                'dd_level2' => $request->dd_level2,
-                'dd_level3' => $request->dd_level3,
-                'dd_level4' => $request->dd_level4,
-                'criteria' => $request->criteria,
-                'search_text' => $request->search_text,
-                'orgCheck' => $request->orgCheck,
-                'userCheck' => $request->userCheck,
-                'edd_level0' => $request->edd_level0,
-                'edd_level1' => $request->edd_level1,
-                'edd_level2' => $request->edd_level2,
-                'edd_level3' => $request->edd_level3,
-                'edd_level4' => $request->edd_level4,
-                'ecriteria' => $request->ecriteria,
-                'esearch_text' => $request->esearch_text,
-                'eorgCheck' => $request->eorgCheck,
-                'euserCheck' => $request->euserCheck,
-            ]);
-        }
-
-        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
-
-        $request->session()->flash('level0', $level0);
-        $request->session()->flash('level1', $level1);
-        $request->session()->flash('level2', $level2);
-        $request->session()->flash('level3', $level3);
-        $request->session()->flash('level4', $level4);
-        $request->session()->flash('userCheck', $request->userCheck);  // Dynamic load 
-        
-        $elevel0 = $request->edd_level0 ? OrganizationTree::where('id', $request->edd_level0)->first() : null;
-        $elevel1 = $request->edd_level1 ? OrganizationTree::where('id', $request->edd_level1)->first() : null;
-        $elevel2 = $request->edd_level2 ? OrganizationTree::where('id', $request->edd_level2)->first() : null;
-        $elevel3 = $request->edd_level3 ? OrganizationTree::where('id', $request->edd_level3)->first() : null;
-        $elevel4 = $request->edd_level4 ? OrganizationTree::where('id', $request->edd_level4)->first() : null;
-
-        $request->session()->flash('elevel0', $elevel0);
-        $request->session()->flash('elevel1', $elevel1);
-        $request->session()->flash('elevel2', $elevel2);
-        $request->session()->flash('elevel3', $elevel3);
-        $request->session()->flash('elevel4', $elevel4);
-        $request->session()->flash('userCheck', $request->euserCheck);  // Dynamic load 
-
-        // Matched Employees 
-        $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
-        $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql->select([ 
-            'employee_demo.employee_id'
-            , 'employee_demo.employee_name'
-            , 'employee_demo.jobcode_desc'
-            , 'employee_demo.employee_email'
-            , 'employee_demo.organization'
-            , 'employee_demo.level1_program'
-            , 'employee_demo.level2_division'
-            , 'employee_demo.level3_branch'
-            , 'employee_demo.level4'
-            , 'employee_demo.deptid'
-            , 'employee_demo.jobcode_desc'])
-        ->orderBy('employee_id')
-        ->pluck('employee_demo.employee_id');        
-
-        $edemoWhere = $this->ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4);
-        $esql = clone $edemoWhere; 
-        $ematched_emp_ids = $esql->select([ 
-            'employee_demo.employee_id as eemployee_id'
-            , 'employee_demo.employee_name as eemployee_name'
-            , 'employee_demo.jobcode_desc as ejobcode_desc'
-            , 'employee_demo.employee_email as eemployee_email'
-            , 'employee_demo.organization as eorganization'
-            , 'employee_demo.level1_program as elevel1_program'
-            , 'employee_demo.level2_division as elevel2_division'
-            , 'employee_demo.level3_branch as elevel3_branch'
-            , 'employee_demo.level4 as elevel4'
-            , 'employee_demo.deptid as edeptid'
-            ])
-        ->orderBy('eemployee_id')
-        ->pluck('eemployee_id');        
-        
-        $criteriaList = $this->search_criteria_list();
-        $ecriteriaList = $this->search_criteria_list();
-
-        $sharedElements = SharedElement::select('id', 'name')->get('name', 'id');
-
-        return view('hradmin.employeeshares.addindex', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes') );
-    }
-
     public function saveall(Request $request) {
-
         $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $eselected_emp_ids = $request->eselected_emp_ids ? json_decode($request->eselected_emp_ids) : [];
         $request->userCheck = $selected_emp_ids;
@@ -341,7 +203,7 @@ class EmployeeSharesController extends Controller
                 }
             }
         }
-        return redirect()->route('hradmin.employeeshares.addnew')
+        return redirect()->route($request->segment(1).'.employeeshares.addnew')
             ->with('success', 'Share user goal/conversation successful.');
     }
 
@@ -391,7 +253,7 @@ class EmployeeSharesController extends Controller
         $empIdsByOrgId = $rows->groupBy('id')->all();
 
         if($request->ajax()){
-            return view('hradmin.employeeshares.partials.recipient-tree', compact('orgs','countByOrg','empIdsByOrgId') );
+            return view('shared.employeeshares.partials.recipient-tree', compact('orgs','countByOrg','empIdsByOrgId') );
         } 
     }
 
@@ -442,9 +304,8 @@ class EmployeeSharesController extends Controller
         $eempIdsByOrgId = $erows->groupBy('id')->all();
 
         if($request->ajax()){
-            return view('hradmin.employeeshares.partials.erecipient-tree', compact('eorgs','eempIdsByOrgId') );
+            return view('shared.employeeshares.partials.erecipient-tree', compact('eorgs','eempIdsByOrgId') );
         } 
-    
     }
   
     public function getDatatableEmployees(Request $request) {
@@ -1038,7 +899,7 @@ class EmployeeSharesController extends Controller
         $parent_id = $id;
         
         // if($request->ajax()){
-            return view('hradmin.employeeshares.partials.employee', compact('parent_id', 'employees') ); 
+            return view('shared.employeeshares.partials.employee', compact('parent_id', 'employees') ); 
         // } 
     }
 
@@ -1063,7 +924,7 @@ class EmployeeSharesController extends Controller
         $parent_id = $id;
         
         // if($request->ajax()){
-            return view('hradmin.employeeshares.partials.employee', compact('parent_id', 'employees') ); 
+            return view('shared.employeeshares.partials.employee', compact('parent_id', 'employees') ); 
         // } 
     }
 
@@ -1316,7 +1177,7 @@ class EmployeeSharesController extends Controller
         $criteriaList = $this->search_criteria_list();
         $sharedElements = SharedElement::all();
 
-        return view('hradmin.employeeshares.manageindex', compact ('request', 'criteriaList', 'sharedElements'));
+        return view('shared.employeeshares.manageindex', compact ('request', 'criteriaList', 'sharedElements'));
     }
 
     public function manageindexlist(Request $request) {
@@ -1366,7 +1227,7 @@ class EmployeeSharesController extends Controller
             ->addIndexColumn()
             ->addcolumn('action', function($row) {
                 $btn = '<button class="btn btn-xs btn-primary modalbutton" role="button" data-userid="' . $row->user_id . '" data-username="' . $row->employee_name . '" data-toggle="modal" data-target="#editModal" role="button">Edit</button>';
-                $btn = $btn . '&nbsp;&nbsp;&nbsp;<a href="' . route('sysadmin.employeeshares.deleteshare', $row->user_id) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->user_id .'"><i class="fa fa-trash"></i></a>';
+                $btn = $btn . '&nbsp;&nbsp;&nbsp;<a href="' . route(request()->segment(1).'.employeeshares.deleteshare', $row->user_id) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->user_id .'"><i class="fa fa-trash"></i></a>';
                 return $btn;
             })
             ->rawColumns(['action'])
@@ -1390,10 +1251,10 @@ class EmployeeSharesController extends Controller
             )
             ->distinct();
             return Datatables::of($query)
-            return Datatables::of($data)
+            // return Datatables::of($data)
             ->addIndexColumn()
             ->addcolumn('action', function($row) {
-                $btn = '<a href="' . route('hradmin.employeeshares.deleteitem', ['type' => $row->item_type, 'id' => $row->item_id, 'part' => $row->part_id]) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->item_type . '_' . $row->id . '_' . $row->part_id .'"><i class="fa fa-trash"></i></a>';
+                $btn = '<a href="' . route(request()->segment(1).'.employeeshares.deleteitem', ['type' => $row->item_type, 'id' => $row->item_id, 'part' => $row->part_id]) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->item_type . '_' . $row->id . '_' . $row->part_id .'"><i class="fa fa-trash"></i></a>';
                 return $btn;
             })
             ->rawColumns(['action'])
@@ -1470,7 +1331,7 @@ class EmployeeSharesController extends Controller
         ->where('model_id', '=', $id)
         ->where('model_has_roles.model_type', 'App\Models\User')
         ->get();
-        return view('hradmin.employeeshares.partials.access-edit-modal', compact('roles', 'access', 'email'));
+        return view('shared.employeeshares.partials.access-edit-modal', compact('roles', 'access', 'email'));
     }
 
 

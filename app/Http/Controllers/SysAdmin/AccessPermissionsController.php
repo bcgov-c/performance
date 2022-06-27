@@ -5,7 +5,6 @@ namespace App\Http\Controllers\SysAdmin;
 
 
 use App\Models\User;
-use App\Jobs\SendEmailJob;
 use App\Models\AdminOrg;
 use App\Models\EmployeeDemo;
 use Illuminate\Http\Request;
@@ -18,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 
 
@@ -123,9 +123,9 @@ class AccessPermissionsController extends Controller
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql->select([ 'employee_demo.employee_id', 'employee_demo.employee_name', 'employee_demo.job_title', 'employee_demo.employee_email', 
+        $matched_emp_ids = $sql->select([ 'employee_demo.employee_id', 'employee_demo.employee_name', 'employee_demo.jobcode_desc', 'employee_demo.employee_email', 
                 'employee_demo.organization', 'employee_demo.level1_program', 'employee_demo.level2_division',
-                'employee_demo.level3_branch','employee_demo.level4', 'employee_demo.deptid', 'employee_demo.job_title'])
+                'employee_demo.level3_branch','employee_demo.level4', 'employee_demo.deptid'])
             ->orderBy('employee_id')
                 ->pluck('employee_demo.employee_id');        
         
@@ -236,7 +236,7 @@ class AccessPermissionsController extends Controller
 
             $sql = clone $demoWhere; 
 
-            $employees = $sql->select([ 'employee_id', 'employee_name', 'job_title', 'employee_email', 
+            $employees = $sql->select([ 'employee_id', 'employee_name', 'jobcode_desc', 'employee_email', 
                 'employee_demo.organization', 'employee_demo.level1_program', 'employee_demo.level2_division',
                 'employee_demo.level3_branch','employee_demo.level4', 'employee_demo.deptid']);
 
@@ -610,20 +610,6 @@ class AccessPermissionsController extends Controller
         return response()->json($eformatted_orgs);
     } 
 
-    // public function getJobTitles() {
-    //     $rows = EmployeeDemo::select('job_title')
-    //        ->whereNotIn('job_title', ['', ' '])
-    //        ->orderBy('job_title')
-    //        ->distinct()->get();
-
-    //     $formatted_data = [];
-    //        foreach ($rows as $item) {
-    //            $formatted_data[] = ['id' => $item->job_title, 'text' => $item->job_title ];
-    //     }
-   
-    //     return response()->json($formatted_data);
-    // }
-
     public function getEmployees(Request $request,  $id) {
         $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
         $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
@@ -654,7 +640,7 @@ class AccessPermissionsController extends Controller
             'all' => 'All',
             'emp' => 'Employee ID', 
             'name'=> 'Employee Name',
-            'job' => 'Job Title', 
+            'job' => 'Classification', 
             'dpt' => 'Department ID'
         ];
     }
@@ -681,7 +667,7 @@ class AccessPermissionsController extends Controller
                 
                 return $query->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->search_text) . "%'")
                     ->orWhereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->search_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.job_title) LIKE '%" . strtolower($request->search_text) . "%'")
+                    ->orWhereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->search_text) . "%'")
                     ->orWhereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
             });
         })
@@ -692,7 +678,7 @@ class AccessPermissionsController extends Controller
             return $q->whereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->search_text) . "%'");
         })
         ->when( $request->search_text && $request->criteria == 'job', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.job_title) LIKE '%" . strtolower($request->search_text) . "%'");
+            return $q->whereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->search_text) . "%'");
         })
         ->when( $request->search_text && $request->criteria == 'dpt', function ($q) use($request) {
             return $q->whereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
@@ -887,7 +873,7 @@ class AccessPermissionsController extends Controller
             ->when($level4, function($q) use($level4) {return $q->where('level4', $level4->name);})
             ->when($request->criteria == 'name', function($q) use($request){return $q->where('employee_name', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'job', function($q) use($request){return $q->where('job_title', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'job', function($q) use($request){return $q->where('jobcode_desc', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'dpt', function($q) use($request){return $q->where('deptid', 'like', "%" . $request->search_text . "%");})
             // ->when([$request->criteria == 'all', $request->search_text], function($q) use ($request) 
             ->when($request->criteria == 'all', function($q) use ($request) {
@@ -895,7 +881,7 @@ class AccessPermissionsController extends Controller
                     if($request->search_text) {
                         $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
                         ->orWhere('employee_name', 'like', "%" . $request->search_text . "%")
-                        ->orWhere('job_title', 'like', "%" . $request->search_text . "%")
+                        ->orWhere('jobcode_desc', 'like', "%" . $request->search_text . "%")
                         ->orWhere('deptid', 'like', "%" . $request->search_text . "%");
                     }
                 });
@@ -904,7 +890,7 @@ class AccessPermissionsController extends Controller
                 'employee_demo.employee_id',
                 'employee_demo.employee_name', 
                 'users.email',
-                'employee_demo.job_title',
+                'employee_demo.jobcode_desc',
                 'employee_demo.organization',
                 'employee_demo.level1_program',
                 'employee_demo.level2_division',

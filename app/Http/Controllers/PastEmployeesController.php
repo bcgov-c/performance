@@ -90,7 +90,7 @@ class PastEmployeesController extends Controller
             ->when($level4, function($q) use($level4) {return $q->where('level4', $level4->name);})
             ->when($request->criteria == 'name', function($q) use($request){return $q->where('employee_name', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'job', function($q) use($request){return $q->where('job_title', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'job', function($q) use($request){return $q->where('jobcode_desc', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'dpt', function($q) use($request){return $q->where('deptid', 'like', "%" . $request->search_text . "%");})
             ->when([$request->criteria == 'all', $request->search_text], function($q) use ($request) 
             {
@@ -98,7 +98,7 @@ class PastEmployeesController extends Controller
                 {
                     $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
                     ->orWhere('employee_name', 'like', "%" . $request->search_text . "%")
-                    ->orWhere('job_title', 'like', "%" . $request->search_text . "%")
+                    ->orWhere('jobcode_desc', 'like', "%" . $request->search_text . "%")
                     ->orWhere('deptid', 'like', "%" . $request->search_text . "%");
                 });
             })
@@ -106,7 +106,7 @@ class PastEmployeesController extends Controller
             (
                 'employee_demo.employee_id',
                 'employee_demo.employee_name', 
-                'employee_demo.job_title',
+                'employee_demo.jobcode_desc',
                 'employee_demo.organization',
                 'employee_demo.level1_program',
                 'employee_demo.level2_division',
@@ -145,7 +145,7 @@ class PastEmployeesController extends Controller
             'all' => 'All',
             'emp' => 'Employee ID', 
             'name'=> 'Employee Name',
-            'job' => 'Job Title', 
+            'job' => 'Classification', 
             'dpt' => 'Department ID'
         ];
     }

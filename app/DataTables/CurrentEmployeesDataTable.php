@@ -41,7 +41,7 @@ class CurrentEmployeesDataTable extends DataTable
     public function query()
     {
         $query = DB::table('employee_demo')
-        ->select('employee_id', 'guid', 'employee_name', 'job_title', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'effdt', 'hire_dt')
+        ->select('employee_id', 'guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'effdt', 'hire_dt')
         ->wherein('employee_status', ['A', 'L', 'P', 'S']);
         // return $model->newQuery();
         return $query->get();

@@ -332,8 +332,8 @@ return [
             'submenu' => [
                 [
                     'text' => 'Employee List',
-                    'url'  => 'sysadmin/employees/currentemployees',
-                    'active' => ['sysadmin/employees/*']
+                    'url'  => 'sysadmin/employeelists/currentlist',
+                    'active' => ['sysadmin/employeelists/*']
                 ],
                 [
                     'text' => 'Share Employees',

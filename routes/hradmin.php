@@ -104,6 +104,11 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::post('/hradmin/employeeshares/manageindex', [EmployeeSharesController::class, 'manageindex'])->name('hradmin.employeeshares.manageindexpost');
         Route::get('/hradmin/employeeshares/manageindexlist', [EmployeeSharesController::class, 'manageindexlist'])->name('hradmin.employeeshares.manageindexlist');
 
+        Route::get('/hradmin/employeeshares/deleteshare/{id}', [EmployeeSharesController::class, 'deleteshare'])->name('hradmin.employeeshares.deleteshareget');
+        Route::delete('/hradmin/employeeshares/deleteshare/{id}', [EmployeeSharesController::class, 'deleteshare'])->name('hradmin.employeeshares.deleteshare');
+        Route::get('hradmin/employeeshares/manageindexviewshares/{id}', [EmployeeSharesController::class, 'manageindexviewshares']);
+        Route::get('/hradmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('hradmin.employeeshares.deleteitemget');
+        Route::delete('/hradmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('hradmin.employeeshares.deleteitem');
         Route::get('/hradmin/employeeshares/org-tree', [EmployeeSharesController::class,'loadOrganizationTree']);
         Route::get('/hradmin/employeeshares/org-organizations', [EmployeeSharesController::class,'getOrganizations']);
         Route::get('/hradmin/employeeshares/org-programs', [EmployeeSharesController::class,'getPrograms']);

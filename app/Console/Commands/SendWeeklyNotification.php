@@ -11,7 +11,6 @@ use App\Models\Conversation;
 use Illuminate\Console\Command;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use App\Models\User;
-use App\Jobs\SendEmailJob;
 
 class SendWeeklyNotification extends Command
 {
@@ -71,7 +70,7 @@ class SendWeeklyNotification extends Command
             $nextDueDate = $user->joining_date ? $user->joining_date->addMonths(4) : '';
             $diff = 0;
         
-            if ($user->conversations->count() == 0 ) {
+            if ($user->conversations->whereNotNull('sign_off_time')->count() == 0 ) {
 
                 $nextDueDate = $user->joining_date ? $user->joining_date->addMonths(4) : '';
                 $text = "You must complete your first performance conversation by " . $nextDueDate->format('d-M-y');
@@ -82,14 +81,11 @@ class SendWeeklyNotification extends Command
                     $lastConv = conversation::getLastConv([], $user);
 
                     if ($lastConv) {
-                        $nextDueDate = $lastConv->sign_off_time->addMonths(4);
-                        $diff = Carbon::now()->diffInDays($lastConv->sign_off_time->addMonths(4), false);
                         if ($lastConv->sign_off_time->addMonths(4)->lt(Carbon::now())) {
-                            $text =  "You are required to complete a performance conversation every 4 months at minimum. You are overdue. Please complete a conversation as soon as possible.";
-
-                        } else { 
+                            $text = "You are required to complete a performance conversation every 4 months at minimum. You are overdue. Please complete a conversation as soon as possible.";
+                        } else {
                             $nextDueDate = $lastConv->sign_off_time->addMonths(4);
-                            // $diff = Carbon::now()->diffInMonths($lastConv->sign_off_time->addMonths(4), false);
+                            $diff = Carbon::now()->diffInMonths($lastConv->sign_off_time->addMonths(4), false);
                             $text = "Your next performance conversation is due by ". $lastConv->sign_off_time->addMonths(4)->format('d-M-y');
                         }
                     } else {
@@ -126,20 +122,13 @@ class SendWeeklyNotification extends Command
         $sendMail = new \App\MicrosoftGraph\SendMail();
         $sendMail->toRecipients = [ $to->id ];
         $sendMail->alertFormat = 'E';
+        $sendMail->useQueue = false;
         $sendMail->template = 'WEEKLY_OVERDUE_SUMMARY';
         array_push($sendMail->bindvariables, $listing);
-        $response = $sendMail->sendMailWithGenericTemplate();
-        if ($response->getStatus() == 202) {
+        $success = $sendMail->sendMailWithGenericTemplate();
+        if ($success) {
             $this->info( 'Email was successfully sent.');
         }
-
-        // // Method 2: Using Queue
-        // $sendEmailJob = (new SendEmailJob())->delay( now()->addSeconds(1) );
-        // $sendEmailJob->bccRecipients = [ $to->id ];
-        // $sendEmailJob->template = 'WEEKLY_OVERDUE_SUMMARY';
-        // array_push($sendEmailJob->bindvariables, $listing);
-        // $sendEmailJob->alertFormat = 'E';
-        // $ret = dispatch($sendEmailJob);
 
     }
 

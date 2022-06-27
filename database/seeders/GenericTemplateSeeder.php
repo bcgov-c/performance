@@ -37,6 +37,10 @@ $body2 = <<<'EOD'
 
 EOD;
 
+$body3 = <<<'EOD'
+<p>Hi Administrator,</p><p>The following are the listing of the overdue users:</p><p>%1</p><p>&nbsp;</p>
+EOD;
+
     $template = GenericTemplate::updateOrCreate([
       'template' => 'SUPERVISOR_COMMENT_MY_GOAL',
     ], [
@@ -88,6 +92,29 @@ EOD;
       'seqno' => 0,
       'bind' => '%1', 
       'description' => 'Conversation Template',
+    ]);        
+
+
+  // Template 3
+    $template = GenericTemplate::updateOrCreate([
+      'template' => 'WEEKLY_OVERDUE_SUMMARY',
+    ], [
+      'description' =>  'Send out email notification to HR Administrator about the list of conversation is overdue',
+      'instructional_text' => 'You can add parameters',
+      'sender' => '2',
+      'sender_id' => 702,
+      'subject' => 'Weekly overdue notification',
+      'body' => $body3,
+    ]);
+
+    foreach ($template->binds as $bind) {
+      $bind->delete();
+    }
+
+    $template->binds()->create([
+      'seqno' => 0,
+      'bind' => '%1', 
+      'description' => 'Overdue listing',
     ]);        
 
   }
