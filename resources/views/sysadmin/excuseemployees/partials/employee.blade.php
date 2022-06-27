@@ -13,7 +13,7 @@
                                value="{{ $employee->employee_id }}">
                     </div>
                     <div class="col"><span>{{ $employee->employee_name  }}</span></div>
-                    <div class="col"><span>{{ $employee->job_title  }}</span></div>
+                    <div class="col"><span>{{ $employee->jobcode_desc  }}</span></div>
                     <div class="col"><span>{{ $employee->employee_email  }}</span></div>
                 </div>
             </div>

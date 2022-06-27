@@ -60,12 +60,12 @@
                 text-overflow: ellipsis;
                 width: 5em;
             }
+
             #filtertable_filter label {
                 text-align: right !important;
             }
         </style>
     </x-slot>
-    
 @endpush
 
 @push('js')
@@ -143,7 +143,7 @@
                             , render: function(data, type, row) { return '<a href="#' + row.id + '" onclick="showModal(' + row.id 
                             + ')" class="button edit-button">' + row.creator_name + '</a>' }},
                         {title: 'Individual Audience', ariaTitle: 'Individual Audience', target: 0, type: 'num', data: 'audience'
-                            , name: 'audience', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'audience', searchable: true},
                         {title: 'Business Unit Audience', ariaTitle: 'Business Unit Audience', target: 0, type: 'num', data: 'org_audience'
                             , name: 'org_audience', searchable: true},
                         {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},

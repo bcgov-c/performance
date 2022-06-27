@@ -237,6 +237,42 @@
             $('#dd_level4').val(null).trigger('change');
         });
 
+        $('#dd_level0').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#dd_level0').val(null).trigger('change');
+            $('#dd_level1').val(null).trigger('change');
+            $('#dd_level2').val(null).trigger('change');
+            $('#dd_level3').val(null).trigger('change');
+            $('#dd_level4').val(null).trigger('change');
+        });
+
+        $('#dd_level1').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#dd_level1').val(null).trigger('change');
+            $('#dd_level2').val(null).trigger('change');
+            $('#dd_level3').val(null).trigger('change');
+            $('#dd_level4').val(null).trigger('change');
+        });
+
+        $('#dd_level2').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#dd_level2').val(null).trigger('change');
+            $('#dd_level3').val(null).trigger('change');
+            $('#dd_level4').val(null).trigger('change');
+        });
+
+        $('#dd_level3').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#dd_level3').val(null).trigger('change');
+            $('#dd_level4').val(null).trigger('change');
+        });
+
+        $('#dd_level4').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#dd_level4').val(null).trigger('change');
+            $('#btn_search').click();
+        });
+
     </script>
 
 @endpush

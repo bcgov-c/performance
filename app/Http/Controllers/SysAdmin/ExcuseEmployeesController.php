@@ -662,9 +662,7 @@ class ExcuseEmployeesController extends Controller
 
         $parent_id = $id;
         
-        // if($request->ajax()){
-            return view('sysadmin.excuseemployees.partials.employee', compact('parent_id', 'employees') ); 
-        // } 
+        return view('sysadmin.excuseemployees.partials.employee', compact('parent_id', 'employees') ); 
     }
 
     protected function search_criteria_list() {
