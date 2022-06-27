@@ -59,7 +59,7 @@
             <div class="form-group row">
                 <span class="float-left float-bottom">  
                     <button type="button" class="btn btn-primary" id="btn_search" name="btn_search" value="btn_search" >Filter</button>
-                    <button type="button" class="btn btn-secondary  " id="btn_search_reset" name="btn_reset" value="btn_reset">Reset</button>
+                    <button type="button" class="btn btn-secondary  " id="btn_search_reset" name="btn_search_reset" value="btn_reset">Reset</button>
                 </span>
             </div>
         </div>
@@ -97,7 +97,7 @@
                 placeholder: 'Select Organization',
                 allowClear: true,
                 ajax: {
-                    url: 'org-organizations'
+                    url: '{{ "/" . request()->segment(1) . "/employeelists/org-organizations" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -119,7 +119,7 @@
                 placeholder: 'Select Level 1',
                 allowClear: true,
                 ajax: {
-                    url: 'org-programs' 
+                    url: '{{ "/" . request()->segment(1) . "/employeelists/org-programs" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -142,7 +142,7 @@
                 placeholder: 'Select Level 2',
                 allowClear: true,
                 ajax: {
-                    url: 'org-divisions' 
+                    url: '{{ "/" . request()->segment(1) . "/employeelists/org-divisions" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -166,7 +166,7 @@
                 placeholder: 'Select Level 3',
                 allowClear: true,
                 ajax: {
-                    url: 'org-branches' 
+                    url: '{{ "/" . request()->segment(1) . "/employeelists/org-branches" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -191,7 +191,7 @@
                 placeholder: 'Select level 4',
                 allowClear: true,
                 ajax: {
-                    url: 'org-level4' 
+                    url: '{{ "/" . request()->segment(1) . "/employeelists/org-level4" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -239,17 +239,95 @@
                 $('#dd_level4').val(null).trigger('change');
             });
 
-            $('#btn_search_reset').click(function() {
+            $('#dd_level0').on('select2:unselect', function (e) {
+                e.preventDefault();
                 $('#dd_level0').val(null).trigger('change');
                 $('#dd_level1').val(null).trigger('change');
                 $('#dd_level2').val(null).trigger('change');
                 $('#dd_level3').val(null).trigger('change');
                 $('#dd_level4').val(null).trigger('change');
-                $('#search_text').val(null);
             });
 
-            $('#btn_search').click(function() {
-                $('#filtertable').DataTable().ajax.reload(null, false);
+            $('#dd_level1').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#dd_level1').val(null).trigger('change');
+                $('#dd_level2').val(null).trigger('change');
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level2').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#dd_level2').val(null).trigger('change');
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level3').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level4').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#dd_level4').val(null).trigger('change');
+                $('#btn_search').click();
+            });
+
+            $('#dd_level0').change(function (e){
+                e.preventDefault();
+            });
+
+            $('#dd_level1').change(function (e){
+                e.preventDefault();
+            });
+
+            $('#dd_level2').change(function (e){
+                e.preventDefault();
+            });
+
+            $('#dd_level3').change(function (e){
+                e.preventDefault();
+            });
+
+            $('#dd_level4').change(function (e){
+                e.preventDefault();
+                $('#btn_search').click();
+            });
+
+            $('#criteria').change(function (e){
+                e.preventDefault();
+                $('#btn_search').click();
+            });
+
+            $('#search_text').change(function (e){
+                e.preventDefault();
+                $('#btn_search').click();
+            });
+
+            $('#search_text').keydown(function (e){
+                if (e.keyCode == 13) {
+                    e.preventDefault();
+                    $('#btn_search').click();
+                }
+            });
+
+            $('#btn_search_reset').click(function(e) {
+                e.preventDefault();
+                $('#dd_level0').val(null).trigger('change');
+                $('#dd_level1').val(null).trigger('change');
+                $('#dd_level2').val(null).trigger('change');
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+                $('#criteria').val('all');
+                $('#search_text').val(null);
+                $('#btn_search').click();
+            });
+
+            $('#btn_search').click(function(e) {
+                e.preventDefault();
+                $('#listtable').DataTable().ajax.reload(null, false);
             });
         };
     </script>
