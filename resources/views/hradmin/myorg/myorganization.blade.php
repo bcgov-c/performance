@@ -6,8 +6,7 @@
     </div>
 
     <div class="card">
-        <div class="card-body">
-            <div class="h4">{{__('All BC Public Service Employees')}}</div>
+        <div class="card-body">            
             @include('hradmin.myorg.partials.filter')
             <p></p>
             <table class="table table-bordered myorgtable" id="myorgtable" style="width: 100%; overflow-x: auto; "></table>

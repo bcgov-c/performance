@@ -1,25 +1,81 @@
 <x-side-layout title="{{ __('Dashboard') }}">
     <div name="header" class="container-header p-n2 "> 
         <div class="container-fluid">
-            <h3>Excuse Employees</h3>
-            @include('sysadmin.excuseemployees.partials.tabs')
+            <h3>Goal Bank</h3>
         </div>
     </div>
+
+	<small><a href="{{ route(request()->segment(1).'.excuseemployees.manageindex') }}" class="btn btn-md btn-primary"><i class="fa fa-arrow-left"></i> Back to goals</a></small>
+
+	<br><br>
+
+	<h4>Edit: {{ $goaldetail->title }}</h4>
 
 	<p class="px-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tincidunt, nibh nec interdum fermentum, est metus rutrum elit, in molestie ex massa ut urna. Duis dignissim tortor ipsum, dignissim rutrum quam gravida sed. Mauris auctor malesuada luctus. Praesent vitae ante et diam gravida lobortis. Donec eleifend euismod scelerisque. Curabitur laoreet erat sit amet tortor rutrum tristique. Sed lobortis est ac mauris lobortis euismod. Morbi tincidunt porta orci eu elementum. Donec lorem lacus, hendrerit a augue sed, tempus rhoncus arcu. Praesent a enim vel eros elementum porta. Nunc ut leo eu augue dapibus efficitur ac ac risus. Maecenas risus tellus, tincidunt vitae finibus vel, ornare vel neque. Curabitur imperdiet orci ac risus tempor semper. Integer nec varius urna, sit amet rhoncus diam. Aenean finibus, sapien eu placerat tristique, sapien dui maximus neque, id tempor dui magna eget lorem. Suspendisse egestas mauris non feugiat bibendum.</p>
 	<p class="px-3">Cras quis augue quis risus auctor facilisis quis ac ligula. Fusce vehicula consequat dui, et egestas augue sodales aliquam. In hac habitasse platea dictumst. Curabitur sit amet nulla nibh. Morbi mollis malesuada diam ut egestas. Pellentesque blandit placerat nisi ac facilisis. Vivamus consequat, nisl a lacinia ultricies, velit leo consequat magna, sit amet condimentum justo nibh id nisl. Quisque mattis condimentum cursus. Nullam eget congue augue, a molestie leo. Aenean sollicitudin convallis arcu non maximus. Curabitur ut lacinia nisi. Nam cursus venenatis lacus aliquet dapibus. Nulla facilisi.</p>
 
-
-	<br>
-	<h6 class="text-bold">Step 1. Select employee(s) to excuse</h6>
-	<br>
-
-	<form id="notify-form" action="{{ route('sysadmin.excuseemployees.saveexcuse') }}" method="post">
+	<form id="notify-form" action="{{ route(request()->segment(1).'.excuseemployees.updategoalone') }}" method="post">
 		@csrf
+		<br>
+		<h6 class="text-bold">Step 1. Update Goal Details</h6>
+		<br>
+
+		<div class="row">
+			<div class="col m-2">
+				<x-dropdown :list="$goalTypes" label="Goal Type" name="goal_type_id" :selected="$goaldetail->goal_type_id" />
+			</div>
+			<div class="col m-2">
+				<x-input label="Goal Title" name="title" tooltip='A short title (1-3 words) used to reference the goal throughout the Performance platform.' :value="$goaldetail->title" />
+					<small class="text-danger error-title"></small>
+			</div>
+			<div class="col m-2">
+				<x-dropdown :list="$mandatoryOrSuggested" label="Mandatory/Suggested" name="is_mandatory" :selected="$goaldetail->goal_type_id" ></x-dropdown>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col m-2">
+				<x-dropdown :list="$tags" label="Tags" name="tag_ids[]" :selected="array_column($goaldetail->tags->toArray(), 'id')" class="tags" multiple />
+				<small  class="text-danger error-tag_ids"></small>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col m-2">
+				<x-textarea label="Description" name="what" tooltip='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative MyPerformance sessions to ministry audiences".' :value="$goaldetail->what" />
+					<small class="text-danger error-what"></small>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col m-2">
+				<x-textarea label="Measures of Success" name="measure_of_success" tooltip='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"' :value="$goaldetail->measure_of_success" />
+					<small class="text-danger error-measure_of_success"></small>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col m-2">
+				<x-input label="Start Date " class="error-start" type="date" name="start_date" :value="$goaldetail->start_date ? $goaldetail->start_date->format('Y-m-d') : ''" />
+				<small  class="text-danger error-start_date"></small>
+			</div>
+			<div class="col m-2">
+				<x-input label="End Date " class="error-target" type="date" name="target_date" :value="$goaldetail->target_date ? $goaldetail->target_date->format('Y-m-d') : ''" />
+				<small  class="text-danger error-target_date"></small>
+			</div>
+		</div>
+
+		<div class="card">
+			<div class="card-body">
+				<label label="Current Audience" name="current_audience" > Current Individual Audience </label>
+				@include('shared.excuseemployees.partials.filter')
+				<div class="p-3">  
+					<table class="table table-bordered currenttable" id="currenttable" style="width: 100%; overflow-x: auto; "></table>
+				</div>
+			</div>
+		</div>
+
 		<input type="hidden" id="selected_emp_ids" name="selected_emp_ids" value="">
+		<input type="hidden" id="goal_id" name="goal_id" value={{$goaldetail->id}}>
 
 		<!----modal starts here--->
-		<div id="saveExcuseModal" class="modal" role='dialog'>
+		<div id="saveGoalModal" class="modal" role='dialog'>
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -32,7 +88,7 @@
 						<p>Are you sure to send out this message ?</p>
 					</div>
 					<div class="modal-footer">
-						<button class="btn btn-primary mt-2" type="submit" name="btn_send" value="btn_send">Excuse</button>
+						<button class="btn btn-primary mt-2" type="submit" name="btn_send" value="btn_send">Update Goal</button>
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
 					</div>
 					
@@ -41,7 +97,14 @@
 		</div>
 		<!--Modal ends here--->	
 	
-		@include('sysadmin.excuseemployees.partials.filter')
+
+		<br>
+		<h6 class="text-bold">Step 2. Select additional individual audience</h6>
+		<br>
+
+		<input type="hidden" id="selected_org_nodes" name="selected_org_nodes" value="">
+
+		@include('shared.excuseemployees.partials.filter')
 
         <div class="p-3">
             <nav>
@@ -52,7 +115,7 @@
             </nav>
             <div class="tab-content" id="nav-tabContent">
                 <div class="tab-pane fade show active" id="nav-list" role="tabpanel" aria-labelledby="nav-list-tab">
-                    @include('sysadmin.excuseemployees.partials.recipient-list')
+                    @include('shared.excuseemployees.partials.recipient-list')
                 </div>
                 <div class="tab-pane fade" id="nav-tree" role="tabpanel" aria-labelledby="nav-tree-tab" loaded="">
                     <div class="mt-2 fas fa-spinner fa-spin fa-3x fa-fw loading-spinner" id="tree-loading-spinner" role="status" style="display:none">
@@ -62,59 +125,11 @@
             </div>
         </div>
 
-
-        <div class="container-fluid">
-			<br>
-			<h6 class="text-bold">Step 2. Enter date range and reason for excusing selected employee(s)</h6> 
-			<br>
-			<div class="card col-md-6" >
-				<div class="card-body">
-					<div class="row">
-						<div class="col">
-							<x-input label="Start Date " class="error-start" type="date" id="start_date" name="start_date" value="{{ Request::old('start_date') }}" />
-						</div>
-						<div class="col">
-							<x-input label="End Date " class="error-target" type="date" id="target_date" name="target_date" value="{{ Request::old('target_date') }}" />
-						</div>
-						<div class="col">
-							<label for='excuse_reason'>Reason
-								{{-- <x-dropdown :list="$reasons" class="multiple" id="excuse_reason" name="excuse_reason" :selected="request()->excused_reason"></x-dropdown> --}}
-								<select id="excused_reason" name="excused_reason" class="form-control">
-									@foreach($reasons as $reason)
-										<option value="{{ $reason->id }}" {{ old('excused_reason') == '$reason->id' ? "selected" : "" }}>{{ $reason->name }}</option>
-									@endforeach
-								</select>
-							</label>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="container-fluid">
-			<br>
-			<h6 class="text-bold">Step 3. Declaration</h6>
-			<br>
-			<div class="card col-md-12" >
-				<div class="card-body">
-					{{-- <h6 class="text-bold mt-1">Target Audience</h6> --}}
-					<div class="row">
-						<input class="" type="checkbox"  id="chkbox_declare" name="chkbox_declare" value="">
-						<p class="px-3">I wish to excuse the selected employees from having to complete their MyPerformance Profile.</p>
-					</div>
-					<div class="row">
-						<div class="alert alert-warning alert-dismissible no-border"  style="border-color:#d5e6f6; background-color:#d5e6f6" role="alert">
-							<span class="h6" aria-hidden="true"><i class="icon fa fa-exclamation-triangle  "></i><b>Note:  By doing so, these employees will not show up in current and historical performance reports.</b></span>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		
 		<br>
-		<h6 class="text-bold">Step 4. Excuse selected employee(s)</h6>
+		<h6 class="text-bold">Step 3. Finish</h6>
 		<br>
 		<div class="col-md-3 mb-2">
-			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveExcuseModal()" id="btn_send" name="btn_send" value="btn_send">Excuse Employee(s)</button>
+			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveChangesModal()" name="btn_send" value="btn_send">Save Changes</button>
 			<button class="btn btn-secondary mt-2">Cancel</button>
 		</div>
 
@@ -124,6 +139,10 @@
 	<h6 class="m-20">&nbsp;</h6>
 	<h6 class="m-20">&nbsp;</h6>
 
+
+    @push('css')
+        <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}">
+    @endpush
 
 	<x-slot name="css">
 		<style>
@@ -164,6 +183,8 @@
 	</x-slot>
 
 	<x-slot name="js">
+		<script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
+		<script src="//cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
 
 		<script>
 			let g_matched_employees = {!!json_encode($matched_emp_ids)!!};
@@ -171,33 +192,102 @@
 			let g_selected_orgnodes = {!!json_encode($old_selected_org_nodes)!!};
 			let g_employees_by_org = [];
 
-			function confirmSaveExcuseModal(){
-				count = g_selected_employees.length;
+			function confirmSaveChangesModal(){
+				let count = g_selected_employees.length;
 				if (count == 0) {
-					$('#saveExcuseModal .modal-body p').html('Are you sure to excuse employee?');
+					$('#saveGoalModal .modal-body p').html('Are you sure to update goal without additional audience?');
 				} else {
-					$('#saveExcuseModal .modal-body p').html('Are you sure to excuse ' + count + ' selected users?');
+					$('#saveGoalModal .modal-body p').html('Are you sure to update goal and assign to selected additional audience?');
 				}
-				$('#saveExcuseModal').modal();
+				$('#saveGoalModal').modal();
 			}
 
 			$(document).ready(function(){
 
-				confirmSwitch();
 
-				function confirmSwitch(){
-					if($('#chkbox_declare').prop('checked')) {
-						$('#btn_send').removeAttr('disabled');
-					} else {
-						$('#btn_send').attr('disabled',true);
+				var table = $('.currenttable').DataTable
+				(
+					{
+						processing: true,
+						serverSide: true,
+						scrollX: true,
+						stateSave: true,
+						deferRender: true,
+						ajax: {
+							url: "{{ route('sysadmin.excuseemployees.getgoalinds', $goaldetail->id) }}",
+							data: function(d) {
+								d.dd_level0 = $('#dd_level0').val();
+								d.dd_level1 = $('#dd_level1').val();
+								d.dd_level2 = $('#dd_level2').val();
+								d.dd_level3 = $('#dd_level3').val();
+								d.dd_level4 = $('#dd_level4').val();
+								d.criteria = $('#criteria').val();
+								d.search_text = $('#search_text').val();
+							}
+						},
+						columns: [
+							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', searchable: true},
+							{title: 'Name', ariaTitle: 'Employee Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', searchable: true},
+							{title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', searchable: true},
+							{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', searchable: true},
+							{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', searchable: true},
+							{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', searchable: true},
+							{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', searchable: true},
+							{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true},
+							{title: 'Dept ID', ariaTitle: 'Dept ID', target: 0, type: 'string', data: 'deptid', name: 'deptid', searchable: true},
+							{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},
+							{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id', name: 'goal_id', searchable: false, visible: false},
+							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'num', data: 'share_id', name: 'share_id', searchable: false, visible: false},
+						]
 					}
-				}
+				);
 
-				$("#chkbox_declare").change(function (e){
+				$('#btn_search').click(function(e) {
 					e.preventDefault();
-					confirmSwitch();
+					$('#currenttable').DataTable().destroy();
+					$('#currenttable').empty();
+					$('#currenttable').DataTable(
+						{
+							processing: true,
+							serverSide: true,
+							scrollX: true,
+							stateSave: true,
+							deferRender: true,
+							ajax: {
+								url: "{{ route('sysadmin.excuseemployees.getgoalinds', $goaldetail->id) }}",
+								type: 'GET',
+								data: function(d) {
+									d.dd_level0 = $('#dd_level0').val();
+									d.dd_level1 = $('#dd_level1').val();
+									d.dd_level2 = $('#dd_level2').val();
+									d.dd_level3 = $('#dd_level3').val();
+									d.dd_level4 = $('#dd_level4').val();
+									d.criteria = $('#criteria').val();
+									d.search_text = $('#search_text').val();
+								}
+							},
+							columns: [
+								{title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', searchable: true, className: 'dt-nowrap show-modal'},
+								{title: 'Name', ariaTitle: 'Employee Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', searchable: true, className: 'dt-nowrap show-modal'},
+								{title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', searchable: true, className: 'dt-nowrap show-modal'},
+								{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', searchable: true, className: 'dt-nowrap show-modal'},
+								{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', searchable: true, className: 'dt-nowrap show-modal'},
+								{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', searchable: true, className: 'dt-nowrap show-modal'},
+								{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', searchable: true, className: 'dt-nowrap show-modal'},
+								{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true, className: 'dt-nowrap show-modal'},
+								{title: 'Dept ID', ariaTitle: 'Dept ID', target: 0, type: 'string', data: 'deptid', name: 'deptid', searchable: true, className: 'dt-nowrap show-modal'},
+								{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},
+								{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id', name: 'goal_id', searchable: false, visible: false},
+								{title: 'ID', ariaTitle: 'ID', target: 0, type: 'num', data: 'share_id', name: 'share_id', searchable: false, visible: false},
+							]
+						}
+					);
 				});
 
+				$(".tags").multiselect({
+                	enableFiltering: true,
+                	enableCaseInsensitiveFiltering: true
+            	});
 				$('#pageLoader').hide();
 
 				$('#notify-form').keydown(function (e) {
@@ -209,7 +299,6 @@
 
 				$('#notify-form').submit(function() {
 					// console.log('Search Button Clicked');			
-
 					// assign back the selected employees to server
 					var text = JSON.stringify(g_selected_employees);
 					$('#selected_emp_ids').val( text );
@@ -218,13 +307,17 @@
 					return true; // return false to cancel form action
 				});
 
+				CKEDITOR.replace('what', {
+					toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ],disableNativeSpellChecker: false});
+
+				CKEDITOR.replace('measure_of_success', {
+					toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ],disableNativeSpellChecker: false});
 
 				// Tab  -- LIST Page  activate
 				$("#nav-list-tab").on("click", function(e) {
 					table  = $('#employee-list-table').DataTable();
 					table.rows().invalidate().draw();
 				});
-
 
 				// Tab  -- TREE activate
 				$("#nav-tree-tab").on("click", function(e) {
@@ -267,7 +360,8 @@
                             redrawTreeCheckboxes();
                         }
                     } else {
-						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Tree result is too big.  Please apply organization filter before clicking on Tree.');
+						// alert("error");
+                        $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Tree result is too big.  Please apply organization filter before clicking on Tree.');
 					}
 				});
 
@@ -417,51 +511,61 @@
 						$(prev_input).prop("indeterminate", false);
 					}
 				}
-
-				$('#ebtn_search').click(function(e) {
-					target = $('#enav-tree'); 
-					ddnotempty = $('#edd_level0').val() + $('#edd_level1').val() + $('#edd_level2').val() + $('#edd_level3').val() + $('#edd_level4').val();
-                    if(ddnotempty) {
-						// To do -- ajax called to load the tree
-						$.when( 
-							$.ajax({
-								url: '/sysadmin/excuseemployees/eorg-tree',
-								// url: $url,
-								type: 'GET',
-								data: $("#notify-form").serialize(),
-								dataType: 'html',
-
-								beforeSend: function() {
-									$("#etree-loading-spinner").show();                    
-								},
-
-								success: function (result) {
-									$('#enav-tree').html(''); 
-									$('#enav-tree').html(result);
-									$('#enav-tree').attr('loaded','loaded');
-								},
-
-								complete: function() {
-									$("#etree-loading-spinner").hide();
-								},
-
-								error: function () {
-									alert("error");
-									$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
-								}
-							})
-							
-						).then(function( data, textStatus, jqXHR ) {
-							//alert( jqXHR.status ); // Alerts 200
-							enodes = $('#eaccordion-level0 input:checkbox');
-							eredrawTreeCheckboxes();	
-						}); 
-					} else {
-						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Tree result is too big.  Please apply organization filter before clicking on Tree.');
-					};
-				});
-
 			});
+
+			$('#ebtn_search').click(function(e) {
+				target = $('#enav-tree'); 
+				ddnotempty = $('#edd_level0').val() + $('#edd_level1').val() + $('#edd_level2').val() + $('#edd_level3').val() + $('#edd_level4').val();
+                if(ddnotempty) {
+					// To do -- ajax called to load the tree
+					$.when( 
+						$.ajax({
+							url: '/sysadmin/excuseemployees/eorg-tree',
+							// url: $url,
+							type: 'GET',
+							data: $("#notify-form").serialize(),
+							dataType: 'html',
+
+							beforeSend: function() {
+								$("#etree-loading-spinner").show();                    
+							},
+
+							success: function (result) {
+								$('#enav-tree').html(''); 
+								$('#enav-tree').html(result);
+								$('#enav-tree').attr('loaded','loaded');
+							},
+
+							complete: function() {
+								$("#etree-loading-spinner").hide();
+							},
+
+							error: function () {
+								alert("error");
+								$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
+							}
+						})
+						
+					).then(function( data, textStatus, jqXHR ) {
+						//alert( jqXHR.status ); // Alerts 200
+						enodes = $('#eaccordion-level0 input:checkbox');
+						eredrawTreeCheckboxes();	
+					}); 
+				} else {
+					$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Tree result is too big.  Please apply organization filter before clicking on Tree.');
+				}
+			});
+
+			$('#btn_search_reset').click(function(e) {
+					e.preventDefault();
+					$('#search_text').val(null);
+					$('#dd_level0').val(null);
+					$('#dd_level1').val(null);
+					$('#dd_level2').val(null);
+					$('#dd_level3').val(null);
+					$('#dd_level4').val(null);
+					// $('#btn_search').click();
+        		});
 
 			$(window).on('beforeunload', function(){
 				$('#pageLoader').show();
@@ -474,20 +578,20 @@
 
 			// Model -- Confirmation Box
 
-			// var modalConfirm = function(callback) {
-			// 	$("#btn-confirm").on("click", function(){
-			// 		$("#mi-modal").modal('show');
-			// 	});
-			// 	$("#modal-btn-si").on("click", function(){
-			// 		callback(true);
-			// 		$("#mi-modal").modal('hide');
-			// 	});
+			var modalConfirm = function(callback) {
+				$("#btn-confirm").on("click", function(){
+					$("#mi-modal").modal('show');
+				});
+				$("#modal-btn-si").on("click", function(){
+					callback(true);
+					$("#mi-modal").modal('hide');
+				});
 				
-			// 	$("#modal-btn-no").on("click", function(){
-			// 		callback(false);
-			// 		$("#mi-modal").modal('hide');
-			// 	});
-			// };
+				$("#modal-btn-no").on("click", function(){
+					callback(false);
+					$("#mi-modal").modal('hide');
+				});
+			};
 
 		</script>
 	</x-slot>

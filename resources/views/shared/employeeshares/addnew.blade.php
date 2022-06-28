@@ -670,10 +670,7 @@
                         $(prev_input).prop('checked', false);
                         $(prev_input).prop("indeterminate", false);
                     }
-
                 }
-
-
 
             });
 
