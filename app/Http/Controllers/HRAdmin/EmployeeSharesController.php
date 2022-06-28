@@ -1041,7 +1041,7 @@ class EmployeeSharesController extends Controller
         return $demoWhere;
     }
 
-    protected function ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4) {
+    protected function ebaseFilteredWhere(Request $request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4) {
         // Base Where Clause
         $edemoWhere = EmployeeDemo::
             join('admin_orgs', function($join) {
@@ -1092,7 +1092,7 @@ class EmployeeSharesController extends Controller
         return $edemoWhere;
     }
 
-    protected function baseFilteredSQLs($request, $level0, $level1, $level2, $level3, $level4) {
+    protected function baseFilteredSQLs(Request $request, $level0, $level1, $level2, $level3, $level4) {
         // Base Where Clause
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
 
@@ -1138,7 +1138,7 @@ class EmployeeSharesController extends Controller
         return  [$sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4];
     }
 
-    protected function ebaseFilteredSQLs($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4) {
+    protected function ebaseFilteredSQLs(Request $request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4) {
         // Base Where Clause
         $edemoWhere = $this->ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4);
 
@@ -1372,8 +1372,6 @@ class EmployeeSharesController extends Controller
             ->delete();
         return redirect()->back();
     }
-
-    // public function getAdminOrgs(Request $request, $model_id) {
 
     /**
      * Show the form for editing the specified resource.
