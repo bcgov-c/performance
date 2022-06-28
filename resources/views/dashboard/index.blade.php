@@ -12,7 +12,7 @@
                     <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="{{ $supervisorTooltip }}"></i>
                 </strong>
                 <div class="bg-white border-b rounded p-2 mt-2 shadow-sm">
-                    <x-profile-pic></x-profile-pic>
+                    {{-- <x-profile-pic></x-profile-pic> --}}
                     {{ Auth::user()->reportingManager ? Auth::user()->reportingManager->name : 'No supervisor' }}
                 </div>
             </div>
@@ -25,7 +25,7 @@
                     <button class="btn p-0" style="width:100%" data-toggle="modal" data-target="#profileSharedWithViewModal">
                         @if(count($sharedList) > 0)
                         <div class="d-flex align-items-center">
-                            <x-profile-pic></x-profile-pic>
+                            {{-- <x-profile-pic></x-profile-pic> --}}
                             {{$sharedList[0]->sharedWithUser->name}}
                             @if(count($sharedList) > 1)
                                 and {{count($sharedList) - 1}} Others
