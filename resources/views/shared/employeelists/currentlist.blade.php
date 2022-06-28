@@ -8,7 +8,7 @@
     
     <div class="card">
         <div class="card-body">
-            <div class="h4">{{__('Current Employees')}}</div> 
+            {{-- <div class="h4">{{__('Current Employees')}}</div>  --}}
             @include('shared.employeelists.partials.filter')
             <div class="p-3"> 
                 <table class="table table-bordered listtable table-striped" id="listtable" style="width: 100%; overflow-x: auto; "></table>
@@ -34,6 +34,7 @@
                     text-overflow: ellipsis;
                     width: 5em;
                 }
+
                 #listtable_filter label {
                     text-align: right !important;
                 }
@@ -86,19 +87,8 @@
                         {title: 'Direct Reports', ariaTitle: 'Direct Reports', target: 0, type: 'string', data: 'reportees', name: 'reportees', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'num', data: 'id', name: 'users.id', searchable: true, visible: false},
                     ],
-                    // "initComplete": function(settings, json ) {
-                    //     $('#listtable').DataTable().columns.adjust().draw();
-                    // }
                 } );
-
-                // $(window).resize(function() {
-                //     location.reload();
-                //     // table.columns.adjust().draw();
-                //     return;
-                // } );
-
             } );
-
         </script>
     @endpush
 

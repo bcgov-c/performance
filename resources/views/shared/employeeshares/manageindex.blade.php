@@ -8,7 +8,7 @@
 
     <div class="card">
         <div class="card-body">
-            <div class="h4">{{__('Manage Existing Employee Shares')}}</div>
+            {{-- <div class="h4">{{__('Manage Existing Employee Shares')}}</div> --}}
             @include('shared.employeeshares.partials.loader')
             <div class="p-3">  
                 <table class="table table-bordered generictable table-striped" id="generictable" style="width: 100%; overflow-x: auto; "></table>

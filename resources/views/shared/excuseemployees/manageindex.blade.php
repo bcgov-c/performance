@@ -8,7 +8,7 @@
 
     <div class="card">
         <div class="card-body">
-            <div class="h4">{{__('Manage Existing Excused')}}</div>
+            {{-- <div class="h4">{{__('Manage Existing Excused')}}</div> --}}
             @include('shared.excuseemployees.partials.filter')
             <div class="p-3">  
                 <table class="table table-bordered filtertable" id="filtertable" style="width: 100%; overflow-x: auto; "></table>
