@@ -227,14 +227,6 @@
         $('#edd_level4').val(null).trigger('change');
     });
 
-    // $('#ebtn_search').click(function() {
-    //     $('#edd_level0').val(null).trigger('change');
-    //     $('#edd_level1').val(null).trigger('change');
-    //     $('#edd_level2').val(null).trigger('change');
-    //     $('#edd_level3').val(null).trigger('change');
-    //     $('#edd_level4').val(null).trigger('change');
-    // });
-
     $('#ebtn_search_reset').click(function() {
         $('#edd_level0').val(null).trigger('change');
         $('#edd_level1').val(null).trigger('change');

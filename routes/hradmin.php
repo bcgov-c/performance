@@ -96,7 +96,7 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
 
         Route::get('/hradmin/employeeshares/manageindex', [EmployeeSharesController::class, 'manageindex'])->name('hradmin.employeeshares.manageindex');
         Route::post('/hradmin/employeeshares/manageindex', [EmployeeSharesController::class, 'manageindex'])->name('hradmin.employeeshares.manageindexpost');
-        Route::get('/hradmin/employeeshares/manageindexlist', [EmployeeSharesController::class, 'manageindexlist'])->name('hradmin.employeeshares.manageindexlist');
+        Route::get('/hradmin/employeeshares/manageindexlist', [EmployeeSharesController:statisticsexcused:class, 'manageindexlist'])->name('hradmin.employeeshares.manageindexlist');
 
         Route::get('/hradmin/employeeshares/deleteshare/{id}', [EmployeeSharesController::class, 'deleteshare'])->name('hradmin.employeeshares.deleteshareget');
         Route::delete('/hradmin/employeeshares/deleteshare/{id}', [EmployeeSharesController::class, 'deleteshare'])->name('hradmin.employeeshares.deleteshare');
