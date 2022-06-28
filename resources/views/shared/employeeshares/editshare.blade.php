@@ -327,7 +327,6 @@
 				});
 
 				$('#notify-form').submit(function() {
-					// console.log('Search Button Clicked');			
 					// assign back the selected employees to server
 					var text = JSON.stringify(g_selected_employees);
 					$('#selected_emp_ids').val( text );
@@ -430,7 +429,6 @@
 
 				function eredrawTreeCheckboxes() {
 					// redraw the selection 
-					//console.log('eredraw triggered');
 					enodes = $('#eaccordion-level0 input:checkbox');
 					$.each( enodes, function( index, chkbox ) {
 						if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {

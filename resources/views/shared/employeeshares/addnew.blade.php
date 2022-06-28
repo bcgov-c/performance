@@ -378,8 +378,6 @@
                 });
 
 				$('#share-form').submit(function() {
-					// console.log('Search Button Clicked');			
-
 					// assign back the selected employees to server
 					var text = JSON.stringify(g_selected_employees);
 					$('#selected_emp_ids').val( text );
@@ -405,7 +403,6 @@
 
 				// Tab  -- TREE activate
 				$("#nav-tree-tab").on("click", function(e) {
-                    console.log('#nav-tree-tab - Click');
 					target = $('#nav-tree'); 
                     ddnotempty = $('#dd_level0').val() + $('#dd_level1').val() + $('#dd_level2').val() + $('#dd_level3').val() + $('#dd_level4').val();
                     if(ddnotempty) {
@@ -450,7 +447,6 @@
 				});
 
 				$("#enav-tree-tab").on("click", function(e) {
-                    console.log('#enav-tree-tab - Click');
 					etarget = $('#enav-tree'); 
                     ddnotempty = $('#edd_level0').val() + $('#edd_level1').val() + $('#edd_level2').val() + $('#edd_level3').val() + $('#edd_level4').val();
                     if(ddnotempty) {
@@ -497,16 +493,12 @@
 
                 function redrawTreeCheckboxes() {
                     // redraw the selection 
-                    //console.log('redraw triggered');
                     nodes = $('#accordion-level0 input:checkbox');
                     $.each( nodes, function( index, chkbox ) {
                         if (g_employees_by_org.hasOwnProperty(chkbox.value)) {
-                            // console.log( 'org checkbox ' + chkbox.value);
 
                             all_emps = g_employees_by_org[ chkbox.value ].map( function(x) {return x.employee_id} );
 
-                            // console.log(all_emps);
-                            // console.log(g_selected_employees);
                             b = all_emps.every(v=> g_selected_employees.indexOf(v) !== -1);
 
                             if (all_emps.every(v=> g_selected_employees.indexOf(v) !== -1)) {
@@ -538,9 +530,7 @@
                             pid = $(chkbox).attr('pid');
                             do {
                                 value = '#orgCheck' + pid;
-                                //console.log(  value );
                                 toggle_indeterminate( value );
-                                //console.log("parent : " + pid);                
                                 pid = $('#orgCheck' + pid).attr('pid');    
                             } 
                             while (pid);
@@ -551,16 +541,12 @@
 
                 function eredrawTreeCheckboxes() {
                     // redraw the selection 
-                    //console.log('redraw triggered');
                     nodes = $('#eaccordion-level0 input:checkbox');
                     $.each( nodes, function( index, chkbox ) {
                         if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
-                            // console.log( 'org checkbox ' + chkbox.value);
 
                             all_emps = eg_employees_by_org[ chkbox.value ].map( function(x) {return x.employee_id} );
 
-                            // console.log(all_emps);
-                            // console.log(g_selected_employees);
                             b = all_emps.every(v=> eg_selected_employees.indexOf(v) !== -1);
 
                             if (all_emps.every(v=> eg_selected_employees.indexOf(v) !== -1)) {
@@ -592,9 +578,7 @@
                             pid = $(chkbox).attr('pid');
                             do {
                                 value = '#eorgCheck' + pid;
-                                //console.log(  value );
                                 etoggle_indeterminate( value );
-                                //console.log("parent : " + pid);                
                                 pid = $('#eorgCheck' + pid).attr('pid');    
                             } 
                             while (pid);

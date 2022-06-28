@@ -118,8 +118,6 @@
 					$('#generictable').DataTable().rows().invalidate().draw();
                 } );
 
-                // $('#btn_search').click();
-
                 $('#cancelButton').on('click', function(e) {
                      e.preventDefault();
                     if($.fn.dataTable.isDataTable('#admintable')) {
@@ -131,7 +129,7 @@
                 });
 
                 $('#removeButton').on('click', function(e) {
-                    console.log('Delete button clicked');
+
                 });
 
                 $(window).on('beforeunload', function(e){
