@@ -202,7 +202,7 @@ class EmployeeSharesController extends Controller
                 }
             }
         }
-        return redirect()->route($request->segment(1).'.employeeshares.addnew')
+        return redirect()->route(request()->segment(1).'.employeeshares.addnew')
             ->with('success', 'Share user goal/conversation successful.');
     }
 
@@ -233,7 +233,7 @@ class EmployeeSharesController extends Controller
         ->union( $sql_level0->groupBy('organization_trees.id')->select('organization_trees.id', DB::raw("COUNT(*) as count_row") ) )
         ->pluck('count_row', 'organization_trees.id');  
         
-        // // Employee ID by Tree ID
+        // Employee ID by Tree ID
         $empIdsByOrgId = [];
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
@@ -1012,7 +1012,7 @@ class EmployeeSharesController extends Controller
                 return $row->updated_at ? $row->updated_at->format('M D, Y H:i:s') : null;
             })
             ->addcolumn('action', function($row) {
-                $btn = '<a href="' . route($request->segment(1) . '.employeeshares.deleteshare', ['id' => $row->shared_profile_id]) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="' . $row->shared_profile_id . '"><i class="fa fa-trash"></i></a>';
+                $btn = '<a href="' . route(request()->segment(1) . '.employeeshares.deleteshare', ['id' => $row->shared_profile_id]) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="' . $row->shared_profile_id . '"><i class="fa fa-trash"></i></a>';
                 return $btn;
             })
             ->rawColumns(['created_at', 'updated_at', 'action'])
@@ -1040,7 +1040,7 @@ class EmployeeSharesController extends Controller
             return Datatables::of($query)
             ->addIndexColumn()
             ->addcolumn('action', function($row) {
-                $btn = '<a href="' . route($request->segment(1) . '.employeeshares.deleteitem', ['id' => $row->user_id, 'part' => $row->shared_with_id]) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->id . '_' . $row->part_id .'"><i class="fa fa-trash"></i></a>';
+                $btn = '<a href="' . route(request()->segment(1) . '.employeeshares.deleteitem', ['id' => $row->user_id, 'part' => $row->shared_with_id]) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->id . '_' . $row->part_id .'"><i class="fa fa-trash"></i></a>';
                 return $btn;
             })
             ->rawColumns(['action'])

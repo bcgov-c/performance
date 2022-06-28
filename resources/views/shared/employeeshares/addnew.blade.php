@@ -405,6 +405,7 @@
 
 				// Tab  -- TREE activate
 				$("#nav-tree-tab").on("click", function(e) {
+                    console.log('#nav-tree-tab - Click');
 					target = $('#nav-tree'); 
                     ddnotempty = $('#dd_level0').val() + $('#dd_level1').val() + $('#dd_level2').val() + $('#dd_level3').val() + $('#dd_level4').val();
                     if(ddnotempty) {
@@ -412,22 +413,22 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                                    url: '/hradmin/employeeshares/org-tree',
+                                    url: "{{ '/' . request()->segment(1) . '/employeeshares/org-tree' }}",
                                     type: 'GET',
                                     data: $("#share-form").serialize(),
                                     dataType: 'html',
-                                    // beforeSend: function() {
-                                    //     $("#tree-loading-spinner").show();                    
-                                    // },
+                                    beforeSend: function() {
+                                        $("#tree-loading-spinner").show();                    
+                                    },
                                     success: function (result) {
                                         $(target).html(''); 
                                         $(target).html(result);
 
                                         $('#nav-tree').attr('loaded','loaded');
                                     },
-                                    // complete: function() {
-                                    //     $(".tree-loading-spinner").hide();
-                                    // },
+                                    complete: function() {
+                                        $(".tree-loading-spinner").hide();
+                                    },
                                     error: function () {
                                         alert("error");
                                         $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
@@ -449,6 +450,7 @@
 				});
 
 				$("#enav-tree-tab").on("click", function(e) {
+                    console.log('#enav-tree-tab - Click');
 					etarget = $('#enav-tree'); 
                     ddnotempty = $('#edd_level0').val() + $('#edd_level1').val() + $('#edd_level2').val() + $('#edd_level3').val() + $('#edd_level4').val();
                     if(ddnotempty) {
@@ -456,22 +458,22 @@
                         if($.trim($(etarget).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                                    url: '/hradmin/employeeshares/org-tree',
+                                    url: "{{ '/' . request()->segment(1) . '/employeeshares/eorg-tree' }}",
                                     type: 'GET',
                                     data: $("share-form").serialize(),
                                     dataType: 'html',
-                                    // beforeSend: function() {
-                                    //     $("#etree-loading-spinner").show();                    
-                                    // },
+                                    beforeSend: function() {
+                                        $("#etree-loading-spinner").show();                    
+                                    },
                                     success: function (result) {
                                         $(etarget).html(''); 
                                         $(etarget).html(result);
 
                                         $('#enav-tree').attr('loaded','loaded');
                                     },
-                                    // complete: function() {
-                                    //     $(".etree-loading-spinner").hide();
-                                    // },
+                                    complete: function() {
+                                        $(".etree-loading-spinner").hide();
+                                    },
                                     error: function () {
                                         alert("error");
                                         $(etarget).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');

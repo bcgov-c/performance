@@ -390,7 +390,7 @@ $(document).ready(function() {
         
         if($.trim($(etarget).html())=='') {
             $.ajax({
-                url: '{{ "/" . request()->segment(1) . "/employeeshares/eemployees/" . tree_id }}',
+                url: '/'+'{{ request()->segment(1) }}'+'/employeeshares/eemployees/'+tree_id,
                 type: 'GET',
                 data: $("#enotify-form").serialize(),
                 dataType: 'html',

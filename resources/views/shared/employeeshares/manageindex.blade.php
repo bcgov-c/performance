@@ -37,7 +37,7 @@
                     width: 5em;
                 }
                 
-                #filtertable_filter label {
+                #generictable_filter label {
                     text-align: right !important;
                 }
             </style>
@@ -59,7 +59,7 @@
 
                 $('#generictable').DataTable ( {
                     processing: true,
-                    serverSide: true,
+                    serverSide: false,
                     scrollX: true,
                     stateSave: true,
                     deferRender: true,
@@ -78,31 +78,31 @@
                     },
                     columns: [
                         {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id'
-                            , name: 'employee_id', searchable: false, className: 'dt-nowrap show-modal'},
+                            , name: 'employee_id', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name'
-                            , name: 'employee_name', searchable: false, className: 'dt-nowrap show-modal'},
+                            , name: 'employee_name', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Delegate ID', ariaTitle: 'Delegate ID', target: 0, type: 'string', data: 'delegate_ee_id'
-                            , name: 'delegate_ee_id', searchable: false, className: 'dt-nowrap show-modal'},
+                            , name: 'delegate_ee_id', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Delegate Name', ariaTitle: 'Delegate Name', target: 0, type: 'string', data: 'delegate_ee_name'
-                            , name: 'delegate_ee_name', searchable: false, className: 'dt-nowrap show-modal'},
+                            , name: 'delegate_ee_name', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Shared Item', ariaTitle: 'Shared Item', target: 0, type: 'string', data: 'shared_item'
-                            , name: 'shared_item', searchable: false, className: 'dt-nowrap show-modal'},
+                            , name: 'shared_item', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc'
-                            , name: 'jobcode_desc', searchable: false, className: 'dt-nowrap show-modal'},
+                            , name: 'jobcode_desc', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization'
-                            , name: 'organization', searchable: false, className: 'dt-nowrap show-modal'},
+                            , name: 'organization', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program'
-                            , name: 'level1_program', searchable: false, className: 'dt-nowrap show-modal'},
+                            , name: 'level1_program', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division'
-                            , name: 'level2_division', searchable: false, className: 'dt-nowrap show-modal'},
+                            , name: 'level2_division', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch'
-                            , name: 'level3_branch', searchable: false, className: 'dt-nowrap show-modal'},
+                            , name: 'level3_branch', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4'
-                            , name: 'level4', searchable: false, className: 'dt-nowrap show-modal'},
+                            , name: 'level4', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid'
-                            , name: 'deptid', searchable: false, className: 'dt-nowrap show-modal'},
+                            , name: 'deptid', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Shared By', ariaTitle: 'Shared By', target: 0, type: 'string', data: 'created_name'
-                            , name: 'created_name', searchable: false, className: 'dt-nowrap show-modal'},
+                            , name: 'created_name', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Created At', ariaTitle: 'Created At', target: 0, type: 'string', data: 'created_at'
                             , name: 'created_at', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'Updated At', ariaTitle: 'Updated At', target: 0, type: 'string', data: 'updated_at'

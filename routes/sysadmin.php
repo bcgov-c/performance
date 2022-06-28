@@ -179,12 +179,12 @@ Route::group(['middleware' => ['role:Sys Admin']], function () {
         Route::get('/sysadmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('sysadmin.employeeshares.deleteitemget');
         Route::delete('/sysadmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('sysadmin.employeeshares.deleteitem');
 
-        Route::get('/sysadmin/employeeshares/org-tree', [EmployeeSharesController::class,'loadOrganizationTree']);
-        Route::get('/sysadmin/employeeshares/org-organizations', [EmployeeSharesController::class,'getOrganizations']);
-        Route::get('/sysadmin/employeeshares/org-programs', [EmployeeSharesController::class,'getPrograms']);
-        Route::get('/sysadmin/employeeshares/org-divisions', [EmployeeSharesController::class,'getDivisions']);
-        Route::get('/sysadmin/employeeshares/org-branches', [EmployeeSharesController::class,'getBranches']);
-        Route::get('/sysadmin/employeeshares/org-level4', [EmployeeSharesController::class,'getLevel4']);
+        Route::get('/sysadmin/employeeshares/org-tree', [EmployeeSharesController::class,'loadOrganizationTree'])->name('sysadmin.employeeshares.org-tree');
+        Route::get('/sysadmin/employeeshares/org-organizations', [EmployeeSharesController::class,'getOrganizations'])->name('sysadmin.employeeshares.org-organizations');
+        Route::get('/sysadmin/employeeshares/org-programs', [EmployeeSharesController::class,'getPrograms'])->name('sysadmin.employeeshares.org-programs');
+        Route::get('/sysadmin/employeeshares/org-divisions', [EmployeeSharesController::class,'getDivisions'])->name('sysadmin.employeeshares.org-divisions');
+        Route::get('/sysadmin/employeeshares/org-branches', [EmployeeSharesController::class,'getBranches'])->name('sysadmin.employeeshares.org-branches');
+        Route::get('/sysadmin/employeeshares/org-level4', [EmployeeSharesController::class,'getLevel4'])->name('sysadmin.employeeshares.org-level4');
         Route::get('/sysadmin/employeeshares/employee-list', [EmployeeSharesController::class, 'getDatatableEmployees'])->name('sysadmin.employeeshares.employee.list');
         Route::get('/sysadmin/employeeshares/employees/{id}', [EmployeeSharesController::class,'getEmployees']);
 

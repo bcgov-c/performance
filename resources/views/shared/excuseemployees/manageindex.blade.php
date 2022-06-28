@@ -37,6 +37,7 @@
                     text-overflow: ellipsis;
                     width: 5em;
                 }
+                
                 #filtertable_filter label {
                     text-align: right !important;
                 }
