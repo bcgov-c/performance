@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MyOrgController;
 use App\Http\Controllers\HRadminController;
 use App\Http\Controllers\GenericTemplateController;
+use App\Http\Controllers\HRAdmin\ExcuseEmployeesController;
 use App\Http\Controllers\HRAdmin\NotificationController;
 use App\Http\Controllers\HRAdmin\MyOrganizationController;
 use App\Http\Controllers\HRAdmin\StatisticsReportController;
@@ -128,7 +129,33 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
 
         Route::get('/hradmin/employeeshares/addnew', [EmployeeSharesController::class, 'addnew'])->name('hradmin.employeeshares.addnew');
 
-});
+    });
+
+    //Excuse Employees
+    Route::group(['middleware' => ['auth']], function() {    
+        Route::get('/hradmin/excuseemployees', [ExcuseEmployeesController::class, 'addindex'])->name('hradmin.excuseemployees');
+        Route::get('/hradmin/excuseemployees/addindex', [ExcuseEmployeesController::class, 'addindex'])->name('hradmin.excuseemployees.addindex');
+        Route::post('/hradmin/excuseemployees/saveexcuse', [ExcuseEmployeesController::class, 'saveexcuse'])->name('hradmin.excuseemployees.saveexcuse');
+        Route::post('/hradmin/excuseemployees/addindex', [ExcuseEmployeesController::class, 'addindex'])->name('hradmin.excuseemployees.search');
+        Route::get('/hradmin/excuseemployees/employee-list', [ExcuseEmployeesController::class, 'getDatatableEmployees'])->name('hradmin.excuseemployees.employee.list');
+
+
+        Route::get('/hradmin/excuseemployees/manageindex', [ExcuseEmployeesController::class, 'manageindex'])->name('hradmin.excuseemployees.manageindex');
+        Route::get('/hradmin/excuseemployees/manageindexlist', [ExcuseEmployeesController::class, 'manageindexlist'])->name('hradmin.excuseemployees.manageindexlist');
+        Route::get('/hradmin/excuseemployees/manageindexedit/{id}', [ExcuseEmployeesController::class, 'manageindexedit'])->name('hradmin.excuseemployees.manageindexedit');
+        Route::post('/hradmin/excuseemployees/manageindexupdate/{id}', [ExcuseEmployeesController::class, 'manageindexupdate']);
+        Route::get('/hradmin/excuseemployees/manageindexclear/{id}', [ExcuseEmployeesController::class, 'manageindexclear']);
+
+        Route::get('/hradmin/excuseemployees/org-tree', [ExcuseEmployeesController::class,'loadOrganizationTree']);
+        Route::get('/hradmin/excuseemployees/org-organizations', [ExcuseEmployeesController::class,'getOrganizations']);
+        Route::get('/hradmin/excuseemployees/org-programs', [ExcuseEmployeesController::class,'getPrograms']);
+        Route::get('/hradmin/excuseemployees/org-divisions', [ExcuseEmployeesController::class,'getDivisions']);
+        Route::get('/hradmin/excuseemployees/org-branches', [ExcuseEmployeesController::class,'getBranches']);
+        Route::get('/hradmin/excuseemployees/org-level4', [ExcuseEmployeesController::class,'getLevel4']);
+        Route::get('/hradmin/excuseemployees/employees/{id}', [ExcuseEmployeesController::class,'getEmployees']);
+    });
+
+
   
     Route::get('/hradmin/notifications', [NotificationController::class, 'index'])->name('hradmin.notifications');
     Route::get('/hradmin/notifications/detail/{notification_id}', [NotificationController::class, 'show']);

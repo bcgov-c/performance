@@ -946,42 +946,6 @@ class GoalBankController extends Controller
         }
     }
 
-        // public function getDatatableEmployeesEmpty(Request $request) {
-
-        //     if($request->ajax()){
-    
-        //         $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-        //         $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-        //         $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-        //         $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-        //         $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
-        
-        //         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
-    
-        //         $sql = clone $demoWhere; 
-    
-        //         $employees = $sql->select([ 
-        //             'employee_id'
-        //             , 'employee_name'
-        //             , 'jobcode_desc'
-        //             , 'employee_email'
-        //             , 'employee_demo.organization'
-        //             , 'employee_demo.level1_program'
-        //             , 'employee_demo.level2_division'
-        //             , 'employee_demo.level3_branch'
-        //             , 'employee_demo.level4'
-        //             , 'employee_demo.deptid'])
-        //         ->where('employee_id', '=', 98989898989898);
-        //         return Datatables::of($employees)
-        //             ->addColumn('select_users', static function ($employee) {
-        //                     return '<input pid="1335" type="checkbox" id="userCheck'. 
-        //                         $employee->employee_id .'" name="userCheck[]" value="'. $employee->employee_id .'" class="dt-body-center">';
-        //             })->rawColumns(['select_users','action'])
-        //             ->make(true);
-        //     }
-        // }
-    
-        
     public function addnewgoal(Request $request) 
     {
         $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
@@ -1128,17 +1092,14 @@ class GoalBankController extends Controller
 
    public function getUsers(Request $request)
     {
-
         $search = $request->search;
         $users =  User::whereRaw("lower(name) like '%". strtolower($search)."%'")
                     ->whereNotNull('email')->paginate();
-
         return ['data'=> $users];
     }
 
 
     public function getOrganizations(Request $request) {
-
         $orgs = OrganizationTree::join('admin_orgs', function($join) {
             $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
             ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
@@ -1158,12 +1119,10 @@ class GoalBankController extends Controller
         foreach ($orgs as $org) {
             $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
         }
-
         return response()->json($formatted_orgs);
     } 
 
     public function getPrograms(Request $request) {
-
         $level0 = $request->level0 ? OrganizationTree::join('admin_orgs', function($join) {
             $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
             ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
@@ -1173,7 +1132,6 @@ class GoalBankController extends Controller
         })
         ->where('admin_orgs.user_id', '=', Auth::id())
         ->where('organization_trees.id',$request->level0)->first() : null;
-
         $orgs = OrganizationTree::join('admin_orgs', function($join) {
             $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
             ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
@@ -1192,17 +1150,14 @@ class GoalBankController extends Controller
         })
         ->groupBy('organization_trees.name')
         ->get();
-
         $formatted_orgs = [];
         foreach ($orgs as $org) {
             $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
         }
-
         return response()->json($formatted_orgs);
     } 
 
     public function getDivisions(Request $request) {
-
         $level0 = $request->level0 ? OrganizationTree::join('admin_orgs', function($join) {
             $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
             ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
@@ -1221,7 +1176,6 @@ class GoalBankController extends Controller
         })
         ->where('admin_orgs.user_id', '=', Auth::id())
         ->where('organization_trees.id', $request->level1)->first() : null;
-
         $orgs = OrganizationTree::join('admin_orgs', function($join) {
             $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
             ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
@@ -1244,17 +1198,14 @@ class GoalBankController extends Controller
             ->groupBy('organization_trees.name')
             ->limit(300)
             ->get();
-
         $formatted_orgs = [];
         foreach ($orgs as $org) {
             $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
         }
-
         return response()->json($formatted_orgs);
     } 
 
     public function getBranches(Request $request) {
-
         $level0 = $request->level0 ? OrganizationTree::join('admin_orgs', function($join) {
             $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
             ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
@@ -1282,7 +1233,6 @@ class GoalBankController extends Controller
         })
         ->where('admin_orgs.user_id', '=', Auth::id())
         ->where('organization_trees.id', $request->level2)->first() : null;
-
         $orgs = OrganizationTree::join('admin_orgs', function($join) {
             $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
             ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
@@ -1313,7 +1263,6 @@ class GoalBankController extends Controller
         foreach ($orgs as $org) {
             $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
         }
-
         return response()->json($formatted_orgs);
     } 
 
@@ -1354,7 +1303,6 @@ class GoalBankController extends Controller
         })
         ->where('admin_orgs.user_id', '=', Auth::id())
         ->where('organization_trees.id', $request->level3)->first() : null;
-
         $orgs = OrganizationTree::join('admin_orgs', function($join) {
             $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
             ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
@@ -1383,12 +1331,10 @@ class GoalBankController extends Controller
             ->groupBy('organization_trees.name')
             ->limit(300)
             ->get();
-
         $formatted_orgs = [];
         foreach ($orgs as $org) {
             $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
         }
-
         return response()->json($formatted_orgs);
     } 
 
@@ -1728,7 +1674,6 @@ class GoalBankController extends Controller
         })
         ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
             $q->where(function($query) use ($request) {
-                
                 return $query->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->search_text) . "%'")
                     ->orWhereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->search_text) . "%'")
                     ->orWhereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->search_text) . "%'")
@@ -1747,7 +1692,6 @@ class GoalBankController extends Controller
         ->when( $request->search_text && $request->criteria == 'dpt', function ($q) use($request) {
             return $q->whereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
         });
-
         return $demoWhere;
     }
 
@@ -1831,20 +1775,17 @@ class GoalBankController extends Controller
     protected function baseFilteredSQLs($request, $level0, $level1, $level2, $level3, $level4) {
         // Base Where Clause
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
-
         $sql_level0 = clone $demoWhere; 
         $sql_level0->join('organization_trees', function($join) use($level0) {
             $join->on('employee_demo.organization', '=', 'organization_trees.organization')
                 ->where('organization_trees.level', '=', 0);
             });
-            
         $sql_level1 = clone $demoWhere; 
         $sql_level1->join('organization_trees', function($join) use($level0, $level1) {
             $join->on('employee_demo.organization', '=', 'organization_trees.organization')
                 ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
                 ->where('organization_trees.level', '=', 1);
             });
-            
         $sql_level2 = clone $demoWhere; 
         $sql_level2->join('organization_trees', function($join) use($level0, $level1, $level2) {
             $join->on('employee_demo.organization', '=', 'organization_trees.organization')
@@ -1852,7 +1793,6 @@ class GoalBankController extends Controller
                 ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
                 ->where('organization_trees.level', '=', 2);    
             });    
-            
         $sql_level3 = clone $demoWhere; 
         $sql_level3->join('organization_trees', function($join) use($level0, $level1, $level2, $level3) {
             $join->on('employee_demo.organization', '=', 'organization_trees.organization')
@@ -1861,7 +1801,6 @@ class GoalBankController extends Controller
                 ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
                 ->where('organization_trees.level', '=', 3);    
             });
-            
         $sql_level4 = clone $demoWhere; 
         $sql_level4->join('organization_trees', function($join) use($level0, $level1, $level2, $level3, $level4) {
             $join->on('employee_demo.organization', '=', 'organization_trees.organization')

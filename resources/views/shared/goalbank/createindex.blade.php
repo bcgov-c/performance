@@ -720,14 +720,6 @@
 					selector: '[data-toggle-select]',
 					trigger: 'click',
 				});
-
-
-
-
-
-
-
-
 			});
 
 			// Model -- Confirmation Box
