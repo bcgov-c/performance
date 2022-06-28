@@ -23,17 +23,6 @@ use Illuminate\Validation\ValidationException;
 
 class AccessPermissionsController extends Controller
 {
-
-    // public function show(Request $request) 
-    // {
-    //     $notificationLog = NotificationLog::where('id', $request->notification_id)->first();
-
-    //     if($request->ajax()){
-    //         return view('sysadmin.accesspermissions.partials.show', compact('notificationLog') ); 
-    //     } 
-    // }
-
-    
     public function index(Request $request) 
     {
 

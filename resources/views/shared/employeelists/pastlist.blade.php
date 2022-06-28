@@ -11,7 +11,7 @@
             <div class="h4">{{__('Past Employees')}}</div>
             @include('shared.employeelists.partials.filter')
             <div class="p-3"> 
-                <table class="table table-bordered listtable" id="listtable" style="width: 100%; overflow-x: auto; "></table>
+                <table class="table table-bordered listtable table-striped" id="listtable" style="width: 100%; overflow-x: auto; "></table>
             </div>
         </div>    
     </div>   
@@ -61,7 +61,7 @@
                             deferRender: true,
                             ajax: 
                             {
-                                url: "{{ route('sysadmin.employeelists.getpastlist') }}",
+                                url: "{{ route(request()->segment(1).'.employeelists.getpastlist') }}",
                                 data: function (d) 
                                 {
                                     d.dd_level0 = $('#dd_level0').val();
@@ -98,16 +98,6 @@
                     );
                 });
             }
-
-            // $(window).on('beforeunload', function(){
-            //         $('#pageLoader').show();
-            //     });
-
-            // $(window).resize(function(){
-            //     // location.reload();
-            //     table.columns.adjust().draw();
-            //     return;
-            // });
 
         </script>
     @endpush
