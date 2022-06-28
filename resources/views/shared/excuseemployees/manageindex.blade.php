@@ -2,20 +2,20 @@
     <div name="header" class="container-header p-n2 "> 
         <div class="container-fluid">
             <h3>Excuse Employees</h3>
-            @include('sysadmin.excuseemployees.partials.tabs')
+            @include('shared.excuseemployees.partials.tabs')
         </div>
     </div>
 
     <div class="card">
         <div class="card-body">
             <div class="h4">{{__('Manage Existing Excused')}}</div>
-            @include('sysadmin.excuseemployees.partials.filter')
+            @include('shared.excuseemployees.partials.filter')
             <div class="p-3">  
                 <table class="table table-bordered filtertable" id="filtertable" style="width: 100%; overflow-x: auto; "></table>
             </div>
         </div>    
     </div>   
-    @include('sysadmin/excuseemployees/partials/excused-edit-modal')
+    @include('shared/excuseemployees/partials/excused-edit-modal')
     {{-- @endsection --}}
 
 

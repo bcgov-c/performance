@@ -301,8 +301,8 @@ return [
                 ],
                 [
                     'text' => 'Excuse Employees',
-                    'url'  => 'hradmin/excused/excuseemployee',
-                    'active' => ['hradmin/excused/*']
+                    'url'  => 'hradmin/excuseemployees/addindex',
+                    'active' => ['hradmin/excuseemployees/*']
                 ],
                 [
                     'text' => 'Goal Bank',

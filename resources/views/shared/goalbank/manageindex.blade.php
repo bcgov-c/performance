@@ -6,10 +6,11 @@
         </div>
     </div>
 
+    <p class="px-3">Use the table below to modify or delete goals currently in the goal bank. Changes to content will be updated in employee goal banks as soon as you save the new version. You can also edit the audience if you want to add or remove individuals or business units.</p>
 
     <div class="card">
         <div class="card-body">
-            <div class="h5">{{__('Manage Goals in Goal Bank')}}</div>
+            <!-- <div class="h5">{{__('Manage Goals in Goal Bank')}}</div> -->
             @include('shared.goalbank.partials.filter')
             <div class="p-3" id='datagrid'>  
                 <table class="table table-bordered filtertable table-striped" id="filtertable" name="filtertable" style="width: 100%; overflow-x: auto; "></table>
