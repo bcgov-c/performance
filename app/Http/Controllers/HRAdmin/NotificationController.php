@@ -169,13 +169,14 @@ class NotificationController extends Controller
 
         list($sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4) = 
             $this->baseFilteredSQLs($request, $level0, $level1, $level2, $level3, $level4, $job_titles);
-        
+
         $rows = $sql_level4->groupBy('organization_trees.id')->select('organization_trees.id')
             ->union( $sql_level3->groupBy('organization_trees.id')->select('organization_trees.id') )
             ->union( $sql_level2->groupBy('organization_trees.id')->select('organization_trees.id') )
             ->union( $sql_level1->groupBy('organization_trees.id')->select('organization_trees.id') )
             ->union( $sql_level0->groupBy('organization_trees.id')->select('organization_trees.id') )
             ->pluck('organization_trees.id'); 
+
         $orgs = OrganizationTree::whereIn('id', $rows->toArray() )->get()->toTree();
 
         // Employee Count by Organization
@@ -271,8 +272,8 @@ class NotificationController extends Controller
         $validator = Validator::make(request()->all(), [
             'sender_id'          => 'required',
             //'recipients'         => 'required',
-            'orgCheck'         => 'required',
-            'userCheck'         => 'required',
+            'orgCheck'         => 'required_if:userCheck,null',
+            'userCheck'         => 'required_if:orgCheck,null',
             'subject'            => 'required',
             'body'               => 'required',
         ]);
@@ -315,10 +316,13 @@ class NotificationController extends Controller
         $sendMail->subject = $request->subject;
         $sendMail->body = $request->body;
         $sendMail->alertFormat = $request->alert_format;
-        $response = $sendMail->sendMailWithoutGenericTemplate();
-        if ($response->getStatus() == 202) {
+        $success = $sendMail->sendMailWithoutGenericTemplate();
+        if ($success) {
             return redirect()->route('hradmin.notifications.notify')
                 ->with('success','Email with subject "' . $request->subject  . '" was successfully sent.');
+        } else {
+            return redirect()->back()
+                ->with('failure','Error! Email with subject "' . $request->subject  . '" was failed to sent out.');
         }
 
 

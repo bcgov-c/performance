@@ -24,6 +24,11 @@
 	 <p>{{ $message }}</p>
  </div>
 @endif
+@if ($message = Session::get('failure'))
+ <div class="alert alert-danger">
+	 <p>{{ $message }}</p>
+ </div>
+@endif
 
 <h6 class="text-bold">Step 1. Select employees to notify</h6>
 {{-- 

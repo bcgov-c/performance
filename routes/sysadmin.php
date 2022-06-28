@@ -155,7 +155,7 @@ Route::group(['middleware' => ['role:Sys Admin']], function () {
         Route::post('/sysadmin/notifications/notify-send', [NotificationController::class, 'send'])->name('sysadmin.notifications.send');
         Route::get('/sysadmin/notifications/users', [NotificationController::class, 'getUsers'])->name('sysadmin.notifications.users.list');
         Route::resource('/sysadmin/notifications/generic-template', GenericTemplateController::class)->except(['destroy']);
-        Route::get('graph-users', [GenericTemplateController::class,'getUsers']);
+        //Route::get('graph-users', [GenericTemplateController::class,'getUsers']);
         
         Route::get('/sysadmin/notifications/org-tree', [NotificationController::class,'loadOrganizationTree']);
         Route::get('/sysadmin/notifications/org-organizations', [NotificationController::class,'getOrganizations']);
