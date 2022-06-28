@@ -124,7 +124,7 @@
 <div class="card">
 	<div class="card-body">
 		<h6></h6>
-		<table class="table table-bordered" id="conversation-list-table" style="width: 100%">
+		<table class="table table-bordered table-striped" id="conversation-list-table" style="width: 100%">
 			<thead>
 				<tr>
                     <th>&nbsp;</th>

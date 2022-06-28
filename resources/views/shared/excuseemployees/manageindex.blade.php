@@ -11,7 +11,7 @@
             {{-- <div class="h4">{{__('Manage Existing Excused')}}</div> --}}
             @include('shared.excuseemployees.partials.filter')
             <div class="p-3">  
-                <table class="table table-bordered filtertable" id="filtertable" style="width: 100%; overflow-x: auto; "></table>
+                <table class="table table-bordered filtertable table-striped" id="filtertable" style="width: 100%; overflow-x: auto; "></table>
             </div>
         </div>    
     </div>   

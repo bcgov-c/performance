@@ -66,7 +66,7 @@
 				<label label="Current Audience" name="current_audience" > Current Individual Audience </label>
 				@include('shared.excuseemployees.partials.filter')
 				<div class="p-3">  
-					<table class="table table-bordered currenttable" id="currenttable" style="width: 100%; overflow-x: auto; "></table>
+					<table class="table table-bordered currenttable table-striped" id="currenttable" style="width: 100%; overflow-x: auto; "></table>
 				</div>
 			</div>
 		</div>
