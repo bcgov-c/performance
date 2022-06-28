@@ -235,23 +235,23 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                                    url: '/sysadmin/excuseemployees/org-tree',
-                                    type: 'GET',
-                                    data: $("#notify-form").serialize(),
-                                    dataType: 'html',
-                                    beforeSend: function() {
+                					url: '{{ "/" . request()->segment(1) . "/excuseemployees/org-tree" }}'
+                                    , type: 'GET'
+									, data: $("#notify-form").serialize()
+									, dataType: 'html'
+									, beforeSend: function() {
                                         $("#tree-loading-spinner").show();                    
-                                    },
-                                    success: function (result) {
+                                    }
+									, success: function (result) {
                                         $(target).html(''); 
                                         $(target).html(result);
 
                                         $('#nav-tree').attr('loaded','loaded');
-                                    },
-                                    complete: function() {
+                                    }
+									, complete: function() {
                                         $(".tree-loading-spinner").hide();
-                                    },
-                                    error: function () {
+                                    }
+									, error: function () {
                                         alert("error");
                                         $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
                                     }
@@ -425,32 +425,26 @@
 						// To do -- ajax called to load the tree
 						$.when( 
 							$.ajax({
-								url: '/sysadmin/excuseemployees/eorg-tree',
-								// url: $url,
-								type: 'GET',
-								data: $("#notify-form").serialize(),
-								dataType: 'html',
-
-								beforeSend: function() {
+                				url: '{{ "/" . request()->segment(1) . "/excuseemployees/eorg-tree" }}'
+								, type: 'GET'
+								, data: $("#notify-form").serialize()
+								, dataType: 'html'
+								, beforeSend: function() {
 									$("#etree-loading-spinner").show();                    
-								},
-
-								success: function (result) {
+								}
+								, success: function (result) {
 									$('#enav-tree').html(''); 
 									$('#enav-tree').html(result);
 									$('#enav-tree').attr('loaded','loaded');
-								},
-
-								complete: function() {
+								}
+								, complete: function() {
 									$("#etree-loading-spinner").hide();
-								},
-
-								error: function () {
+								}
+								, error: function () {
 									alert("error");
 									$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
 								}
 							})
-							
 						).then(function( data, textStatus, jqXHR ) {
 							//alert( jqXHR.status ); // Alerts 200
 							enodes = $('#eaccordion-level0 input:checkbox');

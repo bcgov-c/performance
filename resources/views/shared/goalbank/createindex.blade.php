@@ -672,13 +672,11 @@
 						// To do -- ajax called to load the tree
 						$.when( 
 							$.ajax({
-                				url: '{{ "/" . request()->segment(1) . "/goalbank/eorg-tree" }}',
-								type: 'GET',
-								data: $("#notify-form").serialize(),
-								dataType: 'html',
-
-
-								success: function (result) {
+                				url: '{{ "/" . request()->segment(1) . "/goalbank/eorg-tree" }}'
+								, type: 'GET'
+								, data: $("#notify-form").serialize()
+								, dataType: 'html'
+								, success: function (result) {
 									$('#enav-tree').html(''); 
 									$('#enav-tree').html(result);
 									$('#enav-tree').attr('loaded','loaded');

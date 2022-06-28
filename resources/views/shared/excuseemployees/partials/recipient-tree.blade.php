@@ -390,7 +390,7 @@ $(document).ready(function() {
         
         if($.trim($(target).html())=='') {
             $.ajax({
-                url: '/sysadmin/excuseemployees/employees/' + tree_id,
+                url: 'employees/'+tree_id,
                 type: 'GET',
                 data: $("#notify-form").serialize(),
                 dataType: 'html',
