@@ -154,7 +154,7 @@
     <script>
         $('body').popover({
             selector: '[data-toggle]',
-            trigger: 'hover',
+            trigger: 'click',
         });
         
         $('.modal').popover({
@@ -271,7 +271,7 @@
         $(document).ready(() => {            
             $(".tags").multiselect({
                 enableFiltering: true,
-                enableCaseInsensitiveFiltering: true
+                enableCaseInsensitiveFiltering: true,
             });
             $(".search-users").each(function() {
                 const goalId = $(this).data('goal-id');
