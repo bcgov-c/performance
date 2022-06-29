@@ -1,5 +1,5 @@
 <ul class="list-group">
-    @foreach($aemployees as $employee)
+    @foreach($eemployees as $employee)
     <li class="list-group-item pl-5 py-1">
 
         <a role="button" class="disabled collapsed">
@@ -7,9 +7,9 @@
             <div class="container">
                 <div class="row">
                     <div class="col-1">
-                        <input pid="{{ $aparent_id }}" 
-                        type="checkbox"  id="auserCheck{{ $employee->employee_id }}" name="auserCheck[]" 
-                        {{ (is_array(old('auserCheck')) and in_array($employee->employee_id, old('auserCheck'))) ? ' checked' : '' }}
+                        <input pid="{{ $eparent_id }}" 
+                        type="checkbox"  id="userCheck{{ $employee->employee_id }}" name="userCheck[]" 
+                        {{ (is_array(old('userCheck')) and in_array($employee->employee_id, old('userCheck'))) ? ' checked' : '' }}
                                value="{{ $employee->employee_id }}">
                     </div>
                     <div class="col"><span>{{ $employee->employee_name  }}</span></div>

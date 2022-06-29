@@ -303,7 +303,7 @@ class EmployeeSharesController extends Controller
         $eempIdsByOrgId = $erows->groupBy('id')->all();
 
         if($request->ajax()){
-            return view('shared.employeeshares.partials.erecipient-tree', compact('eorgs','eempIdsByOrgId') );
+            return view('shared.employeeshares.partials.erecipient-tree', compact('eorgs', 'ecountByOrg', 'eempIdsByOrgId') );
         } 
     }
   
@@ -704,7 +704,7 @@ class EmployeeSharesController extends Controller
 
         $parent_id = $id;
         
-        return view('shared.employeeshares.partials.employee', compact('parent_id', 'employees') ); 
+        return view('shared.employeeshares.partials.employee', compact('eparent_id', 'eemployees') ); 
     }
 
     protected function search_criteria_list() {
@@ -759,7 +759,7 @@ class EmployeeSharesController extends Controller
         return $demoWhere;
     }
 
-    protected function ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4) {
+    protected function ebaseFilteredWhere(Request $request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4) {
         // Base Where Clause
         $edemoWhere = EmployeeDemo::
             when( $elevel0, function ($q) use($elevel0) {

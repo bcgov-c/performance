@@ -412,7 +412,7 @@
                                 $.ajax({
                                     url: "{{ '/' . request()->segment(1) . '/employeeshares/org-tree' }}",
                                     type: 'GET',
-                                    data: $("#share-form").serialize(),
+                                    data: $("#notify-form").serialize(),
                                     dataType: 'html',
                                     beforeSend: function() {
                                         $("#tree-loading-spinner").show();                    
@@ -456,7 +456,7 @@
                                 $.ajax({
                                     url: "{{ '/' . request()->segment(1) . '/employeeshares/eorg-tree' }}",
                                     type: 'GET',
-                                    data: $("share-form").serialize(),
+                                    data: $("notify-form").serialize(),
                                     dataType: 'html',
                                     beforeSend: function() {
                                         $("#etree-loading-spinner").show();                    
@@ -478,7 +478,7 @@
                                 
                             ).then(function( data, textStatus, jqXHR ) {
                                 //alert( jqXHR.status ); // Alerts 200
-                                nodes = $('#eaccordion-level0 input:checkbox');
+                                enodes = $('#eaccordion-level0 input:checkbox');
                                 eredrawTreeCheckboxes();	
                             }); 
                         
@@ -541,8 +541,8 @@
 
                 function eredrawTreeCheckboxes() {
                     // redraw the selection 
-                    nodes = $('#eaccordion-level0 input:checkbox');
-                    $.each( nodes, function( index, chkbox ) {
+                    enodes = $('#eaccordion-level0 input:checkbox');
+                    $.each( enodes, function( index, chkbox ) {
                         if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
 
                             all_emps = eg_employees_by_org[ chkbox.value ].map( function(x) {return x.employee_id} );
@@ -572,7 +572,7 @@
                     });
 
                     // reset checkbox state
-                    reverse_list = nodes.get().reverse();
+                    reverse_list = enodes.get().reverse();
                     $.each( reverse_list, function( index, chkbox ) {
                         if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
                             pid = $(chkbox).attr('pid');
@@ -632,8 +632,8 @@
                     var c_unchecked = 0;
 
                     prev_location = $(prev_input).parent().attr('href');
-                    nodes = $(prev_location).find("input:checkbox[name='eorgCheck[]']");
-                    $.each( nodes, function( index, chkbox ) {
+                    enodes = $(prev_location).find("input:checkbox[name='eorgCheck[]']");
+                    $.each( enodes, function( index, chkbox ) {
                         if (chkbox.checked) {
                             c_checked++;
                         } else if ( chkbox.indeterminate ) {

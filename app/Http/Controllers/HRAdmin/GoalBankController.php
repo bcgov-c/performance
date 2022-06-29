@@ -1634,7 +1634,7 @@ class GoalBankController extends Controller
 
         $aparent_id = $id;
         
-        return view('shared.goalbank.partials.employee', compact('parent_id', 'employees') ); 
+        return view('shared.goalbank.partials.employee', compact('aparent_id', 'aemployees') ); 
     }
 
     protected function search_criteria_list() {

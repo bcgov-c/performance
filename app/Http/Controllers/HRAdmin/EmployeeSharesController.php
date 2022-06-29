@@ -977,7 +977,7 @@ class EmployeeSharesController extends Controller
 
         $parent_id = $id;
         
-            return view('shared.employeeshares.partials.employee', compact('parent_id', 'employees') ); 
+            return view('shared.employeeshares.partials.employee', compact('eparent_id', 'eemployees') ); 
     }
 
     protected function search_criteria_list() {
