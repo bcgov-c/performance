@@ -48,15 +48,20 @@ Route::group(['middleware' => ['role:Sys Admin']], function () {
         Route::get('/sysadmin/unlock/unlocked-conversation-list', [UnlockConversationController::class, 'getDatatableManagedUnlocked'])->name('sysadmin.unlock.unlockconversation.list');
     });
 
-
-    Route::get('sysadmin/statistics/goalsummary', [SysadminStatisticsReportController::class, 'goalsummary'])->name('sysadmin.statistics.goalsummary');
-    Route::get('sysadmin/statistics/goalsummary-export', [SysadminStatisticsReportController::class, 'goalSummaryExport'])->name('sysadmin.statistics.goalsummary.export');
-    Route::get('sysadmin/statistics/conversationsummary', [SysadminStatisticsReportController::class, 'conversationsummary'])->name('sysadmin.statistics.conversationsummary');
-    Route::get('sysadmin/statistics/conversationsummary-export', [SysadminStatisticsReportController::class, 'conversationSummaryExport'])->name('sysadmin.statistics.conversationsummary.export');
-    Route::get('sysadmin/statistics/sharedsummary', [SysadminStatisticsReportController::class, 'sharedsummary'])->name('sysadmin.statistics.sharedsummary');
-    Route::get('sysadmin/statistics/sharedsummary-export', [SysadminStatisticsReportController::class, 'sharedSummaryExport'])->name('sysadmin.statistics.sharedsummary.export');
-    Route::get('sysadmin/statistics/excusedsummary', [SysadminStatisticsReportController::class, 'excusedsummary'])->name('sysadmin.statistics.excusedsummary');
-    Route::get('sysadmin/statistics/excusedsummary-export', [SysadminStatisticsReportController::class, 'excusedSummaryExport'])->name('sysadmin.statistics.excusedsummary.export');
+    // Statictics and Reporting
+    Route::get('/sysadmin/statistics/goalsummary', [SysadminStatisticsReportController::class, 'goalsummary'])->name('sysadmin.statistics.goalsummary');
+    Route::get('/sysadmin/statistics/goalsummary-export', [SysadminStatisticsReportController::class, 'goalSummaryExport'])->name('sysadmin.statistics.goalsummary.export');
+    Route::get('/sysadmin/statistics/conversationsummary', [SysadminStatisticsReportController::class, 'conversationsummary'])->name('sysadmin.statistics.conversationsummary');
+    Route::get('/sysadmin/statistics/conversationsummary-export', [SysadminStatisticsReportController::class, 'conversationSummaryExport'])->name('sysadmin.statistics.conversationsummary.export');
+    Route::get('/sysadmin/statistics/sharedsummary', [SysadminStatisticsReportController::class, 'sharedsummary'])->name('sysadmin.statistics.sharedsummary');
+    Route::get('/sysadmin/statistics/sharedsummary-export', [SysadminStatisticsReportController::class, 'sharedSummaryExport'])->name('sysadmin.statistics.sharedsummary.export');
+    Route::get('/sysadmin/statistics/excusedsummary', [SysadminStatisticsReportController::class, 'excusedsummary'])->name('sysadmin.statistics.excusedsummary');
+    Route::get('/sysadmin/statistics/excusedsummary-export', [SysadminStatisticsReportController::class, 'excusedSummaryExport'])->name('sysadmin.statistics.excusedsummary.export');
+    Route::get('/sysadmin/statistics/org-organizations', [SysadminStatisticsReportController::class,'getOrganizations']);
+    Route::get('/sysadmin/statistics/org-programs', [SysadminStatisticsReportController::class,'getPrograms']);
+    Route::get('/sysadmin/statistics/org-divisions', [SysadminStatisticsReportController::class,'getDivisions']);
+    Route::get('/sysadmin/statistics/org-branches', [SysadminStatisticsReportController::class,'getBranches']);
+    Route::get('/sysadmin/statistics/org-level4', [SysadminStatisticsReportController::class,'getLevel4']);
 
 
     //Goal Bank

@@ -10,6 +10,14 @@
         <a class="btn btn-primary" id="btn_print">Print</a>
     </div>
 
+	<form id="filter-form">
+
+		<input type="hidden" name="filter_params" value="{{ old('filter') }}">
+		
+		@include('sysadmin.statistics.partials.filter',['formaction' => route('sysadmin.statistics.goalsummary') ])
+
+	</form>
+
 <span id="pdf-output">
 
 	<div class="row justify-content-center">
@@ -172,11 +180,11 @@ $(function()  {
 						onclick: function (option1) {
 							ids =  myChart.getModel().option.ids;
 							goal_id =  myChart.getModel().option.goal_type_id;
-
+							filter = $('input[name=filter_params').val();
 							console.log(goal_id);
 							
 							// let _url = '{{ route('sysadmin.statistics.goalsummary.export')}}' 
-							let _url = export_url + '?goal=' + goal_id + '&range=';
+							let _url = export_url + '?goal=' + goal_id + '&range=' + filter ;
       						window.location.href = _url;
 
 							//   $.ajax({
@@ -305,7 +313,8 @@ $(function()  {
 			// let _url = '{{ route('sysadmin.statistics.goalsummary.export')}}' 
 			//  let _url = '{{ route('sysadmin.statistics.goalsummary.export')}}' 
 							// + '?goal=' + params.data.goal_id + '&range=' + params.name;
-			let _url = export_url + '?goal=' + goal_type_id + '&range=' + params.name  + '&ids=' + params.data.ids;
+			filter = $('input[name=filter_params').val();
+			let _url = export_url + '?goal=' + goal_type_id + '&range=' + params.name  + '&ids=' + params.data.ids + filter;
       		window.location.href = _url;
 
 

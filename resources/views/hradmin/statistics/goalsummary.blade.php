@@ -10,6 +10,13 @@
         <a class="btn btn-primary" id="btn_print">Print</a>
     </div>
 
+	<form id="filter-form">
+		<input type="hidden" name="filter_params" value="{{ old('filter') }}">
+		
+		@include('hradmin.statistics.partials.filter',['formaction' => route('hradmin.statistics.goalsummary') ])
+
+	</form>
+
 <span id="pdf-output">
 
 	<div class="row justify-content-center">
@@ -166,9 +173,10 @@ $(function()  {
 						onclick: function (option1) {
 							ids =  myChart.getModel().option.ids;
 							goal_id =  myChart.getModel().option.goal_type_id;
+							filter = $('input[name=filter_params').val();
 							
 							// let _url = '{{ route('hradmin.statistics.goalsummary.export')}}' 
-							let _url = export_url + '?goal=' + goal_id + '&ids=' + ids;
+							let _url = export_url + '?goal=' + goal_id + '&ids=' + ids + filter;
       						window.location.href = _url;
 						}
 					},
@@ -283,7 +291,8 @@ $(function()  {
 			// let _url = '{{ route('hradmin.statistics.goalsummary.export')}}' 
 			//  let _url = '{{ route('hradmin.statistics.goalsummary.export')}}' 
 							// + '?goal=' + params.data.goal_id + '&range=' + params.name;
-			let _url = export_url + '?goal=' + goal_type_id + '&range=' + params.name  + '&ids=' + params.data.ids;
+			filter = $('input[name=filter_params').val();
+			let _url = export_url + '?goal=' + goal_type_id + '&range=' + params.name  + '&ids=' + params.data.ids + filter;
       		window.location.href = _url;
 
 

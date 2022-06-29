@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\GoalType;
 use App\Models\Conversation;
 use Illuminate\Http\Request;
+use App\Models\OrganizationTree;
 use App\Models\ConversationTopic;
 use Illuminate\Support\Facades\DB;
 use App\Exports\ConversationExport;
@@ -46,7 +47,7 @@ class SysadminStatisticsReportController extends Controller
 
     Public function goalSummary_from_statement($goal_type_id)
     {
-        $from_stmt = "(select users.employee_id, users.empl_record, (select count(*) from goals where user_id = users.id
+        $from_stmt = "(select users.employee_id, users.empl_record, users.guid, users.reporting_to, (select count(*) from goals where user_id = users.id
                         and status = 'active' and deleted_at is null and is_library = 0 ";
         if ($goal_type_id)                        
             $from_stmt .= " and goal_type_id =".  $goal_type_id ;
@@ -58,6 +59,21 @@ class SysadminStatisticsReportController extends Controller
     public function goalSummary(Request $request)
     {
        
+        // send back the input parameters
+        $this->preservedInputParams($request);
+
+        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
+        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
+        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
+        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
+        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+
+        $request->session()->flash('level0', $level0);
+        $request->session()->flash('level1', $level1);
+        $request->session()->flash('level2', $level2);
+        $request->session()->flash('level3', $level3);
+        $request->session()->flash('level4', $level4);
+
         $types = GoalType::orderBy('id')->get();
         $types->prepend( new GoalType()  ) ;
 
@@ -68,11 +84,26 @@ class SysadminStatisticsReportController extends Controller
             $from_stmt = $this->goalSummary_from_statement($type->id);
 
             $sql = User::selectRaw('AVG(goals_count) as goals_average')
-                          ->from(DB::raw( $from_stmt ))
-                          ->join('employee_demo', function($join) {
-                                $join->on('employee_demo.employee_id', '=', 'A.employee_id');
-                                $join->on('employee_demo.empl_record', '=', 'A.empl_record');
-                            });
+                        ->from(DB::raw( $from_stmt ))
+                        ->join('employee_demo', function($join) {
+                            $join->on('employee_demo.employee_id', '=', 'A.employee_id');
+                            // $join->on('employee_demo.empl_record', '=', 'A.empl_record');
+                        })
+                        ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                            return $q->where('employee_demo.organization', $level0->name);
+                        })
+                        ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                            return $q->where('employee_demo.level1_program', $level1->name);
+                        })
+                        ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                            return $q->where('employee_demo.level2_division', $level2->name);
+                        })
+                        ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                            return $q->where('employee_demo.level3_branch', $level3->name);
+                        })
+                        ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                            return $q->where('employee_demo.level4', $level4->name);
+                        });
 
             $goals_average = $sql->get()->first()->goals_average;
 
@@ -91,7 +122,22 @@ class SysadminStatisticsReportController extends Controller
                         ->from(DB::raw( $from_stmt ))
                         ->join('employee_demo', function($join) {
                             $join->on('employee_demo.employee_id', '=', 'A.employee_id');
-                            $join->on('employee_demo.empl_record', '=', 'A.empl_record');
+                            //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
+                        })
+                        ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                            return $q->where('employee_demo.organization', $level0->name);
+                        })
+                        ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                            return $q->where('employee_demo.level1_program', $level1->name);
+                        })
+                        ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                            return $q->where('employee_demo.level2_division', $level2->name);
+                        })
+                        ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                            return $q->where('employee_demo.level3_branch', $level3->name);
+                        })
+                        ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                            return $q->where('employee_demo.level4', $level4->name);
                         })
                         // ->where('acctlock', 0)
                         ->whereBetween('goals_count', $range);
@@ -112,6 +158,13 @@ class SysadminStatisticsReportController extends Controller
     public function goalSummaryExport(Request $request)
     {
 
+        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
+        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
+        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
+        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
+        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+
+
         $from_stmt = $this->goalSummary_from_statement($request->goal);
 
         $sql = User::selectRaw('A.*, goals_count, employee_name, 
@@ -119,9 +172,24 @@ class SysadminStatisticsReportController extends Controller
                 ->from(DB::raw( $from_stmt ))                                
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'A.employee_id');
-                    $join->on('employee_demo.empl_record', '=', 'A.empl_record');
+                    //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
                 })
                 ->whereNotNull('A.guid')
+                ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.organization', $level0->name);
+                })
+                ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level1_program', $level1->name);
+                })
+                ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level2_division', $level2->name);
+                })
+                ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level3_branch', $level3->name);
+                })
+                ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level4', $level4->name);
+                })
                 // ->where('acctlock', 0)
                 ->when( (array_key_exists($request->range, $this->groups)) , function($q) use($request) {
                     return $q->whereBetween('goals_count', $this->groups[$request->range]);
@@ -179,6 +247,21 @@ class SysadminStatisticsReportController extends Controller
     public function conversationSummary(Request $request)
     {
 
+        // send back the input parameters
+        $this->preservedInputParams($request);
+
+        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
+        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
+        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
+        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
+        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+
+        $request->session()->flash('level0', $level0);
+        $request->session()->flash('level1', $level1);
+        $request->session()->flash('level2', $level2);
+        $request->session()->flash('level3', $level3);
+        $request->session()->flash('level4', $level4);
+
         // Chart1 -- Overdue
         $sql_2 = User::selectRaw("users.employee_id, users.empl_record, employee_name, 
                             organization, level1_program, level2_division, level3_branch, level4,
@@ -195,7 +278,22 @@ class SysadminStatisticsReportController extends Controller
                     as overdue_in_days")
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-                    $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+                    // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+                })
+                ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.organization', $level0->name);
+                })
+                ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level1_program', $level1->name);
+                })
+                ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level2_division', $level2->name);
+                })
+                ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level3_branch', $level3->name);
+                })
+                ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level4', $level4->name);
                 });
             
         $next_due_users = $sql_2->get();
@@ -218,7 +316,22 @@ class SysadminStatisticsReportController extends Controller
         $sql = Conversation::join('users', 'users.id', 'conversations.user_id') 
         ->join('employee_demo', function($join) {
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-            $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+            // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+        })
+        ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.organization', $level0->name);
+        })
+        ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.level1_program', $level1->name);
+        })
+        ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.level2_division', $level2->name);
+        })
+        ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.level3_branch', $level3->name);
+        })
+        ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.level4', $level4->name);
         })
         ->where(function ($query)  {
             return $query->whereNull('signoff_user_id')
@@ -268,7 +381,22 @@ class SysadminStatisticsReportController extends Controller
         ->join('users', 'users.id', 'conversations.user_id') 
         ->join('employee_demo', function($join) {
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-            $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+            // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+        })
+        ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.organization', $level0->name);
+        })
+        ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.level1_program', $level1->name);
+        })
+        ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.level2_division', $level2->name);
+        })
+        ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.level3_branch', $level3->name);
+        })
+        ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.level4', $level4->name);
         })
         ->get();
 
@@ -288,7 +416,12 @@ class SysadminStatisticsReportController extends Controller
 
     public function conversationSummaryExport(Request $request)
     {
-       
+        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
+        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
+        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
+        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
+        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+
         // SQL - Chart 1
         $sql_chart1 = User::selectRaw("users.*, employee_name, 
                         organization, level1_program, level2_division, level3_branch, level4,
@@ -312,7 +445,22 @@ class SysadminStatisticsReportController extends Controller
                             ,joining_date), '%Y-%m-%d'), INTERVAL 122 day) as next_due_date")
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-                    $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+                    // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+                })
+                ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.organization', $level0->name);
+                })
+                ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level1_program', $level1->name);
+                })
+                ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level2_division', $level2->name);
+                })
+                ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level3_branch', $level3->name);
+                })
+                ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level4', $level4->name);
                 });
                 
         // SQL - Chart 2
@@ -346,7 +494,22 @@ class SysadminStatisticsReportController extends Controller
                 ->join('users', 'users.id', 'conversations.user_id') 
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-                    $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+                    // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+                })
+                ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.organization', $level0->name);
+                })
+                ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level1_program', $level1->name);
+                })
+                ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level2_division', $level2->name);
+                })
+                ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level3_branch', $level3->name);
+                })
+                ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level4', $level4->name);
                 })
                 ->when( $request->topic_id, function($q) use($request) {
                     $q->where('conversations.conversation_topic_id', $request->topic_id);
@@ -371,7 +534,22 @@ class SysadminStatisticsReportController extends Controller
             ->join('users', 'users.id', 'conversations.user_id') 
             ->join('employee_demo', function($join) {
                 $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-                $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+                // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+            })
+            ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                return $q->where('employee_demo.organization', $level0->name);
+            })
+            ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                return $q->where('employee_demo.level1_program', $level1->name);
+            })
+            ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                return $q->where('employee_demo.level2_division', $level2->name);
+            })
+            ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                return $q->where('employee_demo.level3_branch', $level3->name);
+            })
+            ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                return $q->where('employee_demo.level4', $level4->name);
             })
             ->where(function ($query)  {
                 return $query->whereNotNull('signoff_user_id')
@@ -554,12 +732,44 @@ class SysadminStatisticsReportController extends Controller
     public function sharedsummary(Request $request) 
     {
 
+        // send back the input parameters
+        $this->preservedInputParams($request);
+
+        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
+        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
+        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
+        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
+        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+
+        $request->session()->flash('level0', $level0);
+        $request->session()->flash('level1', $level1);
+        $request->session()->flash('level2', $level2);
+        $request->session()->flash('level3', $level3);
+        $request->session()->flash('level4', $level4);
+
+
         $sql = User::selectRaw("users.employee_id, users.empl_record,
                 case when (select count(*) from shared_profiles A where A.shared_id = users.id) > 0 then 'Yes' else 'No' end as shared")
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-                    $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+                    //$join->on('employee_demo.empl_record', '=', 'users.empl_record');
+                })
+                ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.organization', $level0->name);
+                })
+                ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level1_program', $level1->name);
+                })
+                ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level2_division', $level2->name);
+                })
+                ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level3_branch', $level3->name);
+                })
+                ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level4', $level4->name);
                 });
+
 
         $users = $sql->get();
 
@@ -586,6 +796,13 @@ class SysadminStatisticsReportController extends Controller
     public function sharedSummaryExport(Request $request) 
     {
 
+        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
+        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
+        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
+        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
+        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+
+
       $selected_ids = $request->ids ? explode(',', $request->ids) : [];
 
       $sql = User::selectRaw("users.*,
@@ -593,7 +810,7 @@ class SysadminStatisticsReportController extends Controller
             case when (select count(*) from shared_profiles A where A.shared_id = users.id) > 0 then 'Yes' else 'No' end as shared")
             ->join('employee_demo', function($join) {
                 $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-                $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+                // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
             })
             ->when( $request->legend == 'Yes', function($q) use($request) {
                 $q->whereRaw(" (select count(*) from shared_profiles A where A.shared_id = users.id) > 0 ");
@@ -601,6 +818,21 @@ class SysadminStatisticsReportController extends Controller
             ->when( $request->legend == 'No', function($q) use($request) {
                 $q->whereRaw(" (select count(*) from shared_profiles A where A.shared_id = users.id) = 0 ");
             }) 
+            ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                return $q->where('employee_demo.organization', $level0->name);
+            })
+            ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                return $q->where('employee_demo.level1_program', $level1->name);
+            })
+            ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                return $q->where('employee_demo.level2_division', $level2->name);
+            })
+            ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                return $q->where('employee_demo.level3_branch', $level3->name);
+            })
+            ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                return $q->where('employee_demo.level4', $level4->name);
+            })
             ->with('sharedWith');
 
       $users = $sql->get();
@@ -651,16 +883,48 @@ class SysadminStatisticsReportController extends Controller
 
     public function excusedsummary(Request $request) {
 
-        
+        // send back the input parameters
+        $this->preservedInputParams($request);
+
+        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
+        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
+        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
+        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
+        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+
+        $request->session()->flash('level0', $level0);
+        $request->session()->flash('level1', $level1);
+        $request->session()->flash('level2', $level2);
+        $request->session()->flash('level3', $level3);
+        $request->session()->flash('level4', $level4);
+
         $sql = User::selectRaw("users.employee_id, users.empl_record, 
                     employee_name, organization, level1_program, level2_division, level3_branch, level4,
                     case when date(SYSDATE()) between excused_start_date and excused_end_date then 'Yes' else 'No' end as excused")
                     ->join('employee_demo', function($join) {
                         $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-                        $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+                        // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+                    })
+                    ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                        return $q->where('employee_demo.organization', $level0->name);
+                    })
+                    ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                        return $q->where('employee_demo.level1_program', $level1->name);
+                    })
+                    ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                        return $q->where('employee_demo.level2_division', $level2->name);
+                    })
+                    ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                        return $q->where('employee_demo.level3_branch', $level3->name);
+                    })
+                    ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                        return $q->where('employee_demo.level4', $level4->name);
                     });
 
         $users = $sql->get();
+
+      
+
 
         // Chart1 -- Excuse 
         $legends = ['Yes', 'No'];
@@ -687,24 +951,47 @@ class SysadminStatisticsReportController extends Controller
 
     public function excusedSummaryExport(Request $request) {
 
+        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
+        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
+        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
+        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
+        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+
       $selected_ids = $request->ids ? explode(',', $request->ids) : [];
 
-      $sql = User::selectRaw("users.*, 
+      $sql = User::selectRaw("users.employee_id, users.email, users.excused_start_date, users.excused_end_date,
+                            users.excused_reason_id, users.reporting_to,
                     employee_name, organization, level1_program, level2_division, level3_branch, level4,
                     case when date(SYSDATE()) between excused_start_date and excused_end_date then 'Yes' else 'No' end as excused")
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-                    $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+                    // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
                 ->when( $request->legend == 'Yes', function($q) use($request) {
-                    $q->whereRaw(" ( date(SYSDATE()) between excused_start_date and excused_end_date) = TRUE ");
+                    $q->whereRaw(" ( date(SYSDATE()) between excused_start_date and excused_end_date) = 1 ");
                 }) 
                 ->when( $request->legend == 'No', function($q) use($request) {
-                    $q->whereRaw(" ( date(SYSDATE()) between excused_start_date and excused_end_date) = FALSE ");
+                    $q->whereRaw(" ( date(SYSDATE()) between excused_start_date and excused_end_date) is NULL ");
+                })
+                ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.organization', $level0->name);
+                })
+                ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level1_program', $level1->name);
+                })
+                ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level2_division', $level2->name);
+                })
+                ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level3_branch', $level3->name);
+                })
+                ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level4', $level4->name);
                 })
                 ->with('excuseReason') ;
 
         $users = $sql->get();
+
 
       // Generating Output file
         $filename = 'Excused Employees.csv';
@@ -735,8 +1022,8 @@ class SysadminStatisticsReportController extends Controller
                 $row['Excused Start Date'] = $user->excused_start_date;
                 $row['Excused End Date'] = $user->excused_end_date;
                 $row['Excused Reason'] = $user->excuseReason ? $user->excuseReason->name : '';
-                $row['Shared'] = $user->shared;
-                $row['Shared with'] = implode(', ', $user->sharedWith->map( function ($item, $key) { return $item ? $item->sharedWith->name : null; })->toArray() );
+                // $row['Shared'] = $user->shared;
+                // $row['Shared with'] = implode(', ', $user->sharedWith->map( function ($item, $key) { return $item ? $item->sharedWith->name : null; })->toArray() );
                 $row['Organization'] = $user->organization;
                 $row['Level 1'] = $user->level1_program;
                 $row['Level 2'] = $user->level2_division;
@@ -745,13 +1032,192 @@ class SysadminStatisticsReportController extends Controller
 
                 fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], 
                         $row['Excused'], $row['Excused Start Date'], $row['Excused End Date'], $row['Excused Reason'],
-                        $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
+                        $row['Organization'], $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
             }
 
             fclose($file);
         };
 
         return response()->stream($callback, 200, $headers);
+
+    }
+
+    public function getOrganizations(Request $request) {
+
+        $orgs = OrganizationTree::orderby('name','asc')->select('id','name')
+            ->where('level',0)
+            ->when( $request->q , function ($q) use($request) {
+                return $q->whereRaw("LOWER(name) LIKE '%" . strtolower($request->q) . "%'");
+            })
+            ->get();
+
+        $formatted_orgs = [];
+        foreach ($orgs as $org) {
+            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
+        }
+
+        return response()->json($formatted_orgs);
+    } 
+
+    public function getPrograms(Request $request) {
+
+        $level0 = $request->level0 ? OrganizationTree::where('id',$request->level0)->first() : null;
+
+        $orgs = OrganizationTree::orderby('name','asc')->select(DB::raw('min(id) as id'),'name')
+            ->where('level',1)
+            ->when( $request->q , function ($q) use($request) {
+                return $q->whereRaw("LOWER(name) LIKE '%" . strtolower($request->q) . "%'");
+                })
+            ->when( $level0 , function ($q) use($level0) {
+                return $q->where('organization', $level0->name );
+            })
+            ->groupBy('name')
+            ->get();
+
+        $formatted_orgs = [];
+        foreach ($orgs as $org) {
+            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
+        }
+
+        return response()->json($formatted_orgs);
+    } 
+
+    public function getDivisions(Request $request) {
+
+        $level0 = $request->level0 ? OrganizationTree::where('id', $request->level0)->first() : null;
+        $level1 = $request->level1 ? OrganizationTree::where('id', $request->level1)->first() : null;
+
+        $orgs = OrganizationTree::orderby('name','asc')->select(DB::raw('min(id) as id'),'name')
+            ->where('level',2)
+            ->when( $request->q , function ($q) use($request) {
+                return $q->whereRaw("LOWER(name) LIKE '%" . strtolower($request->q) . "%'");
+                })
+            ->when( $level0 , function ($q) use($level0) {
+                return $q->where('organization', $level0->name) ;
+            })
+            ->when( $level1 , function ($q) use($level1) {
+                return $q->where('level1_program', $level1->name );
+            })
+            ->groupBy('name')
+            ->limit(300)
+            ->get();
+
+
+        $formatted_orgs = [];
+        foreach ($orgs as $org) {
+            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
+        }
+
+        return response()->json($formatted_orgs);
+    } 
+
+    public function getBranches(Request $request) {
+
+        $level0 = $request->level0 ? OrganizationTree::where('id', $request->level0)->first() : null;
+        $level1 = $request->level1 ? OrganizationTree::where('id', $request->level1)->first() : null;
+        $level2 = $request->level2 ? OrganizationTree::where('id', $request->level2)->first() : null;
+
+        $orgs = OrganizationTree::orderby('name','asc')->select(DB::raw('min(id) as id'),'name')
+            ->where('level',3)
+            ->when( $request->q , function ($q) use($request) {
+                return $q->whereRaw("LOWER(name) LIKE '%" . strtolower($request->q) . "%'");
+                })
+            ->when( $level0 , function ($q) use($level0) {
+                return $q->where('organization', $level0->name) ;
+            })
+            ->when( $level1 , function ($q) use($level1) {
+                return $q->where('level1_program', $level1->name );
+            })
+            ->when( $level2 , function ($q) use($level2) {
+                return $q->where('level2_division', $level2->name );
+            })
+            ->groupBy('name')
+            ->limit(300)
+            ->get();
+
+        $formatted_orgs = [];
+        foreach ($orgs as $org) {
+            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
+        }
+
+        return response()->json($formatted_orgs);
+    } 
+
+    public function getLevel4(Request $request) {
+
+        $level0 = $request->level0 ? OrganizationTree::where('id', $request->level0)->first() : null;
+        $level1 = $request->level1 ? OrganizationTree::where('id', $request->level1)->first() : null;
+        $level2 = $request->level2 ? OrganizationTree::where('id', $request->level2)->first() : null;
+        $level3 = $request->level3 ? OrganizationTree::where('id', $request->level3)->first() : null;
+
+        $orgs = OrganizationTree::orderby('name','asc')->select(DB::raw('min(id) as id'),'name')
+            ->where('level',4)
+            ->when( $request->q , function ($q) use($request) {
+                return $q->whereRaw("LOWER(name) LIKE '%" . strtolower($request->q) . "%'");
+                })
+            ->when( $level0 , function ($q) use($level0) {
+                return $q->where('organization', $level0->name) ;
+            })
+            ->when( $level1 , function ($q) use($level1) {
+                return $q->where('level1_program', $level1->name );
+            })
+            ->when( $level2 , function ($q) use($level2) {
+                return $q->where('level2_division', $level2->name );
+            })
+            ->when( $level3 , function ($q) use($level3) {
+                return $q->where('level3_branch', $level3->name );
+            })
+            ->groupBy('name')
+            ->limit(300)
+            ->get();
+
+        $formatted_orgs = [];
+        foreach ($orgs as $org) {
+            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
+        }
+
+        return response()->json($formatted_orgs);
+    } 
+
+
+    public function preservedInputParams(Request $request) 
+    {
+        $errors = session('errors');
+        if ($errors) {
+            $old = session()->getOldInput();
+
+            $request->dd_level0 = isset($old['dd_level0']) ? $old['dd_level0'] : null;
+            $request->dd_level1 = isset($old['dd_level1']) ? $old['dd_level1'] : null;
+            $request->dd_level2 = isset($old['dd_level2']) ? $old['dd_level2'] : null;
+            $request->dd_level3 = isset($old['dd_level3']) ? $old['dd_level3'] : null;
+            $request->dd_level4 = isset($old['dd_level4']) ? $old['dd_level4'] : null;
+
+        } 
+
+        // no validation and move filter variable to old 
+        if ($request->btn_search) {
+
+            $filter = '&dd_level0='.$request->dd_level0. 
+                        '&dd_level1='.$request->dd_level1. 
+                        '&dd_level2='.$request->dd_level2. 
+                        '&dd_level3='.$request->dd_level3. 
+                        '&dd_level4='.$request->dd_level4; 
+
+            session()->put('_old_input', [
+                'dd_level0' => $request->dd_level0,
+                'dd_level1' => $request->dd_level1,
+                'dd_level2' => $request->dd_level2,
+                'dd_level3' => $request->dd_level3,
+                'dd_level4' => $request->dd_level4,
+                'filter' => $filter, 
+            ]);
+        } else {
+
+            session()->put('_old_input', [
+                'filter' => '', 
+            ]);
+
+        }
 
     }
     
