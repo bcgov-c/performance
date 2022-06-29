@@ -36,7 +36,7 @@
                             <x-input class="form-control" id="reason" name="reason" label="Reason for assigning" data-toggle="tooltip" data-placement="top" data-trigger="hover-focus" tooltip="Reason tooltip"/>
                         </div>
                     </div>
-                    <table class="table table-bordered admintable" id="admintable" name="admintable" style="width: 100%; overflow-x: auto; "></table>
+                    <table class="table table-bordered admintable table-striped" id="admintable" name="admintable" style="width: 100%; overflow-x: auto; "></table>
                 </div>
                 <div class="modal-footer p-3">
                     <div class="col">

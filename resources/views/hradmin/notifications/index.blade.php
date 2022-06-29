@@ -70,7 +70,7 @@
 		</form>
 
 		<p></p>
-		<table class="table table-bordered" id="notificationlog-table">
+		<table class="table table-bordered table-striped" id="notificationlog-table">
 			<thead>
 				<tr>
 					<th>Date Sent</th>

@@ -59,8 +59,6 @@
             <div class="form-group row"> </div>
                 <div class="form-group row">
                     <span class="float-left float-bottom">  
-                        {{-- <button type="submit" class="btn btn-primary" name="btn_search" 
-                            value="btn_search" formaction="{{ route('sysadmin.excuseemployees.search') }}">Filter</button> --}}
                         <button type="button" class="btn btn-primary" id="btn_search" name="btn_search" value="btn_search" >Filter</button>
                         <button type="button" class="btn btn-secondary" id="btn_search_reset" name="btn_reset" value="btn_reset">Reset</button>
                     </span>

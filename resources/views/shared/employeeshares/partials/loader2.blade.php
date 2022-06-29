@@ -295,7 +295,6 @@
 
             $('#edd_level4').on('select2:select', function (e) {
                 e.preventDefault();
-                console.log('#edd_level4.select2:select');
             });
 
             $('#edd_level0').on('select2:unselect', function (e) {

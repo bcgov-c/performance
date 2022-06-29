@@ -6,8 +6,8 @@
         </div>
     </div>
 
-	<p class="px-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tincidunt, nibh nec interdum fermentum, est metus rutrum elit, in molestie ex massa ut urna. Duis dignissim tortor ipsum, dignissim rutrum quam gravida sed. Mauris auctor malesuada luctus. Praesent vitae ante et diam gravida lobortis. Donec eleifend euismod scelerisque. Curabitur laoreet erat sit amet tortor rutrum tristique. Sed lobortis est ac mauris lobortis euismod. Morbi tincidunt porta orci eu elementum. Donec lorem lacus, hendrerit a augue sed, tempus rhoncus arcu. Praesent a enim vel eros elementum porta. Nunc ut leo eu augue dapibus efficitur ac ac risus. Maecenas risus tellus, tincidunt vitae finibus vel, ornare vel neque. Curabitur imperdiet orci ac risus tempor semper. Integer nec varius urna, sit amet rhoncus diam. Aenean finibus, sapien eu placerat tristique, sapien dui maximus neque, id tempor dui magna eget lorem. Suspendisse egestas mauris non feugiat bibendum.</p>
-	<p class="px-3">Cras quis augue quis risus auctor facilisis quis ac ligula. Fusce vehicula consequat dui, et egestas augue sodales aliquam. In hac habitasse platea dictumst. Curabitur sit amet nulla nibh. Morbi mollis malesuada diam ut egestas. Pellentesque blandit placerat nisi ac facilisis. Vivamus consequat, nisl a lacinia ultricies, velit leo consequat magna, sit amet condimentum justo nibh id nisl. Quisque mattis condimentum cursus. Nullam eget congue augue, a molestie leo. Aenean sollicitudin convallis arcu non maximus. Curabitur ut lacinia nisi. Nam cursus venenatis lacus aliquet dapibus. Nulla facilisi.</p>
+	<p class="px-3">Follow the steps below to select an employee and excuse them from the Performance Development process. This will remove the employee from any reporting and will pause the employee’s conversation deadlines during the date range selected.</p>
+	<!-- <p class="px-3">Cras quis augue quis risus auctor facilisis quis ac ligula. Fusce vehicula consequat dui, et egestas augue sodales aliquam. In hac habitasse platea dictumst. Curabitur sit amet nulla nibh. Morbi mollis malesuada diam ut egestas. Pellentesque blandit placerat nisi ac facilisis. Vivamus consequat, nisl a lacinia ultricies, velit leo consequat magna, sit amet condimentum justo nibh id nisl. Quisque mattis condimentum cursus. Nullam eget congue augue, a molestie leo. Aenean sollicitudin convallis arcu non maximus. Curabitur ut lacinia nisi. Nam cursus venenatis lacus aliquet dapibus. Nulla facilisi.</p> -->
 
 
 	<br>
@@ -99,11 +99,11 @@
 					{{-- <h6 class="text-bold mt-1">Target Audience</h6> --}}
 					<div class="row">
 						<input class="" type="checkbox"  id="chkbox_declare" name="chkbox_declare" value="">
-						<p class="px-3">I wish to excuse the selected employees from having to complete their MyPerformance Profile.</p>
+						<p class="px-3">I wish to excuse the selected employees from the Performance Development process during the date range selected.</p>
 					</div>
 					<div class="row">
 						<div class="alert alert-warning alert-dismissible no-border"  style="border-color:#d5e6f6; background-color:#d5e6f6" role="alert">
-							<span class="h6" aria-hidden="true"><i class="icon fa fa-exclamation-triangle  "></i><b>Note:  By doing so, these employees will not show up in current and historical performance reports.</b></span>
+							<span class="h6" aria-hidden="true"><i class="icon fa fa-exclamation-triangle  "></i><b>Note: By doing so, these employees will not show up in PDP reports.</b></span>
 						</div>
 					</div>
 				</div>
@@ -235,23 +235,23 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                                    url: '/sysadmin/excuseemployees/org-tree',
-                                    type: 'GET',
-                                    data: $("#notify-form").serialize(),
-                                    dataType: 'html',
-                                    beforeSend: function() {
+                					url: '{{ "/" . request()->segment(1) . "/excuseemployees/org-tree" }}'
+                                    , type: 'GET'
+									, data: $("#notify-form").serialize()
+									, dataType: 'html'
+									, beforeSend: function() {
                                         $("#tree-loading-spinner").show();                    
-                                    },
-                                    success: function (result) {
+                                    }
+									, success: function (result) {
                                         $(target).html(''); 
                                         $(target).html(result);
 
                                         $('#nav-tree').attr('loaded','loaded');
-                                    },
-                                    complete: function() {
+                                    }
+									, complete: function() {
                                         $(".tree-loading-spinner").hide();
-                                    },
-                                    error: function () {
+                                    }
+									, error: function () {
                                         alert("error");
                                         $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
                                     }
@@ -425,32 +425,26 @@
 						// To do -- ajax called to load the tree
 						$.when( 
 							$.ajax({
-								url: '/sysadmin/excuseemployees/eorg-tree',
-								// url: $url,
-								type: 'GET',
-								data: $("#notify-form").serialize(),
-								dataType: 'html',
-
-								beforeSend: function() {
+                				url: '{{ "/" . request()->segment(1) . "/excuseemployees/eorg-tree" }}'
+								, type: 'GET'
+								, data: $("#notify-form").serialize()
+								, dataType: 'html'
+								, beforeSend: function() {
 									$("#etree-loading-spinner").show();                    
-								},
-
-								success: function (result) {
+								}
+								, success: function (result) {
 									$('#enav-tree').html(''); 
 									$('#enav-tree').html(result);
 									$('#enav-tree').attr('loaded','loaded');
-								},
-
-								complete: function() {
+								}
+								, complete: function() {
 									$("#etree-loading-spinner").hide();
-								},
-
-								error: function () {
+								}
+								, error: function () {
 									alert("error");
 									$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
 								}
 							})
-							
 						).then(function( data, textStatus, jqXHR ) {
 							//alert( jqXHR.status ); // Alerts 200
 							enodes = $('#eaccordion-level0 input:checkbox');
@@ -463,31 +457,14 @@
 
 			});
 
-			$(window).on('beforeunload', function(){
-				$('#pageLoader').show();
-			});
+			// $(window).on('beforeunload', function(){
+			// 	$('#pageLoader').show();
+			// });
 
-			$(window).resize(function(){
-				location.reload();
-				return;
-			});
-
-			// Model -- Confirmation Box
-
-			// var modalConfirm = function(callback) {
-			// 	$("#btn-confirm").on("click", function(){
-			// 		$("#mi-modal").modal('show');
-			// 	});
-			// 	$("#modal-btn-si").on("click", function(){
-			// 		callback(true);
-			// 		$("#mi-modal").modal('hide');
-			// 	});
-				
-			// 	$("#modal-btn-no").on("click", function(){
-			// 		callback(false);
-			// 		$("#mi-modal").modal('hide');
-			// 	});
-			// };
+			// $(window).resize(function(){
+			// 	location.reload();
+			// 	return;
+			// });
 
 		</script>
 	</x-slot>
