@@ -85,7 +85,7 @@
             <div class="form-group col-md-12">
               <span class="float-right">  
                <button type="submit" class="btn btn-primary" name="btn_search" 
-                    value="btn_search" formaction="{{ route($request->segment(1).'.notifications.search') }}">Search</button>
+                    value="btn_search" formaction="{{ route(request()->segment(1) . '.notifications.search') }}">Search</button>
                <button type="button" class="btn btn-secondary  " id="btn_search_reset" name="btn_reset" value="btn_reset">reset</button>
               </span>
             </div>

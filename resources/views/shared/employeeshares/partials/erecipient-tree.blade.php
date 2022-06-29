@@ -353,9 +353,7 @@ $(document).ready(function() {
 
         do {
             value = '#eorgCheck' + pid;
-            //console.log(  value );
             toggle_indeterminate( value );
-            //console.log("parent : " + pid);                
             pid = $('#eorgCheck' + pid).attr('pid');    
         } 
         while (pid);
@@ -390,8 +388,7 @@ $(document).ready(function() {
         
         if($.trim($(etarget).html())=='') {
             $.ajax({
-                url: '{{ "/" . request()->segment(1) . "/employeeshares/eemployees/" . tree_id }}',
-                // url: $request->segment(1)+'/employeeshares/employees/'+tree_id,
+                url: '/'+'{{ request()->segment(1) }}'+'/employeeshares/eemployees/'+tree_id,
                 type: 'GET',
                 data: $("#enotify-form").serialize(),
                 dataType: 'html',
@@ -405,7 +402,6 @@ $(document).ready(function() {
 
                     nodes = $(etarget).find('input:checkbox');
                     $.each( nodes, function( index, chkbox ) {
-                        console.log( chkbox.value )
 						if (eg_selected_employees.includes(chkbox.value)) {
 							$(chkbox).prop('checked', true);
                         } 
@@ -541,14 +537,10 @@ $(document).ready(function() {
                 
             }      
 
-            //console.log( g_selected_employees);     
-
             pid = $(this).find('input:first').attr('pid');
             do {
                 value = '#eorgCheck' + pid;
-                //console.log(  value );
                 toggle_indeterminate( value );
-                //console.log("parent : " + pid);                
                 pid = $('#eorgCheck' + pid).attr('pid');    
             } 
             while (pid);

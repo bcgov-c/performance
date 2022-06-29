@@ -15,9 +15,10 @@ use App\Http\Controllers\SysAdmin\UnlockConversationController;
 
 Route::group(['middleware' => ['role:Sys Admin']], function () {
 
-
+    //Employee List
     Route::group(['middleware' => ['auth']], function() 
     {    
+        Route::get('sysadmin/employeelists', [EmployeeListController::class, 'currentList'])->name('sysadmin.employeelists');
         Route::get('sysadmin/employeelists/currentlist', [EmployeeListController::class, 'currentList'])->name('sysadmin.employeelists.currentlist');
         Route::get('sysadmin/employeelists/getcurrentlist', [EmployeeListController::class, 'getCurrentList'])->name('sysadmin.employeelists.getcurrentlist');
         Route::get('sysadmin/employeelists/pastlist', [EmployeeListController::class, 'pastList'])->name('sysadmin.employeelists.pastlist');
@@ -30,17 +31,14 @@ Route::group(['middleware' => ['role:Sys Admin']], function () {
     Route::get('/sysadmin/employeelists/org-level4', [EmployeeListController::class,'getLevel4']);
     });
 
-    // Route::get('sysadmin/employees/pastemployees', [PastEmployeesController::class, 'index'])->name('sysadmin.employees.pastemployees');
-    // Route::get('sysadmin/employees/pastemployeeslist', [PastEmployeesController::class, 'getList'])->name('sysadmin.employees.pastemployeeslist');
-    // Route::post('sysadmin/employees/pastemployees', [PastEmployeesController::class, 'index'])->name('sysadmin.employees.pastemployees');
-
-    // Route::get('sysadmin/employees/manageexistingshareslist', [ManageExistingSharesController::class, 'getList'])->name('sysadmin.employees.manageexistingshareslist');
   
     Route::get('sysadmin/get-identities', [SysadminController::class, 'getIdentities'])->name('sysadmin.get-identities');
     
 
+    //Unlock
     Route::group(['middleware' => ['auth']], function() 
     {    
+        Route::get('/sysadmin/unlock', [UnlockConversationController::class, 'index'])->name('sysadmin.unlock');
         Route::get('/sysadmin/unlock/unlockconversation', [UnlockConversationController::class, 'index'])->name('sysadmin.unlock.unlockconversation');
         Route::post('/sysadmin/unlock/unlockconversation', [UnlockConversationController::class, 'index'])->name('sysadmin.unlock.unlockconversation.search');
         Route::get('/sysadmin/unlock/locked-conversation-list', [UnlockConversationController::class, 'getDatatableConversations'])->name('sysadmin.unlock.lockedconversation.list');
@@ -140,8 +138,6 @@ Route::group(['middleware' => ['role:Sys Admin']], function () {
         Route::get('/sysadmin/excuseemployees/org-branches', [ExcuseEmployeesController::class,'getBranches']);
         Route::get('/sysadmin/excuseemployees/org-level4', [ExcuseEmployeesController::class,'getLevel4']);
         Route::get('/sysadmin/excuseemployees/employees/{id}', [ExcuseEmployeesController::class,'getEmployees']);
-
-
     });
 
 
@@ -154,7 +150,7 @@ Route::group(['middleware' => ['role:Sys Admin']], function () {
         Route::post('/sysadmin/notifications/notify-send', [NotificationController::class, 'send'])->name('sysadmin.notifications.send');
         Route::get('/sysadmin/notifications/users', [NotificationController::class, 'getUsers'])->name('sysadmin.notifications.users.list');
         Route::resource('/sysadmin/notifications/generic-template', GenericTemplateController::class)->except(['destroy']);
-        Route::get('graph-users', [GenericTemplateController::class,'getUsers']);
+        //Route::get('graph-users', [GenericTemplateController::class,'getUsers']);
         
         Route::get('/sysadmin/notifications/org-tree', [NotificationController::class,'loadOrganizationTree']);
         Route::get('/sysadmin/notifications/org-organizations', [NotificationController::class,'getOrganizations']);
@@ -165,14 +161,13 @@ Route::group(['middleware' => ['role:Sys Admin']], function () {
         Route::get('/sysadmin/notifications/job-titles', [NotificationController::class,'getJobTitles']);
         Route::get('/sysadmin/notifications/employees/{id}', [NotificationController::class,'getEmployees']);
         Route::get('/sysadmin/notifications/employee-list', [NotificationController::class, 'getDatatableEmployees'])->name('sysadmin.notifications.employee.list');
-        
     });
 
 
     //Shared Employees
     Route::group(['middleware' => ['auth']], function() {    
-        Route::get('/sysadmin/employeeshares/addindex', [EmployeeSharesController::class, 'addindex'])->name('sysadmin.employeeshares.addindex');
-        Route::post('/sysadmin/employeeshares/addindex', [EmployeeSharesController::class, 'addindex'])->name('sysadmin.employeeshares.addindexpost');
+        Route::get('/sysadmin/employeeshares', [EmployeeSharesController::class, 'addnew'])->name('sysadmin.employeeshares');
+        Route::get('/sysadmin/employeeshares/addnew', [EmployeeSharesController::class, 'addnew'])->name('sysadmin.employeeshares.addnew');
         Route::post('/sysadmin/employeeshares/saveall', [EmployeeSharesController::class, 'saveall'])->name('sysadmin.employeeshares.saveall');
 
         Route::get('/sysadmin/employeeshares/manageindex', [EmployeeSharesController::class, 'manageindex'])->name('sysadmin.employeeshares.manageindex');
@@ -184,12 +179,12 @@ Route::group(['middleware' => ['role:Sys Admin']], function () {
         Route::get('/sysadmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('sysadmin.employeeshares.deleteitemget');
         Route::delete('/sysadmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('sysadmin.employeeshares.deleteitem');
 
-        Route::get('/sysadmin/employeeshares/org-tree', [EmployeeSharesController::class,'loadOrganizationTree']);
-        Route::get('/sysadmin/employeeshares/org-organizations', [EmployeeSharesController::class,'getOrganizations']);
-        Route::get('/sysadmin/employeeshares/org-programs', [EmployeeSharesController::class,'getPrograms']);
-        Route::get('/sysadmin/employeeshares/org-divisions', [EmployeeSharesController::class,'getDivisions']);
-        Route::get('/sysadmin/employeeshares/org-branches', [EmployeeSharesController::class,'getBranches']);
-        Route::get('/sysadmin/employeeshares/org-level4', [EmployeeSharesController::class,'getLevel4']);
+        Route::get('/sysadmin/employeeshares/org-tree', [EmployeeSharesController::class,'loadOrganizationTree'])->name('sysadmin.employeeshares.org-tree');
+        Route::get('/sysadmin/employeeshares/org-organizations', [EmployeeSharesController::class,'getOrganizations'])->name('sysadmin.employeeshares.org-organizations');
+        Route::get('/sysadmin/employeeshares/org-programs', [EmployeeSharesController::class,'getPrograms'])->name('sysadmin.employeeshares.org-programs');
+        Route::get('/sysadmin/employeeshares/org-divisions', [EmployeeSharesController::class,'getDivisions'])->name('sysadmin.employeeshares.org-divisions');
+        Route::get('/sysadmin/employeeshares/org-branches', [EmployeeSharesController::class,'getBranches'])->name('sysadmin.employeeshares.org-branches');
+        Route::get('/sysadmin/employeeshares/org-level4', [EmployeeSharesController::class,'getLevel4'])->name('sysadmin.employeeshares.org-level4');
         Route::get('/sysadmin/employeeshares/employee-list', [EmployeeSharesController::class, 'getDatatableEmployees'])->name('sysadmin.employeeshares.employee.list');
         Route::get('/sysadmin/employeeshares/employees/{id}', [EmployeeSharesController::class,'getEmployees']);
 
@@ -201,11 +196,8 @@ Route::group(['middleware' => ['role:Sys Admin']], function () {
         Route::get('/sysadmin/employeeshares/eorg-level4', [EmployeeSharesController::class,'egetLevel4']);
         Route::get('/sysadmin/employeeshares/eemployee-list', [EmployeeSharesController::class, 'egetDatatableEmployees'])->name('sysadmin.employeeshares.eemployee.list');
         Route::get('/sysadmin/employeeshares/eemployees/{id}', [EmployeeSharesController::class,'egetEmployees']);
-
-        Route::get('/sysadmin/employeeshares/addnew', [EmployeeSharesController::class, 'addnew'])->name('sysadmin.employeeshares.addnew');
-
     });
-  
+
 
     //Access and Permissions
     Route::group(['middleware' => ['auth']], function() {    
@@ -241,26 +233,23 @@ Route::group(['middleware' => ['role:Sys Admin']], function () {
         Route::get('sysadmin/accesspermissions/accessedit/{id}', [AccessPermissionsController::class, 'manageEdit'])->name('sysadmin.accesspermissions.accessedit');
         Route::post('sysadmin/accesspermissions/accessupdate/{id}', [AccessPermissionsController::class, 'manageUpdate']);
     });
+
+
+    Route::get('/sysadmin/org-organizations', [SysadminController::class,'getOrganizations']);
+    Route::get('/sysadmin/org-programs', [SysadminController::class,'getPrograms']);
+    Route::get('/sysadmin/org-divisions', [SysadminController::class,'getDivisions']);
+    Route::get('/sysadmin/org-branches', [SysadminController::class,'getBranches']);
+    Route::get('/sysadmin/org-level4', [SysadminController::class,'getLevel4']);
+
+    
+    Route::get('sysadmin/level0', 'App\Http\Controllers\SysadminController@getOrgLevel0')->name('sysadmin.level0');
+    Route::get('sysadmin/level1/{id0}', 'App\Http\Controllers\SysadminController@getOrgLevel1')->name('sysadmin.level1');
+    Route::get('sysadmin/level2/{id0}/{id1}', 'App\Http\Controllers\SysadminController@getOrgLevel2')->name('sysadmin.level2');
+    Route::get('sysadmin/level3/{id0}/{id1}/{id2}', 'App\Http\Controllers\SysadminController@getOrgLevel3')->name('sysadmin.level3');
+    Route::get('sysadmin/level4/{id0}/{id1}/{id2}/{id3}', 'App\Http\Controllers\SysadminController@getOrgLevel4')->name('sysadmin.level4');
+        
+
+    Route::get('sysadmin/switch-identity', [SysadminController::class, 'switchIdentity'])->name('sysadmin.switch-identity');
+    Route::get('sysadmin/identity-list', [SysadminController::class, 'identityList'])->name('sysadmin.identity-list');    
+    Route::get('sysadmin/switch-identity-action', [SysadminController::class, 'switchIdentityAction'])->name('sysadmin.switch-identity-action');
 });
-
-
-Route::get('/sysadmin/org-organizations', [SysadminController::class,'getOrganizations']);
-Route::get('/sysadmin/org-programs', [SysadminController::class,'getPrograms']);
-Route::get('/sysadmin/org-divisions', [SysadminController::class,'getDivisions']);
-Route::get('/sysadmin/org-branches', [SysadminController::class,'getBranches']);
-Route::get('/sysadmin/org-level4', [SysadminController::class,'getLevel4']);
-
-
-Route::get('sysadmin/level0', 'App\Http\Controllers\SysadminController@getOrgLevel0')->name('sysadmin.level0');
-Route::get('sysadmin/level1/{id0}', 'App\Http\Controllers\SysadminController@getOrgLevel1')->name('sysadmin.level1');
-Route::get('sysadmin/level2/{id0}/{id1}', 'App\Http\Controllers\SysadminController@getOrgLevel2')->name('sysadmin.level2');
-Route::get('sysadmin/level3/{id0}/{id1}/{id2}', 'App\Http\Controllers\SysadminController@getOrgLevel3')->name('sysadmin.level3');
-Route::get('sysadmin/level4/{id0}/{id1}/{id2}/{id3}', 'App\Http\Controllers\SysadminController@getOrgLevel4')->name('sysadmin.level4');
-
-
-
-    
-Route::get('sysadmin/switch-identity', [SysadminController::class, 'switchIdentity'])->name('sysadmin.switch-identity');
-Route::get('sysadmin/identity-list', [SysadminController::class, 'identityList'])->name('sysadmin.identity-list');    
-Route::get('sysadmin/switch-identity-action', [SysadminController::class, 'switchIdentityAction'])->name('sysadmin.switch-identity-action');
-    

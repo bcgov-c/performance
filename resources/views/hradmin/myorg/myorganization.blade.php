@@ -9,7 +9,7 @@
         <div class="card-body">            
             @include('hradmin.myorg.partials.filter')
             <p></p>
-            <table class="table table-bordered myorgtable" id="myorgtable" style="width: 100%; overflow-x: auto; "></table>
+            <table class="table table-bordered myorgtable table-striped" id="myorgtable" style="width: 100%; overflow-x: auto; "></table>
         </div>    
     </div>   
 

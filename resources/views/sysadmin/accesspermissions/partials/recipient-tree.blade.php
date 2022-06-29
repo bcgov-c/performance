@@ -390,7 +390,7 @@ $(document).ready(function() {
         
         if($.trim($(target).html())=='') {
             $.ajax({
-                url: '/sysadmin/goalbank/employees/' + tree_id,
+                url: '/'+'{{ request()->segment(1) }}'+'/accesspermissions/employees/'+tree_id,
                 type: 'GET',
                 data: $("#notify-form").serialize(),
                 dataType: 'html',

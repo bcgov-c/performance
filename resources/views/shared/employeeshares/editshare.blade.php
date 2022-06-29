@@ -5,7 +5,7 @@
         </div>
     </div>
 
-	<small><a href=" {{ route($request->segment(1).'.employeeshare.manageindex') }}" class="btn btn-md btn-primary"><i class="fa fa-arrow-left"></i> Back to Manage Existing Employee Shares</a></small>
+	<small><a href=" {{ route(request()->segment(1).'.employeeshare.manageindex') }}" class="btn btn-md btn-primary"><i class="fa fa-arrow-left"></i> Back to Manage Existing Employee Shares</a></small>
 
 	<br><br>
 
@@ -14,7 +14,7 @@
 	<p class="px-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tincidunt, nibh nec interdum fermentum, est metus rutrum elit, in molestie ex massa ut urna. Duis dignissim tortor ipsum, dignissim rutrum quam gravida sed. Mauris auctor malesuada luctus. Praesent vitae ante et diam gravida lobortis. Donec eleifend euismod scelerisque. Curabitur laoreet erat sit amet tortor rutrum tristique. Sed lobortis est ac mauris lobortis euismod. Morbi tincidunt porta orci eu elementum. Donec lorem lacus, hendrerit a augue sed, tempus rhoncus arcu. Praesent a enim vel eros elementum porta. Nunc ut leo eu augue dapibus efficitur ac ac risus. Maecenas risus tellus, tincidunt vitae finibus vel, ornare vel neque. Curabitur imperdiet orci ac risus tempor semper. Integer nec varius urna, sit amet rhoncus diam. Aenean finibus, sapien eu placerat tristique, sapien dui maximus neque, id tempor dui magna eget lorem. Suspendisse egestas mauris non feugiat bibendum.</p>
 	<p class="px-3">Cras quis augue quis risus auctor facilisis quis ac ligula. Fusce vehicula consequat dui, et egestas augue sodales aliquam. In hac habitasse platea dictumst. Curabitur sit amet nulla nibh. Morbi mollis malesuada diam ut egestas. Pellentesque blandit placerat nisi ac facilisis. Vivamus consequat, nisl a lacinia ultricies, velit leo consequat magna, sit amet condimentum justo nibh id nisl. Quisque mattis condimentum cursus. Nullam eget congue augue, a molestie leo. Aenean sollicitudin convallis arcu non maximus. Curabitur ut lacinia nisi. Nam cursus venenatis lacus aliquet dapibus. Nulla facilisi.</p>
 
-	<form id="notify-form" action="{{ route($request->segment(1).'.employeeshare.updategoal') }}" method="post">
+	<form id="notify-form" action="{{ route(request()->segment(1) . '.employeeshare.updategoal') }}" method="post">
 		@csrf
 
 		<br>
@@ -209,7 +209,7 @@
 						stateSave: true,
 						deferRender: true,
 						ajax: {
-							url: "{{ route($request->segment(1).'.goalbank.getgoalorgs', $goaldetail->id) }}",
+							url: "{{ route(request()->segment(1) . '.goalbank.getgoalorgs', $goaldetail->id) }}",
 							data: function(d) {
 								d.dd_level0 = $('#dd_level0').val();
 								d.dd_level1 = $('#dd_level1').val();
@@ -251,7 +251,7 @@
 							stateSave: true,
 							deferRender: true,
 							ajax: {
-								url: "{{ route($request->segment(1).'.goalbank.getgoalorgs', $goaldetail->id) }}",
+								url: "{{ route(request()->segment(1) . '.goalbank.getgoalorgs', $goaldetail->id) }}",
 								type: 'GET',
 								data: function(d) {
 									d.dd_level0 = $('#dd_level0').val();
@@ -327,7 +327,6 @@
 				});
 
 				$('#notify-form').submit(function() {
-					// console.log('Search Button Clicked');			
 					// assign back the selected employees to server
 					var text = JSON.stringify(g_selected_employees);
 					$('#selected_emp_ids').val( text );
@@ -357,7 +356,7 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                                    url: $request->segment(1).'/goalbank/org-tree',
+                                    url: request()->segment(1) . '/goalbank/org-tree',
                                     type: 'GET',
                                     data: $("#notify-form").serialize(),
                                     dataType: 'html',
@@ -430,7 +429,6 @@
 
 				function eredrawTreeCheckboxes() {
 					// redraw the selection 
-					//console.log('eredraw triggered');
 					enodes = $('#eaccordion-level0 input:checkbox');
 					$.each( enodes, function( index, chkbox ) {
 						if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
@@ -583,8 +581,7 @@
 						// To do -- ajax called to load the tree
 						$.when( 
 							$.ajax({
-								url: $request->segment(1).'/goalbank/eorg-tree',
-								// url: $url,
+								url: request()->segment(1) . '/goalbank/eorg-tree',
 								type: 'GET',
 								data: $("#notify-form").serialize(),
 								dataType: 'html',

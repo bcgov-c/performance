@@ -8,10 +8,10 @@
 
     <div class="card">
         <div class="card-body">
-            <div class="h4">{{__('Manage Existing Excused')}}</div>
+            {{-- <div class="h4">{{__('Manage Existing Excused')}}</div> --}}
             @include('shared.excuseemployees.partials.filter')
             <div class="p-3">  
-                <table class="table table-bordered filtertable" id="filtertable" style="width: 100%; overflow-x: auto; "></table>
+                <table class="table table-bordered filtertable table-striped" id="filtertable" style="width: 100%; overflow-x: auto; "></table>
             </div>
         </div>    
     </div>   
@@ -37,6 +37,7 @@
                     text-overflow: ellipsis;
                     width: 5em;
                 }
+                
                 #filtertable_filter label {
                     text-align: right !important;
                 }
@@ -62,7 +63,7 @@
                         stateSave: true,
                         deferRender: true,
                         ajax: {
-                            url: "{{ route('sysadmin.excuseemployees.manageindexlist') }}",
+                            url: "{{ route(request()->segment(1).'.excuseemployees.manageindexlist') }}",
                             data: function(d) {
                                 d.dd_level0 = $('#dd_level0').val();
                                 d.dd_level1 = $('#dd_level1').val();

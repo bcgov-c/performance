@@ -296,17 +296,17 @@ return [
                 ],
                 [
                     'text' => 'Share Employees',
-                    'url'  => 'hradmin/employeeshares/addnew',
+                    'url'  => 'hradmin/employeeshares',
                     'active' => ['hradmin/employeeshares/*']
                 ],
                 [
                     'text' => 'Excuse Employees',
-                    'url'  => 'hradmin/excuseemployees/addindex',
+                    'url'  => 'hradmin/excuseemployees',
                     'active' => ['hradmin/excuseemployees/*']
                 ],
                 [
                     'text' => 'Goal Bank',
-                    'url'  => 'hradmin/goalbank/creategoal',
+                    'url'  => 'hradmin/goalbank',
                     'active' => ['hradmin/goalbank/*']
                 ],
                 // [
@@ -332,22 +332,22 @@ return [
             'submenu' => [
                 [
                     'text' => 'Employee List',
-                    'url'  => 'sysadmin/employeelists/currentlist',
+                    'url'  => 'sysadmin/employeelists',
                     'active' => ['sysadmin/employeelists/*']
                 ],
                 [
                     'text' => 'Share Employees',
-                    'url'  => 'sysadmin/employeeshares/addnew',
+                    'url'  => 'sysadmin/employeeshares',
                     'active' => ['sysadmin/employeeshares/*']
                 ],
                 [
                     'text' => 'Excuse Employees',
-                    'url'  => 'sysadmin/excuseemployees/addindex',
+                    'url'  => 'sysadmin/excuseemployees',
                     'active' => ['sysadmin/excuseemployees/*']
                 ],
                 [
                     'text' => 'Goal Bank',
-                    'url'  => 'sysadmin/goalbank/creategoal',
+                    'url'  => 'sysadmin/goalbank',
                     'active' => ['sysadmin/goalbank/*']
                 ],
                 [
@@ -365,7 +365,7 @@ return [
                 // ],
                 [
                     'text' => 'Access and Permissions',
-                    'url'  => 'sysadmin/accesspermissions/index',
+                    'url'  => 'sysadmin/accesspermissions',
                     'active' => ['sysadmin/accesspermissions/*']
                 ],
                 [

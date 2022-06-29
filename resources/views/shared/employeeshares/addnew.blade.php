@@ -378,8 +378,6 @@
                 });
 
 				$('#share-form').submit(function() {
-					// console.log('Search Button Clicked');			
-
 					// assign back the selected employees to server
 					var text = JSON.stringify(g_selected_employees);
 					$('#selected_emp_ids').val( text );
@@ -412,22 +410,22 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                                    url: '/hradmin/employeeshares/org-tree',
+                                    url: "{{ '/' . request()->segment(1) . '/employeeshares/org-tree' }}",
                                     type: 'GET',
                                     data: $("#share-form").serialize(),
                                     dataType: 'html',
-                                    // beforeSend: function() {
-                                    //     $("#tree-loading-spinner").show();                    
-                                    // },
+                                    beforeSend: function() {
+                                        $("#tree-loading-spinner").show();                    
+                                    },
                                     success: function (result) {
                                         $(target).html(''); 
                                         $(target).html(result);
 
                                         $('#nav-tree').attr('loaded','loaded');
                                     },
-                                    // complete: function() {
-                                    //     $(".tree-loading-spinner").hide();
-                                    // },
+                                    complete: function() {
+                                        $(".tree-loading-spinner").hide();
+                                    },
                                     error: function () {
                                         alert("error");
                                         $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
@@ -456,22 +454,22 @@
                         if($.trim($(etarget).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                                    url: '/hradmin/employeeshares/org-tree',
+                                    url: "{{ '/' . request()->segment(1) . '/employeeshares/eorg-tree' }}",
                                     type: 'GET',
                                     data: $("share-form").serialize(),
                                     dataType: 'html',
-                                    // beforeSend: function() {
-                                    //     $("#etree-loading-spinner").show();                    
-                                    // },
+                                    beforeSend: function() {
+                                        $("#etree-loading-spinner").show();                    
+                                    },
                                     success: function (result) {
                                         $(etarget).html(''); 
                                         $(etarget).html(result);
 
                                         $('#enav-tree').attr('loaded','loaded');
                                     },
-                                    // complete: function() {
-                                    //     $(".etree-loading-spinner").hide();
-                                    // },
+                                    complete: function() {
+                                        $(".etree-loading-spinner").hide();
+                                    },
                                     error: function () {
                                         alert("error");
                                         $(etarget).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
@@ -495,16 +493,12 @@
 
                 function redrawTreeCheckboxes() {
                     // redraw the selection 
-                    //console.log('redraw triggered');
                     nodes = $('#accordion-level0 input:checkbox');
                     $.each( nodes, function( index, chkbox ) {
                         if (g_employees_by_org.hasOwnProperty(chkbox.value)) {
-                            // console.log( 'org checkbox ' + chkbox.value);
 
                             all_emps = g_employees_by_org[ chkbox.value ].map( function(x) {return x.employee_id} );
 
-                            // console.log(all_emps);
-                            // console.log(g_selected_employees);
                             b = all_emps.every(v=> g_selected_employees.indexOf(v) !== -1);
 
                             if (all_emps.every(v=> g_selected_employees.indexOf(v) !== -1)) {
@@ -536,9 +530,7 @@
                             pid = $(chkbox).attr('pid');
                             do {
                                 value = '#orgCheck' + pid;
-                                //console.log(  value );
                                 toggle_indeterminate( value );
-                                //console.log("parent : " + pid);                
                                 pid = $('#orgCheck' + pid).attr('pid');    
                             } 
                             while (pid);
@@ -549,16 +541,12 @@
 
                 function eredrawTreeCheckboxes() {
                     // redraw the selection 
-                    //console.log('redraw triggered');
                     nodes = $('#eaccordion-level0 input:checkbox');
                     $.each( nodes, function( index, chkbox ) {
                         if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
-                            // console.log( 'org checkbox ' + chkbox.value);
 
                             all_emps = eg_employees_by_org[ chkbox.value ].map( function(x) {return x.employee_id} );
 
-                            // console.log(all_emps);
-                            // console.log(g_selected_employees);
                             b = all_emps.every(v=> eg_selected_employees.indexOf(v) !== -1);
 
                             if (all_emps.every(v=> eg_selected_employees.indexOf(v) !== -1)) {
@@ -590,9 +578,7 @@
                             pid = $(chkbox).attr('pid');
                             do {
                                 value = '#eorgCheck' + pid;
-                                //console.log(  value );
                                 etoggle_indeterminate( value );
-                                //console.log("parent : " + pid);                
                                 pid = $('#eorgCheck' + pid).attr('pid');    
                             } 
                             while (pid);

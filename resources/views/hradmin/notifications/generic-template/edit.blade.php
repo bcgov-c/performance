@@ -146,7 +146,7 @@
             {{--  Detail -- Bind Variables --}}
             <div class="my-4">
                 <h5>Template Varaiables</h5> 
-                <table class="table" id="binds_table">
+                <table class="table table-striped" id="binds_table">
                     <thead>
                     <tr>
                         <th class="col-2">Value</th>

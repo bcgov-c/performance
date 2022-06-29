@@ -13,7 +13,7 @@
     <div class="card">
         <div class="card-body">
             <h6></h6>
-            <table class="table table-bordered" id="employee-list-table">
+            <table class="table table-bordered table-striped" id="employee-list-table">
                 <thead>
                     <tr>
                         <th><input name="select_all" value="1" id="employee-list-select-all" type="checkbox" /></th>
