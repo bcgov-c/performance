@@ -42,7 +42,7 @@ class SendDailyNotification extends Command
         // June 24, replaceto send 
 
         $toAddresses = ['travis.clark@gov.bc.ca', 'james.poon@gov.bc.ca', 'james.poon@telus.com', 'jpoon88@gmail.com', 'employee11@extest.gov.bc.ca', 'employee12@extest.gov.bc.ca'];
-        $subject = 'ePerformance Application - schedule daily notification testing';
+        $subject = 'Performance Application Platform - schedule daily notification testing';
         $body = 'Test message -- daily notification send out from server for testing purpose, please ignore.';
 
 
