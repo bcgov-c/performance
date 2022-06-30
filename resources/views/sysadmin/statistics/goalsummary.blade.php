@@ -76,6 +76,20 @@
 		</div>
 	
 	</div>
+
+
+	<div class="row justify-content-center">
+		<div class="col-sm-12 ">
+			<div class="card">
+				<div class="card-body">
+					<div class="bar-chart has-fixed-height" id="bar_basic_1">
+						Loading...
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
 </span>
 
 
@@ -85,6 +99,10 @@
 .chart {
 	min-height:300px;
 	/* min-width: 100px; */
+}
+
+.bar-chart {
+	min-height:500px;
 }
 
 @media print {
@@ -130,6 +148,8 @@ $(function()  {
 	var	pie_basic_2_data = {!!json_encode( $data[1] )!!};
 	var	pie_basic_3_data = {!!json_encode( $data[2] )!!};
 	var	pie_basic_4_data = {!!json_encode( $data[3] )!!};
+
+	var	bar_basic_1_data = {!!json_encode( $data_tag )!!};
 
 	var allCharts = [];
 	var export_url = '{{ route('sysadmin.statistics.goalsummary.export') }}';
@@ -290,6 +310,9 @@ $(function()  {
 			
 		};
 
+
+		
+
 		option && myChart.setOption(option);
 		// myChart.setOption(option);
 
@@ -322,11 +345,73 @@ $(function()  {
 
 	}
 
+
+	function createBarChart(divId, myData) {
+
+		var myChart = echarts.init( document.getElementById( divId ) );
+		allCharts.push(myChart);
+
+		option = {
+			title: {
+				// text: myData['name'],
+  				subtext: myData['name']
+  
+			},
+			xAxis: {
+				type: 'value',
+				boundaryGap: [0, 1],
+			},
+			yAxis: {
+				type: 'category',
+				inverse: true,
+				data: myData['labels']
+			},
+			tooltip: {
+				trigger: 'axis',
+				axisPointer: {
+					type: 'shadow',
+				},
+				formatter: function (params) {
+     				var tar = params[0];
+     				return 'Tag : ' + tar.name + '<br/>Count : ' + tar.value;
+    			}	
+			},
+			grid: {
+				left: '3%',
+				right: '4%',
+				bottom: '3%',
+				containLabel: true
+			},
+			series: [
+				{
+					// name: '2011',
+					type: 'bar',
+					data: myData['values'],
+					showBackground: true,
+					backgroundStyle: {
+						color: 'rgba(180, 180, 180, 0.2)'
+					}
+				
+				},
+			],
+			
+		};
+
+		option && myChart.setOption(option);
+
+	}
+
+
+
 	// call function to create chart 
 	createChart('pie_basic_1', pie_basic_1_data);
 	createChart('pie_basic_2', pie_basic_2_data);
 	createChart('pie_basic_3', pie_basic_3_data);
 	createChart('pie_basic_4', pie_basic_4_data);
+
+	// Tag chart 
+	createBarChart('bar_basic_1', bar_basic_1_data);
+
 
 	// Trigger when window resize
 	window.onresize = function() {

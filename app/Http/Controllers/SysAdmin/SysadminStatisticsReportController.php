@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\SysAdmin;
 
+use stdClass;
+use App\Models\Tag;
 use App\Models\Goal;
 use App\Models\User;
 use App\Models\GoalType;
@@ -58,7 +60,8 @@ class SysadminStatisticsReportController extends Controller
 
     public function goalSummary(Request $request)
     {
-       
+
+  
         // send back the input parameters
         $this->preservedInputParams($request);
 
@@ -152,8 +155,70 @@ class SysadminStatisticsReportController extends Controller
 
         }
 
-        return view('sysadmin.statistics.goalsummary',compact('data'));
+        // Goal Tag count 
+        $count_raw = "id, name, ";
+        $count_raw .= " (select count(*) from goal_tags, goals, users, employee_demo ";
+        $count_raw .= "   where goals.id = goal_tags.goal_id "; 
+	    $count_raw .= "     and tag_id = tags.id ";  
+        $count_raw .= "     and users.id = goals.user_id ";
+        $count_raw .= "     and users.employee_id = employee_demo.employee_id ";
+        $count_raw .= $level0 ? "     and employee_demo.organization = '". addslashes($level0->name) ."'" : '';
+        $count_raw .= $level1 ? "     and employee_demo.level1_program = '". addslashes($level1->name) ."'" : '';
+        $count_raw .= $level2 ? "     and employee_demo.level2_division = '". addslashes($level2->name) ."'" : '';
+        $count_raw .= $level3 ? "     and employee_demo.level3_branch = '". addslashes($level3->name) ."'" : '';
+        $count_raw .= $level4 ? "     and employee_demo.level4 = '". addslashes($level4->name) ."'" : '';
+        $count_raw .= ") as count";
+
+        $sql = Tag::selectRaw($count_raw);
+        $sql2 = Goal::join('users', function($join) {
+                    $join->on('goals.user_id', '=', 'users.id');
+                })
+                ->join('employee_demo', function($join) {
+                    $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                    // $join->on('employee_demo.empl_record', '=', 'A.empl_record');
+                })
+                ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.organization', $level0->name);
+                })
+                ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level1_program', $level1->name);
+                })
+                ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level2_division', $level2->name);
+                })
+                ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level3_branch', $level3->name);
+                })
+                ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level4', $level4->name);
+                })
+                ->whereNotExists(function ($query) {
+                    $query->select(DB::raw(1))
+                          ->from('goal_tags')
+                          ->whereColumn('goals.id', 'goal_tags.goal_id');
+                });
+
+        $tags = $sql->get();
+        $blank_count = $sql2->count();
+        
+        $data_tag = [ 
+            'name' => 'Active Goal Tags',
+            'labels' => [],
+            'values' => [],
+        ];
+
+        // each group 
+        array_push($data_tag['labels'], '[Blank]');  
+        array_push($data_tag['values'], $blank_count);
+        foreach($tags as $key => $tag)
+        {
+            array_push($data_tag['labels'], $tag->name);  
+            array_push($data_tag['values'], $tag->count);
+        }
+
+        return view('sysadmin.statistics.goalsummary',compact('data', 'data_tag'));
     }
+
 
     public function goalSummaryExport(Request $request)
     {
