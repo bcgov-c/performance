@@ -472,7 +472,6 @@
                     , success: function(result) {
                         $("#viewConversationModal").find('textarea').prop('disable', false);
                         isSupervisor = result.view_as_supervisor;
-                        //alert('isSupervisor ' + isSupervisor);
                         $('#conv_participant_edit').val('');
                         $('#conv_participant').val('');
                         $('#conv_title').text(result.topic.name);
