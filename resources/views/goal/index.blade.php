@@ -1,6 +1,12 @@
 <x-side-layout>
     <x-slot name="header">
-        <h3>My Goals</h3>
+        <h3>
+        @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
+              My Goals
+          @else
+              {{ $user->name }}'s Goals
+          @endif
+        </h3>
         @include('goal.partials.tabs')
     </x-slot>
     @if($type != 'supervisor' && !$disableEdit)

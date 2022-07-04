@@ -55,6 +55,7 @@
             @if($user->hasRole('Supervisor'))
             <b class="p-2">Conversations with My Team</b>
             @forelse ($myTeamConversations as $c)
+            @if (!in_array($c->id, $supervisor_conversations)) 
             <div class="col-12 col-md-12">
                 <div class="d-flex callout callout-info">
                     <div class="flex-fill btn-view-conversation"  style="cursor: pointer;" data-id="{{ $c->id }}" data-toggle="modal" data-target="#viewConversationModal">
@@ -77,7 +78,8 @@
                         </button>
                     </div>
                 </div>
-            </div>
+            </div>            
+            @endif
             @empty
                 <div class="col-12 text-center">
                     No Conversations
@@ -469,7 +471,7 @@
                     url: '/conversation/' + conversation_id
                     , success: function(result) {
                         $("#viewConversationModal").find('textarea').prop('disable', false);
-                        isSupervisor = !result.is_with_supervisor;
+                        isSupervisor = !result.view_as_supervisor;
                         $('#conv_participant_edit').val('');
                         $('#conv_participant').val('');
                         $('#conv_title').text(result.topic.name);
@@ -529,7 +531,6 @@
                             $('#employee-signoff-message').find('.time').html("on " + result.sign_off_time);
                             $('#supervisor-signoff-message').find('.time').html("on " + result.supervisor_signoff_time);
                             $("textarea.supervisor-comment").addClass('enable-not-allowed').prop('readonly', true);
-                            
                             if (result.conversation_topic_id == 3) {
                                 $("textarea.info_comment2").addClass('enable-not-allowed').prop('readonly', true); 
                                 $("textarea.info_comment6").addClass('enable-not-allowed').prop('readonly', true);
@@ -550,7 +551,6 @@
                             $('#employee-signoff-message').find('.time').html("on " + result.sign_off_time);
                             $('#supervisor-signoff-message').find('.time').html("on " + result.supervisor_signoff_time);
                             $("textarea.employee-comment").addClass('enable-not-allowed').prop('readonly', true);
-                            
                             if (result.conversation_topic_id == 3) {
                                 $("textarea.info_comment1").addClass('enable-not-allowed').prop('readonly', true);    
                                 $("textarea.info_comment3").addClass('enable-not-allowed').prop('readonly', true);
