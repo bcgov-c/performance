@@ -294,6 +294,7 @@
 
             $('#dd_level4').on('select2:select', function (e) {
                 e.preventDefault();
+                $('#btn_search').click();
             });
 
             $('#dd_level0').on('select2:unselect', function (e) {

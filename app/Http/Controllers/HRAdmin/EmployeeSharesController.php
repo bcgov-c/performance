@@ -1237,11 +1237,11 @@ class EmployeeSharesController extends Controller
 
     public function manageindexlist(Request $request) {
         if ($request->ajax()) {
-            $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-            $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-            $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-            $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-            $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+            $level0 = $request->dd_level0 ? OrganizationTree::where('organization_trees.id', $request->dd_level0)->first() : null;
+            $level1 = $request->dd_level1 ? OrganizationTree::where('organization_trees.id', $request->dd_level1)->first() : null;
+            $level2 = $request->dd_level2 ? OrganizationTree::where('organization_trees.id', $request->dd_level2)->first() : null;
+            $level3 = $request->dd_level3 ? OrganizationTree::where('organization_trees.id', $request->dd_level3)->first() : null;
+            $level4 = $request->dd_level4 ? OrganizationTree::where('organization_trees.id', $request->dd_level4)->first() : null;
 
             $query = User::withoutGlobalScopes()
             ->join('shared_profiles', 'shared_profiles.shared_id', '=', 'users.id')
@@ -1286,8 +1286,8 @@ class EmployeeSharesController extends Controller
             } )
             ->where('ao1.user_id', '=', Auth::id())
             ->where('ao2.user_id', '=', Auth::id())
-            ->when($level0, function($q) use($level0) {return $q->where('employee_demo.organization', $level0->name);})
-            ->when($level1, function($q) use($level1) {return $q->where('employee_demo.level1_program', $level1->name);})
+            ->when($level0, function($q) use($level0) {return $q->where('employee_demo.organization', '=', $level0->name);})
+            ->when($level1, function($q) use($level1) {return $q->where('employee_demo.level1_program', '=', $level1->name);})
             ->when($level2, function($q) use($level2) {return $q->where('employee_demo.level2_division', $level2->name);})
             ->when($level3, function($q) use($level3) {return $q->where('employee_demo.level3_branch', $level3->name);})
             ->when($level4, function($q) use($level4) {return $q->where('employee_demo.level4', $level4->name);})
