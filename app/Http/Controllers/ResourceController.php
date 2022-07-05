@@ -20,20 +20,24 @@ class ResourceController extends Controller
         $data = [
             [
                 'question' => 'What is goal setting?',
-                'answer' => 'Goal setting is a process of working towards what you want to do or who you want to be.'
+                'answer' => 'Goal setting is a process of working towards what we want to do or who we want to be. Employees and supervisors should collaborate and communicate openly on what goals should be and how they can be achieved.'
             ],
             [
                 'question' => 'Why are goals important?',
                 'answer_file' => '2'
             ],
             [
-                'question' => 'Elements of effective goals(the Five C’s)',
+                'question' => 'SMART and HARD goal setting frameworks',
                 'answer_file' => '3'
             ],
             [
                 'question' => 'What does a good goal statement look like?',
                 'answer_file' => '4'
             ],
+            [
+                'question' => 'Tips on how to get started',
+                'answer_file' => '9'
+            ],            
             [
                 'question' => 'What are goal tags?',
                 'answer_file' => '8'
@@ -58,7 +62,7 @@ class ResourceController extends Controller
       $data = [
           [
               'question' => 'What is a performance development conversation?',
-              'answer' => 'Any conversation about an employee and their work can be considered a performance development conversation. They can be informal check-ins, regular 1-on-1’s, recognition for a job well done, feedback, or more formal conversations when trying to modify an employee’s behaviour.'
+              'answer' => "Any conversation about an employee and their work can be considered a performance development conversation. They can be informal check-ins, regular 1-on-1's, recognition for a job well done, feedback, or more formal conversations when trying to modify behaviour."
           ],
           [
               'question' => 'Why are conversations important?',
@@ -76,6 +80,10 @@ class ResourceController extends Controller
               'question' => 'Elements of effective feedback',
               'answer_file' => '5'
           ],
+          [
+            'question' => 'How to use the conversation templates',
+            'answer_file' => '6'
+        ],          
       ];
          return view('resource.conversations', compact('data'));
     }
