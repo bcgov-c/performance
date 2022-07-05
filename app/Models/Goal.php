@@ -31,7 +31,8 @@ class Goal extends Model implements Auditable
     'created_at',
     'updated_at',
     'is_library',
-    'is_mandatory'
+    'is_mandatory',
+    'by_admin'
   ];
 
 
