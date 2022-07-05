@@ -44,7 +44,10 @@
         <div class="card-footer align-items-center">
             @if(!session()->has('view-profile-as')) 
             @if(Auth::user()->reporteesCount() > 0 && (request()->is('goal/current') || request()->is('goal/library')))
+                <div>
                 @include('goal.partials.goal-share-with-dropdown')
+                <br><br>
+                </div>
             @endif
             @endif
             <div class="flex-fill"></div>
@@ -68,10 +71,10 @@
 
             @if(!$goal->is_library)
             <div>
-                @if(($type ?? '') !== 'supervisor' && !$disableEdit)                    
-                    Goal Status:&nbsp; 
+                @if(($type ?? '') !== 'supervisor' && !$disableEdit)                       
+                    Goal Status:&nbsp;&nbsp;  
                     <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="<b>Active</b> - Currently in progress or scheduled for a future date. <br><br><b>Achieved</b> - Supervisor and employee agree objectives met. <br><br><b>Not Met</b> - Substantial portion incomplete by end date. <br><br><b>Cancelled Or Deferred</b> - Shift in plans but want to archive goal for future reference."  ></i>                  
-                    @include('goal.partials.status-change')
+                    @include('goal.partials.status-change')                                     
                 @else
                     <x-goal-status :status="$goal->status"></x-goal-status>
                 @endif                
