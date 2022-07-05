@@ -1087,7 +1087,7 @@ class GoalBankController extends Controller
 
     }
 
-    public function updategoalone(Request $request) 
+    public function updategoalone(Request $request, $id) 
     {
         $request->auserCheck = $request->aselected_emp_ids;
         Log::info($request->aselected_emp_ids);
@@ -1095,7 +1095,7 @@ class GoalBankController extends Controller
         $request->auserCheck = $aselected_emp_ids;
         $aselected_org_nodes = $request->aselected_org_nodes ? json_decode($request->aselected_org_nodes) : [];
         $current_user = Auth::id();
-        $resultrec = Goal::withoutGlobalScopes()->findorfail( $request->goal_id );
+        $resultrec = Goal::withoutGlobalScopes()->findorfail( $id );
         // $resultrec->update(
         //     ['goal_type_id' => $request->input('goal_type_id')
         //     , 'title' => $request->input('title')
