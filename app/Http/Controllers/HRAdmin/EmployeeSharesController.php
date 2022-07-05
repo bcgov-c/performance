@@ -202,7 +202,7 @@ class EmployeeSharesController extends Controller
                 }
             }
         }
-        return redirect()->route(request()->segment(1).'.employeeshares.addnew')
+        return redirect()->route(request()->segment(1).'.employeeshares')
             ->with('success', 'Share user goal/conversation successful.');
     }
 
@@ -1250,6 +1250,42 @@ class EmployeeSharesController extends Controller
             ->leftjoin('employee_demo as e2', 'u2.guid', '=', 'e2.guid')
             ->leftjoin('users as cc', 'cc.id', '=', 'shared_profiles.shared_by')
             ->leftjoin('employee_demo as ec', 'cc.guid', '=', 'ec.guid')
+            ->join('admin_orgs as ao1', function ($j1) {
+                $j1->on(function ($j1a) {
+                    $j1a->whereRAW('ao1.organization = employee_demo.organization OR ((ao1.organization = "" OR ao1.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+                } )
+                ->on(function ($j2a) {
+                    $j2a->whereRAW('ao1.level1_program = employee_demo.level1_program OR ((ao1.level1_program = "" OR ao1.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+                } )
+                ->on(function ($j3a) {
+                    $j3a->whereRAW('ao1.level2_division = employee_demo.level2_division OR ((ao1.level2_division = "" OR ao1.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+                } )
+                ->on(function ($j4a) {
+                    $j4a->whereRAW('ao1.level3_branch = employee_demo.level3_branch OR ((ao1.level3_branch = "" OR ao1.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+                } )
+                ->on(function ($j5a) {
+                    $j5a->whereRAW('ao1.level4 = employee_demo.level4 OR ((ao1.level4 = "" OR ao1.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+                } );
+            } )
+            ->join('admin_orgs as ao2', function ($j1) {
+                $j1->on(function ($j1a) {
+                    $j1a->whereRAW('ao2.organization = e2.organization OR ((ao2.organization = "" OR ao2.organization IS NULL) AND (e2.organization = "" OR e2.organization IS NULL))');
+                } )
+                ->on(function ($j2a) {
+                    $j2a->whereRAW('ao2.level1_program = e2.level1_program OR ((ao2.level1_program = "" OR ao2.level1_program IS NULL) AND (e2.level1_program = "" OR e2.level1_program IS NULL))');
+                } )
+                ->on(function ($j3a) {
+                    $j3a->whereRAW('ao2.level2_division = e2.level2_division OR ((ao2.level2_division = "" OR ao2.level2_division IS NULL) AND (e2.level2_division = "" OR e2.level2_division IS NULL))');
+                } )
+                ->on(function ($j4a) {
+                    $j4a->whereRAW('ao2.level3_branch = e2.level3_branch OR ((ao2.level3_branch = "" OR ao2.level3_branch IS NULL) AND (e2.level3_branch = "" OR e2.level3_branch IS NULL))');
+                } )
+                ->on(function ($j5a) {
+                    $j5a->whereRAW('ao2.level4 = e2.level4 OR ((ao2.level4 = "" OR ao2.level4 IS NULL) AND (e2.level4 = "" OR e2.level4 IS NULL))');
+                } );
+            } )
+            ->where('ao1.user_id', '=', Auth::id())
+            ->where('ao2.user_id', '=', Auth::id())
             ->when($level0, function($q) use($level0) {return $q->where('employee_demo.organization', $level0->name);})
             ->when($level1, function($q) use($level1) {return $q->where('employee_demo.level1_program', $level1->name);})
             ->when($level2, function($q) use($level2) {return $q->where('employee_demo.level2_division', $level2->name);})
@@ -1300,7 +1336,7 @@ class EmployeeSharesController extends Controller
                 return $row->created_at ? $row->created_at->format('M d, Y H:i:s') : null;
             })
             ->editColumn('updated_at', function ($row) {
-                return $row->updated_at ? $row->updated_at->format('M D, Y H:i:s') : null;
+                return $row->updated_at ? $row->updated_at->format('M d, Y H:i:s') : null;
             })
             ->addcolumn('action', function($row) {
                 $btn = '<a href="' . route(request()->segment(1) . '.employeeshares.deleteshare', ['id' => $row->shared_profile_id]) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="' . $row->shared_profile_id . '"><i class="fa fa-trash"></i></a>';
