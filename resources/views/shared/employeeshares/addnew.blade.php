@@ -14,7 +14,7 @@
 		the supervisor you would like to share the profiles with, which elements you would like to share, and your reason 
 		for sharing the profile.</p>
 
-    <form id="share-form" action="{{ route(request()->segment(1).'.employeeshares.saveall') }}" method="post">
+    <form id="notify-form" action="{{ route(request()->segment(1).'.employeeshares.saveall') }}" method="post">
         @csrf
 
         <div class="container-fluid">
@@ -98,7 +98,7 @@
 
         <div class="container-fluid">
             <br>
-            <h6 class="text-bold">Step 4. Select selected profile(s)</h6>
+            <h6 class="text-bold">Step 4. Share selected profile(s)</h6>
             <br>
             <div class="col-md-3 mb-2">
                 <button class="btn btn-primary mt-2" type="submit" onclick="confirmSaveAllModal()" name="btn_send" value="btn_send">Share</button>
@@ -377,7 +377,7 @@
                     $('#eemployee-list-table').DataTable().rows().invalidate().draw();
                 });
 
-				$('#share-form').submit(function() {
+				$('#notify-form').submit(function() {
 					// assign back the selected employees to server
 					var text = JSON.stringify(g_selected_employees);
 					$('#selected_emp_ids').val( text );
