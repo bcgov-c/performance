@@ -90,7 +90,7 @@
                         return {
                             results: $.map(response.data.data, function (item) {
                                 return {
-                                    text: item.name,
+                                    text: item.name+(item.employee_id ? ' - '+item.employee_id : ''),
                                     id: item.id
                                 }
                             }),

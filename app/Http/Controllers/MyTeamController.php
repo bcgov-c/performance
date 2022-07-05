@@ -195,6 +195,7 @@ class MyTeamController extends Controller
     public function userList(Request $request) {
         $search = $request->search;
         return $this->respondeWith(User::where('name', 'LIKE', "%{$search}%")->paginate());
+        // return $this->respondeWith(User::leftjoin('employee_demo', 'employee_demo.guid', '=', 'users.guid')->where('name', 'LIKE', "%{$search}%")->paginate());
     }
 
     public function performanceStatistics()
