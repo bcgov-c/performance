@@ -1,7 +1,7 @@
 <x-side-layout title="{{ __('Dashboard') }}">
     <div name="header" class="container-header p-n2 "> 
         <div class="container-fluid">
-            <h3>Shared Employees</h3>
+            <h3>Share Employees</h3>
             @include('shared.employeeshares.partials.tabs')
         </div>
     </div>

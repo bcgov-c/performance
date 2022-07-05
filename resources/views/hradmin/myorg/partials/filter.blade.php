@@ -213,40 +213,121 @@
             }
         });
         
-        $('#dd_level0').on('select2:select', function (e) {
-            // Do something
-            $('#dd_level1').val(null).trigger('change');
-            $('#dd_level2').val(null).trigger('change');
-            $('#dd_level3').val(null).trigger('change');
-            $('#dd_level4').val(null).trigger('change');
-        });
+            $('#dd_level0').change(function (e){
+                e.preventDefault();
+            });
 
-        $('#dd_level1').on('select2:select', function (e) {
-            // Do something
-            $('#dd_level2').val(null).trigger('change');
-            $('#dd_level3').val(null).trigger('change');
-            $('#dd_level4').val(null).trigger('change');
-        });
+            $('#dd_level1').change(function (e){
+                e.preventDefault();
+            });
 
-        $('#dd_level2').on('select2:select', function (e) {
-            // Do something
-            $('#dd_level3').val(null).trigger('change');
-            $('#dd_level4').val(null).trigger('change');
-        });
+            $('#dd_level2').change(function (e){
+                e.preventDefault();
+            });
 
-        $('#dd_level3').on('select2:select', function (e) {
-            // Do something
-            $('#dd_level4').val(null).trigger('change');
-        });
+            $('#dd_level3').change(function (e){
+                e.preventDefault();
+            });
 
-        $('#btn_search_reset').click(function() {
-            $('#dd_level0').val(null).trigger('change');
-            $('#dd_level1').val(null).trigger('change');
-            $('#dd_level2').val(null).trigger('change');
-            $('#dd_level3').val(null).trigger('change');
-            $('#dd_level4').val(null).trigger('change');
-            $('#search_text').val(null);
-        });
+            $('#dd_level4').change(function (e){
+                e.preventDefault();
+                $('#btn_search').click();
+            });
+
+            $('#criteria').change(function (e){
+                e.preventDefault();
+                $('#btn_search').click();
+            });
+
+            $('#search_text').change(function (e){
+                e.preventDefault();
+                $('#btn_search').click();
+            });
+
+            $('#search_text').keydown(function (e){
+                if (e.keyCode == 13) {
+                    e.preventDefault();
+                    $('#btn_search').click();
+                }
+            });
+
+            $('#btn_search_reset').click(function (e){
+                e.preventDefault();
+                $('#criteria').val('all');
+                $('#search_text').val(null);
+                $('#dd_level0').val(null).trigger('change');
+                $('#dd_level1').val(null).trigger('change');
+                $('#dd_level2').val(null).trigger('change');
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level0').on('select2:select', function (e) {
+                e.preventDefault();
+                $('#dd_level1').val(null).trigger('change');
+                $('#dd_level2').val(null).trigger('change');
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level1').on('select2:select', function (e) {
+                e.preventDefault();
+                $('#dd_level2').val(null).trigger('change');
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level2').on('select2:select', function (e) {
+                e.preventDefault();
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level3').on('select2:select', function (e) {
+                e.preventDefault();
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level4').on('select2:select', function (e) {
+                e.preventDefault();
+            });
+
+            $('#dd_level0').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#dd_level0').val(null).trigger('change');
+                $('#dd_level1').val(null).trigger('change');
+                $('#dd_level2').val(null).trigger('change');
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level1').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#dd_level1').val(null).trigger('change');
+                $('#dd_level2').val(null).trigger('change');
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level2').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#dd_level2').val(null).trigger('change');
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level3').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level4').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#dd_level4').val(null).trigger('change');
+                $('#btn_search').click();
+            });
+
 
 
 

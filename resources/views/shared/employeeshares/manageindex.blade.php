@@ -1,7 +1,7 @@
 <x-side-layout title="{{ __('Dashboard') }}">
     <div name="header" class="container-header p-n2 "> 
         <div class="container-fluid">
-            <h3>Shared Employees</h3>
+            <h3>Share Employees</h3>
             @include('shared.employeeshares.partials.tabs')
         </div>
     </div>
@@ -107,7 +107,8 @@
                             , name: 'shared_profiles.created_at', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'Updated At', ariaTitle: 'Updated At', target: 0, type: 'string', data: 'updated_at'
                             , name: 'shared_profiles.updated_at', searchable: false, className: 'dt-nowrap show-modal'},
-                        {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false, className: 'dt-nowrap'},
+                        {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action'
+                            , name: 'action', orderable: false, searchable: false, className: 'dt-nowrap'},
                         {title: 'Shared Profile ID', ariaTitle: 'Shared Profile ID', target: 0, type: 'num', data: 'shared_profile_id'
                             , name: 'shared_profiles.shared_profile_id', searchable: false, visible: false},
                     ]
