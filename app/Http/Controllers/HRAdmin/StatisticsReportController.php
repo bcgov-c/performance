@@ -1260,6 +1260,12 @@ class StatisticsReportController extends Controller
             ->when( $request->q , function ($q) use($request) {
                 return $q->whereRaw("LOWER(name) LIKE '%" . strtolower($request->q) . "%'");
             })
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                      ->from('admin_orgs')
+                      ->whereColumn('admin_orgs.organization', 'organization_trees.organization')
+                      ->where('admin_orgs.user_id', '=', Auth::id() );
+            })
             ->get();
 
         $formatted_orgs = [];
@@ -1281,6 +1287,15 @@ class StatisticsReportController extends Controller
                 })
             ->when( $level0 , function ($q) use($level0) {
                 return $q->where('organization', $level0->name );
+            })
+            ->whereExists(function ($query) use($request) {
+                $query->select(DB::raw(1))
+                    ->from('admin_orgs')
+                    ->when( $request->level0, function ($q) { 
+                        return $q->whereColumn('admin_orgs.organization', 'organization_trees.organization');
+                    })
+                    ->whereColumn('admin_orgs.level1_program', 'organization_trees.level1_program')
+                    ->where('admin_orgs.user_id', '=', Auth::id() );
             })
             ->groupBy('name')
             ->get();
@@ -1308,6 +1323,18 @@ class StatisticsReportController extends Controller
             })
             ->when( $level1 , function ($q) use($level1) {
                 return $q->where('level1_program', $level1->name );
+            })
+            ->whereExists(function ($query) use($request) {
+                $query->select(DB::raw(1))
+                    ->from('admin_orgs')
+                    ->when( $request->level0, function ($q) { 
+                        return $q->whereColumn('admin_orgs.organization', 'organization_trees.organization');
+                    })
+                    ->when( $request->level1, function ($q) { 
+                        return $q->whereColumn('admin_orgs.level1_program', 'organization_trees.level1_program');
+                    })
+                    ->whereColumn('admin_orgs.level2_division', 'organization_trees.level2_division')
+                    ->where('admin_orgs.user_id', '=', Auth::id() );
             })
             ->groupBy('name')
             ->limit(300)
@@ -1341,6 +1368,22 @@ class StatisticsReportController extends Controller
             })
             ->when( $level2 , function ($q) use($level2) {
                 return $q->where('level2_division', $level2->name );
+            })
+            ->whereExists(function ($query) use($request) {
+                $query->select(DB::raw(1))
+                    ->from('admin_orgs')
+                    ->when( $request->level0, function ($q) { 
+                        return $q->whereColumn('admin_orgs.organization', 'organization_trees.organization');
+                    })
+                    ->when( $request->level1, function ($q) { 
+                        return $q->whereColumn('admin_orgs.level1_program', 'organization_trees.level1_program');
+                    })
+                    ->when( $request->level2, function ($q) { 
+                        return $q->whereColumn('admin_orgs.level2_division', 'organization_trees.level2_division');
+                    })
+                    ->whereColumn('admin_orgs.level3_branch',  'organization_trees.level3_branch')
+                    //   ->whereColumn('admin_orgs.level4', 'organization_trees.level4')
+                      ->where('admin_orgs.user_id', '=', Auth::id() );
             })
             ->groupBy('name')
             ->limit(300)
@@ -1377,6 +1420,24 @@ class StatisticsReportController extends Controller
             })
             ->when( $level3 , function ($q) use($level3) {
                 return $q->where('level3_branch', $level3->name );
+            })
+            ->whereExists(function ($query) use($request) {
+                $query->select(DB::raw(1))
+                    ->from('admin_orgs')
+                    ->when( $request->level0, function ($q) { 
+                        return $q->whereColumn('admin_orgs.organization', 'organization_trees.organization');
+                    })
+                    ->when( $request->level1, function ($q) { 
+                        return $q->whereColumn('admin_orgs.level1_program', 'organization_trees.level1_program');
+                    })
+                    ->when( $request->level2, function ($q) { 
+                        return $q->whereColumn('admin_orgs.level2_division', 'organization_trees.level2_division');
+                    })
+                    ->when( $request->level3, function ($q) { 
+                        return $q->whereColumn('admin_orgs.level3_branch',  'organization_trees.level3_branch');
+                    })
+                    ->whereColumn('admin_orgs.level4', 'organization_trees.level4')
+                    ->where('admin_orgs.user_id', '=', Auth::id() );
             })
             ->groupBy('name')
             ->limit(300)
