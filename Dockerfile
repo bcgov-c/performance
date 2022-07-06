@@ -33,7 +33,8 @@ RUN apt-get update -y && apt -y upgrade && apt-get install -y \
     zip \
     unzip \
     vim \
-    cron
+    cron \
+	sudo
 
 # Copy cron file to the cron.d directory
 COPY /laravelcron /etc/cron.d/laravelcron
