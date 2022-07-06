@@ -30,7 +30,7 @@
 
     <div id="idir-login" style="{{  $errors->has('email')  ? 'display:none;' : '' }}" >
         <div class="text-center py-3">
-                <p class="h6 font-weight-bold">Log in to start your session<p>
+                <h1 class="font-weight-bold">Log in to start your session<h1>
                     <p class="my-4 ">
                         <form action="{{ '/login/microsoft' }}" method="get">
                             @csrf
@@ -39,7 +39,7 @@
                     </p>
         </div>
         <div class="py-2 border-top">
-            <div class="pt-4 h5 font-weight-bold">Need Help?</div>
+            <h2 class="pt-4 font-weight-bold">Need Help?</h2>
             <div class="">Contact your IDIR security administrator or the 7-7000 Service Desk at:</div>
             <div class="pt-2">Phone: <a href="tel:0612345678">250-387-7000</a></div>
             <div>Email: <a href="mailto:77000@gov.bc.ca" target="_blank" >77000@gov.bc.ca</a></div>
@@ -51,15 +51,16 @@
 
     <div id="admin-login" style="{{  Session::get('error-psft') || $has_admin_error == false ? 'display:none;' : '' }}"">
         <div class="text-center py-3">
-            <p class="h5 font-weight-bold">Log in to start your session<p>
+            <h4 class="font-weight-bold">Log in to start your session<h4>
         </div>
 
         <form action="{{ $login_url }}" method="post">
             {{ csrf_field() }}
 
             {{-- Email field --}}
+            <label for="email" class="col-3 col-form-label">Email</label>
             <div class="input-group mb-3">
-                <input type="email" name="email" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
+                <input type="text" name="email" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                     value="{{ old('email') }}" placeholder="{{ __('adminlte::adminlte.email') }}" autofocus>
                 <div class="input-group-append">
                     <div class="input-group-text">
@@ -68,12 +69,13 @@
                 </div>
                 @if($errors->has('email'))
                     <div class="invalid-feedback">
-                        <strong>{{ $errors->first('email') }}</strong>
+                        <strong>Error: {{ $errors->first('email') }}</strong>
                     </div>
                 @endif
             </div>
 
             {{-- Password field --}}
+            <label for="password" class="col-3 col-form-label">Password</label>
             <div class="input-group mb-3">
                 <input type="password" name="password" class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
                     placeholder="{{ __('adminlte::adminlte.password') }}">
@@ -84,13 +86,13 @@
                 </div>
                 @if($errors->has('password'))
                     <div class="invalid-feedback">
-                        <strong>{{ $errors->first('password') }}</strong>
+                        <strong>Error: {{ $errors->first('password') }}</strong>
                     </div>
                 @endif
             </div>
 
             {{-- Login field --}}
-            <div class="row">
+            <div class="row pt-3">
                 <div class="col-7">
                     <div class="icheck-primary">
                         <input type="checkbox" name="remember" id="remember">
@@ -107,7 +109,9 @@
 
         </form>
 
-        <div class="py-3"><a class="idir-login" >Back</a></div>
+        <hr>
+        <button type="button" class="btn btn-outline-secondary idir-login">Back</button>
+        {{-- <span class=""><a class="btn btn-outline-info ">Back</a></span> --}}
 
     </div>    
 
@@ -151,6 +155,22 @@
         </p>
     @endif
 @stop
+
+
+@push('css')
+<style>
+    .login-box, .register-box {
+        width: 600px;    
+    }
+
+    .login-box .card, .register-box .card {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+</style>
+
+@endpush
 
 @push('js')
 <script>
