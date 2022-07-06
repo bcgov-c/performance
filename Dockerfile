@@ -102,10 +102,14 @@ RUN chmod -R 755 /var/www/html/storage
 
 RUN chmod 4111 /usr/bin/sudo
 
+RUN service /usr/sbin/cron start
+
 
 EXPOSE 8000
 
 # Add a command to base-image entrypont script
-RUN sed -i 's/^exec /service cron start\n\nexec /' /usr/local/bin/apache2-foreground
+#RUN sed -i 's/^exec /service cron start\n\nexec /' /usr/local/bin/apache2-foreground
 
 #CMD /usr/local/bin/apache2-foreground
+
+RUN /usr/local/bin/apache2-foreground
