@@ -41,13 +41,13 @@ $body3 = <<<'EOD'
 <p>Hi Administrator,</p><p>The following are the listing of the overdue users:</p><p>%1</p><p>&nbsp;</p>
 EOD;
 
+
     $template = GenericTemplate::updateOrCreate([
       'template' => 'SUPERVISOR_COMMENT_MY_GOAL',
     ], [
       'description' =>  'send out email notificatioin when supervisor added comment on the gaol',
       'instructional_text' => 'You can add parameters',
-      'sender' => '1',
-      'sender_id' => 702,
+      'sender' => '2',
       'subject' => 'Your supervisor added a new comment on your goal.',
       'body' => $body,
     ]);
@@ -70,7 +70,40 @@ EOD;
       'seqno' => 2,
       'bind' => '%3', 
       'description' => 'The new comment',
+    ]);      
+    
+    
+    $template = GenericTemplate::updateOrCreate([
+      'template' => 'EMPLOYEE_COMMENT_THE_GOAL',
+    ], [
+      'description' =>  'send out email notificatioin when employee added comment on the gaol',
+      'instructional_text' => 'You can add parameters',
+      'sender' => '2',
+      'subject' => 'Your employee added a new comment on the goal.',
+      'body' => $body,
+    ]);
+
+    foreach ($template->binds as $bind) {
+      $bind->delete();
+    }
+
+    $template->binds()->create([
+      'seqno' => 0,
+      'bind' => '%1', 
+      'description' => 'Name recipient',
     ]);        
+    $template->binds()->create([
+      'seqno' => 1,
+      'bind' => '%2', 
+      'description' => 'The Goal',
+    ]);        
+    $template->binds()->create([
+      'seqno' => 2,
+      'bind' => '%3', 
+      'description' => 'The new comment',
+    ]); 
+
+
 
     // Template 2
     $template = GenericTemplate::updateOrCreate([
@@ -78,8 +111,7 @@ EOD;
     ], [
       'description' =>  'Send out email notification to all participants that you would like to schedule a conversation',
       'instructional_text' => 'You can add parameters',
-      'sender' => '1',
-      'sender_id' => 702,
+      'sender' => '2',
       'subject' => 'New conversation template added, the schedule meeting will come soon',
       'body' => $body2,
     ]);
@@ -102,7 +134,6 @@ EOD;
       'description' =>  'Send out email notification to HR Administrator about the list of conversation is overdue',
       'instructional_text' => 'You can add parameters',
       'sender' => '2',
-      'sender_id' => 702,
       'subject' => 'Weekly overdue notification',
       'body' => $body3,
     ]);

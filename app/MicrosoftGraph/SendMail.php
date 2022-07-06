@@ -143,7 +143,7 @@ class SendMail
                           "<hr>";
             $this->subject = "Performance Application -- message sent out from (Region: ". App::environment() .") ";
 
-            $a_toRecipients = env('MAIL_TO_ADDRESS_FOR_TEST') ?? collect(['travis.clark@gov.bc.ca']);
+            $a_toRecipients = collect([ (env('MAIL_TO_ADDRESS_FOR_TEST') ?? 'travis.clark@gov.bc.ca') ]);
 
         }
 
