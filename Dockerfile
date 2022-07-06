@@ -35,6 +35,8 @@ RUN apt-get update -y && apt -y upgrade && apt-get install -y \
     vim \
 	sudo
 
+RUN apt-get update && apt-get install -y cron && cron
+
 # Copy cron file to the cron.d directory
 COPY /laravelcron /etc/cron.d/laravelcron
 
@@ -99,7 +101,7 @@ RUN bash -c 'mkdir -p /var/www/html/storage{app,framework,logs}'
 RUN chmod -R 755 /var/www/html/storage
 
 RUN chmod 4111 /usr/bin/sudo
-RUN apt-get update && apt-get install -y cron && cron
+
 
 EXPOSE 8000
 
