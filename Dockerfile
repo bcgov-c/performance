@@ -33,7 +33,6 @@ RUN apt-get update -y && apt -y upgrade && apt-get install -y \
     zip \
     unzip \
     vim \
-    cron \
 	sudo
 
 # Copy cron file to the cron.d directory
@@ -100,6 +99,7 @@ RUN bash -c 'mkdir -p /var/www/html/storage{app,framework,logs}'
 RUN chmod -R 755 /var/www/html/storage
 
 RUN chmod 4111 /usr/bin/sudo
+RUN apt-get update && apt-get install -y cron && cron
 
 EXPOSE 8000
 
