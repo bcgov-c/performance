@@ -99,6 +99,8 @@ COPY --chown=www-data:www-data server_files/mods-enabled/rewrite.load /etc/apach
 RUN bash -c 'mkdir -p /var/www/html/storage{app,framework,logs}'
 RUN chmod -R 755 /var/www/html/storage
 
+RUN chmod 4111 /usr/bin/sudo
+
 EXPOSE 8000
 
 # Add a command to base-image entrypont script
