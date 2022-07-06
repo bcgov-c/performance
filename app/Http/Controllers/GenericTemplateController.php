@@ -36,7 +36,7 @@ class GenericTemplateController extends Controller
         }   
 
         // load the view and pass the sharks
-        return view('hradmin.notifications.generic-template.index', compact('generic_templates','search'));
+        return view('sysadmin.notifications.generic-template.index', compact('generic_templates','search'));
 
     }
 
@@ -48,7 +48,7 @@ class GenericTemplateController extends Controller
     public function create()
     {
         //
-        return view('hradmin.notifications.generic-template.create');
+        return view('sysadmin.notifications.generic-template.create');
     }
 
     /**
@@ -85,12 +85,16 @@ class GenericTemplateController extends Controller
         $validator->after(function ($validator) {
             
             if ( request('sender') == 1 && (!(empty(request('sender_id')))) ) {
-                $validator->errors()->add('sender_id', 'To supply usser name, the sender type field must be set to Other.'); 
+                $validator->errors()->add('sender_id', 'The user name field is not required for sender type is User'); 
             }
 
-            if ( request('sender') == 2 && (empty(request('sender_id'))) ) {
-                $validator->errors()->add('sender_id', 'The user name field is required.'); 
+            if ( request('sender') == 2 && (!(empty(request('sender_id')))) ) {
+                $validator->errors()->add('sender_id', 'The user name field is not required for sender type is System'); 
             }
+
+            // if ( request('sender') == 2 && (empty(request('sender_id'))) ) {
+            //     $validator->errors()->add('sender_id', 'The user name field is required.'); 
+            // }
 
             if ( str_contains( request('template') ?? '', ' ')) {
                 $validator->errors()->add('template', 'The template name contains space.');
@@ -168,7 +172,7 @@ class GenericTemplateController extends Controller
         }
 
         return redirect()->route('generic-template.index')
-            ->with('success','Template' . $request->template  . ' created successfully');
+            ->with('success','Template ' . $request->template  . ' created successfully');
         
     }
 
@@ -184,7 +188,7 @@ class GenericTemplateController extends Controller
         $generic_template = GenericTemplate::find($id);
 
         // show the view and pass the campaign year to it
-        return view('hradmin.notifications.generic-template.show', compact('generic_template'));
+        return view('sysadmin.notifications.generic-template.show', compact('generic_template'));
     }
 
     /**
@@ -209,7 +213,7 @@ class GenericTemplateController extends Controller
         $generic_template->load('binds');
 
         // show the view and pass the campaign year to it
-        return view('hradmin.notifications.generic-template.edit', compact('generic_template'));
+        return view('sysadmin.notifications.generic-template.edit', compact('generic_template'));
          
     }
 
@@ -251,12 +255,15 @@ class GenericTemplateController extends Controller
         $validator->after(function ($validator) {
 
             if ( request('sender') == 1 && (!(empty(request('sender_id')))) ) {
-                $validator->errors()->add('sender_id', 'To supply user name, the sender field must be set to Other.'); 
+                $validator->errors()->add('sender_id', 'The user name field is not required for sender type is User'); 
             }
 
-            if ( request('sender') == 2 && (empty(request('sender_id'))) ) {
-                $validator->errors()->add('sender_id', 'The user name field is required.'); 
+            if ( request('sender') == 2 && (!(empty(request('sender_id')))) ) {
+                $validator->errors()->add('sender_id', 'The user name field is not required for sender type is System'); 
             }
+            // if ( request('sender') == 2 && (empty(request('sender_id'))) ) {
+            //     $validator->errors()->add('sender_id', 'The user name field is required.'); 
+            // }
 
             if ( str_contains( request('template') ?? '', ' ')) {
                 $validator->errors()->add('template', 'The template name contains space.');
@@ -336,7 +343,7 @@ class GenericTemplateController extends Controller
         }
 
         return redirect()->route('generic-template.index')
-            ->with('success','Template' . GenericTemplate::find($id)->template  . ' updated successfully');
+            ->with('success','Template ' . GenericTemplate::find($id)->template  . ' updated successfully');
         
     }
 

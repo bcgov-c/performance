@@ -69,9 +69,8 @@
                         @else
                             {{ $val_status = old('sender') ? old('sender') : $generic_template->sender }}    
                         @enderror
-                        
                         <option value="1" {{ $val_status == '1' ? 'selected' : '' }}>{{ 'User'   }}</option>
-                        <option value="2" {{ $val_status == '2' ? 'selected' : '' }}>{{ 'Other' }}</option>
+                        <option value="2" {{ $val_status == '2' ? 'selected' : '' }}>{{ 'System' }}</option>
                     </select>
                     @error('sender')
                         <span class="invalid-feedback">
@@ -82,7 +81,7 @@
               <label for="sender_id" class="col-sm-2 col-form-label text-right">User Name:</label>
               <div class="col-sm-5" >
                 <select class="form-control select2 @error('sender_id') is-invalid @enderror" 
-                 name="sender_id" id="sender_id">
+                 name="sender_id" id="sender_id" style="width:100%">
 
                   @if (old('sender_id')) 
 

@@ -269,10 +269,10 @@ class NotificationController extends Controller
 
         //setup Validator and passing request data and rules
         $validator = Validator::make(request()->all(), [
-            'sender_id'          => 'required',
+            // 'sender_id'          => 'required',
             //'recipients'         => 'required',
-            'orgCheck'         => 'required',
-            'userCheck'         => 'required',
+            'orgCheck'         => 'required_if:userCheck,null',
+            'userCheck'         => 'required_if:orgCheck,null',
             'subject'            => 'required',
             'body'               => 'required',
         ]);
@@ -311,7 +311,7 @@ class NotificationController extends Controller
         // Method 1: Real-Time
         $sendMail = new \App\MicrosoftGraph\SendMail();
         $sendMail->toRecipients = $toRecipients->toArray();
-        $sendMail->sender_id = $request->sender_id;
+        $sendMail->sender_id = '';
         $sendMail->subject = $request->subject;
         $sendMail->body = $request->body;
         $sendMail->alertFormat = $request->alert_format;

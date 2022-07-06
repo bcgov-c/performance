@@ -10,6 +10,7 @@ use App\Mail\NotifyMail;
 use App\Models\GenericTemplate;
 use App\Models\NotificationLog;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 // use GuzzleHttp\Client;
@@ -82,9 +83,9 @@ class SendMail
     public function sendMailWithoutGenericTemplate() 
     {
 
-        if (!($this->sender_id) ) {
-            $this->sender_id = Auth::id();
-        }
+        // if (!($this->sender_id) ) {
+        //     $this->sender_id = Auth::id();
+        // }
         
         // return $this->sendMailUsingApplicationToken();
         return $this->sendMailUsingSMPTServer();
@@ -104,8 +105,9 @@ class SendMail
 
         if ($this->generic_template->sender == 2) {
             // Override the sender based on the generic template definition
-            $user = User::find($this->generic_template->sender_id);
-            $this->sender_id = $user->id;
+            // $user = User::find($this->generic_template->sender_id);
+            // $this->sender_id = $user->id;
+            $this->sender_id = '';
         } else {
             $this->sender_id = Auth::id();
         }
@@ -132,7 +134,7 @@ class SendMail
             /* replace the body with the send out message, and also override the recipients */
             $this->body = "<h4>Note: The following message is the content was sent out from Performance application (Region: ". App::environment() .")</h4>".      
                           "<hr>".
-                          "<p><b>From: </b>". $from . "</p>".
+                          "<p><b>From: </b>". ( empty($from) ? env('MAIL_FROM_ADDRESS') : $from ) . "</p>".
                           "<p><b>To: </b>". implode('; ', $a_toRecipients->toArray() ). "</p>".
                           "<p><b>cc: </b>". implode('; ', $a_ccRecipients->toArray() ). "</p>".
                           "<p><b>Bcc: </b>". implode('; ', $a_bccRecipients->toArray() ). "</p>".
@@ -141,32 +143,46 @@ class SendMail
                           "<hr>";
             $this->subject = "Performance Application -- message sent out from (Region: ". App::environment() .") ";
 
-            $a_toRecipients = env('MAIL_TO_ADDRESS_FOR_TEST') ?? 'travis.clark@gov.bc.ca';
+            $a_toRecipients = env('MAIL_TO_ADDRESS_FOR_TEST') ?? collect(['travis.clark@gov.bc.ca']);
 
         }
 
         $bResult = false;
+        $log_text = "Message (sender: " . implode('; ', $a_toRecipients->toArray() ) . ") with subject " . $this->subject;
         // Send immediately or using Queue
         if ($this->useQueue) {
-            Mail::to( $a_toRecipients )
-                ->cc( $a_ccRecipients )
-                ->bcc( $a_bccRecipients )   
-                ->queue(new NotifyMail($from, $this->subject, $this->body ));
-            // check for failures
-            $bResult = Mail::failures() ? false : true;
+
+            
+            try {
+                Mail::to( $a_toRecipients )
+                    ->cc( $a_ccRecipients )
+                    ->bcc( $a_bccRecipients )   
+                    ->queue(new NotifyMail($from, $this->subject, $this->body ));
+
+                Log::info( $log_text . ' was successfully sent.' );
+                $bResult = true;
+            } catch (Exception $e) {
+                Log::error($e); 
+                $bResult = false;
+            }
         } else {
-            Mail::to( $a_toRecipients )
-                ->cc( $a_ccRecipients )
-                ->bcc( $a_bccRecipients )
-                ->send(new NotifyMail($from, $this->subject, $this->body ));
-            // check for failures
-            $bResult = Mail::failures() ? false : true;
+            try {
+                Mail::to( $a_toRecipients )
+                    ->cc( $a_ccRecipients )
+                    ->bcc( $a_bccRecipients )
+                    ->send(new NotifyMail($from, $this->subject, $this->body ));
+
+                Log::info( $log_text . ' was successfully sent.' );
+                $bResult = true;
+                
+            } catch (Exception $e) {
+                Log::error( $log_text . ' was failed to sent out.' ); 
+                Log::error($e); 
+                $bResult = false;
+            }
         }
-
         
-
         if ($this->saveToLog) {
-
             // Insert Notification log
             $notification_log = NotificationLog::Create([  
                 'recipients' => ' ',        // Not in Use
