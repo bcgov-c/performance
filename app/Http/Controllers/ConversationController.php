@@ -437,6 +437,8 @@ class ConversationController extends Controller
     }
 
     public function templates(Request $request, $viewType = 'conversations') {
+        $authId = Auth::id();
+        $user = User::find($authId);
         $query = new ConversationTopic;
         if ($request->has('search') && $request->search) {
             $query = $query->where('name', 'LIKE', "%$request->search%");
@@ -444,7 +446,7 @@ class ConversationController extends Controller
         $templates = $query->get();
         $searchValue = $request->search ?? '';
         $conversationMessage = Conversation::warningMessage();
-        return view('conversation.templates', compact('templates', 'searchValue', 'conversationMessage', 'viewType'));
+        return view('conversation.templates', compact('templates', 'searchValue', 'conversationMessage', 'viewType', 'user'));
     }
 
     public function templateDetail($id) {
