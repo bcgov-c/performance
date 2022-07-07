@@ -102,8 +102,14 @@ RUN chmod -R 755 /var/www/html/storage
 
 RUN chmod 4111 /usr/bin/sudo
 
+RUN groupadd crond-users && \
+    chgrp crond-users /var/run/crond.pid && \
+    usermod -a -G crond-users 1001510000
+
 
 EXPOSE 8000
+
+
 
 # Add a command to base-image entrypont script
 RUN sed -i 's/^exec /service cron start\n\nexec /' /usr/local/bin/apache2-foreground
