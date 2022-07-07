@@ -98,6 +98,8 @@
                             , name: 'shared', searchable: false},
                         {title: 'Direct Reports', ariaTitle: 'Direct Reports', target: 0, type: 'string', data: 'reportees'
                             , name: 'reportees', searchable: false},
+                        {title: 'Date Deleted', ariaTitle: 'Date Deleted', target: 0, type: 'date', data: 'date_deleted'
+                            , name: 'employee_demo.date_deleted', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'num', data: 'id'
                             , name: 'users.id', searchable: true, visible: false},
                     ],

@@ -59,10 +59,8 @@
             <div class="form-group row"> </div>
                 <div class="form-group row">
                     <span class="float-left float-bottom">  
-                        {{-- <button type="submit" class="btn btn-primary" name="btn_search" 
-                            value="btn_search" formaction="{{ route('sysadmin.accesspermissions.search') }}">Filter</button> --}}
-                        <button type="button" class="btn btn-primary" id="btn_search" name="btn_search" value="btn_search">Filter</button>
-                        <button type="button" class="btn btn-secondary" id="btn_search_reset" name="btn_reset" value="btn_reset">Reset</button>
+                        <button type="button" class="btn btn-primary" id="btn_search" name="btn_search" value="btn_search" >Filter</button>
+                        <button type="button" class="btn btn-secondary  " id="btn_search_reset" name="btn_reset" value="btn_reset">Reset</button>
                     </span>
                 </div>
             </div>
@@ -82,7 +80,8 @@
 
     .select2-container .select2-selection--single {
         height: 38px !important;
-        }
+    }
+
     .select2-container--default .select2-selection--single .select2-selection__arrow {
         height: 38px !important;
     }
@@ -277,46 +276,46 @@
             $('#btn_search').click();
         });
 
-        $('#dd_level0').change(function (){
-            // e.preventDefault();
+        $('#dd_level0').change(function (e){
+            e.preventDefault();
         });
 
-        $('#dd_level1').change(function (){
-            // e.preventDefault();
+        $('#dd_level1').change(function (e){
+            e.preventDefault();
         });
 
-        $('#dd_level2').change(function (){
-            // e.preventDefault();
+        $('#dd_level2').change(function (e){
+            e.preventDefault();
         });
 
-        $('#dd_level3').change(function (){
-            // e.preventDefault();
+        $('#dd_level3').change(function (e){
+            e.preventDefault();
         });
 
-        $('#dd_level4').change(function (){
-            // e.preventDefault();
+        $('#dd_level4').change(function (e){
+            e.preventDefault();
             $('#btn_search').click();
         });
 
-        $('#criteria').change(function (){
-            // e.preventDefault();
+        $('#criteria').change(function (e){
+            e.preventDefault();
             $('#btn_search').click();
         });
 
-        $('#search_text').change(function (){
-            // e.preventDefault();
+        $('#search_text').change(function (e){
+            e.preventDefault();
             $('#btn_search').click();
         });
 
         $('#search_text').keydown(function (e){
             if (e.keyCode == 13) {
-                // e.preventDefault();
+                e.preventDefault();
                 $('#btn_search').click();
             }
         });
 
-        $('#btn_search_reset').click(function() {
-            // e.preventDefault();
+        $('#btn_search_reset').click(function(e) {
+            e.preventDefault();
             $('#dd_level0').val(null).trigger('change');
             $('#dd_level1').val(null).trigger('change');
             $('#dd_level2').val(null).trigger('change');
@@ -327,12 +326,10 @@
             $('#btn_search').click();
         });
 
-        $('#btn_search').click(function() {
-            // e.preventDefault();
-            $('#employee-list-table').DataTable().ajax.reload(null, false);
+        $('#btn_search').click(function(e) {
+            e.preventDefault();
+            $('#filtertable').DataTable().ajax.reload(null, false);
         });
-
-
 
 
 

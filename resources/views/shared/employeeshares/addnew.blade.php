@@ -89,7 +89,10 @@
                        </div>
                         <div class="col col-10">
                             <x-input id="reason" name="input_reason" label="Reason for sharing" data-toggle="tooltip" data-placement="top" data-trigger="manual" tooltip="Reason tooltip"/>
-					        <small  class="text-danger error-target_date"></small>
+                            {{-- @error('reason') --}}
+                                {{-- <div class="alert alert-danger alert-dismissable fade show"> "Reason for sharing" is required. </div> --}}
+					            <small  class="text-danger error-reason"></small>
+                            {{-- @enderror --}}
                         </div>
                     </div>
                 </div>
@@ -101,7 +104,7 @@
             <h6 class="text-bold">Step 4. Share selected profile(s)</h6>
             <br>
             <div class="col-md-3 mb-2">
-                <button class="btn btn-primary mt-2" type="submit" onclick="confirmSaveAllModal()" name="btn_send" value="btn_send">Share</button>
+                <button class="btn btn-primary mt-2" type="button" onclick="confirmSaveAllModal()" name="btn_send" value="btn_send">Share</button>
                 <button class="btn btn-secondary mt-2">Cancel</button>
             </div>
         </div>

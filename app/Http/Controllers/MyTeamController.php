@@ -53,6 +53,17 @@ class MyTeamController extends Controller
         // ->whereIn('users.id', $adminShared)->get();
         // $employees = $employees->merge($adminemps);
 
+        $adminShared=SharedProfile::select('shared_id')
+        ->where('shared_with', '=', Auth::id())
+        ->where(function ($sh) {
+            $sh->where('shared_item', 'like', '%1%')
+            ->orWhere('shared_item', 'like', '%2%');
+        })
+        ->pluck('shared_id');
+        $adminemps = User::select('users.*')
+        ->whereIn('users.id', $adminShared)->get();
+        $employees = $employees->merge($adminemps);
+
         $type = 'upcoming'; // Allow Editing
         $showSignoff = false;
         $myEmpTable = $myEmployeesDataTable->html();

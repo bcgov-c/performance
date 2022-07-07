@@ -3,24 +3,24 @@
 namespace App\Http\Controllers\SysAdmin;
 
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Goal;
 use App\Models\Conversation;
 use App\Models\SharedElement;
-use App\Models\EmployeeShare;
+// use App\Models\EmployeeShare;
 use App\Models\SharedProfile;
 use App\Models\ConversationParticipant;
 use App\Models\EmployeeDemo;
-use Illuminate\Http\Request;
 use App\Models\OrganizationTree;
 use Yajra\Datatables\Datatables;
-use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 
@@ -151,6 +151,16 @@ class EmployeeSharesController extends Controller
     }
 
     public function saveall(Request $request) {
+        // $error['reason'] = '';
+        // $request->validate()->resetForm();
+        // Session::flush('errors');
+        // $this->resetValidation();
+        // $error()->remove('reason');
+        // $request->session()->flash('errors');
+        // $request->validate([
+        //     'reason' => 'required',
+        // ]);
+
         $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $eselected_emp_ids = $request->eselected_emp_ids ? json_decode($request->eselected_emp_ids) : [];
         $request->userCheck = $selected_emp_ids;

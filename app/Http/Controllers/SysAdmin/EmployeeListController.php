@@ -9,12 +9,12 @@ use App\Models\EmployeeDemo;
 use App\Models\OrganizationTree;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 
@@ -228,16 +228,21 @@ class EmployeeListController extends Controller
                 'employee_demo.level3_branch',
                 'employee_demo.level4',
                 'employee_demo.deptid',
-                'users.id'
+                'employee_demo.date_deleted',
+                'users.id',
             );
-            return Datatables::of($query)->addIndexColumn()
+            return Datatables::of($query)
+            ->addIndexColumn()
             ->addColumn('activeGoals', function($row) {
                 $countActiveGoals = $row->activeGoals()->count() . ' Goals';
                 return $countActiveGoals;
             })
             ->addColumn('nextConversationDue', function ($row) {
                 $nextConversation = Conversation::nextConversationDue(User::find($row["id"]));
+                // $nextConversation = $nextConversation->format('M d, Y');
+                // $nextConversation = $nextConversation->format('M d, Y H:i:s');
                 return $nextConversation;
+                // return $nextConversation ? $nextConversation->format('M d, Y') : null;
             })
             ->addColumn('excused', function ($row) {
                 $yesOrNo = ($row->excused_start_date !== null) ? 'Yes' : 'No';
@@ -251,6 +256,11 @@ class EmployeeListController extends Controller
                 $countReportees = $row->reportees()->count() ?? '0';
                 return $countReportees;
             })
+            ->editColumn('date_deleted', function ($row) {
+                // return $row->date_deleted ? $row->date_deleted->format('M d, Y H:i:s') : null;
+                return $row->date_deleted;
+            })
+            ->rawColumns(['date_deleted', 'nextConversation'])
             ->make(true);
         }
     }
