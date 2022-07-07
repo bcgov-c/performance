@@ -102,7 +102,8 @@ RUN chmod -R 755 /var/www/html/storage
 
 RUN chmod 4111 /usr/bin/sudo
 
-RUN groupadd crond-users && \
+RUN useradd -l -u 1001510000 -c "1001510000" 1001510000 && \
+    addgroup crond-users && \
     chgrp crond-users /var/run/crond.pid && \
     usermod -a -G crond-users 1001510000
 
