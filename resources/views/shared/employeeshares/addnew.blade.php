@@ -89,10 +89,10 @@
                        </div>
                         <div class="col col-10">
                             <x-input id="reason" name="input_reason" label="Reason for sharing" data-toggle="tooltip" data-placement="top" data-trigger="manual" tooltip="Reason tooltip"/>
-                            {{-- @error('reason') --}}
+                            @error('input_reason')
                                 {{-- <div class="alert alert-danger alert-dismissable fade show"> "Reason for sharing" is required. </div> --}}
-					            <small  class="text-danger error-reason"></small>
-                            {{-- @enderror --}}
+					            <small  class="text-danger error-reason" id="error-reason"></small>
+                            @enderror
                         </div>
                     </div>
                 </div>

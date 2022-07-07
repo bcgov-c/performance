@@ -2,25 +2,25 @@
 
 namespace App\Http\Controllers\HRAdmin;
 
-
+use Validator;
 use App\Models\User;
 use App\Models\Goal;
 use App\Models\Conversation;
 use App\Models\SharedElement;
-use App\Models\EmployeeShare;
+// use App\Models\EmployeeShare;
 use App\Models\SharedProfile;
 use App\Models\ConversationParticipant;
 use App\Models\EmployeeDemo;
-use Illuminate\Http\Request;
 use App\Models\OrganizationTree;
 use Yajra\Datatables\Datatables;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+// use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 
@@ -151,15 +151,26 @@ class EmployeeSharesController extends Controller
     }
 
     public function saveall(Request $request) {
+        $input = $request->all();
+        $rules = [
+            'input_reason' => 'required',
+        ];
+        $messages = [
+            'required' => 'The :attribute field is required.',
+        ];
+        $validator = Validator::make($input, $rules, $messages);
+        if ($validator->fails()) {
+            return redirect()->route(request()->segment(1).'.employeeshares')
+            ->withErrors($validator)
+            ->withInput();
+        }
         $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $eselected_emp_ids = $request->eselected_emp_ids ? json_decode($request->eselected_emp_ids) : [];
         $request->userCheck = $selected_emp_ids;
         $request->euserCheck = $eselected_emp_ids;
         $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
         $eselected_org_nodes = $request->eselected_org_nodes ? json_decode($request->eselected_org_nodes) : [];
-
         $current_user = User::find(Auth::id());
-
         $employee_ids = ($request->userCheck) ? $request->userCheck : [];
 
         $eeToShare = EmployeeDemo::select('users.id')
@@ -233,7 +244,7 @@ class EmployeeSharesController extends Controller
         ->union( $sql_level0->groupBy('organization_trees.id')->select('organization_trees.id', DB::raw("COUNT(*) as count_row") ) )
         ->pluck('count_row', 'organization_trees.id');  
         
-        // // Employee ID by Tree ID
+        // Employee ID by Tree ID
         $empIdsByOrgId = [];
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
@@ -303,7 +314,7 @@ class EmployeeSharesController extends Controller
         $eempIdsByOrgId = $erows->groupBy('id')->all();
 
         if($request->ajax()){
-            return view('shared.employeeshares.partials.erecipient-tree', compact('eorgs','eempIdsByOrgId') );
+            return view('shared.employeeshares.partials.erecipient-tree', compact('eorgs', 'ecountByOrg', 'eempIdsByOrgId') );
         } 
     }
   
@@ -1286,8 +1297,8 @@ class EmployeeSharesController extends Controller
             } )
             ->where('ao1.user_id', '=', Auth::id())
             ->where('ao2.user_id', '=', Auth::id())
-            ->when($level0, function($q) use($level0) {return $q->where('employee_demo.organization', '=', $level0->name);})
-            ->when($level1, function($q) use($level1) {return $q->where('employee_demo.level1_program', '=', $level1->name);})
+            ->when($level0, function($q) use($level0) {return $q->where('employee_demo.organization', $level0->name);})
+            ->when($level1, function($q) use($level1) {return $q->where('employee_demo.level1_program', $level1->name);})
             ->when($level2, function($q) use($level2) {return $q->where('employee_demo.level2_division', $level2->name);})
             ->when($level3, function($q) use($level3) {return $q->where('employee_demo.level3_branch', $level3->name);})
             ->when($level4, function($q) use($level4) {return $q->where('employee_demo.level4', $level4->name);})

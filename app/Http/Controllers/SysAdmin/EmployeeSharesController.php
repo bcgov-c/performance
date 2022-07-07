@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers\SysAdmin;
 
-
-use App\Http\Controllers\Controller;
+use Validator;
 use App\Models\User;
 use App\Models\Goal;
 use App\Models\Conversation;
@@ -15,12 +14,13 @@ use App\Models\EmployeeDemo;
 use App\Models\OrganizationTree;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Validator;
+// use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 
@@ -151,25 +151,26 @@ class EmployeeSharesController extends Controller
     }
 
     public function saveall(Request $request) {
-        // $error['reason'] = '';
-        // $request->validate()->resetForm();
-        // Session::flush('errors');
-        // $this->resetValidation();
-        // $error()->remove('reason');
-        // $request->session()->flash('errors');
-        // $request->validate([
-        //     'reason' => 'required',
-        // ]);
-
+        $input = $request->all();
+        $rules = [
+            'input_reason' => 'required',
+        ];
+        $messages = [
+            'required' => 'The :attribute field is required.',
+        ];
+        $validator = Validator::make($input, $rules, $messages);
+        if ($validator->fails()) {
+            return redirect()->route(request()->segment(1).'.employeeshares')
+            ->withErrors($validator)
+            ->withInput();
+        }
         $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $eselected_emp_ids = $request->eselected_emp_ids ? json_decode($request->eselected_emp_ids) : [];
         $request->userCheck = $selected_emp_ids;
         $request->euserCheck = $eselected_emp_ids;
         $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
         $eselected_org_nodes = $request->eselected_org_nodes ? json_decode($request->eselected_org_nodes) : [];
-
         $current_user = User::find(Auth::id());
-
         $employee_ids = ($request->userCheck) ? $request->userCheck : [];
 
         $eeToShare = EmployeeDemo::select('users.id')
@@ -956,11 +957,11 @@ class EmployeeSharesController extends Controller
 
     public function manageindexlist(Request $request) {
         if ($request->ajax()) {
-            $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-            $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-            $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-            $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-            $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+            $level0 = $request->dd_level0 ? OrganizationTree::where('organization_trees.id', $request->dd_level0)->first() : null;
+            $level1 = $request->dd_level1 ? OrganizationTree::where('organization_trees.id', $request->dd_level1)->first() : null;
+            $level2 = $request->dd_level2 ? OrganizationTree::where('organization_trees.id', $request->dd_level2)->first() : null;
+            $level3 = $request->dd_level3 ? OrganizationTree::where('organization_trees.id', $request->dd_level3)->first() : null;
+            $level4 = $request->dd_level4 ? OrganizationTree::where('organization_trees.id', $request->dd_level4)->first() : null;
 
             $query = User::withoutGlobalScopes()
             ->join('shared_profiles', 'shared_profiles.shared_id', '=', 'users.id')
