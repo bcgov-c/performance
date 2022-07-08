@@ -377,7 +377,7 @@ class ConversationController extends Controller
     {
         $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
         $current_employee = DB::table('employee_demo')
-                            ->select('employee_id')
+                            ->select('employee_demo.employee_id')
                             ->join('users', 'employee_demo.guid', '=', 'users.guid')
                             ->where('users.id', $authId)
                             ->get();
@@ -414,7 +414,7 @@ class ConversationController extends Controller
     {
         $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
         $current_employee = DB::table('employee_demo')
-                            ->select('employee_id')
+                            ->select('employee_demo.employee_id')
                             ->join('users', 'employee_demo.guid', '=', 'users.guid')
                             ->where('users.id', $authId)
                             ->get();
