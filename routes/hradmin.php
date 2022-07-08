@@ -45,6 +45,8 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('/hradmin/goalbank/editpage/{id}', [GoalBankController::class, 'editpage'])->name('hradmin.goalbank.editpage');
         Route::post('/hradmin/goalbank/editpage/{id}', [GoalBankController::class, 'editpage'])->name('hradmin.goalbank.editpagepost');
         Route::get('/hradmin/goalbank/editone/{id}', [GoalBankController::class, 'editone'])->name('hradmin.goalbank.editone');
+        Route::get('/hradmin/goalbank/editdetails/{id}', [GoalBankController::class, 'editdetails'])->name('hradmin.goalbank.editdetails');
+        Route::post('/hradmin/goalbank/editdetails/{id}', [GoalBankController::class, 'editdetails'])->name('hradmin.goalbank.editdetailspost');
         Route::post('/hradmin/goalbank/editone/{id}', [GoalBankController::class, 'editone'])->name('hradmin.goalbank.editonepost');
         Route::get('/hradmin/goalbank/deletegoal/{id}', [GoalBankController::class, 'deletegoal'])->name('hradmin.goalbank.deletegoalget');
         Route::get('/hradmin/goalbank/deleteorg/{id}', [GoalBankController::class, 'deleteorg'])->name('hradmin.goalbank.deleteorgget');

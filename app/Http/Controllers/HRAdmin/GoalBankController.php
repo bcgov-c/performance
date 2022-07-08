@@ -2285,6 +2285,54 @@ class GoalBankController extends Controller
             )
             ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)])
             ;
+            $admingoals = Goal::withoutGlobalScopes()
+            ->join('users as cu', 'cu.id', '=', 'goals.created_by')
+            ->join('employee_demo as ced', 'ced.guid', '=', 'cu.guid')
+            ->join('admin_orgs', function ($j1) {
+                $j1->on(function ($j1a) {
+                    $j1a->whereRAW('admin_orgs.organization = ced.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (ced.organization = "" OR ced.organization IS NULL))');
+                } )
+                ->on(function ($j2a) {
+                    $j2a->whereRAW('admin_orgs.level1_program = ced.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (ced.level1_program = "" OR ced.level1_program IS NULL))');
+                } )
+                ->on(function ($j3a) {
+                    $j3a->whereRAW('admin_orgs.level2_division = ced.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (ced.level2_division = "" OR ced.level2_division IS NULL))');
+                } )
+                ->on(function ($j4a) {
+                    $j4a->whereRAW('admin_orgs.level3_branch = ced.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (ced.level3_branch = "" OR ced.level3_branch IS NULL))');
+                } )
+                ->on(function ($j5a) {
+                    $j5a->whereRAW('admin_orgs.level4 = ced.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (ced.level4 = "" OR ced.level4 IS NULL))');
+                } );
+            } )
+            ->where('admin_orgs.user_id', '=', Auth::id())
+            ->where('is_library', true)
+            // ->where('goals.created_by', '=', Auth::id())
+            ->whereIn('by_admin', [1, 2])
+            ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
+                $q->where(function($query) use ($request) {
+                    return $query->whereRaw("LOWER(goals.title) LIKE '%" . strtolower($request->search_text) . "%'")
+                        ->orWhereRaw("LOWER(ced.employee_name) LIKE '%" . strtolower($request->search_text) . "%'");
+                });
+            })
+            ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
+                return $q->whereRaw("LOWER(goals.title) LIKE '%" . strtolower($request->search_text) . "%'");
+            })
+            ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
+                return $q->whereRaw("LOWER(ced.employee_name) LIKE '%" . strtolower($request->search_text) . "%'");
+            })
+            ->distinct()
+            ->select
+            (
+                'goals.id',
+                'goals.title',
+                'goals.created_at',
+                'ced.employee_name as creator_name',
+            )
+            ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)])
+            ;
+            // $query = $ownedgoals->merge($admingoals);
+            // $query = $ownedgoals->merge($ownedgoals);
             $query = $ownedgoals;
             return Datatables::of($query)
             ->addIndexColumn()
