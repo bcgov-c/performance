@@ -133,7 +133,7 @@
 				@enderror
 			  </div>
  --}}				
-			  <div class="col-4">
+			  {{-- <div class="col-4">
 				<label for="sender_id" >From</label>
 				<select class="form-control select2 @error('sender_id') is-invalid @enderror" 
 						name="sender_id" id="sender_id" >
@@ -148,7 +148,7 @@
 					{{  $message  }}
 					</span>
 				@enderror
-			  </div>
+			  </div> --}}
 			</div>
 			<div class="form-row mb-2">
 			  <div class="col-8">

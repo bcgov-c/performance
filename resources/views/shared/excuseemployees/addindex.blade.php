@@ -455,6 +455,11 @@
 					};
 				});
 
+				$('#btn_search').click(function(e) {
+					e.preventDefault();
+					$('#employee-list-table').DataTable().rows().invalidate().draw();
+				} );
+
 			});
 
 			// $(window).on('beforeunload', function(){

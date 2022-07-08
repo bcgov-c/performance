@@ -25,7 +25,10 @@
 					<x-dropdown id="goal_type_id" :list="$goalTypes" name="goal_type_id" data-toggle="tooltip" />
 				</div>
 				<div class="col col-md-8">
-					<x-input label="Goal Title" name="title" tooltip='A short title (1-3 words) used to reference the goal throughout the Performance Development Platform.' />
+					<b> Goal Title</b>
+					<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>
+					<!-- <x-input label="Goal Title" name="title" tooltip='A short title (1-3 words) used to reference the goal throughout the Performance Development Platform.' /> -->
+					<x-input name="title" />
 					<small class="text-danger error-title"></small>
 				</div>
 				<div class="col col-md-2">
@@ -71,7 +74,10 @@
 			</div>
 			<div class="row">
 				<div class="col">
-					<x-textarea label="Measures of Success" name="measure_of_success" tooltip='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"'/>
+					<b>Measures of Success</b>
+					<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"'> </i>
+					<x-textarea name="measure_of_success" />
+					<!-- <x-textarea label="Measures of Success" name="measure_of_success" tooltip='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"'/> -->
 					<small class="text-danger error-measure_of_success"></small>
 				</div>
 			</div>
@@ -718,6 +724,17 @@
 					selector: '[data-toggle-select]',
 					trigger: 'click',
 				});
+
+				$('body').on('click', function (e) {
+                $('[data-toggle=popover]').each(function () {
+                    // hide any open popovers when the anywhere else in the body is clicked
+                    if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                        $(this).popover('hide');
+                    }
+                });
+            });							
+
+
 			});
 
 			// Model -- Confirmation Box

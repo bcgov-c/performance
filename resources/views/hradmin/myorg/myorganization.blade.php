@@ -46,12 +46,10 @@
 
         <script type="text/javascript">
 
-            $(document).ready()
+            $(document).ready() 
             {
-
-                $(function ()
-                {
-                    var table = $('.myorgtable').DataTable
+                $(function () {
+                    var table = $('#myorgtable').DataTable
                     (
                         {
                             processing: true,
@@ -78,24 +76,44 @@
                             },
                             columns: 
                             [
-                                {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_demo.employee_id', searchable: true},
-                                {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_demo.employee_name', searchable: true},
-                                {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'employee_demo.jobcode_desc', searchable: true},
-                                {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'employee_demo.organization', searchable: true},
-                                {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'employee_demo.level1_program', searchable: true},
-                                {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'employee_demo.level2_division', searchable: true},
-                                {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'employee_demo.level3_branch', searchable: true},
-                                {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'employee_demo.level4', searchable: true},
-                                {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', name: 'employee_demo.deptid', searchable: true},
-                                {title: 'Active Goals', ariaTitle: 'Active Goals', target: 0, type: 'string', data: 'activeGoals', name: 'activeGoals', searchable: false},
-                                {title: 'Next Conversation', ariaTitle: 'Next Conversation', target: 0, type: 'date', data: 'nextConversationDue', name: 'nextConversationDue', searchable: false},
-                                {title: 'Excused', ariaTitle: 'Excused', target: 0, type: 'string', data: 'excused', name: 'excused', searchable: false},
-                                {title: 'Shared', ariaTitle: 'Shared', target: 0, type: 'string', data: 'shared', name: 'shared', searchable: false},
-                                {title: 'Direct Reports', ariaTitle: 'Direct Reports', target: 0, type: 'string', data: 'reportees', name: 'reportees', searchable: false},
-                                {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'num', data: 'id', name: 'users.id', searchable: true, visible: false},
+                                {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id'
+                                    , name: 'employee_demo.employee_id', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name'
+                                    , name: 'employee_demo.employee_name', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc'
+                                    , name: 'employee_demo.jobcode_desc', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization'
+                                    , name: 'employee_demo.organization', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program'
+                                 , name: 'employee_demo.level1_program', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division'
+                                    , name: 'employee_demo.level2_division', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch'
+                                    , name: 'employee_demo.level3_branch', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4'
+                                    , name: 'employee_demo.level4', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid'
+                                    , name: 'employee_demo.deptid', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Active Goals', ariaTitle: 'Active Goals', target: 0, type: 'string', data: 'activeGoals'
+                                    , name: 'activeGoals', searchable: false, className: 'dt-nowrap'},
+                                {title: 'Next Conversation', ariaTitle: 'Next Conversation', target: 0, type: 'date', data: 'nextConversationDue'
+                                    , name: 'nextConversationDue', searchable: false, className: 'dt-nowrap'},
+                                {title: 'Excused', ariaTitle: 'Excused', target: 0, type: 'string', data: 'excused'
+                                    , name: 'excused', searchable: false, className: 'dt-nowrap'},
+                                {title: 'Shared', ariaTitle: 'Shared', target: 0, type: 'string', data: 'shared'
+                                    , name: 'shared', searchable: false, className: 'dt-nowrap'},
+                                {title: 'Direct Reports', ariaTitle: 'Direct Reports', target: 0, type: 'string', data: 'reportees'
+                                    , name: 'reportees', searchable: false, className: 'dt-nowrap'},
+                                {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'num', data: 'id'
+                                    , name: 'users.id', searchable: true, visible: false, className: 'dt-nowrap'},
                             ]
                         }
                     );
+                });
+
+                $('#btn_search').click(function(e) {
+                    e.preventDefault();
+                    $('#myorgtable').DataTable().rows().invalidate().draw();
                 });
 
                 $(window).on('beforeunload', function(){

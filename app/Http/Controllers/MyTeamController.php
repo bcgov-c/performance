@@ -45,13 +45,16 @@ class MyTeamController extends Controller
             ->with('goalType')->get();
         $employees = $this->myEmployeesAjax();
 
-        // $adminShared=EmployeeShare::select('shared_with_id')
-        // ->where('user_id', '=', Auth::id())
-        // ->whereIn('shared_element_id', ['B', 'G'])
-        // ->pluck('shared_with_id');
-        // $adminemps = User::select('users.*')
-        // ->whereIn('users.id', $adminShared)->get();
-        // $employees = $employees->merge($adminemps);
+        $adminShared=SharedProfile::select('shared_id')
+        ->where('shared_with', '=', Auth::id())
+        ->where(function ($sh) {
+            $sh->where('shared_item', 'like', '%1%')
+            ->orWhere('shared_item', 'like', '%2%');
+        })
+        ->pluck('shared_id');
+        $adminemps = User::select('users.*')
+        ->whereIn('users.id', $adminShared)->get();
+        $employees = $employees->merge($adminemps);
 
         $type = 'upcoming'; // Allow Editing
         $showSignoff = false;
@@ -195,6 +198,7 @@ class MyTeamController extends Controller
     public function userList(Request $request) {
         $search = $request->search;
         return $this->respondeWith(User::where('name', 'LIKE', "%{$search}%")->paginate());
+        // return $this->respondeWith(User::leftjoin('employee_demo', 'employee_demo.guid', '=', 'users.guid')->where('name', 'LIKE', "%{$search}%")->paginate());
     }
 
     public function performanceStatistics()

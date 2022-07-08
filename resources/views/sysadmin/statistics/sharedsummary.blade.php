@@ -10,6 +10,14 @@
 		<a class="btn btn-primary mr-3" id="btn_print">Print</a>
 	</div>
 
+	<form id="filter-form" >
+		
+		<input type="hidden" name="filter_params" value="{{ old('filter') }}">
+		
+		@include('sysadmin.statistics.partials.filter',['formaction' => route('sysadmin.statistics.sharedsummary') ])
+
+	</form>
+
 <span id="pdf-output">
 
 	<div class="row justify-content-center">
@@ -58,6 +66,7 @@
 <script type="text/javascript">
 
 $(function() {
+	
 	
 	var	pie_basic_1_data = {!!json_encode( $data['chart1'] )!!};
 
@@ -110,8 +119,8 @@ $(function() {
 						onclick: function (option1){
 							ids =  myChart.getModel().option.ids;
 							chart_id = myChart.getModel().option.chart_id;
-							
-							let _url = export_url + '?chart=' + chart_id; // + '&ids=' + ids;
+							filter = $('input[name=filter_params').val();
+							let _url = export_url + '?chart=' + chart_id + filter; // + '&ids=' + ids;
 							window.location.href = _url;
 						}
 					},
@@ -227,7 +236,8 @@ $(function() {
 
 			// prepare the parameters for calling export on difference segments
 			chart_id = myChart.getModel().option.chart_id;
-			let _url = export_url + '?chart=' + chart_id + '&legend=' + params.data.legend;
+			filter = $('input[name=filter_params').val();
+			let _url = export_url + '?chart=' + chart_id + '&legend=' + params.data.legend + filter;
 			window.location.href = _url;
 
 		});

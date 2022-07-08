@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Config;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class Conversation extends Model
 {
@@ -156,11 +157,27 @@ class Conversation extends Model
 
     public static function warningMessage() {
         $lastConv = self::getLastConv();
+        $authId = Auth::id();
+        $user = User::find($authId);
+        if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null )){
+            // $msg1 = "You are required to complete a performance conversation every 4 months at minimum. You are overdue. Please complete a conversation as soon as possible.";
+            // $msg2 = "Your next performance conversation is due by ";
+            // $msg3 = "You must complete your first performance conversation by ";            
+            $msg = "Next performance conversation is due by ";            
+        } else {
+            // $msg1 = $user->name . " is required to complete a performance conversation every 4 months at minimum. It is overdue. Please complete a conversation as soon as possible.";
+            // $msg2 = $user->name . "'s next performance conversation is due by ";
+            // $msg3 = $user->name . " must complete the first performance conversation by ";    
+            $msg = "Next performance conversation is due by ";                        
+        }
+              
         
         if ($lastConv) {
             if ($lastConv->sign_off_time->addMonths(4)->lt(Carbon::now())) {
+                $nextDueDate = $lastConv->sign_off_time->addMonths(4);    
                 return [
-                    "You are required to complete a performance conversation every 4 months at minimum. You are overdue. Please complete a conversation as soon as possible.",
+                    //  $msg1,   
+                    $msg.$nextDueDate->format('d-M-y'),
                     "danger"
                 ];
             }
@@ -168,7 +185,8 @@ class Conversation extends Model
             $diff = Carbon::now()->diffInMonths($lastConv->sign_off_time->addMonths(4), false);
             return [
                 // "Your last performance conversation was completed on ".$lastConv->sign_off_time->format('d-M-y').". 
-                "Your next performance conversation is due by ". $lastConv->sign_off_time->addMonths(4)->format('d-M-y'),
+                // $msg2. $lastConv->sign_off_time->addMonths(4)->format('d-M-y'),
+                $msg. $lastConv->sign_off_time->addMonths(4)->format('d-M-y'),
                 $diff < 0 ? "danger" : ($diff < 1 ? "warning" : "success")
             ];
         }
@@ -181,7 +199,8 @@ class Conversation extends Model
             $diff
         ]); */
         return [
-            "You must complete your first performance conversation by " . $nextDueDate->format('d-M-y'),
+            // $msg3 . $nextDueDate->format('d-M-y'),
+            $msg. $nextDueDate->format('d-M-y'),
             $diff < 0 ? "danger" : ($diff < 1 ? "warning" : "success")
         ];
     }

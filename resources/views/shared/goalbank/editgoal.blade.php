@@ -11,58 +11,10 @@
 
 	<h4>Edit: {{ $goaldetail->title }}</h4>
 
-	<!-- <p class="px-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tincidunt, nibh nec interdum fermentum, est metus rutrum elit, in molestie ex massa ut urna. Duis dignissim tortor ipsum, dignissim rutrum quam gravida sed. Mauris auctor malesuada luctus. Praesent vitae ante et diam gravida lobortis. Donec eleifend euismod scelerisque. Curabitur laoreet erat sit amet tortor rutrum tristique. Sed lobortis est ac mauris lobortis euismod. Morbi tincidunt porta orci eu elementum. Donec lorem lacus, hendrerit a augue sed, tempus rhoncus arcu. Praesent a enim vel eros elementum porta. Nunc ut leo eu augue dapibus efficitur ac ac risus. Maecenas risus tellus, tincidunt vitae finibus vel, ornare vel neque. Curabitur imperdiet orci ac risus tempor semper. Integer nec varius urna, sit amet rhoncus diam. Aenean finibus, sapien eu placerat tristique, sapien dui maximus neque, id tempor dui magna eget lorem. Suspendisse egestas mauris non feugiat bibendum.</p> -->
-	<!-- <p class="px-3">Cras quis augue quis risus auctor facilisis quis ac ligula. Fusce vehicula consequat dui, et egestas augue sodales aliquam. In hac habitasse platea dictumst. Curabitur sit amet nulla nibh. Morbi mollis malesuada diam ut egestas. Pellentesque blandit placerat nisi ac facilisis. Vivamus consequat, nisl a lacinia ultricies, velit leo consequat magna, sit amet condimentum justo nibh id nisl. Quisque mattis condimentum cursus. Nullam eget congue augue, a molestie leo. Aenean sollicitudin convallis arcu non maximus. Curabitur ut lacinia nisi. Nam cursus venenatis lacus aliquet dapibus. Nulla facilisi.</p> -->
-
-	<form id="notify-form" action="{{ route(request()->segment(1).'.goalbank.updategoal') }}" method="post">
+	<form id="notify-form" action="{{ route(request()->segment(1).'.goalbank.updategoal', $request->id) }}" method="post">
 		@csrf
 
-		<br>
-		<h6 class="text-bold">Step 1. Update Goal Details</h6>
-		<br>
-
-		<div class="row">
-			<div class="col m-2">
-				<x-dropdown :list="$goalTypes" label="Goal Type" name="goal_type_id" :selected="$goaldetail->goal_type_id" />
-			</div>
-			<div class="col m-2">
-				<x-input label="Goal Title" name="title" tooltip='A short title (1-3 words) used to reference the goal throughout the Performance platform.' :value="$goaldetail->title" />
-					<small class="text-danger error-title"></small>
-			</div>
-			<div class="col m-2">
-				<x-dropdown :list="$mandatoryOrSuggested" label="Mandatory/Suggested" name="is_mandatory" :selected="$goaldetail->goal_type_id" ></x-dropdown>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col m-2">
-				<x-dropdown :list="$tags" label="Tags" name="tag_ids[]" :selected="array_column($goaldetail->tags->toArray(), 'id')" class="tags" multiple />
-				<small  class="text-danger error-tag_ids"></small>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col m-2">
-				<x-textarea label="Description" name="what" tooltip='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative MyPerformance sessions to ministry audiences".' :value="$goaldetail->what" />
-					<small class="text-danger error-what"></small>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col m-2">
-				<x-textarea label="Measures of Success" name="measure_of_success" tooltip='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"' :value="$goaldetail->measure_of_success" />
-					<small class="text-danger error-measure_of_success"></small>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col m-2">
-				<x-input label="Start Date " class="error-start" type="date" name="start_date" :value="$goaldetail->start_date ? $goaldetail->start_date->format('Y-m-d') : ''" />
-				<small  class="text-danger error-start_date"></small>
-			</div>
-			<div class="col m-2">
-				<x-input label="End Date " class="error-target" type="date" name="target_date" :value="$goaldetail->target_date ? $goaldetail->target_date->format('Y-m-d') : ''" />
-				<small  class="text-danger error-target_date"></small>
-			</div>
-		</div>
-
-		<div class="card m-2">
+		<div class="card">
 			<div class="card-body">
 				<label label="Current Audience" name="current_audience" > Current Organizational Audience </label>
 				@include('shared.goalbank.partials.filter')
@@ -97,10 +49,9 @@
 			</div>
 		</div>
 		<!--Modal ends here--->	
-	
 
 		<br>
-		<h6 class="text-bold">Step 2. Select additional organizational audience</h6>
+		<h6 class="text-bold">Step 1. Select additional organizational audience</h6>
 		<br>
 
 		<input type="hidden" id="selected_org_nodes" name="selected_org_nodes" value="">
@@ -114,9 +65,8 @@
 		</div>
 
 		<br>
-		<h6 class="text-bold">Step 3. Finish</h6>
+		<h6 class="text-bold">Step 2. Finish</h6>
 		<br>
-
 		<div class="col-md-3 mb-2">
 			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveChangesModal()" name="btn_send" value="btn_send">Save Changes</button>
 			<button class="btn btn-secondary mt-2">Cancel</button>
@@ -177,7 +127,34 @@
 
 	<x-slot name="js">
 		<script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
-		<script src="//cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
+		{{-- <script src="//cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script> --}}
+
+		<script>				
+				$('body').popover({
+					selector: '[data-toggle]',
+					trigger: 'click',
+				});
+                
+				$('.modal').popover({
+					selector: '[data-toggle-select]',
+					trigger: 'click',
+				});
+
+				$(".tags").multiselect({
+                	enableFiltering: true,
+                	enableCaseInsensitiveFiltering: true,
+					nonSelectedText: null,
+            	});
+
+				$('body').on('click', function (e) {
+                $('[data-toggle=popover]').each(function () {
+                    // hide any open popovers when the anywhere else in the body is clicked
+                    	if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                        $(this).popover('hide');
+                    	}
+                	});
+				});		
+		</script>
 
 		<script>
 			let g_matched_employees = {!!json_encode($matched_emp_ids)!!};
@@ -340,11 +317,11 @@
 					return true; // return false to cancel form action
 				});
 
-				CKEDITOR.replace('what', {
-					toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ],disableNativeSpellChecker: false});
+				// CKEDITOR.replace('what', {
+				// 	toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ],disableNativeSpellChecker: false});
 
-				CKEDITOR.replace('measure_of_success', {
-					toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ],disableNativeSpellChecker: false});
+				// CKEDITOR.replace('measure_of_success', {
+				// 	toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ],disableNativeSpellChecker: false});
 
 			// Tab  -- LIST Page  activate
 				$("#nav-list-tab").on("click", function(e) {

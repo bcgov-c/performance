@@ -2,7 +2,7 @@
 @section('tab-content')
 <ul>
 	<li>
-		User Guide is under development.
+		User guide and tutorial videos for all basic functions will be available soon.
 	</li>
 </u>
 @endsection

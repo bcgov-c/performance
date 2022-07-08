@@ -120,6 +120,7 @@
         retrieve: true,
         processing: true,
         serverSide: true,
+        'order': [[0, 'desc']],
         ajax: {
             url: '{!! route('sysadmin.notifications') !!}',
             data: function (d) {
