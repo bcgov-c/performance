@@ -653,15 +653,15 @@
 
                         //Additional Info to Capture
                         if (result.conversation_topic_id == 1) {
-                          $("#info_capture1").html('<span>Appreciation (optional) - highlight what has gone well </span><i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="hover" data-content="Provide an overview of the actions or results being celebrated. Be as specific as possible about timing, activities, and outcomes achieved. Highlight behaviours, competencies, and corporate values that you feel contributed to the success." ></i>');
-                          $("#info_capture2").html('<span>Coaching (optional) - identify areas where things could be (even) better </span><i class="fas fa-info-circle" data-toggle="popover" data-placement="right" data-trigger="hover" data-content="Provide specific examples of actions, outcomes or behaviours where there is opportunity for growth. Capture information on any additional assistance or training offered to support improvement."></i>');
-                          $("#info_capture3").html('<span>Evaluation (optional) - provide an overall summary of performance</span> <i class="fas fa-info-circle" data-toggle="popover" data-placement="right" data-trigger="hover" data-content="Be as specific as possible, use examples, and focus on observable behaviours and business results"></i>');
+                          $("#info_capture1").html('<span>Appreciation (optional) - supervisor to highlight what has gone well </span><i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Provide an overview of the actions or results being celebrated. Be as specific as possible about timing, activities, and outcomes achieved. Highlight behaviours, competencies, and corporate values that you feel contributed to the success." ></i>');
+                          $("#info_capture2").html('<span>Coaching (optional) - supervisor to identify areas where things could be (even) better </span><i class="fas fa-info-circle" data-toggle="popover" data-placement="right" data-trigger="click" data-content="Provide specific examples of actions, outcomes or behaviours where there is opportunity for growth. Capture information on any additional assistance or training offered to support improvement."></i>');
+                          $("#info_capture3").html('<span>Evaluation (optional) - supervisor to provide an overall summary of performance</span> <i class="fas fa-info-circle" data-toggle="popover" data-placement="right" data-trigger="click" data-content="Be as specific as possible, use examples, and focus on observable behaviours and business results"></i>');
                         }
                         if (result.conversation_topic_id == 3) {
-                          $('#info_capture1').html('<span>Strengths (optional) – identify your top 1 to 3 strengths</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="hover" data-content="Employee to indicate areas of strength to build on for career advancement." ></i>');
-                          $('#info_capture2').html('<span>Supervisor Comments (optional) – provide feedback on strength(s) identified by employee above</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="hover" data-content="Supervisor to comment on strengths identified by employee, note additional areas of strength as required, and provide examples where appropriate." ></i>');
-                          $('#info_capture3').html('<span>Areas for Growth (optional) – identify 1 to 3 areas you’d most like to grow over the next two years</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="hover" data-content="Employee to indicate areas for growth in the short to medium term to assist with career advancement." ></i>');
-                          $('#info_capture4').html('<span>Supervisor Comments (optional) – provide feedback on area(s) for growth identified by employee above</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="hover" data-content="Supervisor to comment on areas for growth identified by employee, note additional areas of growth as required, and provide examples where appropriate." ></i>');
+                          $('#info_capture1').html('<span>Strengths (optional) ï¿½ identify your top 1 to 3 strengths</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Employee to indicate areas of strength to build on for career advancement." ></i>');
+                          $('#info_capture2').html('<span>Supervisor Comments (optional) ï¿½ provide feedback on strength(s) identified by employee above</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Supervisor to comment on strengths identified by employee, note additional areas of strength as required, and provide examples where appropriate." ></i>');
+                          $('#info_capture3').html('<span>Areas for Growth (optional) ï¿½ identify 1 to 3 areas youï¿½d most like to grow over the next two years</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Employee to indicate areas for growth in the short to medium term to assist with career advancement." ></i>');
+                          $('#info_capture4').html('<span>Supervisor Comments (optional) ï¿½ provide feedback on area(s) for growth identified by employee above</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Supervisor to comment on areas for growth identified by employee, note additional areas of growth as required, and provide examples where appropriate." ></i>');
                         }
                         if (result.conversation_topic_id == 4) {
                           $("#info_capture1").html("What date will a follow up meeting occur?");
@@ -686,6 +686,15 @@
                         // result.questions
                         $('#template-title').text(result.topic.name + ' Template');
                         // $('#conv_participant_edit').next(".select2-container").hide();
+
+                        $('body').on('click', function (e) {
+                            $('[data-toggle=popover]').each(function () {
+                            // hide any open popovers when the anywhere else in the body is clicked
+                            if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                                $(this).popover('hide');
+                                }
+                            });
+                        });
 
                         var participants = '';
                         $.each(result.topics, function(key, value) {
@@ -722,6 +731,7 @@
                     }
                 });
             }
+
 
         </script>
     </x-slot>
