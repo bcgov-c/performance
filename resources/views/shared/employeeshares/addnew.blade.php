@@ -1,7 +1,7 @@
 <x-side-layout title="{{ __('Dashboard') }}">
     <div name="header" class="container-header p-n2 "> 
         <div class="container-fluid">
-            <h3>Shared Employees</h3>
+            <h3>Share Employees</h3>
             @include('shared.employeeshares.partials.tabs')
         </div>
     </div>
@@ -14,7 +14,7 @@
 		the supervisor you would like to share the profiles with, which elements you would like to share, and your reason 
 		for sharing the profile.</p>
 
-    <form id="share-form" action="{{ route(request()->segment(1).'.employeeshares.saveall') }}" method="post">
+    <form id="notify-form" action="{{ route(request()->segment(1).'.employeeshares.saveall') }}" method="post">
         @csrf
 
         <div class="container-fluid">
@@ -89,7 +89,10 @@
                        </div>
                         <div class="col col-10">
                             <x-input id="reason" name="input_reason" label="Reason for sharing" data-toggle="tooltip" data-placement="top" data-trigger="manual" tooltip="Reason tooltip"/>
-					        <small  class="text-danger error-target_date"></small>
+                            @error('input_reason')
+                                {{-- <div class="alert alert-danger alert-dismissable fade show"> "Reason for sharing" is required. </div> --}}
+					            <small  class="text-danger error-reason" id="error-reason"></small>
+                            @enderror
                         </div>
                     </div>
                 </div>
@@ -98,10 +101,10 @@
 
         <div class="container-fluid">
             <br>
-            <h6 class="text-bold">Step 4. Select selected profile(s)</h6>
+            <h6 class="text-bold">Step 4. Share selected profile(s)</h6>
             <br>
             <div class="col-md-3 mb-2">
-                <button class="btn btn-primary mt-2" type="submit" onclick="confirmSaveAllModal()" name="btn_send" value="btn_send">Share</button>
+                <button class="btn btn-primary mt-2" type="button" onclick="confirmSaveAllModal()" name="btn_send" value="btn_send">Share</button>
                 <button class="btn btn-secondary mt-2">Cancel</button>
             </div>
         </div>
@@ -377,7 +380,7 @@
                     $('#eemployee-list-table').DataTable().rows().invalidate().draw();
                 });
 
-				$('#share-form').submit(function() {
+				$('#notify-form').submit(function() {
 					// assign back the selected employees to server
 					var text = JSON.stringify(g_selected_employees);
 					$('#selected_emp_ids').val( text );
@@ -412,7 +415,7 @@
                                 $.ajax({
                                     url: "{{ '/' . request()->segment(1) . '/employeeshares/org-tree' }}",
                                     type: 'GET',
-                                    data: $("#share-form").serialize(),
+                                    data: $("#notify-form").serialize(),
                                     dataType: 'html',
                                     beforeSend: function() {
                                         $("#tree-loading-spinner").show();                    
@@ -456,7 +459,7 @@
                                 $.ajax({
                                     url: "{{ '/' . request()->segment(1) . '/employeeshares/eorg-tree' }}",
                                     type: 'GET',
-                                    data: $("share-form").serialize(),
+                                    data: $("notify-form").serialize(),
                                     dataType: 'html',
                                     beforeSend: function() {
                                         $("#etree-loading-spinner").show();                    
@@ -478,7 +481,7 @@
                                 
                             ).then(function( data, textStatus, jqXHR ) {
                                 //alert( jqXHR.status ); // Alerts 200
-                                nodes = $('#eaccordion-level0 input:checkbox');
+                                enodes = $('#eaccordion-level0 input:checkbox');
                                 eredrawTreeCheckboxes();	
                             }); 
                         
@@ -541,8 +544,8 @@
 
                 function eredrawTreeCheckboxes() {
                     // redraw the selection 
-                    nodes = $('#eaccordion-level0 input:checkbox');
-                    $.each( nodes, function( index, chkbox ) {
+                    enodes = $('#eaccordion-level0 input:checkbox');
+                    $.each( enodes, function( index, chkbox ) {
                         if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
 
                             all_emps = eg_employees_by_org[ chkbox.value ].map( function(x) {return x.employee_id} );
@@ -572,7 +575,7 @@
                     });
 
                     // reset checkbox state
-                    reverse_list = nodes.get().reverse();
+                    reverse_list = enodes.get().reverse();
                     $.each( reverse_list, function( index, chkbox ) {
                         if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
                             pid = $(chkbox).attr('pid');
@@ -632,8 +635,8 @@
                     var c_unchecked = 0;
 
                     prev_location = $(prev_input).parent().attr('href');
-                    nodes = $(prev_location).find("input:checkbox[name='eorgCheck[]']");
-                    $.each( nodes, function( index, chkbox ) {
+                    enodes = $(prev_location).find("input:checkbox[name='eorgCheck[]']");
+                    $.each( enodes, function( index, chkbox ) {
                         if (chkbox.checked) {
                             c_checked++;
                         } else if ( chkbox.indeterminate ) {

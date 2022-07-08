@@ -37,7 +37,7 @@
             <label for="sender" class="col-sm-2 col-form-label">Sender:</label>
             <div class="col-sm-2">
                 <input type="text" class="form-control" id="sender" name="sender" 
-                value="{{ $generic_template->sender == '1' ? 'User' : 'Other' }}" readonly>
+                value="{{ $generic_template->sender == '1' ? 'User' : 'System' }}" readonly>
             </div>
           
             <label for="email" class="col-sm-1 col-form-label text-right">Email:</label>

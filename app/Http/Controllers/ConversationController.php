@@ -172,6 +172,11 @@ class ConversationController extends Controller
             $myTeamConversations = $myTeamQuery->orderBy('id', 'DESC')->paginate(10);
             
         }
+        
+        $supervisor_conversations = array();
+        foreach ($conversations as $conversation) {
+            array_push($supervisor_conversations, $conversation->id);
+        }
 
         $view = 'conversation.index';
         $reportees = $user->reportees()->get();
@@ -181,8 +186,9 @@ class ConversationController extends Controller
         } else {            
             $textAboveFilter = 'The list below contains all planned conversations that have yet to be signed-off by both employee and supervisor. Once a conversation has been signed-off by both participants, it will move to the Completed Conversations tab and become an official performance development record for the employee.';
         }
+          
                 
-        return view($view, compact('type', 'conversations', 'myTeamConversations', 'conversationTopics', 'conversationMessage', 'viewType', 'reportees', 'topics', 'textAboveFilter', 'user'));
+        return view($view, compact('type', 'conversations', 'myTeamConversations', 'conversationTopics', 'conversationMessage', 'viewType', 'reportees', 'topics', 'textAboveFilter', 'user', 'supervisor_conversations'));
     }
 
     /**
@@ -236,14 +242,15 @@ class ConversationController extends Controller
         }
         DB::commit();
 
-        // // Send a notification to all participants that you would like to schedule a conversation 
-        // $topic = ConversationTopic::find($request->conversation_topic_id);
-        // $sendMail = new \App\MicrosoftGraph\SendMail();
-        // $sendMail->toRecipients = $request->participant_id;
-        // $sendMail->sender_id = Auth::id();
-        // $sendMail->template = 'ADVICE_SCHEDULE_CONVERSATION';
-        // array_push($sendMail->bindvariables, $topic->name);
-        // $response = $sendMail->sendMailWithGenericTemplate();
+        // // Send a notification to all participants that you would like to schedule a conversation   
+        $topic = ConversationTopic::find($request->conversation_topic_id);
+        $sendMail = new \App\MicrosoftGraph\SendMail();
+        $sendMail->toRecipients = $request->participant_id;
+        $sendMail->sender_id = null;  // default sender is System
+        $sendMail->useQueue = false;
+        $sendMail->template = 'ADVICE_SCHEDULE_CONVERSATION';
+        array_push($sendMail->bindvariables, $topic->name);
+        $response = $sendMail->sendMailWithGenericTemplate();
 
         if(request()->ajax()){
             return response()->json(['success' => true, 'message' => 'Conversation Created successfully']);
@@ -262,9 +269,61 @@ class ConversationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function show(Conversation $conversation)
+    public function show(Conversation $conversation, Request $request)
     {
         $conversation->topics = ConversationTopic::all();
+        
+        $conversation_id = $conversation->id;
+        $current_user = auth()->user()->id;
+        
+        $conversation_participants = DB::table('conversation_participants')                        
+                        ->where('conversation_id', $conversation_id)
+                        ->where('participant_id', '<>', $current_user)
+                        ->get();         
+        $participant = $conversation_participants[0]->participant_id;
+        
+        $participant_is_mgr = false;
+        $user_is_mgr = false; 
+        
+        //check direct report
+        $check_mgr = DB::table('users')                        
+                        ->where('reporting_to', $participant)
+                        ->where('id', $current_user)
+                        ->count(); 
+        
+        $own_conversation = false;
+        if($check_mgr > 0) {
+            $participant_is_mgr = true;
+        } else {
+            $check_mgr = DB::table('users')                        
+                        ->where('reporting_to', $current_user)
+                        ->where('id', $participant)
+                        ->count(); 
+            if($check_mgr > 0) {
+                $user_is_mgr = true;                
+            } else {
+                // check shared
+                $check_mgr = DB::table('shared_profiles')                        
+                        ->where('shared_id', $current_user)
+                        ->where('shared_with', $participant)
+                        ->count(); 
+                if($check_mgr > 0) {
+                    $participant_is_mgr = true;
+                } else {
+                    $user_is_mgr = true;     
+                }
+            }
+        }
+        
+        
+        if($user_is_mgr ==  true) {
+            $view_as_supervisor = true;
+        } else {
+            $view_as_supervisor = false;
+        }
+        //$request->session()->put('view_as_supervisor', $view_as_supervisor);
+        $conversation->view_as_supervisor = $view_as_supervisor;
+        //error_log($conversation->view_as_supervisor);
 
         return $conversation;
     }
@@ -318,7 +377,7 @@ class ConversationController extends Controller
     {
         $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
         $current_employee = DB::table('employee_demo')
-                            ->select('employee_id')
+                            ->select('employee_demo.employee_id')
                             ->join('users', 'employee_demo.guid', '=', 'users.guid')
                             ->where('users.id', $authId)
                             ->get();
@@ -355,7 +414,7 @@ class ConversationController extends Controller
     {
         $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
         $current_employee = DB::table('employee_demo')
-                            ->select('employee_id')
+                            ->select('employee_demo.employee_id')
                             ->join('users', 'employee_demo.guid', '=', 'users.guid')
                             ->where('users.id', $authId)
                             ->get();
@@ -378,6 +437,8 @@ class ConversationController extends Controller
     }
 
     public function templates(Request $request, $viewType = 'conversations') {
+        $authId = Auth::id();
+        $user = User::find($authId);
         $query = new ConversationTopic;
         if ($request->has('search') && $request->search) {
             $query = $query->where('name', 'LIKE', "%$request->search%");
@@ -385,7 +446,7 @@ class ConversationController extends Controller
         $templates = $query->get();
         $searchValue = $request->search ?? '';
         $conversationMessage = Conversation::warningMessage();
-        return view('conversation.templates', compact('templates', 'searchValue', 'conversationMessage', 'viewType'));
+        return view('conversation.templates', compact('templates', 'searchValue', 'conversationMessage', 'viewType', 'user'));
     }
 
     public function templateDetail($id) {
@@ -397,14 +458,16 @@ class ConversationController extends Controller
         $reportingManager = $user->reportingManager()->get();
         $sharedProfile = SharedProfile::where('shared_with', Auth::id())->with('sharedUser')->get()->pluck('sharedUser');
         $participants = $participants->toBase()->merge($reportingManager)->merge($sharedProfile);
+        
+        error_log(print_r($sharedProfile,true));
 
-        // $adminShared=EmployeeShare::select('shared_with_id')
-        // ->where('user_id', '=', Auth::id())
-        // ->whereIn('shared_element_id', ['B', 'C'])
-        // ->pluck('shared_with_id');
-        // $adminemps = User::select('users.*')
-        // ->whereIn('users.id', $adminShared)->get('id', 'name');
-        // $participants = $participants->toBase()->merge($adminemps);
+        $adminShared=SharedProfile::select('shared_with')
+        ->where('shared_id', '=', Auth::id())
+        ->where('shared_item', 'like', '%2%')
+        ->pluck('shared_with');
+        $adminemps = User::select('users.*')
+        ->whereIn('users.id', $adminShared)->get('id', 'name');
+        $participants = $participants->merge($adminemps);
 
         return view('conversation.partials.template-detail-modal-body', compact('template','allTemplates','participants','reportingManager'));
     }

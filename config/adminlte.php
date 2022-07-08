@@ -355,14 +355,11 @@ return [
                     'url'  => 'sysadmin/unlock/unlockconversation',
                     'active' => ['sysadmin/unlock/*']
                 ],
-                // [
-                //     // 'text' => 'Notifications',
-                //     // 'url'  => 'sysadmin/notifications/createnotification',
-                //     // 'active' => ['sysadmin/notifications/*']
-                //     'text' => 'Notifications',
-                //     'url'  => 'sysadmin/notifications',
-                //     'active' => ['sysadmin/notifications/*']
-                // ],
+                [
+                    'text' => 'Notifications',
+                    'url'  => 'sysadmin/notifications/generic-template',
+                    'active' => ['sysadmin/notifications/*']
+                ],
                 [
                     'text' => 'Access and Permissions',
                     'url'  => 'sysadmin/accesspermissions',

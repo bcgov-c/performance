@@ -550,16 +550,21 @@
 				}
 			});
 
-			$('#btn_search_reset').click(function(e) {
-					e.preventDefault();
-					$('#search_text').val(null);
-					$('#dd_level0').val(null);
-					$('#dd_level1').val(null);
-					$('#dd_level2').val(null);
-					$('#dd_level3').val(null);
-					$('#dd_level4').val(null);
-					// $('#btn_search').click();
-        		});
+			// $('#btn_search_reset').click(function(e) {
+			// 		e.preventDefault();
+			// 		$('#search_text').val(null);
+			// 		$('#dd_level0').val(null);
+			// 		$('#dd_level1').val(null);
+			// 		$('#dd_level2').val(null);
+			// 		$('#dd_level3').val(null);
+			// 		$('#dd_level4').val(null);
+			// 		// $('#btn_search').click();
+        	// 	});
+
+			$('#btn_search').click(function(e) {
+				e.preventDefault();
+				$('#employee-list-table').DataTable().rows().invalidate().draw();
+			} );
 
 			$(window).on('beforeunload', function(){
 				$('#pageLoader').show();

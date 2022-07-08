@@ -2,25 +2,25 @@
 
 namespace App\Http\Controllers\SysAdmin;
 
-
+use Validator;
 use App\Models\User;
 use App\Models\Goal;
 use App\Models\Conversation;
 use App\Models\SharedElement;
-use App\Models\EmployeeShare;
+// use App\Models\EmployeeShare;
 use App\Models\SharedProfile;
 use App\Models\ConversationParticipant;
 use App\Models\EmployeeDemo;
-use Illuminate\Http\Request;
 use App\Models\OrganizationTree;
 use Yajra\Datatables\Datatables;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+// use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 
@@ -151,15 +151,26 @@ class EmployeeSharesController extends Controller
     }
 
     public function saveall(Request $request) {
+        $input = $request->all();
+        $rules = [
+            'input_reason' => 'required',
+        ];
+        $messages = [
+            'required' => 'The :attribute field is required.',
+        ];
+        $validator = Validator::make($input, $rules, $messages);
+        if ($validator->fails()) {
+            return redirect()->route(request()->segment(1).'.employeeshares')
+            ->withErrors($validator)
+            ->withInput();
+        }
         $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $eselected_emp_ids = $request->eselected_emp_ids ? json_decode($request->eselected_emp_ids) : [];
         $request->userCheck = $selected_emp_ids;
         $request->euserCheck = $eselected_emp_ids;
         $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
         $eselected_org_nodes = $request->eselected_org_nodes ? json_decode($request->eselected_org_nodes) : [];
-
         $current_user = User::find(Auth::id());
-
         $employee_ids = ($request->userCheck) ? $request->userCheck : [];
 
         $eeToShare = EmployeeDemo::select('users.id')
@@ -202,7 +213,7 @@ class EmployeeSharesController extends Controller
                 }
             }
         }
-        return redirect()->route(request()->segment(1).'.employeeshares.addnew')
+        return redirect()->route(request()->segment(1).'.employeeshares')
             ->with('success', 'Share user goal/conversation successful.');
     }
 
@@ -303,7 +314,7 @@ class EmployeeSharesController extends Controller
         $eempIdsByOrgId = $erows->groupBy('id')->all();
 
         if($request->ajax()){
-            return view('shared.employeeshares.partials.erecipient-tree', compact('eorgs','eempIdsByOrgId') );
+            return view('shared.employeeshares.partials.erecipient-tree', compact('eorgs', 'ecountByOrg', 'eempIdsByOrgId') );
         } 
     }
   
@@ -375,22 +386,6 @@ class EmployeeSharesController extends Controller
         return ['data'=> $users];
     }
 
-
-    public function getOrganizations(Request $request) {
-        $orgs = OrganizationTree::
-        orderby('organization_trees.name','asc')->select('organization_trees.id','organization_trees.name')
-            ->where('organization_trees.level',0)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(name) LIKE '%" . strtolower($request->q) . "%'");
-            })
-            ->get();
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-        return response()->json($formatted_orgs);
-    } 
-
     public function egetOrganizations(Request $request) {
         $eorgs = OrganizationTree::
         orderby('organization_trees.name','asc')->select('organization_trees.id','organization_trees.name')
@@ -404,27 +399,6 @@ class EmployeeSharesController extends Controller
             $eformatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
         }
         return response()->json($eformatted_orgs);
-    } 
-
-    public function getPrograms(Request $request) {
-        $level0 = $request->level0 ? OrganizationTree::
-        where('organization_trees.id',$request->level0)->first() : null;
-        $orgs = OrganizationTree::
-        orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',1)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $level0 , function ($q) use($level0) {
-                return $q->where('organization_trees.organization', $level0->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->get();
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-        return response()->json($formatted_orgs);
     } 
 
     public function egetPrograms(Request $request) {
@@ -446,37 +420,6 @@ class EmployeeSharesController extends Controller
             $eformatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
         }
         return response()->json($eformatted_orgs);
-    } 
-
-    public function getDivisions(Request $request) {
-
-        $level0 = $request->level0 ? OrganizationTree::
-            where('organization_trees.id', $request->level0)->first() : null;
-        $level1 = $request->level1 ? OrganizationTree::
-        where('organization_trees.id', $request->level1)->first() : null;
-
-        $orgs = OrganizationTree::
-        orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',2)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $level0 , function ($q) use($level0) {
-                return $q->where('organization_trees.organization', $level0->name) ;
-            })
-            ->when( $level1 , function ($q) use($level1) {
-                return $q->where('organization_trees.level1_program', $level1->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->limit(300)
-            ->get();
-
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($formatted_orgs);
     } 
 
     public function egetDivisions(Request $request) {
@@ -508,42 +451,6 @@ class EmployeeSharesController extends Controller
         }
 
         return response()->json($eformatted_orgs);
-    } 
-
-    public function getBranches(Request $request) {
-
-        $level0 = $request->level0 ? OrganizationTree::
-            where('organization_trees.id', $request->level0)->first() : null;
-        $level1 = $request->level1 ? OrganizationTree::
-            where('organization_trees.id', $request->level1)->first() : null;
-        $level2 = $request->level2 ? OrganizationTree::
-            where('organization_trees.id', $request->level2)->first() : null;
-
-        $orgs = OrganizationTree::
-        orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',3)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $level0 , function ($q) use($level0) {
-                return $q->where('organization_trees.organization', $level0->name) ;
-            })
-            ->when( $level1 , function ($q) use($level1) {
-                return $q->where('organization_trees.level1_program', $level1->name );
-            })
-            ->when( $level2 , function ($q) use($level2) {
-                return $q->where('organization_trees.level2_division', $level2->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->limit(300)
-            ->get();
-
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($formatted_orgs);
     } 
 
     public function egetBranches(Request $request) {
@@ -579,46 +486,6 @@ class EmployeeSharesController extends Controller
         }
 
         return response()->json($eformatted_orgs);
-    } 
-
-    public function getLevel4(Request $request) {
-        $level0 = $request->level0 ? OrganizationTree::
-            where('organization_trees.id', $request->level0)->first() : null;
-        $level1 = $request->level1 ? OrganizationTree::
-            where('organization_trees.id', $request->level1)->first() : null;
-        $level2 = $request->level2 ? OrganizationTree::
-            where('organization_trees.id', $request->level2)->first() : null;
-        $level3 = $request->level3 ? OrganizationTree::
-            where('organization_trees.id', $request->level3)->first() : null;
-
-        $orgs = OrganizationTree::
-            orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',4)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $level0 , function ($q) use($level0) {
-                return $q->where('organization_trees.organization', $level0->name) ;
-            })
-            ->when( $level1 , function ($q) use($level1) {
-                return $q->where('organization_trees.level1_program', $level1->name );
-            })
-            ->when( $level2 , function ($q) use($level2) {
-                return $q->where('organization_trees.level2_division', $level2->name );
-            })
-            ->when( $level3 , function ($q) use($level3) {
-                return $q->where('organization_trees.level3_branch', $level3->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->limit(300)
-            ->get();
-
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($formatted_orgs);
     } 
 
     public function egetLevel4(Request $request) {
@@ -704,7 +571,7 @@ class EmployeeSharesController extends Controller
 
         $parent_id = $id;
         
-        return view('shared.employeeshares.partials.employee', compact('parent_id', 'employees') ); 
+        return view('shared.employeeshares.partials.employee', compact('eparent_id', 'eemployees') ); 
     }
 
     protected function search_criteria_list() {
@@ -759,7 +626,7 @@ class EmployeeSharesController extends Controller
         return $demoWhere;
     }
 
-    protected function ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4) {
+    protected function ebaseFilteredWhere(Request $request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4) {
         // Base Where Clause
         $edemoWhere = EmployeeDemo::
             when( $elevel0, function ($q) use($elevel0) {
@@ -946,11 +813,11 @@ class EmployeeSharesController extends Controller
 
     public function manageindexlist(Request $request) {
         if ($request->ajax()) {
-            $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-            $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-            $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-            $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-            $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+            $level0 = $request->dd_level0 ? OrganizationTree::where('organization_trees.id', $request->dd_level0)->first() : null;
+            $level1 = $request->dd_level1 ? OrganizationTree::where('organization_trees.id', $request->dd_level1)->first() : null;
+            $level2 = $request->dd_level2 ? OrganizationTree::where('organization_trees.id', $request->dd_level2)->first() : null;
+            $level3 = $request->dd_level3 ? OrganizationTree::where('organization_trees.id', $request->dd_level3)->first() : null;
+            $level4 = $request->dd_level4 ? OrganizationTree::where('organization_trees.id', $request->dd_level4)->first() : null;
 
             $query = User::withoutGlobalScopes()
             ->join('shared_profiles', 'shared_profiles.shared_id', '=', 'users.id')
@@ -1009,7 +876,7 @@ class EmployeeSharesController extends Controller
                 return $row->created_at ? $row->created_at->format('M d, Y H:i:s') : null;
             })
             ->editColumn('updated_at', function ($row) {
-                return $row->updated_at ? $row->updated_at->format('M D, Y H:i:s') : null;
+                return $row->updated_at ? $row->updated_at->format('M d, Y H:i:s') : null;
             })
             ->addcolumn('action', function($row) {
                 $btn = '<a href="' . route(request()->segment(1) . '.employeeshares.deleteshare', ['id' => $row->shared_profile_id]) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="' . $row->shared_profile_id . '"><i class="fa fa-trash"></i></a>';

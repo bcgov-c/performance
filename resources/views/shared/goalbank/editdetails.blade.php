@@ -1,0 +1,210 @@
+<x-side-layout title="{{ __('Dashboard') }}">
+    <div name="header" class="container-header p-n2 "> 
+        <div class="container-fluid">
+            <h3>Goal Bank</h3>
+        </div>
+    </div>
+
+	<small><a href=" {{ route(request()->segment(1).'.goalbank.manageindex') }}" class="btn btn-md btn-primary"><i class="fa fa-arrow-left"></i> Back to goals</a></small>
+
+	<br><br>
+
+	<h4>Edit: {{ $goaldetail->title }}</h4>
+
+	<form id="notify-form" action="{{ route(request()->segment(1).'.goalbank.updategoaldetails', $request->id) }}" method="post">
+		@csrf
+
+		<div class="row">
+			<div class="col m-2">
+				<b>Goal Type</b>
+				<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="{{$type_desc_str}}"> </i>
+				<x-dropdown :list="$goalTypes" name="goal_type_id" :selected="$goaldetail->goal_type_id" />
+			</div>
+			<div class="col m-2">
+				<b>Goal Title</b>
+				<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>
+				<x-input name="title" :value="$goaldetail->title" />
+					<small class="text-danger error-title"></small>
+			</div>
+			<div class="col m-2">
+				<x-dropdown :list="$mandatoryOrSuggested" label="Mandatory/Suggested" name="is_mandatory" :selected="$goaldetail->is_mandatory" ></x-dropdown>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col m-2">
+				<b>Tags</b>
+				<i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resource/goal-setting?t=4' target=\'_blank\'><u>View full list of tag descriptions.</u></a>"></i>				
+				<x-dropdown :list="$tags" name="tag_ids[]" :selected="array_column($goaldetail->tags->toArray(), 'id')" class="tags" multiple />
+				<small  class="text-danger error-tag_ids"></small>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col m-2">
+				<b>Goal Description</b>
+				<p>
+				Each goal should include a description of <b>WHAT</b>  
+				<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".'> </i> you will accomplish, <b>WHY</b> 
+				<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important,, and <b>HOW</b> 
+				<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> you will achieve it. 
+				</p>
+				<x-textarea name="what" :value="$goaldetail->what" />
+					<small class="text-danger error-what"></small>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col m-2">
+				<b>Measures of Success</b>
+				<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"'> </i>
+				<x-textarea name="measure_of_success" :value="$goaldetail->measure_of_success" />
+					<small class="text-danger error-measure_of_success"></small>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col m-2">
+				<x-input label="Start Date " class="error-start" type="date" name="start_date" :value="$goaldetail->start_date ? $goaldetail->start_date->format('Y-m-d') : ''" />
+				<small  class="text-danger error-start_date"></small>
+			</div>
+			<div class="col m-2">
+				<x-input label="End Date " class="error-target" type="date" name="target_date" :value="$goaldetail->target_date ? $goaldetail->target_date->format('Y-m-d') : ''" />
+				<small  class="text-danger error-target_date"></small>
+			</div>
+		</div>
+
+		<div class="col-md-3 mb-2">
+			<button class="btn btn-primary mt-2" type="submit" name="btn_send" value="btn_send">Save Changes</button>
+			<button class="btn btn-secondary mt-2">Cancel</button>
+		</div>
+
+	</form>
+
+	<h6 class="m-20">&nbsp;</h6>
+	<h6 class="m-20">&nbsp;</h6>
+	<h6 class="m-20">&nbsp;</h6>
+
+
+    @push('css')
+        <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}">
+    @endpush
+
+	<x-slot name="css">
+		<style>
+
+            #currenttable_filter label {
+                text-align: right !important;
+            }
+
+			.select2-container .select2-selection--single {
+				height: 38px !important;
+			}EmployeeID
+
+			.select2-container--default .select2-selection--single .select2-selection__arrow {
+				height: 38px !important;
+			}
+
+			.pageLoader{
+				/* background: url(../images/loader.gif) no-repeat center center; */
+				position: fixed;
+				top: 0;
+				left: 0;
+				height: 100%;
+				width: 100%;
+				z-index: 9999999;
+				background-color: #ffffff8c;
+
+			}
+
+			.pageLoader .spinner {
+				/* background: url(../images/loader.gif) no-repeat center center; */
+				position: fixed;
+				top: 25%;
+				left: 47%;
+				/* height: 100%;
+				width: 100%; */
+				width: 10em;
+				height: 10em;
+				z-index: 9000000;
+			}
+
+		</style>
+	</x-slot>
+
+	<x-slot name="js">
+		<script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
+		<script src="//cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
+
+		<script>				
+				$('body').popover({
+					selector: '[data-toggle]',
+					trigger: 'click',
+				});
+                
+				$('.modal').popover({
+					selector: '[data-toggle-select]',
+					trigger: 'click',
+				});
+
+				$(".tags").multiselect({
+                	enableFiltering: true,
+                	enableCaseInsensitiveFiltering: true,
+					nonSelectedText: null,
+            	});
+
+				$('body').on('click', function (e) {
+                $('[data-toggle=popover]').each(function () {
+                    // hide any open popovers when the anywhere else in the body is clicked
+                    	if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                        $(this).popover('hide');
+                    	}
+                	});
+				});		
+		</script>
+
+		<script>
+			$(document).ready(function(){
+
+				$(".tags").multiselect({
+                	enableFiltering: true,
+                	enableCaseInsensitiveFiltering: true
+            	});
+
+				$('#pageLoader').hide();
+
+				$('#notify-form').keydown(function (e) {
+					if (e.keyCode == 13) {
+						e.preventDefault();
+						return false;
+					}
+				});
+
+				// $('#notify-form').submit(function() {
+				// 	// console.log('Search Button Clicked');			
+				// 	// assign back the selected employees to server
+				// 	var text = JSON.stringify(ag_selected_employees);
+				// 	$('#aselected_emp_ids').val( text );
+				// 	var text2 = JSON.stringify(ag_selected_orgnodes);
+				// 	$('#aselected_org_nodes').val( text2 );
+				// 	// dd(g_selected_orgnodes);
+				// 	return true; // return false to cancel form action
+				// });
+
+				CKEDITOR.replace('what', {
+					toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ],disableNativeSpellChecker: false});
+
+				CKEDITOR.replace('measure_of_success', {
+					toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ],disableNativeSpellChecker: false});
+
+				$(window).on('beforeunload', function(){
+					$('#pageLoader').show();
+				});
+
+				$(window).resize(function(){
+					location.reload();
+					return;
+				});
+
+			});
+
+		</script>
+	</x-slot>
+
+</x-side-layout>

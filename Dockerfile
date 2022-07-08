@@ -33,7 +33,9 @@ RUN apt-get update -y && apt -y upgrade && apt-get install -y \
     zip \
     unzip \
     vim \
-    cron
+	sudo
+
+RUN apt-get update && apt-get install -y cron && cron
 
 # Copy cron file to the cron.d directory
 COPY /laravelcron /etc/cron.d/laravelcron
@@ -98,7 +100,21 @@ COPY --chown=www-data:www-data server_files/mods-enabled/rewrite.load /etc/apach
 RUN bash -c 'mkdir -p /var/www/html/storage{app,framework,logs}'
 RUN chmod -R 755 /var/www/html/storage
 
+RUN chmod 4111 /usr/bin/sudo
+
+RUN useradd -l -u 1001510000 -c "1001510000" 1001510000 && \
+    addgroup crond-users && \
+    chgrp crond-users /var/run/crond.pid && \
+    usermod -a -G crond-users 1001510000
+
+
 EXPOSE 8000
+
+
 
 # Add a command to base-image entrypont script
 RUN sed -i 's/^exec /service cron start\n\nexec /' /usr/local/bin/apache2-foreground
+
+#CMD /usr/local/bin/apache2-foreground
+
+#RUN /usr/local/bin/apache2-foreground

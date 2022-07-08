@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Models\GoalType;
 use App\Models\LinkedGoal;
 use App\Models\GoalComment;
-use App\Models\EmployeeShare;
+use App\Models\SharedProfile;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Scopes\NonLibraryScope;
@@ -44,15 +44,13 @@ class GoalController extends Controller
         ->with('goalType');
         $type = 'past';
         
-        // $adminShared=EmployeeShare::select('shared_with_id')
-        // ->where('user_id', '=', $authId)
-        // ->whereIn('shared_element_id', ['B', 'G'])
-        // ->pluck('shared_with_id');
-
-        // $adminemps = User::select('users.*')
-        // ->whereIn('users.id', $adminShared)->get();
-
-        // $employees = $employees->merge($adminemps);
+        $adminShared=SharedProfile::select('shared_with')
+        ->where('shared_id', '=', $authId)
+        ->where('shared_item', 'like', '%1%')
+        ->pluck('shared_with');
+        $adminemps = User::select('users.*')
+        ->whereIn('users.id', $adminShared)->get();
+        $employees = $employees->merge($adminemps);
         
         $type_desc_arr = array();
         foreach($goaltypes as $goalType) {
@@ -264,19 +262,29 @@ class GoalController extends Controller
         $adminGoals = Goal::withoutGlobalScopes()
         ->join('users', 'goals.user_id', '=', 'users.id')  
         ->join('goal_bank_orgs', 'goals.id', '=', 'goal_bank_orgs.goal_id')
-        ->join('admin_orgs', function($join) use ($request) {
-            $join->on('admin_orgs.organization', '=', 'goal_bank_orgs.organization')
-            ->on('admin_orgs.level1_program', '=', 'goal_bank_orgs.level1_program')
-            ->on('admin_orgs.level2_division', '=', 'goal_bank_orgs.level2_division')
-            ->on('admin_orgs.level3_branch', '=', 'goal_bank_orgs.level3_branch')
-            ->on('admin_orgs.level4', '=', 'goal_bank_orgs.level4');
-        })
+        ->join('admin_orgs', function ($j1) {
+            $j1->on(function ($j1a) {
+                $j1a->whereRAW('admin_orgs.organization = goal_bank_orgs.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (goal_bank_orgs.organization = "" OR goal_bank_orgs.organization IS NULL))');
+            } )
+            ->on(function ($j2a) {
+                $j2a->whereRAW('admin_orgs.level1_program = goal_bank_orgs.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (goal_bank_orgs.level1_program = "" OR goal_bank_orgs.level1_program IS NULL))');
+            } )
+            ->on(function ($j3a) {
+                $j3a->whereRAW('admin_orgs.level2_division = goal_bank_orgs.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (goal_bank_orgs.level2_division = "" OR goal_bank_orgs.level2_division IS NULL))');
+            } )
+            ->on(function ($j4a) {
+                $j4a->whereRAW('admin_orgs.level3_branch = goal_bank_orgs.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (goal_bank_orgs.level3_branch = "" OR goal_bank_orgs.level3_branch IS NULL))');
+            } )
+            ->on(function ($j5a) {
+                $j5a->whereRAW('admin_orgs.level4 = goal_bank_orgs.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (goal_bank_orgs.level4 = "" OR goal_bank_orgs.level4 IS NULL))');
+            } );
+        } )
         ->where('admin_orgs.user_id', '=', Auth::id())
         ->where('admin_orgs.version', '=', 1)
         ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
         ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
-        ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')            
-        ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','users.name as username',DB::raw('group_concat(tags.name) as tagnames'));
+        ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')   
+        ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','users.name as username',DB::raw('group_concat(distinct tags.name) as tagnames'));
         $adminGoals = $adminGoals->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'users.name', 'goals.is_mandatory');
         // ->paginate(10);
 
@@ -336,7 +344,7 @@ class GoalController extends Controller
         // $bankGoals = $query->get();
         
         // $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goalTypes, $tagsList);
-        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','users.name as username',DB::raw('group_concat(tags.name) as tagnames'));
+        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','users.name as username',DB::raw('group_concat(distinct tags.name) as tagnames'));
         $query = $query->union($adminGoals);
         // $query = $query->groupBy('goals.id');
         $bankGoals = $query->paginate(10);
@@ -559,6 +567,17 @@ class GoalController extends Controller
                     $newNotify->comment = $user->name . ' replied to your Goal comment.';
                     $newNotify->related_id = $goal->id;
                     $newNotify->save();
+
+                    // Send Out Email Notification to Employee
+                    $sendMail = new SendMail();
+                    $sendMail->toRecipients = array( Auth::id() );  
+                    $sendMail->sender_id = null;
+                    $sendMail->useQueue = false;
+                    $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
+                    array_push($sendMail->bindvariables, $curr_user->reporting_to->name);
+                    array_push($sendMail->bindvariables, $goal->what);
+                    array_push($sendMail->bindvariables, $user->name . ' replied to your Goal comment.');
+                    $response = $sendMail->sendMailWithGenericTemplate();
                 }
             }
             else {
@@ -570,10 +589,19 @@ class GoalController extends Controller
                     $newNotify->comment = $comment->user->name . ' added a comment to your goal.';
                     $newNotify->related_id = $goal->id;
                     $newNotify->save();
-                    //send email notification to employee
-                    // $sendMail = new SendMail();
-                    // $response = $sendMail->send(['email here'],   "Supervisor Added Goal Comment",
-                    //      "Your Supervisor have added comment to your goal.");
+
+
+                    // Send Out Email Notification to Employee
+                    $sendMail = new SendMail();
+                    $sendMail->toRecipients = array( Auth::id() );  
+                    $sendMail->sender_id = null;
+                    $sendMail->useQueue = false;
+                    $sendMail->template = 'SUPERVISOR_COMMENT_MY_GOAL';
+                    array_push($sendMail->bindvariables, $curr_user->reporting_to->name);
+                    array_push($sendMail->bindvariables, $goal->what);
+                    array_push($sendMail->bindvariables, $comment->user->name . ' added a comment to your goal.' );
+                    $response = $sendMail->sendMailWithGenericTemplate();
+    
                 }
             }
 
@@ -585,20 +613,33 @@ class GoalController extends Controller
                 $newNotify->comment = $curr_user->name . ' added a comment to your goal.';
                 $newNotify->related_id = $goal->id;
                 $newNotify->save();
+
+                // Send Out Email Notification to Supervisor
+                $sendMail = new SendMail();
+                $sendMail->toRecipients = array( $curr_user->reporting_to );  
+                $sendMail->sender_id = null;
+                $sendMail->useQueue = false;
+                $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
+                array_push($sendMail->bindvariables, $curr_user->reportingManager->employee_name);
+                array_push($sendMail->bindvariables, $goal->what);
+                array_push($sendMail->bindvariables, $curr_user->name . ' added a comment to your goal.' );
+                $response = $sendMail->sendMailWithGenericTemplate();
+
             }
 
-            // notify the employee when my supervisor reply my comment
-            if (($curr_user->reporting_to == $goal->user_id) and ($goal->user_id != Auth::id())) {
-                // Real-Time
-                $sendMail = new SendMail();
-                $sendMail->toRecipients = array($goal->user->id);  
-                $sendMail->sender_id = $curr_user->id;
-                $sendMail->template = 'SUPERVISOR_COMMENT_MY_GOAL';
-                array_push($sendMail->bindvariables, $goal->user->name);
-                array_push($sendMail->bindvariables, $goal->what);
-                array_push($sendMail->bindvariables, $comment->comment);
-                $response = $sendMail->sendMailWithGenericTemplate();
-            }
+            // // notify the employee when my supervisor reply my comment
+            // if (($curr_user->reporting_to == $goal->user_id) and ($goal->user_id != Auth::id())) {
+            //     // Real-Time
+            //     $sendMail = new SendMail();
+            //     $sendMail->toRecipients = array($goal->user->id);  
+            //     $sendMail->sender_id = null;
+            //     $sendMail->useQueue = false;
+            //     $sendMail->template = 'SUPERVISOR_COMMENT_MY_GOAL';
+            //     array_push($sendMail->bindvariables, $goal->user->name);
+            //     array_push($sendMail->bindvariables, $goal->what);
+            //     array_push($sendMail->bindvariables, $comment->comment);
+            //     $response = $sendMail->sendMailWithGenericTemplate();
+            // }
         }
         return redirect()->back();
     }

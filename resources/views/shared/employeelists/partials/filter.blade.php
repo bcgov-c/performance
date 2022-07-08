@@ -70,19 +70,24 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <style>
-    .select2-selection--multiple{
-        overflow: hidden !important;
-        height: auto !important;
-        min-height: 38px !important;
-    }
-
-    .select2-container .select2-selection--single {
-        height: 38px !important;
+        .select2-selection--multiple{
+            overflow: hidden !important;
+            height: auto !important;
+            min-height: 38px !important;
         }
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 38px !important;
-    }
 
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+        }
+        
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 38px !important;
+        }
+
+        #listtable_filter label {
+            text-align: right !important;
+            padding-right: 10px;
+        } 
     </style>
 
 @endpush
@@ -91,9 +96,10 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-        $(document).ready()
+        // $(document).ready() 
+        $(document).ready(function()
         {
-            $('#dd_level0').select2({
+            $('#dd_level0').select2( {
                 placeholder: 'Select Organization',
                 allowClear: true,
                 ajax: {
@@ -213,68 +219,6 @@
                 }
             });
             
-            $('#dd_level0').on('select2:select', function (e) {
-                // Do something
-                $('#dd_level1').val(null).trigger('change');
-                $('#dd_level2').val(null).trigger('change');
-                $('#dd_level3').val(null).trigger('change');
-                $('#dd_level4').val(null).trigger('change');
-            });
-
-            $('#dd_level1').on('select2:select', function (e) {
-                // Do something
-                $('#dd_level2').val(null).trigger('change');
-                $('#dd_level3').val(null).trigger('change');
-                $('#dd_level4').val(null).trigger('change');
-            });
-
-            $('#dd_level2').on('select2:select', function (e) {
-                // Do something
-                $('#dd_level3').val(null).trigger('change');
-                $('#dd_level4').val(null).trigger('change');
-            });
-
-            $('#dd_level3').on('select2:select', function (e) {
-                // Do something
-                $('#dd_level4').val(null).trigger('change');
-            });
-
-            $('#dd_level0').on('select2:unselect', function (e) {
-                e.preventDefault();
-                $('#dd_level0').val(null).trigger('change');
-                $('#dd_level1').val(null).trigger('change');
-                $('#dd_level2').val(null).trigger('change');
-                $('#dd_level3').val(null).trigger('change');
-                $('#dd_level4').val(null).trigger('change');
-            });
-
-            $('#dd_level1').on('select2:unselect', function (e) {
-                e.preventDefault();
-                $('#dd_level1').val(null).trigger('change');
-                $('#dd_level2').val(null).trigger('change');
-                $('#dd_level3').val(null).trigger('change');
-                $('#dd_level4').val(null).trigger('change');
-            });
-
-            $('#dd_level2').on('select2:unselect', function (e) {
-                e.preventDefault();
-                $('#dd_level2').val(null).trigger('change');
-                $('#dd_level3').val(null).trigger('change');
-                $('#dd_level4').val(null).trigger('change');
-            });
-
-            $('#dd_level3').on('select2:unselect', function (e) {
-                e.preventDefault();
-                $('#dd_level3').val(null).trigger('change');
-                $('#dd_level4').val(null).trigger('change');
-            });
-
-            $('#dd_level4').on('select2:unselect', function (e) {
-                e.preventDefault();
-                $('#dd_level4').val(null).trigger('change');
-                $('#btn_search').click();
-            });
-
             $('#dd_level0').change(function (e){
                 e.preventDefault();
             });
@@ -313,15 +257,80 @@
                 }
             });
 
-            $('#btn_search_reset').click(function(e) {
+            $('#btn_search_reset').click(function (e){
+                e.preventDefault();
+                $('#criteria').val('all');
+                $('#search_text').val(null);
+                $('#dd_level0').val(null).trigger('change');
+                $('#dd_level1').val(null).trigger('change');
+                $('#dd_level2').val(null).trigger('change');
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level0').on('select2:select', function (e) {
+                e.preventDefault();
+                $('#dd_level1').val(null).trigger('change');
+                $('#dd_level2').val(null).trigger('change');
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level1').on('select2:select', function (e) {
+                e.preventDefault();
+                $('#dd_level2').val(null).trigger('change');
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level2').on('select2:select', function (e) {
+                e.preventDefault();
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level3').on('select2:select', function (e) {
+                e.preventDefault();
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level4').on('select2:select', function (e) {
+                e.preventDefault();
+            });
+
+            $('#dd_level0').on('select2:unselect', function (e) {
                 e.preventDefault();
                 $('#dd_level0').val(null).trigger('change');
                 $('#dd_level1').val(null).trigger('change');
                 $('#dd_level2').val(null).trigger('change');
                 $('#dd_level3').val(null).trigger('change');
                 $('#dd_level4').val(null).trigger('change');
-                $('#criteria').val('all');
-                $('#search_text').val(null);
+            });
+
+            $('#dd_level1').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#dd_level1').val(null).trigger('change');
+                $('#dd_level2').val(null).trigger('change');
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level2').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#dd_level2').val(null).trigger('change');
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level3').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#dd_level3').val(null).trigger('change');
+                $('#dd_level4').val(null).trigger('change');
+            });
+
+            $('#dd_level4').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#dd_level4').val(null).trigger('change');
                 $('#btn_search').click();
             });
 
@@ -329,7 +338,7 @@
                 e.preventDefault();
                 $('#listtable').DataTable().ajax.reload(null, false);
             });
-        };
+        });
     </script>
 
 @endpush

@@ -1,7 +1,7 @@
 <x-side-layout title="{{ __('Dashboard') }}">
     <div name="header" class="container-header p-n2 "> 
         <div class="container-fluid">
-            <h3>Shared Employees</h3>
+            <h3>Share Employees</h3>
             @include('shared.employeeshares.partials.tabs')
         </div>
     </div>
@@ -59,7 +59,7 @@
 
                 $('#generictable').DataTable ( {
                     processing: true,
-                    serverSide: false,
+                    serverSide: true,
                     scrollX: true,
                     stateSave: true,
                     deferRender: true,
@@ -78,54 +78,56 @@
                     },
                     columns: [
                         {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id'
-                            , name: 'employee_id', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'employee_demo.employee_id', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name'
-                            , name: 'employee_name', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'employee_demo.employee_name', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Delegate ID', ariaTitle: 'Delegate ID', target: 0, type: 'string', data: 'delegate_ee_id'
-                            , name: 'delegate_ee_id', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'e2.employee_id', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Delegate Name', ariaTitle: 'Delegate Name', target: 0, type: 'string', data: 'delegate_ee_name'
-                            , name: 'delegate_ee_name', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'e2.employee_name', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Shared Item', ariaTitle: 'Shared Item', target: 0, type: 'string', data: 'shared_item'
-                            , name: 'shared_item', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'shared_profiles.shared_item', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc'
-                            , name: 'jobcode_desc', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'employee_demo.jobcode_desc', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization'
-                            , name: 'organization', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'employee_demo.organization', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program'
-                            , name: 'level1_program', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'employee_demo.level1_program', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division'
-                            , name: 'level2_division', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'employee_demo.level2_division', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch'
-                            , name: 'level3_branch', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'employee_demo.level3_branch', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4'
-                            , name: 'level4', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'employee_demo.level4', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid'
-                            , name: 'deptid', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'employee_demo.deptid', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Shared By', ariaTitle: 'Shared By', target: 0, type: 'string', data: 'created_name'
-                            , name: 'created_name', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'ec.employee_name', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Created At', ariaTitle: 'Created At', target: 0, type: 'string', data: 'created_at'
-                            , name: 'created_at', searchable: false, className: 'dt-nowrap show-modal'},
+                            , name: 'shared_profiles.created_at', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'Updated At', ariaTitle: 'Updated At', target: 0, type: 'string', data: 'updated_at'
-                            , name: 'updated_at', searchable: false, className: 'dt-nowrap show-modal'},
-                        {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false, className: 'dt-nowrap'},
-                        {title: 'Shared Profile ID', ariaTitle: 'Shared Profile ID', target: 0, type: 'num', data: 'shared_profile_id', name: 'shared_profile_id', searchable: false, visible: false},
+                            , name: 'shared_profiles.updated_at', searchable: false, className: 'dt-nowrap show-modal'},
+                        {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action'
+                            , name: 'action', orderable: false, searchable: false, className: 'dt-nowrap'},
+                        {title: 'Shared Profile ID', ariaTitle: 'Shared Profile ID', target: 0, type: 'num', data: 'shared_profile_id'
+                            , name: 'shared_profiles.shared_profile_id', searchable: false, visible: false},
                     ]
                 } );
 
-
                 $('#btn_search').click(function(e) {
                     e.preventDefault();
+                    console.log('btn_search clicked');
 					$('#generictable').DataTable().rows().invalidate().draw();
                 } );
 
                 $('#cancelButton').on('click', function(e) {
                      e.preventDefault();
-                    if($.fn.dataTable.isDataTable('#admintable')) {
-                        $('#admintable').DataTable().clear();
-                        $('#admintable').DataTable().destroy();
-                        $('#admintable').empty();
+                    if($.fn.dataTable.isDataTable('#generictable')) {
+                        $('#generictable').DataTable().clear();
+                        $('#generictable').DataTable().destroy();
+                        $('#generictable').empty();
                     }
-                    // $('#generictable').DataTable().rows().invalidate().draw();
+                    $('#generictable').DataTable().rows().invalidate().draw();
                 });
 
                 $('#removeButton').on('click', function(e) {

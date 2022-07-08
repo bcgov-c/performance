@@ -55,6 +55,7 @@
             @if($user->hasRole('Supervisor'))
             <b class="p-2">Conversations with My Team</b>
             @forelse ($myTeamConversations as $c)
+            @if (!in_array($c->id, $supervisor_conversations)) 
             <div class="col-12 col-md-12">
                 <div class="d-flex callout callout-info">
                     <div class="flex-fill btn-view-conversation"  style="cursor: pointer;" data-id="{{ $c->id }}" data-toggle="modal" data-target="#viewConversationModal">
@@ -77,7 +78,8 @@
                         </button>
                     </div>
                 </div>
-            </div>
+            </div>            
+            @endif
             @empty
                 <div class="col-12 text-center">
                     No Conversations
@@ -469,7 +471,7 @@
                     url: '/conversation/' + conversation_id
                     , success: function(result) {
                         $("#viewConversationModal").find('textarea').prop('disable', false);
-                        isSupervisor = !result.is_with_supervisor;
+                        isSupervisor = result.view_as_supervisor;
                         $('#conv_participant_edit').val('');
                         $('#conv_participant').val('');
                         $('#conv_title').text(result.topic.name);
@@ -529,7 +531,6 @@
                             $('#employee-signoff-message').find('.time').html("on " + result.sign_off_time);
                             $('#supervisor-signoff-message').find('.time').html("on " + result.supervisor_signoff_time);
                             $("textarea.supervisor-comment").addClass('enable-not-allowed').prop('readonly', true);
-                            
                             if (result.conversation_topic_id == 3) {
                                 $("textarea.info_comment2").addClass('enable-not-allowed').prop('readonly', true); 
                                 $("textarea.info_comment6").addClass('enable-not-allowed').prop('readonly', true);
@@ -550,7 +551,6 @@
                             $('#employee-signoff-message').find('.time').html("on " + result.sign_off_time);
                             $('#supervisor-signoff-message').find('.time').html("on " + result.supervisor_signoff_time);
                             $("textarea.employee-comment").addClass('enable-not-allowed').prop('readonly', true);
-                            
                             if (result.conversation_topic_id == 3) {
                                 $("textarea.info_comment1").addClass('enable-not-allowed').prop('readonly', true);    
                                 $("textarea.info_comment3").addClass('enable-not-allowed').prop('readonly', true);
@@ -565,6 +565,15 @@
                         $("#employee-signoff-questions").find('input:radio[name="check_two_"][value="'+result.supv_agree2+'"]').prop('checked', true);
                         $("#employee-signoff-questions").find('input:radio[name="check_three_"][value="'+result.supv_agree3+'"]').prop('checked', true);
 
+                        @if(session()->has('view-profile-as'))
+                            $("#employee-sign_off_form").find('input:radio[name="check_one"]').prop('disabled', true);
+                            $("#employee-sign_off_form").find('input:radio[name="check_two"]').prop('disabled', true);
+                            $("#employee-sign_off_form").find('input:radio[name="check_three"]').prop('disabled', true);
+
+                            $("#employee-signoff-questions").find('input:radio[name="check_one_"]').prop('disabled', true);
+                            $("#employee-signoff-questions").find('input:radio[name="check_two_"]').prop('disabled', true);
+                            $("#employee-signoff-questions").find('input:radio[name="check_three_"]').prop('disabled', true);
+                        @endif    
 
                         if (!!result.supervisor_signoff_id) {
                             $('#supervisor-signoff-message').find('.not').addClass('d-none');
@@ -644,15 +653,15 @@
 
                         //Additional Info to Capture
                         if (result.conversation_topic_id == 1) {
-                          $("#info_capture1").html('<span>Appreciation (optional) - highlight what has gone well </span><i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="hover" data-content="Provide an overview of the actions or results being celebrated. Be as specific as possible about timing, activities, and outcomes achieved. Highlight behaviours, competencies, and corporate values that you feel contributed to the success." ></i>');
-                          $("#info_capture2").html('<span>Coaching (optional) - identify areas where things could be (even) better </span><i class="fas fa-info-circle" data-toggle="popover" data-placement="right" data-trigger="hover" data-content="Provide specific examples of actions, outcomes or behaviours where there is opportunity for growth. Capture information on any additional assistance or training offered to support improvement."></i>');
-                          $("#info_capture3").html('<span>Evaluation (optional) - provide an overall summary of performance</span> <i class="fas fa-info-circle" data-toggle="popover" data-placement="right" data-trigger="hover" data-content="Be as specific as possible, use examples, and focus on observable behaviours and business results"></i>');
+                          $("#info_capture1").html('<span>Appreciation (optional) - supervisor to highlight what has gone well </span><i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Provide an overview of the actions or results being celebrated. Be as specific as possible about timing, activities, and outcomes achieved. Highlight behaviours, competencies, and corporate values that you feel contributed to the success." ></i>');
+                          $("#info_capture2").html('<span>Coaching (optional) - supervisor to identify areas where things could be (even) better </span><i class="fas fa-info-circle" data-toggle="popover" data-placement="right" data-trigger="click" data-content="Provide specific examples of actions, outcomes or behaviours where there is opportunity for growth. Capture information on any additional assistance or training offered to support improvement."></i>');
+                          $("#info_capture3").html('<span>Evaluation (optional) - supervisor to provide an overall summary of performance</span> <i class="fas fa-info-circle" data-toggle="popover" data-placement="right" data-trigger="click" data-content="Be as specific as possible, use examples, and focus on observable behaviours and business results"></i>');
                         }
                         if (result.conversation_topic_id == 3) {
-                          $('#info_capture1').html('<span>Strengths (optional) – identify your top 1 to 3 strengths</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="hover" data-content="Employee to indicate areas of strength to build on for career advancement." ></i>');
-                          $('#info_capture2').html('<span>Supervisor Comments (optional) – provide feedback on strength(s) identified by employee above</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="hover" data-content="Supervisor to comment on strengths identified by employee, note additional areas of strength as required, and provide examples where appropriate." ></i>');
-                          $('#info_capture3').html('<span>Areas for Growth (optional) – identify 1 to 3 areas you’d most like to grow over the next two years</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="hover" data-content="Employee to indicate areas for growth in the short to medium term to assist with career advancement." ></i>');
-                          $('#info_capture4').html('<span>Supervisor Comments (optional) – provide feedback on area(s) for growth identified by employee above</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="hover" data-content="Supervisor to comment on areas for growth identified by employee, note additional areas of growth as required, and provide examples where appropriate." ></i>');
+                          $('#info_capture1').html('<span>Strengths (optional) � identify your top 1 to 3 strengths</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Employee to indicate areas of strength to build on for career advancement." ></i>');
+                          $('#info_capture2').html('<span>Supervisor Comments (optional) � provide feedback on strength(s) identified by employee above</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Supervisor to comment on strengths identified by employee, note additional areas of strength as required, and provide examples where appropriate." ></i>');
+                          $('#info_capture3').html('<span>Areas for Growth (optional) � identify 1 to 3 areas you�d most like to grow over the next two years</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Employee to indicate areas for growth in the short to medium term to assist with career advancement." ></i>');
+                          $('#info_capture4').html('<span>Supervisor Comments (optional) � provide feedback on area(s) for growth identified by employee above</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Supervisor to comment on areas for growth identified by employee, note additional areas of growth as required, and provide examples where appropriate." ></i>');
                         }
                         if (result.conversation_topic_id == 4) {
                           $("#info_capture1").html("What date will a follow up meeting occur?");
@@ -677,6 +686,15 @@
                         // result.questions
                         $('#template-title').text(result.topic.name + ' Template');
                         // $('#conv_participant_edit').next(".select2-container").hide();
+
+                        $('body').on('click', function (e) {
+                            $('[data-toggle=popover]').each(function () {
+                            // hide any open popovers when the anywhere else in the body is clicked
+                            if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                                $(this).popover('hide');
+                                }
+                            });
+                        });
 
                         var participants = '';
                         $.each(result.topics, function(key, value) {
@@ -713,6 +731,7 @@
                     }
                 });
             }
+
 
         </script>
     </x-slot>

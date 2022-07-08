@@ -68,7 +68,8 @@
 
     .select2-container .select2-selection--single {
         height: 38px !important;
-        }
+    }
+
     .select2-container--default .select2-selection--single .select2-selection__arrow {
         height: 38px !important;
     }
@@ -81,167 +82,254 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-    $('#edd_level0').select2({
-        placeholder: 'Select Organization',
-        allowClear: true,
-        ajax: {
-            url: '/sysadmin/accesspermissions/eorg-organizations'
-            , dataType: 'json'
-            , delay: 250
-            , data: function(params) {
-                var query = {
-                    'q': params.term
-                , }
-                return query;
-            }
-            , processResults: function(data) {
-                return {
-                    results: data
-                    };
-            }
-            , cache: false
-        }
-    });
+		$(document).ready(function(){
 
-    $('#edd_level1').select2({
-        placeholder: 'Select Level 1',
-        allowClear: true,
-        ajax: {
-            url: '/sysadmin/accesspermissions/eorg-programs' 
-            , dataType: 'json'
-            , delay: 250
-            , data: function(params) {
-                var query = {
-                    'q': params.term,
-                    'elevel0': $('#edd_level0').children("option:selected").val()
-                , }
-                return query;
-            }
-            , processResults: function(data) {
-                return {
-                    results: data
-                    };
-            }
-            , cache: false
-        }
-    });
+			$('#ebtn_search').click(function(e) {
+                target = $('#enav-tree'); 
+                ddnotempty = $('#edd_level0').val() + $('#edd_level1').val() + $('#edd_level2').val() + $('#edd_level3').val() + $('#edd_level4').val();
+                if(ddnotempty) {
+                    // To do -- ajax called to load the tree
+                    $.when( 
+                        $.ajax({
+                            url: '/sysadmin/accesspermissions/eorg-tree',
+                            // url: $url,
+                            type: 'GET',
+                            data: $("#notify-form").serialize(),
+                            dataType: 'html',
 
-    $('#edd_level2').select2({
-        placeholder: 'Select Level 2',
-        allowClear: true,
-        ajax: {
-            url: '/sysadmin/accesspermissions/eorg-divisions' 
-            , dataType: 'json'
-            , delay: 250
-            , data: function(params) {
-                var query = {
-                    'q': params.term,
-                    'elevel0': $('#edd_level0').children("option:selected").val(),
-                    'elevel1': $('#edd_level1').children("option:selected").val()
-                , }
-                return query;
-            }
-            , processResults: function(data) {
-                return {
-                    results: data
-                    };
-            }
-            , cache: false
-        }
-    });
+                            beforeSend: function() {
+                                $("#etree-loading-spinner").show();                    
+                            },
 
-    $('#edd_level3').select2({
-        placeholder: 'Select Level 3',
-        allowClear: true,
-        ajax: {
-            url: '/sysadmin/accesspermissions/eorg-branches' 
-            , dataType: 'json'
-            , delay: 250
-            , data: function(params) {
-                var query = {
-                    'q': params.term,
-                    'elevel0': $('#edd_level0').children("option:selected").val(),
-                    'elevel1': $('#edd_level1').children("option:selected").val(),
-                    'elevel2': $('#edd_level2').children("option:selected").val()
-                , }
-                return query;
-            }
-            , processResults: function(data) {
-                return {
-                    results: data
-                    };
-            }
-            , cache: false
-        }
-    });
+                            success: function (result) {
+                                $('#enav-tree').html(''); 
+                                $('#enav-tree').html(result);
+                                $('#enav-tree').attr('loaded','loaded');
+                            },
 
-    $('#edd_level4').select2({
-        placeholder: 'Select Level 4',
-        allowClear: true,
-        ajax: {
-            url: '/sysadmin/accesspermissions/eorg-level4' 
-            , dataType: 'json'
-            , delay: 250
-            , data: function(params) {
-                var query = {
-                    'q': params.term,
-                    'elevel0': $('#edd_level0').children("option:selected").val(),
-                    'elevel1': $('#edd_level1').children("option:selected").val(),
-                    'elevel2': $('#edd_level2').children("option:selected").val(),
-                    'elevel3': $('#edd_level3').children("option:selected").val()
-                , }
-                return query;
-            }
-            , processResults: function(data) {
-                return {
-                    results: data
-                    };
-            }
-            , cache: false
-        }
-    });
-    
-    $('#edd_level0').on('select2:select', function (e) {
-        // Do something
-        $('#edd_level1').val(null).trigger('change');
-        $('#edd_level2').val(null).trigger('change');
-        $('#edd_level3').val(null).trigger('change');
-        $('#edd_level4').val(null).trigger('change');
-    });
+                            complete: function() {
+                                $("#etree-loading-spinner").hide();
+                            },
 
-    $('#edd_level1').on('select2:select', function (e) {
-        // Do something
-        $('#edd_level2').val(null).trigger('change');
-        $('#edd_level3').val(null).trigger('change');
-        $('#edd_level4').val(null).trigger('change');
-    });
+                            error: function () {
+                                alert("error");
+                                $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
+                            }
+                        })
+                        
+                    ).then(function( data, textStatus, jqXHR ) {
+                        //alert( jqXHR.status ); // Alerts 200
+                        enodes = $('#eaccordion-level0 input:checkbox');
+                        eredrawTreeCheckboxes();	
+                    }); 
+                } else {
+                    $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Tree result is too big.  Please apply organization filter before clicking on Tree.');
+                };
+            });
 
-    $('#edd_level2').on('select2:select', function (e) {
-        // Do something
-        $('#edd_level3').val(null).trigger('change');
-        $('#edd_level4').val(null).trigger('change');
-    });
+            $('#edd_level0').select2({
+                placeholder: 'Select Organization',
+                allowClear: true,
+                ajax: {
+                    url: '/sysadmin/accesspermissions/eorg-organizations'
+                    , dataType: 'json'
+                    , delay: 250
+                    , data: function(params) {
+                        var query = {
+                            'q': params.term
+                        , }
+                        return query;
+                    }
+                    , processResults: function(data) {
+                        return {
+                            results: data
+                            };
+                    }
+                    , cache: false
+                }
+            });
 
-    $('#edd_level3').on('select2:select', function (e) {
-        // Do something
-        $('#edd_level4').val(null).trigger('change');
-    });
+            $('#edd_level1').select2({
+                placeholder: 'Select Level 1',
+                allowClear: true,
+                ajax: {
+                    url: '/sysadmin/accesspermissions/eorg-programs' 
+                    , dataType: 'json'
+                    , delay: 250
+                    , data: function(params) {
+                        var query = {
+                            'q': params.term,
+                            'elevel0': $('#edd_level0').children("option:selected").val()
+                        , }
+                        return query;
+                    }
+                    , processResults: function(data) {
+                        return {
+                            results: data
+                            };
+                    }
+                    , cache: false
+                }
+            });
 
-    // $('#ebtn_search').click(function() {
-    //     $('#edd_level0').val(null).trigger('change');
-    //     $('#edd_level1').val(null).trigger('change');
-    //     $('#edd_level2').val(null).trigger('change');
-    //     $('#edd_level3').val(null).trigger('change');
-    //     $('#edd_level4').val(null).trigger('change');
-    // });
+            $('#edd_level2').select2({
+                placeholder: 'Select Level 2',
+                allowClear: true,
+                ajax: {
+                    url: '/sysadmin/accesspermissions/eorg-divisions' 
+                    , dataType: 'json'
+                    , delay: 250
+                    , data: function(params) {
+                        var query = {
+                            'q': params.term,
+                            'elevel0': $('#edd_level0').children("option:selected").val(),
+                            'elevel1': $('#edd_level1').children("option:selected").val()
+                        , }
+                        return query;
+                    }
+                    , processResults: function(data) {
+                        return {
+                            results: data
+                            };
+                    }
+                    , cache: false
+                }
+            });
 
-    $('#ebtn_search_reset').click(function() {
-        $('#edd_level0').val(null).trigger('change');
-        $('#edd_level1').val(null).trigger('change');
-        $('#edd_level2').val(null).trigger('change');
-        $('#edd_level3').val(null).trigger('change');
-        $('#edd_level4').val(null).trigger('change');
-    });
+            $('#edd_level3').select2({
+                placeholder: 'Select Level 3',
+                allowClear: true,
+                ajax: {
+                    url: '/sysadmin/accesspermissions/eorg-branches' 
+                    , dataType: 'json'
+                    , delay: 250
+                    , data: function(params) {
+                        var query = {
+                            'q': params.term,
+                            'elevel0': $('#edd_level0').children("option:selected").val(),
+                            'elevel1': $('#edd_level1').children("option:selected").val(),
+                            'elevel2': $('#edd_level2').children("option:selected").val()
+                        , }
+                        return query;
+                    }
+                    , processResults: function(data) {
+                        return {
+                            results: data
+                            };
+                    }
+                    , cache: false
+                }
+            });
+
+            $('#edd_level4').select2({
+                placeholder: 'Select Level 4',
+                allowClear: true,
+                ajax: {
+                    url: '/sysadmin/accesspermissions/eorg-level4' 
+                    , dataType: 'json'
+                    , delay: 250
+                    , data: function(params) {
+                        var query = {
+                            'q': params.term,
+                            'elevel0': $('#edd_level0').children("option:selected").val(),
+                            'elevel1': $('#edd_level1').children("option:selected").val(),
+                            'elevel2': $('#edd_level2').children("option:selected").val(),
+                            'elevel3': $('#edd_level3').children("option:selected").val()
+                        , }
+                        return query;
+                    }
+                    , processResults: function(data) {
+                        return {
+                            results: data
+                            };
+                    }
+                    , cache: false
+                }
+            });
+            
+            $('#edd_level0').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#edd_level0').val(null).trigger('change');
+                $('#edd_level1').val(null).trigger('change');
+                $('#edd_level2').val(null).trigger('change');
+                $('#edd_level3').val(null).trigger('change');
+                $('#edd_level4').val(null).trigger('change');
+            });
+
+            $('#edd_level1').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#edd_level1').val(null).trigger('change');
+                $('#edd_level2').val(null).trigger('change');
+                $('#edd_level3').val(null).trigger('change');
+                $('#edd_level4').val(null).trigger('change');
+            });
+
+            $('#edd_level2').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#edd_level2').val(null).trigger('change');
+                $('#edd_level3').val(null).trigger('change');
+                $('#edd_level4').val(null).trigger('change');
+            });
+
+            $('#edd_level3').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#edd_level3').val(null).trigger('change');
+                $('#edd_level4').val(null).trigger('change');
+            });
+
+            $('#edd_level4').on('select2:unselect', function (e) {
+                e.preventDefault();
+                $('#edd_level4').val(null).trigger('change');
+                $('#ebtn_search').click(e);
+            });
+
+            $('#edd_level0').change(function (e){
+                e.preventDefault();
+            });
+
+            $('#edd_level1').change(function (e){
+                e.preventDefault();
+            });
+
+            $('#edd_level2').change(function (e){
+                e.preventDefault();
+            });
+
+            $('#edd_level3').change(function (e){
+                e.preventDefault();
+            });
+
+            $('#edd_level4').change(function (e){
+                e.preventDefault();
+                $('#ebtn_search').click();
+            });
+
+            $('#criteria').change(function (e){
+                e.preventDefault();
+                $('#btn_search').click(e);
+            });
+
+            $('#search_text').change(function (e){
+                e.preventDefault();
+                $('#btn_search').click(e);
+            });
+
+            $('#search_text').keydown(function (e){
+                if (e.keyCode == 13) {
+                    e.preventDefault();
+                    $('#btn_search').click(e);
+                }
+            });
+
+            $('#ebtn_search_reset').click(function() {
+                e.preventDefault();
+                $('#edd_level0').val(null).trigger('change');
+                $('#edd_level1').val(null).trigger('change');
+                $('#edd_level2').val(null).trigger('change');
+                $('#edd_level3').val(null).trigger('change');
+                $('#edd_level4').val(null).trigger('change');
+            });
+        });
 
     </script>
 
