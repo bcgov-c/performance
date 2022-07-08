@@ -461,13 +461,13 @@ class ConversationController extends Controller
         
         error_log(print_r($sharedProfile,true));
 
-        // $adminShared=EmployeeShare::select('shared_with_id')
-        // ->where('user_id', '=', Auth::id())
-        // ->whereIn('shared_element_id', ['B', 'C'])
-        // ->pluck('shared_with_id');
-        // $adminemps = User::select('users.*')
-        // ->whereIn('users.id', $adminShared)->get('id', 'name');
-        // $participants = $participants->toBase()->merge($adminemps);
+        $adminShared=SharedProfile::select('shared_with')
+        ->where('shared_id', '=', Auth::id())
+        ->where('shared_item', 'like', '%2%')
+        ->pluck('shared_with');
+        $adminemps = User::select('users.*')
+        ->whereIn('users.id', $adminShared)->get('id', 'name');
+        $participants = $participants->merge($adminemps);
 
         return view('conversation.partials.template-detail-modal-body', compact('template','allTemplates','participants','reportingManager'));
     }

@@ -72,18 +72,19 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <style>
-    .select2-selection--multiple{
-        overflow: hidden !important;
-        height: auto !important;
-        min-height: 38px !important;
-    }
-
-    .select2-container .select2-selection--single {
-        height: 38px !important;
+        .select2-selection--multiple{
+            overflow: hidden !important;
+            height: auto !important;
+            min-height: 38px !important;
         }
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 38px !important;
-    }
+
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+        }
+        
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 38px !important;
+        }
 
     </style>
 
@@ -97,7 +98,7 @@
             placeholder: 'Select Organization',
             allowClear: true,
             ajax: {
-                url: '/hradmin/myorg/org-organizations'
+                url: '/hradmin/org-organizations'
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -119,7 +120,7 @@
             placeholder: 'Select Level 1',
             allowClear: true,
             ajax: {
-                url: '/hradmin/myorg/org-programs' 
+                url: '/hradmin/org-programs' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -142,7 +143,7 @@
             placeholder: 'Select Level 2',
             allowClear: true,
             ajax: {
-                url: '/hradmin/myorg/org-divisions' 
+                url: '/hradmin/org-divisions' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -166,7 +167,7 @@
             placeholder: 'Select Level 3',
             allowClear: true,
             ajax: {
-                url: '/hradmin/myorg/org-branches' 
+                url: '/hradmin/org-branches' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -191,7 +192,7 @@
             placeholder: 'Select level 4',
             allowClear: true,
             ajax: {
-                url: '/hradmin/myorg/org-level4' 
+                url: '/hradmin/org-level4' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -213,122 +214,120 @@
             }
         });
         
-            $('#dd_level0').change(function (e){
-                e.preventDefault();
-            });
+        $('#dd_level0').change(function (e){
+            e.preventDefault();
+        });
 
-            $('#dd_level1').change(function (e){
-                e.preventDefault();
-            });
+        $('#dd_level1').change(function (e){
+            e.preventDefault();
+        });
 
-            $('#dd_level2').change(function (e){
-                e.preventDefault();
-            });
+        $('#dd_level2').change(function (e){
+            e.preventDefault();
+        });
 
-            $('#dd_level3').change(function (e){
-                e.preventDefault();
-            });
+        $('#dd_level3').change(function (e){
+            e.preventDefault();
+        });
 
-            $('#dd_level4').change(function (e){
+        $('#dd_level4').change(function (e){
+            e.preventDefault();
+            $('#btn_search').click();
+        });
+
+        $('#criteria').change(function (e){
+            e.preventDefault();
+            $('#btn_search').click();
+        });
+
+        $('#search_text').change(function (e){
+            e.preventDefault();
+            $('#btn_search').click();
+        });
+
+        $('#search_text').keydown(function (e){
+            if (e.keyCode == 13) {
                 e.preventDefault();
                 $('#btn_search').click();
-            });
+            }
+        });
 
-            $('#criteria').change(function (e){
-                e.preventDefault();
-                $('#btn_search').click();
-            });
+        $('#btn_search_reset').click(function (e){
+            e.preventDefault();
+            $('#criteria').val('all');
+            $('#search_text').val(null);
+            $('#dd_level0').val(null).trigger('change');
+            $('#dd_level1').val(null).trigger('change');
+            $('#dd_level2').val(null).trigger('change');
+            $('#dd_level3').val(null).trigger('change');
+            $('#dd_level4').val(null).trigger('change');
+        });
 
-            $('#search_text').change(function (e){
-                e.preventDefault();
-                $('#btn_search').click();
-            });
+        $('#dd_level0').on('select2:select', function (e) {
+            e.preventDefault();
+            $('#dd_level1').val(null).trigger('change');
+            $('#dd_level2').val(null).trigger('change');
+            $('#dd_level3').val(null).trigger('change');
+            $('#dd_level4').val(null).trigger('change');
+        });
 
-            $('#search_text').keydown(function (e){
-                if (e.keyCode == 13) {
-                    e.preventDefault();
-                    $('#btn_search').click();
-                }
-            });
+        $('#dd_level1').on('select2:select', function (e) {
+            e.preventDefault();
+            $('#dd_level2').val(null).trigger('change');
+            $('#dd_level3').val(null).trigger('change');
+            $('#dd_level4').val(null).trigger('change');
+        });
 
-            $('#btn_search_reset').click(function (e){
-                e.preventDefault();
-                $('#criteria').val('all');
-                $('#search_text').val(null);
-                $('#dd_level0').val(null).trigger('change');
-                $('#dd_level1').val(null).trigger('change');
-                $('#dd_level2').val(null).trigger('change');
-                $('#dd_level3').val(null).trigger('change');
-                $('#dd_level4').val(null).trigger('change');
-            });
+        $('#dd_level2').on('select2:select', function (e) {
+            e.preventDefault();
+            $('#dd_level3').val(null).trigger('change');
+            $('#dd_level4').val(null).trigger('change');
+        });
 
-            $('#dd_level0').on('select2:select', function (e) {
-                e.preventDefault();
-                $('#dd_level1').val(null).trigger('change');
-                $('#dd_level2').val(null).trigger('change');
-                $('#dd_level3').val(null).trigger('change');
-                $('#dd_level4').val(null).trigger('change');
-            });
+        $('#dd_level3').on('select2:select', function (e) {
+            e.preventDefault();
+            $('#dd_level4').val(null).trigger('change');
+        });
 
-            $('#dd_level1').on('select2:select', function (e) {
-                e.preventDefault();
-                $('#dd_level2').val(null).trigger('change');
-                $('#dd_level3').val(null).trigger('change');
-                $('#dd_level4').val(null).trigger('change');
-            });
+        $('#dd_level4').on('select2:select', function (e) {
+            e.preventDefault();
+        });
 
-            $('#dd_level2').on('select2:select', function (e) {
-                e.preventDefault();
-                $('#dd_level3').val(null).trigger('change');
-                $('#dd_level4').val(null).trigger('change');
-            });
+        $('#dd_level0').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#dd_level0').val(null).trigger('change');
+            $('#dd_level1').val(null).trigger('change');
+            $('#dd_level2').val(null).trigger('change');
+            $('#dd_level3').val(null).trigger('change');
+            $('#dd_level4').val(null).trigger('change');
+        });
 
-            $('#dd_level3').on('select2:select', function (e) {
-                e.preventDefault();
-                $('#dd_level4').val(null).trigger('change');
-            });
+        $('#dd_level1').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#dd_level1').val(null).trigger('change');
+            $('#dd_level2').val(null).trigger('change');
+            $('#dd_level3').val(null).trigger('change');
+            $('#dd_level4').val(null).trigger('change');
+        });
 
-            $('#dd_level4').on('select2:select', function (e) {
-                e.preventDefault();
-            });
+        $('#dd_level2').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#dd_level2').val(null).trigger('change');
+            $('#dd_level3').val(null).trigger('change');
+            $('#dd_level4').val(null).trigger('change');
+        });
 
-            $('#dd_level0').on('select2:unselect', function (e) {
-                e.preventDefault();
-                $('#dd_level0').val(null).trigger('change');
-                $('#dd_level1').val(null).trigger('change');
-                $('#dd_level2').val(null).trigger('change');
-                $('#dd_level3').val(null).trigger('change');
-                $('#dd_level4').val(null).trigger('change');
-            });
+        $('#dd_level3').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#dd_level3').val(null).trigger('change');
+            $('#dd_level4').val(null).trigger('change');
+        });
 
-            $('#dd_level1').on('select2:unselect', function (e) {
-                e.preventDefault();
-                $('#dd_level1').val(null).trigger('change');
-                $('#dd_level2').val(null).trigger('change');
-                $('#dd_level3').val(null).trigger('change');
-                $('#dd_level4').val(null).trigger('change');
-            });
-
-            $('#dd_level2').on('select2:unselect', function (e) {
-                e.preventDefault();
-                $('#dd_level2').val(null).trigger('change');
-                $('#dd_level3').val(null).trigger('change');
-                $('#dd_level4').val(null).trigger('change');
-            });
-
-            $('#dd_level3').on('select2:unselect', function (e) {
-                e.preventDefault();
-                $('#dd_level3').val(null).trigger('change');
-                $('#dd_level4').val(null).trigger('change');
-            });
-
-            $('#dd_level4').on('select2:unselect', function (e) {
-                e.preventDefault();
-                $('#dd_level4').val(null).trigger('change');
-                $('#btn_search').click();
-            });
-
-
+        $('#dd_level4').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#dd_level4').val(null).trigger('change');
+            $('#btn_search').click();
+        });
 
 
     </script>

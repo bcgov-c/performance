@@ -10,10 +10,22 @@ use App\Http\Controllers\HRAdmin\MyOrganizationController;
 use App\Http\Controllers\HRAdmin\StatisticsReportController;
 use App\Http\Controllers\HRAdmin\GoalBankController;
 use App\Http\Controllers\HRAdmin\EmployeeSharesController;
+use App\Http\Controllers\HRAdmin\HRAdminSharedController;
 
 
 Route::group(['middleware' => ['role:HR Admin']], function () 
 {
+    //Shared functions
+    Route::get('/hradmin/org-organizations', [HRAdminSharedController::class,'getOrganizations']);
+    Route::get('/hradmin/org-programs', [HRAdminSharedController::class,'getPrograms']);
+    Route::get('/hradmin/org-divisions', [HRAdminSharedController::class,'getDivisions']);
+    Route::get('/hradmin/org-branches', [HRAdminSharedController::class,'getBranches']);
+    Route::get('/hradmin/org-level4', [HRAdminSharedController::class,'getLevel4']);
+    Route::get('/hradmin/eorg-organizations', [HRAdminSharedController::class,'egetOrganizations']);
+    Route::get('/hradmin/eorg-programs', [HRAdminSharedController::class,'egetPrograms']);
+    Route::get('/hradmin/eorg-divisions', [HRAdminSharedController::class,'egetDivisions']);
+    Route::get('/hradmin/eorg-branches', [HRAdminSharedController::class,'egetBranches']);
+    Route::get('/hradmin/eorg-level4', [HRAdminSharedController::class,'egetLevel4']);
 
     //Goal Bank
     Route::group(['middleware' => ['auth']], function() {    
@@ -22,11 +34,6 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::post('hradmin/myorg/myorganization', [MyOrganizationController::class, 'index'])->name('hradmin.myorg.myorganization');
 
         Route::get('/hradmin/myorg/org-tree', [MyOrganizationController::class,'loadOrganizationTree']);
-        Route::get('/hradmin/myorg/org-organizations', [MyOrganizationController::class,'getOrganizations']);
-        Route::get('/hradmin/myorg/org-programs', [MyOrganizationController::class,'getPrograms']);
-        Route::get('/hradmin/myorg/org-divisions', [MyOrganizationController::class,'getDivisions']);
-        Route::get('/hradmin/myorg/org-branches', [MyOrganizationController::class,'getBranches']);
-        Route::get('/hradmin/myorg/org-level4', [MyOrganizationController::class,'getLevel4']);
     });
 
 
@@ -104,20 +111,10 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('/hradmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('hradmin.employeeshares.deleteitemget');
         Route::delete('/hradmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('hradmin.employeeshares.deleteitem');
         Route::get('/hradmin/employeeshares/org-tree', [EmployeeSharesController::class,'loadOrganizationTree']);
-        Route::get('/hradmin/employeeshares/org-organizations', [EmployeeSharesController::class,'getOrganizations']);
-        Route::get('/hradmin/employeeshares/org-programs', [EmployeeSharesController::class,'getPrograms']);
-        Route::get('/hradmin/employeeshares/org-divisions', [EmployeeSharesController::class,'getDivisions']);
-        Route::get('/hradmin/employeeshares/org-branches', [EmployeeSharesController::class,'getBranches']);
-        Route::get('/hradmin/employeeshares/org-level4', [EmployeeSharesController::class,'getLevel4']);
         Route::get('/hradmin/employeeshares/employee-list', [EmployeeSharesController::class, 'getDatatableEmployees'])->name('hradmin.employeeshares.employee.list');
         Route::get('/hradmin/employeeshares/employees/{id}', [EmployeeSharesController::class,'getEmployees']);
 
         Route::get('/hradmin/employeeshares/eorg-tree', [EmployeeSharesController::class,'eloadOrganizationTree']);
-        Route::get('/hradmin/employeeshares/eorg-organizations', [EmployeeSharesController::class,'egetOrganizations']);
-        Route::get('/hradmin/employeeshares/eorg-programs', [EmployeeSharesController::class,'egetPrograms']);
-        Route::get('/hradmin/employeeshares/eorg-divisions', [EmployeeSharesController::class,'egetDivisions']);
-        Route::get('/hradmin/employeeshares/eorg-branches', [EmployeeSharesController::class,'egetBranches']);
-        Route::get('/hradmin/employeeshares/eorg-level4', [EmployeeSharesController::class,'egetLevel4']);
         Route::get('/hradmin/employeeshares/eemployee-list', [EmployeeSharesController::class, 'egetDatatableEmployees'])->name('hradmin.employeeshares.eemployee.list');
     });
 

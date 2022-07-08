@@ -11,9 +11,23 @@ use App\Http\Controllers\SysAdmin\ExcuseEmployeesController;
 use App\Http\Controllers\SysAdmin\SysadminStatisticsReportController;
 use App\Http\Controllers\SysAdmin\AccessPermissionsController;
 use App\Http\Controllers\SysAdmin\UnlockConversationController;
+use App\Http\Controllers\SysAdmin\SysAdminSharedController;
 
 
-Route::group(['middleware' => ['role:Sys Admin']], function () {
+Route::group(['middleware' => ['role:Sys Admin']], function () 
+{
+    //Shared functions
+    Route::get('/sysadmin/org-organizations', [SysAdminSharedController::class,'getOrganizations'])->name('sysadmin.employeeshares.org-organizations');
+    Route::get('/sysadmin/org-programs', [SysAdminSharedController::class,'getPrograms'])->name('sysadmin.employeeshares.org-programs');
+    Route::get('/sysadmin/org-divisions', [SysAdminSharedController::class,'getDivisions'])->name('sysadmin.employeeshares.org-divisions');
+    Route::get('/sysadmin/org-branches', [SysAdminSharedController::class,'getBranches'])->name('sysadmin.employeeshares.org-branches');
+    Route::get('/sysadmin/org-level4', [SysAdminSharedController::class,'getLevel4'])->name('sysadmin.employeeshares.org-level4');
+    Route::get('/sysadmin/eorg-organizations', [SysAdminSharedController::class,'egetOrganizations']);
+    Route::get('/sysadmin/eorg-programs', [SysAdminSharedController::class,'egetPrograms']);
+    Route::get('/sysadmin/eorg-divisions', [SysAdminSharedController::class,'egetDivisions']);
+    Route::get('/sysadmin/eorg-branches', [SysAdminSharedController::class,'egetBranches']);
+    Route::get('/sysadmin/eorg-level4', [SysAdminSharedController::class,'egetLevel4']);
+
 
     //Employee List
     Route::group(['middleware' => ['auth']], function() 
@@ -28,7 +42,7 @@ Route::group(['middleware' => ['role:Sys Admin']], function () {
         Route::get('/sysadmin/employeelists/org-programs', [EmployeeListController::class,'getPrograms']);
         Route::get('/sysadmin/employeelists/org-divisions', [EmployeeListController::class,'getDivisions']);
         Route::get('/sysadmin/employeelists/org-branches', [EmployeeListController::class,'getBranches']);
-    Route::get('/sysadmin/employeelists/org-level4', [EmployeeListController::class,'getLevel4']);
+        Route::get('/sysadmin/employeelists/org-level4', [EmployeeListController::class,'getLevel4']);
     });
 
   
@@ -189,20 +203,10 @@ Route::group(['middleware' => ['role:Sys Admin']], function () {
         Route::delete('/sysadmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('sysadmin.employeeshares.deleteitem');
 
         Route::get('/sysadmin/employeeshares/org-tree', [EmployeeSharesController::class,'loadOrganizationTree'])->name('sysadmin.employeeshares.org-tree');
-        Route::get('/sysadmin/employeeshares/org-organizations', [EmployeeSharesController::class,'getOrganizations'])->name('sysadmin.employeeshares.org-organizations');
-        Route::get('/sysadmin/employeeshares/org-programs', [EmployeeSharesController::class,'getPrograms'])->name('sysadmin.employeeshares.org-programs');
-        Route::get('/sysadmin/employeeshares/org-divisions', [EmployeeSharesController::class,'getDivisions'])->name('sysadmin.employeeshares.org-divisions');
-        Route::get('/sysadmin/employeeshares/org-branches', [EmployeeSharesController::class,'getBranches'])->name('sysadmin.employeeshares.org-branches');
-        Route::get('/sysadmin/employeeshares/org-level4', [EmployeeSharesController::class,'getLevel4'])->name('sysadmin.employeeshares.org-level4');
         Route::get('/sysadmin/employeeshares/employee-list', [EmployeeSharesController::class, 'getDatatableEmployees'])->name('sysadmin.employeeshares.employee.list');
         Route::get('/sysadmin/employeeshares/employees/{id}', [EmployeeSharesController::class,'getEmployees']);
 
         Route::get('/sysadmin/employeeshares/eorg-tree', [EmployeeSharesController::class,'eloadOrganizationTree']);
-        Route::get('/sysadmin/employeeshares/eorg-organizations', [EmployeeSharesController::class,'egetOrganizations']);
-        Route::get('/sysadmin/employeeshares/eorg-programs', [EmployeeSharesController::class,'egetPrograms']);
-        Route::get('/sysadmin/employeeshares/eorg-divisions', [EmployeeSharesController::class,'egetDivisions']);
-        Route::get('/sysadmin/employeeshares/eorg-branches', [EmployeeSharesController::class,'egetBranches']);
-        Route::get('/sysadmin/employeeshares/eorg-level4', [EmployeeSharesController::class,'egetLevel4']);
         Route::get('/sysadmin/employeeshares/eemployee-list', [EmployeeSharesController::class, 'egetDatatableEmployees'])->name('sysadmin.employeeshares.eemployee.list');
         Route::get('/sysadmin/employeeshares/eemployees/{id}', [EmployeeSharesController::class,'egetEmployees']);
     });

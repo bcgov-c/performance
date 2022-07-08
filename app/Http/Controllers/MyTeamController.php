@@ -45,14 +45,6 @@ class MyTeamController extends Controller
             ->with('goalType')->get();
         $employees = $this->myEmployeesAjax();
 
-        // $adminShared=EmployeeShare::select('shared_with_id')
-        // ->where('user_id', '=', Auth::id())
-        // ->whereIn('shared_element_id', ['B', 'G'])
-        // ->pluck('shared_with_id');
-        // $adminemps = User::select('users.*')
-        // ->whereIn('users.id', $adminShared)->get();
-        // $employees = $employees->merge($adminemps);
-
         $adminShared=SharedProfile::select('shared_id')
         ->where('shared_with', '=', Auth::id())
         ->where(function ($sh) {

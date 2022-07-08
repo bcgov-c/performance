@@ -41,11 +41,11 @@
 
     <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 	<style>
-	#employee-list-table_filter label {
-		text-align: right !important;
-        padding-right: 10px;
-	} 
-</style>
+        #employee-list-table_filter label {
+            text-align: right !important;
+            padding-right: 10px;
+        } 
+    </style>
 @endpush
 
 @push('js')

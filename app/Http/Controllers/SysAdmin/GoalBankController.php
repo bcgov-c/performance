@@ -2007,13 +2007,23 @@ public function agetOrganizations(Request $request) {
                 return '<a href="'.route(request()->segment(1).'.goalbank.editone', $row->id).'" aria-label="Edit Goal For Individuals" value="'.$row->id.'">'.$row->sharedWith()->count().'</a>';
             })
             ->addColumn('org_audience', function ($row) {
-                $orgCount = GoalBankOrg::join('employee_demo', function($join) {
-                    $join->on('employee_demo.organization', '=', 'goal_bank_orgs.organization');
-                    $join->on('employee_demo.level1_program', '=', 'goal_bank_orgs.level1_program');
-                    $join->on('employee_demo.level2_division', '=', 'goal_bank_orgs.level2_division');
-                    $join->on('employee_demo.level3_branch', '=', 'goal_bank_orgs.level3_branch');
-                    $join->on('employee_demo.level4', '=', 'goal_bank_orgs.level4');
-                })
+                $orgCount = GoalBankOrg::join('employee_demo', function ($j1) {
+                    $j1->on(function ($j1a) {
+                        $j1a->whereRAW('goal_bank_orgs.organization = employee_demo.organization OR ((goal_bank_orgs.organization = "" OR goal_bank_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+                    } )
+                    ->on(function ($j2a) {
+                        $j2a->whereRAW('goal_bank_orgs.level1_program = employee_demo.level1_program OR ((goal_bank_orgs.level1_program = "" OR goal_bank_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+                    } )
+                    ->on(function ($j3a) {
+                        $j3a->whereRAW('goal_bank_orgs.level2_division = employee_demo.level2_division OR ((goal_bank_orgs.level2_division = "" OR goal_bank_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+                    } )
+                    ->on(function ($j4a) {
+                        $j4a->whereRAW('goal_bank_orgs.level3_branch = employee_demo.level3_branch OR ((goal_bank_orgs.level3_branch = "" OR goal_bank_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+                    } )
+                    ->on(function ($j5a) {
+                        $j5a->whereRAW('goal_bank_orgs.level4 = employee_demo.level4 OR ((goal_bank_orgs.level4 = "" OR goal_bank_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+                    } );
+                } )
                 ->where('goal_bank_orgs.goal_id', '=', $row->id)
                 ->groupBy('goal_bank_orgs.goal_id')
                 ->count();
@@ -2056,7 +2066,7 @@ public function agetOrganizations(Request $request) {
             return Datatables::of($query)
             ->addIndexColumn()
             ->addcolumn('action', function($row) {
-                $btn = '<a href="'.request()->segment(1).'/goalbank/deleteindividual/' . $row->share_id . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_user" value="'. $row->share_id .'"><i class="fa fa-trash"></i></a>';
+                $btn = '<a href="/'.request()->segment(1).'/goalbank/deleteindividual/' . $row->share_id . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_user" value="'. $row->share_id .'"><i class="fa fa-trash"></i></a>';
                 return $btn;
             })
             ->rawColumns(['action'])
