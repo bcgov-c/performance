@@ -18,7 +18,7 @@ class SyncUserProfile extends Command
      *
      * @var string
      */
-    protected $signature = 'command:SyncUserProfiles';
+    protected $signature = 'command:SyncUserProfiles {--manual}';
 
     /**
      * The console command description.
@@ -45,40 +45,49 @@ class SyncUserProfile extends Command
     public function handle()
     {
 
-        $job = JobSchedAudit::where('job_name', $this->signature)
-            ->where('status','completed')
-            ->orderBy('id','desc')
-            ->first();     
+        $switch = strtolower(env('PRCS_SYNC_USER_PROFILES'));
+        $manualoverride = (strtolower($this->option('manual')) ? true : false);
 
-        $last_cutoff_time = ($job) ? $job->cutoff_time : new DateTime( '1990-01-01');
+        if ($switch == 'on' || $manualoverride) {
 
-        $start_time = Carbon::now();
+            $job = JobSchedAudit::where('job_name', $this->signature)
+                ->where('status','completed')
+                ->orderBy('id','desc')
+                ->first();     
 
-        $audit_id = JobSchedAudit::insertGetId(
-          [
-            'job_name' => $this->signature,
-            'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
-            'status' => 'Initiated'
-          ]
-        );
+            $last_cutoff_time = ($job) ? $job->cutoff_time : new DateTime( '1990-01-01');
 
-        $cutoff_time = Carbon::now();
+            $start_time = Carbon::now();
 
-        $this->SyncUserProfile($last_cutoff_time, $cutoff_time);
+            $audit_id = JobSchedAudit::insertGetId(
+            [
+                'job_name' => $this->signature,
+                'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
+                'status' => 'Initiated'
+            ]
+            );
 
-        $end_time = Carbon::now();
-        JobSchedAudit::updateOrInsert(
-          [
-            'id' => $audit_id
-          ],
-          [
-            'job_name' => $this->signature,
-            'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
-            'end_time' => date('Y-m-d H:i:s', strtotime($end_time)),
-            'cutoff_time' => date('Y-m-d H:i:s', strtotime($cutoff_time)),
-            'status' => 'Completed'
-          ]
-        );
+            $cutoff_time = Carbon::now();
+
+            $this->SyncUserProfile($last_cutoff_time, $cutoff_time);
+
+            $end_time = Carbon::now();
+            JobSchedAudit::updateOrInsert(
+            [
+                'id' => $audit_id
+            ],
+            [
+                'job_name' => $this->signature,
+                'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
+                'end_time' => date('Y-m-d H:i:s', strtotime($end_time)),
+                'cutoff_time' => date('Y-m-d H:i:s', strtotime($cutoff_time)),
+                'status' => 'Completed'
+            ]
+            );
+
+        } else {
+            $this->info( 'Process is currently disabled; or "PRCS_SYNC_USER_PROFILES=on" is currently missing in the .env file.');
+        }
 
         return 0;
     }

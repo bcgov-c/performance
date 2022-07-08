@@ -17,7 +17,7 @@ class GetODSEmployeeDemographics extends Command
      *
      * @var string
      */
-    protected $signature = 'command:GetODSEmployeeDemographics';
+    protected $signature = 'command:GetODSEmployeeDemographics {--manual}';
 
     /**
      * The console command description.
@@ -49,7 +49,8 @@ class GetODSEmployeeDemographics extends Command
 
       $job_name = 'command:GetODSEmployeeDemographics';
       $switch = strtolower(env('PRCS_PULL_ODS_DATA'));
-      $status = ($switch == 'on' ? 'Initiated' : 'Disabled in .env');
+      $manualoverride = (strtolower($this->option('manual')) ? true : false);
+      $status = (($switch == 'on' || $manualoverride) ? 'Initiated' : 'Disabled in .env');
       $audit_id = JobSchedAudit::insertGetId(
         [
           'job_name' => $job_name,
@@ -58,7 +59,7 @@ class GetODSEmployeeDemographics extends Command
         ]
       );
 
-      if ($switch == 'on') {
+      if ($switch == 'on' || $manualoverride) {
 
         $stored = DB::table('stored_dates')
         ->where('name', 'ODS Employee Demo Last Pull')
