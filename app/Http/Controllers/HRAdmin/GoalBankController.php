@@ -1130,7 +1130,6 @@ class GoalBankController extends Controller
 
         return redirect()->route(request()->segment(1).'.goalbank.manageindex')
             ->with('success', 'Goal update successful.');
-
     }
 
     public function updategoaldetails(Request $request, $id) 
@@ -2286,6 +2285,7 @@ class GoalBankController extends Controller
             )
             ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)])
             ;
+            $query = $ownedgoals;
             return Datatables::of($query)
             ->addIndexColumn()
             ->addcolumn('click_title', function ($row) {
