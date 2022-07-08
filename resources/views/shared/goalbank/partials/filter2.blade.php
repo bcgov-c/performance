@@ -95,7 +95,7 @@
             placeholder: 'Select Organization',
             allowClear: true,
             ajax: {
-                url: '{{ "/" . request()->segment(1) . "/goalbank/eorg-organizations" }}'
+                url: '{{ "/" . request()->segment(1) . "/eorg-organizations" }}'
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -117,7 +117,7 @@
             placeholder: 'Select Level 1',
             allowClear: true,
             ajax: {
-                url: '{{ "/" . request()->segment(1) . "/goalbank/eorg-programs" }}'
+                url: '{{ "/" . request()->segment(1) . "/eorg-programs" }}'
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -140,7 +140,7 @@
             placeholder: 'Select Level 2',
             allowClear: true,
             ajax: {
-                url: '{{ "/" . request()->segment(1) . "/goalbank/eorg-divisions" }}'
+                url: '{{ "/" . request()->segment(1) . "/eorg-divisions" }}'
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -164,7 +164,7 @@
             placeholder: 'Select Level 3',
             allowClear: true,
             ajax: {
-                url: '{{ "/" . request()->segment(1) . "/goalbank/eorg-branches" }}'
+                url: '{{ "/" . request()->segment(1) . "/eorg-branches" }}'
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -189,7 +189,7 @@
             placeholder: 'Select Level 4',
             allowClear: true,
             ajax: {
-                url: '{{ "/" . request()->segment(1) . "/goalbank/eorg-level4" }}'
+                url: '{{ "/" . request()->segment(1) . "/eorg-level4" }}'
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {

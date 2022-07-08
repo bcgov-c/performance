@@ -17,16 +17,21 @@ use App\Http\Controllers\SysAdmin\SysAdminSharedController;
 Route::group(['middleware' => ['role:Sys Admin']], function () 
 {
     //Shared functions
-    Route::get('/sysadmin/org-organizations', [SysAdminSharedController::class,'getOrganizations'])->name('sysadmin.employeeshares.org-organizations');
-    Route::get('/sysadmin/org-programs', [SysAdminSharedController::class,'getPrograms'])->name('sysadmin.employeeshares.org-programs');
-    Route::get('/sysadmin/org-divisions', [SysAdminSharedController::class,'getDivisions'])->name('sysadmin.employeeshares.org-divisions');
-    Route::get('/sysadmin/org-branches', [SysAdminSharedController::class,'getBranches'])->name('sysadmin.employeeshares.org-branches');
-    Route::get('/sysadmin/org-level4', [SysAdminSharedController::class,'getLevel4'])->name('sysadmin.employeeshares.org-level4');
+    Route::get('/sysadmin/org-organizations', [SysAdminSharedController::class,'getOrganizations']);
+    Route::get('/sysadmin/org-programs', [SysAdminSharedController::class,'getPrograms']);
+    Route::get('/sysadmin/org-divisions', [SysAdminSharedController::class,'getDivisions']);
+    Route::get('/sysadmin/org-branches', [SysAdminSharedController::class,'getBranches']);
+    Route::get('/sysadmin/org-level4', [SysAdminSharedController::class,'getLevel4']);
     Route::get('/sysadmin/eorg-organizations', [SysAdminSharedController::class,'egetOrganizations']);
     Route::get('/sysadmin/eorg-programs', [SysAdminSharedController::class,'egetPrograms']);
     Route::get('/sysadmin/eorg-divisions', [SysAdminSharedController::class,'egetDivisions']);
     Route::get('/sysadmin/eorg-branches', [SysAdminSharedController::class,'egetBranches']);
     Route::get('/sysadmin/eorg-level4', [SysAdminSharedController::class,'egetLevel4']);
+    Route::get('/sysadmin/aorg-organizations', [SysAdminSharedController::class,'agetOrganizations']);
+    Route::get('/sysadmin/aorg-programs', [SysAdminSharedController::class,'agetPrograms']);
+    Route::get('/sysadmin/aorg-divisions', [SysAdminSharedController::class,'agetDivisions']);
+    Route::get('/sysadmin/aorg-branches', [SysAdminSharedController::class,'agetBranches']);
+    Route::get('/sysadmin/aorg-level4', [SysAdminSharedController::class,'agetLevel4']);
 
 
     //Employee List
@@ -107,29 +112,14 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::post('/sysadmin/goalbank/savenewgoal', [GoalBankController::class, 'savenewgoal'])->name('sysadmin.goalbank.savenewgoal');
 
         Route::get('/sysadmin/goalbank/org-tree', [GoalBankController::class,'loadOrganizationTree']);
-        Route::get('/sysadmin/goalbank/org-organizations', [GoalBankController::class,'getOrganizations'])->name('sysadmin.goalbank.org-organizations');
-        Route::get('/sysadmin/goalbank/org-programs', [GoalBankController::class,'getPrograms'])->name('sysadmin.goalbank.org-programs');
-        Route::get('/sysadmin/goalbank/org-divisions', [GoalBankController::class,'getDivisions'])->name('sysadmin.goalbank.org-divisions');
-        Route::get('/sysadmin/goalbank/org-branches', [GoalBankController::class,'getBranches'])->name('sysadmin.goalbank.org-branches');
-        Route::get('/sysadmin/goalbank/org-level4', [GoalBankController::class,'getLevel4'])->name('sysadmin.goalbank.org-level4');
         Route::get('/sysadmin/goalbank/employees/{id}', [GoalBankController::class,'getEmployees']);
         Route::get('/sysadmin/goalbank/employee-list', [GoalBankController::class, 'getDatatableEmployees'])->name('sysadmin.goalbank.employee.list');
 
         Route::get('/sysadmin/goalbank/aorg-tree', [GoalBankController::class,'aloadOrganizationTree']);
-        Route::get('/sysadmin/goalbank/aorg-organizations', [GoalBankController::class,'agetOrganizations']);
-        Route::get('/sysadmin/goalbank/aorg-programs', [GoalBankController::class,'agetPrograms']);
-        Route::get('/sysadmin/goalbank/aorg-divisions', [GoalBankController::class,'agetDivisions']);
-        Route::get('/sysadmin/goalbank/aorg-branches', [GoalBankController::class,'agetBranches']);
-        Route::get('/sysadmin/goalbank/aorg-level4', [GoalBankController::class,'agetLevel4']);
         Route::get('/sysadmin/goalbank/aemployees/{id}', [GoalBankController::class,'agetEmployees']);
         Route::get('/sysadmin/goalbank/aemployee-list', [GoalBankController::class, 'agetDatatableEmployees'])->name('sysadmin.goalbank.aemployee.list');
 
         Route::get('/sysadmin/goalbank/eorg-tree', [GoalBankController::class,'eloadOrganizationTree']);
-        Route::get('/sysadmin/goalbank/eorg-organizations', [GoalBankController::class,'egetOrganizations']);
-        Route::get('/sysadmin/goalbank/eorg-programs', [GoalBankController::class,'egetPrograms']);
-        Route::get('/sysadmin/goalbank/eorg-divisions', [GoalBankController::class,'egetDivisions']);
-        Route::get('/sysadmin/goalbank/eorg-branches', [GoalBankController::class,'egetBranches']);
-        Route::get('/sysadmin/goalbank/eorg-level4', [GoalBankController::class,'egetLevel4']);
         Route::get('/sysadmin/goalbank/eemployees/{id}', [GoalBankController::class,'egetEmployees']);
         Route::get('/sysadmin/goalbank/eemployee-list', [GoalBankController::class, 'egetDatatableEmployees'])->name('sysadmin.goalbank.eemployee.list');
 
