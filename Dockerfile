@@ -113,7 +113,7 @@ EXPOSE 8000
 
 
 # Add a command to base-image entrypont script
-RUN sed -i 's/^exec /sudo service cron start\n\nexec /' /usr/local/bin/apache2-foreground
+RUN sed -i 's/^exec /service cron start\n\nexec /' /usr/local/bin/apache2-foreground
 
 #CMD /usr/local/bin/apache2-foreground
 
