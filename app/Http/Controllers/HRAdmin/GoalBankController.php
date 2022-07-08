@@ -2284,11 +2284,11 @@ class GoalBankController extends Controller
                 'ced.employee_name as creator_name',
             )
             ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)])
-            ;
+            ->get();
             $admingoals = Goal::withoutGlobalScopes()
             ->join('users as cu', 'cu.id', '=', 'goals.created_by')
-            ->join('employee_demo as ced', 'ced.guid', '=', 'cu.guid')
-            ->join('admin_orgs', function ($j1) {
+            ->leftjoin('employee_demo as ced', 'ced.guid', '=', 'cu.guid')
+            ->leftjoin('admin_orgs', function ($j1) {
                 $j1->on(function ($j1a) {
                     $j1a->whereRAW('admin_orgs.organization = ced.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (ced.organization = "" OR ced.organization IS NULL))');
                 } )
@@ -2330,10 +2330,12 @@ class GoalBankController extends Controller
                 'ced.employee_name as creator_name',
             )
             ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)])
-            ;
-            // $query = $ownedgoals->merge($admingoals);
+            ->get();
+            $query = $ownedgoals->merge($admingoals);
             // $query = $ownedgoals->merge($ownedgoals);
-            $query = $ownedgoals;
+            // $query = $ownedgoals;
+            // $query = $admingoals;
+            // $query = $query->merge($ownedgoals);
             return Datatables::of($query)
             ->addIndexColumn()
             ->addcolumn('click_title', function ($row) {
