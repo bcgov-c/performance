@@ -165,11 +165,11 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
     Route::get('hradmin/level3/{id0}/{id1}/{id2}', 'App\Http\Controllers\HRadminController@getOrgLevel3')->name('hradmin.level3');
     Route::get('hradmin/level4/{id0}/{id1}/{id2}/{id3}', 'App\Http\Controllers\HRadminController@getOrgLevel4')->name('hradmin.level4');
 
-    Route::get('/hradmin/org-organizations', [HRadminController::class,'getOrganizations']);
-    Route::get('/hradmin/org-programs', [HRadminController::class,'getPrograms']);
-    Route::get('/hradmin/org-divisions', [HRadminController::class,'getDivisions']);
-    Route::get('/hradmin/org-branches', [HRadminController::class,'getBranches']);
-    Route::get('/hradmin/org-level4', [HRadminController::class,'getLevel4']);
+    // Route::get('/hradmin/org-organizations', [HRadminController::class,'getOrganizations']);
+    // Route::get('/hradmin/org-programs', [HRadminController::class,'getPrograms']);
+    // Route::get('/hradmin/org-divisions', [HRadminController::class,'getDivisions']);
+    // Route::get('/hradmin/org-branches', [HRadminController::class,'getBranches']);
+    // Route::get('/hradmin/org-level4', [HRadminController::class,'getLevel4']);
 
 
   

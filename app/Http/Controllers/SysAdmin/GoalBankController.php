@@ -2027,7 +2027,7 @@ public function agetOrganizations(Request $request) {
                 ->where('goal_bank_orgs.goal_id', '=', $row->id)
                 ->groupBy('goal_bank_orgs.goal_id')
                 ->count();
-                return '<a href="'.route(request()->segment(1).'.goalbank.editpage', $row->id).'" aria-label="Edit Goal For Individuals" value="'.$row->id.'">'.$orgCount.'</a>';
+                return '<a href="'.route(request()->segment(1).'.goalbank.editpage', $row->id).'" aria-label="Edit Goal For Business Units" value="'.$row->id.'">'.$orgCount.'</a>';
             })
             ->addcolumn('action', function($row) {
                 $btn = '<a href="/'.request()->segment(1).'/goalbank/deletegoal/' . $row->id . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->id .'"><i class="fa fa-trash"></i></a>';

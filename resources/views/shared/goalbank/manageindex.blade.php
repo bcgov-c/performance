@@ -137,8 +137,10 @@
                             , name: 'audience', searchable: true},
                         {title: 'Business Unit Audience', ariaTitle: 'Business Unit Audience', target: 0, type: 'num', data: 'org_audience'
                             , name: 'org_audience', searchable: true},
-                        {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},
-                        {title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'string', data: 'id', name: 'id', searchable: false, visible: false},
+                        {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action'
+                            , name: 'action', orderable: false, searchable: false},
+                        {title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'string', data: 'id'
+                            , name: 'id', searchable: false, visible: true},
                     ]
                 } );
             });

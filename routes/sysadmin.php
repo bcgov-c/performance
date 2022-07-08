@@ -229,11 +229,11 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::post('/sysadmin/accesspermissions/accessupdate/{id}', [AccessPermissionsController::class, 'manageUpdate']);
     });
 
-    Route::get('/sysadmin/org-organizations', [SysadminController::class,'getOrganizations']);
-    Route::get('/sysadmin/org-programs', [SysadminController::class,'getPrograms']);
-    Route::get('/sysadmin/org-divisions', [SysadminController::class,'getDivisions']);
-    Route::get('/sysadmin/org-branches', [SysadminController::class,'getBranches']);
-    Route::get('/sysadmin/org-level4', [SysadminController::class,'getLevel4']);
+    // Route::get('/sysadmin/org-organizations', [SysadminController::class,'getOrganizations']);
+    // Route::get('/sysadmin/org-programs', [SysadminController::class,'getPrograms']);
+    // Route::get('/sysadmin/org-divisions', [SysadminController::class,'getDivisions']);
+    // Route::get('/sysadmin/org-branches', [SysadminController::class,'getBranches']);
+    // Route::get('/sysadmin/org-level4', [SysadminController::class,'getLevel4']);
     
     Route::get('/sysadmin/level0', 'App\Http\Controllers\SysadminController@getOrgLevel0')->name('sysadmin.level0');
     Route::get('/sysadmin/level1/{id0}', 'App\Http\Controllers\SysadminController@getOrgLevel1')->name('sysadmin.level1');
