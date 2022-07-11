@@ -303,6 +303,24 @@ class GoalBankController extends Controller
         $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
         if ($request->ajax()) {
             $query = GoalBankOrg::where('goal_id', '=', $goal_id)
+            ->join('admin_orgs', function ($j1) {
+                $j1->on(function ($j1a) {
+                    $j1a->whereRAW('admin_orgs.organization = goal_bank_orgs.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (goal_bank_orgs.organization = "" OR goal_bank_orgs.organization IS NULL))');
+                } )
+                ->on(function ($j2a) {
+                    $j2a->whereRAW('admin_orgs.level1_program = goal_bank_orgs.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (goal_bank_orgs.level1_program = "" OR goal_bank_orgs.level1_program IS NULL))');
+                } )
+                ->on(function ($j3a) {
+                    $j3a->whereRAW('admin_orgs.level2_division = goal_bank_orgs.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (goal_bank_orgs.level2_division = "" OR goal_bank_orgs.level2_division IS NULL))');
+                } )
+                ->on(function ($j4a) {
+                    $j4a->whereRAW('admin_orgs.level3_branch = goal_bank_orgs.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (goal_bank_orgs.level3_branch = "" OR goal_bank_orgs.level3_branch IS NULL))');
+                } )
+                ->on(function ($j5a) {
+                    $j5a->whereRAW('admin_orgs.level4 = goal_bank_orgs.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (goal_bank_orgs.level4 = "" OR goal_bank_orgs.level4 IS NULL))');
+                } );
+            } )
+            ->where('admin_orgs.user_id', '=', Auth::id())
             ->when( $level0, function ($q) use($level0) {
                 return $q->where('goal_bank_orgs.organization', '=', $level0->name);
             })
@@ -319,13 +337,13 @@ class GoalBankController extends Controller
                 return $q->where('goal_bank_orgs.level4', $level4->name);
             })
             ->select (
-                'organization',
-                'level1_program',
-                'level2_division',
-                'level3_branch',
-                'level4',
-                'goal_id',
-                'id'
+                'goal_bank_orgs.organization',
+                'goal_bank_orgs.level1_program',
+                'goal_bank_orgs.level2_division',
+                'goal_bank_orgs.level3_branch',
+                'goal_bank_orgs.level4',
+                'goal_bank_orgs.goal_id',
+                'goal_bank_orgs.id'
             );
             return Datatables::of($query)
             ->addIndexColumn()
@@ -1600,24 +1618,6 @@ class GoalBankController extends Controller
             $admingoals = Goal::withoutGlobalScopes()
             ->join('users as cu', 'cu.id', '=', 'goals.created_by')
             ->leftjoin('employee_demo as ced', 'ced.guid', '=', 'cu.guid')
-            ->leftjoin('admin_orgs', function ($j1) {
-                $j1->on(function ($j1a) {
-                    $j1a->whereRAW('admin_orgs.organization = ced.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (ced.organization = "" OR ced.organization IS NULL))');
-                } )
-                ->on(function ($j2a) {
-                    $j2a->whereRAW('admin_orgs.level1_program = ced.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (ced.level1_program = "" OR ced.level1_program IS NULL))');
-                } )
-                ->on(function ($j3a) {
-                    $j3a->whereRAW('admin_orgs.level2_division = ced.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (ced.level2_division = "" OR ced.level2_division IS NULL))');
-                } )
-                ->on(function ($j4a) {
-                    $j4a->whereRAW('admin_orgs.level3_branch = ced.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (ced.level3_branch = "" OR ced.level3_branch IS NULL))');
-                } )
-                ->on(function ($j5a) {
-                    $j5a->whereRAW('admin_orgs.level4 = ced.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (ced.level4 = "" OR ced.level4 IS NULL))');
-                } );
-            } )
-            ->where('admin_orgs.user_id', '=', Auth::id())
             ->where('is_library', true)
             // ->where('goals.created_by', '=', Auth::id())
             ->whereIn('by_admin', [1, 2])
@@ -1705,9 +1705,46 @@ class GoalBankController extends Controller
         if ($request->ajax()) {
             $query = Goal::withoutGlobalScopes()
             ->where('goals.id', '=', $goal_id)
-            ->leftjoin('goals_shared_with', 'goals.id', '=', 'goals_shared_with.goal_id')
+            ->join('goals_shared_with', 'goals.id', '=', 'goals_shared_with.goal_id')
             ->join('users', 'users.id', '=', 'goals_shared_with.user_id')
-            ->leftjoin('employee_demo', 'employee_demo.guid', '=', 'users.guid')
+            ->join('employee_demo', 'employee_demo.guid', '=', 'users.guid')
+            ->join('admin_orgs', function ($j1) {
+                $j1->on(function ($j1a) {
+                    $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+                } )
+                ->on(function ($j2a) {
+                    $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+                } )
+                ->on(function ($j3a) {
+                    $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+                } )
+                ->on(function ($j4a) {
+                    $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+                } )
+                ->on(function ($j5a) {
+                    $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+                } );
+            } )
+            ->where('admin_orgs.user_id', '=', Auth::id())
+            ->when($level0, function($q) use($level0) {return $q->where('employee_demo.organization', $level0->name);})
+            ->when($level1, function($q) use($level1) {return $q->where('employee_demo.level1_program', $level1->name);})
+            ->when($level2, function($q) use($level2) {return $q->where('employee_demo.level2_division', $level2->name);})
+            ->when($level3, function($q) use($level3) {return $q->where('employee_demo.level3_branch', $level3->name);})
+            ->when($level4, function($q) use($level4) {return $q->where('employee_demo.level4', $level4->name);})
+            ->when($request->criteria == 'name', function($q) use($request){return $q->where('employee_demo.employee_name', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'job', function($q) use($request){return $q->where('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'dpt', function($q) use($request){return $q->where('employee_demo.deptid', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'all', function($q) use ($request) {
+                return $q->where(function ($query2) use ($request) {
+                    if($request->search_text) {
+                        $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
+                        ->orWhere('employee_demo.employee_name', 'like', "%" . $request->search_text . "%")
+                        ->orWhere('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%")
+                        ->orWhere('employee_demo.deptid', 'like', "%" . $request->search_text . "%");
+                    }
+                });
+            })
             ->select (
                 'employee_demo.employee_id',
                 'employee_demo.employee_name',

@@ -248,19 +248,29 @@ class EmployeeSharesController extends Controller
         $empIdsByOrgId = [];
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
-        $rows = $sql->join('organization_trees', function($join) use($request) {
-                $join->on('employee_demo.organization', '=', 'organization_trees.organization')
-                    ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
-                    ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
-                    ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
-                    ->on('employee_demo.level4', '=', 'organization_trees.level4');
-                })
-                ->select('organization_trees.id','employee_demo.employee_id')
-                ->groupBy('organization_trees.id', 'employee_demo.employee_id')
-                ->orderBy('organization_trees.id')->orderBy('employee_demo.employee_id')
-                ->get();
+        $rows = $sql->join('organization_trees', function ($j1) {
+            $j1->on(function ($j1a) {
+                $j1a->whereRAW('organization_trees.organization = employee_demo.organization OR ((organization_trees.organization = "" OR organization_trees.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+            } )
+            ->on(function ($j2a) {
+                $j2a->whereRAW('organization_trees.level1_program = employee_demo.level1_program OR ((organization_trees.level1_program = "" OR organization_trees.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+            } )
+            ->on(function ($j3a) {
+                $j3a->whereRAW('organization_trees.level2_division = employee_demo.level2_division OR ((organization_trees.level2_division = "" OR organization_trees.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+            } )
+            ->on(function ($j4a) {
+                $j4a->whereRAW('organization_trees.level3_branch = employee_demo.level3_branch OR ((organization_trees.level3_branch = "" OR organization_trees.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+            } )
+            ->on(function ($j5a) {
+                $j5a->whereRAW('organization_trees.level4 = employee_demo.level4 OR ((organization_trees.level4 = "" OR organization_trees.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+            } );
+        } )
+        ->select('organization_trees.id','employee_demo.employee_id')
+        ->groupBy('organization_trees.id', 'employee_demo.employee_id')
+        ->orderBy('organization_trees.id')->orderBy('employee_demo.employee_id')
+        ->get();
 
-        $empIdsByOrgId = $rows->groupBy('id')->all();
+        $empIdsByOrgId = $rows->groupBy('organization_trees.id')->all();
 
         if($request->ajax()){
             return view('shared.employeeshares.partials.recipient-tree', compact('orgs','countByOrg','empIdsByOrgId') );
@@ -269,6 +279,8 @@ class EmployeeSharesController extends Controller
 
 
     public function eloadOrganizationTree(Request $request) {
+
+        dd('OneTwoThree');
 
         $elevel0 = $request->edd_level0 ? OrganizationTree::where('id', $request->edd_level0)->first() : null;
         $elevel1 = $request->edd_level1 ? OrganizationTree::where('id', $request->edd_level1)->first() : null;
@@ -299,19 +311,29 @@ class EmployeeSharesController extends Controller
         $eempIdsByOrgId = [];
         $edemoWhere = $this->ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4);
         $esql = clone $edemoWhere; 
-        $erows = $esql->join('organization_trees', function($join) use($request) {
-                $join->on('employee_demo.organization', '=', 'organization_trees.organization')
-                    ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
-                    ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
-                    ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
-                    ->on('employee_demo.level4', '=', 'organization_trees.level4');
-                })
-                ->select('organization_trees.id','employee_demo.employee_id')
-                ->groupBy('organization_trees.id', 'employee_demo.employee_id')
-                ->orderBy('organization_trees.id')->orderBy('employee_demo.employee_id')
-                ->get();
+        $erows = $esql->join('organization_trees', function ($j1) {
+            $j1->on(function ($j1a) {
+                $j1a->whereRAW('organization_trees.organization = employee_demo.organization OR ((organization_trees.organization = "" OR organization_trees.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+            } )
+            ->on(function ($j2a) {
+                $j2a->whereRAW('organization_trees.level1_program = employee_demo.level1_program OR ((organization_trees.level1_program = "" OR organization_trees.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+            } )
+            ->on(function ($j3a) {
+                $j3a->whereRAW('organization_trees.level2_division = employee_demo.level2_division OR ((organization_trees.level2_division = "" OR organization_trees.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+            } )
+            ->on(function ($j4a) {
+                $j4a->whereRAW('organization_trees.level3_branch = employee_demo.level3_branch OR ((organization_trees.level3_branch = "" OR organization_trees.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+            } )
+            ->on(function ($j5a) {
+                $j5a->whereRAW('organization_trees.level4 = employee_demo.level4 OR ((organization_trees.level4 = "" OR organization_trees.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+            } );
+        } )
+        ->select('organization_trees.id','employee_demo.employee_id')
+        ->groupBy('organization_trees.id', 'employee_demo.employee_id')
+        ->orderBy('organization_trees.id')->orderBy('employee_demo.employee_id')
+        ->get();
 
-        $eempIdsByOrgId = $erows->groupBy('id')->all();
+        $eempIdsByOrgId = $erows->groupBy('organization_trees.id')->all();
 
         if($request->ajax()){
             return view('shared.employeeshares.partials.erecipient-tree', compact('eorgs', 'ecountByOrg', 'eempIdsByOrgId') );
@@ -723,16 +745,25 @@ class EmployeeSharesController extends Controller
     protected function baseFilteredWhere(Request $request, $level0, $level1, $level2, $level3, $level4) {
         // Base Where Clause
         $demoWhere = EmployeeDemo::
-            join('admin_orgs', function($join) {
-            $join->on('employee_demo.organization', '=', 'admin_orgs.organization')
-            ->on('employee_demo.level1_program', '=', 'admin_orgs.level1_program')
-            ->on('employee_demo.level2_division', '=', 'admin_orgs.level2_division')
-            ->on('employee_demo.level3_branch', '=', 'admin_orgs.level3_branch')
-            ->on('employee_demo.level4', '=', 'admin_orgs.level4');
-        })
+            join('admin_orgs', function ($j1) {
+            $j1->on(function ($j1a) {
+                $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+            } )
+            ->on(function ($j2a) {
+                $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+            } )
+            ->on(function ($j3a) {
+                $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+            } )
+            ->on(function ($j4a) {
+                $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+            } )
+            ->on(function ($j5a) {
+                $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+            } );
+        } )
         ->where('admin_orgs.user_id', '=', Auth::id())
-        ->
-            when( $level0, function ($q) use($level0) {
+        ->when( $level0, function ($q) use($level0) {
             return $q->where('employee_demo.organization', $level0->name);
         })
         ->when( $level1, function ($q) use($level1) {
@@ -774,16 +805,25 @@ class EmployeeSharesController extends Controller
     protected function ebaseFilteredWhere(Request $request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4) {
         // Base Where Clause
         $edemoWhere = EmployeeDemo::
-            join('admin_orgs', function($join) {
-            $join->on('employee_demo.organization', '=', 'admin_orgs.organization')
-            ->on('employee_demo.level1_program', '=', 'admin_orgs.level1_program')
-            ->on('employee_demo.level2_division', '=', 'admin_orgs.level2_division')
-            ->on('employee_demo.level3_branch', '=', 'admin_orgs.level3_branch')
-            ->on('employee_demo.level4', '=', 'admin_orgs.level4');
-        })
+            join('admin_orgs', function ($j1) {
+            $j1->on(function ($j1a) {
+                $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+            } )
+            ->on(function ($j2a) {
+                $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+            } )
+            ->on(function ($j3a) {
+                $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+            } )
+            ->on(function ($j4a) {
+                $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+            } )
+            ->on(function ($j5a) {
+                $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+            } );
+        } )
         ->where('admin_orgs.user_id', '=', Auth::id())
-        ->
-            when( $elevel0, function ($q) use($elevel0) {
+        ->when( $elevel0, function ($q) use($elevel0) {
             return $q->where('employee_demo.organization', $elevel0->name);
         })
         ->when( $elevel1, function ($q) use($elevel1) {

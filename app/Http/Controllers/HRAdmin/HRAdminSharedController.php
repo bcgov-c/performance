@@ -194,7 +194,7 @@ class HRAdminSharedController extends Controller
             } );
         } )
         ->where('admin_orgs.user_id', '=', Auth::id())
-        ->where('id', $request->level0)->first() : null;
+        ->where('organization_trees.id', $request->level0)->first() : null;
         $level1 = $request->level1 ? OrganizationTree::join('admin_orgs', function ($j1) {
             $j1->on(function ($j1a) {
                 $j1a->whereRAW('admin_orgs.organization = organization_trees.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (organization_trees.organization = "" OR organization_trees.organization IS NULL))');
@@ -581,7 +581,7 @@ class HRAdminSharedController extends Controller
             } );
         } )
         ->where('admin_orgs.user_id', '=', Auth::id())
-        ->where('id', $request->elevel0)->first() : null;
+        ->where('organization_trees.id', $request->elevel0)->first() : null;
         $level1 = $request->elevel1 ? OrganizationTree::join('admin_orgs', function ($j1) {
             $j1->on(function ($j1a) {
                 $j1a->whereRAW('admin_orgs.organization = organization_trees.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (organization_trees.organization = "" OR organization_trees.organization IS NULL))');
@@ -968,7 +968,7 @@ class HRAdminSharedController extends Controller
             } );
         } )
         ->where('admin_orgs.user_id', '=', Auth::id())
-        ->where('id', $request->alevel0)->first() : null;
+        ->where('organization_trees.id', $request->alevel0)->first() : null;
         $level1 = $request->alevel1 ? OrganizationTree::join('admin_orgs', function ($j1) {
             $j1->on(function ($j1a) {
                 $j1a->whereRAW('admin_orgs.organization = organization_trees.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (organization_trees.organization = "" OR organization_trees.organization IS NULL))');
