@@ -1,5 +1,11 @@
 <x-side-layout>
-    <h3>Conversations</h3>
+    <h3>
+        @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
+            My Conversations
+        @else
+            {{ $user->name }}'s Conversations
+        @endif    
+    </h3>
     @if($viewType === 'conversations')
         @include('conversation.partials.compliance-message')
     @endif

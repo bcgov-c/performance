@@ -10,7 +10,7 @@
 <x-side-layout>
     <h3> 
         @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
-              Team Conversations
+              My Conversations
           @else
               {{ $user->name }}'s Conversations
           @endif
