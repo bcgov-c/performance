@@ -77,7 +77,7 @@
 
 <body class="@yield('classes_body')" @yield('body_data') data-panel-auto-height="{{session()->has('view-profile-as') ? -63 : 0}}">
     @if(session()->has('view-profile-as'))
-    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center">
+    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center sticky-top">
         <span class="flex-fill"></span>
         <span>
             <i class="icon fas fa-exclamation-circle"></i> You are viewing {{$viewingProfileAs->name}}'s profile.
@@ -85,18 +85,51 @@
         <span class="flex-fill"></span>
 
         <div class="form-inline" style="position:absolute; right:0">
+            <!-----
             <select name="" class="form-control form-control-sm" id="view-profile-as">
                 @foreach ($listOfEmployee as $employee)
                     <option value="{{$employee->id}}" {{ ($viewingProfileAs->id === $employee->id) ? 'selected' : ''}}>{{$employee->name}}</option>
                 @endforeach
             </select>
+            ---->
+            <x-button :href="route('my-team.return-to-my-view')" size="sm" style="light" class="mx-2">Return to my profile</x-button>
+        </div>
+    </div>
+    
+    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center fixed-top">
+        <span class="flex-fill"></span>
+        <span>
+            <i class="icon fas fa-exclamation-circle"></i> You are viewing {{$viewingProfileAs->name}}'s profile.
+        </span>
+        <span class="flex-fill"></span>
+
+        <div class="form-inline" style="position:absolute; right:0">
+            <!-----
+            <select name="" class="form-control form-control-sm" id="view-profile-as">
+                @foreach ($listOfEmployee as $employee)
+                    <option value="{{$employee->id}}" {{ ($viewingProfileAs->id === $employee->id) ? 'selected' : ''}}>{{$employee->name}}</option>
+                @endforeach
+            </select>
+            ---->
             <x-button :href="route('my-team.return-to-my-view')" size="sm" style="light" class="mx-2">Return to my profile</x-button>
         </div>
     </div>
     @endif
     
     @if(session()->has('user_is_switched') && !session()->has('view-profile-as'))
-    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center">
+    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center sticky-top ">
+        <span class="flex-fill"></span>
+        <span>
+            <i class="icon fas fa-exclamation-circle"></i> You are logged in as {{auth()->user()->name}}'s account.
+        </span>
+        <span class="flex-fill"></span>
+
+        <div class="form-inline" style="position:absolute; right:0">
+            <x-button :href="route('dashboard.revert-identity')" size="sm" style="light" class="mx-2">Revert Identity</x-button>
+        </div>
+    </div>
+    
+    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center fixed-top">
         <span class="flex-fill"></span>
         <span>
             <i class="icon fas fa-exclamation-circle"></i> You are logged in as {{auth()->user()->name}}'s account.
