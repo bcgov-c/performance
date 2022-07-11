@@ -321,7 +321,7 @@ class ConversationController extends Controller
         } else {
             $view_as_supervisor = false;
         }
-        //$request->session()->put('view_as_supervisor', $view_as_supervisor);
+        $request->session()->put('view_as_supervisor', $view_as_supervisor);
         $conversation->view_as_supervisor = $view_as_supervisor;
         //error_log($conversation->view_as_supervisor);
 
@@ -375,6 +375,8 @@ class ConversationController extends Controller
 
     public function signOff(SignoffRequest $request, Conversation $conversation)
     {
+        $view_as_supervisor = session()->get('view_as_supervisor');
+        
         $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
         $current_employee = DB::table('employee_demo')
                             ->select('employee_demo.employee_id')
@@ -385,8 +387,9 @@ class ConversationController extends Controller
         if ($current_employee[0]->employee_id != $request->employee_id) {
             return response()->json(['success' => false, 'Message' => 'Invalide Employee ID', 'data' => $conversation]);            
         }
-        
-        if (!$conversation->is_with_supervisor) {
+  
+        //if (!$conversation->is_with_supervisor) {
+        if ($view_as_supervisor){
             $conversation->supervisor_signoff_id = $authId;
             $conversation->supervisor_signoff_time = Carbon::now();
 
@@ -412,6 +415,8 @@ class ConversationController extends Controller
 
     public function unsignOff(UnSignoffRequest $request, Conversation $conversation)
     {
+        $view_as_supervisor = session()->get('view_as_supervisor');
+
         $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
         $current_employee = DB::table('employee_demo')
                             ->select('employee_demo.employee_id')
@@ -423,7 +428,8 @@ class ConversationController extends Controller
             return response()->json(['success' => false, 'Message' => 'Invalide Employee ID', 'data' => $conversation]);            
         }
         
-        if (!$conversation->is_with_supervisor) {
+        //if (!$conversation->is_with_supervisor) {
+        if ($view_as_supervisor) {
             $conversation->supervisor_signoff_id = null;
             $conversation->supervisor_signoff_time = null;
         } else {
