@@ -5,8 +5,7 @@
         @else
             {{ $user->name }}'s Conversations
         @endif    
-    </h3>
-    
+    </h3>    
     @if($viewType === 'conversations')
         @include('conversation.partials.compliance-message')
     @endif
