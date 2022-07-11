@@ -226,18 +226,30 @@
 							}
 						},
 						columns: [
-							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', searchable: true},
-							{title: 'Name', ariaTitle: 'Employee Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', searchable: true},
-							{title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', searchable: true},
-							{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', searchable: true},
-							{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', searchable: true},
-							{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', searchable: true},
-							{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', searchable: true},
-							{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true},
-							{title: 'Dept ID', ariaTitle: 'Dept ID', target: 0, type: 'string', data: 'deptid', name: 'deptid', searchable: true},
-							{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},
-							{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id', name: 'goal_id', searchable: false, visible: false},
-							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'num', data: 'share_id', name: 'share_id', searchable: false, visible: false},
+							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id'
+								, name: 'employee_id', searchable: true},
+							{title: 'Name', ariaTitle: 'Employee Name', target: 0, type: 'string', data: 'employee_name'
+								, name: 'employee_name', searchable: true},
+							{title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc'
+								, name: 'jobcode_desc', searchable: true},
+							{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization'
+								, name: 'organization', searchable: true},
+							{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program'
+								, name: 'level1_program', searchable: true},
+							{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division'
+								, name: 'level2_division', searchable: true},
+							{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch'
+								, name: 'level3_branch', searchable: true},
+							{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4'
+								, name: 'level4', searchable: true},
+							{title: 'Dept ID', ariaTitle: 'Dept ID', target: 0, type: 'string', data: 'deptid'
+								, name: 'deptid', searchable: true},
+							{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action'
+								, name: 'action', orderable: false, searchable: false},
+							{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id'
+								, name: 'goal_id', searchable: false, visible: false},
+							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'num', data: 'share_id'
+								, name: 'share_id', searchable: false, visible: false},
 						]
 					}
 				);

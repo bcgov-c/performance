@@ -140,7 +140,7 @@
                         {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action'
                             , name: 'action', orderable: false, searchable: false},
                         {title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'string', data: 'id'
-                            , name: 'id', searchable: false, visible: true},
+                            , name: 'id', searchable: false, visible: false},
                     ]
                 } );
             });
