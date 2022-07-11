@@ -4,15 +4,11 @@
             <h3>Share Employees</h3>
             @include('shared.employeeshares.partials.tabs')
         </div>
-    </div>
-	<p class="px-3">Supervisors and Ministry Administrators may share an employee's PDP profile with another supervisor, 
-		or staff who normally handle employees' permanent personnel records (ie. Public Service Agency) for a legitimate 
-		business reason; such as shared supervisory duties.  An employee may wish to share their profile with someone 
-		other than a direct supervisor (for example, a hiring manager).  In order to do this - <b>the employee's consent 
-		is required</b>.</p>
-	<p class="px-3">To continue, please use the functions below to select the employee profiles that you would like to share,
-		the supervisor you would like to share the profiles with, which elements you would like to share, and your reason 
-		for sharing the profile.</p>
+    </div>	
+    <p class="px-3">Supervisors and administrators may share all or part of an employee's PDP profile with another supervisor or staff for a legitimate business reason. The full profile or the Conversations section should only be shared with people who normally handle employees' permanent personnel records (i.e. Public Service Agency or co-supervisors). The Goals section can be shared more broadly (i.e. with project team leads) to encourage collaboration and feedback on specific goals.</p>
+    <p class="px-3">An employee may also wish to share their profile with someone other than a direct supervisor (for example, a hiring manager). In order to do this - the employee's consent is required.</p>
+    <p class="px-3">To continue, please use the functions below to select the employee profiles that you would like to share, the person you would like to share the profiles with, which elements you would like to share, and your reason for sharing the profile.</p>
+	
 
     <form id="notify-form" action="{{ route(request()->segment(1).'.employeeshares.saveall') }}" method="post">
         @csrf
@@ -88,7 +84,10 @@
                             </label>
                        </div>
                         <div class="col col-10">
-                            <x-input id="reason" name="input_reason" label="Reason for sharing" data-toggle="tooltip" data-placement="top" data-trigger="manual" tooltip="Reason tooltip"/>
+                            <!-- <x-input id="reason" name="input_reason" label="Reason for sharing" data-toggle="tooltip" data-placement="top" data-trigger="manual" tooltip="Reason tooltip"/> -->
+                            <b>Reason for sharing</b>
+                            <i class="fa fa-info-circle" label="Reason for sharing" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Provide a brief explanation of why the profile elements are being shared. For example: <br><br><ul><li> Sharing profile with co-supervisor </li><li>Sharing goals section with project team lead</li><li>Sharing conversations section with hiring manager per employee request</li></ul>"> </i> 
+                            <x-input id="reason" name="input_reason"/>                            
                             @error('input_reason')
                                 {{-- <div class="alert alert-danger alert-dismissable fade show"> "Reason for sharing" is required. </div> --}}
 					            <small  class="text-danger error-reason" id="error-reason"></small>
@@ -149,7 +148,29 @@
         <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    
+
+        <script>				
+				$('body').popover({
+					selector: '[data-toggle]',
+					trigger: 'click',
+				});
+                
+				$('.modal').popover({
+					selector: '[data-toggle-select]',
+					trigger: 'click',
+				});
+
+				$('body').on('click', function (e) {
+                $('[data-toggle=popover]').each(function () {
+                    // hide any open popovers when the anywhere else in the body is clicked
+                    	if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                        $(this).popover('hide');
+                    	}
+                	});
+				});		
+		</script>
+
+
         <script>
             let g_matched_employees = {!!json_encode($matched_emp_ids)!!};
             let eg_matched_employees = {!!json_encode($ematched_emp_ids)!!};
@@ -161,7 +182,7 @@
             let eg_selected_orgnodes = [];
 
             function confirmSaveAllModal(){
-				$('#saveAllModal .modal-body p').html('Are you sure to share ?');
+				$('#saveAllModal .modal-body p').html('Are you sure you want to share the selected profile(s)?');
 				$('#saveAllModal').modal();
 			}
 
@@ -665,8 +686,6 @@
             });
 
         </script>
-
-
 
     </x-slot>
 </x-side-layout>
