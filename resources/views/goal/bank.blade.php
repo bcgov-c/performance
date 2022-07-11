@@ -314,4 +314,14 @@
             }           
         });
         
+        $('body').popover({
+            selector: '[data-toggle]',
+            trigger: 'click',
+        });
+        
+        $('.modal').popover({
+            selector: '[data-toggle-select]',
+            trigger: 'click',
+        });
+        
 </script>    
