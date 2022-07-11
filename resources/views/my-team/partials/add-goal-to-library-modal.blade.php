@@ -156,12 +156,6 @@
         });
         
         
-        $(".tags").multiselect({
-                	enableFiltering: true,
-                	enableCaseInsensitiveFiltering: true,
-					nonSelectedText: null,
-            	});
-
 				$('body').on('click', function (e) {
                 $('[data-toggle=popover]').each(function () {
                     // hide any open popovers when the anywhere else in the body is clicked

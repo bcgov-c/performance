@@ -13,21 +13,28 @@
                 <strong>The profile of <span class="user-name"></span> is currently being shared with the following users:</strong> <br>
                     <div class="shared-with-list">None</div>
                 <strong>Share this profile with another user</strong>
-                <p>Supervisor and Ministry Administrators may share an employee's MyPerformance profile with another supervisor, or staff who normally handle employee's parmanent personnel records (ie. Public Service Agency) for a legtimate business reason; such as shared supervisory duties.</p>
-                <p>An employee may wish to share their profile with someone other than a direct supervisor (for example, a hiring manager). In order to do this - the employee's consent is required.</p>
-                <p>To continue, please specify the supervisor(s) you would like to share the employee profile with, which elements you would like to share, and your reason for sharing the profile.</p>
-                <form id="share-profile-form" action="{{ route('my-team.share-profile') }}" method="POST" onsubmit="confirm('Are you sure you want to share this profile ?')">
+                <p>Supervisors and administrators may share all or part of an employee's PDP profile with another supervisor or staff for a legitimate business reason. The full profile or the Conversations section should only be shared with people who normally handle employees' permanent personnel records (i.e. Public Service Agency or co-supervisors). The Goals section can be shared more broadly (i.e. with project team leads) to encourage collaboration and feedback on specific goals.</p>
+                <p>An employee may also wish to share their profile with someone other than a direct supervisor (for example, a hiring manager). In order to do this - the employee's consent is required.</p>
+                <p>To continue, please use the functions below to select the employee profiles that you would like to share, the person you would like to share the profiles with, which elements you would like to share, and your reason for sharing the profile.</p>
+                <form id="share-profile-form" action="{{ route('my-team.share-profile') }}" method="POST" onsubmit="confirm('Are you sure you want to share the selected profile(s)?')">
                     @csrf
                     <input type="hidden" name="shared_id">
                     <div class="row">
                         <div class="col-6">
-                            <x-dropdown name="share_with_users[]" label="Share With" multiple class="share-with-users"></x-dropdown>
+                            <!-- <x-dropdown name="share_with_users[]" label="Share With" multiple class="share-with-users"></x-dropdown> -->
+                            <b>Share With</b>
+                            <x-dropdown name="share_with_users[]" multiple class="share-with-users"></x-dropdown>
                         </div>
                         <div class="col-6">
-                            <x-dropdown name="items_to_share[]" :list="[['id'=>1, 'name'=> 'Goals', 'selected'=>true], ['id'=>2, 'name'=> 'Conversations',  'selected'=>true]]" label="Elements to share" multiple class="items-to-share"></x-dropdown>
+                            <!-- <x-dropdown name="items_to_share[]" :list="[['id'=>1, 'name'=> 'Goals', 'selected'=>true], ['id'=>2, 'name'=> 'Conversations',  'selected'=>true]]" label="Elements to share" multiple class="items-to-share"></x-dropdown> -->
+                            <b>Elements to share</b>
+                            <x-dropdown name="items_to_share[]" :list="[['id'=>1, 'name'=> 'Goals', 'selected'=>true], ['id'=>2, 'name'=> 'Conversations',  'selected'=>true]]" multiple class="items-to-share"></x-dropdown>
                         </div>
                         <div class="col-6">
-                            <x-input name="reason" label="Reason" tooltip="Reason tooltip"></x-input>
+                            <!-- <x-input name="reason" label="Reason" tooltip="Reason tooltip"></x-input> -->
+                            <b>Reason for sharing</b>
+                            <i class="fa fa-info-circle" name="reason" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Provide a brief explanation of why the profile elements are being shared. For example: <br><br><ul><li> Sharing profile with co-supervisor </li><li>Sharing goals section with project team lead</li><li>Sharing conversations section with hiring manager per employee request</li></ul>"> </i> 
+                            <x-input name="reason"></x-input>
                         </div>
                     </div>
                     <div class="py-2">
@@ -48,3 +55,4 @@
         </div>
     </div>
 </div>
+
