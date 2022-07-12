@@ -529,6 +529,8 @@ class GoalController extends Controller
 
     public function addComment(Request $request, $id)
     {
+        $switch = strtolower(env('PRCS_EMAIL_NOTIFICATION'));
+        $emailAllowed = ($switch == 'on');
         if ($request->comment != null and $request->comment != '') {
             $goal = Goal::findOrFail($id);
             $comment = new GoalComment;
@@ -569,15 +571,17 @@ class GoalController extends Controller
                     $newNotify->save();
 
                     // Send Out Email Notification to Employee
-                    $sendMail = new SendMail();
-                    $sendMail->toRecipients = array( Auth::id() );  
-                    $sendMail->sender_id = null;
-                    $sendMail->useQueue = false;
-                    $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
-                    array_push($sendMail->bindvariables, $curr_user->reporting_to->name);
-                    array_push($sendMail->bindvariables, $goal->what);
-                    array_push($sendMail->bindvariables, $user->name . ' replied to your Goal comment.');
-                    $response = $sendMail->sendMailWithGenericTemplate();
+                    if ($emailAllowed) {
+                        $sendMail = new SendMail();
+                        $sendMail->toRecipients = array( Auth::id() );  
+                        $sendMail->sender_id = null;
+                        $sendMail->useQueue = false;
+                        $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
+                        array_push($sendMail->bindvariables, $curr_user->reporting_to->name);
+                        array_push($sendMail->bindvariables, $goal->what);
+                        array_push($sendMail->bindvariables, $user->name . ' replied to your Goal comment.');
+                        $response = $sendMail->sendMailWithGenericTemplate();
+                    }
                 }
             }
             else {
@@ -592,16 +596,17 @@ class GoalController extends Controller
 
 
                     // Send Out Email Notification to Employee
-                    $sendMail = new SendMail();
-                    $sendMail->toRecipients = array( Auth::id() );  
-                    $sendMail->sender_id = null;
-                    $sendMail->useQueue = false;
-                    $sendMail->template = 'SUPERVISOR_COMMENT_MY_GOAL';
-                    array_push($sendMail->bindvariables, $curr_user->reporting_to->name);
-                    array_push($sendMail->bindvariables, $goal->what);
-                    array_push($sendMail->bindvariables, $comment->user->name . ' added a comment to your goal.' );
-                    $response = $sendMail->sendMailWithGenericTemplate();
-    
+                    if ($emailAllowed) {
+                        $sendMail = new SendMail();
+                        $sendMail->toRecipients = array( Auth::id() );  
+                        $sendMail->sender_id = null;
+                        $sendMail->useQueue = false;
+                        $sendMail->template = 'SUPERVISOR_COMMENT_MY_GOAL';
+                        array_push($sendMail->bindvariables, $curr_user->reporting_to->name);
+                        array_push($sendMail->bindvariables, $goal->what);
+                        array_push($sendMail->bindvariables, $comment->user->name . ' added a comment to your goal.' );
+                        $response = $sendMail->sendMailWithGenericTemplate();
+                    }
                 }
             }
 
@@ -615,16 +620,17 @@ class GoalController extends Controller
                 $newNotify->save();
 
                 // Send Out Email Notification to Supervisor
-                $sendMail = new SendMail();
-                $sendMail->toRecipients = array( $curr_user->reporting_to );  
-                $sendMail->sender_id = null;
-                $sendMail->useQueue = false;
-                $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
-                array_push($sendMail->bindvariables, $curr_user->reportingManager->employee_name);
-                array_push($sendMail->bindvariables, $goal->what);
-                array_push($sendMail->bindvariables, $curr_user->name . ' added a comment to your goal.' );
-                $response = $sendMail->sendMailWithGenericTemplate();
-
+                if ($emailAllowed) {
+                    $sendMail = new SendMail();
+                    $sendMail->toRecipients = array( $curr_user->reporting_to );  
+                    $sendMail->sender_id = null;
+                    $sendMail->useQueue = false;
+                    $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
+                    array_push($sendMail->bindvariables, $curr_user->reportingManager->employee_name);
+                    array_push($sendMail->bindvariables, $goal->what);
+                    array_push($sendMail->bindvariables, $curr_user->name . ' added a comment to your goal.' );
+                    $response = $sendMail->sendMailWithGenericTemplate();
+                }
             }
 
             // // notify the employee when my supervisor reply my comment
