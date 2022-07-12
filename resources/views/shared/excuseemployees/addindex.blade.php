@@ -174,9 +174,9 @@
 			function confirmSaveExcuseModal(){
 				count = g_selected_employees.length;
 				if (count == 0) {
-					$('#saveExcuseModal .modal-body p').html('Are you sure to excuse employee?');
+					$('#saveExcuseModal .modal-body p').html('Are you sure you want to excuse employee?');
 				} else {
-					$('#saveExcuseModal .modal-body p').html('Are you sure to excuse ' + count + ' selected users?');
+					$('#saveExcuseModal .modal-body p').html('Are you sure you want to excuse ' + count + ' selected users?');
 				}
 				$('#saveExcuseModal').modal();
 			}

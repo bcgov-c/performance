@@ -285,9 +285,9 @@
 					count = g_selected_orgnodes.length;
 				};
 				if (count == 0) {
-					$('#saveGoalModal .modal-body p').html('Are you sure to create goal without an audience?');
+					$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal without an audience?');
 				} else {
-					$('#saveGoalModal .modal-body p').html('Are you sure to create goal and assign to selected audience?');
+					$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal and assign to the selected audience?');
 				}
 				$('#saveGoalModal').modal();
 			}

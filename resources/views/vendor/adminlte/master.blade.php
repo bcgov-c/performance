@@ -80,7 +80,7 @@
     <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center sticky-top">
         <span class="flex-fill"></span>
         <span>
-            <i class="icon fas fa-exclamation-circle"></i> You are viewing {{$viewingProfileAs->name}}'s profile.
+            <i class="icon fas fa-exclamation-circle"></i> You are viewing {{$viewingProfileAs->name}}'s profile. Click "Return to My Profile" to go back to your own.
         </span>
         <span class="flex-fill"></span>
 
@@ -99,7 +99,7 @@
     <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center fixed-top">
         <span class="flex-fill"></span>
         <span>
-            <i class="icon fas fa-exclamation-circle"></i> You are viewing {{$viewingProfileAs->name}}'s profile.
+            <i class="icon fas fa-exclamation-circle"></i> You are viewing {{$viewingProfileAs->name}}'s profile. Click "Return to My Profile" to go back to your own.
         </span>
         <span class="flex-fill"></span>
 
@@ -120,7 +120,7 @@
     <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center sticky-top ">
         <span class="flex-fill"></span>
         <span>
-            <i class="icon fas fa-exclamation-circle"></i> You are logged in as {{auth()->user()->name}}'s account.
+            <i class="icon fas fa-exclamation-circle"></i> You are logged in as {{auth()->user()->name}}'s account. Click "Revert Identity" to return to your own profile.
         </span>
         <span class="flex-fill"></span>
 
@@ -132,7 +132,7 @@
     <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center fixed-top">
         <span class="flex-fill"></span>
         <span>
-            <i class="icon fas fa-exclamation-circle"></i> You are logged in as {{auth()->user()->name}}'s account.
+            <i class="icon fas fa-exclamation-circle"></i> You are logged in as {{auth()->user()->name}}'s account. Click "Revert Identity" to return to your own profile.
         </span>
         <span class="flex-fill"></span>
 

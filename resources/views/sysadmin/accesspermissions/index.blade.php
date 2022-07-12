@@ -159,9 +159,9 @@
 			function confirmSaveAccessModal(){
 				count = g_selected_employees.length;
 				if (count == 0) {
-					$('#saveAccessModal .modal-body p').html('Are you sure to grant administrator access ?');
+					$('#saveAccessModal .modal-body p').html('Are you sure you want to grant administrator access ?');
 				} else {
-					$('#saveAccessModal .modal-body p').html('Are you sure to grant administrator access to ' + count + ' selected users?');
+					$('#saveAccessModal .modal-body p').html('Are you sure you want to grant administrator access to ' + count + ' selected employee(s)?');
 				}
 				$('#saveAccessModal').modal();
 			}
