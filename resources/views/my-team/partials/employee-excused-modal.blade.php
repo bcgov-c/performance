@@ -14,7 +14,7 @@
                 <u><strong>Declaration</strong></u>
                 <p>I wish to excuse <strong><span class="user-name"></span></strong> from the Performance Development process during the date range selected.</p>
                 <div class="alert alert-default-warning alert-dismissible">
-                  <span class="h5"><i class="icon fas fa-exclamation-triangle"></i>Note: By doing so, these employees will not show up in PDP reports.</span>
+                  <span class="h5"><i class="icon fas fa-exclamation-triangle"></i>Note: By doing so, this employee will not show up in PDP reports.</span>
                 </div>
                 <form id="excused_form" action="{{ route ('excused.updateExcuseDetails')}}" method="POST">
                     @csrf
