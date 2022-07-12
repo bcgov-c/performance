@@ -48,8 +48,8 @@ class ConversationController extends Controller
                             $query->where('participant_id', '<>', $supervisorId);
                         return $query;
                     });
-            })->whereNotNull('signoff_user_id')->whereNotNull('supervisor_signoff_id')
-            ->whereDate('unlock_until', '<', Carbon::today());
+            })->whereNotNull('signoff_user_id')->whereNotNull('supervisor_signoff_id');
+            //->whereDate('unlock_until', '<', Carbon::today());
 
             if ($request->has('user_id') && $request->user_id) {
                 $user_id = $request->user_id;
@@ -274,47 +274,62 @@ class ConversationController extends Controller
         $conversation->topics = ConversationTopic::all();
         
         $conversation_id = $conversation->id;
-        $current_user = auth()->user()->id;
+        $conversation->disable_signoff = false;
         
-        $conversation_participants = DB::table('conversation_participants')                        
-                        ->where('conversation_id', $conversation_id)
-                        ->where('participant_id', '<>', $current_user)
-                        ->get();         
-        $participant = $conversation_participants[0]->participant_id;
-        
-        $participant_is_mgr = false;
-        $user_is_mgr = false; 
-        
-        //check direct report
-        $check_mgr = DB::table('users')                        
-                        ->where('reporting_to', $participant)
-                        ->where('id', $current_user)
-                        ->count(); 
-        
-        $own_conversation = false;
-        if($check_mgr > 0) {
-            $participant_is_mgr = true;
-        } else {
+        if(!session()->has('view-profile-as')) {
+            $current_user = auth()->user()->id;
+            $conversation_participants = DB::table('conversation_participants')                        
+                            ->where('conversation_id', $conversation_id)
+                            ->where('participant_id', '<>', $current_user)
+                            ->get();         
+            $participant = $conversation_participants[0]->participant_id;
+
+            $participant_is_mgr = false;
+            $user_is_mgr = false; 
+
+            //check direct report
             $check_mgr = DB::table('users')                        
-                        ->where('reporting_to', $current_user)
-                        ->where('id', $participant)
-                        ->count(); 
+                            ->where('reporting_to', $participant)
+                            ->where('id', $current_user)
+                            ->count(); 
+
+            $own_conversation = false;
             if($check_mgr > 0) {
-                $user_is_mgr = true;                
+                $participant_is_mgr = true;
             } else {
-                // check shared
-                $check_mgr = DB::table('shared_profiles')                        
-                        ->where('shared_id', $current_user)
-                        ->where('shared_with', $participant)
-                        ->count(); 
+                $check_mgr = DB::table('users')                        
+                            ->where('reporting_to', $current_user)
+                            ->where('id', $participant)
+                            ->count(); 
                 if($check_mgr > 0) {
-                    $participant_is_mgr = true;
+                    $user_is_mgr = true;                
                 } else {
-                    $user_is_mgr = true;     
+                    // check shared
+                    $check_mgr = DB::table('shared_profiles')                        
+                            ->where('shared_id', $current_user)
+                            ->where('shared_with', $participant)
+                            ->count(); 
+                    if($check_mgr > 0) {
+                        $participant_is_mgr = true;
+                    } else {
+                        $user_is_mgr = true;     
+                    }
                 }
             }
+        } else {
+            $current_user = $request->session()->get('view-profile-as');
+            $original_user = $request->session()->get('original-auth-id');
+            $conversation_participants = DB::table('conversation_participants')                        
+                            ->where('conversation_id', $conversation_id)
+                            ->where('participant_id', '=', $original_user)
+                            ->count();         
+            if ($conversation_participants) {
+                $user_is_mgr = true;
+            } else {
+                $user_is_mgr = false;
+                $conversation->disable_signoff = true;
+            }                 
         }
-        
         
         if($user_is_mgr ==  true) {
             $view_as_supervisor = true;
