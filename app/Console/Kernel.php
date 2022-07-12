@@ -35,24 +35,21 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('command:ExportDatabaseToBI')
         ->timezone('America/Vancouver')
-        ->dailyAt('00:00')
-        ->runInBackground();
+        ->dailyAt('00:00');
+       
 
         $schedule->command('command:GetODSEmployeeDemographics')
         ->timezone('America/Vancouver')
         // ->dailyAt('00:10')
-        ->dailyAt(env('TEMP_ODS_SCHED'))
-        ->runInBackground();
+        ->dailyAt(env('TEMP_ODS_SCHED'));
 
         $schedule->command('command:BuildOrgTree')
         ->timezone('America/Vancouver')
-        ->dailyAt('00:20')
-        ->runInBackground();
+        ->dailyAt('00:20');
   
         $schedule->command('command:SyncUserProfile')
         ->timezone('America/Vancouver')
-        ->dailyAt('00:25')
-        ->runInBackground();
+        ->dailyAt('00:25');
 
     }
 
