@@ -242,14 +242,19 @@ class ConversationController extends Controller
         }
         DB::commit();
 
-        // // Send a notification to all participants that you would like to schedule a conversation   
+        // Send a notification to all participants that you would like to schedule a conversation      
+        $names = User::whereIn('employee_id', $request->participant_id)->pluck('name');
+
         $topic = ConversationTopic::find($request->conversation_topic_id);
         $sendMail = new \App\MicrosoftGraph\SendMail();
         $sendMail->toRecipients = $request->participant_id;
         $sendMail->sender_id = null;  // default sender is System
         $sendMail->useQueue = false;
         $sendMail->template = 'ADVICE_SCHEDULE_CONVERSATION';
-        array_push($sendMail->bindvariables, $topic->name);
+        array_push($sendMail->bindvariables, implode(", ", $names->toArray() ) );
+        array_push($sendMail->bindvariables, $conversation->user->name );
+        array_push($sendMail->bindvariables, $conversation->topic->name );
+        array_push($sendMail->bindvariables, $conversation->warningMessage()[0] );
         $response = $sendMail->sendMailWithGenericTemplate();
 
         if(request()->ajax()){
@@ -424,6 +429,36 @@ class ConversationController extends Controller
             }
         }
         $conversation->update();
+
+        
+        // Send a notification to all participants that you would like to schedule a conversation   
+        $current_user = User::where('id', $authId)->first();
+
+        $participants = $conversation->conversationParticipants->map(function ($item, $key) { 
+                                return $item->participant; 
+                        });
+        $to_ids   = $participants->pluck('id')->toArray();
+        $to_names = $participants->pluck('name')->toArray();
+
+        if ($view_as_supervisor) {         
+            $to_ids = array_diff( $to_ids, [ $current_user->id ] );
+            $to_names = array_diff( $to_names, [ $current_user->name ] );
+        } else {
+            array_push($to_ids, $current_user->reporting_to );
+            $to_ids = array_diff( $to_ids, [ $current_user->id ] );
+            $to_names = array_diff( $to_names, [ $current_user->name ] );
+        }
+
+        $topic = ConversationTopic::find($request->conversation_topic_id);
+        $sendMail = new \App\MicrosoftGraph\SendMail();
+        $sendMail->toRecipients = $to_ids;
+        $sendMail->sender_id = null;  // default sender is System
+        $sendMail->useQueue = false;
+        $sendMail->template = 'CONVERSATION_SIGN_OFF';
+        array_push($sendMail->bindvariables, implode(", ", $to_names) );
+        array_push($sendMail->bindvariables, $current_user->name );   //Person who signed the conversation 
+        array_push($sendMail->bindvariables, $conversation->topic->name );  // Conversation topic
+        $response = $sendMail->sendMailWithGenericTemplate();
 
         return response()->json(['success' => true, 'Message' => 'Sign Off Successfull', 'data' => $conversation]);
     }
