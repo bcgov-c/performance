@@ -38,7 +38,8 @@ class Goal extends Model implements Auditable
 
   protected $appends = [
     "start_date_human",
-    "target_date_human"
+    "target_date_human",
+    'mandatory_status_descr'
   ];
 
   /**
@@ -49,6 +50,15 @@ class Goal extends Model implements Auditable
   protected $casts = [
     'start_date' => 'datetime',
     'target_date' => 'datetime',
+  ];
+
+
+  public const MANDATORY_STATUS_LIST = 
+  [
+      "" => "Any",
+      "0" => "Suggested",
+      "1" => "Mandatory",
+
   ];
 
   /* public function newQuery($excludeDeleted = true, $excludeLibrary = true)
@@ -111,4 +121,11 @@ class Goal extends Model implements Auditable
   {
     return $this->belongsToMany(Tag::class, 'goal_tags')->withTimestamps();
   }
+
+  public function getMandatoryStatusDescrAttribute()
+  {
+      //return $this->designation_name();
+      return array_key_exists($this->is_mandatory, self::MANDATORY_STATUS_LIST) ? self::MANDATORY_STATUS_LIST[$this->is_mandatory] : '';
+  }
+
 }

@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\Goals\CreateGoalRequest;
 use Carbon\Carbon;
+use App\MicrosoftGraph\SendMail;
 
 
 class GoalBankController extends Controller
@@ -705,6 +706,8 @@ class GoalBankController extends Controller
 
         $employee_ids = ($request->userCheck) ? $request->userCheck : [];
 
+        $notify_audiences = [];
+        
         if($request->opt_audience == "byEmp") {
             $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
             $toRecipients = EmployeeDemo::select('users.id')
@@ -723,6 +726,8 @@ class GoalBankController extends Controller
                     []
                 );
             }
+            
+            $notify_audiences = $selected_emp_ids;
         }
 
         if($request->opt_audience == "byOrg") {
@@ -750,7 +755,14 @@ class GoalBankController extends Controller
                     break;
                 }
             }
+
+            $notify_audiences = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
+            
         }
+
+        // Send Out Email notification when new goal added
+        $this->notify_employees($resultrec, $notify_audiences);
+
         return redirect()->route(request()->segment(1).'.goalbank')
             ->with('success', 'Create new goal bank successful.');
     }
@@ -1877,6 +1889,79 @@ class GoalBankController extends Controller
         ->where('is_library', true)
         ->delete();
         return redirect()->back();
+    }
+
+    
+    protected function get_employees_by_selected_org_nodes($selected_org_nodes) {
+
+        $sql_level0 = EmployeeDemo::join('organization_trees', function($join)  {
+            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
+                ->where('organization_trees.level', '=', 0);
+            })
+            ->whereIn('organization_trees.id', $selected_org_nodes) ;
+            
+        $sql_level1 = EmployeeDemo::join('organization_trees', function($join)  {
+            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
+                ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
+                ->where('organization_trees.level', '=', 1);
+            })
+            ->whereIn('organization_trees.id', $selected_org_nodes) ;
+            
+        $sql_level2 = EmployeeDemo::join('organization_trees', function($join)  {
+            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
+                ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
+                ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
+                ->where('organization_trees.level', '=', 2);    
+            })
+            ->whereIn('organization_trees.id', $selected_org_nodes) ;
+            
+        $sql_level3 = EmployeeDemo::join('organization_trees', function($join)  {
+            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
+                ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
+                ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
+                ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
+                ->where('organization_trees.level', '=', 3);    
+            })
+            ->whereIn('organization_trees.id', $selected_org_nodes);
+            
+        $sql_level4 = EmployeeDemo::join('organization_trees', function($join)  {
+            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
+                ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
+                ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
+                ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
+                ->on('employee_demo.level4', '=', 'organization_trees.level4')
+                ->where('organization_trees.level', '=', 4);
+            })
+            ->whereIn('organization_trees.id', $selected_org_nodes);
+        
+        $employees = $sql_level4->select('employee_demo.employee_id') 
+            ->union( $sql_level3->select('employee_demo.employee_id') )
+            ->union( $sql_level2->select('employee_demo.employee_id') )
+            ->union( $sql_level1->select('employee_demo.employee_id') )
+            ->union( $sql_level0->select('employee_demo.employee_id') )
+            ->pluck('employee_id'); 
+
+        return ($employees ? $employees->toArray() : []); 
+    }
+
+    protected function notify_employees($goalBank, $employee_ids)
+    {
+
+        // find user id based on the employee_id
+        $bcc_user_ids = User::whereIn('employee_id', $employee_ids)->pluck('id');
+        
+        // Send Out Email Notification to Employee
+        $sendMail = new SendMail();
+        $sendMail->bccRecipients = $bcc_user_ids;  
+        $sendMail->sender_id = null;
+        $sendMail->useQueue = false;
+        $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
+        array_push($sendMail->bindvariables, "");
+        array_push($sendMail->bindvariables, $goalBank->user ? $goalBank->user->name : '');   // Person who added goal to goal bank
+        array_push($sendMail->bindvariables, $goalBank->title);       // goal title
+        array_push($sendMail->bindvariables, $goalBank->mandatory_status_descr);           // Mandatory or suggested status
+        $response = $sendMail->sendMailWithGenericTemplate();
+
     }
 
 }
