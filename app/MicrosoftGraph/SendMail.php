@@ -119,6 +119,11 @@ class SendMail
     public function sendMailUsingSMPTServer() 
     {
 
+        $switch = strtolower(env('PRCS_EMAIL_NOTIFICATION'));
+        if (!($switch == 'on')) {
+            return true;
+        }
+
         $a_toRecipients = User::whereIn('id', $this->toRecipients)->pluck('email');
         $a_ccRecipients = User::whereIn('id', $this->ccRecipients)->pluck('email');
         $a_bccRecipients = User::whereIn('id', $this->bccRecipients)->pluck('email');
@@ -144,6 +149,8 @@ class SendMail
             $this->subject = "Performance Application -- message sent out from (Region: ". App::environment() .") ";
 
             $a_toRecipients = collect([ (env('MAIL_TO_ADDRESS_FOR_TEST') ?? 'travis.clark@gov.bc.ca') ]);
+            $a_ccRecipients = [];
+            $a_bccRecipients = [];
 
         }
 
@@ -197,22 +204,34 @@ class SendMail
             ]);
 
             // Update Recipients
-            foreach ($this->toRecipients as $recipient_id) {
-                $notification_log->recipients()->updateOrCreate([
-                    'recipient_id' => $recipient_id,
-                ],['recipient_type' => 1]);
-            }
+            if (App::environment(['production'])) {
+                foreach ($this->toRecipients as $recipient_id) {
+                    $notification_log->recipients()->updateOrCreate([
+                        'recipient_id' => $recipient_id,
+                    ],['recipient_type' => 1]);
+                }
 
-            foreach ($this->ccRecipients as $recipient_id) {
-                $notification_log->recipients()->updateOrCreate([
-                    'recipient_id' => $recipient_id,
-                ],['recipient_type' => 2]);
-            }
+                foreach ($this->ccRecipients as $recipient_id) {
+                    $notification_log->recipients()->updateOrCreate([
+                        'recipient_id' => $recipient_id,
+                    ],['recipient_type' => 2]);
+                }
 
-            foreach ($this->bccRecipients as $recipient_id) {
-                $notification_log->recipients()->updateOrCreate([
-                    'recipient_id' => $recipient_id,
-                ],['recipient_type' => 3]);
+                foreach ($this->bccRecipients as $recipient_id) {
+                    $notification_log->recipients()->updateOrCreate([
+                        'recipient_id' => $recipient_id,
+                    ],['recipient_type' => 3]);
+                }
+            } else {
+
+                $to_ids = User::whereIn('email', $a_toRecipients )->pluck('id');
+
+                foreach ($to_ids as $recipient_id) {
+                    $notification_log->recipients()->updateOrCreate([
+                        'recipient_id' => $recipient_id,
+                    ],['recipient_type' => 1]);
+                }
+
             }
 
        }   
