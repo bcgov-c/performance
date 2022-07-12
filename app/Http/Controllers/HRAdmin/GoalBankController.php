@@ -1975,25 +1975,20 @@ class GoalBankController extends Controller
 
     protected function notify_employees($goalBank, $employee_ids)
     {
-        $switch = strtolower(env('PRCS_EMAIL_NOTIFICATION'));
-        $emailAllowed = ($switch == 'on');
-
         // find user id based on the employee_id
         $bcc_user_ids = User::whereIn('employee_id', $employee_ids)->pluck('id');
         
         // Send Out Email Notification to Employee
-        if ($emailAllowed) {
-            $sendMail = new SendMail();
-            $sendMail->bccRecipients = $bcc_user_ids;  
-            $sendMail->sender_id = null;
-            $sendMail->useQueue = false;
-            $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
-            array_push($sendMail->bindvariables, "");
-            array_push($sendMail->bindvariables, $goalBank->user ? $goalBank->user->name : '');   // Person who added goal to goal bank
-            array_push($sendMail->bindvariables, $goalBank->title);       // goal title
-            array_push($sendMail->bindvariables, $goalBank->mandatory_status_descr);           // Mandatory or suggested status
-            $response = $sendMail->sendMailWithGenericTemplate();
-        }
+        $sendMail = new SendMail();
+        $sendMail->bccRecipients = $bcc_user_ids;  
+        $sendMail->sender_id = null;
+        $sendMail->useQueue = false;
+        $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
+        array_push($sendMail->bindvariables, "");
+        array_push($sendMail->bindvariables, $goalBank->user ? $goalBank->user->name : '');   // Person who added goal to goal bank
+        array_push($sendMail->bindvariables, $goalBank->title);       // goal title
+        array_push($sendMail->bindvariables, $goalBank->mandatory_status_descr);           // Mandatory or suggested status
+        $response = $sendMail->sendMailWithGenericTemplate();
     }
 
 }

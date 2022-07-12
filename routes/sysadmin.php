@@ -141,11 +141,6 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/excuseemployees/manageindexclear/{id}', [ExcuseEmployeesController::class, 'manageindexclear']);
 
         Route::get('/sysadmin/excuseemployees/org-tree', [ExcuseEmployeesController::class,'loadOrganizationTree']);
-        Route::get('/sysadmin/excuseemployees/org-organizations', [ExcuseEmployeesController::class,'getOrganizations']);
-        Route::get('/sysadmin/excuseemployees/org-programs', [ExcuseEmployeesController::class,'getPrograms']);
-        Route::get('/sysadmin/excuseemployees/org-divisions', [ExcuseEmployeesController::class,'getDivisions']);
-        Route::get('/sysadmin/excuseemployees/org-branches', [ExcuseEmployeesController::class,'getBranches']);
-        Route::get('/sysadmin/excuseemployees/org-level4', [ExcuseEmployeesController::class,'getLevel4']);
         Route::get('/sysadmin/excuseemployees/employees/{id}', [ExcuseEmployeesController::class,'getEmployees']);
     });
 
