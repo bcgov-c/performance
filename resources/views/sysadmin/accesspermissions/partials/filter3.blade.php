@@ -328,7 +328,7 @@
 
         $('#btn_search').click(function(e) {
             e.preventDefault();
-            $('#filtertable').DataTable().ajax.reload(null, false);
+            $('#filtertable').DataTable().ajax.reload();
         });
 
 

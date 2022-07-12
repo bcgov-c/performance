@@ -103,7 +103,7 @@
                 placeholder: 'Select Organization',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/employeelists/org-organizations" }}'
+                    url: '{{ "/" . request()->segment(1) . "/org-organizations" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -125,7 +125,7 @@
                 placeholder: 'Select Level 1',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/employeelists/org-programs" }}'
+                    url: '{{ "/" . request()->segment(1) . "/org-programs" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -148,7 +148,7 @@
                 placeholder: 'Select Level 2',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/employeelists/org-divisions" }}'
+                    url: '{{ "/" . request()->segment(1) . "/org-divisions" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -172,7 +172,7 @@
                 placeholder: 'Select Level 3',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/employeelists/org-branches" }}'
+                    url: '{{ "/" . request()->segment(1) . "/org-branches" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -197,7 +197,7 @@
                 placeholder: 'Select level 4',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/employeelists/org-level4" }}'
+                    url: '{{ "/" . request()->segment(1) . "/org-level4" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -336,7 +336,7 @@
 
             $('#btn_search').click(function(e) {
                 e.preventDefault();
-                $('#listtable').DataTable().ajax.reload(null, false);
+                $('#listtable').DataTable().ajax.reload();
             });
         });
     </script>

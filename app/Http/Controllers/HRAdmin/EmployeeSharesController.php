@@ -279,9 +279,6 @@ class EmployeeSharesController extends Controller
 
 
     public function eloadOrganizationTree(Request $request) {
-
-        dd('OneTwoThree');
-
         $elevel0 = $request->edd_level0 ? OrganizationTree::where('id', $request->edd_level0)->first() : null;
         $elevel1 = $request->edd_level1 ? OrganizationTree::where('id', $request->edd_level1)->first() : null;
         $elevel2 = $request->edd_level2 ? OrganizationTree::where('id', $request->edd_level2)->first() : null;
@@ -299,7 +296,10 @@ class EmployeeSharesController extends Controller
             ->pluck('organization_trees.id'); 
 
         $eorgs = OrganizationTree::whereIn('id', $erows->toArray() )->get()->toTree();
-        
+
+        console.log('FourFiveSix');
+        dd('OneTwoThree');
+
         // Employee Count by Organization
         $ecountByOrg = $esql_level4->groupBy('organization_trees.id')->select('organization_trees.id', DB::raw("COUNT(*) as count_row"))
         ->union( $esql_level3->groupBy('organization_trees.id')->select('organization_trees.id', DB::raw("COUNT(*) as count_row")) )
@@ -1061,8 +1061,19 @@ class EmployeeSharesController extends Controller
             ->when($level2, function($q) use($level2) {return $q->where('employee_demo.level2_division', $level2->name);})
             ->when($level3, function($q) use($level3) {return $q->where('employee_demo.level3_branch', $level3->name);})
             ->when($level4, function($q) use($level4) {return $q->where('employee_demo.level4', $level4->name);})
-            ->when($request->criteria == 'name', function($q) use($request){return $q->where('employee_demo.employee_name', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'name', function($q) use($request){
+                $q->where(function ($r) use($request) {
+                    $r->where('employee_demo.employee_name', 'like', "%" . $request->search_text . "%")
+                    ->orWhere('e2.employee_name', 'like', "%" . $request->search_text . "%")
+                    ->orWhere('ec.employee_name', 'like', "%" . $request->search_text . "%");
+                });
+            })
+            ->when($request->criteria == 'emp', function($q) use($request){
+                $q->where(function ($r) use($request) {
+                    $r->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
+                    ->orWhere('e2.employee_id', 'like', "%" . $request->search_text . "%");
+                });
+            })
             ->when($request->criteria == 'job', function($q) use($request){return $q->where('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'dpt', function($q) use($request){return $q->where('employee_demo.deptid', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'all', function($q) use ($request) {
@@ -1070,6 +1081,9 @@ class EmployeeSharesController extends Controller
                     if($request->search_text) {
                         $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
                         ->orWhere('employee_demo.employee_name', 'like', "%" . $request->search_text . "%")
+                        ->orWhere('e2.employee_id', 'like', "%" . $request->search_text . "%")
+                        ->orWhere('e2.employee_name', 'like', "%" . $request->search_text . "%")
+                        ->orWhere('ec.employee_name', 'like', "%" . $request->search_text . "%")
                         ->orWhere('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%")
                         ->orWhere('employee_demo.deptid', 'like', "%" . $request->search_text . "%");
                     }

@@ -2016,7 +2016,7 @@ public function agetOrganizations(Request $request) {
                 return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.($row->created_at ? $row->created_at->format('F d, Y') : null).' value="'.$row->id.'">'.($row->created_at ? $row->created_at->format('F d, Y') : null).'</a>';
             })
             ->addColumn('audience', function ($row) {
-                return '<a href="'.route(request()->segment(1).'.goalbank.editone', $row->id).'" aria-label="Edit Goal For Individuals" value="'.$row->id.'">'.$row->sharedWith()->count().'</a>';
+                return '<a href="'.route(request()->segment(1).'.goalbank.editone', $row->id).'" aria-label="Edit Goal For Individuals" value="'.$row->id.'">'.$row->sharedWith()->count().' Employees</a>';
             })
             ->addColumn('org_audience', function ($row) {
                 $orgCount = GoalBankOrg::join('employee_demo', function ($j1) {
@@ -2039,7 +2039,7 @@ public function agetOrganizations(Request $request) {
                 ->where('goal_bank_orgs.goal_id', '=', $row->id)
                 ->groupBy('goal_bank_orgs.goal_id')
                 ->count();
-                return '<a href="'.route(request()->segment(1).'.goalbank.editpage', $row->id).'" aria-label="Edit Goal For Business Units" value="'.$row->id.'">'.$orgCount.'</a>';
+                return '<a href="'.route(request()->segment(1).'.goalbank.editpage', $row->id).'" aria-label="Edit Goal For Business Units" value="'.$row->id.'">'.$orgCount.' Employees</a>';
             })
             ->addcolumn('action', function($row) {
                 $btn = '<a href="/'.request()->segment(1).'/goalbank/deletegoal/' . $row->id . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->id .'"><i class="fa fa-trash"></i></a>';

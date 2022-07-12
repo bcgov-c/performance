@@ -477,35 +477,35 @@
                     if(ddnotempty) {
                         // To do -- ajax called to load the tree
                         if($.trim($(etarget).attr('loaded'))=='') {
-                        //     $.when( 
-                        //         $.ajax({
-                        //             url: "{{ '/' . request()->segment(1) . '/employeeshares/eorg-tree' }}",
-                        //             type: 'GET',
-                        //             data: $("notify-form").serialize(),
-                        //             dataType: 'html',
-                        //             beforeSend: function() {
-                        //                 $("#etree-loading-spinner").show();                    
-                        //             },
-                        //             success: function (result) {
-                        //                 $(etarget).html(''); 
-                        //                 $(etarget).html(result);
+                            $.when( 
+                                $.ajax({
+                                    url: "{{ '/' . request()->segment(1) . '/employeeshares/eorg-tree' }}",
+                                    type: 'GET',
+                                    data: $("notify-form").serialize(),
+                                    dataType: 'html',
+                                    beforeSend: function() {
+                                        $("#etree-loading-spinner").show();                    
+                                    },
+                                    success: function (result) {
+                                        $(etarget).html(''); 
+                                        $(etarget).html(result);
 
-                        //                 $('#enav-tree').attr('loaded','loaded');
-                        //             },
-                        //             complete: function() {
-                        //                 $(".etree-loading-spinner").hide();
-                        //             },
-                        //             error: function () {
-                        //                 alert("error");
-                        //                 $(etarget).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
-                        //             }
-                        //         })
+                                        $('#enav-tree').attr('loaded','loaded');
+                                    },
+                                    complete: function() {
+                                        $(".etree-loading-spinner").hide();
+                                    },
+                                    error: function () {
+                                        alert("error");
+                                        $(etarget).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
+                                    }
+                                })
                                 
-                        //     ).then(function( data, textStatus, jqXHR ) {
-                        //         //alert( jqXHR.status ); // Alerts 200
-                        //         enodes = $('#eaccordion-level0 input:checkbox');
-                        //         eredrawTreeCheckboxes();	
-                        //     }); 
+                            ).then(function( data, textStatus, jqXHR ) {
+                                //alert( jqXHR.status ); // Alerts 200
+                                enodes = $('#eaccordion-level0 input:checkbox');
+                                eredrawTreeCheckboxes();	
+                            }); 
                         
                         } else {
                             eredrawTreeCheckboxes();

@@ -329,7 +329,7 @@
 
         $('#btn_search').click(function() {
             // e.preventDefault();
-            $('#employee-list-table').DataTable().ajax.reload(null, false);
+            $('#employee-list-table').DataTable().ajax.reload();
         });
 
 
