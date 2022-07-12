@@ -117,7 +117,7 @@
     });
 
     $('#dd_level1').select2({
-        placeholder: 'select program',
+        placeholder: 'select level 1',
         allowClear: true,
         ajax: {
             url: '/sysadmin/statistics/org-programs' 
@@ -140,7 +140,7 @@
     });
 
     $('#dd_level2').select2({
-        placeholder: 'select division',
+        placeholder: 'select level 2',
         allowClear: true,
         ajax: {
             url: '/sysadmin/statistics/org-divisions' 
@@ -164,7 +164,7 @@
     });
 
     $('#dd_level3').select2({
-        placeholder: 'select branch',
+        placeholder: 'select level 3',
         allowClear: true,
         ajax: {
             url: '/sysadmin/statistics/org-branches' 
