@@ -695,10 +695,10 @@ class GoalBankController extends Controller
             , 'measure_of_success' => $request->input('measure_of_success')
             , 'start_date' => $request->input('start_date')
             , 'target_date' => $request->input('target_date')
-            , 'measure_of_success' => $request->input('measure_of_success')
             , 'user_id' => $current_user->id
             , 'created_by' => $current_user->id
             , 'by_admin' => 2
+            , 'isMandatory' => $request->input('isMandatory')
             ]
         );
         
@@ -1172,7 +1172,7 @@ class GoalBankController extends Controller
             , 'measure_of_success' => $request->input('measure_of_success')
             , 'start_date' => $request->input('start_date')
             , 'target_date' => $request->input('target_date')
-            , 'measure_of_success' => $request->input('measure_of_success')
+            , 'is_mandatory' => $request->input('is_mandatory')
             ]
         );
         $resultrec->tags()->sync($request->tag_ids);
@@ -1650,6 +1650,7 @@ class GoalBankController extends Controller
                 'goals.id',
                 'goals.title',
                 'goals.created_at',
+                'goals.is_mandatory',
                 'ced.employee_name as creator_name',
             )
             ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
@@ -1811,10 +1812,10 @@ class GoalBankController extends Controller
 
     private function getDropdownValues(&$mandatoryOrSuggested) {
         $mandatoryOrSuggested = [
-            [
-                "id" => '',
-                "name" => 'Any'
-            ],
+            // [
+            //     "id" => '',
+            //     "name" => 'Any'
+            // ],
             [
                 "id" => '1',
                 "name" => 'Mandatory'
@@ -1974,22 +1975,25 @@ class GoalBankController extends Controller
 
     protected function notify_employees($goalBank, $employee_ids)
     {
+        $switch = strtolower(env('PRCS_EMAIL_NOTIFICATION'));
+        $emailAllowed = ($switch == 'on');
 
         // find user id based on the employee_id
         $bcc_user_ids = User::whereIn('employee_id', $employee_ids)->pluck('id');
         
         // Send Out Email Notification to Employee
-        $sendMail = new SendMail();
-        $sendMail->bccRecipients = $bcc_user_ids;  
-        $sendMail->sender_id = null;
-        $sendMail->useQueue = false;
-        $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
-        array_push($sendMail->bindvariables, "");
-        array_push($sendMail->bindvariables, $goalBank->user ? $goalBank->user->name : '');   // Person who added goal to goal bank
-        array_push($sendMail->bindvariables, $goalBank->title);       // goal title
-        array_push($sendMail->bindvariables, $goalBank->mandatory_status_descr);           // Mandatory or suggested status
-        $response = $sendMail->sendMailWithGenericTemplate();
-
+        if ($emailAllowed) {
+            $sendMail = new SendMail();
+            $sendMail->bccRecipients = $bcc_user_ids;  
+            $sendMail->sender_id = null;
+            $sendMail->useQueue = false;
+            $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
+            array_push($sendMail->bindvariables, "");
+            array_push($sendMail->bindvariables, $goalBank->user ? $goalBank->user->name : '');   // Person who added goal to goal bank
+            array_push($sendMail->bindvariables, $goalBank->title);       // goal title
+            array_push($sendMail->bindvariables, $goalBank->mandatory_status_descr);           // Mandatory or suggested status
+            $response = $sendMail->sendMailWithGenericTemplate();
+        }
     }
 
 }

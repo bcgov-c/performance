@@ -126,11 +126,6 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('/hradmin/excuseemployees/manageindexclear/{id}', [ExcuseEmployeesController::class, 'manageindexclear']);
 
         Route::get('/hradmin/excuseemployees/org-tree', [ExcuseEmployeesController::class,'loadOrganizationTree']);
-        Route::get('/hradmin/excuseemployees/org-organizations', [ExcuseEmployeesController::class,'getOrganizations']);
-        Route::get('/hradmin/excuseemployees/org-programs', [ExcuseEmployeesController::class,'getPrograms']);
-        Route::get('/hradmin/excuseemployees/org-divisions', [ExcuseEmployeesController::class,'getDivisions']);
-        Route::get('/hradmin/excuseemployees/org-branches', [ExcuseEmployeesController::class,'getBranches']);
-        Route::get('/hradmin/excuseemployees/org-level4', [ExcuseEmployeesController::class,'getLevel4']);
         Route::get('/hradmin/excuseemployees/employees/{id}', [ExcuseEmployeesController::class,'getEmployees']);
     });
 
