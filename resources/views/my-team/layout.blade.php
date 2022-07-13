@@ -105,7 +105,8 @@
             $(".items-to-share").multiselect({
                 allSelectedText: 'All',
                 selectAllText: 'All',
-                includeSelectAllOption: true
+                includeSelectAllOption: true,
+                nonSelectedText: null,
             });
             var currentUserForModal  = null;
             $(document).on('show.bs.modal', '#employee-profile-sharing-modal', function (e) {
@@ -123,7 +124,8 @@
                         $(".items-to-share-edit").multiselect({
                             allSelectedText: 'All',
                             selectAllText: 'All',
-                            includeSelectAllOption: true
+                            includeSelectAllOption: true,
+                            nonSelectedText: null,
                         });
                     }
                 });
