@@ -71,7 +71,7 @@
                             <b>Comments</b>
                             @foreach ($goal->comments as $comment)
                             <div class="d-flex flex-row my-2">
-                                <x-profile-pic></x-profile-pic>
+                                {{-- <x-profile-pic></x-profile-pic> --}}
                                 <div class="border flex-fill p-2 rounded">
                                     <b>{{$comment->user->name}}</b> on {{$comment->created_at->format('M d, Y H:i A')}}<br>
                                     <div class="comment-text">
@@ -85,7 +85,7 @@
                                     <div>
                                         @foreach($comment->replies as $reply)
                                         <div class="card mt-2 p-2 d-flex flex-row bg-light">
-                                            <x-profile-pic></x-profile-pic>
+                                            {{-- <x-profile-pic></x-profile-pic> --}}
                                             <div class="flex-fill">
                                                 <b>{{$reply->user->name}}</b> on {{$reply->created_at->format('M d, Y H:i A')}}<br>
                                                 <div class="comment-text">
@@ -105,7 +105,7 @@
                                                 @csrf
                                                 <input type="hidden" name="parent_id" value="{{$comment->id}}">
                                                 <div class="d-flex flex-row my-2">
-                                                    <x-profile-pic></x-profile-pic>
+                                                    {{-- <x-profile-pic></x-profile-pic> --}}
                                                     <div class="border flex-fill p-2 rounded">
                                                         <!-- <x-textarea class="ckeditor" name="comment" id="addreply"/> -->
                                                         <textarea class="addreply" name="comment"></textarea>
@@ -123,7 +123,7 @@
                             <form action="{{route('goal.add-comment', $goal->id)}}" method="POST">
                                 @csrf
                                 <div class="d-flex flex-row my-2">
-                                    <x-profile-pic></x-profile-pic>
+                                    {{-- <x-profile-pic></x-profile-pic> --}}
                                     <div class="border flex-fill p-2 rounded">
                                         <textarea name="comment" id="addcomment"></textarea>
                                         <!-- <x-textarea class="ckeditor" name="comment" id="addcomment"/> -->

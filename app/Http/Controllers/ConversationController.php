@@ -48,8 +48,8 @@ class ConversationController extends Controller
                             $query->where('participant_id', '<>', $supervisorId);
                         return $query;
                     });
-            })->whereNotNull('signoff_user_id')->whereNotNull('supervisor_signoff_id')
-            ->whereDate('unlock_until', '<', Carbon::today());
+            })->whereNotNull('signoff_user_id')->whereNotNull('supervisor_signoff_id');
+            //->whereDate('unlock_until', '<', Carbon::today());
 
             if ($request->has('user_id') && $request->user_id) {
                 $user_id = $request->user_id;
@@ -242,14 +242,19 @@ class ConversationController extends Controller
         }
         DB::commit();
 
-        // // Send a notification to all participants that you would like to schedule a conversation   
+        // Send a notification to all participants that you would like to schedule a conversation      
+        $names = User::whereIn('employee_id', $request->participant_id)->pluck('name');
+
         $topic = ConversationTopic::find($request->conversation_topic_id);
         $sendMail = new \App\MicrosoftGraph\SendMail();
         $sendMail->toRecipients = $request->participant_id;
         $sendMail->sender_id = null;  // default sender is System
         $sendMail->useQueue = false;
         $sendMail->template = 'ADVICE_SCHEDULE_CONVERSATION';
-        array_push($sendMail->bindvariables, $topic->name);
+        array_push($sendMail->bindvariables, implode(", ", $names->toArray() ) );
+        array_push($sendMail->bindvariables, $conversation->user->name );
+        array_push($sendMail->bindvariables, $conversation->topic->name );
+        array_push($sendMail->bindvariables, $conversation->warningMessage()[0] );
         $response = $sendMail->sendMailWithGenericTemplate();
 
         if(request()->ajax()){
@@ -274,54 +279,69 @@ class ConversationController extends Controller
         $conversation->topics = ConversationTopic::all();
         
         $conversation_id = $conversation->id;
-        $current_user = auth()->user()->id;
+        $conversation->disable_signoff = false;
         
-        $conversation_participants = DB::table('conversation_participants')                        
-                        ->where('conversation_id', $conversation_id)
-                        ->where('participant_id', '<>', $current_user)
-                        ->get();         
-        $participant = $conversation_participants[0]->participant_id;
-        
-        $participant_is_mgr = false;
-        $user_is_mgr = false; 
-        
-        //check direct report
-        $check_mgr = DB::table('users')                        
-                        ->where('reporting_to', $participant)
-                        ->where('id', $current_user)
-                        ->count(); 
-        
-        $own_conversation = false;
-        if($check_mgr > 0) {
-            $participant_is_mgr = true;
-        } else {
+        if(!session()->has('view-profile-as')) {
+            $current_user = auth()->user()->id;
+            $conversation_participants = DB::table('conversation_participants')                        
+                            ->where('conversation_id', $conversation_id)
+                            ->where('participant_id', '<>', $current_user)
+                            ->get();         
+            $participant = $conversation_participants[0]->participant_id;
+
+            $participant_is_mgr = false;
+            $user_is_mgr = false; 
+
+            //check direct report
             $check_mgr = DB::table('users')                        
-                        ->where('reporting_to', $current_user)
-                        ->where('id', $participant)
-                        ->count(); 
+                            ->where('reporting_to', $participant)
+                            ->where('id', $current_user)
+                            ->count(); 
+
+            $own_conversation = false;
             if($check_mgr > 0) {
-                $user_is_mgr = true;                
+                $participant_is_mgr = true;
             } else {
-                // check shared
-                $check_mgr = DB::table('shared_profiles')                        
-                        ->where('shared_id', $current_user)
-                        ->where('shared_with', $participant)
-                        ->count(); 
+                $check_mgr = DB::table('users')                        
+                            ->where('reporting_to', $current_user)
+                            ->where('id', $participant)
+                            ->count(); 
                 if($check_mgr > 0) {
-                    $participant_is_mgr = true;
+                    $user_is_mgr = true;                
                 } else {
-                    $user_is_mgr = true;     
+                    // check shared
+                    $check_mgr = DB::table('shared_profiles')                        
+                            ->where('shared_id', $current_user)
+                            ->where('shared_with', $participant)
+                            ->count(); 
+                    if($check_mgr > 0) {
+                        $participant_is_mgr = true;
+                    } else {
+                        $user_is_mgr = true;     
+                    }
                 }
             }
+        } else {
+            $current_user = $request->session()->get('view-profile-as');
+            $original_user = $request->session()->get('original-auth-id');
+            $conversation_participants = DB::table('conversation_participants')                        
+                            ->where('conversation_id', $conversation_id)
+                            ->where('participant_id', '=', $original_user)
+                            ->count();         
+            if ($conversation_participants) {
+                $user_is_mgr = true;
+            } else {
+                $user_is_mgr = false;
+                $conversation->disable_signoff = true;
+            }                 
         }
-        
         
         if($user_is_mgr ==  true) {
             $view_as_supervisor = true;
         } else {
             $view_as_supervisor = false;
         }
-        //$request->session()->put('view_as_supervisor', $view_as_supervisor);
+        $request->session()->put('view_as_supervisor', $view_as_supervisor);
         $conversation->view_as_supervisor = $view_as_supervisor;
         //error_log($conversation->view_as_supervisor);
 
@@ -375,6 +395,8 @@ class ConversationController extends Controller
 
     public function signOff(SignoffRequest $request, Conversation $conversation)
     {
+        $view_as_supervisor = session()->get('view_as_supervisor');
+        
         $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
         $current_employee = DB::table('employee_demo')
                             ->select('employee_demo.employee_id')
@@ -385,8 +407,9 @@ class ConversationController extends Controller
         if ($current_employee[0]->employee_id != $request->employee_id) {
             return response()->json(['success' => false, 'Message' => 'Invalide Employee ID', 'data' => $conversation]);            
         }
-        
-        if (!$conversation->is_with_supervisor) {
+  
+        //if (!$conversation->is_with_supervisor) {
+        if ($view_as_supervisor){
             $conversation->supervisor_signoff_id = $authId;
             $conversation->supervisor_signoff_time = Carbon::now();
 
@@ -407,11 +430,43 @@ class ConversationController extends Controller
         }
         $conversation->update();
 
+        
+        // Send a notification to all participants that you would like to schedule a conversation   
+        $current_user = User::where('id', $authId)->first();
+
+        $participants = $conversation->conversationParticipants->map(function ($item, $key) { 
+                                return $item->participant; 
+                        });
+        $to_ids   = $participants->pluck('id')->toArray();
+        $to_names = $participants->pluck('name')->toArray();
+
+        if ($view_as_supervisor) {         
+            $to_ids = array_diff( $to_ids, [ $current_user->id ] );
+            $to_names = array_diff( $to_names, [ $current_user->name ] );
+        } else {
+            array_push($to_ids, $current_user->reporting_to );
+            $to_ids = array_diff( $to_ids, [ $current_user->id ] );
+            $to_names = array_diff( $to_names, [ $current_user->name ] );
+        }
+
+        $topic = ConversationTopic::find($request->conversation_topic_id);
+        $sendMail = new \App\MicrosoftGraph\SendMail();
+        $sendMail->toRecipients = $to_ids;
+        $sendMail->sender_id = null;  // default sender is System
+        $sendMail->useQueue = false;
+        $sendMail->template = 'CONVERSATION_SIGN_OFF';
+        array_push($sendMail->bindvariables, implode(", ", $to_names) );
+        array_push($sendMail->bindvariables, $current_user->name );   //Person who signed the conversation 
+        array_push($sendMail->bindvariables, $conversation->topic->name );  // Conversation topic
+        $response = $sendMail->sendMailWithGenericTemplate();
+
         return response()->json(['success' => true, 'Message' => 'Sign Off Successfull', 'data' => $conversation]);
     }
 
     public function unsignOff(UnSignoffRequest $request, Conversation $conversation)
     {
+        $view_as_supervisor = session()->get('view_as_supervisor');
+
         $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
         $current_employee = DB::table('employee_demo')
                             ->select('employee_demo.employee_id')
@@ -423,7 +478,8 @@ class ConversationController extends Controller
             return response()->json(['success' => false, 'Message' => 'Invalide Employee ID', 'data' => $conversation]);            
         }
         
-        if (!$conversation->is_with_supervisor) {
+        //if (!$conversation->is_with_supervisor) {
+        if ($view_as_supervisor) {
             $conversation->supervisor_signoff_id = null;
             $conversation->supervisor_signoff_time = null;
         } else {

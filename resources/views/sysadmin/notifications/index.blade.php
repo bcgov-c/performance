@@ -73,6 +73,7 @@
 		<table class="table table-bordered table-striped" id="notificationlog-table">
 			<thead>
 				<tr>
+                    <th>Tran ID</th>
 					<th>Date Sent</th>
 					<th>Subject</th>
 					<th>Recipients</th>
@@ -131,6 +132,7 @@
 			}
         },
         columns: [
+            {data: 'id', name: 'id'},
 			{data: 'date_sent', name: 'date_sent'},
             {data: 'subject', name: 'subject' },
             {data: 'recipients', name: 'recipients'},

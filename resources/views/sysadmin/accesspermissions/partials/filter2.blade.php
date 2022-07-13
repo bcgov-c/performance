@@ -131,7 +131,7 @@
                 placeholder: 'Select Organization',
                 allowClear: true,
                 ajax: {
-                    url: '/sysadmin/accesspermissions/eorg-organizations'
+                    url: '/sysadmin/eorg-organizations'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -153,7 +153,7 @@
                 placeholder: 'Select Level 1',
                 allowClear: true,
                 ajax: {
-                    url: '/sysadmin/accesspermissions/eorg-programs' 
+                    url: '/sysadmin/eorg-programs' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -176,7 +176,7 @@
                 placeholder: 'Select Level 2',
                 allowClear: true,
                 ajax: {
-                    url: '/sysadmin/accesspermissions/eorg-divisions' 
+                    url: '/sysadmin/eorg-divisions' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -200,7 +200,7 @@
                 placeholder: 'Select Level 3',
                 allowClear: true,
                 ajax: {
-                    url: '/sysadmin/accesspermissions/eorg-branches' 
+                    url: '/sysadmin/eorg-branches' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -225,7 +225,7 @@
                 placeholder: 'Select Level 4',
                 allowClear: true,
                 ajax: {
-                    url: '/sysadmin/accesspermissions/eorg-level4' 
+                    url: '/sysadmin/eorg-level4' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {

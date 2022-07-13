@@ -19,15 +19,15 @@
 
     
     <div id="eaccordion-level0">
-        @foreach($eorgs as $org)
+        @foreach($eorgs as $eorg)
         <div class="card">
             @if ($eorg->children->count() > 0 )    
             <div class="card-header" id="eheading-{{ $eorg->id }}">
                 <h6 class="mb-0">
                 
                 <a role="button" data-toggle="collapse" href="#ecollapse-{{ $eorg->id }}" aria-expanded="false" class="collapsed"
-                            aria-controls="ecollapse-{{ $org->id }}">
-                    <input pid="" class="" type="checkbox"  id="eorgCheck{{ $eorg->id }}" name="orgCheck[]" 
+                            aria-controls="ecollapse-{{ $eorg->id }}">
+                    <input pid="" class="" type="checkbox"  id="eorgCheck{{ $eorg->id }}" name="eorgCheck[]" 
                         {{ (is_array(old('eorgCheck')) and in_array($eorg->id, old('eorgCheck'))) ? ' checked' : '' }}
                         value="{{ $eorg->id }}">    
                         <span class="pr-2">{{ $eorg->name }}</span>
@@ -36,7 +36,7 @@
                 </h6>
             </div>
 
-            <div id="collapse-{{ $eorg->id }}" class="collapse" data-parent="#eaccordion-level0" aria-labelledby="eheading-{{ $org->id }}">
+            <div id="ecollapse-{{ $eorg->id }}" class="collapse" data-parent="#eaccordion-level0" aria-labelledby="eheading-{{ $eorg->id }}">
                 <div class="card-body">
                     {{--  Nested PROGRAM - Start  --}}
                     <div id="eaccordion-1">
@@ -101,7 +101,7 @@
                                                                     <div class="card-body">
                                                                         {{--  Nested LEVEL4 - Start --}}
                                                                         <div id="eaccordion-4">
-                                                                            @foreach($ebranch->children as $level4)
+                                                                            @foreach($ebranch->children as $elevel4)
                                                                                 <div class="card" style="margin-bottom: 0 !important;">
                                                                                     <div class="card-header employees" id="eheading-{{ $elevel4->id }}">
                                                                                         <h6 class="mb-0">
@@ -122,7 +122,7 @@
                                                                                     <div class="mt-2 fas fa-spinner fa-spin fa-3x fa-fw loading-spinner" role="status" style="display:none">
                                                                                         <span class="sr-only">Loading...</span>
                                                                                     </div>
-                                                                                    <div class="card-header employee-list" id="eemployees-{{ $elevel4->id }}" value="{{ $elevel4->id }}"></div>
+                                                                                    <div class="card-header eemployee-list" id="eemployees-{{ $elevel4->id }}" value="{{ $elevel4->id }}"></div>
                                                                                 </div>
                                                                                 {{-- LEVEL4 -- Employee Listing - End --}}                                                                                         
 
@@ -148,7 +148,7 @@
 
                                                                 {{-- BRANCH -- Employee Listing - Start --}}                                                                                         
                                                                 <div id="ecollapse-{{ $ebranch->id }}" class="collapse" data-parent="#eaccordion-3" aria-labelledby="eheading-{{ $ebranch->id }}">
-                                                                    <div class="card-header employee-list" id="eemployees-{{ $ebranch->id }}" value="{{ $ebranch->id }}"></div>
+                                                                    <div class="card-header eemployee-list" id="eemployees-{{ $ebranch->id }}" value="{{ $ebranch->id }}"></div>
                                                                 </div>
                                                                 {{-- BRANCH -- Employee Listing - End --}}                                                                                         
                                                             @endif  
@@ -177,8 +177,8 @@
                                             </div>
 
                                             {{-- DIVISION -- Employee Listing - Start --}}                                                                                         
-                                            <div id="collapse-{{ $edivision->id }}" class="collapse" data-parent="#eaccordion-2" aria-labelledby="eheading-{{ $edivision->id }}">
-                                                <div class="card-header employee-list" id="eemployees-{{ $edivision->id }}" value="{{ $edivision->id }}"></div>
+                                            <div id="ecollapse-{{ $edivision->id }}" class="collapse" data-parent="#eaccordion-2" aria-labelledby="eheading-{{ $edivision->id }}">
+                                                <div class="card-header eemployee-list" id="eemployees-{{ $edivision->id }}" value="{{ $edivision->id }}"></div>
                                             </div>
                                             {{-- DIVISION -- Employee Listing - End --}}                                                                                         
 
@@ -207,7 +207,7 @@
 
                             {{-- PROGRAM -- Employee Listing - Start --}}                                                                                         
                             <div id="ecollapse-{{ $eprogram->id }}" class="collapse" data-parent="#eaccordion-1" aria-labelledby="eheading-{{ $eprogram->id }}">
-                                <div class="card-header employee-list" id="eemployees-{{ $eprogram->id }}" value="{{ $eprogram->id }}"></div>
+                                <div class="card-header eemployee-list" id="eemployees-{{ $eprogram->id }}" value="{{ $eprogram->id }}"></div>
                             </div>
                             {{-- PROGRAM -- Employee Listing - End --}}                                                                                         
 
@@ -384,23 +384,23 @@ $(document).ready(function() {
 
     function load_employees_on_node( tree_id ) {
 
-        var etarget = '#eemployees-' + tree_id;
+        var target = '#eemployees-' + tree_id;
         
-        if($.trim($(etarget).html())=='') {
+        if($.trim($(target).html())=='') {
             $.ajax({
                 url: '/'+'{{ request()->segment(1) }}'+'/employeeshares/eemployees/'+tree_id,
                 type: 'GET',
-                data: $("#enotify-form").serialize(),
+                data: $("#notify-form").serialize(),
                 dataType: 'html',
                 beforeSend: function() {
                     //$('#pageLoader').show();  
                     $(".loading-spinner").show();                    
                 },
                 success: function (result) {
-                    $(etarget).html(''); 
-                    $(etarget).html(result);
+                    $(target).html(''); 
+                    $(target).html(result);
 
-                    nodes = $(etarget).find('input:checkbox');
+                    nodes = $(target).find('input:checkbox');
                     $.each( nodes, function( index, chkbox ) {
 						if (eg_selected_employees.includes(chkbox.value)) {
 							$(chkbox).prop('checked', true);
@@ -414,7 +414,7 @@ $(document).ready(function() {
                 },
                 error: function () {
                     alert("error");
-                    $(etarget).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
+                    $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
                 }
             });
         }
@@ -429,16 +429,16 @@ $(document).ready(function() {
     $("#eaccordion-level0 .card-header").on("click","a", function(e) {
         //e.preventDefault(); 	
 
-        if (e.etarget.tagName != "INPUT") {
+        if (e.target.tagName != "INPUT") {
             // do link
             //alert("Doing link functionality");
         } else {
             e.stopPropagation();
     
-            //var location  = '#collapse-' + $(e.etarget).val();
+            //var location  = '#collapse-' + $(e.target).val();
             var location = $(this).attr('href') ;
 
-            if (e.etarget.checked) {
+            if (e.target.checked) {
                 // expand itself
                 $(location).collapse();
     
@@ -453,14 +453,14 @@ $(document).ready(function() {
                 //if no employee class, then have to add all 
                 
                 // User level checkbox 
-                if ( $(e.etarget).attr('name') == 'userCheck[]') {
-                    emp_id = $(e.etarget).val();  
+                if ( $(e.target).attr('name') == 'euserCheck[]') {
+                    emp_id = $(e.target).val();  
                     if (!eg_selected_employees.includes(emp_id)) {
                             eg_selected_employees.push( emp_id );    
                     } 
                 }
 
-                node  = $(e.etarget).val();
+                node  = $(e.target).val();
                 if (eg_employees_by_org.hasOwnProperty( node )) {
                     $.each(eg_employees_by_org[ node  ], function(index, emp) {
                         if (!eg_selected_employees.includes(emp.employee_id)) {
@@ -478,7 +478,7 @@ $(document).ready(function() {
                             }
                         })
                     } else {
-                        if (chkbox.name == 'userCheck[]') {
+                        if (chkbox.name == 'euserCheck[]') {
                             if (!eg_selected_employees.includes(chkbox.value)) {
                                 eg_selected_employees.push( chkbox.value);    
                             }
@@ -499,15 +499,15 @@ $(document).ready(function() {
 
 
                 // User level checkbox 
-                if ( $(e.etarget).attr('name') == 'userCheck[]') {
-                    emp_id = $(e.etarget).val();  
+                if ( $(e.target).attr('name') == 'euserCheck[]') {
+                    emp_id = $(e.target).val();  
                     var index = $.inArray(emp_id, eg_selected_employees);
                     if (index > -1) {
                         eg_selected_employees.splice( index, 1 );
                     }
                 }
 
-                node = $(e.etarget).val();
+                node = $(e.target).val();
                 if (eg_employees_by_org.hasOwnProperty( node )) {
                     $.each(g_employees_by_org[ node  ], function(index, emp) {
                         if (!eg_selected_employees.includes(emp.employee_id)) {
@@ -570,20 +570,20 @@ $(document).ready(function() {
 
     $(".toggle-accordion").on("click", function(e) {
 
-        b_active =  $( e.etarget ).hasClass( "active" );
+        b_active =  $( e.target ).hasClass( "active" );
         
         if (b_active) {
             nodes = $('div.collapse.show');
             $.each( nodes, function( index, item ) {
                 $(item).collapse('hide');
             });
-            $( e.etarget ).removeClass( "active" );
+            $( e.target ).removeClass( "active" );
         } else {
             nodes = $('div.collapse');
             $.each( nodes, function( index, item ) {
                 $(item).collapse('show');
             });
-            $( e.etarget ).addClass( "active" );
+            $( e.target ).addClass( "active" );
         }
 
     })

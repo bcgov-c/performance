@@ -10,7 +10,7 @@
             </select>
           </div>
           <div class="form-group col-md-4">
-            <label for="dd_level1">Program</label>
+            <label for="dd_level1">Level 1</label>
             <select id="dd_level1" name="dd_level1" class="form-control select2" style="width:100%;">
                 @if ( old('dd_level1') && session()->get('level1') )
                     <option value="{{ session()->get('level1')->id }}">{{ session()->get('level1')->name }}</option>
@@ -18,7 +18,7 @@
             </select>
           </div>
           <div class="form-group col-md-4">
-            <label for="dd_level2">Division</label>
+            <label for="dd_level2">Level 2</label>
             <select id="dd_level2" name="dd_level2" class="form-control select2" style="width:100%;">
                 @if ( old('dd_level2') && session()->get('level2') )
                     <option value="{{ session()->get('level2')->id }}">{{ session()->get('level2')->name }}</option>
@@ -30,7 +30,7 @@
 
         <div class="form-row">
           <div class="form-group col-md-4">
-            <label for="dd_level3">Branch</label>
+            <label for="dd_level3">Level 3</label>
             <select id="dd_level3" name="dd_level3" class="form-control select2" style="width:100%;">
                 @if ( old('dd_level3') && session()->get('level3') )
                     <option value="{{ session()->get('level3')->id }}">{{ session()->get('level3')->name }}</option>
@@ -50,7 +50,7 @@
             <span class="float-right pt-4">  
              <button type="submit" class="btn btn-primary" name="btn_search" 
                   value="btn_search" formaction="{{ $formaction }}">Search</button>
-             <button type="button" class="btn btn-secondary  " id="btn_search_reset" name="btn_reset" value="btn_reset">reset</button>
+             <button type="button" class="btn btn-secondary  " id="btn_search_reset" name="btn_reset" value="btn_reset">Reset</button>
             </span>
           </div>
 
@@ -117,7 +117,7 @@
     });
 
     $('#dd_level1').select2({
-        placeholder: 'select program',
+        placeholder: 'select level 1',
         allowClear: true,
         ajax: {
             url: '/sysadmin/statistics/org-programs' 
@@ -140,7 +140,7 @@
     });
 
     $('#dd_level2').select2({
-        placeholder: 'select division',
+        placeholder: 'select level 2',
         allowClear: true,
         ajax: {
             url: '/sysadmin/statistics/org-divisions' 
@@ -164,7 +164,7 @@
     });
 
     $('#dd_level3').select2({
-        placeholder: 'select branch',
+        placeholder: 'select level 3',
         allowClear: true,
         ajax: {
             url: '/sysadmin/statistics/org-branches' 
@@ -246,9 +246,9 @@
         $('#dd_level2').val(null).trigger('change');
         $('#dd_level3').val(null).trigger('change');
         $('#dd_level4').val(null).trigger('change');
-        $('#job_titles').val(null).trigger('change');
-        $('#active_since').val(null);
-        $('#search_text').val(null);
+        // $('#job_titles').val(null).trigger('change');
+        // $('#active_since').val(null);
+        // $('#search_text').val(null);
     });
 
     </script>

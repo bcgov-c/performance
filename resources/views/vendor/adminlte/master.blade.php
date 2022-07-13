@@ -77,29 +77,62 @@
 
 <body class="@yield('classes_body')" @yield('body_data') data-panel-auto-height="{{session()->has('view-profile-as') ? -63 : 0}}">
     @if(session()->has('view-profile-as'))
-    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center">
+    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center sticky-top">
         <span class="flex-fill"></span>
         <span>
-            <i class="icon fas fa-exclamation-circle"></i> You are viewing {{$viewingProfileAs->name}}'s profile.
+            <i class="icon fas fa-exclamation-circle"></i> You are viewing {{$viewingProfileAs->name}}'s profile. Click "Return to My Profile" to go back to your own.
         </span>
         <span class="flex-fill"></span>
 
         <div class="form-inline" style="position:absolute; right:0">
+            <!-----
             <select name="" class="form-control form-control-sm" id="view-profile-as">
                 @foreach ($listOfEmployee as $employee)
                     <option value="{{$employee->id}}" {{ ($viewingProfileAs->id === $employee->id) ? 'selected' : ''}}>{{$employee->name}}</option>
                 @endforeach
             </select>
+            ---->
+            <x-button :href="route('my-team.return-to-my-view')" size="sm" style="light" class="mx-2">Return to my profile</x-button>
+        </div>
+    </div>
+    
+    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center fixed-top">
+        <span class="flex-fill"></span>
+        <span>
+            <i class="icon fas fa-exclamation-circle"></i> You are viewing {{$viewingProfileAs->name}}'s profile. Click "Return to My Profile" to go back to your own.
+        </span>
+        <span class="flex-fill"></span>
+
+        <div class="form-inline" style="position:absolute; right:0">
+            <!-----
+            <select name="" class="form-control form-control-sm" id="view-profile-as">
+                @foreach ($listOfEmployee as $employee)
+                    <option value="{{$employee->id}}" {{ ($viewingProfileAs->id === $employee->id) ? 'selected' : ''}}>{{$employee->name}}</option>
+                @endforeach
+            </select>
+            ---->
             <x-button :href="route('my-team.return-to-my-view')" size="sm" style="light" class="mx-2">Return to my profile</x-button>
         </div>
     </div>
     @endif
     
     @if(session()->has('user_is_switched') && !session()->has('view-profile-as'))
-    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center">
+    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center sticky-top ">
         <span class="flex-fill"></span>
         <span>
-            <i class="icon fas fa-exclamation-circle"></i> You are logged in as {{auth()->user()->name}}'s account.
+            <i class="icon fas fa-exclamation-circle"></i> You are logged in as {{auth()->user()->name}}'s account. Click "Revert Identity" to return to your own profile.
+        </span>
+        <span class="flex-fill"></span>
+
+        <div class="form-inline" style="position:absolute; right:0">
+            <x-button :href="route('dashboard.revert-identity')" size="sm" style="light" class="mx-2">Revert Identity</x-button>
+        </div>
+    </div>
+    
+    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center fixed-top">
+        <span class="flex-fill"></span>
+        <span>
+            <i class="icon fas fa-exclamation-circle"></i> You are logged in as {{auth()->user()->name}}'s account. Click "Revert Identity" to return to your own profile.
         </span>
         <span class="flex-fill"></span>
 
@@ -133,6 +166,18 @@
         @else
             <livewire:scripts />
         @endif
+    @endif
+
+    {{-- Add Footer here (reference: https://adminlte.io/themes/AdminLTE/index2.html )--}}
+    @if(!request()->is('login') && !request()->is('register') && !request()->is('password/*'))
+        <footer class="main-footer">
+            <div class="pull-right hidden-xs">
+                <img src="{{asset('img/brand/1.png')}}" alt="" class="p-3" style="height:140px;">
+            {{-- <b>Version</b> 2.4.13 --}}
+            </div>
+            {{-- <strong>Copyright &copy; 2014-2019 <a href="https://adminlte.io">AdminLTE</a>.</strong> All rights
+            reserved. --}}
+        </footer>
     @endif
 
     {{-- Custom Scripts --}}

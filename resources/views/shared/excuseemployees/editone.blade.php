@@ -14,7 +14,7 @@
 	<p class="px-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tincidunt, nibh nec interdum fermentum, est metus rutrum elit, in molestie ex massa ut urna. Duis dignissim tortor ipsum, dignissim rutrum quam gravida sed. Mauris auctor malesuada luctus. Praesent vitae ante et diam gravida lobortis. Donec eleifend euismod scelerisque. Curabitur laoreet erat sit amet tortor rutrum tristique. Sed lobortis est ac mauris lobortis euismod. Morbi tincidunt porta orci eu elementum. Donec lorem lacus, hendrerit a augue sed, tempus rhoncus arcu. Praesent a enim vel eros elementum porta. Nunc ut leo eu augue dapibus efficitur ac ac risus. Maecenas risus tellus, tincidunt vitae finibus vel, ornare vel neque. Curabitur imperdiet orci ac risus tempor semper. Integer nec varius urna, sit amet rhoncus diam. Aenean finibus, sapien eu placerat tristique, sapien dui maximus neque, id tempor dui magna eget lorem. Suspendisse egestas mauris non feugiat bibendum.</p>
 	<p class="px-3">Cras quis augue quis risus auctor facilisis quis ac ligula. Fusce vehicula consequat dui, et egestas augue sodales aliquam. In hac habitasse platea dictumst. Curabitur sit amet nulla nibh. Morbi mollis malesuada diam ut egestas. Pellentesque blandit placerat nisi ac facilisis. Vivamus consequat, nisl a lacinia ultricies, velit leo consequat magna, sit amet condimentum justo nibh id nisl. Quisque mattis condimentum cursus. Nullam eget congue augue, a molestie leo. Aenean sollicitudin convallis arcu non maximus. Curabitur ut lacinia nisi. Nam cursus venenatis lacus aliquet dapibus. Nulla facilisi.</p>
 
-	<form id="notify-form" action="{{ route(request()->segment(1).'.excuseemployees.updategoalone') }}" method="post">
+	<form id="notify-form" action="{{ route(request()->segment(1).'.excuseemployees.updategoalone', $goaldetail->id) }}" method="post">
 		@csrf
 		<br>
 		<h6 class="text-bold">Step 1. Update Goal Details</h6>
@@ -226,18 +226,30 @@
 							}
 						},
 						columns: [
-							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', searchable: true},
-							{title: 'Name', ariaTitle: 'Employee Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', searchable: true},
-							{title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', searchable: true},
-							{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', searchable: true},
-							{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', searchable: true},
-							{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', searchable: true},
-							{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', searchable: true},
-							{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true},
-							{title: 'Dept ID', ariaTitle: 'Dept ID', target: 0, type: 'string', data: 'deptid', name: 'deptid', searchable: true},
-							{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},
-							{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id', name: 'goal_id', searchable: false, visible: false},
-							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'num', data: 'share_id', name: 'share_id', searchable: false, visible: false},
+							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id'
+								, name: 'employee_id', searchable: true},
+							{title: 'Name', ariaTitle: 'Employee Name', target: 0, type: 'string', data: 'employee_name'
+								, name: 'employee_name', searchable: true},
+							{title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc'
+								, name: 'jobcode_desc', searchable: true},
+							{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization'
+								, name: 'organization', searchable: true},
+							{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program'
+								, name: 'level1_program', searchable: true},
+							{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division'
+								, name: 'level2_division', searchable: true},
+							{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch'
+								, name: 'level3_branch', searchable: true},
+							{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4'
+								, name: 'level4', searchable: true},
+							{title: 'Dept ID', ariaTitle: 'Dept ID', target: 0, type: 'string', data: 'deptid'
+								, name: 'deptid', searchable: true},
+							{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action'
+								, name: 'action', orderable: false, searchable: false},
+							{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id'
+								, name: 'goal_id', searchable: false, visible: false},
+							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'num', data: 'share_id'
+								, name: 'share_id', searchable: false, visible: false},
 						]
 					}
 				);

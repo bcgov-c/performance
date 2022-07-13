@@ -353,6 +353,155 @@ class StatisticsReportController extends Controller
 
     }
 
+    public function goalSummaryTagExport(Request $request)
+    {
+
+        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
+        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
+        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
+        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
+        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+
+        $tags = Tag::when($request->tag, function ($q) use($request) {
+                        return $q->where('name', $request->tag);
+                    })
+                    ->orderBy('name')->get();
+
+        $count_raw = "users.*, ";
+        $count_raw .= " employee_name, organization, level1_program, level2_division, level3_branch, level4";
+        if (!$request->tag || $request->tag == '[Blank]') {
+            $count_raw .= " ,(select count(*) from goals ";
+            $count_raw .= "    where users.id = goals.user_id ";
+            $count_raw .= "      and not exists (select 'x' from goal_tags ";
+            $count_raw .= "                       where goals.id = goal_tags.goal_id)) as 'tag_0' ";
+        }
+        foreach ($tags as $tag) {
+            $count_raw .= " ,(select count(*) from goal_tags, goals ";
+            $count_raw .= "    where goals.id = goal_tags.goal_id "; 
+            $count_raw .= "      and tag_id = " . $tag->id;  
+            $count_raw .= "      and users.id = goals.user_id ) as 'tag_". $tag->id ."'";
+        }
+
+        $sql = User::selectRaw($count_raw)
+                    ->join('employee_demo', function($join) {
+                        $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                        // $join->on('employee_demo.empl_record', '=', 'A.empl_record');
+                    })
+                    ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                        return $q->where('employee_demo.organization', $level0->name);
+                    })
+                    ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                        return $q->where('employee_demo.level1_program', $level1->name);
+                    })
+                    ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                        return $q->where('employee_demo.level2_division', $level2->name);
+                    })
+                    ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                        return $q->where('employee_demo.level3_branch', $level3->name);
+                    })
+                    ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                        return $q->where('employee_demo.level4', $level4->name);
+                    })
+                    ->whereExists(function ($query) {
+                        $query->select(DB::raw(1))
+                                ->from('goals')
+                                ->whereColumn('goals.user_id',  'users.id');
+                    })
+                    // To show the tag == selected tag name
+                    ->when( ($request->tag && $request->tag <> '[Blank]' ), function ($q) use ($request) {
+                        $q->whereExists(function ($query) use ($request) {
+                              return $query->select(DB::raw(1))
+                                        ->from('goals')
+                                        ->join('goal_tags', 'goals.id', '=', 'goal_tags.goal_id')
+                                        ->join('tags', 'goal_tags.tag_id', '=', 'tags.id')
+                                        ->whereColumn('goals.user_id',  'users.id')
+                                        ->where('name', $request->tag);
+                            });
+                    })  
+                    // To show the  tag == '[blank]'
+                    ->when( ($request->tag && $request->tag == '[Blank]' ), function ($q) {
+                        $q->whereNotExists(function ($query) {
+                              return $query->select(DB::raw(1))
+                                        ->from('goals')
+                                        ->join('goal_tags', 'goals.id', '=', 'goal_tags.goal_id')
+                                        ->whereColumn('goals.user_id',  'users.id');
+                                });
+                    })  
+                    ->whereExists(function ($query) {
+                        $query->select(DB::raw(1))
+                              ->from('admin_orgs')
+                              ->whereColumn('admin_orgs.organization', 'employee_demo.organization')
+                              ->whereColumn('admin_orgs.level1_program', 'employee_demo.level1_program')
+                              ->whereColumn('admin_orgs.level2_division', 'employee_demo.level2_division')
+                              ->whereColumn('admin_orgs.level3_branch',  'employee_demo.level3_branch')
+                              ->whereColumn('admin_orgs.level4', 'employee_demo.level4')
+                              ->where('admin_orgs.user_id', '=', Auth::id() );
+                    });
+        
+        $users = $sql->get();
+
+
+
+        // Generating Output file 
+        $filename = 'Active Goal Tags Per Employee.csv';
+
+        $headers = array(
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+
+        $columns = ["Employee ID", "Name", "Email", 
+                    "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
+                    ];
+        if (!$request->tag || $request->tag == '[Blank]') {
+            array_push($columns, 'Blank' );
+        }
+        foreach ($tags as $tag)                    
+        {
+            array_push($columns, $tag->name); 
+        }
+
+        $callback = function() use($users, $columns, $tags, $request) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($users as $user) {
+                $row['Employee ID'] = $user->employee_id;
+                $row['Name'] = $user->employee_name;
+                $row['Email'] = $user->email;
+                $row['Organization'] = $user->organization;
+                $row['Level 1'] = $user->level1_program;
+                $row['Level 2'] = $user->level2_division;
+                $row['Level 3'] = $user->level3_branch;
+                $row['Level 4'] = $user->level4;
+
+                $row_data = array( $row['Employee ID'], $row['Name'], $row['Email'], $row['Organization'],
+                                    $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'],
+                                );
+
+                if (!$request->tag || $request->tag == '[Blank]') {
+                    array_push($row_data, $user->getAttribute('tag_0') );
+                }
+
+                foreach ($tags as $tag) 
+                {
+                    array_push($row_data, $user->getAttribute('tag_'.$tag->id) );
+                }
+
+                fputcsv($file, $row_data );
+
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+        
+    }
+
     public function conversationSummary(Request $request)
     {
 

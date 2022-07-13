@@ -126,11 +126,6 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('/hradmin/excuseemployees/manageindexclear/{id}', [ExcuseEmployeesController::class, 'manageindexclear']);
 
         Route::get('/hradmin/excuseemployees/org-tree', [ExcuseEmployeesController::class,'loadOrganizationTree']);
-        Route::get('/hradmin/excuseemployees/org-organizations', [ExcuseEmployeesController::class,'getOrganizations']);
-        Route::get('/hradmin/excuseemployees/org-programs', [ExcuseEmployeesController::class,'getPrograms']);
-        Route::get('/hradmin/excuseemployees/org-divisions', [ExcuseEmployeesController::class,'getDivisions']);
-        Route::get('/hradmin/excuseemployees/org-branches', [ExcuseEmployeesController::class,'getBranches']);
-        Route::get('/hradmin/excuseemployees/org-level4', [ExcuseEmployeesController::class,'getLevel4']);
         Route::get('/hradmin/excuseemployees/employees/{id}', [ExcuseEmployeesController::class,'getEmployees']);
     });
 
@@ -147,6 +142,7 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
     Route::get('/hradmin/statistics', [StatisticsReportController::class, 'goalsummary'])->name('hradmin.statistics');
     Route::get('/hradmin/statistics/goalsummary', [StatisticsReportController::class, 'goalsummary'])->name('hradmin.statistics.goalsummary');
     Route::get('/hradmin/statistics/goalsummary-export', [StatisticsReportController::class, 'goalSummaryExport'])->name('hradmin.statistics.goalsummary.export');
+    Route::get('/hradmin/statistics/goalsummary-tag-export', [StatisticsReportController::class, 'goalSummaryTagExport'])->name('hradmin.statistics.goalsummary.tag.export');
     Route::get('/hradmin/statistics/conversationsummary', [StatisticsReportController::class, 'conversationsummary'])->name('hradmin.statistics.conversationsummary');
     Route::get('/hradmin/statistics/conversationsummary-export', [StatisticsReportController::class, 'conversationSummaryExport'])->name('hradmin.statistics.conversationsummary.export');
     Route::get('/hradmin/statistics/sharedsummary', [StatisticsReportController::class, 'sharedsummary'])->name('hradmin.statistics.sharedsummary');
