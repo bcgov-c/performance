@@ -86,8 +86,7 @@ class ConversationController extends Controller
             }
             $myTeamQuery = clone $query;
 
-            // With My Team
-            $myTeamQuery->where('user_id', '<>', $supervisorId);
+           
             // With my Supervisor
             $sharedSupervisorIds = SharedProfile::where('shared_id', Auth::id())->with('sharedWithUser')->get()->pluck('shared_with')->toArray();
             array_push($sharedSupervisorIds, $supervisorId);
@@ -97,11 +96,14 @@ class ConversationController extends Controller
                     $query->whereIn('participant_id', $sharedSupervisorIds);
                 });
             });
+            
+             // With My Team
+            //$myTeamQuery->whereNotIn('user_id', '<>', $supervisorId);
+            $myTeamQuery->whereNotIn('user_id', $sharedSupervisorIds);
             $type = 'past';
 
-            $conversations = $query->orderBy('id', 'DESC')->paginate(10);
+            $conversations = $query->orderBy('id', 'DESC')->paginate(10);                       
             $myTeamConversations = $myTeamQuery->orderBy('id', 'DESC')->paginate(10);
-
         } else { // Upcoming
             $conversations = $query->where(function($query) use ($authId, $supervisorId, $viewType) {
                 $query->where('user_id', $authId)->
@@ -514,9 +516,7 @@ class ConversationController extends Controller
         $reportingManager = $user->reportingManager()->get();
         $sharedProfile = SharedProfile::where('shared_with', Auth::id())->with('sharedUser')->get()->pluck('sharedUser');
         $participants = $participants->toBase()->merge($reportingManager)->merge($sharedProfile);
-        
-        error_log(print_r($sharedProfile,true));
-
+ 
         $adminShared=SharedProfile::select('shared_with')
         ->where('shared_id', '=', Auth::id())
         ->where('shared_item', 'like', '%2%')
