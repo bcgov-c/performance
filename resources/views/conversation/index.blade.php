@@ -328,6 +328,12 @@
                     }
                 });
             });
+            
+            $(document).on('keypress', '#employee_id', function(e) {                
+                if ( e.which == 13 ) {
+                   e.preventDefault();
+                }
+            });
 
             $(document).on('click', '.btn-sign-off', function(e) {
                 const formType = 'employee-';
