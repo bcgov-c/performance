@@ -11,6 +11,10 @@ class ResourceController extends Controller
     {        
         $data = [
             [
+                'question' => 'Welcome!',
+                'answer_file' => '5'
+            ],
+            [
                 'question' => 'My Goals Section',
                 'answer_file' => '2'
             ],
