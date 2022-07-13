@@ -42,7 +42,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('command:GetODSEmployeeDemographics')
         ->timezone('America/Vancouver')
-        ->dailyAt('00:10')
+        ->dailyAt('00:10');
         // ->dailyAt(env('TEMP_ODS_SCHED'));
 
         $schedule->command('command:BuildOrgTree')
