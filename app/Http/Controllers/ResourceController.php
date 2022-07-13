@@ -7,9 +7,24 @@ use App\Models\Tag;
 
 class ResourceController extends Controller
 {
-    public function userguide()
-    {
-        return view('resource.user-guide');
+    public function userguide(Request $request)
+    {        
+        $data = [
+            [
+                'question' => 'My Goals Section',
+                'answer_file' => '2'
+            ],
+            [
+                'question' => 'My Conversations Section',
+                'answer_file' => '3'
+            ],
+            [
+                'question' => 'My Team Section (supervisors only)',
+                'answer_file' => '4'
+            ],
+
+        ];
+        return view('resource.user-guide', compact('data'));
     }
     public function goalsetting(Request $request)
     {
@@ -57,8 +72,11 @@ class ResourceController extends Controller
         ];
         return view('resource.goal-setting', compact('data', 'tags', 't'));
     }
-    public function conversations()
+    public function conversations(Request $request)
     {
+      
+      $t = $request->t;
+
       $data = [
           [
               'question' => 'What is a performance development conversation?',
@@ -81,11 +99,11 @@ class ResourceController extends Controller
               'answer_file' => '5'
           ],
           [
-            'question' => 'How to use the conversation templates',
-            'answer_file' => '6'
-        ],          
+              'question' => 'How to use the conversation templates',
+              'answer_file' => '6'
+          ],          
       ];
-         return view('resource.conversations', compact('data'));
+         return view('resource.conversations', compact('data', 't'));
     }
     public function contact()
     {
