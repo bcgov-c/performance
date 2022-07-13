@@ -354,9 +354,25 @@ class GoalController extends Controller
         $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','users.name as username',DB::raw('group_concat(distinct tags.name) as tagnames'));
         $query = $query->union($adminGoals);
         
-        if ($request->has('sortby') && $request->sortby != '') {
-            $query = $query->orderby($request->sortby);            
+        if (!$request->has('sortorder') || $request->sortorder == '') {
+            $sortorder = 'ASC';
+        } elseif (strtoupper($request->sortorder) != 'ASC' && strtoupper($request->sortorder) != 'DESC') {
+            $sortorder = 'ASC';
+        }else {
+            $sortorder = $request->sortorder;
         }
+        
+        $sortby = '';
+        if ($request->has('sortby') && $request->sortby != '') {
+            $sortby = $request->sortby;
+            $query = $query->orderby($sortby, $sortorder);    
+            if ($sortorder == 'ASC') {
+                $sortorder = 'DESC';
+            } else {
+                $sortorder = 'ASC';
+            }
+        }
+        
         
         // $query = $query->groupBy('goals.id');
         $bankGoals = $query->paginate(10);
@@ -380,7 +396,7 @@ class GoalController extends Controller
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
         $goals_count = count($bankGoals);
 
-        return view('goal.bank', array_merge(compact('bankGoals', 'tags', 'tagsList', 'goalTypes', 'type_desc_str', 'mandatoryOrSuggested', 'createdBy', 'goals_count'), $suggestedGoalsData));
+        return view('goal.bank', array_merge(compact('bankGoals', 'tags', 'tagsList', 'goalTypes', 'type_desc_str', 'mandatoryOrSuggested', 'createdBy', 'goals_count', 'sortby','sortorder'), $suggestedGoalsData));
     }
 
     private function getDropdownValues(&$mandatoryOrSuggested, &$createdBy, &$goalTypes, &$tagsList) {

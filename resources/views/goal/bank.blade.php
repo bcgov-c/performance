@@ -45,7 +45,8 @@
                     <button class="btn btn-primary mt-4 px-5">Filter</button>
                 </div> -->
             </div>
-            <input name="sortby" id="sortby" value="" type="hidden">
+            <input name="sortby" id="sortby" value="{{$sortby}}" type="hidden">
+            <input name="sortorder" id="sortorder" value="{{$sortorder}}" type="hidden">
         </form>
 
         <form action="{{ route('goal.library.save-multiple') }}" method="post">
@@ -61,12 +62,12 @@
                                         <th>
                                             <input type="checkbox" id="select_all">
                                         </th>
-                                        <th style="width:35%"> <span id='sortTitle'>Goal Title</span> </th>
-                                        <th style="width:20%"> <span id='sortType'>Goal Type</span></th>
-                                        <th style="width:15%"> Tags</th>
-                                        <th style="width:15%"> <span id='sortDateAdd'>Date Added</span></th>
-                                        <th style="width:15%"> <span id='sortCreated'>Created By</span></th>
-                                        <th style="width:15%"> <span id='sortMs'>Mandatory/Suggested</span></th>
+                                        <th style="width:35%"> <a href='javascript:sort("title")'>Goal Title <i class="sorttitle fas fa-sort" style="display:none"></i></a> </th>
+                                        <th style="width:20%"> <a href='javascript:sort("typename")'>Goal Type <i class="sorttype fas fa-sort"  style="display:none"></i></a></th>
+                                        <th style="width:15%"> <a href='javascript:sort("tagnames")'>Tags <i class="sorttag fas fa-sort"  style="display:none"></i></a></th>
+                                        <th style="width:15%"> <a href='javascript:sort("created_at")'>Date Added <i class="sortdate fas fa-sort"  style="display:none"></i></a></th>
+                                        <th style="width:15%"> <a href='javascript:sort("username")'>Created By <i class="sortuser fas fa-sort"  style="display:none"></i></a></th>
+                                        <th style="width:15%"> <a href='javascript:sort("is_mandatory")'>Mandatory/Suggested <i class="sortmandatory fas fa-sort"  style="display:none"></i></a></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -229,21 +230,69 @@
                 $("#filter-menu").submit();
             });
             
-            $('#sortType').click(function(){
-                $('#sortby').val('title');
+            function sort(v) {
+                $('#sortby').val(v);
                 $("#filter-menu").submit();
-            });
-            $('#sortDateAdd').click(function(){
-                $('#sortby').val('created_at');
-                $("#filter-menu").submit();
-            });
-            $('#sortCreated').click(function(){
-                $('#sortby').val('username');
-                $("#filter-menu").submit();
-            });
-            $('#sortMs').click(function(){
-                $('#sortby').val('is_mandatory');
-                $("#filter-menu").submit();
+            }
+            
+            
+            
+            $( document ).ready(function() {
+                var sortby = $('#sortby').val();
+                $('.sorttitle').hide();
+                $('.sorttype').hide();
+                $('.sorttag').hide();
+                $('.sortdate').hide();
+                $('.sortuser').hide();
+                $('.sortmandatory').hide();
+                if (sortby == 'title') {
+                    $('.sorttitle').show();
+                    $('.sorttype').hide();
+                    $('.sorttag').hide();
+                    $('.sortdate').hide();
+                    $('.sortuser').hide();
+                    $('.sortmandatory').hide();
+                }
+                if (sortby == 'typename') {
+                    $('.sorttitle').hide();
+                    $('.sorttype').show();
+                    $('.sorttag').hide();
+                    $('.sortdate').hide();
+                    $('.sortuser').hide();
+                    $('.sortmandatory').hide();                    
+                }
+                if (sortby == 'tagnames') {
+                    $('.sorttitle').hide();
+                    $('.sorttype').hide();
+                    $('.sorttag').show();
+                    $('.sortdate').hide();
+                    $('.sortuser').hide();
+                    $('.sortmandatory').hide();    
+                }
+                if (sortby == 'created_at') {
+                    $('.sorttitle').hide();
+                    $('.sorttype').hide();
+                    $('.sorttag').hide();
+                    $('.sortdate').show();
+                    $('.sortuser').hide();
+                    $('.sortmandatory').hide();    
+                }
+                if (sortby == 'username') {
+                    $('.sorttitle').hide();
+                    $('.sorttype').hide();
+                    $('.sorttag').hide();
+                    $('.sortdate').hide();
+                    $('.sortuser').show();
+                    $('.sortmandatory').hide();    
+                }
+                if (sortby == 'is_mandatory') {
+                    $('.sorttitle').hide();
+                    $('.sorttype').hide();
+                    $('.sorttag').hide();
+                    $('.sortdate').hide();
+                    $('.sortuser').hide();
+                    $('.sortmandatory').show();    
+                }
             });
             
             $('input[name="date_added"]').daterangepicker({
