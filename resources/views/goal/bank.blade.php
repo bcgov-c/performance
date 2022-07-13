@@ -2,12 +2,14 @@
     <div class="container-fluid">
         <div class="row ">
             <div class="col-md-6 col-6">
-                <x-slot name="header">
+                <x-slot name="header">                    
+                    <h1>Goal Bank</h1>
                     @include('goal.partials.tabs')
                 </x-slot>
             </div>
         </div>
         <div>
+            <h3>My Goal Bank</h3>
             <!-- <b>My Goal Bank</b> <br> -->
             The goals below have been created for you by your supervisor or organization. Click on a goal to view it and add it to your own profile. If needed, you can edit the goal to personalize it once it is in your profile. 
             <br>
@@ -43,6 +45,7 @@
                     <button class="btn btn-primary mt-4 px-5">Filter</button>
                 </div> -->
             </div>
+            <input name="sortby" id="sortby" value="" type="hidden">
         </form>
 
         <form action="{{ route('goal.library.save-multiple') }}" method="post">
@@ -51,25 +54,26 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
+                            <input name="total_count" id="total_count" type="hidden" value="{{$goals_count}}">
                             <table class="table table-borderless">
                                 <thead>
                                     <tr class="border-bottom">
                                         <th>
                                             <input type="checkbox" id="select_all">
                                         </th>
-                                        <th style="width:35%"> Goal Title</th>
-                                        <th style="width:20%"> Goal Type</th>
+                                        <th style="width:35%"> <span id='sortTitle'>Goal Title</span> </th>
+                                        <th style="width:20%"> <span id='sortType'>Goal Type</span></th>
                                         <th style="width:15%"> Tags</th>
-                                        <th style="width:15%"> Date Added</th>
-                                        <th style="width:15%"> Created By</th>
-                                        <th style="width:15%"> Mandatory/Suggested</th>
+                                        <th style="width:15%"> <span id='sortDateAdd'>Date Added</span></th>
+                                        <th style="width:15%"> <span id='sortCreated'>Created By</span></th>
+                                        <th style="width:15%"> <span id='sortMs'>Mandatory/Suggested</span></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($bankGoals as $goal)
                                     <tr>
                                         <td>
-                                            <input type="checkbox" name="goal_ids[]" value="{{$goal->id}}">
+                                            <input type="checkbox" class="goal_ids" name="goal_ids[]" value="{{$goal->id}}">
                                         </td>
                                         <td style="width:25%">
                                             <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->title }}</a>
@@ -111,7 +115,7 @@
         @php $shareWithLabel = 'Audience' @endphp
         @php $doNotShowInfo = true @endphp
         <div>
-            <b>Team Goal Bank</b> <br>
+            <h3>Team Goal Bank</h3>
         </div>
         <form action="{{ route('my-team.sync-goals-sharing')}}" method="POST" id="share-my-goals-form">
             @csrf
@@ -225,6 +229,23 @@
                 $("#filter-menu").submit();
             });
             
+            $('#sortType').click(function(){
+                $('#sortby').val('title');
+                $("#filter-menu").submit();
+            });
+            $('#sortDateAdd').click(function(){
+                $('#sortby').val('created_at');
+                $("#filter-menu").submit();
+            });
+            $('#sortCreated').click(function(){
+                $('#sortby').val('username');
+                $("#filter-menu").submit();
+            });
+            $('#sortMs').click(function(){
+                $('#sortby').val('is_mandatory');
+                $("#filter-menu").submit();
+            });
+            
             $('input[name="date_added"]').daterangepicker({
                 autoUpdateInput: false,
                 locale: {
@@ -240,12 +261,18 @@
         </script>
         <script>
             $(document).on('click', '#select_all', function (e) {
-                $('input:checkbox').prop('checked', this.checked);
+                $('.goal_ids').prop('checked', this.checked);
+                let total_count = $('#total_count').val();  
+                let isChecked = $('#select_all')[0].checked
+                if (isChecked === false) {
+                    total_count = 0;
+                }
+                $('#addMultipleGoalButton').find('span.selected_count').html("("+total_count+")");
             });
-            $(document).on('click', 'input:checkbox', function (e) {
-                let count = $('input:checkbox:checked').length;
-                if ($("#select_all").get(0).checked) {
-                    count--;
+            $(document).on('click', '.goal_ids', function (e) {
+                let count = $('.goal_ids:checked').length;
+                if (count == 0) {
+                    $('#select_all').prop('checked', false); 
                 }
                 $('#addMultipleGoalButton').find('span.selected_count').html("("+count+")");
                 $('#addMultipleGoalButton').prop('disabled', count === 0);    
@@ -254,7 +281,7 @@
                 e.preventDefault();
                 $("#goal_form").find('input[name=selected_goal]').val($(this).data('id'));
 
-                $.get('/goal/library/'+$(this).data('id')+'?add=true', function (data) {
+                $.get('/goal/goalbank/'+$(this).data('id')+'?add=true', function (data) {
                     $("#goal-detail-modal").find('.data-placeholder').html(data);
                     $("#goal-detail-modal").modal('show');
                 });
@@ -265,7 +292,7 @@
                 const goalId = $(this).data("id");
                 e.preventDefault();
                 $.ajax({
-                    url: '/goal/library'
+                    url: '/goal/goalbank'
                     , type: 'POST'
                     , data: {
                         selected_goal: goalId

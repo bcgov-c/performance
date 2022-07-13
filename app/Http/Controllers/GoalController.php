@@ -211,11 +211,18 @@ class GoalController extends Controller
     {
         $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->findOrFail($id);
         $input = $request->validated();
-
-        $tags = $input['tag_ids'];
+        
+        $tags = '';
+        if(isset($input['tag_ids'])) {
+            $tags = $input['tag_ids'];
+        } 
         unset($input['tag_ids']);        
         $goal->update($input);
-        $goal->tags()->sync($tags);
+        if ($tags != '') {
+            $goal->tags()->sync($tags);
+        } else {
+            DB::table('goal_tags')->where('goal_id', $id)->delete();
+        }
 
         return redirect()->route($goal->is_library ? 'my-team.suggested-goals' : 'goal.index');
     }
@@ -318,7 +325,7 @@ class GoalController extends Controller
         }
 
         if ($request->has('title') && $request->title) {
-            $query = $query->where('goal_tags.goal_id', "LIKE", "%$request->title%");
+            $query = $query->where('goals.title', "LIKE", "%$request->title%");
         }
 
         if ($request->has('date_added') && $request->date_added && Str::lower($request->date_added) !== 'any') {
@@ -346,6 +353,11 @@ class GoalController extends Controller
         // $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goalTypes, $tagsList);
         $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','users.name as username',DB::raw('group_concat(distinct tags.name) as tagnames'));
         $query = $query->union($adminGoals);
+        
+        if ($request->has('sortby') && $request->sortby != '') {
+            $query = $query->orderby($request->sortby);            
+        }
+        
         // $query = $query->groupBy('goals.id');
         $bankGoals = $query->paginate(10);
         $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goalTypes, $tagsList);
@@ -366,8 +378,9 @@ class GoalController extends Controller
             }
         }
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
+        $goals_count = count($bankGoals);
 
-        return view('goal.bank', array_merge(compact('bankGoals', 'tags', 'tagsList', 'goalTypes', 'type_desc_str', 'mandatoryOrSuggested', 'createdBy'), $suggestedGoalsData));
+        return view('goal.bank', array_merge(compact('bankGoals', 'tags', 'tagsList', 'goalTypes', 'type_desc_str', 'mandatoryOrSuggested', 'createdBy', 'goals_count'), $suggestedGoalsData));
     }
 
     private function getDropdownValues(&$mandatoryOrSuggested, &$createdBy, &$goalTypes, &$tagsList) {

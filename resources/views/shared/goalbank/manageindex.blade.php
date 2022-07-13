@@ -82,7 +82,7 @@
 
         function showModal ($id) {
                 $showAddBtn = false;
-                $.get('/goal/library/' + $id, function (data) {
+                $.get('/goal/goalbank/' + $id, function (data) {
                     $("#goal-detail-modal").find('.data-placeholder').html(data);
                     $("#goal-detail-modal").modal('show');
                 });
