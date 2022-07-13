@@ -56,6 +56,7 @@
         </div>
     </div>
     @include('dashboard.partials.shared_with_view-modal')
+    @include('dashboard.partials.message-modal')
     @push('js')
         <script>
             $(document).ready(function(){

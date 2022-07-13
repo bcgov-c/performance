@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\SharedProfile;
+use App\Models\DashboardMessage;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -48,7 +49,14 @@ class AuthenticatedSessionController extends Controller
         // Grant or Remove 'Supervisor' Role based on ODS demo database
         $this->assignSupervisorRole($user);
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        $dashboardmessage = DashboardMessage::get();
+        foreach ($dashboardmessage as $message) {}
+
+        if ($message->status) {
+            return view('resource.contact');
+        } else {
+            return redirect()->intended(RouteServiceProvider::HOME);
+        }
     }
 
     /**
