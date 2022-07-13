@@ -26,6 +26,7 @@
 	@endforeach
 
 </div>
+
 @push('css')
 <style>
 	.card-header{
