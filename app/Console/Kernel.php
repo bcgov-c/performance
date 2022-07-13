@@ -4,6 +4,8 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class Kernel extends ConsoleKernel
 {
@@ -40,8 +42,8 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('command:GetODSEmployeeDemographics')
         ->timezone('America/Vancouver')
-        // ->dailyAt('00:10')
-        ->dailyAt(env('TEMP_ODS_SCHED'));
+        ->dailyAt('00:10')
+        // ->dailyAt(env('TEMP_ODS_SCHED'));
 
         $schedule->command('command:BuildOrgTree')
         ->timezone('America/Vancouver')

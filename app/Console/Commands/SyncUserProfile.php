@@ -86,6 +86,14 @@ class SyncUserProfile extends Command
             );
 
         } else {
+            $start_time = Carbon::now()->format('c');
+            $audit_id = JobSchedAudit::insertGetId(
+            [
+                'job_name' => 'command:SyncUserProfiles',
+                'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
+                'status' => 'Disabled'
+            ]
+            );
             $this->info( 'Process is currently disabled; or "PRCS_SYNC_USER_PROFILES=on" is currently missing in the .env file.');
         }
 
