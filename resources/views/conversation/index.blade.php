@@ -1,5 +1,11 @@
 <x-side-layout>
-    <h3>Conversations</h3>
+    <h3>
+        @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
+            My Conversations
+        @else
+            {{ $user->name }}'s Conversations
+        @endif    
+    </h3>    
     @if($viewType === 'conversations')
         @include('conversation.partials.compliance-message')
     @endif
@@ -472,6 +478,7 @@
                     , success: function(result) {
                         $("#viewConversationModal").find('textarea').prop('disable', false);
                         isSupervisor = result.view_as_supervisor;
+                        disable_signoff = result.disable_signoff;
                         $('#conv_participant_edit').val('');
                         $('#conv_participant').val('');
                         $('#conv_title').text(result.topic.name);
@@ -565,7 +572,7 @@
                         $("#employee-signoff-questions").find('input:radio[name="check_two_"][value="'+result.supv_agree2+'"]').prop('checked', true);
                         $("#employee-signoff-questions").find('input:radio[name="check_three_"][value="'+result.supv_agree3+'"]').prop('checked', true);
 
-                        @if(session()->has('view-profile-as'))
+                        if (disable_signoff) {
                             $("#employee-sign_off_form").find('input:radio[name="check_one"]').prop('disabled', true);
                             $("#employee-sign_off_form").find('input:radio[name="check_two"]').prop('disabled', true);
                             $("#employee-sign_off_form").find('input:radio[name="check_three"]').prop('disabled', true);
@@ -573,7 +580,7 @@
                             $("#employee-signoff-questions").find('input:radio[name="check_one_"]').prop('disabled', true);
                             $("#employee-signoff-questions").find('input:radio[name="check_two_"]').prop('disabled', true);
                             $("#employee-signoff-questions").find('input:radio[name="check_three_"]').prop('disabled', true);
-                        @endif    
+                        }
 
                         if (!!result.supervisor_signoff_id) {
                             $('#supervisor-signoff-message').find('.not').addClass('d-none');

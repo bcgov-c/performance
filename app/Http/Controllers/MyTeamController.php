@@ -74,8 +74,8 @@ class MyTeamController extends Controller
         $i = 0;
         if(count($employees)>0) {
             foreach ($employees as $employee) {
-                $employees_list[0]["id"] = $employee->id;
-                $employees_list[0]["name"] = $employee->name;
+                $employees_list[$i]["id"] = $employee->id;
+                $employees_list[$i]["name"] = $employee->name;
                 $i++;
             }
         }
@@ -374,7 +374,7 @@ class MyTeamController extends Controller
             ->with('tags')    
             ->with('goalType')->get();
         $employees = $this->myEmployeesAjax();
-        
+       
         $type_desc_arr = array();
         foreach($goaltypes as $goalType) {
             if(isset($goalType['description']) && isset($goalType['name'])) {                
@@ -388,8 +388,8 @@ class MyTeamController extends Controller
         $i = 0;
         if(count($employees)>0) {
             foreach ($employees as $employee) {
-                $employees_list[0]["id"] = $employee->id;
-                $employees_list[0]["name"] = $employee->name;
+                $employees_list[$i]["id"] = $employee->id;
+                $employees_list[$i]["name"] = $employee->name;
                 $i++;
             }
         }

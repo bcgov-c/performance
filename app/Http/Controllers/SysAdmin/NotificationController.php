@@ -33,8 +33,10 @@ class NotificationController extends Controller
             $notifications = NotificationLog::when($date_sent_from, function ($query) use($date_sent_from, $date_sent_to) {
                     $query->whereBetween('date_sent', [$date_sent_from, $date_sent_to] );
                 })
-                ->whereHas('recipients.recipient', function ($query) use($recipients) { 
+                ->when($recipients, function ($query) use($recipients) { 
+                    $query->whereHas('recipients.recipient', function ($query) use($recipients) { 
                         $query->whereRaw("lower(name) like  '%". strtolower($recipients) . "%'"); 
+                    });        
                 })
                 ->when($alert_format, function ($query) use($alert_format) {
                         $query->where('alert_format', $alert_format);

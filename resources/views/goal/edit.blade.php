@@ -23,7 +23,7 @@
                 </div>                                                   
                 <div class="col-12">
                     <b>Tags</b>
-                    <i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resource/goal-setting?t=4' target=\'_blank\'><u>View full list of tag descriptions.</u></a>"></i>				
+                    <i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resource/goal-setting?t=5' target=\'_blank\'><u>View full list of tag descriptions.</u></a>"></i>				
                     <!-- <x-xdropdown :list="$tags" label="Tags" name="tag_ids[]" :selected="array_column($goal->tags->toArray(), 'id')" class="tags" multiple/> -->
                     <x-xdropdown :list="$tags" name="tag_ids[]" :selected="array_column($goal->tags->toArray(), 'id')" class="tags" multiple/>
                 </div>

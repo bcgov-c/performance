@@ -165,6 +165,24 @@ class ExcuseEmployeesController extends Controller
             $query = User::withoutGlobalScopes()
             ->whereNotNull('excused_start_date')
             ->leftjoin('employee_demo', 'users.guid', '=', 'employee_demo.guid')
+            ->join('admin_orgs as ao1', function ($j1) {
+                $j1->on(function ($j1a) {
+                    $j1a->whereRAW('ao1.organization = employee_demo.organization OR ((ao1.organization = "" OR ao1.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+                } )
+                ->on(function ($j2a) {
+                    $j2a->whereRAW('ao1.level1_program = employee_demo.level1_program OR ((ao1.level1_program = "" OR ao1.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+                } )
+                ->on(function ($j3a) {
+                    $j3a->whereRAW('ao1.level2_division = employee_demo.level2_division OR ((ao1.level2_division = "" OR ao1.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+                } )
+                ->on(function ($j4a) {
+                    $j4a->whereRAW('ao1.level3_branch = employee_demo.level3_branch OR ((ao1.level3_branch = "" OR ao1.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+                } )
+                ->on(function ($j5a) {
+                    $j5a->whereRAW('ao1.level4 = employee_demo.level4 OR ((ao1.level4 = "" OR ao1.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+                } );
+            } )
+            ->where('ao1.user_id', '=', Auth::id())
             ->when($level0, function($q) use($level0) {return $q->where('organization', $level0->name);})
             ->when($level1, function($q) use($level1) {return $q->where('level1_program', $level1->name);})
             ->when($level2, function($q) use($level2) {return $q->where('level2_division', $level2->name);})
@@ -794,7 +812,26 @@ class ExcuseEmployeesController extends Controller
 
     protected function baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4) {
         // Base Where Clause
-        $demoWhere = EmployeeDemo::when( $level0, function ($q) use($level0) {
+        $demoWhere = EmployeeDemo::
+            join('admin_orgs', function ($j1) {
+            $j1->on(function ($j1a) {
+                $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+            } )
+            ->on(function ($j2a) {
+                $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+            } )
+            ->on(function ($j3a) {
+                $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+            } )
+            ->on(function ($j4a) {
+                $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+            } )
+            ->on(function ($j5a) {
+                $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+            } );
+        } )
+        ->where('admin_orgs.user_id', '=', Auth::id())
+        ->when( $level0, function ($q) use($level0) {
             return $q->where('employee_demo.organization', $level0->name);
         })
         ->when( $level1, function ($q) use($level1) {
@@ -836,7 +873,26 @@ class ExcuseEmployeesController extends Controller
 
     protected function ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4) {
         // Base Where Clause
-        $demoWhere = EmployeeDemo::when( $elevel0, function ($q) use($elevel0) {
+        $demoWhere = EmployeeDemo::
+        join('admin_orgs', function ($j1) {
+            $j1->on(function ($j1a) {
+                $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+            } )
+            ->on(function ($j2a) {
+                $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+            } )
+            ->on(function ($j3a) {
+                $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+            } )
+            ->on(function ($j4a) {
+                $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+            } )
+            ->on(function ($j5a) {
+                $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+            } );
+        } )
+        ->where('admin_orgs.user_id', '=', Auth::id())
+        ->when( $elevel0, function ($q) use($elevel0) {
             return $q->where('employee_demo.organization', $elevel0->name);
         })
         ->when( $elevel1, function ($q) use($elevel1) {

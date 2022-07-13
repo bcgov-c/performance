@@ -241,7 +241,7 @@
                 $('#search_text').val(null);
             });
             $('#btn_search').click(function() {
-                $('#filtertable').DataTable().ajax.reload(null, false);
+                $('#filtertable').DataTable().ajax.reload();
             });
         };
     </script>

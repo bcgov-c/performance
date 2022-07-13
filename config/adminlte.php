@@ -316,7 +316,7 @@ return [
                 // ],
                 [
                     'text' => 'Statistic and Reports',
-                    'url'  => 'hradmin/statistics/goalsummary',
+                    'url'  => 'hradmin/statistics/sharedsummary',
                     'active' => ['hradmin/statistics/*']
                 ]
 
@@ -372,7 +372,7 @@ return [
                 ],
                 [
                     'text' => 'Statistic and Reports',
-                    'url'  => 'sysadmin/statistics/goalsummary',
+                    'url'  => 'sysadmin/statistics/sharedsummary',
                     'active' => ['sysadmin/statistics/*']
                 ],
             ],

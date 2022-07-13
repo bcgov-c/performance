@@ -38,12 +38,11 @@
 
 
 
-
 			<div class="row">
 				<div class="col-md-2">
 					<b> Tags </b>
 					<!-- <i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="A concise opening statement of what you plan"> </i> -->
-                                        <i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resource/goal-setting?t=4' target=\'_blank\'><u>View full list of tag descriptions.</u></a>"></i>					
+                                        <i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resource/goal-setting?t=5' target=\'_blank\'><u>View full list of tag descriptions.</u></a>"></i>					
 					{{-- <div> --}}
 					<x-dropdown :list="$tags" data-tooltip-trigger='hover' data-toggle="tooltip" name="tag_ids[]" id="tags" class="tags" multiple/>
 					{{-- </div> --}}
@@ -285,9 +284,9 @@
 					count = g_selected_orgnodes.length;
 				};
 				if (count == 0) {
-					$('#saveGoalModal .modal-body p').html('Are you sure to create goal without an audience?');
+					$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal without an audience?');
 				} else {
-					$('#saveGoalModal .modal-body p').html('Are you sure to create goal and assign to selected audience?');
+					$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal and assign to the selected audience?');
 				}
 				$('#saveGoalModal').modal();
 			}

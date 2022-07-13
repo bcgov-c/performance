@@ -67,6 +67,7 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
     // Statictics and Reporting
     Route::get('/sysadmin/statistics/goalsummary', [SysadminStatisticsReportController::class, 'goalsummary'])->name('sysadmin.statistics.goalsummary');
     Route::get('/sysadmin/statistics/goalsummary-export', [SysadminStatisticsReportController::class, 'goalSummaryExport'])->name('sysadmin.statistics.goalsummary.export');
+    Route::get('/sysadmin/statistics/goalsummary-tag-export', [SysadminStatisticsReportController::class, 'goalSummaryTagExport'])->name('sysadmin.statistics.goalsummary.tag.export');
     Route::get('/sysadmin/statistics/conversationsummary', [SysadminStatisticsReportController::class, 'conversationsummary'])->name('sysadmin.statistics.conversationsummary');
     Route::get('/sysadmin/statistics/conversationsummary-export', [SysadminStatisticsReportController::class, 'conversationSummaryExport'])->name('sysadmin.statistics.conversationsummary.export');
     Route::get('/sysadmin/statistics/sharedsummary', [SysadminStatisticsReportController::class, 'sharedsummary'])->name('sysadmin.statistics.sharedsummary');
@@ -140,11 +141,6 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/excuseemployees/manageindexclear/{id}', [ExcuseEmployeesController::class, 'manageindexclear']);
 
         Route::get('/sysadmin/excuseemployees/org-tree', [ExcuseEmployeesController::class,'loadOrganizationTree']);
-        Route::get('/sysadmin/excuseemployees/org-organizations', [ExcuseEmployeesController::class,'getOrganizations']);
-        Route::get('/sysadmin/excuseemployees/org-programs', [ExcuseEmployeesController::class,'getPrograms']);
-        Route::get('/sysadmin/excuseemployees/org-divisions', [ExcuseEmployeesController::class,'getDivisions']);
-        Route::get('/sysadmin/excuseemployees/org-branches', [ExcuseEmployeesController::class,'getBranches']);
-        Route::get('/sysadmin/excuseemployees/org-level4', [ExcuseEmployeesController::class,'getLevel4']);
         Route::get('/sysadmin/excuseemployees/employees/{id}', [ExcuseEmployeesController::class,'getEmployees']);
     });
 

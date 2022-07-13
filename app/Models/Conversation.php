@@ -209,8 +209,8 @@ class Conversation extends Model
         if ($user === null)
             $user = Auth::user();
         $lastConv = self::getLastConv([], $user);
-        $nextConvDate =  ($lastConv) ? $lastConv->sign_off_time->addMonths(4)->format('d-M-y') : (
-            $user->joining_date ? $user->joining_date->addMonths(4)->format('d-M-y') : ''
+        $nextConvDate =  ($lastConv) ? $lastConv->sign_off_time->addMonths(4)->format('M d, Y') : (
+            $user->joining_date ? $user->joining_date->addMonths(4)->format('M d, Y') : ''
         );
         return $nextConvDate;
     }

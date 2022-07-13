@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\Goals\CreateGoalRequest;
 use Carbon\Carbon;
+use App\MicrosoftGraph\SendMail;
 
 
 class GoalBankController extends Controller
@@ -676,16 +677,18 @@ class GoalBankController extends Controller
             , 'measure_of_success' => $request->input('measure_of_success')
             , 'start_date' => $request->input('start_date')
             , 'target_date' => $request->input('target_date')
-            , 'measure_of_success' => $request->input('measure_of_success')
             , 'user_id' => $current_user->id
             , 'created_by' => $current_user->id
             , 'by_admin' => '1'
+            , 'isMandatory' => $request->input('isMandatory')
             ]
         );
         
         $resultrec->tags()->sync($request->tag_ids);
 
         $employee_ids = ($request->userCheck) ? $request->userCheck : [];
+
+        $notify_audiences = [];
 
         if($request->opt_audience == "byEmp") {
             $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
@@ -705,6 +708,8 @@ class GoalBankController extends Controller
                     []
                 );
             }
+
+            $notify_audiences = $selected_emp_ids;
         }
 
         if($request->opt_audience == "byOrg") {
@@ -732,7 +737,14 @@ class GoalBankController extends Controller
                     break;
                 }
             }
+            
+            $notify_audiences = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
+
         }
+
+        // Send Out Email notification when new goal added
+        $this->notify_employees($resultrec, $notify_audiences);
+
         return redirect()->route(request()->segment(1).'.goalbank')
             ->with('success', 'Create new goal bank successful.');
     }
@@ -1136,13 +1148,13 @@ class GoalBankController extends Controller
     {
         $resultrec = Goal::withoutGlobalScopes()->findorfail( $id );
         $resultrec->update(
-            ['goal_type_id' => $request->input('goal_type_id')
+            [ 'goal_type_id' => $request->input('goal_type_id')
             , 'title' => $request->input('title')
             , 'what' => $request->input('what')
             , 'measure_of_success' => $request->input('measure_of_success')
             , 'start_date' => $request->input('start_date')
             , 'target_date' => $request->input('target_date')
-            , 'measure_of_success' => $request->input('measure_of_success')
+            , 'is_mandatory' => $request->input('is_mandatory')
             ]
         );
         $resultrec->tags()->sync($request->tag_ids);
@@ -1982,6 +1994,7 @@ public function agetOrganizations(Request $request) {
                 'goals.id',
                 'goals.title',
                 'goals.created_at',
+                'goals.is_mandatory',
                 'ced.employee_name as creator_name',
             )
             ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)])
@@ -1998,13 +2011,13 @@ public function agetOrganizations(Request $request) {
                 return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.$row->creator_name.' value="'.$row->id.'">'.$row->creator_name.'</a>';
             })
             ->addColumn('mandatory', function ($row) {
-                return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.($row->is_mandatory ? "Mandatory" : "Suggested").' value="'.$row->id.'">'.($row->is_mandatory ? "Mandatory" : "Suggested").'</a>';
+                return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.($row->is_mandatory ? "Mandatory" : "Suggested").' value="'.$row->id.'">'.($row->is_mandatory == 1 ? "Mandatory" : "Suggested").'</a>';
             })
             ->editColumn('created_at', function ($row) {
                 return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.($row->created_at ? $row->created_at->format('F d, Y') : null).' value="'.$row->id.'">'.($row->created_at ? $row->created_at->format('F d, Y') : null).'</a>';
             })
             ->addColumn('audience', function ($row) {
-                return '<a href="'.route(request()->segment(1).'.goalbank.editone', $row->id).'" aria-label="Edit Goal For Individuals" value="'.$row->id.'">'.$row->sharedWith()->count().'</a>';
+                return '<a href="'.route(request()->segment(1).'.goalbank.editone', $row->id).'" aria-label="Edit Goal For Individuals" value="'.$row->id.'">'.$row->sharedWith()->count().' Employees</a>';
             })
             ->addColumn('org_audience', function ($row) {
                 $orgCount = GoalBankOrg::join('employee_demo', function ($j1) {
@@ -2027,7 +2040,7 @@ public function agetOrganizations(Request $request) {
                 ->where('goal_bank_orgs.goal_id', '=', $row->id)
                 ->groupBy('goal_bank_orgs.goal_id')
                 ->count();
-                return '<a href="'.route(request()->segment(1).'.goalbank.editpage', $row->id).'" aria-label="Edit Goal For Business Units" value="'.$row->id.'">'.$orgCount.'</a>';
+                return '<a href="'.route(request()->segment(1).'.goalbank.editpage', $row->id).'" aria-label="Edit Goal For Business Units" value="'.$row->id.'">'.$orgCount.' Employees</a>';
             })
             ->addcolumn('action', function($row) {
                 $btn = '<a href="/'.request()->segment(1).'/goalbank/deletegoal/' . $row->id . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->id .'"><i class="fa fa-trash"></i></a>';
@@ -2076,10 +2089,10 @@ public function agetOrganizations(Request $request) {
 
     private function getDropdownValues(&$mandatoryOrSuggested) {
         $mandatoryOrSuggested = [
-            [
-                "id" => '',
-                "name" => 'Any'
-            ],
+            // [
+            //     "id" => '',
+            //     "name" => 'Any'
+            // ],
             [
                 "id" => '1',
                 "name" => 'Mandatory'
@@ -2119,6 +2132,76 @@ public function agetOrganizations(Request $request) {
         ->where('id', '=', $goal_id)
         ->delete();
         return redirect()->back();
+    }
+
+    protected function get_employees_by_selected_org_nodes($selected_org_nodes) {
+
+        $sql_level0 = EmployeeDemo::join('organization_trees', function($join)  {
+            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
+                ->where('organization_trees.level', '=', 0);
+            })
+            ->whereIn('organization_trees.id', $selected_org_nodes) ;
+            
+        $sql_level1 = EmployeeDemo::join('organization_trees', function($join)  {
+            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
+                ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
+                ->where('organization_trees.level', '=', 1);
+            })
+            ->whereIn('organization_trees.id', $selected_org_nodes) ;
+            
+        $sql_level2 = EmployeeDemo::join('organization_trees', function($join)  {
+            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
+                ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
+                ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
+                ->where('organization_trees.level', '=', 2);    
+            })
+            ->whereIn('organization_trees.id', $selected_org_nodes) ;
+            
+        $sql_level3 = EmployeeDemo::join('organization_trees', function($join)  {
+            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
+                ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
+                ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
+                ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
+                ->where('organization_trees.level', '=', 3);    
+            })
+            ->whereIn('organization_trees.id', $selected_org_nodes);
+            
+        $sql_level4 = EmployeeDemo::join('organization_trees', function($join)  {
+            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
+                ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
+                ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
+                ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
+                ->on('employee_demo.level4', '=', 'organization_trees.level4')
+                ->where('organization_trees.level', '=', 4);
+            })
+            ->whereIn('organization_trees.id', $selected_org_nodes);
+        
+        $employees = $sql_level4->select('employee_demo.employee_id') 
+            ->union( $sql_level3->select('employee_demo.employee_id') )
+            ->union( $sql_level2->select('employee_demo.employee_id') )
+            ->union( $sql_level1->select('employee_demo.employee_id') )
+            ->union( $sql_level0->select('employee_demo.employee_id') )
+            ->pluck('employee_id'); 
+
+        return ($employees ? $employees->toArray() : []); 
+    }
+
+    protected function notify_employees($goalBank, $employee_ids)
+    {
+        // find user id based on the employee_id
+        $bcc_user_ids = User::whereIn('employee_id', $employee_ids)->pluck('id');
+        
+        // Send Out Email Notification to Employee
+        $sendMail = new SendMail();
+        $sendMail->bccRecipients = $bcc_user_ids;  
+        $sendMail->sender_id = null;
+        $sendMail->useQueue = false;
+        $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
+        array_push($sendMail->bindvariables, "");
+        array_push($sendMail->bindvariables, $goalBank->user ? $goalBank->user->name : '');   // Person who added goal to goal bank
+        array_push($sendMail->bindvariables, $goalBank->title);       // goal title
+        array_push($sendMail->bindvariables, $goalBank->mandatory_status_descr);           // Mandatory or suggested status
+        $response = $sendMail->sendMailWithGenericTemplate();
     }
 
 }

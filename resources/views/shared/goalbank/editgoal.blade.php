@@ -202,14 +202,22 @@
 							}
 						},
 						columns: [
-							{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', searchable: true},
-							{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', searchable: true},
-							{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', searchable: true},
-							{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', searchable: true},
-							{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true},
-							{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},
-							{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id', name: 'goal_id', searchable: false, visible: false},
-							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'num', data: 'id', name: 'id', searchable: false, visible: false},
+							{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization'
+								, name: 'organization', searchable: true, className: 'dt-nowrap'},
+							{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program'
+								, name: 'level1_program', searchable: true, className: 'dt-nowrap'},
+							{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division'
+								, name: 'level2_division', searchable: true, className: 'dt-nowrap'},
+							{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch'
+								, name: 'level3_branch', searchable: true, className: 'dt-nowrap'},
+							{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4'
+								, name: 'level4', searchable: true, className: 'dt-nowrap'},
+							{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action'
+								, name: 'action', orderable: false, searchable: false, className: 'dt-nowrap'},
+							{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id'
+								, name: 'goal_id', searchable: false, visible: false, className: 'dt-nowrap'},
+							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'num', data: 'id'
+								, name: 'id', searchable: false, visible: false, className: 'dt-nowrap'},
 						]
 					}
 				);

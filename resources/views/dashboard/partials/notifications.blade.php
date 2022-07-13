@@ -31,7 +31,7 @@
             <input id='ntfyitem' type='checkbox' class='sub_chk' data-id="{{$notification->id}}">
             <div style="cursor:pointer;" onclick="window.location.href = '{{route("goal.show", $notification->relatedGoal->id)}}'">
               <div class="pl-3 d-flex align-items-center justify-content-center flex-row">
-                  <x-profile-pic size="36"></x-profile-pic>
+                  {{-- <x-profile-pic size="36"></x-profile-pic> --}}
                   <div class="d-flex flex-column">
                       <strong>
                             {{$notification->comment}}
