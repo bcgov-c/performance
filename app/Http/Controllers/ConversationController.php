@@ -40,12 +40,15 @@ class ConversationController extends Controller
                 
         $type = 'upcoming';
         if ($request->is('conversation/past') || $request->is('my-team/conversations/past')) {
-            $query->where(function($query) use ($authId, $supervisorId, $viewType) {
+            $sharedSupervisorIds = SharedProfile::where('shared_id', Auth::id())->with('sharedWithUser')->get()->pluck('shared_with')->toArray();
+            array_push($sharedSupervisorIds, $supervisorId);
+            $query->where(function($query) use ($authId, $supervisorId, $sharedSupervisorIds, $viewType) {
                 $query->where('user_id', $authId)->
-                    orWhereHas('conversationParticipants', function($query) use ($authId, $supervisorId, $viewType) {
+                    orWhereHas('conversationParticipants', function($query) use ($authId, $supervisorId, $sharedSupervisorIds, $viewType) {
                         $query->where('participant_id', $authId);
-                        if ($viewType === 'my-team')
+                        if ($viewType === 'my-team') {
                             $query->where('participant_id', '<>', $supervisorId);
+                        } 
                         return $query;
                     });
             })->whereNotNull('signoff_user_id')->whereNotNull('supervisor_signoff_id');
@@ -87,9 +90,7 @@ class ConversationController extends Controller
             $myTeamQuery = clone $query;
 
            
-            // With my Supervisor
-            $sharedSupervisorIds = SharedProfile::where('shared_id', Auth::id())->with('sharedWithUser')->get()->pluck('shared_with')->toArray();
-            array_push($sharedSupervisorIds, $supervisorId);
+            // With my Supervisor            
             $query->where(function($query) use ($sharedSupervisorIds) {
                 $query->whereIn('user_id', $sharedSupervisorIds)->
                 orWhereHas('conversationParticipants', function ($query) use ($sharedSupervisorIds) {
@@ -98,18 +99,14 @@ class ConversationController extends Controller
             });
             
              // With My Team
+            $myTeamQuery->where(function($query) use ($sharedSupervisorIds) {
+                $query->whereNotIn('user_id', $sharedSupervisorIds)->
+                orWhereHas('conversationParticipants', function ($query) use ($sharedSupervisorIds) {
+                    $query->whereNotIn('participant_id', $sharedSupervisorIds);
+                });
+            });
+            
             $myTeamQuery->whereNotIn('user_id', $sharedSupervisorIds);    
-            $myTeamQuery->where('user_id', '<>', $authId);
-            
-            
-            
-            if (session()->has('existing_user_id')) {
-                $tq = $myTeamQuery->toSql();
-                $tb = $myTeamQuery->getBindings();
-                print_r($tq);
-                print_r($tb);
-                exit;
-            }
             
             $type = 'past';
 
