@@ -213,8 +213,11 @@ class Conversation extends Model
         $diff = Carbon::now()->diffInMonths($nextDueDate, false);
 
         $DDt = abs ((Auth::id() % 10) - 1) * 5 + ((Auth::id() % 5));
-        if ($nextDueDate < date('YYYY-MM-DD', '2022-10-14')) {
-            $nextDueDate = date('YYYY-MM-DD', '2022-10-14')->addDays($DDt);
+        if ($nextDueDate < Carbon::createFromDate(2022, 10, 14)) {
+            // $nextDueDate = date('d.M.y', '14.Oct.2022') + $DDt;
+            // $nextDueDate = Carbon::createFromDate(2022, 10, 14) + $DDt;
+            $nextDueDate = Carbon::createFromDate(2022, 10, 14)->addDays($DDt);
+            // $nextDueDate = $nextDueDate + $DDt;
         }
 
         /* dd([
