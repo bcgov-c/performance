@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Conversation\ConversationRequest;
-use App\Http\Requests\Conversation\SignoffRequest;
-use App\Http\Requests\Conversation\UnSignoffRequest;
-use App\Http\Requests\Conversation\UpdateRequest;
-use App\Models\Conversation;
-use App\Models\ConversationParticipant;
-use App\Models\ConversationTopic;
+use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Participant;
+use App\Models\Conversation;
+use App\Models\EmployeeDemo;
+use Illuminate\Http\Request;
 use App\Models\EmployeeShare;
 use App\Models\SharedProfile;
-use App\Models\User;
-use App\Models\EmployeeDemo;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
+use App\Models\ConversationTopic;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Models\DashboardNotification;
 use Illuminate\Support\Facades\Route;
+use App\Models\ConversationParticipant;
+use App\Http\Requests\Conversation\UpdateRequest;
+use App\Http\Requests\Conversation\SignoffRequest;
+use App\Http\Requests\Conversation\UnSignoffRequest;
+use App\Http\Requests\Conversation\ConversationRequest;
 
 class ConversationController extends Controller
 {
@@ -252,6 +253,16 @@ class ConversationController extends Controller
         }
         DB::commit();
 
+        // create a message on the participant's dasboard under home page
+        foreach ($request->participant_id as $key => $value) {
+            DashboardNotification::create([
+                'user_id' => $value,
+                'notification_type' => 'CA',        // Conversation Added
+                'comment' => $conversation->user->name . ' would like to schedule a performance conversation with you.',
+                'related_id' => $conversation->id,
+            ]);
+        }
+
         // Send a notification to all participants that you would like to schedule a conversation      
         $names = User::whereIn('employee_id', $request->participant_id)->pluck('name');
 
@@ -440,25 +451,27 @@ class ConversationController extends Controller
         }
         $conversation->update();
 
-        
-        // Send a notification to all participants that you would like to schedule a conversation   
+        // Notification the participants when someone sign the conversation
         $current_user = User::where('id', $authId)->first();
 
         $participants = $conversation->conversationParticipants->map(function ($item, $key) { 
                                 return $item->participant; 
                         });
         $to_ids   = $participants->pluck('id')->toArray();
-        $to_names = $participants->pluck('name')->toArray();
+        $to_ids = array_diff( $to_ids, [ $current_user->id ] );
+        $to_names = User::whereIn('id', $to_ids)->pluck('name')->toArray();
 
-        if ($view_as_supervisor) {         
-            $to_ids = array_diff( $to_ids, [ $current_user->id ] );
-            $to_names = array_diff( $to_names, [ $current_user->name ] );
-        } else {
-            array_push($to_ids, $current_user->reporting_to );
-            $to_ids = array_diff( $to_ids, [ $current_user->id ] );
-            $to_names = array_diff( $to_names, [ $current_user->name ] );
+        // create a message on the dasboard under home page when signoff 
+        foreach ($to_ids as $key => $value) {
+            DashboardNotification::create([
+                'user_id' => $value,
+                'notification_type' => 'CS',        // Conversation signoff 
+                'comment' => $current_user->name . ' signed your performance review.',
+                'related_id' => $conversation->id,
+            ]);
         }
 
+        // Send a email notification to the participants when someone sign the conversation
         $topic = ConversationTopic::find($request->conversation_topic_id);
         $sendMail = new \App\MicrosoftGraph\SendMail();
         $sendMail->toRecipients = $to_ids;
