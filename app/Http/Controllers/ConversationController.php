@@ -98,13 +98,8 @@ class ConversationController extends Controller
             });
             
              // With My Team
-            //$myTeamQuery->whereNotIn('user_id', '<>', $supervisorId);
-            $myTeamQuery->where(function($query) use ($sharedSupervisorIds) {
-                $query->WhereHas('conversationParticipants', function ($query) use ($sharedSupervisorIds) {
-                    $query->whereNotIn('participant_id', $sharedSupervisorIds);
-                });
-            });
-            $myTeamQuery->whereNotIn('user_id', $sharedSupervisorIds);
+            $myTeamQuery->whereNotIn('user_id', $sharedSupervisorIds);    
+            $myTeamQuery->where('user_id', '<>', $authId);
             
             $type = 'past';
 
