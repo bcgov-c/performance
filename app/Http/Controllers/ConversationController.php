@@ -101,6 +101,16 @@ class ConversationController extends Controller
             $myTeamQuery->whereNotIn('user_id', $sharedSupervisorIds);    
             $myTeamQuery->where('user_id', '<>', $authId);
             
+            
+            
+            if (session()->has('existing_user_id')) {
+                $tq = $myTeamQuery->toSql();
+                $tb = $myTeamQuery->getBindings();
+                print_r($tq);
+                print_r($tb);
+                exit;
+            }
+            
             $type = 'past';
 
             $conversations = $query->orderBy('id', 'DESC')->paginate(10);                       
