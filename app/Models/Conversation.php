@@ -213,7 +213,7 @@ class Conversation extends Model
         $diff = Carbon::now()->diffInMonths($nextDueDate, false);
 
         if ($nextDueDate < Carbon::createFromDate(2022, 10, 14)) {
-            $DDt = abs (($user % 10) - 1) * 5 + (($user % 5));
+            $DDt = abs (($user->id % 10) - 1) * 5 + (($user->id % 5));
             $nextDueDate = Carbon::createFromDate(2022, 10, 14)->addDays($DDt);
         }
 
@@ -236,8 +236,8 @@ class Conversation extends Model
         $nextConvDate =  ($lastConv) ? $lastConv->sign_off_time->addMonths(4)->format('M d, Y') : (
             $user->joining_date ? $user->joining_date->addMonths(4)->format('M d, Y') : ''
         );
-        if ($nextConvDate < Carbon::createFromDate(2022, 10, 14)) {
-            $DDt = abs (($user % 10) - 1) * 5 + (($user % 5));
+        if ((!$nextConvDate) || ($nextConvDate < Carbon::createFromDate(2022, 10, 14))) {
+            $DDt = abs (($user->id % 10) - 1) * 5 + (($user->id % 5));
             $nextConvDate = Carbon::createFromDate(2022, 10, 14)->addDays($DDt);
         }
         return $nextConvDate;
