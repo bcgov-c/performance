@@ -176,7 +176,7 @@ class Conversation extends Model
         $lastConv = self::getLastConv();
 
         $authId = Auth::id();
-        $user = User::find($authId);
+        $user =() User::find($authId);
         if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null )){
             // $msg1 = "You are required to complete a performance conversation every 4 months at minimum. You are overdue. Please complete a conversation as soon as possible.";
             // $msg2 = "Your next performance conversation is due by ";
@@ -209,8 +209,14 @@ class Conversation extends Model
             ];
         }
         $user = Auth::user();
-        $nextDueDate = $user->joining_date ? $user->joining_date->addMonths(4) : '';
+        $nextDueDate = $user->joining_date ?  : '';
         $diff = Carbon::now()->diffInMonths($nextDueDate, false);
+
+        $DD = abs ((Auth::id() % 10) - 1) * 5 + ((Auth::id() % 5));
+        if ($nextDueDate < date('2022-10-14', 'YYYY-MM-DD')) {
+            $nextDueDate = date('2022-10-14', 'YYYY-MM-DD')->addDays($DD);
+        }
+
         /* dd([
             Carbon::now()->format('d-M-y'),
             $nextDueDate->format('d-M-y'),
