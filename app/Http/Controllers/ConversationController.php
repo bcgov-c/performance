@@ -107,7 +107,8 @@ class ConversationController extends Controller
                 });
             });
             
-            $myTeamQuery->whereNotIn('user_id', $sharedSupervisorIds);    
+            $myTeamQuery->whereNotIn('user_id', $sharedSupervisorIds);
+            $myTeamQuery->where('user_id','<>', $authId)->where('signoff_user_id','<>', $authId); 
             
             $type = 'past';
 
