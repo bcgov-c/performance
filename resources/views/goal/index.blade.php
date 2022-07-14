@@ -324,7 +324,8 @@
                 $(this).multiselect({
                     allSelectedText: 'All Team Members',
                     selectAllText: 'All Team Members',
-                    nonSelectedText: 'No one',
+                    // nonSelectedText: 'No one',
+                    nonSelectedText: null,
                     includeSelectAllOption: true,
                     onDropdownShow: function () {
                         valueBeforeChange = [...selectDropdown.options].filter(option => option.selected).map(option => option.value);
