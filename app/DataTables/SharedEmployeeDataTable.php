@@ -30,7 +30,7 @@ class SharedEmployeeDataTable extends DataTable
             })->addColumn('nextConversationDue', function ($row) {
                 $text = Conversation::nextConversationDue(User::find($row["id"]));
                 // if ($text < Carbon::createFromDate(2022, 10, 14)) {
-                //     $DDt = abs (($user->id % 10) - 1) * 5 + (($user->id % 5));
+                //     $DDt = abs ((User::find($row["id"])->id % 10) - 1) * 5 + ((User::find($row["id"])->id % 5));
                 //     $text = Carbon::createFromDate(2022, 10, 14)->addDays($DDt);
                 // }
                 $landingPage = 'conversation.templates';

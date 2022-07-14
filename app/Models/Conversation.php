@@ -236,11 +236,12 @@ class Conversation extends Model
         $nextConvDate =  ($lastConv) ? $lastConv->sign_off_time->addMonths(4)->format('M d, Y') : (
             $user->joining_date ? $user->joining_date->addMonths(4)->format('M d, Y') : ''
         );
-        if ((!$nextConvDate) || ($nextConvDate < Carbon::createFromDate(2022, 10, 14))) {
+        if ((!$nextConvDate) || (Carbon::createFromDate(2022, 10, 14)->gt($nextConvDate))) {
+        // if (Carbon::createFromDate(2022, 10, 14)->gt($nextConvDate))  {
             $DDt = abs (($user->id % 10) - 1) * 5 + (($user->id % 5));
             $nextConvDate = Carbon::createFromDate(2022, 10, 14)->addDays($DDt);
         }
-        return $nextConvDate;
+        return $nextConvDate->format('M d, Y');
     }
 
     public static function latestPastConversation()
