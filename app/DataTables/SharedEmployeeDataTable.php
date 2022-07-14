@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
+use Carbon\Carbon;
 
 class SharedEmployeeDataTable extends DataTable
 {
@@ -28,6 +29,10 @@ class SharedEmployeeDataTable extends DataTable
                 return view('my-team.partials.link-to-profile', compact(['row', 'text']));
             })->addColumn('nextConversationDue', function ($row) {
                 $text = Conversation::nextConversationDue(User::find($row["id"]));
+                // if ($text < Carbon::createFromDate(2022, 10, 14)) {
+                //     $DDt = abs (($user->id % 10) - 1) * 5 + (($user->id % 5));
+                //     $text = Carbon::createFromDate(2022, 10, 14)->addDays($DDt);
+                // }
                 $landingPage = 'conversation.templates';
                 return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
             })/* ->addColumn('latestConversation', function ($row) {
