@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
     {
 
         // Seeder for Prod Environment
+        $this->call(UserRoleSeeder::class);
+        $this->call(UserRoleSeederAdmins::class);
         $this->call(GoalTypeSeeder::class);
         $this->call(GoalTypeSeeder_Update20220607::class);
         $this->call(TopicSeeder::class);
