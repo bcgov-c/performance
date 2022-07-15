@@ -52,6 +52,14 @@ class GoalController extends Controller
         ->whereIn('users.id', $adminShared)->get();
         $employees = $employees->merge($adminemps);
         
+        $empShared=SharedProfile::select('shared_id')
+        ->where('shared_with', '=', $authId)
+        ->where('shared_item', 'like', '%1%')
+        ->pluck('shared_id');
+        $empShared = User::select('users.*')
+        ->whereIn('users.id', $empShared)->get();
+        $employees = $employees->merge($empShared);
+        
         $type_desc_arr = array();
         foreach($goaltypes as $goalType) {
             if(isset($goalType['description']) && isset($goalType['name'])) {                
