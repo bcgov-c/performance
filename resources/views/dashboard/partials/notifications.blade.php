@@ -47,8 +47,8 @@
                             @break
                         @case('CA')
                         @case('CS')
-                            Title: {{$notification->conversation->topic->name}} | Date: {{$notification->created_at->format('M d, Y H:i A')}}
-                        @break
+                            Title: {{$notification->conversation ? $notification->conversation->topic->name : ''}} | Date: {{$notification->created_at->format('M d, Y H:i A')}}
+                            @break
                         @endswitch
                       </div>
                   </div>
