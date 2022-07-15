@@ -44,6 +44,7 @@ class GoalController extends Controller
         ->with('goalType');
         $type = 'past';
         
+        /*
         $adminShared=SharedProfile::select('shared_with')
         ->where('shared_id', '=', $authId)
         ->where('shared_item', 'like', '%1%')
@@ -51,6 +52,8 @@ class GoalController extends Controller
         $adminemps = User::select('users.*')
         ->whereIn('users.id', $adminShared)->get();
         $employees = $employees->merge($adminemps);
+         * 
+         */
         
         $empShared=SharedProfile::select('shared_id')
         ->where('shared_with', '=', $authId)
