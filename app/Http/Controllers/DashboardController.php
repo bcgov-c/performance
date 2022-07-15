@@ -61,9 +61,23 @@ class DashboardController extends Controller
                 })
             ->orderby('status', 'asc')->orderby('created_at', 'desc')
             ->paginate(8);
-//  dd( [$notifications->toSql(), $notifications->getBindings(), $notifications->get() ] );
-
-        $notifications_unread = DashboardNotification::where('user_id', Auth::id())->where('status', null);
+        $notifications_unread = DashboardNotification::where('user_id', Auth::id())->where('status', null)
+                                ->where(function ($q)  {
+                                    $q->whereExists(function ($query) {
+                                        return $query->select(DB::raw(1))
+                                                ->from('conversations')
+                                                ->whereColumn('dashboard_notifications.related_id', 'conversations.id')
+                                                ->whereNull('conversations.deleted_at')
+                                                ->whereIn('dashboard_notifications.notification_type', ['CA', 'CS']);
+                                    })
+                                    ->orWhereExists(function ($query) {
+                                        return $query->select(DB::raw(1))
+                                                ->from('goals')
+                                                ->whereColumn('dashboard_notifications.related_id', 'goals.id')
+                                                ->whereNull('goals.deleted_at')
+                                                ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB']);
+                                    });    
+                                });
         $supervisorTooltip = 'If your current supervisor in the Performance Development Platform is incorrect, please have your supervisor submit an AskMyHR ticket and choose the category: <span class="text-primary">My Team or Organization > HR Software Systems Support > Position / Reporting Updates</span>';        
         $sharedList = SharedProfile::where('shared_id', Auth::id())->with('sharedWithUser')->get();
         $profilesharedTooltip = 'If this information is incorrect, please discuss with your supervisor first and escalate to your organization\'s Strategic Human Resources shop if you are unable to resolve.';
