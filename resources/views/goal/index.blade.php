@@ -17,7 +17,7 @@
     <x-button icon="clone" href="{{ route('goal.library') }}">
         Add Goal from Goal Bank
     </x-button>
-    <x-button icon="question" href="{{ route('resource.goal-setting') }} " target="_blank" tooltip='Click here to access goal setting resources and examples (opens in new window).'>
+    <x-button icon="question" href="{{ route('resource.user-guide','t=1') }} " target="_blank" tooltip='Click here to access goal setting resources and examples (opens in new window).'>    
         Need Help?
     </x-button>
     @endif
@@ -282,7 +282,7 @@
     });
 
     $(document).on('click', '.show-goal-detail', function(e) {
-        $.get('/goal/library/'+$(this).data('id'), function (data) {
+        $.get('/goal/goalbank/'+$(this).data('id'), function (data) {
             $("#goal-detail-modal").find('.data-placeholder').html(data);
             $("#goal-detail-modal").modal('show');
         });
@@ -324,7 +324,8 @@
                 $(this).multiselect({
                     allSelectedText: 'All Team Members',
                     selectAllText: 'All Team Members',
-                    nonSelectedText: 'No one',
+                    // nonSelectedText: 'No one',
+                    nonSelectedText: null,
                     includeSelectAllOption: true,
                     onDropdownShow: function () {
                         valueBeforeChange = [...selectDropdown.options].filter(option => option.selected).map(option => option.value);

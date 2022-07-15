@@ -50,7 +50,7 @@ class GetODSEmployeeDemographics extends Command
       $job_name = 'command:GetODSEmployeeDemographics';
       $switch = strtolower(env('PRCS_PULL_ODS_DATA'));
       $manualoverride = (strtolower($this->option('manual')) ? true : false);
-      $status = (($switch == 'on' || $manualoverride) ? 'Initiated' : 'Disabled in .env');
+      $status = (($switch == 'on' || $manualoverride) ? 'Initiated' : 'Disabled');
       $audit_id = JobSchedAudit::insertGetId(
         [
           'job_name' => $job_name,

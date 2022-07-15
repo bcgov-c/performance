@@ -43,7 +43,7 @@
         @endif
         <div class="card-footer align-items-center">
             @if(!session()->has('view-profile-as')) 
-            @if(Auth::user()->reporteesCount() > 0 && (request()->is('goal/current') || request()->is('goal/library')))
+            @if(Auth::user()->reporteesCount() > 0 && (request()->is('goal/current') || request()->is('goal/goalbank')))
                 <div>
                 @include('goal.partials.goal-share-with-dropdown')
                 <br><br>

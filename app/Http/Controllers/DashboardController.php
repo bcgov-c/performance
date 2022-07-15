@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SharedProfile;
-use App\Models\DashboardNotification;
 use Illuminate\Http\Request;
+use App\Models\SharedProfile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\DashboardNotification;
 use Illuminate\Support\Facades\Route;
 
 class DashboardController extends Controller
@@ -41,12 +42,47 @@ class DashboardController extends Controller
         // $tab = (Route::current()->getName() == 'dashboard.notifications') ? 'notifications' : 'todo';
         $tab = (Route::current()->getName() == 'dashboard.notifications') ? 'notifications' : 'notifications';
         // $notifications = DashboardNotification::where('user_id', Auth::id())->get();
-        $notifications = DashboardNotification::where('user_id', Auth::id())->orderby('status', 'asc')->orderby('created_at', 'desc')->paginate(8);
-        $notifications_unread = DashboardNotification::where('user_id', Auth::id())->where('status', null);
+        $notifications = DashboardNotification::where('user_id', Auth::id())
+                ->where(function ($q)  {
+                        $q->whereExists(function ($query) {
+                            return $query->select(DB::raw(1))
+                                    ->from('conversations')
+                                    ->whereColumn('dashboard_notifications.related_id', 'conversations.id')
+                                    ->whereNull('conversations.deleted_at')
+                                    ->whereIn('dashboard_notifications.notification_type', ['CA', 'CS']);
+                        })
+                        ->orWhereExists(function ($query) {
+                            return $query->select(DB::raw(1))
+                                    ->from('goals')
+                                    ->whereColumn('dashboard_notifications.related_id', 'goals.id')
+                                    ->whereNull('goals.deleted_at')
+                                    ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB']);
+                        });    
+                })
+            ->orderby('status', 'asc')->orderby('created_at', 'desc')
+            ->paginate(8);
+        $notifications_unread = DashboardNotification::where('user_id', Auth::id())->where('status', null)
+                                ->where(function ($q)  {
+                                    $q->whereExists(function ($query) {
+                                        return $query->select(DB::raw(1))
+                                                ->from('conversations')
+                                                ->whereColumn('dashboard_notifications.related_id', 'conversations.id')
+                                                ->whereNull('conversations.deleted_at')
+                                                ->whereIn('dashboard_notifications.notification_type', ['CA', 'CS']);
+                                    })
+                                    ->orWhereExists(function ($query) {
+                                        return $query->select(DB::raw(1))
+                                                ->from('goals')
+                                                ->whereColumn('dashboard_notifications.related_id', 'goals.id')
+                                                ->whereNull('goals.deleted_at')
+                                                ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB']);
+                                    });    
+                                });
         $supervisorTooltip = 'If your current supervisor in the Performance Development Platform is incorrect, please have your supervisor submit an AskMyHR ticket and choose the category: <span class="text-primary">My Team or Organization > HR Software Systems Support > Position / Reporting Updates</span>';        
         $sharedList = SharedProfile::where('shared_id', Auth::id())->with('sharedWithUser')->get();
         $profilesharedTooltip = 'If this information is incorrect, please discuss with your supervisor first and escalate to your organization\'s Strategic Human Resources shop if you are unable to resolve.';
-        return view('dashboard.index', compact('greetings', 'tab', 'supervisorTooltip', 'sharedList', 'profilesharedTooltip', 'notifications', 'notifications_unread'));
+        $message = '';
+        return view('dashboard.index', compact('greetings', 'tab', 'supervisorTooltip', 'sharedList', 'profilesharedTooltip', 'notifications', 'notifications_unread', 'message'));
     }
 
     public function destroy($id)

@@ -3,26 +3,27 @@
 namespace App\Http\Controllers\HRAdmin;
 
 
-use App\Models\User;
-use App\Models\Goal;
-use App\Models\GoalType;
+use Carbon\Carbon;
 use App\Models\Tag;
+use App\Models\Goal;
+use App\Models\User;
+use App\Models\GoalType;
 use App\Models\GoalBankOrg;
 use App\Models\EmployeeDemo;
 use Illuminate\Http\Request;
+use App\MicrosoftGraph\SendMail;
 use App\Models\OrganizationTree;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Models\DashboardNotification;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Validation\ValidationException;
 use App\Http\Requests\Goals\CreateGoalRequest;
-use Carbon\Carbon;
-use App\MicrosoftGraph\SendMail;
+use Illuminate\Validation\ValidationException;
 
 
 class GoalBankController extends Controller
@@ -759,6 +760,9 @@ class GoalBankController extends Controller
             $notify_audiences = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
             
         }
+
+        // notify_on_dashboard when new goal added
+        $this->notify_on_dashboard($resultrec, $notify_audiences);
 
         // Send Out Email notification when new goal added
         $this->notify_employees($resultrec, $notify_audiences);
@@ -1971,6 +1975,23 @@ class GoalBankController extends Controller
             ->pluck('employee_id'); 
 
         return ($employees ? $employees->toArray() : []); 
+    }
+
+    protected function notify_on_dashboard($goalBank, $employee_ids) {
+
+        // find user id based on the employee_id
+        $notify_users_ids = User::whereIn('employee_id', $employee_ids)->pluck('id');
+
+        // Add dasboard message to each participant_id
+        foreach ($notify_users_ids as $key => $value) {
+            DashboardNotification::create([
+                    'user_id' => $value,
+                    'notification_type' => 'GB',        // Goal Bank
+                    'comment' => $goalBank->user->name . ' added a new goal to your goal bank.',
+                    'related_id' => $goalBank->id,
+            ]);
+        }
+    
     }
 
     protected function notify_employees($goalBank, $employee_ids)

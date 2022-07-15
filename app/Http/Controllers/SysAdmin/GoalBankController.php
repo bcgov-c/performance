@@ -3,26 +3,28 @@
 namespace App\Http\Controllers\SysAdmin;
 
 
-use App\Models\User;
-use App\Models\Goal;
-use App\Models\GoalType;
+use Carbon\Carbon;
 use App\Models\Tag;
+use App\Models\Goal;
+use App\Models\User;
+use App\Models\GoalType;
 use App\Models\GoalBankOrg;
 use App\Models\EmployeeDemo;
 use Illuminate\Http\Request;
+use App\MicrosoftGraph\SendMail;
 use App\Models\OrganizationTree;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Models\DashboardNotification;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Validation\ValidationException;
 use App\Http\Requests\Goals\CreateGoalRequest;
-use Carbon\Carbon;
-use App\MicrosoftGraph\SendMail;
+use Illuminate\Validation\ValidationException;
 
 
 class GoalBankController extends Controller
@@ -742,6 +744,9 @@ class GoalBankController extends Controller
 
         }
 
+        // notify_on_dashboard when new goal added
+        $this->notify_on_dashboard($resultrec, $notify_audiences);
+
         // Send Out Email notification when new goal added
         $this->notify_employees($resultrec, $notify_audiences);
 
@@ -905,18 +910,24 @@ class GoalBankController extends Controller
     public function getDatatableEmployees(Request $request) {
         if($request->ajax()){
 
-            $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-            $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-            $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-            $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-            $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+            $level0 = $request->dd_level0 ? OrganizationTree::where('organization_trees.id', $request->dd_level0)->first() : null;
+            $level1 = $request->dd_level1 ? OrganizationTree::where('organization_trees.id', $request->dd_level1)->first() : null;
+            $level2 = $request->dd_level2 ? OrganizationTree::where('organization_trees.id', $request->dd_level2)->first() : null;
+            $level3 = $request->dd_level3 ? OrganizationTree::where('organization_trees.id', $request->dd_level3)->first() : null;
+            $level4 = $request->dd_level4 ? OrganizationTree::where('organization_trees.id', $request->dd_level4)->first() : null;
     
             $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
 
             $sql = clone $demoWhere; 
 
+            // $reqMatched = clone $demoWhere;
+            // $reqMatched->select('employee_demo.employee_id')
+            // ->orderBy('employee_demo.employee_id')
+            // ->pluck('employee_demo.employee_id');
+            // // ->get();
+
             $employees = $sql->select([ 
-                'employee_id'
+                  'employee_id'
                 , 'employee_name'
                 , 'jobcode_desc'
                 , 'employee_email'
@@ -925,7 +936,8 @@ class GoalBankController extends Controller
                 , 'employee_demo.level2_division'
                 , 'employee_demo.level3_branch'
                 , 'employee_demo.level4'
-                , 'employee_demo.deptid']);
+                , 'employee_demo.deptid'
+            ]);
             return Datatables::of($employees)
                 ->addColumn('select_users', static function ($employee) {
                         return '<input pid="1335" type="checkbox" id="userCheck'. 
@@ -2011,7 +2023,7 @@ public function agetOrganizations(Request $request) {
                 return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.$row->creator_name.' value="'.$row->id.'">'.$row->creator_name.'</a>';
             })
             ->addColumn('mandatory', function ($row) {
-                return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.($row->is_mandatory ? "Mandatory" : "Suggested").' value="'.$row->id.'">'.($row->is_mandatory == 1 ? "Mandatory" : "Suggested").'</a>';
+                return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.($row->is_mandatory ? "Mandatory" : "Suggested").' value="'.$row->id.'">'.($row->is_mandatory ? "Mandatory" : "Suggested").'</a>';
             })
             ->editColumn('created_at', function ($row) {
                 return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.($row->created_at ? $row->created_at->format('F d, Y') : null).' value="'.$row->id.'">'.($row->created_at ? $row->created_at->format('F d, Y') : null).'</a>';
@@ -2185,6 +2197,25 @@ public function agetOrganizations(Request $request) {
 
         return ($employees ? $employees->toArray() : []); 
     }
+
+
+    protected function notify_on_dashboard($goalBank, $employee_ids) {
+
+        // find user id based on the employee_id
+        $notify_users_ids = User::whereIn('employee_id', $employee_ids)->pluck('id');
+
+        // Add dasboard message to each participant_id
+        foreach ($notify_users_ids as $key => $value) {
+            DashboardNotification::create([
+                    'user_id' => $value,
+                    'notification_type' => 'GB',        // Goal Bank
+                    'comment' => $goalBank->user->name . ' added a new goal to your goal bank.',
+                    'related_id' => $goalBank->id,
+            ]);
+        }
+    
+    }
+
 
     protected function notify_employees($goalBank, $employee_ids)
     {

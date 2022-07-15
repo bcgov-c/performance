@@ -24,12 +24,12 @@
   </div>
 
   @foreach($notifications as $notification)
-  @if ($notification->relatedGoal)
+  {{-- @if ($notification->relatedGoal) --}}
   <div class="rounded shadow-sm" size="xs" >
       <div class="p-2">
         <div class="pl-2 d-flex align-items-center justify-content-center {{$notification->status === null ? "border-left" : ""}}  border-primary" style="border-width:3px !important" id="tr_{{$notification->id}}">
             <input id='ntfyitem' type='checkbox' class='sub_chk' data-id="{{$notification->id}}">
-            <div style="cursor:pointer;" onclick="window.location.href = '{{route("goal.show", $notification->relatedGoal->id)}}'">
+            <div style="cursor:pointer;" onclick="window.location.href = '{{ $notification->url }}'">
               <div class="pl-3 d-flex align-items-center justify-content-center flex-row">
                   {{-- <x-profile-pic size="36"></x-profile-pic> --}}
                   <div class="d-flex flex-column">
@@ -37,21 +37,34 @@
                             {{$notification->comment}}
                         </strong>
                       <div class="text-muted">
-                        Title: {{$notification->relatedGoal->title}} | Goal Type: {{$notification->relatedGoal->goalType->name}} | Date: {{$notification->created_at->format('M d, Y H:i A')}}
+                        @switch($notification->notification_type)
+                        @case('GC')
+                        @case('GR')
+                            Title: {{$notification->relatedGoal->title}} | Goal Type: {{$notification->relatedGoal->goalType->name}} | Date: {{$notification->created_at->format('M d, Y H:i A')}}
+                            @break
+                        @case('GB')
+                            Title: {{$notification->relatedGoal->title}} | Type: {{$notification->relatedGoal->mandatory_status_descr}} | Date: {{$notification->created_at->format('M d, Y H:i A')}}
+                            @break
+                        @case('CA')
+                        @case('CS')
+                            Title: {{$notification->conversation ? $notification->conversation->topic->name : ''}} | Date: {{$notification->created_at->format('M d, Y H:i A')}}
+                            @break
+                        @endswitch
                       </div>
                   </div>
               </div>
               </div>
               <div class="flex-fill"></div>
-            @if (($notification->notification_type == 'GC') or ($notification->notification_type == 'GR'))
+            {{-- @if (($notification->notification_type == 'GC') or ($notification->notification_type == 'GR')) --}}
               <x-button
                   size="sm"
-                  :href='route("goal.show", $notification->relatedGoal->id)'
-                  :tooltip="__('Click to view the details of this goal.')"
+                  {{-- :href='route("goal.show", $notification->relatedGoal->id)' --}}
+                  :href='$notification->url'
+                  :tooltip="__('Click to view the details.')"
                   tooltipPosition="bottom" class="mr-2" aria-label="Show Item">{{__('View')}}
 
               </x-button>
-            @endif
+            {{-- @endif --}}
               <x-button
                   size="sm" style="danger" icon="trash"
                   :tooltip="__('Click to delete notification.')"
@@ -61,7 +74,7 @@
           </div>
       </div>
   </div>
-  @endif
+  {{-- @endif --}}
   @endforeach
 </div>
 

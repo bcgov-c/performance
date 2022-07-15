@@ -3,7 +3,7 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             Edit: {{ $goal-> title}}
         </h2>
-        <small><a href="{{ route('goal.index') }}">Back to list</a></small>
+        <!----<small><a href="{{ route('goal.index') }}">Back to list</a></small>---->
     </x-slot>
 
     <div class="container-fluid">

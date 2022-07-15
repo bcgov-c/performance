@@ -8,8 +8,14 @@ use App\Models\Tag;
 class ResourceController extends Controller
 {
     public function userguide(Request $request)
-    {        
+    {   
+        $t = $request->t;
+
         $data = [
+            [
+                'question' => 'Welcome!',
+                'answer_file' => '5'
+            ],
             [
                 'question' => 'My Goals Section',
                 'answer_file' => '2'
@@ -24,7 +30,7 @@ class ResourceController extends Controller
             ],
 
         ];
-        return view('resource.user-guide', compact('data'));
+        return view('resource.user-guide', compact('data', 't'));
     }
     public function goalsetting(Request $request)
     {
