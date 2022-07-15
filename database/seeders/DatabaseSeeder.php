@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
     {
 
         // Seeder for Prod Environment
+        $this->call(UserTableSeeder_GoLive::class);
         $this->call(GoalTypeSeeder::class);
         $this->call(GoalTypeSeeder_Update20220607::class);
         $this->call(TopicSeeder::class);
@@ -26,18 +27,6 @@ class DatabaseSeeder extends Seeder
         $this->call(SharedElementSeeder::class);
         $this->call(DashboardMessageSeeder::class);
 
-        // Go Live seeder
-        $this->call(UserTableSeeder_GoLive::class);
-
-        // Seeder for Test Environment
-        // Items below need to be removed before Go-Live
-        // $this->call(UserTableSeeder::class);
-        // $this->call(UserTableSeederAdmins::class);
-        // $this->call(SupervisorGoalSeeder::class);
-        // $this->call(GoalBankSeeder::class);
-        // $this->call(AdditionalUsersTableSeeder::class);
-        // $this->call(ConversationSeeder::class);
-        // $this->call(GenericTemplateSeeder::class);
         
     }
 }
