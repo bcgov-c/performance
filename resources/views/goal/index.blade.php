@@ -17,7 +17,7 @@
     <x-button icon="clone" href="{{ route('goal.library') }}">
         Add Goal from Goal Bank
     </x-button>
-    <x-button icon="question" href="{{ route('resource.goal-setting') }} " target="_blank" tooltip='Click here to access goal setting resources and examples (opens in new window).'>
+    <x-button icon="question" href="{{ route('resource.user-guide','t=1') }} " target="_blank" tooltip='Click here to access goal setting resources and examples (opens in new window).'>    
         Need Help?
     </x-button>
     @endif
