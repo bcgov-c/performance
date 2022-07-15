@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Carbon\Carbon;
 
-class UserTableSeeder extends Seeder
+class UserTableSeeder_GoLive extends Seeder
 {
   /**
    * Run the database seeds.
