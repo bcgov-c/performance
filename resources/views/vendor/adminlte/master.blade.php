@@ -168,18 +168,6 @@
         @endif
     @endif
 
-    {{-- Add Footer here (reference: https://adminlte.io/themes/AdminLTE/index2.html )--}}
-    @if(!request()->is('login') && !request()->is('register') && !request()->is('password/*'))
-        <footer class="main-footer">
-            <div class="pull-right hidden-xs">
-                <img src="{{asset('img/brand/1.png')}}" alt="" class="p-3" style="height:140px;">
-            {{-- <b>Version</b> 2.4.13 --}}
-            </div>
-            {{-- <strong>Copyright &copy; 2014-2019 <a href="https://adminlte.io">AdminLTE</a>.</strong> All rights
-            reserved. --}}
-        </footer>
-    @endif
-
     {{-- Custom Scripts --}}
     @yield('adminlte_js')
     <script>

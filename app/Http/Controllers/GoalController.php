@@ -211,13 +211,20 @@ class GoalController extends Controller
     {
         $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->findOrFail($id);
         $input = $request->validated();
-
-        $tags = $input['tag_ids'];
+        
+        $tags = '';
+        if(isset($input['tag_ids'])) {
+            $tags = $input['tag_ids'];
+        } 
         unset($input['tag_ids']);        
         $goal->update($input);
-        $goal->tags()->sync($tags);
+        if ($tags != '') {
+            $goal->tags()->sync($tags);
+        } else {
+            DB::table('goal_tags')->where('goal_id', $id)->delete();
+        }
 
-        return redirect()->route($goal->is_library ? 'my-team.suggested-goals' : 'goal.index');
+        return redirect()->route($goal->is_library ? 'goal.library' : 'goal.index');
     }
 
     public function getSuggestedGoal($id) {
@@ -260,34 +267,33 @@ class GoalController extends Controller
         $tags_input = $request->tag_ids;     
 
         $adminGoals = Goal::withoutGlobalScopes()
-        ->join('users', 'goals.user_id', '=', 'users.id')  
         ->join('goal_bank_orgs', 'goals.id', '=', 'goal_bank_orgs.goal_id')
-        ->join('admin_orgs', function ($j1) {
+        ->join('employee_demo', function ($j1) {
             $j1->on(function ($j1a) {
-                $j1a->whereRAW('admin_orgs.organization = goal_bank_orgs.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (goal_bank_orgs.organization = "" OR goal_bank_orgs.organization IS NULL))');
+                $j1a->whereRAW('employee_demo.organization = goal_bank_orgs.organization OR ((employee_demo.organization = "" OR employee_demo.organization IS NULL) AND (goal_bank_orgs.organization = "" OR goal_bank_orgs.organization IS NULL))');
             } )
             ->on(function ($j2a) {
-                $j2a->whereRAW('admin_orgs.level1_program = goal_bank_orgs.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (goal_bank_orgs.level1_program = "" OR goal_bank_orgs.level1_program IS NULL))');
+                $j2a->whereRAW('employee_demo.level1_program = goal_bank_orgs.level1_program OR ((employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL) AND (goal_bank_orgs.level1_program = "" OR goal_bank_orgs.level1_program IS NULL))');
             } )
             ->on(function ($j3a) {
-                $j3a->whereRAW('admin_orgs.level2_division = goal_bank_orgs.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (goal_bank_orgs.level2_division = "" OR goal_bank_orgs.level2_division IS NULL))');
+                $j3a->whereRAW('employee_demo.level2_division = goal_bank_orgs.level2_division OR ((employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL) AND (goal_bank_orgs.level2_division = "" OR goal_bank_orgs.level2_division IS NULL))');
             } )
             ->on(function ($j4a) {
-                $j4a->whereRAW('admin_orgs.level3_branch = goal_bank_orgs.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (goal_bank_orgs.level3_branch = "" OR goal_bank_orgs.level3_branch IS NULL))');
+                $j4a->whereRAW('employee_demo.level3_branch = goal_bank_orgs.level3_branch OR ((employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL) AND (goal_bank_orgs.level3_branch = "" OR goal_bank_orgs.level3_branch IS NULL))');
             } )
             ->on(function ($j5a) {
-                $j5a->whereRAW('admin_orgs.level4 = goal_bank_orgs.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (goal_bank_orgs.level4 = "" OR goal_bank_orgs.level4 IS NULL))');
+                $j5a->whereRAW('employee_demo.level4 = goal_bank_orgs.level4 OR ((employee_demo.level4 = "" OR employee_demo.level4 IS NULL) AND (goal_bank_orgs.level4 = "" OR goal_bank_orgs.level4 IS NULL))');
             } );
         } )
-        ->where('admin_orgs.user_id', '=', Auth::id())
-        ->where('admin_orgs.version', '=', 1)
+        ->join('users', 'users.guid', '=', 'employee_demo.guid')
+        ->where('users.id', '=', Auth::id())
+        ->whereIn('goals.by_admin', [1, 2])
+        ->where('is_library', true)
         ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
         ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')   
-        ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','users.name as username',DB::raw('group_concat(distinct tags.name) as tagnames'));
-        $adminGoals = $adminGoals->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'users.name', 'goals.is_mandatory');
-        // ->paginate(10);
-
+        ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','users.name as username',DB::raw('group_concat(distinct tags.name) as tagnames'))
+        ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'users.name', 'goals.is_mandatory');
         $query = Goal::withoutGlobalScope(NonLibraryScope::class)
         ->where('is_library', true)
         ->join('users', 'goals.user_id', '=', 'users.id')          
@@ -318,7 +324,7 @@ class GoalController extends Controller
         }
 
         if ($request->has('title') && $request->title) {
-            $query = $query->where('goal_tags.goal_id', "LIKE", "%$request->title%");
+            $query = $query->where('goals.title', "LIKE", "%$request->title%");
         }
 
         if ($request->has('date_added') && $request->date_added && Str::lower($request->date_added) !== 'any') {
@@ -346,6 +352,27 @@ class GoalController extends Controller
         // $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goalTypes, $tagsList);
         $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','users.name as username',DB::raw('group_concat(distinct tags.name) as tagnames'));
         $query = $query->union($adminGoals);
+        
+        if (!$request->has('sortorder') || $request->sortorder == '') {
+            $sortorder = 'ASC';
+        } elseif (strtoupper($request->sortorder) != 'ASC' && strtoupper($request->sortorder) != 'DESC') {
+            $sortorder = 'ASC';
+        }else {
+            $sortorder = $request->sortorder;
+        }
+        
+        $sortby = '';
+        if ($request->has('sortby') && $request->sortby != '') {
+            $sortby = $request->sortby;
+            $query = $query->orderby($sortby, $sortorder);    
+            if ($sortorder == 'ASC') {
+                $sortorder = 'DESC';
+            } else {
+                $sortorder = 'ASC';
+            }
+        }
+        
+        
         // $query = $query->groupBy('goals.id');
         $bankGoals = $query->paginate(10);
         $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goalTypes, $tagsList);
@@ -366,8 +393,9 @@ class GoalController extends Controller
             }
         }
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
+        $goals_count = count($bankGoals);
 
-        return view('goal.bank', array_merge(compact('bankGoals', 'tags', 'tagsList', 'goalTypes', 'type_desc_str', 'mandatoryOrSuggested', 'createdBy'), $suggestedGoalsData));
+        return view('goal.bank', array_merge(compact('bankGoals', 'tags', 'tagsList', 'goalTypes', 'type_desc_str', 'mandatoryOrSuggested', 'createdBy', 'goals_count', 'sortby','sortorder'), $suggestedGoalsData));
     }
 
     private function getDropdownValues(&$mandatoryOrSuggested, &$createdBy, &$goalTypes, &$tagsList) {

@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Config;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use App\Models\SharedProfile;
 
 class Conversation extends Model
 {
@@ -80,13 +82,28 @@ class Conversation extends Model
             $authId = $userID;
         }
         $user = User::find($authId);
+        $sharing = SharedProfile::find($authId);
         $reportingManager = $user ? $user->reportingManager()->first() : null;
-        if (!$reportingManager) {
+        
+        //check sharing manager
+        $sharingManagers =  DB::table('shared_profiles')                        
+                            ->where('shared_id', $authId)
+                            ->get()->toArray(); 
+        $sharing = array();
+        foreach ($sharingManagers as $sharingManager) {
+            array_push($sharing, $sharingManager->shared_with);
+        }                
+        if (!$reportingManager && count($sharing) == 0) {
             return false;
         }
+        
         foreach ($this->conversationParticipants->toArray() as $cp) {
-            if ($cp['participant_id'] === $reportingManager->id)
+            if ($cp['participant_id'] == $reportingManager->id) {
                 return true;
+            }
+            if (in_array($cp['participant_id'], $sharing)) {
+                return true;
+            }
         }
         return false;
     }
@@ -137,7 +154,7 @@ class Conversation extends Model
         if ($user === null) 
             $user = Auth::user();
         $authId = $user->id;
-        
+
         $lastConv = self::where(function ($query) use ($authId) {
             $query->where('user_id', $authId)->orWhereHas('conversationParticipants', function ($query) use ($authId) {
                 return $query->where('participant_id', $authId);
@@ -147,7 +164,7 @@ class Conversation extends Model
         ->whereNotIn('id', $ignoreList)
         ->orderBy('sign_off_time', 'DESC')
         ->first();
-        
+                        
         if ($lastConv && !$lastConv->isWithSupervisor($user->id)) {
             $ignoreList[] = $lastConv->id;
             $lastConv = self::getLastConv($ignoreList, $user);
@@ -157,6 +174,7 @@ class Conversation extends Model
 
     public static function warningMessage() {
         $lastConv = self::getLastConv();
+
         $authId = Auth::id();
         $user = User::find($authId);
         if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null )){
@@ -191,8 +209,14 @@ class Conversation extends Model
             ];
         }
         $user = Auth::user();
-        $nextDueDate = $user->joining_date ? $user->joining_date->addMonths(4) : '';
+        $nextDueDate = $user->joining_date ?  : '';
         $diff = Carbon::now()->diffInMonths($nextDueDate, false);
+
+        if ((!$nextDueDate) || (Carbon::createFromDate(2022, 10, 14)->gt($nextDueDate))) {
+            $DDt = abs (($user->id % 10) - 1) * 5 + (($user->id % 5));
+            $nextDueDate = Carbon::createFromDate(2022, 10, 14)->addDays($DDt);
+        }
+
         /* dd([
             Carbon::now()->format('d-M-y'),
             $nextDueDate->format('d-M-y'),
@@ -212,6 +236,10 @@ class Conversation extends Model
         $nextConvDate =  ($lastConv) ? $lastConv->sign_off_time->addMonths(4)->format('M d, Y') : (
             $user->joining_date ? $user->joining_date->addMonths(4)->format('M d, Y') : ''
         );
+        if ((!$nextConvDate) || (Carbon::createFromDate(2022, 10, 14)->gt($nextConvDate))) {
+            $DDt = abs (($user->id % 10) - 1) * 5 + (($user->id % 5));
+            $nextConvDate = Carbon::createFromDate(2022, 10, 14)->addDays($DDt)->format('M d, Y');
+        }
         return $nextConvDate;
     }
 

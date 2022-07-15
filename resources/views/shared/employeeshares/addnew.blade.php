@@ -52,7 +52,7 @@
                 <nav>
                     <div class="nav nav-tabs" id="enav-tab" role="tablist">
                         <a class="nav-item nav-link active" id="enav-list-tab" data-toggle="tab" href="#enav-list" role="tab" aria-controls="enav-list" aria-selected="true">List</a>
-                        <a class="nav-item nav-link" id="enav-tree-tab" data-toggle="tab" href="#enav-tree" role="tab" aria-controls="enav-tree" aria-selected="false">Tree</a>
+                        {{-- <a class="nav-item nav-link" id="enav-tree-tab" data-toggle="tab" href="#enav-tree" role="tab" aria-controls="enav-tree" aria-selected="false">Tree</a> --}}
                     </div>
                 </nav>
                 <div class="tab-content" id="enav-tabContent">
@@ -466,7 +466,7 @@
                             redrawTreeCheckboxes();
                         }
                     } else {
-						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Tree result is too big.  Please apply organization filter before clicking on Tree.');
+						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
 					}
 				});
 
@@ -511,7 +511,7 @@
                             eredrawTreeCheckboxes();
                         }
                     } else {
-						$(etarget).html('<i class="glyphicon glyphicon-info-sign"></i> Tree result is too big.  Please apply organization filter before clicking on Tree.');
+						$(etarget).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
 					}
 				});
 

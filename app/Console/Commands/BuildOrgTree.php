@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use App\Models\EmployeeDemo;
 use Illuminate\Console\Command;
 use App\Models\OrganizationTree;
+use App\Models\JobSchedAudit;
+use Carbon\Carbon;
 
 class BuildOrgTree extends Command
 {
@@ -295,6 +297,14 @@ class BuildOrgTree extends Command
             $this->info( now() );
 
         } else {
+            $start_time = Carbon::now()->format('c');
+            $audit_id = JobSchedAudit::insertGetId(
+            [
+                'job_name' => 'command:buildOrgTree',
+                'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
+                'status' => 'Disabled'
+            ]
+            );
             $this->info( 'Process is currently disabled; or "PRCS_BUILD_ORG_TREE=on" is currently missing in the .env file.');
         }
 

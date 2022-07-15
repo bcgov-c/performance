@@ -1,6 +1,7 @@
 <!-- Modal -->
+<ol style="overflow-y: scroll; overflow-x: hidden;">
 <div class="modal fade" id="employee-profile-sharing-modal" tabindex="-1" aria-labelledby="employeeProfileSharing"
-    aria-hidden="true">
+    aria-hidden="true" style="overflow-y: scroll; overflow-x: hidden;">
     <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-primary">
@@ -28,7 +29,7 @@
                         <div class="col-6">
                             <!-- <x-dropdown name="items_to_share[]" :list="[['id'=>1, 'name'=> 'Goals', 'selected'=>true], ['id'=>2, 'name'=> 'Conversations',  'selected'=>true]]" label="Elements to share" multiple class="items-to-share"></x-dropdown> -->
                             <b>Elements to share</b>
-                            <x-dropdown name="items_to_share[]" :list="[['id'=>1, 'name'=> 'Goals', 'selected'=>true], ['id'=>2, 'name'=> 'Conversations',  'selected'=>true]]" multiple class="items-to-share"></x-dropdown>
+                            <x-dropdown name="items_to_share[]" :list="[['id'=>1, 'name'=> 'Goals', 'selected'=>false], ['id'=>2, 'name'=> 'Conversations',  'selected'=>false]]" multiple class="items-to-share"></x-dropdown>
                         </div>
                         <div class="col-6">
                             <!-- <x-input name="reason" label="Reason" tooltip="Reason tooltip"></x-input> -->
@@ -55,4 +56,20 @@
         </div>
     </div>
 </div>
+</ol>
+@push('css')
+    <style>
+        /* .modal {
+            display: block !important;
+        } */
 
+        .modal-dialog {
+            overflow-y: initial !important;
+        }
+
+        .modal-body {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+    </style>
+@endpush

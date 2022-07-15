@@ -237,7 +237,7 @@
                             redrawTreeCheckboxes();
                         }
                     } else {
-						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Tree result is too big.  Please apply organization filter before clicking on Tree.');
+						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
 					}
 				});
 

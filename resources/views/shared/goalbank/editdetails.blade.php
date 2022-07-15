@@ -15,56 +15,56 @@
 		@csrf
 
 		<div class="row">
-			<div class="col m-2">
-				<b>Goal Type</b>
+				<div class="col col-md-2">
+					<b> Goal Type </b>
 				<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="{{$type_desc_str}}"> </i>
-				<x-dropdown :list="$goalTypes" name="goal_type_id" :selected="$goaldetail->goal_type_id" />
+				<x-dropdown id="goal_type_id" :list="$goalTypes" aria-label="Goal Type" name="goal_type_id" :selected="$goaldetail->goal_type_id" />
 			</div>
-			<div class="col m-2">
-				<b>Goal Title</b>
+			<div class="col col-md-8">
+				<b> Goal Title </b>
 				<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>
 				<x-input name="title" :value="$goaldetail->title" />
-					<small class="text-danger error-title"></small>
+				<small class="text-danger error-title"></small>
 			</div>
-			<div class="col m-2">
-				<x-dropdown :list="$mandatoryOrSuggested" label="Mandatory/Suggested" name="is_mandatory" :selected="$goaldetail->is_mandatory" ></x-dropdown>
+			<div class="col col-md-2">
+				<x-dropdown :list="$mandatoryOrSuggested" label="Mandatory/Suggested" name="is_mandatory" :selected="$goaldetail->is_mandatory" />
 			</div>
 		</div>
 		<div class="row">
-			<div class="col m-2">
-				<b>Tags</b>
+			<div class="col-md-4">
+				<b> Tags </b>
 				<i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resource/goal-setting?t=5' target=\'_blank\'><u>View full list of tag descriptions.</u></a>"></i>				
 				<x-dropdown :list="$tags" name="tag_ids[]" :selected="array_column($goaldetail->tags->toArray(), 'id')" class="tags" multiple />
 				<small  class="text-danger error-tag_ids"></small>
 			</div>
 		</div>
 		<div class="row">
-			<div class="col m-2">
+			<div class="col-md-12">
 				<b>Goal Description</b>
 				<p>
-				Each goal should include a description of <b>WHAT</b>  
-				<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".'> </i> you will accomplish, <b>WHY</b> 
-				<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important,, and <b>HOW</b> 
-				<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> you will achieve it. 
+					Each goal should include a description of <b>WHAT</b>  
+					<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".'> </i> you will accomplish, <b>WHY</b> 
+					<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important,, and <b>HOW</b> 
+					<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> you will achieve it. 
 				</p>
-				<x-textarea name="what" :value="$goaldetail->what" />
-					<small class="text-danger error-what"></small>
+				<x-textarea id="what" name="what" :value="$goaldetail->what" />
+				<small class="text-danger error-what"></small>
 			</div>
 		</div>
 		<div class="row">
-			<div class="col m-2">
+			<div class="col-md-12">
 				<b>Measures of Success</b>
 				<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"'> </i>
 				<x-textarea name="measure_of_success" :value="$goaldetail->measure_of_success" />
-					<small class="text-danger error-measure_of_success"></small>
+				<small class="text-danger error-measure_of_success"></small>
 			</div>
 		</div>
 		<div class="row">
-			<div class="col m-2">
+			<div class="col-md-2">
 				<x-input label="Start Date " class="error-start" type="date" name="start_date" :value="$goaldetail->start_date ? $goaldetail->start_date->format('Y-m-d') : ''" />
 				<small  class="text-danger error-start_date"></small>
 			</div>
-			<div class="col m-2">
+			<div class="col-md-2">
 				<x-input label="End Date " class="error-target" type="date" name="target_date" :value="$goaldetail->target_date ? $goaldetail->target_date->format('Y-m-d') : ''" />
 				<small  class="text-danger error-target_date"></small>
 			</div>
