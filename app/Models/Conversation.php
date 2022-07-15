@@ -212,7 +212,7 @@ class Conversation extends Model
         $nextDueDate = $user->joining_date ?  : '';
         $diff = Carbon::now()->diffInMonths($nextDueDate, false);
 
-        if ($nextDueDate < Carbon::createFromDate(2022, 10, 14)) {
+        if ((!$nextDueDate) || (Carbon::createFromDate(2022, 10, 14)->gt($nextDueDate))) {
             $DDt = abs (($user->id % 10) - 1) * 5 + (($user->id % 5));
             $nextDueDate = Carbon::createFromDate(2022, 10, 14)->addDays($DDt);
         }
@@ -238,9 +238,9 @@ class Conversation extends Model
         );
         if ((!$nextConvDate) || (Carbon::createFromDate(2022, 10, 14)->gt($nextConvDate))) {
             $DDt = abs (($user->id % 10) - 1) * 5 + (($user->id % 5));
-            $nextConvDate = Carbon::createFromDate(2022, 10, 14)->addDays($DDt);
+            $nextConvDate = Carbon::createFromDate(2022, 10, 14)->addDays($DDt)->format('M d, Y');
         }
-        return $nextConvDate->format('M d, Y');
+        return $nextConvDate;
     }
 
     public static function latestPastConversation()
