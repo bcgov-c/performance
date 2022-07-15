@@ -533,6 +533,7 @@
                             isNotThirdPerson = false;
                         }
                         $('#employee-signoff-questions').removeClass('d-none');
+          
                         if (!isSupervisor) {
                             $("#employee-signoff-questions").find('.sup-inputs').find('input').prop('disabled', true);
                             $("#employee-signoff-questions").find('.emp-inputs').find('input').prop('disabled', false);
@@ -545,8 +546,13 @@
                             $('#supervisor-signoff-message').find('.time').html("on " + result.supervisor_signoff_time);
                             $("textarea.supervisor-comment").addClass('enable-not-allowed').prop('readonly', true);
                             if (result.conversation_topic_id == 3) {
-                                $("textarea.info_comment2").addClass('enable-not-allowed').prop('readonly', true); 
-                                $("textarea.info_comment6").addClass('enable-not-allowed').prop('readonly', true);
+                                $("#info_comment1").removeClass('enable-not-allowed').prop('readonly', false); 
+                                $("#info_comment1_edit").removeClass('enable-not-allowed').prop('readonly', false); 
+                                $("#info_comment3").removeClass('enable-not-allowed').prop('readonly', false);
+                                $("#info_comment3_edit").removeClass('enable-not-allowed').prop('readonly', false); 
+                                
+                                $("#info_comment2").addClass('enable-not-allowed').prop('readonly', true); 
+                                $("#info_comment6").addClass('enable-not-allowed').prop('readonly', true);
                             }
                             
                         } else {
@@ -565,8 +571,8 @@
                             $('#supervisor-signoff-message').find('.time').html("on " + result.supervisor_signoff_time);
                             $("textarea.employee-comment").addClass('enable-not-allowed').prop('readonly', true);
                             if (result.conversation_topic_id == 3) {
-                                $("textarea.info_comment1").addClass('enable-not-allowed').prop('readonly', true);    
-                                $("textarea.info_comment3").addClass('enable-not-allowed').prop('readonly', true);
+                                $("#info_comment1").addClass('enable-not-allowed').prop('readonly', true);    
+                                $("#info_comment3").addClass('enable-not-allowed').prop('readonly', true);
                             }
                         }
 
@@ -671,10 +677,10 @@
                           $("#info_capture3").html('<span>Evaluation (optional) - supervisor to provide an overall summary of performance</span> <i class="fas fa-info-circle" data-toggle="popover" data-placement="right" data-trigger="click" data-content="Be as specific as possible, use examples, and focus on observable behaviours and business results"></i>');
                         }
                         if (result.conversation_topic_id == 3) {
-                          $('#info_capture1').html('<span>Strengths (optional) ï¿½ identify your top 1 to 3 strengths</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Employee to indicate areas of strength to build on for career advancement." ></i>');
-                          $('#info_capture2').html('<span>Supervisor Comments (optional) ï¿½ provide feedback on strength(s) identified by employee above</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Supervisor to comment on strengths identified by employee, note additional areas of strength as required, and provide examples where appropriate." ></i>');
-                          $('#info_capture3').html('<span>Areas for Growth (optional) ï¿½ identify 1 to 3 areas youï¿½d most like to grow over the next two years</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Employee to indicate areas for growth in the short to medium term to assist with career advancement." ></i>');
-                          $('#info_capture4').html('<span>Supervisor Comments (optional) ï¿½ provide feedback on area(s) for growth identified by employee above</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Supervisor to comment on areas for growth identified by employee, note additional areas of growth as required, and provide examples where appropriate." ></i>');
+                          $('#info_capture1').html('<span>Strengths (optional) identify your top 1 to 3 strengths</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Employee to indicate areas of strength to build on for career advancement." ></i>');
+                          $('#info_capture2').html('<span>Supervisor Comments (optional) provide feedback on strength(s) identified by employee above</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Supervisor to comment on strengths identified by employee, note additional areas of strength as required, and provide examples where appropriate." ></i>');
+                          $('#info_capture3').html('<span>Areas for Growth (optional) identify 1 to 3 areas you most like to grow over the next two years</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Employee to indicate areas for growth in the short to medium term to assist with career advancement." ></i>');
+                          $('#info_capture4').html('<span>Supervisor Comments (optional) provide feedback on area(s) for growth identified by employee above</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Supervisor to comment on areas for growth identified by employee, note additional areas of growth as required, and provide examples where appropriate." ></i>');
                         }
                         if (result.conversation_topic_id == 4) {
                           $("#info_capture1").html("What date will a follow up meeting occur?");
