@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
     {
 
         // Seeder for Prod Environment
+        $this->call(UserTableSeeder_GoLive::class);
         $this->call(GoalTypeSeeder::class);
         $this->call(GoalTypeSeeder_Update20220607::class);
         $this->call(TopicSeeder::class);
