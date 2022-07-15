@@ -106,11 +106,11 @@ class BuildOrgTree extends Command
 
                     if (!$node) {
                         $node = new OrganizationTree([
-                            'name' => $program_name,
+                            'name' => trim($program_name),
                             'status' => 1,
                             'level' => 1,
-                            'organization' =>  $parent->organization,
-                            'level1_program' =>  $program_name,
+                            'organization' =>  trim($parent->organization),
+                            'level1_program' =>  trim($program_name),
                             // 'no_of_employee' => $count,
                         ]);
                         $node->save(); // Saved as root
@@ -157,12 +157,12 @@ class BuildOrgTree extends Command
 
                     if (!$node) {
                         $node = new OrganizationTree([
-                            'name' => $division_name,
+                            'name' => trim($division_name),
                             'status' => 1,
                             'level' => 2,
-                            'organization' =>  $parent->organization,
-                            'level1_program' =>  $parent->name,
-                            'level2_division' =>  $division_name,
+                            'organization' =>  trim($parent->organization),
+                            'level1_program' =>  trim($parent->name),
+                            'level2_division' =>  trim($division_name),
                             // 'no_of_employee' => $count,
                         ]);
                         $node->save(); // Saved as root
@@ -213,13 +213,13 @@ class BuildOrgTree extends Command
                                     
                     if (!$node) {
                         $node = new OrganizationTree([
-                            'name' => $branch_name,
+                            'name' => trim($branch_name),
                             'status' => 1,
                             'level' => 3,
-                            'organization' =>  $parent->organization,
-                            'level1_program' =>  $parent->level1_program,
-                            'level2_division' =>  $parent->name,
-                            'level3_branch' =>  $branch_name,
+                            'organization' =>  trim($parent->organization),
+                            'level1_program' =>  trim($parent->level1_program),
+                            'level2_division' =>  trim($parent->name),
+                            'level3_branch' =>  trim($branch_name),
                             // 'no_of_employee' => $count,
                         ]);
                         $node->save(); // Saved as root
@@ -272,14 +272,14 @@ class BuildOrgTree extends Command
 
                     if (!$node) {
                         $node = new OrganizationTree([
-                            'name' => $level4_name,
+                            'name' => trim($level4_name),
                             'status' => 1,
                             'level' => 4,
-                            'organization' =>  $parent->organization,
-                            'level1_program' =>  $parent->level1_program,
-                            'level2_division' =>  $parent->level2_division,
-                            'level3_branch' => $parent->name,
-                            'level4' => $level4_name,
+                            'organization' =>  trim($parent->organization),
+                            'level1_program' =>  trim($parent->level1_program),
+                            'level2_division' =>  trim($parent->level2_division),
+                            'level3_branch' => trim($parent->name),
+                            'level4' => trim($level4_name),
                             // 'no_of_employee' => $count,
                         ]);
                         $node->save(); // Saved as root
