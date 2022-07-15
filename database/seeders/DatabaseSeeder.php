@@ -27,18 +27,6 @@ class DatabaseSeeder extends Seeder
         $this->call(SharedElementSeeder::class);
         $this->call(DashboardMessageSeeder::class);
 
-        // Go Live seeder
-        $this->call(UserTableSeeder_GoLive::class);
-
-        // Seeder for Test Environment
-        // Items below need to be removed before Go-Live
-        // $this->call(UserTableSeeder::class);
-        // $this->call(UserTableSeederAdmins::class);
-        // $this->call(SupervisorGoalSeeder::class);
-        // $this->call(GoalBankSeeder::class);
-        // $this->call(AdditionalUsersTableSeeder::class);
-        // $this->call(ConversationSeeder::class);
-        // $this->call(GenericTemplateSeeder::class);
         
     }
 }
