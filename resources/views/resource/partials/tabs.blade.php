@@ -11,7 +11,7 @@
     </div>
     <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'resource.conversations' ? 'border-primary' : ''}}">
         <x-button :href="route('resource.conversations')" style="">
-            Conversations
+            Performance Conversations
         </x-button>
     </div>
     <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'resource.contact' ? 'border-primary' : ''}}">

@@ -3,4 +3,4 @@
 <p>There are also helpful tips like this one
 <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="top" data-html="true" data-content="See the sections below for more info on the basic functions of the PDP."> </i>
 throughout the app. Make sure to click on them if you are looking for more information.
-<p>If you have technical trouble, please feel free to <a href='/resource/contact' target=\'_blank\'>Contact Us</a> and we will do our best to help.</p>
+<p>If you have technical trouble, please <a href='/resource/contact' target=\'_blank\'>Contact Us</a> and we will do our best to help.</p>
