@@ -15,13 +15,14 @@ use App\MicrosoftGraph\SendMail;
 use App\Models\OrganizationTree;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DashboardNotification;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Route;
 use App\Http\Requests\Goals\CreateGoalRequest;
 use Illuminate\Validation\ValidationException;
 
@@ -909,18 +910,24 @@ class GoalBankController extends Controller
     public function getDatatableEmployees(Request $request) {
         if($request->ajax()){
 
-            $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-            $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-            $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-            $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-            $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+            $level0 = $request->dd_level0 ? OrganizationTree::where('organization_trees.id', $request->dd_level0)->first() : null;
+            $level1 = $request->dd_level1 ? OrganizationTree::where('organization_trees.id', $request->dd_level1)->first() : null;
+            $level2 = $request->dd_level2 ? OrganizationTree::where('organization_trees.id', $request->dd_level2)->first() : null;
+            $level3 = $request->dd_level3 ? OrganizationTree::where('organization_trees.id', $request->dd_level3)->first() : null;
+            $level4 = $request->dd_level4 ? OrganizationTree::where('organization_trees.id', $request->dd_level4)->first() : null;
     
             $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
 
             $sql = clone $demoWhere; 
 
+            // $reqMatched = clone $demoWhere;
+            // $reqMatched->select('employee_demo.employee_id')
+            // ->orderBy('employee_demo.employee_id')
+            // ->pluck('employee_demo.employee_id');
+            // // ->get();
+
             $employees = $sql->select([ 
-                'employee_id'
+                  'employee_id'
                 , 'employee_name'
                 , 'jobcode_desc'
                 , 'employee_email'
@@ -929,7 +936,8 @@ class GoalBankController extends Controller
                 , 'employee_demo.level2_division'
                 , 'employee_demo.level3_branch'
                 , 'employee_demo.level4'
-                , 'employee_demo.deptid']);
+                , 'employee_demo.deptid'
+            ]);
             return Datatables::of($employees)
                 ->addColumn('select_users', static function ($employee) {
                         return '<input pid="1335" type="checkbox" id="userCheck'. 

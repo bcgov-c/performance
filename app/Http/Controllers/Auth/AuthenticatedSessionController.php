@@ -53,7 +53,8 @@ class AuthenticatedSessionController extends Controller
         foreach ($dashboardmessage as $message) {}
 
         if ($message->status) {
-            return view('resource.contact');
+            return redirect()->intended(RouteServiceProvider::HOME)->with('showMessage', 1);
+            // return '<a href="#' + row.id + '" onclick="showModal(' + row.id + ')" class="button edit-button">' + row.goal_type_name + '</a>';
         } else {
             return redirect()->intended(RouteServiceProvider::HOME);
         }

@@ -1,6 +1,7 @@
 <!-- Modal -->
+<ol style="overflow-y: scroll; overflow-x: hidden;">
 <div class="modal fade" id="employee-profile-sharing-modal" tabindex="-1" aria-labelledby="employeeProfileSharing"
-    aria-hidden="true">
+    aria-hidden="true" style="overflow-y: scroll; overflow-x: hidden;">
     <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-primary">
@@ -55,4 +56,20 @@
         </div>
     </div>
 </div>
+</ol>
+@push('css')
+    <style>
+        /* .modal {
+            display: block !important;
+        } */
 
+        .modal-dialog {
+            overflow-y: initial !important;
+        }
+
+        .modal-body {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+    </style>
+@endpush
