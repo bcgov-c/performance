@@ -31,13 +31,13 @@ class DatabaseSeeder extends Seeder
 
         // Seeder for Test Environment
         // Items below need to be removed before Go-Live
-        $this->call(UserTableSeeder::class);
-        $this->call(UserTableSeederAdmins::class);
-        $this->call(SupervisorGoalSeeder::class);
-        $this->call(GoalBankSeeder::class);
-        $this->call(AdditionalUsersTableSeeder::class);
-        $this->call(ConversationSeeder::class);
-        $this->call(GenericTemplateSeeder::class);
+        // $this->call(UserTableSeeder::class);
+        // $this->call(UserTableSeederAdmins::class);
+        // $this->call(SupervisorGoalSeeder::class);
+        // $this->call(GoalBankSeeder::class);
+        // $this->call(AdditionalUsersTableSeeder::class);
+        // $this->call(ConversationSeeder::class);
+        // $this->call(GenericTemplateSeeder::class);
         
     }
 }
