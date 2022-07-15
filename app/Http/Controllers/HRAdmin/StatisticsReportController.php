@@ -1416,7 +1416,8 @@ class StatisticsReportController extends Controller
       $selected_ids = $request->ids ? explode(',', $request->ids) : [];
 
       $sql = User::selectRaw("users.*,
-                employee_name, organization, level1_program, level2_division, level3_branch, level4,
+                employee_name, employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division,
+                 employee_demo.level3_branch, employee_demo.level4,
             case when (select count(*) from shared_profiles A where A.shared_id = users.id) > 0 then 'Yes' else 'No' end as shared")
             ->join('employee_demo', function($join) {
                 $join->on('employee_demo.guid', '=', 'users.guid');
