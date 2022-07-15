@@ -41,18 +41,15 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('command:GetODSEmployeeDemographics')
         ->timezone('America/Vancouver')
-        // ->dailyAt('00:10');
-        ->hourlyAt('10');
+        ->dailyAt('00:10');
 
         $schedule->command('command:BuildOrgTree')
         ->timezone('America/Vancouver')
-        // ->dailyAt('00:20');
-        ->hourlyAt('20');
+        ->dailyAt('00:20');
   
         $schedule->command('command:SyncUserProfile')
         ->timezone('America/Vancouver')
-        // ->dailyAt('00:25');
-        ->hourlyAt('25');
+        ->dailyAt('00:25');
 
     }
 

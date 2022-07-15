@@ -28,6 +28,8 @@ class DatabaseSeeder extends Seeder
         $this->call(SharedElementSeeder::class);
         $this->call(DashboardMessageSeeder::class);
 
+        // Go Live seeder
+        $this->call(UserTableSeeder_GoLive::class);
 
         // Seeder for Test Environment
         // Items below need to be removed before Go-Live
