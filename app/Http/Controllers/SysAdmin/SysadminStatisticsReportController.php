@@ -1072,6 +1072,7 @@ class SysadminStatisticsReportController extends Controller
 
                 fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], 
                         $row['Shared'], $row['Shared with'],
+                        $row['Organization'],
                         $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
             }
 
