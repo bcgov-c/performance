@@ -2232,7 +2232,7 @@ public function agetOrganizations(Request $request) {
         array_push($sendMail->bindvariables, $goalBank->user ? $goalBank->user->name : '');   // Person who added goal to goal bank
         array_push($sendMail->bindvariables, $goalBank->title);       // goal title
         array_push($sendMail->bindvariables, $goalBank->mandatory_status_descr);           // Mandatory or suggested status
-        $response = $sendMail->sendMailWithGenericTemplate();
+        // $response = $sendMail->sendMailWithGenericTemplate();
     }
 
 }
