@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\SharedProfile;
+use App\Models\DashboardMessage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DashboardNotification;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 
 class DashboardController extends Controller
 {
@@ -81,8 +83,16 @@ class DashboardController extends Controller
         $supervisorTooltip = 'If your current supervisor in the Performance Development Platform is incorrect, please have your supervisor submit an AskMyHR ticket and choose the category: <span class="text-primary">My Team or Organization > HR Software Systems Support > Position / Reporting Updates</span>';        
         $sharedList = SharedProfile::where('shared_id', Auth::id())->with('sharedWithUser')->get();
         $profilesharedTooltip = 'If this information is incorrect, please discuss with your supervisor first and escalate to your organization\'s Strategic Human Resources shop if you are unable to resolve.';
-        $message = '';
+        
+        $messages = $this->getDashboardMessage();
+        foreach ($messages as $message) {}
+
         return view('dashboard.index', compact('greetings', 'tab', 'supervisorTooltip', 'sharedList', 'profilesharedTooltip', 'notifications', 'notifications_unread', 'message'));
+    }
+
+    public function getDashboardMessage() {
+        $dbm = DashboardMessage::select('message')->get();
+        return $dbm;
     }
 
     public function destroy($id)

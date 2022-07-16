@@ -467,7 +467,7 @@ class ConversationController extends Controller
             DashboardNotification::create([
                 'user_id' => $value,
                 'notification_type' => 'CS',        // Conversation signoff 
-                'comment' => $current_user->name . ' signed your performance review.',
+                'comment' => $current_user->name . ' signed your performance conversation.',
                 'related_id' => $conversation->id,
             ]);
         }

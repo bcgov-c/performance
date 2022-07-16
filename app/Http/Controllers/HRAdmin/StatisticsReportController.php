@@ -1416,7 +1416,8 @@ class StatisticsReportController extends Controller
       $selected_ids = $request->ids ? explode(',', $request->ids) : [];
 
       $sql = User::selectRaw("users.*,
-                employee_name, organization, level1_program, level2_division, level3_branch, level4,
+                employee_name, employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division,
+                 employee_demo.level3_branch, employee_demo.level4,
             case when (select count(*) from shared_profiles A where A.shared_id = users.id) > 0 then 'Yes' else 'No' end as shared")
             ->join('employee_demo', function($join) {
                 $join->on('employee_demo.guid', '=', 'users.guid');
@@ -1585,19 +1586,19 @@ class StatisticsReportController extends Controller
                     // });
                     ->join('admin_orgs', function ($j1) {
                         $j1->on(function ($j1a) {
-                            $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "") AND (employee_demo.organization = ""))');
+                            $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
                         } )
                         ->on(function ($j2a) {
-                            $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" ) AND (employee_demo.level1_program = "" ))');
+                            $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
                         } )
                         ->on(function ($j3a) {
-                            $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "") AND (employee_demo.level2_division = "" ))');
+                            $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
                         } )
                         ->on(function ($j4a) {
-                            $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR (admin_orgs.level3_branch = "" AND employee_demo.level3_branch = "" )');
+                            $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
                         } )
                         ->on(function ($j5a) {
-                            $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR (admin_orgs.level4 = ""  AND employee_demo.level4 = "")');
+                            $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
                         } );
                     })
                     ->where('admin_orgs.user_id', '=', Auth::id());

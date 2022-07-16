@@ -10,7 +10,7 @@
           Actions
       </button>
       <div class="dropdown-menu"  size="xs">
-          <x-button icon="fas fa-xs fa-trash-alt" href="{{ route('dashboard.destroyall') }}" class="dropdown-item delete_all" id='delete_all'>
+          <x-button icon="fas fa-xs fa-trash-alt" class="dropdown-item delete_all" id='delete_all'>
               Delete selected
           </x-button>
           <x-button icon="fas fa-xs fa-envelope-open" href="{{ route('dashboard.updatestatus') }}" class="dropdown-item update_status" >
@@ -144,6 +144,7 @@
 
                                         //alert('Whoop Something went wrong!!');
                                     }
+                                    window.location.reload();
                                 },
                                 error: function (data) {
                                     // alert(data.responseText);
@@ -213,9 +214,12 @@
                                     type: 'POST',
                                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                                     data: {'ids':join_selected_values
+                                    },
+                                    success: function (data) {
+                                        window.location.reload();
                                     }
                                 });
-                                // location.reload();
+                                //location.reload();
                         }
                     });
 
@@ -246,6 +250,9 @@
                                         type: 'POST',
                                         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                                         data: {'ids':join_selected_values
+                                        },
+                                        success: function (data) {
+                                            window.location.reload();
                                         }
                                     });
                                     // location.reload();

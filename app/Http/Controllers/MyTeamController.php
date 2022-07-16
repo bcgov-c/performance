@@ -118,6 +118,8 @@ class MyTeamController extends Controller
         $sharedProfiles = SharedProfile::where('shared_id', $user_id)->with(['sharedWith' => function ($query) {
             $query->select('id', 'name');
         }])->get();
+        
+        session()->put('checking_user', $user_id);
 
         return view('my-team.partials.profile-shared-with', compact('sharedProfiles'));
         // return $this->respondeWith($sharedProfiles);
@@ -196,8 +198,23 @@ class MyTeamController extends Controller
     }
 
     public function userList(Request $request) {
+        $current_user = '';
+        if(session()->has('checking_user') && session()->get('checking_user') != '') {
+            $current_user = session()->get('checking_user');
+        }
+        
+        
         $search = $request->search;
-        return $this->respondeWith(User::where('name', 'LIKE', "%{$search}%")->paginate());
+        
+        if ($current_user == '') {
+            $user_query = User::where('name', 'LIKE', "%{$search}%")->paginate();
+        } else {
+            $user_query = User::where('name', 'LIKE', "%{$search}%")
+                          ->where('id', '<>', $current_user)
+                          ->paginate();
+        }
+        
+        return $this->respondeWith($user_query);
         // return $this->respondeWith(User::leftjoin('employee_demo', 'employee_demo.guid', '=', 'users.guid')->where('name', 'LIKE', "%{$search}%")->paginate());
     }
 
