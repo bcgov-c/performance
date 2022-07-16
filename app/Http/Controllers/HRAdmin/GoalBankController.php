@@ -1864,7 +1864,7 @@ class GoalBankController extends Controller
             ->where('admin_orgs.user_id', '=', Auth::id())
             ->where('goals.id', '=', 'goal_tags.goal_id'); 
         } )
-        ->where('is_library', true)
+        // ->where('is_library', true)
         ->delete();
         $query2 = GoalBankOrg::where('goal_id', '=', $goal_id)
         ->whereExists(function($exist) {
@@ -1882,7 +1882,7 @@ class GoalBankController extends Controller
             ->where('admin_orgs.user_id', '=', Auth::id())
             ->where('goals.id', '=', 'goal_bank_orgs.goal_id');
         })
-        ->where('is_library', true)
+        // ->where('is_library', true)
         ->delete();
         $query3 = DB::table('goals_shared_with')
         ->where('goal_id', '=', $goal_id)
@@ -1901,13 +1901,14 @@ class GoalBankController extends Controller
             ->where('admin_orgs.user_id', '=', Auth::id())
             ->where('goals.id', '=', 'goals_shared_with.goal_id');
         })
-        ->where('is_library', true)
+        // ->where('is_library', true)
         ->delete();
         $query4 = DB::table('goals')
         ->where('id', '=', $goal_id)
         ->whereExists(function($exist) {
             $exist->select(DB::raw(1))
-            ->from('users', 'users.id', '=', 'goals.user_id')
+            ->from('users')
+            ->where('users.id', '=', 'goals.user_id')
             ->join('employee_demo', 'employee_demo.guid', '=', 'users.guid')
             ->join('admin_orgs', function($join) {
                 $join->on('employee_demo.organization', '=', 'admin_orgs.organization')
@@ -1919,7 +1920,7 @@ class GoalBankController extends Controller
             ->where('admin_orgs.user_id', '=', Auth::id())
             ->where('goals.id', '=', 'goals_shared_with.goal_id');
         })
-        ->where('is_library', true)
+        // ->where('is_lisbrary', true)
         ->delete();
         return redirect()->back();
     }
