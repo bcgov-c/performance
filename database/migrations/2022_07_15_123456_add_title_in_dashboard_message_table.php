@@ -15,7 +15,7 @@ class AddTitleInDashboardMessageTable extends Migration
     {
         Schema::table('dashboard_message', function (Blueprint $table) {
             $table->text('title')->nullable()->first();
-            $table->text('id')->first()->unique();
+            $table->id()->first();
         });
     }
 
