@@ -747,8 +747,8 @@ class GoalBankController extends Controller
         // notify_on_dashboard when new goal added
         $this->notify_on_dashboard($resultrec, $notify_audiences);
 
-        // Send Out Email notification when new goal added
-        $this->notify_employees($resultrec, $notify_audiences);
+        // // Send Out Email notification when new goal added
+        // $this->notify_employees($resultrec, $notify_audiences);
 
         return redirect()->route(request()->segment(1).'.goalbank')
             ->with('success', 'Create new goal bank successful.');
