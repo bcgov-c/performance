@@ -15,7 +15,7 @@ class AddEmployeeIdInUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             //
-            $table->string('employee_id')->nullable()->after('password');
+            $table->string('employee_id')->nullable()->first();
             $table->unsignedBigInteger('empl_record')->nullable()->after('employee_id');
 
             $table->index(['employee_id', 'empl_record']);

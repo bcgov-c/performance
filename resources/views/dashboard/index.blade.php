@@ -55,11 +55,20 @@
             </div>
         </div>
     </div>
+
     @include('dashboard.partials.shared_with_view-modal')
-    @include('dashboard.partials.message-modal')
+    @include('dashboard.partials.message-modal', ['content' => $message->message])
+
     @push('js')
+        {{-- <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script> --}}
         <script>
             $(document).ready(function(){
+                
+                @if(!empty(Session::get('displayModalMessage'))) 
+                    $("#messageModal").modal();
+                @endif
+
                 $('[data-toggle="popover"]').popover();
             });
 
@@ -72,8 +81,19 @@
                 });
             });
 
-
-
         </script>
+
+
+        <script type="text/javascript">
+            // $("#modalMessage").modal();
+
+            // @if(!empty(Session::get('displayModalMessage'))) 
+            //     // $("#messageModal modal-title").html('{{ $message->title }}');
+            //     // $("#messageModal modal-body data-placeholder").html('{{ $message->message }}');
+            //     // console.log("Show message");
+            //     $("#messageModal").modal('show');
+            // @endif
+        </script>
+
     @endpush
 </x-side-layout>
