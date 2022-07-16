@@ -277,7 +277,7 @@ class ConversationController extends Controller
         array_push($sendMail->bindvariables, $conversation->user->name );
         array_push($sendMail->bindvariables, $conversation->topic->name );
         array_push($sendMail->bindvariables, $conversation->warningMessage()[0] );
-        $response = $sendMail->sendMailWithGenericTemplate();
+        // $response = $sendMail->sendMailWithGenericTemplate();
 
         if(request()->ajax()){
             return response()->json(['success' => true, 'message' => 'Conversation Created successfully']);
@@ -482,7 +482,7 @@ class ConversationController extends Controller
         array_push($sendMail->bindvariables, implode(", ", $to_names) );
         array_push($sendMail->bindvariables, $current_user->name );   //Person who signed the conversation 
         array_push($sendMail->bindvariables, $conversation->topic->name );  // Conversation topic
-        $response = $sendMail->sendMailWithGenericTemplate();
+        // $response = $sendMail->sendMailWithGenericTemplate();
 
         return response()->json(['success' => true, 'Message' => 'Sign Off Successfull', 'data' => $conversation]);
     }
