@@ -29,6 +29,8 @@ class AddTitleInDashboardMessageTable extends Migration
         Schema::table('dashboard_message', function (Blueprint $table) {
             if(Schema::hasColumn('dashboard_message', 'title')) {
                 $table->dropColumn('title');
+            }
+            if(Schema::hasColumn('dashboard_message', 'id')) {
                 $table->dropColumn('id');
             }
         });
