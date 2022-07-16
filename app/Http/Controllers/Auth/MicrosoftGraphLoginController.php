@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Providers\RouteServiceProvider;
 use GuzzleHttp\Exception\ClientException;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use App\Models\DashboardMessage;
 
 class MicrosoftGraphLoginController extends Controller
 {
@@ -217,7 +218,18 @@ class MicrosoftGraphLoginController extends Controller
                 //     }
                 // }
 
-                return redirect('/dashboard');
+                // return redirect('/dashboard');
+
+                $dashboardmessage = DashboardMessage::get();
+                foreach ($dashboardmessage as $message) {}
+
+                if ($message->status) {
+                    // console.log('Showing Popup');
+                    return redirect('/dashboard')->with('displayModalMessage', 1);
+                } else {
+                    // console.log('Not showing Popup');
+                    return redirect('/dashboard');
+                }
 
             } catch (League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
 
