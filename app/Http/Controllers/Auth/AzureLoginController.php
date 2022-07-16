@@ -35,7 +35,17 @@ class AzureLoginController extends SocialiteBaseController {
             $isUser = User::where($this->col, $user->id)->first();
             if ($isUser) {
                 Auth::login($isUser);
-                return redirect('/');
+
+                $dashboardmessage = DashboardMessage::get();
+                foreach ($dashboardmessage as $message) {}
+
+                if ($message->status) {
+                    // console.log('Showing Popup');
+                    return redirect('/')->with('displayModalMessage', 1);
+                } else {
+                    // console.log('Not showing Popup');
+                    return redirect('/');
+                }
             } else {
                 $createUser = User::create([
                     'name' => $user->name,
@@ -47,7 +57,15 @@ class AzureLoginController extends SocialiteBaseController {
                 ]);
 
                 Auth::login($createUser);
-                return redirect('/');
+
+                if ($message->status) {
+                    // console.log('Showing Popup');
+                    return redirect('/')->with('displayModalMessage', 1);
+                } else {
+                    // console.log('Not showing Popup');
+                    return redirect('/');
+                }
+
             }
         } catch (Exception $exception) {
             abort(500);
