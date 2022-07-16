@@ -620,7 +620,7 @@ class GoalController extends Controller
                     array_push($sendMail->bindvariables,  $user->name );    // %2 Person who added the comment
                     array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
                     array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
-                    $response = $sendMail->sendMailWithGenericTemplate();
+                    // $response = $sendMail->sendMailWithGenericTemplate();
 
                 }
             }
@@ -644,7 +644,7 @@ class GoalController extends Controller
                     array_push($sendMail->bindvariables,  $user->reportingManager->name );    // %2 Person who added the comment
                     array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
                     array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
-                    $response = $sendMail->sendMailWithGenericTemplate();
+                    // $response = $sendMail->sendMailWithGenericTemplate();
                 }
             }
 
@@ -668,7 +668,7 @@ class GoalController extends Controller
                 array_push($sendMail->bindvariables, $curr_user->name);    // %2 Person who added the comment
                 array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
                 array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
-                $response = $sendMail->sendMailWithGenericTemplate();
+                // $response = $sendMail->sendMailWithGenericTemplate();
             }
 
         }
