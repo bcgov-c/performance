@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\SocialiteBaseController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+use App\Models\DashboardMessage;
 
 class AzureLoginController extends SocialiteBaseController {
 
