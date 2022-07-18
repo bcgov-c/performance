@@ -1855,7 +1855,7 @@ class GoalBankController extends Controller
         $query3 = DB::table('goals_shared_with')
         ->where('goal_id', '=', $goal_id)
         ->delete();
-        $query4 = Goals::where('goals.id', '=', $goal_id)
+        $query4 = Goal::where('goals.id', '=', $goal_id)
         ->where('goals.is_library', true)
         ->delete();
         return redirect()->back();
