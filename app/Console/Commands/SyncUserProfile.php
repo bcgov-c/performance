@@ -234,7 +234,9 @@ class SyncUserProfile extends Command
         $users = User::whereNotNull('guid')
             ->whereNotIn('guid',function($query) { 
                 $query->select('guid')->from('employee_demo')
-                    ->whereIn('organization', ['BC Public Service Agency']);
+                    ->whereIn('organization', ['BC Public Service Agency',
+                                                'Royal BC Museum', 
+                                                'Social Development and Poverty Reduction']);
         })->update(['acctlock'=>true, 'last_sync_at' => $new_sync_at]);
 
         echo now();
