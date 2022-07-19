@@ -711,6 +711,7 @@ class GoalBankController extends Controller
         
         if($request->opt_audience == "byEmp") {
             $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
+            // $selected_emp_ids = $request->userCheck ? $request->userCheck : [];
             $toRecipients = EmployeeDemo::select('users.id')
             ->join('users', 'employee_demo.guid', 'users.guid')
             ->whereIn('employee_demo.employee_id', $selected_emp_ids )
@@ -732,7 +733,7 @@ class GoalBankController extends Controller
         }
 
         if($request->opt_audience == "byOrg") {
-            $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
+            $selected_org_nodes = $request->eorgCheck ? $request->eorgCheck : [];
             $organizationList = OrganizationTree::select('id', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
             ->whereIn('id', $selected_org_nodes)
             ->distinct()
@@ -1077,7 +1078,7 @@ class GoalBankController extends Controller
 
     public function updategoal(Request $request) 
     {
-        $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
+        $selected_org_nodes = $request->orgCheck ? $request->orgCheck : [];
         $current_user = Auth::id();
 
             $organizationList = OrganizationTree::select('id', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
