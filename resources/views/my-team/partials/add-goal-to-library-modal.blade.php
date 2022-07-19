@@ -19,10 +19,16 @@
             @csrf
             <div class="row">
                 <div class="col-6">
-                    <x-tooltip-dropdown-outside name="goal_type_id" :options="$goaltypes" label="Goal Type" popoverstr="{{$type_desc_str}}" tooltipField="description" displayField="name" />
+                    <b>Goal Type</b>
+                    <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="{{$type_desc_str}}"> </i>
+                    <!-- <x-tooltip-dropdown-outside name="goal_type_id" :options="$goaltypes" label="Goal Type" popoverstr="{{$type_desc_str}}" tooltipField="description" displayField="name" /> -->                    
+                    <x-dropdown :list="$goaltypes" name="goal_type_id" />
                 </div>
                 <div class="col-6">
-                    <x-input-modal label="Goal Title" name="title"  tooltip='A short title (1-3 words) used to reference the goal throughout the Performance platform.' />
+                    <b>Goal Title</b>
+                    <!-- <x-input-modal label="Goal Title" name="title"  tooltip='A short title (1-3 words) used to reference the goal throughout the Performance Development Platform.' /> -->
+                    <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>                        
+                    <x-input-modal name="title" />                    
                 </div>                
                 <div class="col-sm-6">
                         <b>Tags</b>
@@ -32,15 +38,25 @@
                         <small  class="text-danger error-tag_ids"></small>
                 </div>
                 <div class="col-12">
-                    <label style="font-weight: normal;">
+                    <!-- <label style="font-weight: normal;"> -->
                         <b>Goal Description</b>
-                        <p class="py-2">Each goal should include a description of <b>WHAT</b><x-tooltip-modal text='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative MyPerformance sessions to ministry audiences".' /> you will accomplish, <b>WHY</b><x-tooltip-modal text='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".' /> it is important, and <b>HOW</b><x-tooltip-modal text='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the need of their employees in advance of each phase of the performance management cycle".'/> you will achieve it.</p>
-                        <textarea id="what" label="Goal Description" name="what" ></textarea>
+                        <!-- <p class="py-2">Each goal should include a description of <b>WHAT</b><x-tooltip-modal text='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".' /> you will accomplish, <b>WHY</b><x-tooltip-modal text='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".' /> it is important, and <b>HOW</b><x-tooltip-modal text='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process.".'/> you will achieve it.</p> -->
+                        <p>
+				        Each goal should include a description of <b>WHAT</b>  
+				        <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".'> </i> you will accomplish, <b>WHY</b> 
+				        <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important,, and <b>HOW</b> 
+				        <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> you will achieve it. 
+				        </p>                                                                                          
+                        <!-- <textarea id="what" label="Goal Description" name="what" ></textarea> -->                        
+                        <x-textarea-modal id="what" name="what" />
                         <small class="text-danger error-what"></small>
-                    </label>
+                    <!-- </label> -->
                 </div>
                 <div class="col-12">
-                    <x-textarea-modal id="measure_of_success" label="Measures of Success" name="measure_of_success" tooltip='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"'  />
+                    <b>Measures of Success</b>
+                    <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"'> </i>                        
+                    <!-- <x-textarea-modal id="measure_of_success" label="Measures of Success" name="measure_of_success" tooltip='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"'  /> -->
+                    <x-textarea-modal id="measure_of_success" name="measure_of_success"/>
                     <small class="text-danger error-measure_of_success"></small>
                 </div>
                 <div class="col-sm-6">
@@ -50,23 +66,23 @@
                     <x-input label="End Date" type="date" name="target_date" id="target_date" />
                 </div>
                 <div class="col-6">
-                    <label>
-                        Mandatory/Suggested
+                    <!-- <label> -->
+                        <b>Mandatory/Suggested</b>
                         <select class="form-control" name="is_mandatory">
                             <option value="1">Mandatory</option>
                             <option value="0">Suggested</option>
                         </select>
-                    </label>
+                    <!-- </label> -->
                 </div>
                 <div class="col-6">
-                    <label>
-                        Audience <br>
+                    <!-- <label> -->
+                        <b>Audience</br>
                         <select multiple class="form-control items-to-share" name="itemsToShare[]">
                             @foreach ($employees_list as $employee)
-                                <option value="{{ $employee["id"] }}" selected> {{$employee["name"]}}</option>
+                                <option value="{{ $employee['id'] }}" selected> {{$employee["name"]}}</option>                                
                             @endforeach
                         </select>
-                    </label>
+                    <!-- </label> -->
                     <small class="text-danger error-share_with"></small>
                 </div>
             </div>
@@ -84,19 +100,43 @@
   </div>
 </div>
 
-@push('js')
+@push('js')    
     <script>
 
         $('body').popover({
             selector: '[data-toggle]',
-            trigger: 'hover',
+            trigger: 'click',
         });
         
         $('.modal').popover({
             selector: '[data-toggle-select]',
             trigger: 'click',
         });
+
+        $(".tags").multiselect({
+                	enableFiltering: true,
+                	enableCaseInsensitiveFiltering: true,
+					// nonSelectedText: null,
+            	});              
+                
+		$('body').on('click', function (e) {
+            $('[data-toggle=popover]').each(function () {
+            // hide any open popovers when the anywhere else in the body is clicked
+               	if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                        $(this).popover('hide');
+                    	}
+             	});
+		});
         
+        $('body').on('click', function (e) {
+            $('[data-toggle=dropdown]').each(function () {
+            // hide any open popovers when the anywhere else in the body is clicked
+               	if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                        $(this).popover('hide');
+                    	}
+             	});
+		}); 
+
         $(document).on('show.bs.modal', '#addGoalModal', function(e) {
             $('#what').val('');
             $('#measure_of_success').val('');
