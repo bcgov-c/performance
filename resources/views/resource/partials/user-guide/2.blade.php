@@ -13,13 +13,13 @@
     <br>
     <li>Click the “My Supervisor&rsquo;s Goals” tab. This takes you to a list of goals that your supervisor is currently working on and has decided to share with you. You can use this information to align your own goals where possible. You can also copy your supervisor&rsquo;s goal to your own profile and modify or personalize it without having any impact on your supervisor's original goal.</li>
 </ol>
-<p>Once you have added a new goal to your My Current Goals tab, you will see it displayed as clickable card. You can open the goal card to edit the content or add comments. You can also change the status of the goal if it has been achieved, not met, cancelled or deferred. Once you change the status, the goal will be transferred to your My Past Goals tab.</p>
+<p>Once you have added a new goal to your My Current Goals tab, you will see it display as a clickable card. You can open the goal card to edit the content or add comments. You can also change the status of the goal if it has been achieved, not met, cancelled or deferred. Once you change the status, the goal will be transferred to your My Past Goals tab.</p>
 <p><i>Supervisor Tip: you will see an additional option on your goal cards called “Shared with”. This dropdown menu allows you to make a goal visible to selected employees. This lets team members know what you are working on and may help team members set their own goals. By default, all your goals are private.</i></p>
 <br>
 
 <u>My Past Goals</u>
 <br><br>
-<p>This area lists all your goals that have previously been achieved, not met, cancelled, or deferred. You can reactive the goals by changing the status to “Active” and moving them to back to your My Current Goals tab.</p>
+<p>This area lists all your goals that have previously been achieved, not met, cancelled, or deferred. You can reactivate the goals by changing the status to “Active” and moving them to back to your My Current Goals tab.</p>
 <p>This list can be a useful reference point to recall all the work you&rsquo;ve done when preparing for performance conversations or applying for a new position.</p>
 <br>
 
