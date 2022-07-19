@@ -5,7 +5,7 @@
 <br><br>
 <p>Clicking on the Yes/No below the “Shared” column header launches the employee share window. This provides details of anyone that currently has supervisor level access to the employee&rsquo;s profile and allows you to add additional shared access.</p>
 <p>You can share all or part of an employee's PDP profile with another supervisor or staff for a legitimate business reason. The full profile or the Conversations section should only be shared with people who normally handle employees' permanent personnel records (i.e. Public Service Agency or co-supervisors). The Goals section can be shared more broadly (i.e. with project team leads) to encourage collaboration and feedback on specific goals.</p>
-<p>An employee may also wish to share their profile with someone other than a direct supervisor (for example, a hiring manager). In order to do this - the employee's consent is required.</p>
+<p>An employee may also wish to share their profile with someone other than a direct supervisor (for example, a hiring manager). In order to do this - the employee's consent is required. If you require assistance with sharing an employee, please submit a ticket through <a target="blank" href="https://www2.gov.bc.ca/gov/content/careers-myhr">AskMyHR</a> to My Team or Organization > HR Software Systems Support > Performance Development Platform.</p>
 <br>
 
 <u>Excused Status</u>
