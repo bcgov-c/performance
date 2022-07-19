@@ -12,7 +12,7 @@
 <u>Open Conversations</u>
 <br><br>
 <p>This area lists all planned or in progress conversations that have yet to be signed-off by both employee and supervisor. Each open conversations includes an optional list of questions to help guide the conversation, text boxes to capture major conversation outcomes, and an attestation and sign-off area to formalize the results.</p>
-<p>Once a conversation has been signed-off by both participants, it moves to the Completed Conversations tab and becomes an official performance development record for the employee. Their next performance conversation deadline will be set for the sign-off date plus four months</p>
+<p>Once a conversation has been signed-off by both participants, it moves to the Completed Conversations tab and becomes an official performance development record for the employee. Their next performance conversation deadline will be set for the sign-off date plus four months.</p>
 <br>
 
 <u>Completed Conversations</u>
