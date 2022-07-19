@@ -329,7 +329,6 @@ class MyTeamController extends Controller
 
     public function addGoalToLibrary(AddGoalToLibraryRequest $request) {
         $input = $request->validated();
-        $input['created_by'] = Auth::id();
         $input['user_id'] = Auth::id();
         $input['is_library'] = true;
         
