@@ -218,10 +218,28 @@ class GoalController extends Controller
     * @param  int  $id
     * @return \Illuminate\Http\Response
     */
-    public function update(CreateGoalRequest $request, $id)
-    {
-        $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->findOrFail($id);
-        $input = $request->validated();
+    public function update(Request $request, $id)
+    {        
+        $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->findOrFail($id); 
+        if ($request->title == '' || $request->what== '') {
+            if($request->title == '') {
+                $request->session()->flash('title_miss', 'The title field is required');
+            } elseif($request->what == '') {
+                $request->session()->flash('what_miss', 'The description field is required');
+            }                
+            return \Redirect::route('goal.edit', [$id])->with('message', " There are one or more errors on the page. Please review and try again.");
+        } else {
+            //$input = $request->validated();
+            $input["title"] = $request->title;
+            $input["start_date"] = $request->start_date;
+            $input["target_date"] = $request->target_date;
+            $input["what"] = $request->what;
+            $input["why"] = $request->why;
+            $input["how"] = $request->how;
+            $input["measure_of_success"] = $request->measure_of_success;
+            $input["goal_type_id"] = $request->goal_type_id;
+            $input["tag_ids"] = $request->tag_ids;
+        }
         
         $tags = '';
         if(isset($input['tag_ids'])) {
