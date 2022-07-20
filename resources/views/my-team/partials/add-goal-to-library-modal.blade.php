@@ -196,6 +196,8 @@
                 },
                 error: function (error){
                     var errors = error.responseJSON.errors;
+                    $('.alert-danger').show();
+                    $('.modal-body').animate({scrollTop: 0},100);
                     $('.text-danger').each(function(i, obj) {
                         $('.text-danger').text('');
                     });
