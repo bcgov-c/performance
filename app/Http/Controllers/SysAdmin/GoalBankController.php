@@ -2010,7 +2010,18 @@ public function agetOrganizations(Request $request) {
                 'goals.is_mandatory',
                 'ced.employee_name as creator_name',
             )
-            ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)])
+            ->addSelect(['org_audience' => 
+                GoalBankOrg::whereColumn('goal_id', 'goals.id')
+                // ->join('employee_demo', function ($sj) {
+                //     $sj->whereRAW("nullif(employee_demo.organization,'')=nullif(goal_bank_orgs.organization,'')")
+                //     ->whereRAW("nullif(employee_demo.level1_program,'')=nullif(goal_bank_orgs.level1_program,'')")
+                //     ->whereRAW("nullif(employee_demo.level2_division,'')=nullif(goal_bank_orgs.level2_division,'')")
+                //     ->whereRAW("nullif(employee_demo.level3_branch,'')=nullif(goal_bank_orgs.level3_branch,'')")
+                //     ->whereRAW("nullif(employee_demo.level4,'')=nullif(goal_bank_orgs.level4,'')");
+                // } )
+                ->selectRAW('count(distinct goal_bank_orgs.id)')
+            ] )
+            ->addSelect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)])
             ;
             return Datatables::of($query)
             ->addIndexColumn()
@@ -2032,28 +2043,29 @@ public function agetOrganizations(Request $request) {
             ->addColumn('audience', function ($row) {
                 return '<a href="'.route(request()->segment(1).'.goalbank.editone', $row->id).'" aria-label="Edit Goal For Individuals" value="'.$row->id.'">'.$row->sharedWith()->count().' Employees</a>';
             })
-            ->addColumn('org_audience', function ($row) {
-                $orgCount = GoalBankOrg::join('employee_demo', function ($j1) {
-                    $j1->on(function ($j1a) {
-                        $j1a->whereRAW('goal_bank_orgs.organization = employee_demo.organization OR ((goal_bank_orgs.organization = "" OR goal_bank_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
-                    } )
-                    ->on(function ($j2a) {
-                        $j2a->whereRAW('goal_bank_orgs.level1_program = employee_demo.level1_program OR ((goal_bank_orgs.level1_program = "" OR goal_bank_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
-                    } )
-                    ->on(function ($j3a) {
-                        $j3a->whereRAW('goal_bank_orgs.level2_division = employee_demo.level2_division OR ((goal_bank_orgs.level2_division = "" OR goal_bank_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
-                    } )
-                    ->on(function ($j4a) {
-                        $j4a->whereRAW('goal_bank_orgs.level3_branch = employee_demo.level3_branch OR ((goal_bank_orgs.level3_branch = "" OR goal_bank_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
-                    } )
-                    ->on(function ($j5a) {
-                        $j5a->whereRAW('goal_bank_orgs.level4 = employee_demo.level4 OR ((goal_bank_orgs.level4 = "" OR goal_bank_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
-                    } );
-                } )
-                ->where('goal_bank_orgs.goal_id', '=', $row->id)
-                ->groupBy('goal_bank_orgs.goal_id')
-                ->count();
-                return '<a href="'.route(request()->segment(1).'.goalbank.editpage', $row->id).'" aria-label="Edit Goal For Business Units" value="'.$row->id.'">'.$orgCount.' Employees</a>';
+            ->editColumn('org_audience', function ($row) {
+            // ->addColumn('org_audience', function ($row) {
+            //     $orgCount = GoalBankOrg::join('employee_demo', function ($j1) {
+            //         $j1->on(function ($j1a) {
+            //             $j1a->whereRAW('goal_bank_orgs.organization = employee_demo.organization OR ((goal_bank_orgs.organization = "" OR goal_bank_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+            //         } )
+            //         ->on(function ($j2a) {
+            //             $j2a->whereRAW('goal_bank_orgs.level1_program = employee_demo.level1_program OR ((goal_bank_orgs.level1_program = "" OR goal_bank_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+            //         } )
+            //         ->on(function ($j3a) {
+            //             $j3a->whereRAW('goal_bank_orgs.level2_division = employee_demo.level2_division OR ((goal_bank_orgs.level2_division = "" OR goal_bank_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+            //         } )
+            //         ->on(function ($j4a) {
+            //             $j4a->whereRAW('goal_bank_orgs.level3_branch = employee_demo.level3_branch OR ((goal_bank_orgs.level3_branch = "" OR goal_bank_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+            //         } )
+            //         ->on(function ($j5a) {
+            //             $j5a->whereRAW('goal_bank_orgs.level4 = employee_demo.level4 OR ((goal_bank_orgs.level4 = "" OR goal_bank_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+            //         } );
+            //     } )
+            //     ->where('goal_bank_orgs.goal_id', '=', $row->id)
+            //     ->groupBy('goal_bank_orgs.goal_id')
+            //     ->count();
+                return '<a href="'.route(request()->segment(1).'.goalbank.editpage', $row->id).'" aria-label="Edit Goal For Business Units" value="'.$row->id.'">'.$row->org_audience.' Business Units</a>';
             })
             ->addcolumn('action', function($row) {
                 $btn = '<a href="/'.request()->segment(1).'/goalbank/deletegoal/' . $row->id . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->id .'"><i class="fa fa-trash"></i></a>';
