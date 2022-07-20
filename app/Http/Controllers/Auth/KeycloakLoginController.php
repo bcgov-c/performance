@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use Auth;
+use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\DashboardMessage;
 use App\Http\Controllers\Controller;
 use Laravel\Socialite\Facades\Socialite;
-use Carbon\Carbon;
 
 class KeycloakLoginController extends Controller
 {
@@ -49,7 +50,17 @@ class KeycloakLoginController extends Controller
                 Auth::loginUsingId($isUser->id);
                 $request->session()->regenerate();
 
-                return redirect('/');
+                $dashboardmessage = DashboardMessage::get();
+                foreach ($dashboardmessage as $message) {}
+
+                if ($message->status) {
+                    // console.log('Showing Popup');
+                    return redirect('/dashboard')->with('displayModalMessage', 1);
+                } else {
+                    // console.log('Not showing Popup');
+                    return redirect('/dashboard');
+                }
+                // return redirect('/');
 
             } else {
 
