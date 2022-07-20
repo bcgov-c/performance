@@ -1640,7 +1640,7 @@ class StatisticsReportController extends Controller
 
       $sql = User::selectRaw("users.employee_id, users.email, users.excused_start_date, users.excused_end_date,
                             users.excused_reason_id, users.reporting_to,
-                    employee_name, organization, level1_program, level2_division, level3_branch, level4,
+                    employee_demo.employee_name, employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
                     case when date(SYSDATE()) between excused_start_date and excused_end_date then 'Yes' else 'No' end as excused")
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.guid', '=', 'users.guid');
