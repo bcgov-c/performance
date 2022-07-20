@@ -6,6 +6,7 @@ use Auth;
 use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\SharedProfile;
 use App\Models\DashboardMessage;
 use App\Http\Controllers\Controller;
 use Laravel\Socialite\Facades\Socialite;
@@ -154,6 +155,10 @@ class KeycloakLoginController extends Controller
         // User was found, then update the signin information
         if ($isUser) {
 
+            if (!($isUser->hasRole('employee'))) {
+                $isUser->assignRole('employee');
+            }
+
             if ($isUser->keycloak_id != $keycloak_user->getId()) {
                 // Assign values
                 $isUser->identity_provider = $identity_provider;
@@ -163,6 +168,9 @@ class KeycloakLoginController extends Controller
 
             $isUser->last_signon_at = now();
             $isUser->save();
+
+            // Grant or Remove 'Supervisor' Role based on ODS demo database
+            $this->assignSupervisorRole( $isUser );
 
             // Insert record into Access Log 
             \App\Models\AccessLog::create([
@@ -181,4 +189,40 @@ class KeycloakLoginController extends Controller
         
     }
 
+    private function assignSupervisorRole(User $user)
+    {
+
+        $role = 'Supervisor';
+
+        $isManager = false;
+        $hasSharedProfile = false;
+
+        // To determine the login user whether is manager or not 
+           // To determine the login user whether is manager or not 
+           $mgr = User::where('reporting_to', $user->id)->first();
+           if ($mgr) {
+               $isManager = true;
+           } else {
+               $isManager = false;
+           }
+
+        // To determine the login user whether has shared profile
+        $sp = SharedProfile::where('shared_with', $user->id )->first();
+        if ($sp) {
+            $hasSharedProfile = true;
+        } else {
+            $hasSharedProfile = false;
+        }
+
+        // Assign/Rovoke Role when is manager or has shared Profile
+        if ($user->hasRole($role)) {
+            if (!($isManager or $hasSharedProfile)) {
+                $user->removeRole($role);
+            }
+        } else {
+            if ($isManager or $hasSharedProfile) {
+                $user->assignRole($role);
+            }
+        }
+    }
 }
