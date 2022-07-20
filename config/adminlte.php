@@ -375,6 +375,11 @@ return [
                     'url'  => 'sysadmin/statistics/sharedsummary',
                     'active' => ['sysadmin/statistics/*']
                 ],
+                [
+                    'text' => 'System Security',
+                    'url'  => 'sysadmin/system-security/access-logs',
+                    'active' => ['sysadmin/system-security/*']
+                ],
             ],
         ],
         [

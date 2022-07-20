@@ -75,10 +75,12 @@ class KeycloakLoginController extends Controller
     public function destroy(Request $request)
     {
 
+        
         // Update logout time in Access Log
+        $login_method = empty(session('accessToken')) ? 'Laravel UI' : 'Keycloak';
         $accessLog = \App\Models\AccessLog::where('user_id', Auth::Id() )
                                         ->whereNull('logout_at')
-                                        ->where('login_method', 'Keycloak')
+                                        ->where('login_method', $login_method)
                                         ->orderBy('login_at', 'desc')
                                         ->first();   
         if ($accessLog) {
@@ -89,6 +91,7 @@ class KeycloakLoginController extends Controller
         // Determine whether signon Azure or local database
         if (empty(session('accessToken'))) {
             $back_url = ('/login');
+
         } else {
             $back = urlencode(url('/login'));
             $back_url = env('KEYCLOAK_BASE_URL').'/realms/'.env('KEYCLOAK_REALM').'/protocol/openid-connect/logout?redirect_uri='.$back; // Redirect to Keycloak
