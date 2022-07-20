@@ -2,16 +2,17 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SysadminController;
-use App\Http\Controllers\SysAdmin\EmployeeListController;
 use App\Http\Controllers\GenericTemplateController;
 use App\Http\Controllers\SysAdmin\GoalBankController;
+use App\Http\Controllers\SysAdmin\AccessLogController;
+use App\Http\Controllers\SysAdmin\EmployeeListController;
 use App\Http\Controllers\SysAdmin\NotificationController;
 use App\Http\Controllers\SysAdmin\EmployeeSharesController;
+use App\Http\Controllers\SysAdmin\SysAdminSharedController;
 use App\Http\Controllers\SysAdmin\ExcuseEmployeesController;
-use App\Http\Controllers\SysAdmin\SysadminStatisticsReportController;
 use App\Http\Controllers\SysAdmin\AccessPermissionsController;
 use App\Http\Controllers\SysAdmin\UnlockConversationController;
-use App\Http\Controllers\SysAdmin\SysAdminSharedController;
+use App\Http\Controllers\SysAdmin\SysadminStatisticsReportController;
 
 
 Route::group(['middleware' => ['role:Sys Admin']], function () 
@@ -165,6 +166,9 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/notifications/employees/{id}', [NotificationController::class,'getEmployees']);
         Route::get('/sysadmin/notifications/employee-list', [NotificationController::class, 'getDatatableEmployees'])->name('sysadmin.notifications.employee.list');
     });
+
+    // System Security -- Access Log 
+    Route::get('/sysadmin/system-security/access-logs', [AccessLogController::class, 'index'])->name('sysadmin.system_security.access_logs');
 
     //Shared Employees
     Route::group(['middleware' => ['auth']], function() {    

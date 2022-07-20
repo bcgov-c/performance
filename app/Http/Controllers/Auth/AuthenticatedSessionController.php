@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Providers\RouteServiceProvider;
@@ -46,6 +47,15 @@ class AuthenticatedSessionController extends Controller
         $user->last_signon_at = now();
         $user->save();
 
+        // Write to access log
+        \App\Models\AccessLog::create([
+            'user_id' => $user->id,
+            'login_at' => Carbon::now(), 
+            'login_ip' => $request->getClientIp(),
+            'login_method' => 'Laravel UI',
+       ]);
+
+
         // Grant or Remove 'Supervisor' Role based on ODS demo database
         $this->assignSupervisorRole($user);
 
@@ -69,6 +79,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request)
     {
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
