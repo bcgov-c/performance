@@ -71,6 +71,11 @@
         <form id="goal_form" action="{{ route ('goal.store')}}" method="POST">
             @csrf
             <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-danger" style="display:none">
+                        <i class="fa fa-info-circle"></i> There are one or more errors on the page. Please review and try again.
+                    </div>
+                </div>
                 <div class="col-6">
                     <div>
                         <b>Goal Type</b>
@@ -271,6 +276,8 @@
                 }
             },
             error: function (error){
+                $('.alert-danger').show();
+                $('.modal-body').animate({scrollTop: 0},100);
                 var errors = error.responseJSON.errors;
                 $('.text-danger').each(function(i, obj) {
                     $('.text-danger').text('');
@@ -399,7 +406,7 @@
         
         $(document).ready(function(){
             $(":button").removeClass('text-center');
-            $(":button").addClass('text-left');
+            $(":button").addClass('text-left');            
         });
               
 </script>    
@@ -409,6 +416,12 @@
             overflow: hidden;
             text-overflow: ellipsis;
             width: 275px;
+    }
+    
+    .alert-danger {
+        color: #a94442;
+        background-color: #f2dede;
+        border-color: #ebccd1;
     }
 </style>    
  
