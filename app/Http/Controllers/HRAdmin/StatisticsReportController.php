@@ -330,8 +330,8 @@ class StatisticsReportController extends Controller
 
         $from_stmt = $this->goalSummary_from_statement($request->goal);
 
-        $sql = User::selectRaw('A.*, goals_count, employee_name, 
-                                organization, level1_program, level2_division, level3_branch, level4')
+        $sql = User::selectRaw('A.*, goals_count, employee_demo.employee_name, 
+                                employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4')
                 ->from(DB::raw( $from_stmt ))                                
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.guid', '=', 'A.guid');
@@ -456,7 +456,7 @@ class StatisticsReportController extends Controller
                     ->orderBy('name')->get();
 
         $count_raw = "users.*, ";
-        $count_raw .= " employee_name, organization, level1_program, level2_division, level3_branch, level4";
+        $count_raw .= " employee_demo.employee_name, employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4";
         if (!$request->tag || $request->tag == '[Blank]') {
             $count_raw .= " ,(select count(*) from goals ";
             $count_raw .= "    where users.id = goals.user_id ";
@@ -896,8 +896,8 @@ class StatisticsReportController extends Controller
         $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
 
         // SQL - Chart 1
-        $sql_chart1 = User::selectRaw("users.*, employee_name, 
-                        organization, level1_program, level2_division, level3_branch, level4,
+        $sql_chart1 = User::selectRaw("users.*, employee_demo.employee_name, 
+                        employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
                     DATEDIFF (
                             COALESCE (
                                 (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )  
@@ -971,8 +971,8 @@ class StatisticsReportController extends Controller
                 ->where('admin_orgs.user_id', '=', Auth::id());
                 
         // SQL - Chart 2
-        $sql_chart2 = Conversation::selectRaw("conversations.*, users.employee_id, employee_name, 
-                        organization, level1_program, level2_division, level3_branch, level4,
+        $sql_chart2 = Conversation::selectRaw("conversations.*, users.employee_id, employee_demo.employee_name, 
+                        employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
                     DATE_ADD(
                         COALESCE (
                             (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )  
@@ -1060,8 +1060,8 @@ class StatisticsReportController extends Controller
                 ->with('signoff_supervisor:id,name');
 
          // SQL for Chart 3
-         $sql_chart3 = Conversation::selectRaw("conversations.*, users.employee_id, employee_name, 
-                    organization, level1_program, level2_division, level3_branch, level4,
+         $sql_chart3 = Conversation::selectRaw("conversations.*, users.employee_id, employee_demo.employee_name, 
+                    employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
                     DATE_ADD(
                         COALESCE (
                             (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )  
