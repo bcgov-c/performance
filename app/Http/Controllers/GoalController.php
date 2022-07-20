@@ -297,13 +297,14 @@ class GoalController extends Controller
             } );
         } )
         ->join('users', 'users.guid', '=', 'employee_demo.guid')
+        ->leftjoin('users as u2', 'u2.id', '=', 'goals.created_by')
         ->where('users.id', '=', Auth::id())
         ->whereIn('goals.by_admin', [1, 2])
         ->where('is_library', true)
         ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
         ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')   
-        ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','users.name as username',DB::raw('group_concat(distinct tags.name) as tagnames'))
+        ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name) as tagnames'))
         ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'users.name', 'goals.is_mandatory');
         $query = Goal::withoutGlobalScope(NonLibraryScope::class)
         ->where('is_library', true)
