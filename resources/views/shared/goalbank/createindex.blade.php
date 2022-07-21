@@ -14,6 +14,13 @@
 		@csrf
 
         <div class="container-fluid">
+                    @if(Session::has('message'))
+                    <div class="col-12">                    
+                        <div class="alert alert-danger" style="display:">
+                            <i class="fa fa-info-circle"></i> {{ Session::get('message') }}
+                        </div>
+                    </div>
+                    @endif
 			<br>
 			<h6 class="text-bold">Step 1. Enter Goal Details</h6>
 			<br>
@@ -28,7 +35,9 @@
 					<b> Goal Title </b>
 					<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>
 					<x-input name="title" />
-					<small class="text-danger error-title"></small>
+					@if(session()->has('title_miss'))
+                                            <small class="text-danger">The title field is required</small>
+                                        @endif
 				</div>
 				<div class="col col-md-2">
 					<x-dropdown :list="$mandatoryOrSuggested" label="Mandatory/Suggested" name="is_mandatory" :selected="request()->is_mandatory" />
@@ -52,7 +61,9 @@
 						<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> you will achieve it. 
 					</p>
 					<x-textarea id="what" name="what"/>
-					<small class="text-danger error-what"></small>
+					@if(session()->has('title_miss'))
+                                            <small class="text-danger">The title field is required</small>
+                                        @endif
 				</div>
 			</div>
 			<div class="row">
@@ -737,3 +748,12 @@
 	</x-slot>
 
 </x-side-layout>
+
+<style>
+    .alert-danger {
+        color: #a94442;
+        background-color: #f2dede;
+        border-color: #ebccd1;
+    }
+    
+</style> 

@@ -57,8 +57,10 @@
     </div>
 
     @include('dashboard.partials.shared_with_view-modal')
+    @if(!empty($message))
     @include('dashboard.partials.message-modal', ['content' => $message->message])
-
+    @endif
+    
     @push('js')
         {{-- <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script> --}}
