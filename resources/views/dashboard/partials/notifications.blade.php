@@ -29,7 +29,7 @@
       <div class="p-2">
         <div class="pl-2 d-flex align-items-center justify-content-center {{$notification->status === null ? "border-left" : ""}}  border-primary" style="border-width:3px !important" id="tr_{{$notification->id}}">
             <input id='ntfyitem' type='checkbox' class='sub_chk' data-id="{{$notification->id}}">
-            <div style="cursor:pointer;" onclick="window.location.href = '{{ $notification->url }}'">
+            <div style="cursor:pointer;" onclick="window.location.href = '{{ route('dashboardmessage.show', $notification->id) }}'">
               <div class="pl-3 d-flex align-items-center justify-content-center flex-row">
                   {{-- <x-profile-pic size="36"></x-profile-pic> --}}
                   <div class="d-flex flex-column">
@@ -59,7 +59,7 @@
               <x-button
                   size="sm"
                   {{-- :href='route("goal.show", $notification->relatedGoal->id)' --}}
-                  :href='$notification->url'
+                  :href='route("dashboardmessage.show", $notification->id)'
                   :tooltip="__('Click to view the details.')"
                   tooltipPosition="bottom" class="mr-2" aria-label="Show Item">{{__('View')}}
 
