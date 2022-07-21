@@ -76,7 +76,7 @@
                 </div>
                 <div class="col-6">
                     <!-- <label> -->
-                        <b>Audience</b>
+                        <b>Audience</b><br>
                         <select multiple class="form-control items-to-share" name="itemsToShare[]">
                             @foreach ($employees_list as $employee)
                                 <option value="{{ $employee['id'] }}" selected> {{$employee["name"]}}</option>                                
