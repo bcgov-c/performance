@@ -84,8 +84,12 @@ class DashboardController extends Controller
         $sharedList = SharedProfile::where('shared_id', Auth::id())->with('sharedWithUser')->get();
         $profilesharedTooltip = 'If this information is incorrect, please discuss with your supervisor first and escalate to your organization\'s Strategic Human Resources shop if you are unable to resolve.';
         
+        $message= '';
         $messages = $this->getDashboardMessage();
-        foreach ($messages as $message) {}
+        
+        if (count($messages) > 0) {
+            foreach ($messages as $message) {}
+        }
 
         return view('dashboard.index', compact('greetings', 'tab', 'supervisorTooltip', 'sharedList', 'profilesharedTooltip', 'notifications', 'notifications_unread', 'message'));
     }
