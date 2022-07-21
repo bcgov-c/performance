@@ -1,7 +1,7 @@
 <x-side-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Edit: {{ $goal-> title}}
+            Edit: {{ $goal-> title}} 
         </h2>
         <!----<small><a href="{{ route('goal.index') }}">Back to list</a></small>---->
     </x-slot>
@@ -11,6 +11,13 @@
             @csrf
             @method('PUT')
             <div class="row">
+                @if(Session::has('message'))
+                <div class="col-12">                    
+                    <div class="alert alert-danger" style="display:">
+                        <i class="fa fa-info-circle"></i> {{ Session::get('message') }}
+                    </div>
+                </div>
+                @endif
                 <div class="col-12">
                     <b>Goal Type</b>
                     <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="{{$type_desc_str}}"> </i>
@@ -19,6 +26,9 @@
                     <b>Goal Title</b>
                     <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>
                     <x-input-modal name="title"  :value="$goal->title"/>                    
+                    @if(session()->has('title_miss'))
+                        <small class="text-danger">The title field is required</small>
+                    @endif
                     <!-- <x-input-modal label="Goal Title" name="title" tooltip='A short title (1-3 words) used to reference the goal throughout the Performance Development Platform.' :value="$goal->title"/>                     -->
                 </div>                                                   
                 <div class="col-12">
@@ -37,6 +47,9 @@
 				    </p>            
                    <!-- <p class="py-2">Each goal should include a description of <b>WHAT</b><x-tooltip-modal text='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".' /> you will accomplish, <b>WHY</b><x-tooltip-modal text='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".' /> it is important, and <b>HOW</b><x-tooltip-modal text='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'/> you will achieve it.</p>                         -->
                    <x-textarea-modal id="what" name="what" :value="$goal->what" />
+                   @if(session()->has('what_miss'))
+                        <small class="text-danger">The description field is required</small>
+                    @endif
                    </div>
                 <div class = "col-12">
                     <b>Measures of Success</b>
@@ -166,6 +179,15 @@
                 alert('Please choose start date first.');
                 $( "#target_date" ).val('');
             }           
-        });
+        });        
         
 </script>    
+
+
+<style> 
+    .alert-danger {
+        color: #a94442;
+        background-color: #f2dede;
+        border-color: #ebccd1;
+    }
+</style>    

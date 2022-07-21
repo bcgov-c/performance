@@ -218,10 +218,28 @@ class GoalController extends Controller
     * @param  int  $id
     * @return \Illuminate\Http\Response
     */
-    public function update(CreateGoalRequest $request, $id)
-    {
-        $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->findOrFail($id);
-        $input = $request->validated();
+    public function update(Request $request, $id)
+    {        
+        $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->findOrFail($id); 
+        if ($request->title == '' || $request->what== '') {
+            if($request->title == '') {
+                $request->session()->flash('title_miss', 'The title field is required');
+            } elseif($request->what == '') {
+                $request->session()->flash('what_miss', 'The description field is required');
+            }                
+            return \Redirect::route('goal.edit', [$id])->with('message', " There are one or more errors on the page. Please review and try again.");
+        } else {
+            //$input = $request->validated();
+            $input["title"] = $request->title;
+            $input["start_date"] = $request->start_date;
+            $input["target_date"] = $request->target_date;
+            $input["what"] = $request->what;
+            $input["why"] = $request->why;
+            $input["how"] = $request->how;
+            $input["measure_of_success"] = $request->measure_of_success;
+            $input["goal_type_id"] = $request->goal_type_id;
+            $input["tag_ids"] = $request->tag_ids;
+        }
         
         $tags = '';
         if(isset($input['tag_ids'])) {
@@ -297,13 +315,14 @@ class GoalController extends Controller
             } );
         } )
         ->join('users', 'users.guid', '=', 'employee_demo.guid')
+        ->leftjoin('users as u2', 'u2.id', '=', 'goals.created_by')
         ->where('users.id', '=', Auth::id())
         ->whereIn('goals.by_admin', [1, 2])
         ->where('is_library', true)
         ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
         ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')   
-        ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','users.name as username',DB::raw('group_concat(distinct tags.name) as tagnames'))
+        ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name) as tagnames'))
         ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'users.name', 'goals.is_mandatory');
         $query = Goal::withoutGlobalScope(NonLibraryScope::class)
         ->where('is_library', true)
