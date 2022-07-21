@@ -663,8 +663,17 @@ class GoalBankController extends Controller
     
     }
 
-    public function savenewgoal(CreateGoalRequest $request) 
+    public function savenewgoal(Request $request) 
     {
+        if ($request->input('title') == '' || $request->input('what') == '') {
+            if($request->input('title') == '') {
+                $request->session()->flash('title_miss', 'The title field is required');
+            } elseif($request->input('what') == '') {
+                $request->session()->flash('what_miss', 'The description field is required');
+            }                
+            return \Redirect::route('sysadmin.goalbank')->with('message', " There are one or more errors on the page. Please review and try again.");
+        }  
+        
         $request->userCheck = $request->selected_emp_ids;
 
         $current_user = User::find(Auth::id());

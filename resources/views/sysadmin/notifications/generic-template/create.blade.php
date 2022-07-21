@@ -7,8 +7,15 @@
     </x-slot>
 
 <div class="card">
-    <div class="card-body">
-
+    @if(Session::has('message'))
+                    <div class="col-12"> 
+                        <br/>
+                        <div class="alert alert-danger" style="display:">
+                            <i class="fa fa-info-circle"></i> {{ Session::get('message') }}
+                        </div>
+                    </div>
+        @endif
+    <div class="card-body">        
         <form action="{{ isset($generic_template) ? route('generic-template.update', $generic_template->id ) : route('generic-template.store') }}" 
             method="post">
             @csrf
@@ -262,3 +269,11 @@
           @endpush
 
 </x-side-layout>
+<style>
+    .alert-danger {
+        color: #a94442;
+        background-color: #f2dede;
+        border-color: #ebccd1;
+    }
+    
+</style> 
