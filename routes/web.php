@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 
     Route::middleware(['ViewShare'])->group(function () {
         Route::match(['get', 'post', 'delete', 'put'], '/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
+        Route::get('/dashboardmessage/{id}',[DashboardController::class, 'show'])->name('dashboardmessage.show');
         Route::delete('/dashboard/{id}',[DashboardController::class, 'destroy'])->name('dashboard.destroy');
         Route::delete('/dashboarddeleteall',[DashboardController::class, 'destroyall'])->name('dashboard.destroyall');
         Route::post('/dashboardupdatestatus',[DashboardController::class, 'updatestatus'])->name('dashboard.updatestatus');
