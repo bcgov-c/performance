@@ -8,6 +8,13 @@
 
 	<p class="px-3">Follow the steps below to select an employee and excuse them from the Performance Development process. This will remove the employee from any reporting and will pause the employee’s conversation deadlines during the date range selected.</p>
 
+        @if(Session::has('message'))
+            <div class="col-12">                    
+                <div class="alert alert-danger" style="display:">
+                    <i class="fa fa-info-circle"></i> {{ Session::get('message') }}
+                </div>
+            </div>
+        @endif
 
 	<br>
 	<h6 class="text-bold">Step 1. Select employee(s) to excuse</h6>
@@ -474,3 +481,12 @@
 	</x-slot>
 
 </x-side-layout>
+
+<style>
+    .alert-danger {
+        color: #a94442;
+        background-color: #f2dede;
+        border-color: #ebccd1;
+    }
+    
+</style> 

@@ -349,11 +349,30 @@ class ExcuseEmployeesController extends Controller
 
     public function saveexcuse(Request $request) 
     {
+        /*
         $this->validate($request, [
             'start_date' => 'required|date',
             'target_date' => 'required|date|after_or_equal:start_date',
             'excused_reason' => 'required'
         ]);
+         * 
+         */
+        $input = $request->all();
+        $rules = [
+            'start_date' => 'required|date',
+            'target_date' => 'required|date|after_or_equal:start_date',
+            'excused_reason' => 'required'
+        ];
+        $messages = [
+            'required' => 'The :attribute field is required.',
+        ];
+        $validator = Validator::make($input, $rules, $messages);
+        if ($validator->fails()) {
+            return redirect()->route(request()->segment(1).'.excuseemployees')
+            ->with('message', " There are one or more errors on the page. Please review and try again.")    
+            ->withErrors($validator)
+            ->withInput();
+        }
 
         $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $request->userCheck = $selected_emp_ids;

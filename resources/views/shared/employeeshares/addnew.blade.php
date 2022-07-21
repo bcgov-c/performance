@@ -12,7 +12,13 @@
 
     <form id="notify-form" action="{{ route(request()->segment(1).'.employeeshares.saveall') }}" method="post">
         @csrf
-
+        @if(Session::has('message'))
+            <div class="col-12">                    
+                <div class="alert alert-danger" style="display:">
+                    <i class="fa fa-info-circle"></i> {{ Session::get('message') }}
+                </div>
+            </div>
+        @endif
         <div class="container-fluid">
             <br>
             <h6 class="text-bold">Step 1. Select employees to share</h6>
@@ -690,3 +696,11 @@
     </x-slot>
 </x-side-layout>
 
+<style>
+    .alert-danger {
+        color: #a94442;
+        background-color: #f2dede;
+        border-color: #ebccd1;
+    }
+    
+</style> 
