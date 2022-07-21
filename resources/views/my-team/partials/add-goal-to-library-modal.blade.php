@@ -11,7 +11,7 @@
     border-color: #ebccd1;
 }
 </style>
-<div class="modal fade" id="addGoalToLibraryModal" tabindex="-1" aria-labelledby="addGoalToLibraryLabel" aria-hidden="true">
+<div class="modal fade" id="addGoalToLibraryModal" aria-labelledby="addGoalToLibraryLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header bg-primary">

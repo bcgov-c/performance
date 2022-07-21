@@ -58,7 +58,7 @@
 
 @include('goal.partials.supervisor-goal')
 @include('goal.partials.goal-detail-modal')
-<div class="modal fade" id="addGoalModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+<div class="modal fade" id="addGoalModal"  aria-labelledby="addModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header bg-primary">
@@ -159,6 +159,7 @@
 
     <x-slot name="js">
         {{-- {{$dataTable->scripts()}} --}}
+        
     <script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
     <script type="text/javascript">
         $(document).ready(function(){
@@ -168,6 +169,7 @@
                     ["Bold", "Italic", "Underline"],
                     ["NumberedList", "BulletedList"],
                     ["Outdent", "Indent"],
+                    ["Link"],
                 ],
                 disableNativeSpellChecker: false
             });
@@ -177,6 +179,7 @@
                     ["Bold", "Italic", "Underline"],
                     ["NumberedList", "BulletedList"],
                     ["Outdent", "Indent"],
+                    ["Link"],
                 ],
                 disableNativeSpellChecker: false
             });

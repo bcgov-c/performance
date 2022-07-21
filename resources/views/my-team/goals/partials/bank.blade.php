@@ -30,9 +30,9 @@ Create a goal for your employees to use in their own profile. Goals can be sugge
     });
     $(document).ready(function(){
         CKEDITOR.replace('what', {
-            toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ] });
+            toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent", "Link"] ] });
         CKEDITOR.replace('measure_of_success', {
-            toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ] });
+            toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent", "Link"] ] });
     });
 </script>
 @endpush
