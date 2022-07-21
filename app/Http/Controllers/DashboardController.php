@@ -94,6 +94,22 @@ class DashboardController extends Controller
         return view('dashboard.index', compact('greetings', 'tab', 'supervisorTooltip', 'sharedList', 'profilesharedTooltip', 'notifications', 'notifications_unread', 'message'));
     }
 
+    public function show(Request $request, $id) {
+
+        $notification = DashboardNotification::where('id', $id)->first();
+
+        // TODO: update
+        if ($notification) {
+            $notification->status = 'R';
+            $notification->save();
+
+            return redirect( $notification->url );
+        }
+
+        return redirect()->back();
+
+    }
+
     public function getDashboardMessage() {
         $dbm = DashboardMessage::select('message')->get();
         return $dbm;
