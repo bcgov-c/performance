@@ -161,6 +161,7 @@ class EmployeeSharesController extends Controller
         $validator = Validator::make($input, $rules, $messages);
         if ($validator->fails()) {
             return redirect()->route(request()->segment(1).'.employeeshares')
+            ->with('message', " There are one or more errors on the page. Please review and try again.")    
             ->withErrors($validator)
             ->withInput();
         }

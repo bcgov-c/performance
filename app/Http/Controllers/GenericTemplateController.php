@@ -132,7 +132,10 @@ class GenericTemplateController extends Controller
                 }
             }
         });
-
+        
+        if (count($validator->errors())>0) {
+            $request->session()->flash('message', 'There are one or more errors on the page. Please review and try again.');            
+        }
         //run validation which will redirect on failure
         $validator->validate();
 
@@ -301,7 +304,7 @@ class GenericTemplateController extends Controller
                 }
             }
         });
-
+        error_log(print_r($validator->errors(),true));
         //run validation which will redirect on failure
         $validator->validate();
 
