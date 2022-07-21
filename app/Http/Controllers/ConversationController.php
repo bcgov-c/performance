@@ -449,6 +449,21 @@ class ConversationController extends Controller
             if (!$conversation->initial_signoff) {
                 $conversation->initial_signoff = Carbon::now();
             }
+
+            // #646 Create a message for the supervisor when the people check on Team member disagrees 
+            // with the information contained in this performance review
+            if ($request->team_member_agreement) {
+                $signoff_user = User::where('id', $authId)->first();
+                    if ($signoff_user && $signoff_user->reporting_to ) {
+                        DashboardNotification::create([
+                        'user_id' => $signoff_user->reporting_to,
+                        'notification_type' => 'CS',        // Conversation signoff 
+                        'comment' => $signoff_user->name . ' has selected the "disagree" option on a performance conversation with you.',
+                        'related_id' => $conversation->id,
+                    ]);
+                }
+            }
+
         }
         $conversation->update();
 
