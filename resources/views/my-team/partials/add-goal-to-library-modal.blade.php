@@ -76,7 +76,7 @@
                 </div>
                 <div class="col-6">
                     <!-- <label> -->
-                        <b>Audience</br>
+                        <b>Audience</b>
                         <select multiple class="form-control items-to-share" name="itemsToShare[]">
                             @foreach ($employees_list as $employee)
                                 <option value="{{ $employee['id'] }}" selected> {{$employee["name"]}}</option>                                
@@ -113,11 +113,11 @@
             trigger: 'click',
         });
 
-        $(".tags").multiselect({
-                	enableFiltering: true,
-                	enableCaseInsensitiveFiltering: true,
-					// nonSelectedText: null,
-            	});              
+        // $('.tags').multiselect({
+        //         	enableFiltering: true,
+        //         	enableCaseInsensitiveFiltering: true,
+		// 			// nonSelectedText: null,
+        //     	});              
                 
 		$('body').on('click', function (e) {
             $('[data-toggle=popover]').each(function () {
