@@ -248,7 +248,7 @@
                 </div>
                 <div class="mt-3 alert alert-default-warning d-none" id="locked-message">
                     <!-- Conversation records can be un-signed and edited for up to two weeks from initial completion date. After the two week period, a request to unlock the conversation record will need to be submitted to your HR Administrator if changes are required. -->
-                    Conversation records can be un-signed and edited for up to two weeks from initial completion date. After the two week period, an AskMyHR request to unlock the conversation record will need to be submitted to Myself > HR Software Systems Support > Performance Development Platform.
+                    Conversation records can be un-signed and edited for up to two weeks from initial completion date. After the two week period, an AskMyHR service request to unlock the conversation record will need to be submitted to Myself > HR Software Systems Support > Performance Development Platform.
                 </div>
                 @endif
                 <div class="mt-3 alert alert-default-warning alert-dismissible" id="supervisor-signoff-message">

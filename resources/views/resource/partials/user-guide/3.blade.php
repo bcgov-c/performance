@@ -17,5 +17,5 @@
 
 <u>Completed Conversations</u>
 <br><br>
-<p>This area contains all conversations that have been signed by both employee and supervisor. There is a two-week period from the date of sign-off when either participant can un-sign the conversation to return it to the Open Conversations tab for further edits. Conversations that have passed the two-week period require approval and assistance to re-open. If you need to unlock a conversation, submit an <a target="blank" href="https://www2.gov.bc.ca/gov/content/careers-myhr">AskMyHR</a> request to Myself > HR Software Systems Support > Performance Development Platform.</p>
+<p>This area contains all conversations that have been signed by both employee and supervisor. There is a two-week period from the date of sign-off when either participant can un-sign the conversation to return it to the Open Conversations tab for further edits. Conversations that have passed the two-week period require approval and assistance to re-open. If you need to unlock a conversation, submit an <a target="blank" href="https://www2.gov.bc.ca/gov/content/careers-myhr">AskMyHR</a> service request to Myself > HR Software Systems Support > Performance Development Platform.</p>
     
