@@ -1900,6 +1900,19 @@ class GoalBankController extends Controller
         // })
         // // ->where('is_library', true)
         // ->delete();
+        $query1 = DB::table('goal_tags') 
+        ->where('goal_id', '=', $goal_id) 
+        ->delete(); 
+        $query2 = DB::table('goal_bank_orgs')
+        ->where('goal_id', '=', $goal_id)  
+        ->delete(); 
+        $query3 = DB::table('goals_shared_with')
+        ->where('goal_id', '=', $goal_id)  
+        ->delete(); 
+        $query4 = DB::table('goals') 
+        ->where('goals.id', '=', $goal_id) 
+        ->where('goals.is_library', true) 
+        ->delete(); 
         // $query3 = DB::table('goals_shared_with')
         // ->where('goal_id', '=', $goal_id)
         // ->whereExists(function($exist) {
@@ -1938,19 +1951,6 @@ class GoalBankController extends Controller
         // })
         // // ->where('is_lisbrary', true)
         // ->delete();
-        $query1 = DB::table('goal_tags') 
-        ->where('goal_id', '=', $goal_id) 
-        ->delete(); 
-        $query2 = DB::table('goal_bank_orgs')
-        ->where('goal_id', '=', $goal_id)  
-        ->delete(); 
-        $query3 = DB::table('goals_shared_with')
-        ->where('goal_id', '=', $goal_id)  
-        ->delete(); 
-        $query4 = DB::table('goals') 
-        ->where('goals.id', '=', $goal_id) 
-        ->where('goals.is_library', true) 
-        ->delete(); 
         return redirect()->back(); 
     }
     
