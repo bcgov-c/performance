@@ -1861,13 +1861,8 @@ class GoalBankController extends Controller
         ->where('model_id', '=', $modelId);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function deletegoal(Request $request, $goal_id) {
+        Log::info('$goal_id='.$goal_id);
         $query1 = DB::table('goal_tags')
         ->where('goal_id', '=', $goal_id)
         ->delete();
@@ -1883,7 +1878,6 @@ class GoalBankController extends Controller
         ->delete();
         return redirect()->back();
     }
-
     
     protected function get_employees_by_selected_org_nodes($selected_org_nodes) {
 
