@@ -1862,7 +1862,6 @@ class GoalBankController extends Controller
     }
 
     public function deletegoal(Request $request, $goal_id) {
-        Log::info('$goal_id='.$goal_id); 
         $query1 = DB::table('goal_tags') 
         ->where('goal_id', '=', $goal_id) 
         ->delete(); 
