@@ -476,6 +476,17 @@
 			// 	location.reload();
 			// 	return;
 			// });
+                        
+                        @if(session()->has('start_date_missing'))                           
+                            $('#start_date').addClass('is-invalid');
+                        @endif
+                        @if(session()->has('target_date_missing'))                           
+                            $('#target_date').addClass('is-invalid');
+                        @endif
+                        @if(session()->has('date_error'))      
+                            $('#start_date').addClass('is-invalid');
+                            $('#target_date').addClass('is-invalid');
+                        @endif
 
 		</script>
 	</x-slot>

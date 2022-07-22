@@ -743,6 +743,10 @@
 					$("#mi-modal").modal('hide');
 				});
 			};
+                        
+                        @if(session()->has('title_miss'))                           
+                            $('input[name=title]').addClass('is-invalid');
+                        @endif
 
 		</script>
 	</x-slot>

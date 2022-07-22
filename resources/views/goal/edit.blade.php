@@ -26,7 +26,7 @@
                     <b>Goal Title</b>
                     <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>
                     <x-input-modal name="title"  :value="$goal->title"/>                    
-                    @if(session()->has('title_miss'))
+                    @if(session()->has('title_miss'))                           
                         <small class="text-danger">The title field is required</small>
                     @endif
                     <!-- <x-input-modal label="Goal Title" name="title" tooltip='A short title (1-3 words) used to reference the goal throughout the Performance Development Platform.' :value="$goal->title"/>                     -->
@@ -180,6 +180,10 @@
                 $( "#target_date" ).val('');
             }           
         });        
+        
+        @if(session()->has('title_miss'))                           
+            $('input[name=title]').addClass('is-invalid');
+        @endif
         
 </script>    
 

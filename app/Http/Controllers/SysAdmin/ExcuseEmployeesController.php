@@ -348,6 +348,16 @@ class ExcuseEmployeesController extends Controller
         $messages = [
             'required' => 'The :attribute field is required.',
         ];
+        if($request->start_date == '') {
+            $request->session()->flash('start_date_missing', 'The start date field is required');
+        } 
+        if ($request->target_date == '') {
+            $request->session()->flash('target_date_missing', 'The target date field is required');
+        } 
+        if ($request->target_date < $request->start_date) {
+            $request->session()->flash('date_error', 'The date fields are wrong');
+        }
+        
         $validator = Validator::make($input, $rules, $messages);
         if ($validator->fails()) {
             return redirect()->route(request()->segment(1).'.excuseemployees')
