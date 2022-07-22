@@ -1862,21 +1862,21 @@ class GoalBankController extends Controller
     }
 
     public function deletegoal(Request $request, $goal_id) {
-        Log::info('$goal_id='.$goal_id);
-        $query1 = DB::table('goal_tags')
-        ->where('goal_id', '=', $goal_id)
-        ->delete();
+        Log::info('$goal_id='.$goal_id); 
+        $query1 = DB::table('goal_tags') 
+        ->where('goal_id', '=', $goal_id) 
+        ->delete(); 
         $query2 = DB::table('goal_bank_orgs')
-        ->where('goal_id', '=', $goal_id)
-        ->delete();
+        ->where('goal_id', '=', $goal_id)  
+        ->delete(); 
         $query3 = DB::table('goals_shared_with')
-        ->where('goal_id', '=', $goal_id)
-        ->delete();
-        $query4 = DB::table('goals')
-        ->where('goals.id', '=', $goal_id)
-        ->where('goals.is_library', true)
-        ->delete();
-        return redirect()->back();
+        ->where('goal_id', '=', $goal_id)  
+        ->delete(); 
+        $query4 = DB::table('goals') 
+        ->where('goals.id', '=', $goal_id) 
+        ->where('goals.is_library', true) 
+        ->delete(); 
+        return redirect()->back(); 
     }
     
     protected function get_employees_by_selected_org_nodes($selected_org_nodes) {
