@@ -55,7 +55,7 @@ class Goal extends Model implements Auditable
 
   public const MANDATORY_STATUS_LIST = 
   [
-      "" => "Any",
+      "" => "Suggested",
       "0" => "Suggested",
       "1" => "Mandatory",
 
