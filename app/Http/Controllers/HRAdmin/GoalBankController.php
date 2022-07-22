@@ -1862,44 +1862,6 @@ class GoalBankController extends Controller
     }
 
     public function deletegoal(Request $request, $goal_id) {
-        // Log::info('$goal_id='.$goal_id);
-        // $query1 = DB::table('goal_tags')
-        // ->where('goal_id', '=', $goal_id)
-        // ->whereExists(function($exist) {
-        //     $exist->select(DB::raw(1))
-        //     ->from('goals')
-        //     ->join('users', 'users.id', '=', 'goals.user_id')
-        //     ->join('employee_demo', 'employee_demo.guid', '=', 'users.guid')
-        //     ->join('admin_orgs', function($join) {
-        //         $join->on('employee_demo.organization', '=', 'admin_orgs.organization')
-        //         ->on('employee_demo.level1_program', '=', 'admin_orgs.level1_program')
-        //         ->on('employee_demo.level2_division', '=', 'admin_orgs.level2_division')
-        //         ->on('employee_demo.level3_branch', '=', 'admin_orgs.level3_branch')
-        //         ->on('employee_demo.level4', '=', 'admin_orgs.level4');
-        //     })
-        //     ->where('admin_orgs.user_id', '=', Auth::id())
-        //     ->where('goals.id', '=', 'goal_tags.goal_id'); 
-        // } )
-        // // ->where('is_library', true)
-        // ->delete();
-        // $query2 = GoalBankOrg::where('goal_id', '=', $goal_id)
-        // ->whereExists(function($exist) {
-        //     $exist->select(DB::raw(1))
-        //     ->from('goals')
-        //     ->join('users', 'users.id', '=', 'goals.user_id')
-        //     ->join('employee_demo', 'employee_demo.guid', '=', 'users.guid')
-        //     ->join('admin_orgs', function($join) {
-        //         $join->on('employee_demo.organization', '=', 'admin_orgs.organization')
-        //         ->on('employee_demo.level1_program', '=', 'admin_orgs.level1_program')
-        //         ->on('employee_demo.level2_division', '=', 'admin_orgs.level2_division')
-        //         ->on('employee_demo.level3_branch', '=', 'admin_orgs.level3_branch')
-        //         ->on('employee_demo.level4', '=', 'admin_orgs.level4');
-        //     })
-        //     ->where('admin_orgs.user_id', '=', Auth::id())
-        //     ->where('goals.id', '=', 'goal_bank_orgs.goal_id');
-        // })
-        // // ->where('is_library', true)
-        // ->delete();
         $query1 = DB::table('goal_tags') 
         ->where('goal_id', '=', $goal_id) 
         ->delete(); 
@@ -1913,44 +1875,6 @@ class GoalBankController extends Controller
         ->where('goals.id', '=', $goal_id) 
         ->where('goals.is_library', true) 
         ->delete(); 
-        // $query3 = DB::table('goals_shared_with')
-        // ->where('goal_id', '=', $goal_id)
-        // ->whereExists(function($exist) {
-        //     $exist->select(DB::raw(1))
-        //     ->from('goals')
-        //     ->join('users', 'users.id', '=', 'goals.user_id')
-        //     ->join('employee_demo', 'employee_demo.guid', '=', 'users.guid')
-        //     ->join('admin_orgs', function($join) {
-        //         $join->on('employee_demo.organization', '=', 'admin_orgs.organization')
-        //         ->on('employee_demo.level1_program', '=', 'admin_orgs.level1_program')
-        //         ->on('employee_demo.level2_division', '=', 'admin_orgs.level2_division')
-        //         ->on('employee_demo.level3_branch', '=', 'admin_orgs.level3_branch')
-        //         ->on('employee_demo.level4', '=', 'admin_orgs.level4');
-        //     })
-        //     ->where('admin_orgs.user_id', '=', Auth::id())
-        //     ->where('goals.id', '=', 'goals_shared_with.goal_id');
-        // })
-        // // ->where('is_library', true)
-        // ->delete();
-        // $query4 = DB::table('goals')
-        // ->where('id', '=', $goal_id)
-        // ->whereExists(function($exist) {
-        //     $exist->select(DB::raw(1))
-        //     ->from('users')
-        //     ->where('users.id', '=', 'goals.user_id')
-        //     ->join('employee_demo', 'employee_demo.guid', '=', 'users.guid')
-        //     ->join('admin_orgs', function($join) {
-        //         $join->on('employee_demo.organization', '=', 'admin_orgs.organization')
-        //         ->on('employee_demo.level1_program', '=', 'admin_orgs.level1_program')
-        //         ->on('employee_demo.level2_division', '=', 'admin_orgs.level2_division')
-        //         ->on('employee_demo.level3_branch', '=', 'admin_orgs.level3_branch')
-        //         ->on('employee_demo.level4', '=', 'admin_orgs.level4');
-        //     })
-        //     ->where('admin_orgs.user_id', '=', Auth::id())
-        //     ->where('goals.id', '=', 'goals_shared_with.goal_id');
-        // })
-        // // ->where('is_lisbrary', true)
-        // ->delete();
         return redirect()->back(); 
     }
     
