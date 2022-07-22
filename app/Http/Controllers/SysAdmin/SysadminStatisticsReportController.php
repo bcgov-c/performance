@@ -467,17 +467,24 @@ class SysadminStatisticsReportController extends Controller
         // Chart1 -- Overdue
         $sql_2 = User::selectRaw("users.employee_id, users.empl_record, employee_name, 
                             organization, level1_program, level2_division, level3_branch, level4,
-                        DATEDIFF (
-                            COALESCE (
-                                (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )  
-                                    from conversations A 
-                                where A.user_id = users.id
-                                    and signoff_user_id is not null      
-                                    and supervisor_signoff_id is not null)
-                                , (joining_date) 
-                            ) 
-                        , DATE_ADD( DATE_FORMAT(sysdate(), '%Y-%m-%d'), INTERVAL -122 day) )
-                    as overdue_in_days")
+                            DATEDIFF (
+                                COALESCE (
+                                    (select
+                                        DATE_ADD( DATE(GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )) , interval 122 + 1 day)  
+                                        from conversations A 
+                                    where A.user_id = users.id
+                                        and signoff_user_id is not null      
+                                        and supervisor_signoff_id is not null)
+    
+                                    ,   case when users.joining_date < '2022-10-14' then 
+                                            DATE_ADD('2022-10-14', INTERVAL 
+                                            abs(((cast(users.id AS signed) % 10) - 1) * 5) + (cast(users.id AS signed) % 5) day)
+                                        else 
+                                            joining_date
+                                        end 
+                                ) 
+                            , curdate() )
+                        as overdue_in_days")
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
@@ -539,16 +546,33 @@ class SysadminStatisticsReportController extends Controller
             return $query->whereNull('signoff_user_id')
                         ->orWhereNull('supervisor_signoff_id');
         })
+        // ->whereRaw("DATEDIFF (
+        //             COALESCE (
+        //                     (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )  
+        //                         from conversations A 
+        //                     where A.user_id = conversations.user_id
+        //                         and signoff_user_id is not null      
+        //                         and supervisor_signoff_id is not null),
+        //                     (select joining_date from users where id = conversations.user_id)
+        //                 ) 
+        //         , DATE_ADD( DATE_FORMAT(sysdate(), '%Y-%m-%d'), INTERVAL -122 day) ) < 0 ");
         ->whereRaw("DATEDIFF (
-                    COALESCE (
-                            (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )  
-                                from conversations A 
-                            where A.user_id = conversations.user_id
-                                and signoff_user_id is not null      
-                                and supervisor_signoff_id is not null),
-                            (select joining_date from users where id = conversations.user_id)
-                        ) 
-                , DATE_ADD( DATE_FORMAT(sysdate(), '%Y-%m-%d'), INTERVAL -122 day) ) < 0 ");
+            COALESCE (
+                (select 
+                    DATE_ADD( DATE(GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )) , interval 122 + 1 day)  
+                    from conversations A 
+                where A.user_id = users.id
+                    and signoff_user_id is not null      
+                    and supervisor_signoff_id is not null)
+
+                ,   case when users.joining_date < '2022-10-14' then 
+                        DATE_ADD('2022-10-14', INTERVAL 
+                        abs(((cast(users.id AS signed) % 10) - 1) * 5) + (cast(users.id AS signed) % 5) day)
+                    else 
+                        joining_date
+                    end 
+            ) 
+        , curdate() ) > 0 ");
 
         $conversations = $sql->get();
 
@@ -627,24 +651,38 @@ class SysadminStatisticsReportController extends Controller
         // SQL - Chart 1
         $sql_chart1 = User::selectRaw("users.*, employee_name, 
                         organization, level1_program, level2_division, level3_branch, level4,
-                    DATEDIFF (
+                        DATEDIFF (
                             COALESCE (
-                                (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )  
+                                (select 
+                                    DATE_ADD( DATE(GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )) , interval 122 + 1 day)  
                                     from conversations A 
                                 where A.user_id = users.id
                                     and signoff_user_id is not null      
                                     and supervisor_signoff_id is not null)
-                                , (joining_date) 
+    
+                                ,   case when users.joining_date < '2022-10-14' then 
+                                        DATE_ADD('2022-10-14', INTERVAL 
+                                        abs(((cast(users.id AS signed) % 10) - 1) * 5) + (cast(users.id AS signed) % 5) day)
+                                    else 
+                                        joining_date
+                                    end 
                             ) 
-                    , DATE_ADD( DATE_FORMAT(sysdate(), '%Y-%m-%d'), INTERVAL -122 day) )
-                    as overdue_in_days,
-                    DATE_ADD( DATE_FORMAT( COALESCE (                       
-                       (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )
-                            from conversations A
-                        where A.user_id = users.id 
-                            and signoff_user_id is not null 
-                            and supervisor_signoff_id is not null)
-                            ,joining_date), '%Y-%m-%d'), INTERVAL 122 day) as next_due_date")
+                        , curdate() )
+                        as overdue_in_days,
+                        COALESCE (
+                            (select 
+                                DATE_ADD( DATE(GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )) , interval 122 + 1 day)  
+                                from conversations A 
+                                    where A.user_id = users.id
+                                        and signoff_user_id is not null      
+                                        and supervisor_signoff_id is not null)
+                            ,    case when users.joining_date < '2022-10-14' then 
+                                    DATE_ADD('2022-10-14', INTERVAL 
+                                    abs(((cast(users.id AS signed) % 10) - 1) * 5) + (cast(users.id AS signed) % 5) day)
+                                else 
+                                    joining_date
+                                end 
+                        ) as next_due_date")
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
@@ -668,27 +706,48 @@ class SysadminStatisticsReportController extends Controller
         // SQL - Chart 2
         $sql_chart2 = Conversation::selectRaw("conversations.*, users.employee_id, employee_name, 
                         organization, level1_program, level2_division, level3_branch, level4,
-                    DATE_ADD(
-                        COALESCE (
-                            (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )  
-                                from conversations A 
-                            where A.user_id = conversations.user_id
-                                and signoff_user_id is not null      
-                                and supervisor_signoff_id is not null), 
-                            (select joining_date from users where id = conversations.user_id)
-                        ), INTERVAL 122 day)
-                    as next_due_date")
+                            COALESCE (
+                                (select 
+                                    DATE_ADD( DATE(GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )) , interval 122 + 1 day)  
+                                    from conversations A 
+                                        where A.user_id = users.id
+                                            and signoff_user_id is not null      
+                                            and supervisor_signoff_id is not null)
+                                ,    case when (select joining_date from users where id = conversations.user_id) < '2022-10-14' then 
+                                        DATE_ADD('2022-10-14', INTERVAL 
+                                        abs(((cast(users.id AS signed) % 10) - 1) * 5) + (cast(users.id AS signed) % 5) day)
+                                    else 
+                                        (select joining_date from users where id = conversations.user_id)
+                                    end 
+                            ) as next_due_date")
                 // ->whereIn('id', $selected_ids)
+                // ->whereRaw("DATEDIFF (
+                //     COALESCE (
+                //             (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )  
+                //                 from conversations A 
+                //             where A.user_id = conversations.user_id
+                //                 and signoff_user_id is not null      
+                //                 and supervisor_signoff_id is not null),
+                //             (select joining_date from users where id = conversations.user_id)
+                //         ) 
+                // , DATE_ADD( DATE_FORMAT(sysdate(), '%Y-%m-%d'), INTERVAL -122 day) ) < 0 ")
                 ->whereRaw("DATEDIFF (
                     COALESCE (
-                            (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )  
-                                from conversations A 
-                            where A.user_id = conversations.user_id
-                                and signoff_user_id is not null      
-                                and supervisor_signoff_id is not null),
-                            (select joining_date from users where id = conversations.user_id)
+                        (select 
+                            DATE_ADD( DATE(GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )) , interval 122 + 1 day)  
+                            from conversations A 
+                        where A.user_id = users.id
+                            and signoff_user_id is not null      
+                            and supervisor_signoff_id is not null)
+
+                        ,   case when users.joining_date < '2022-10-14' then 
+                                DATE_ADD('2022-10-14', INTERVAL 
+                                abs(((cast(users.id AS signed) % 10) - 1) * 5) + (cast(users.id AS signed) % 5) day)
+                            else 
+                                joining_date
+                            end 
                         ) 
-                , DATE_ADD( DATE_FORMAT(sysdate(), '%Y-%m-%d'), INTERVAL -122 day) ) < 0 ")
+                     , curdate() ) > 0 ")
                 ->where(function ($query)  {
                     return $query->whereNull('signoff_user_id')
                                  ->orwhereNull('supervisor_signoff_id');
@@ -723,16 +782,20 @@ class SysadminStatisticsReportController extends Controller
          // SQL for Chart 3
          $sql_chart3 = Conversation::selectRaw("conversations.*, users.employee_id, employee_name, 
                     organization, level1_program, level2_division, level3_branch, level4,
-                    DATE_ADD(
-                        COALESCE (
-                            (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )  
-                                from conversations A 
-                            where A.user_id = conversations.user_id
-                                and signoff_user_id is not null      
-                                and supervisor_signoff_id is not null), 
-                            (select joining_date from users where id = conversations.user_id)
-                        ), INTERVAL 122 day)
-                    as next_due_date")
+                    COALESCE (
+                        (select 
+                            DATE_ADD( DATE(GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )) , interval 122 + 1 day)  
+                            from conversations A 
+                                where A.user_id = users.id
+                                    and signoff_user_id is not null      
+                                    and supervisor_signoff_id is not null)
+                        ,    case when (select joining_date from users where id = conversations.user_id) < '2022-10-14' then 
+                                DATE_ADD('2022-10-14', INTERVAL 
+                                abs(((cast(users.id AS signed) % 10) - 1) * 5) + (cast(users.id AS signed) % 5) day)
+                            else 
+                                (select joining_date from users where id = conversations.user_id)
+                            end 
+                    ) as next_due_date")
             ->join('users', 'users.id', 'conversations.user_id') 
             ->join('employee_demo', function($join) {
                 $join->on('employee_demo.employee_id', '=', 'users.employee_id');
