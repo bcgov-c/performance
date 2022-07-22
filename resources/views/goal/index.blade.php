@@ -287,6 +287,7 @@
                 });
                 Object.entries(errors).forEach(function callback(value, index) {
                     var className = '.error-' + value[0];
+                    $('input[name='+value[0]+']').addClass('is-invalid');
                     $(className).text(value[1]);
                 });
             }

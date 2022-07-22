@@ -690,6 +690,10 @@
                 }
 
             });
+            
+            @error('input_reason')
+                $('input[name=input_reason]').addClass('is-invalid');
+            @enderror
 
         </script>
 
