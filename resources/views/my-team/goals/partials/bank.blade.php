@@ -1,7 +1,7 @@
 <p>
 Create a goal for your employees to use in their own profile. Goals can be suggested (for example, a learning goal to help increase team skill or capacity in a relevant area) or mandatory (for example, a work goal detailing a new priority that all employees are responsible for). Employees will be notified when a new goal has been added to their Goal Bank.
 </p>
-<x-button id="add-goal-to-library-btn" tooltip="Create a goal for your employees to use in their own profile." tooltipPosition="bottom" class="my-2">
+<x-button id="add-goal-to-library-btn" class="my-2">
     Add Goal to Bank
 </x-button>
 <div class="row">
