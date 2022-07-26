@@ -691,7 +691,7 @@ class GoalBankController extends Controller
             return \Redirect::route('hradmin.goalbank')->with('message', " There are one or more errors on the page. Please review and try again.");
         }       
         
-        $request->userCheck = $request->selected_emp_ids;
+        // $request->userCheck = $request->selected_emp_ids;
 
         $current_user = User::find(Auth::id());
 
@@ -719,8 +719,8 @@ class GoalBankController extends Controller
         $notify_audiences = [];
         
         if($request->opt_audience == "byEmp") {
-            $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
-            // $selected_emp_ids = $request->userCheck ? $request->userCheck : [];
+            // $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
+            $selected_emp_ids = $request->userCheck ? $request->userCheck : [];
             $toRecipients = EmployeeDemo::select('users.id')
             ->join('users', 'employee_demo.guid', 'users.guid')
             ->whereIn('employee_demo.employee_id', $selected_emp_ids )

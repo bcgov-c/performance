@@ -418,7 +418,15 @@
 								$(chkbox).prop('checked', false);
 								$(chkbox).prop("indeterminate", false);
 							}
-						} 
+						} else {
+							if ( $(chkbox).attr('name') == 'userCheck[]') {
+								if (g_selected_orgnodes.includes(chkbox.value)) {
+									$(chkbox).prop('checked', true);
+								} else {
+									$(chkbox).prop('checked', false);
+								}
+							}
+						}
 					});
 
 					// reset checkbox state
@@ -444,7 +452,6 @@
 						if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
 							eall_emps = eg_employees_by_org[ chkbox.value ].map( function(x) {return x.employee_id} );
 							b = eall_emps.every(v=> eg_selected_orgnodes.indexOf(v) !== -1);
-
 							if (eall_emps.every(v=> eg_selected_orgnodes.indexOf(v) !== -1)) {
 								$(chkbox).prop('checked', true);
 								$(chkbox).prop("indeterminate", false);
@@ -456,7 +463,7 @@
 								$(chkbox).prop("indeterminate", false);
 							}
 						} else {
-							if ( $(chkbox).attr('name') == 'userCheck[]') {
+							if ( $(chkbox).attr('name') == 'euserCheck[]') {
 								if (eg_selected_orgnodes.includes(chkbox.value)) {
 									$(chkbox).prop('checked', true);
 								} else {

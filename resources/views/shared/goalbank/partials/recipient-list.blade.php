@@ -125,21 +125,21 @@
                 }
             });
 
-            // // Handle click on "Select all" control
-            // $('#employee-list-select-all').on('click', function() {
-            //     console.log('Selected All');
-            //     // Check/uncheck all checkboxes in the table
-            //     $('#employee-list-table tbody input:checkbox').prop('checked', this.checked);
-            //     if (this.checked) {
-            //         g_selected_employees = g_matched_employees.map((x) => x);
-            //         $('#employee-list-select-all').prop("checked", true);
-            //         $('#employee-list-select-all').prop("indeterminate", false);    
-            //     } else {
-            //         g_selected_employees = [];
-            //         $('#employee-list-select-all').prop("checked", false);
-            //         $('#employee-list-select-all').prop("indeterminate", false);    
-            //     }    
-            // });
+            // Handle click on "Select all" control
+            $('#employee-list-select-all').on('click', function() {
+                console.log('Selected All');
+                // Check/uncheck all checkboxes in the table
+                $('#employee-list-table tbody input:checkbox').prop('checked', this.checked);
+                if (this.checked) {
+                    g_selected_employees = g_matched_employees.map((x) => x);
+                    $('#employee-list-select-all').prop("checked", true);
+                    $('#employee-list-select-all').prop("indeterminate", false);    
+                } else {
+                    g_selected_employees = [];
+                    $('#employee-list-select-all').prop("checked", false);
+                    $('#employee-list-select-all').prop("indeterminate", false);    
+                }    
+            });
 
         });
 
