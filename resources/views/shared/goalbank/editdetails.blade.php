@@ -32,9 +32,9 @@
 		</div>
 		<div class="row">
 			<div class="col-md-4">
-				<b> Tags </b>
+				<b>Tags</b>
 				<i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resource/goal-setting?t=5' target=\'_blank\'><u>View full list of tag descriptions.</u></a>"></i>				
-				<x-dropdown :list="$tags" name="tag_ids[]" :selected="array_column($goaldetail->tags->toArray(), 'id')" class="tags" multiple />
+				<x-dropdown :list="$tags" name="tag_ids[]" :selected="array_column($goaldetail->tags->toArray(), 'id')" class="tags" multiple/>								
 				<small  class="text-danger error-tag_ids"></small>
 			</div>
 		</div>
@@ -146,11 +146,20 @@
 				$(".tags").multiselect({
                 	enableFiltering: true,
                 	enableCaseInsensitiveFiltering: true,
-					nonSelectedText: null,
+					// nonSelectedText: null,
             	});
 
 				$('body').on('click', function (e) {
                 $('[data-toggle=popover]').each(function () {
+                    // hide any open popovers when the anywhere else in the body is clicked
+                    	if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                        $(this).popover('hide');
+                    	}
+                	});
+				});	
+
+				$('body').on('click', function (e) {
+                $('[data-toggle=dropdown]').each(function () {
                     // hide any open popovers when the anywhere else in the body is clicked
                     	if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
                         $(this).popover('hide');
