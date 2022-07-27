@@ -1121,10 +1121,11 @@ class GoalBankController extends Controller
 
     public function updategoalone(Request $request, $id) 
     {
-        $request->auserCheck = $request->aselected_emp_ids;
+        // $request->auserCheck = $request->aselected_emp_ids;
         Log::info($request->aselected_emp_ids);
-        $aselected_emp_ids = $request->aselected_emp_ids ? json_decode($request->aselected_emp_ids) : [];
-        $request->auserCheck = $aselected_emp_ids;
+        // $aselected_emp_ids = $request->aselected_emp_ids ? json_decode($request->aselected_emp_ids) : [];
+        $aselected_emp_ids = $request->auserCheck ? $request->auserCheck : [];
+        // $request->auserCheck = $aselected_emp_ids;
         $aselected_org_nodes = $request->aselected_org_nodes ? json_decode($request->aselected_org_nodes) : [];
         $current_user = Auth::id();
         $resultrec = Goal::withoutGlobalScopes()->findorfail( $id );
