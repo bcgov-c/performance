@@ -1089,18 +1089,6 @@ class GoalBankController extends Controller
             ->get();
 
             $resultrec = Goal::withoutGlobalScopes()->findorfail( $request->goal_id );
-            // $resultrec->update(
-            //     ['goal_type_id' => $request->input('goal_type_id')
-            //     , 'title' => $request->input('title')
-            //     , 'what' => $request->input('what')
-            //     , 'measure_of_success' => $request->input('measure_of_success')
-            //     , 'start_date' => $request->input('start_date')
-            //     , 'target_date' => $request->input('target_date')
-            //     , 'measure_of_success' => $request->input('measure_of_success')
-            //     ]
-            // );
-
-            // $resultrec->tags()->sync($request->tag_ids);
     
             foreach($organizationList as $org1) {
                 $result = DB::table('goal_bank_orgs')
@@ -1132,18 +1120,6 @@ class GoalBankController extends Controller
         $aselected_org_nodes = $request->aselected_org_nodes ? json_decode($request->aselected_org_nodes) : [];
         $current_user = Auth::id();
         $resultrec = Goal::withoutGlobalScopes()->findorfail( $id );
-        // $resultrec->update(
-        //     ['goal_type_id' => $request->input('goal_type_id')
-        //     , 'title' => $request->input('title')
-        //     , 'what' => $request->input('what')
-        //     , 'measure_of_success' => $request->input('measure_of_success')
-        //     , 'start_date' => $request->input('start_date')
-        //     , 'target_date' => $request->input('target_date')
-        //     , 'measure_of_success' => $request->input('measure_of_success')
-        //     ]
-        // );
-
-        // $resultrec->tags()->sync($request->tag_ids);
 
         $aemployee_ids = ($request->auserCheck) ? $request->auserCheck : [];
         $toRecipients = EmployeeDemo::select('users.id')
@@ -1194,141 +1170,6 @@ class GoalBankController extends Controller
         return ['data'=> $users];
     }
 
-
-    public function getOrganizations(Request $request) {
-        $orgs = OrganizationTree::
-        orderby('organization_trees.name','asc')->select('organization_trees.id','organization_trees.name')
-            ->where('organization_trees.level',0)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(name) LIKE '%" . strtolower($request->q) . "%'");
-            })
-            ->get();
-
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-        return response()->json($formatted_orgs);
-    } 
-
-    public function getPrograms(Request $request) {
-        $level0 = $request->level0 ? OrganizationTree::
-        where('organization_trees.id', $request->level0)->first() : null;
-        $orgs = OrganizationTree::
-        orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',1)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $level0 , function ($q) use($level0) {
-                return $q->where('organization_trees.organization', $level0->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->get();
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-        return response()->json($formatted_orgs);
-    } 
-
-    public function getDivisions(Request $request) {
-        $level0 = $request->level0 ? OrganizationTree::
-        where('organization_trees.id', $request->level0)->first() : null;
-        $level1 = $request->level1 ? OrganizationTree::
-        where('organization_trees.id', $request->level1)->first() : null;
-        $orgs = OrganizationTree::
-        orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',2)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $level0 , function ($q) use($level0) {
-                return $q->where('organization_trees.organization', $level0->name) ;
-            })
-            ->when( $level1 , function ($q) use($level1) {
-                return $q->where('organization_trees.level1_program', $level1->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->limit(300)
-            ->get();
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-        return response()->json($formatted_orgs);
-    } 
-
-    public function getBranches(Request $request) {
-        $level0 = $request->level0 ? OrganizationTree::
-        where('id', $request->level0)->first() : null;
-        $level1 = $request->level1 ? OrganizationTree::
-        where('organization_trees.id', $request->level1)->first() : null;
-        $level2 = $request->level2 ? OrganizationTree::
-        where('organization_trees.id', $request->level2)->first() : null;
-        $orgs = OrganizationTree::
-        orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',3)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $level0 , function ($q) use($level0) {
-                return $q->where('organization_trees.organization', $level0->name) ;
-            })
-            ->when( $level1 , function ($q) use($level1) {
-                return $q->where('organization_trees.level1_program', $level1->name );
-            })
-            ->when( $level2 , function ($q) use($level2) {
-                return $q->where('organization_trees.level2_division', $level2->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->limit(300)
-            ->get();
-
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-        return response()->json($formatted_orgs);
-    } 
-
-    public function getLevel4(Request $request) {
-        $level0 = $request->level0 ? OrganizationTree::
-        where('organization_trees.id', $request->level0)->first() : null;
-        $level1 = $request->level1 ? OrganizationTree::
-        where('organization_trees.id', $request->level1)->first() : null;
-        $level2 = $request->level2 ? OrganizationTree::
-        where('organization_trees.id', $request->level2)->first() : null;
-        $level3 = $request->level3 ? OrganizationTree::
-        where('organization_trees.id', $request->level3)->first() : null;
-        $orgs = OrganizationTree::
-        orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',4)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $level0 , function ($q) use($level0) {
-                return $q->where('organization_trees.organization', $level0->name) ;
-            })
-            ->when( $level1 , function ($q) use($level1) {
-                return $q->where('organization_trees.level1_program', $level1->name );
-            })
-            ->when( $level2 , function ($q) use($level2) {
-                return $q->where('organization_trees.level2_division', $level2->name );
-            })
-            ->when( $level3 , function ($q) use($level3) {
-                return $q->where('organization_trees.level3_branch', $level3->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->limit(300)
-            ->get();
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-        return response()->json($formatted_orgs);
-    } 
-
     public function getEmployees(Request $request,  $id) {
         $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
         $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
@@ -1351,142 +1192,6 @@ class GoalBankController extends Controller
         
         return view('shared.goalbank.partials.employee', compact('parent_id', 'employees') ); 
     }
-
-    public function egetOrganizations(Request $request) {
-
-        $eorgs = OrganizationTree::
-        orderby('organization_trees.name','asc')->select('organization_trees.id','organization_trees.name')
-            ->where('organization_trees.level',0)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-            })
-            ->get();
-
-        $eformatted_orgs = [];
-        foreach ($eorgs as $org) {
-            $eformatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($eformatted_orgs);
-    } 
-
-    public function egetPrograms(Request $request) {
-
-        $elevel0 = $request->elevel0 ? OrganizationTree::where('organization_trees.id',$request->elevel0)->first() : null;
-
-        $eorgs = OrganizationTree::
-        orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',1)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $elevel0 , function ($q) use($elevel0) {
-                return $q->where('organization_trees.organization', $elevel0->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->get();
-
-        $eformatted_orgs = [];
-        foreach ($eorgs as $org) {
-            $eformatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($eformatted_orgs);
-    } 
-
-    public function egetDivisions(Request $request) {
-
-        $elevel0 = $request->elevel0 ? OrganizationTree::where('id', $request->elevel0)->first() : null;
-        $elevel1 = $request->elevel1 ? OrganizationTree::where('id', $request->elevel1)->first() : null;
-
-        $eorgs = OrganizationTree::orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',2)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $elevel0 , function ($q) use($elevel0) {
-                return $q->where('organization_trees.organization', $elevel0->name) ;
-            })
-            ->when( $elevel1 , function ($q) use($elevel1) {
-                return $q->where('organization_trees.level1_program', $elevel1->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->limit(300)
-            ->get();
-
-        $eformatted_orgs = [];
-        foreach ($eorgs as $org) {
-            $eformatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($eformatted_orgs);
-    } 
-
-    public function egetBranches(Request $request) {
-        $elevel0 = $request->elevel0 ? OrganizationTree::where('id', $request->elevel0)->first() : null;
-        $elevel1 = $request->elevel1 ? OrganizationTree::where('id', $request->elevel1)->first() : null;
-        $elevel2 = $request->elevel2 ? OrganizationTree::where('id', $request->elevel2)->first() : null;
-
-        $eorgs = OrganizationTree::
-        orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',3)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $elevel0 , function ($q) use($elevel0) {
-                return $q->where('organization_trees.organization', $elevel0->name) ;
-            })
-            ->when( $elevel1 , function ($q) use($elevel1) {
-                return $q->where('organization_trees.level1_program', $elevel1->name );
-            })
-            ->when( $elevel2 , function ($q) use($elevel2) {
-                return $q->where('organization_trees.level2_division', $elevel2->name );
-            })
-            ->groupBy('name')
-            ->limit(300)
-            ->get();
-
-        $eformatted_orgs = [];
-        foreach ($eorgs as $org) {
-            $eformatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($eformatted_orgs);
-    } 
-
-    public function egetLevel4(Request $request) {
-        $elevel0 = $request->elevel0 ? OrganizationTree::where('id', $request->elevel0)->first() : null;
-        $elevel1 = $request->elevel1 ? OrganizationTree::where('id', $request->elevel1)->first() : null;
-        $elevel2 = $request->elevel2 ? OrganizationTree::where('id', $request->elevel2)->first() : null;
-        $elevel3 = $request->elevel3 ? OrganizationTree::where('id', $request->elevel3)->first() : null;
-
-        $eorgs = OrganizationTree::orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',4)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $elevel0 , function ($q) use($elevel0) {
-                return $q->where('organization_trees.organization', $elevel0->name) ;
-            })
-            ->when( $elevel1 , function ($q) use($elevel1) {
-                return $q->where('organization_trees.level1_program', $elevel1->name );
-            })
-            ->when( $elevel2 , function ($q) use($elevel2) {
-                return $q->where('organization_trees.level2_division', $elevel2->name );
-            })
-            ->when( $elevel3 , function ($q) use($elevel3) {
-                return $q->where('organization_trees.level3_branch', $elevel3->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->limit(300)
-            ->get();
-
-        $eformatted_orgs = [];
-        foreach ($eorgs as $org) {
-            $eformatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-        return response()->json($eformatted_orgs);
-    } 
 
     public function egetEmployees(Request $request,  $id) {
         $elevel0 = $request->edd_level0 ? OrganizationTree::
@@ -1515,152 +1220,6 @@ class GoalBankController extends Controller
         
         return view('shared.goalbank.partials.eemployee', compact('eparent_id', 'eemployees') ); 
     }
-
-public function agetOrganizations(Request $request) {
-
-        $aorgs = OrganizationTree::
-        orderby('organization_trees.name','asc')->select('organization_trees.id','organization_trees.name')
-            ->where('organization_trees.level',0)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-            })
-            ->get();
-
-        $aformatted_orgs = [];
-        foreach ($aorgs as $org) {
-            $aformatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($aformatted_orgs);
-    } 
-
-    public function agetPrograms(Request $request) {
-
-        $alevel0 = $request->alevel0 ? OrganizationTree::
-        where('organization_trees.id',$request->alevel0)->first() : null;
-
-        $aorgs = OrganizationTree::
-        orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',1)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $alevel0 , function ($q) use($alevel0) {
-                return $q->where('organization_trees.organization', $alevel0->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->get();
-
-        $aformatted_orgs = [];
-        foreach ($aorgs as $org) {
-            $aformatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($aformatted_orgs);
-    } 
-
-    public function agetDivisions(Request $request) {
-        $alevel0 = $request->alevel0 ? OrganizationTree::
-        where('organization_trees.id', $request->alevel0)->first() : null;
-        $alevel1 = $request->alevel1 ? OrganizationTree::
-        where('organization_trees.id', $request->alevel1)->first() : null;
-
-        $aorgs = OrganizationTree::
-        orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',2)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $alevel0 , function ($q) use($alevel0) {
-                return $q->where('organization_trees.organization', $alevel0->name) ;
-            })
-            ->when( $alevel1 , function ($q) use($alevel1) {
-                return $q->where('organization_trees.level1_program', $alevel1->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->limit(300)
-            ->get();
-
-        $aformatted_orgs = [];
-        foreach ($aorgs as $org) {
-            $aformatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($aformatted_orgs);
-    } 
-
-    public function agetBranches(Request $request) {
-        $alevel0 = $request->alevel0 ? OrganizationTree::
-        where('organization_trees.id', $request->alevel0)->first() : null;
-        $alevel1 = $request->alevel1 ? OrganizationTree::
-        where('organization_trees.id', $request->alevel1)->first() : null;
-        $alevel2 = $request->alevel2 ? OrganizationTree::
-        where('organization_trees.id', $request->alevel2)->first() : null;
-        $aorgs = OrganizationTree::
-        orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',3)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $alevel0 , function ($q) use($alevel0) {
-                return $q->where('organization_trees.organization', $alevel0->name) ;
-            })
-            ->when( $alevel1 , function ($q) use($alevel1) {
-                return $q->where('organization_trees.level1_program', $alevel1->name );
-            })
-            ->when( $alevel2 , function ($q) use($alevel2) {
-                return $q->where('organization_trees.level2_division', $alevel2->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->limit(300)
-            ->get();
-
-        $aformatted_orgs = [];
-        foreach ($aorgs as $org) {
-            $aformatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($aformatted_orgs);
-    } 
-
-    public function agetLevel4(Request $request) {
-        $alevel0 = $request->alevel0 ? OrganizationTree::
-        where('organization_trees.id', $request->alevel0)->first() : null;
-        $alevel1 = $request->alevel1 ? OrganizationTree::
-        where('organization_trees.id', $request->alevel1)->first() : null;
-        $alevel2 = $request->alevel2 ? OrganizationTree::
-        where('organization_trees.id', $request->alevel2)->first() : null;
-        $alevel3 = $request->alevel3 ? OrganizationTree::
-        where('organization_trees.id', $request->alevel3)->first() : null;
-
-        $aorgs = OrganizationTree::
-        orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',4)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $alevel0 , function ($q) use($alevel0) {
-                return $q->where('organization_trees.organization', $alevel0->name) ;
-            })
-            ->when( $alevel1 , function ($q) use($alevel1) {
-                return $q->where('organization_trees.level1_program', $alevel1->name );
-            })
-            ->when( $alevel2 , function ($q) use($alevel2) {
-                return $q->where('organization_trees.level2_division', $alevel2->name );
-            })
-            ->when( $alevel3 , function ($q) use($alevel3) {
-                return $q->where('organization_trees.level3_branch', $alevel3->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->limit(300)
-            ->get();
-
-        $aformatted_orgs = [];
-        foreach ($aorgs as $org) {
-            $aformatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-        return response()->json($aformatted_orgs);
-    } 
 
     public function agetEmployees(Request $request,  $id) {
         $alevel0 = $request->add_level0 ? OrganizationTree::where('id', $request->add_level0)->first() : null;
@@ -2023,13 +1582,6 @@ public function agetOrganizations(Request $request) {
             )
             ->addSelect(['org_audience' => 
                 GoalBankOrg::whereColumn('goal_id', 'goals.id')
-                // ->join('employee_demo', function ($sj) {
-                //     $sj->whereRAW("nullif(employee_demo.organization,'')=nullif(goal_bank_orgs.organization,'')")
-                //     ->whereRAW("nullif(employee_demo.level1_program,'')=nullif(goal_bank_orgs.level1_program,'')")
-                //     ->whereRAW("nullif(employee_demo.level2_division,'')=nullif(goal_bank_orgs.level2_division,'')")
-                //     ->whereRAW("nullif(employee_demo.level3_branch,'')=nullif(goal_bank_orgs.level3_branch,'')")
-                //     ->whereRAW("nullif(employee_demo.level4,'')=nullif(goal_bank_orgs.level4,'')");
-                // } )
                 ->selectRAW('count(distinct goal_bank_orgs.id)')
             ] )
             ->addSelect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)])
@@ -2055,27 +1607,6 @@ public function agetOrganizations(Request $request) {
                 return '<a href="'.route(request()->segment(1).'.goalbank.editone', $row->id).'" aria-label="Edit Goal For Individuals" value="'.$row->id.'">'.$row->sharedWith()->count().' Employees</a>';
             })
             ->editColumn('org_audience', function ($row) {
-            // ->addColumn('org_audience', function ($row) {
-            //     $orgCount = GoalBankOrg::join('employee_demo', function ($j1) {
-            //         $j1->on(function ($j1a) {
-            //             $j1a->whereRAW('goal_bank_orgs.organization = employee_demo.organization OR ((goal_bank_orgs.organization = "" OR goal_bank_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
-            //         } )
-            //         ->on(function ($j2a) {
-            //             $j2a->whereRAW('goal_bank_orgs.level1_program = employee_demo.level1_program OR ((goal_bank_orgs.level1_program = "" OR goal_bank_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
-            //         } )
-            //         ->on(function ($j3a) {
-            //             $j3a->whereRAW('goal_bank_orgs.level2_division = employee_demo.level2_division OR ((goal_bank_orgs.level2_division = "" OR goal_bank_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
-            //         } )
-            //         ->on(function ($j4a) {
-            //             $j4a->whereRAW('goal_bank_orgs.level3_branch = employee_demo.level3_branch OR ((goal_bank_orgs.level3_branch = "" OR goal_bank_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
-            //         } )
-            //         ->on(function ($j5a) {
-            //             $j5a->whereRAW('goal_bank_orgs.level4 = employee_demo.level4 OR ((goal_bank_orgs.level4 = "" OR goal_bank_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
-            //         } );
-            //     } )
-            //     ->where('goal_bank_orgs.goal_id', '=', $row->id)
-            //     ->groupBy('goal_bank_orgs.goal_id')
-            //     ->count();
                 return '<a href="'.route(request()->segment(1).'.goalbank.editpage', $row->id).'" aria-label="Edit Goal For Business Units" value="'.$row->id.'">'.$row->org_audience.' Business Units</a>';
             })
             ->addcolumn('action', function($row) {
@@ -2125,20 +1656,15 @@ public function agetOrganizations(Request $request) {
 
     private function getDropdownValues(&$mandatoryOrSuggested) {
         $mandatoryOrSuggested = [
-            // [
-            //     "id" => '',
-            //     "name" => 'Any'
-            // ],
+            [
+                "id" => '0',
+                "name" => 'Suggested'
+            ],
             [
                 "id" => '1',
                 "name" => 'Mandatory'
             ],
-            [
-                "id" => '0',
-                "name" => 'Suggested'
-            ]
         ];
-
     }
 
     public function get_access_entry($roleId, $modelId) {
