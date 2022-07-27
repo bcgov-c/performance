@@ -433,6 +433,7 @@ class MyTeamController extends Controller
         $suggestedGoals = Goal::withoutGlobalScope(NonLibraryScope::class)->where('user_id', Auth::id())
             ->where('status', 'active')
             ->where('is_library', 1)
+            ->where('by_admin', '=', 0)
             ->with('user')
             ->with('goalType')
             ->paginate(8);
