@@ -1097,18 +1097,6 @@ class GoalBankController extends Controller
             ->get();
 
             $resultrec = Goal::withoutGlobalScopes()->findorfail( $request->goal_id );
-            // $resultrec->update(
-            //     ['goal_type_id' => $request->input('goal_type_id')
-            //     , 'title' => $request->input('title')
-            //     , 'what' => $request->input('what')
-            //     , 'measure_of_success' => $request->input('measure_of_success')
-            //     , 'start_date' => $request->input('start_date')
-            //     , 'target_date' => $request->input('target_date')
-            //     , 'measure_of_success' => $request->input('measure_of_success')
-            //     ]
-            // );
-
-            // $resultrec->tags()->sync($request->tag_ids);
     
             foreach($organizationList as $org1) {
                 $result = DB::table('goal_bank_orgs')
@@ -1140,18 +1128,6 @@ class GoalBankController extends Controller
         $aselected_org_nodes = $request->aselected_org_nodes ? json_decode($request->aselected_org_nodes) : [];
         $current_user = Auth::id();
         $resultrec = Goal::withoutGlobalScopes()->findorfail( $id );
-        // $resultrec->update(
-        //     ['goal_type_id' => $request->input('goal_type_id')
-        //     , 'title' => $request->input('title')
-        //     , 'what' => $request->input('what')
-        //     , 'measure_of_success' => $request->input('measure_of_success')
-        //     , 'start_date' => $request->input('start_date')
-        //     , 'target_date' => $request->input('target_date')
-        //     , 'measure_of_success' => $request->input('measure_of_success')
-        //     ]
-        // );
-
-        // $resultrec->tags()->sync($request->tag_ids);
 
         $aemployee_ids = ($request->auserCheck) ? $request->auserCheck : [];
         $toRecipients = EmployeeDemo::select('users.id')
@@ -1669,46 +1645,9 @@ class GoalBankController extends Controller
             )
             ->addSelect(['org_audience' => 
                 GoalBankOrg::whereColumn('goal_id', 'goals.id')
-                // ->join('employee_demo', function ($sj) {
-                //     $sj->whereRAW("nullif(employee_demo.organization,'')=nullif(goal_bank_orgs.organization,'')")
-                //     ->whereRAW("nullif(employee_demo.level1_program,'')=nullif(goal_bank_orgs.level1_program,'')")
-                //     ->whereRAW("nullif(employee_demo.level2_division,'')=nullif(goal_bank_orgs.level2_division,'')")
-                //     ->whereRAW("nullif(employee_demo.level3_branch,'')=nullif(goal_bank_orgs.level3_branch,'')")
-                //     ->whereRAW("nullif(employee_demo.level4,'')=nullif(goal_bank_orgs.level4,'')");
-                // } )
                 ->selectRAW('count(distinct goal_bank_orgs.id)')
             ] )
             ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
-            // ->get();
-            // $admingoals = Goal::withoutGlobalScopes()
-            // ->join('users as cu', 'cu.id', '=', 'goals.created_by')
-            // ->leftjoin('employee_demo as ced', 'ced.guid', '=', 'cu.guid')
-            // ->where('is_library', true)
-            // // ->where('goals.created_by', '=', Auth::id())
-            // ->whereIn('by_admin', [1, 2])
-            // ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
-            //     $q->where(function($query) use ($request) {
-            //         return $query->whereRaw("LOWER(goals.title) LIKE '%" . strtolower($request->search_text) . "%'")
-            //             ->orWhereRaw("LOWER(ced.employee_name) LIKE '%" . strtolower($request->search_text) . "%'");
-            //     });
-            // })
-            // ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
-            //     return $q->whereRaw("LOWER(goals.title) LIKE '%" . strtolower($request->search_text) . "%'");
-            // })
-            // ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
-            //     return $q->whereRaw("LOWER(ced.employee_name) LIKE '%" . strtolower($request->search_text) . "%'");
-            // })
-            // ->distinct()
-            // ->select
-            // (
-            //     'goals.id',
-            //     'goals.title',
-            //     'goals.created_at',
-            //     'ced.employee_name as creator_name',
-            // )
-            // ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)])
-            // ->get();
-            // $query = $ownedgoals->merge($admingoals);
             $query = $ownedgoals;
             return Datatables::of($query)
             ->addIndexColumn()
@@ -1731,26 +1670,6 @@ class GoalBankController extends Controller
                 return '<a href="'.route(request()->segment(1).'.goalbank.editone', $row->id).'" aria-label="Edit Goal For Individuals" value="'.$row->id.'">'.$row->sharedWith()->count().' Employees</a>';
             })
             ->editColumn('org_audience', function ($row) {
-                // $orgCount = GoalBankOrg::join('employee_demo', function ($j1) {
-                //     $j1->on(function ($j1a) {
-                //         $j1a->whereRAW('goal_bank_orgs.organization = employee_demo.organization OR ((goal_bank_orgs.organization = "" OR goal_bank_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
-                //     } )
-                //     ->on(function ($j2a) {
-                //         $j2a->whereRAW('goal_bank_orgs.level1_program = employee_demo.level1_program OR ((goal_bank_orgs.level1_program = "" OR goal_bank_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
-                //     } )
-                //     ->on(function ($j3a) {
-                //         $j3a->whereRAW('goal_bank_orgs.level2_division = employee_demo.level2_division OR ((goal_bank_orgs.level2_division = "" OR goal_bank_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
-                //     } )
-                //     ->on(function ($j4a) {
-                //         $j4a->whereRAW('goal_bank_orgs.level3_branch = employee_demo.level3_branch OR ((goal_bank_orgs.level3_branch = "" OR goal_bank_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
-                //     } )
-                //     ->on(function ($j5a) {
-                //         $j5a->whereRAW('goal_bank_orgs.level4 = employee_demo.level4 OR ((goal_bank_orgs.level4 = "" OR goal_bank_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
-                //     } );
-                // } )
-                // ->where('goal_bank_orgs.goal_id', '=', $row->id)
-                // ->groupBy('goal_bank_orgs.goal_id')
-                // ->count();
                 return '<a href="'.route(request()->segment(1).'.goalbank.editpage', $row->id).'" aria-label="Edit Goal For Business Units" value="'.$row->id.'">'.$row->org_audience.' Business Units</a>';
             })
             ->addcolumn('action', function($row) {
@@ -1837,20 +1756,15 @@ class GoalBankController extends Controller
 
     private function getDropdownValues(&$mandatoryOrSuggested) {
         $mandatoryOrSuggested = [
-            // [
-            //     "id" => '',
-            //     "name" => 'Any'
-            // ],
+            [
+                "id" => '0',
+                "name" => 'Suggested'
+            ],
             [
                 "id" => '1',
                 "name" => 'Mandatory'
             ],
-            [
-                "id" => '0',
-                "name" => 'Suggested'
-            ]
         ];
-
     }
 
     public function get_access_entry($roleId, $modelId) {
