@@ -349,14 +349,6 @@ class ExcuseEmployeesController extends Controller
 
     public function saveexcuse(Request $request) 
     {
-        /*
-        $this->validate($request, [
-            'start_date' => 'required|date',
-            'target_date' => 'required|date|after_or_equal:start_date',
-            'excused_reason' => 'required'
-        ]);
-         * 
-         */
         $input = $request->all();
         $rules = [
             'start_date' => 'required|date',
@@ -384,8 +376,9 @@ class ExcuseEmployeesController extends Controller
             ->withInput();
         }
 
-        $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
-        $request->userCheck = $selected_emp_ids;
+        // $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
+        $selected_emp_ids = $request->userCheck ? $request->userCheck : [];
+        // $request->userCheck = $selected_emp_ids;
         $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
         $employee_ids = ($request->userCheck) ? $request->userCheck : [];
 

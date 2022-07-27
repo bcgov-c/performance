@@ -165,10 +165,12 @@ class EmployeeSharesController extends Controller
             ->withErrors($validator)
             ->withInput();
         }
-        $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
-        $eselected_emp_ids = $request->eselected_emp_ids ? json_decode($request->eselected_emp_ids) : [];
-        $request->userCheck = $selected_emp_ids;
-        $request->euserCheck = $eselected_emp_ids;
+        // $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
+        $selected_emp_ids = $request->userCheck ? $request->userCheck : [];
+        // $eselected_emp_ids = $request->eselected_emp_ids ? json_decode($request->eselected_emp_ids) : [];
+        $eselected_emp_ids = $request->euserCheck ? $request->euserCheck : [];
+        // $request->userCheck = $selected_emp_ids;
+        // $request->euserCheck = $eselected_emp_ids;
         $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
         $eselected_org_nodes = $request->eselected_org_nodes ? json_decode($request->eselected_org_nodes) : [];
         $current_user = User::find(Auth::id());
@@ -954,17 +956,13 @@ class EmployeeSharesController extends Controller
     private function getDropdownValues(&$mandatoryOrSuggested) {
         $mandatoryOrSuggested = [
             [
-                "id" => '',
-                "name" => 'Any'
+                "id" => '0',
+                "name" => 'Suggested'
             ],
             [
                 "id" => '1',
                 "name" => 'Mandatory'
             ],
-            [
-                "id" => '0',
-                "name" => 'Suggested'
-            ]
         ];
 
     }
