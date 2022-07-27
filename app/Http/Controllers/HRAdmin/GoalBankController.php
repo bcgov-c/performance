@@ -1793,54 +1793,25 @@ class GoalBankController extends Controller
     }
     
     protected function get_employees_by_selected_org_nodes($selected_org_nodes) {
-
-        $sql_level0 = EmployeeDemo::join('organization_trees', function($join)  {
-            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
-                ->where('organization_trees.level', '=', 0);
-            })
-            ->whereIn('organization_trees.id', $selected_org_nodes) ;
-            
-        $sql_level1 = EmployeeDemo::join('organization_trees', function($join)  {
-            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
-                ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
-                ->where('organization_trees.level', '=', 1);
-            })
-            ->whereIn('organization_trees.id', $selected_org_nodes) ;
-            
-        $sql_level2 = EmployeeDemo::join('organization_trees', function($join)  {
-            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
-                ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
-                ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
-                ->where('organization_trees.level', '=', 2);    
-            })
-            ->whereIn('organization_trees.id', $selected_org_nodes) ;
-            
-        $sql_level3 = EmployeeDemo::join('organization_trees', function($join)  {
-            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
-                ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
-                ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
-                ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
-                ->where('organization_trees.level', '=', 3);    
-            })
-            ->whereIn('organization_trees.id', $selected_org_nodes);
-            
-        $sql_level4 = EmployeeDemo::join('organization_trees', function($join)  {
-            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
-                ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
-                ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
-                ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
-                ->on('employee_demo.level4', '=', 'organization_trees.level4')
-                ->where('organization_trees.level', '=', 4);
-            })
-            ->whereIn('organization_trees.id', $selected_org_nodes);
-        
-        $employees = $sql_level4->select('employee_demo.employee_id') 
-            ->union( $sql_level3->select('employee_demo.employee_id') )
-            ->union( $sql_level2->select('employee_demo.employee_id') )
-            ->union( $sql_level1->select('employee_demo.employee_id') )
-            ->union( $sql_level0->select('employee_demo.employee_id') )
+        $employees = EmployeeDemo::join('organization_trees', function ($j1) {
+                $j1->on(function ($j1a) {
+                    $j1a->whereRAW('organization_trees.organization = employee_demo.organization OR ((organization_trees.organization = "" OR organization_trees.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+                } )
+                ->on(function ($j2a) {
+                    $j2a->whereRAW('organization_trees.level1_program = employee_demo.level1_program OR ((organization_trees.level1_program = "" OR organization_trees.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+                } )
+                ->on(function ($j3a) {
+                    $j3a->whereRAW('organization_trees.level2_division = employee_demo.level2_division OR ((organization_trees.level2_division = "" OR organization_trees.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+                } )
+                ->on(function ($j4a) {
+                    $j4a->whereRAW('organization_trees.level3_branch = employee_demo.level3_branch OR ((organization_trees.level3_branch = "" OR organization_trees.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+                } )
+                ->on(function ($j5a) {
+                    $j5a->whereRAW('organization_trees.level4 = employee_demo.level4 OR ((organization_trees.level4 = "" OR organization_trees.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+                } );
+            } )
+            ->whereIn('organization_trees.id', $selected_org_nodes)
             ->pluck('employee_id'); 
-
         return ($employees ? $employees->toArray() : []); 
     }
 
