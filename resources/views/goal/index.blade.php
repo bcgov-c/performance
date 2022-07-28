@@ -1,4 +1,4 @@
-<x-side-layout>
+<x-side-layout title="{{ __('My Goals - Performance Development Platform') }}">
     <x-slot name="header">
         <h3>
         @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))

@@ -1,4 +1,4 @@
-<x-side-layout>
+<x-side-layout title="{{ __('Team Members - Performance Development Platform') }}">
     <div class="row">
         <div class="col-12 col-sm-6">
             <h3>My Team</h3>

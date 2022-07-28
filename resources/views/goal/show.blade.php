@@ -1,4 +1,4 @@
-<x-side-layout>
+<x-side-layout title="{{ __('My Goals - Performance Development Platform') }}">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
 		{{ $goal['title'] }}

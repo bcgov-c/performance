@@ -1,4 +1,4 @@
-<x-side-layout>
+<x-side-layout title="{{ __('Team Members - Performance Development Platform') }}">
     <div>
         @yield('breadcrumb')
         <div class="float-right">
