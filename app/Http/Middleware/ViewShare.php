@@ -26,7 +26,8 @@ class ViewShare
             // dd($viewingProfileAs);
             $employee = User::find($viewingProfileAs);
             
-            $listOfEmployee = $employee->reportingManager->reportees()->get();
+            // $listOfEmployee = $employee->reportingManager->reportees()->get();
+            $listOfEmployee = $employee->reportingManager ? $employee->reportingManager->reportees()->get() : [];
             View::share('viewingProfileAs', $employee);
             View::share('listOfEmployee', $listOfEmployee);            
             View::share('disableEdit', true);
