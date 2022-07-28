@@ -1,4 +1,4 @@
-@extends('sysadmin.layout', ['title' => 'Switch Identity'])
+@extends('sysadmin.layout', ['title' => 'Switch Identity','tab_title' => 'Switch Identity - Performance Development Platform'])
 @section('page-content')
     
     <div class="card">

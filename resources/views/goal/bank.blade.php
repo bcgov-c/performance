@@ -1,4 +1,4 @@
-<x-side-layout>
+<x-side-layout title="{{ __('My Goals - Performance Development Platform') }}">
     <div class="container-fluid">
         <div class="row ">
             <div class="col-md-6 col-6">

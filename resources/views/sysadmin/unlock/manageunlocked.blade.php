@@ -1,4 +1,4 @@
-<x-side-layout title="{{ 'Unlock conversation' }}">
+<x-side-layout title="{{ 'Unlock Conversations - Performance Development Platform' }}">
 
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-primary leading-tight" role="banner">

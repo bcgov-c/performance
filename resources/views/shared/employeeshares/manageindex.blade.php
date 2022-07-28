@@ -1,4 +1,4 @@
-<x-side-layout title="{{ __('Dashboard') }}">
+<x-side-layout title="{{ __('Share Employees - Performance Development Platform') }}">
     <div name="header" class="container-header p-n2 "> 
         <div class="container-fluid">
             <h3>Share Employees</h3>
