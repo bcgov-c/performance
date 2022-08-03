@@ -177,6 +177,11 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
     Route::post('/sysadmin/system-security/access-orgs-toggle-allow-login', [AccessOrganizationsController::class,'toggleAllowLogin'])->name('access-orgs-toggle-allow-login');
     Route::post('/sysadmin/system-security/access-orgs-reset', [AccessOrganizationsController::class,'reset'])->name('access-orgs-reset');
 
+    // System Security -- Access Organizations
+    Route::resource('/sysadmin/system-security/access-orgs', AccessOrganizationsController::class)->except(['create', 'store', 'show', 'destroy']);
+    Route::post('/sysadmin/system-security/access-orgs-toggle-allow-login', [AccessOrganizationsController::class,'toggleAllowLogin'])->name('access-orgs-toggle-allow-login');
+    Route::post('/sysadmin/system-security/access-orgs-reset', [AccessOrganizationsController::class,'reset'])->name('access-orgs-reset');
+
     //Shared Employees
     Route::group(['middleware' => ['auth']], function() {    
         Route::get('/sysadmin/employeeshares', [EmployeeSharesController::class, 'addnew'])->name('sysadmin.employeeshares');
