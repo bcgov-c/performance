@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\EmployeeDemo;
 use App\Models\JobSchedAudit;
+use App\Models\SharedProfile;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 
@@ -157,6 +158,16 @@ class SyncUserProfile extends Command
     
                 $user->save();
 
+                // Grant employee Role
+                if (!$user->hasRole('Employee')) {
+                    $user->assignRole('Employee');
+                }
+
+                if (!$user->hasRole('Supervisor')) {
+                    $this->assignSupervisorRole( $user );
+                }
+
+
           } else {
 
               $user = User::where('email', $employee->employee_email)->first()  ;
@@ -181,8 +192,15 @@ class SyncUserProfile extends Command
                         'acctlock' => $employee->date_deleted ? true : false,
                         'last_sync_at' => $new_sync_at,
                     ]);
-              }
 
+
+                    $user->assignRole('Employee');
+
+                    // Grant 'Supervisor' Role based on ODS demo database
+                    $this->assignSupervisorRole( $user );
+
+
+              }
           }
         
         }
@@ -227,17 +245,17 @@ class SyncUserProfile extends Command
             })->update(['acctlock'=>true, 'last_sync_at' => $new_sync_at]);
 
             
-        // Step 4 : Lock all users except pivot run users
-        $this->info( now() );        
-        $this->info('Step 4 - Lock Out Users except Pivot run based on organization');
+        // // Step 4 : Lock all users except pivot run users
+        // $this->info( now() );        
+        // $this->info('Step 4 - Lock Out Users except Pivot run based on organization');
 
-        $users = User::whereNotNull('guid')
-            ->whereNotIn('guid',function($query) { 
-                $query->select('guid')->from('employee_demo')
-                    ->whereIn('organization', ['BC Public Service Agency',
-                                                'Royal BC Museum', 
-                                                'Social Development and Poverty Reduction']);
-        })->update(['acctlock'=>true, 'last_sync_at' => $new_sync_at]);
+        // $users = User::whereNotNull('guid')
+        //     ->whereNotIn('guid',function($query) { 
+        //         $query->select('guid')->from('employee_demo')
+        //             ->whereIn('organization', ['BC Public Service Agency',
+        //                                         'Royal BC Museum', 
+        //                                         'Social Development and Poverty Reduction']);
+        // })->update(['acctlock'=>true, 'last_sync_at' => $new_sync_at]);
 
         echo now();
     }
@@ -275,6 +293,35 @@ class SyncUserProfile extends Command
 
         return null;
 
+    }
+
+    private function assignSupervisorRole(User $user)
+    {
+
+        $role = 'Supervisor';
+
+        $isManager = false;
+        $hasSharedProfile = false;
+
+        // To determine the login user whether is manager or not 
+        // To determine the login user whether is manager or not 
+        $mgr = User::where('reporting_to', $user->id)->first();
+        $isManager = $mgr ? true : false;
+
+        // To determine the login user whether has shared profile
+        $sp = SharedProfile::where('shared_with', $user->id )->first();
+        $hasSharedProfile = $sp ? true : false;
+
+        // Assign/Rovoke Role when is manager or has shared Profile
+        if ($user->hasRole($role)) {
+            if (!($isManager or $hasSharedProfile)) {
+                $user->removeRole($role);
+            }
+        } else {
+            if ($isManager or $hasSharedProfile) {
+                $user->assignRole($role);
+            }
+        }
     }
 
 }

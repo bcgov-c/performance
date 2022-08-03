@@ -1,0 +1,185 @@
+<?php
+
+namespace App\Http\Controllers\SysAdmin;
+
+use App\Models\EmployeeDemo;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Yajra\Datatables\Datatables;
+use App\Models\AccessOrganization;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+
+class AccessOrganizationsController extends Controller
+{
+    //
+    public function index(Request $request) {
+
+
+        if($request->ajax()) {
+
+             // $columns = ["code","name","status","created_at"];
+            $access_orgs = AccessOrganization::with('created_by', 'updated_by')
+                                ->when($request->organization, function($query) use($request) {
+                                    return $query->where('organization', 'like', '%'.$request->organization.'%');
+                                })
+                                ->when($request->allow_login, function($query) use($request) {
+                                    return $query->where('allow_login', $request->allow_login);
+                                })
+                                ->when($request->allow_inapp_msg, function($query) use($request) {
+                                    return $query->where('allow_inapp_msg', $request->allow_inapp_msg);
+                                })
+                                ->when($request->allow_email_msg, function($query) use($request) {
+                                    return $query->where('allow_email_msg', $request->allow_email_msg);
+                                })
+                                ->withCount('active_employee_ids');
+
+            return Datatables::of($access_orgs)
+                                
+                    ->addColumn('action', function ($org) {
+                        return '<a class="btn btn-info btn-sm edit-org" data-id="'. $org->id .'" >Change</a>' ;
+                    })
+                    // ->addColumn('deleted_by', function ($user) {
+                    //     return $user->deleted_at ? $user->updated_by->name : '';       
+                    // })
+                    ->addColumn('select_users', static function ($org) {
+                        return '<input pid="1335" type="checkbox" id="userCheck'. 
+                            $org->id .'" name="userCheck[]" value="'. $org->id .'" class="dt-body-center">';
+                    })
+                    ->editColumn('created_at', function ($user) {
+                        return $user->created_at->format('Y-m-d H:m:s'); // human readable format
+                    })
+                    ->editColumn('updated_at', function ($user) {
+                        return $user->updated_at->format('Y-m-d H:m:s'); // human readable format
+                    })
+                    ->rawColumns(['action','select_users'])
+                    ->make(true);
+        }
+
+        $this->createNewAccessOrgsFromEmployeeDemo();
+
+        $matched_emp_ids = AccessOrganization::pluck('id');
+        $old_selected_emp_ids = [];
+
+        return view('sysadmin.system-security.access-orgs.index',compact('request','matched_emp_ids','old_selected_emp_ids') );
+
+
+    }
+
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Request $request, $id)
+    {
+        if ($request->ajax()) {
+            $access_org = AccessOrganization::where('id', $id)->first();
+            return response()->json($access_org);
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        if ($request->ajax()) {
+
+            $validator = Validator::make(request()->all(), [
+                    'allow_login'  => ['required', Rule::in(['Y', 'N']) ],
+                    'allow_inapp_msg'  => ['required', Rule::in(['Y', 'N']) ],
+                    'allow_email_msg'  => ['required', Rule::in(['Y', 'N']) ],
+            ]);
+
+            //run validation which will redirect on failure
+            $validated = $validator->validate();
+
+            $access_org = AccessOrganization::where('id', $id)->first();
+            $access_org->fill( $validated );
+            $access_org->updated_by_id = Auth::ID();
+
+            $access_org->save();
+
+            return response()->json($access_org);
+        }
+    }
+
+    public function toggleAllowLogin(Request $request) 
+    {
+
+        if ($request->ajax()) {
+
+            $access_orgs = AccessOrganization::whereIn('id', $request->selected_orgs)->get();
+
+            // return implode(', ', $access_orgs->pluck('id')->toArray() );
+
+            foreach($access_orgs as $org) {
+                $org->allow_login = $request->allow_login;
+                $org->updated_by_id = Auth::ID();
+
+                $org->save();
+            }
+
+            // return response()->json( $access_orgs->pluck('id') );
+            return response()->noContent();
+        }
+
+    }
+
+    public function reset(Request $request) 
+    {
+
+        if ($request->ajax()) {
+
+            $access_orgs = AccessOrganization::whereIn('id', $request->selected_orgs)->get();
+
+            // return implode(', ', $access_orgs->pluck('id')->toArray() );
+
+            foreach($access_orgs as $org) {
+                $org->allow_login = 'N';
+                $org->allow_inapp_msg = 'N';
+                $org->allow_email_msg = 'N';
+                $org->updated_by_id = Auth::ID();
+
+                $org->save();
+            }
+
+            // return response()->json( $access_orgs->pluck('id') );
+            return response()->noContent();
+        }
+
+    }
+
+
+    protected function createNewAccessOrgsFromEmployeeDemo() 
+    {
+        $org_names = EmployeeDemo::where('organization', '<>','')
+                            ->distinct('organization')->orderBy('organization')->pluck('organization');
+
+        foreach ($org_names as $org_name) {
+            
+            $access_org = AccessOrganization::where('organization', $org_name)->first();
+
+            if ( !$access_org ) {
+
+                AccessOrganization::create([
+                    'organization' => $org_name,
+                    'created_by_id' => Auth::Id(),
+                    'updated_by_id' => Auth::Id(),
+                ]);
+                
+            }
+
+        }
+
+    }
+
+}
