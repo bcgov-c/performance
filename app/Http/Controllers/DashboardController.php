@@ -59,7 +59,9 @@ class DashboardController extends Controller
                                     ->whereColumn('dashboard_notifications.related_id', 'goals.id')
                                     ->whereNull('goals.deleted_at')
                                     ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB']);
-                        });    
+                        })
+                        ->orWhere('dashboard_notifications.notification_type', '')
+                        ;    
                 })
             ->orderby('status', 'asc')->orderby('created_at', 'desc')
             ->paginate(8);
