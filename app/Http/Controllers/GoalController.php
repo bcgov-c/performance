@@ -43,7 +43,7 @@ class GoalController extends Controller
         ->with('user')
         ->with('goalType');
         $type = 'past';
-        
+                
         /*
         $adminShared=SharedProfile::select('shared_with')
         ->where('shared_id', '=', $authId)
@@ -61,7 +61,11 @@ class GoalController extends Controller
         ->pluck('shared_id');
         $empShared = User::select('users.*')
         ->whereIn('users.id', $empShared)->get();
-        $employees = $employees->merge($empShared);
+        $employees = $employees->merge($empShared);        
+        
+        if(count($employees)>0) {
+            $request->session()->put('has_employees', true);
+        }        
         
         $type_desc_arr = array();
         foreach($goaltypes as $goalType) {
