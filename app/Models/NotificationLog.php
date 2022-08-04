@@ -17,6 +17,9 @@ class NotificationLog extends Model
         'alert_type',
         'alert_format',
         'sender_id',
+        'notify_user_id',          // InApp -- notify to 
+        'notify_due_date',
+        'notify_for_days',          // InApp -- notify for due in days e.g. conversation due date
         'template_id',
         'status',
         'date_sent',
