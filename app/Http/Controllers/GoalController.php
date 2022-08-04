@@ -434,8 +434,8 @@ class GoalController extends Controller
             $sortorder = $request->sortorder;
         }
         
-        $sortby = '';
-        if ($request->has('sortby') && $request->sortby != '') {
+        $sortby = 'created_at';
+        if ($request->has('sortby') && ($request->sortby != 'created_at' && $request->sortby != '')) {
             $sortby = $request->sortby;
             $query = $query->orderby($sortby, $sortorder);    
             if ($sortorder == 'ASC') {
