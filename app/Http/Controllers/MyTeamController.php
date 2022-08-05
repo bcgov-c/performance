@@ -2,26 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Tag;
+use App\Models\Goal;
+use App\Models\User;
+use App\Models\GoalType;
+use App\Models\Participant;
+use Illuminate\Http\Request;
+use App\Models\EmployeeShare;
+use App\Models\ExcusedReason;
+use App\Models\SharedProfile;
+use App\Scopes\NonLibraryScope;
+use App\Models\ConversationTopic;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Models\DashboardNotification;
 use App\DataTables\MyEmployeesDataTable;
+use App\Http\Requests\ShareMyGoalRequest;
 use App\DataTables\SharedEmployeeDataTable;
-use App\Http\Requests\Goals\AddGoalToLibraryRequest;
 use App\Http\Requests\MyTeams\ShareProfileRequest;
 use App\Http\Requests\MyTeams\UpdateExcuseRequest;
+use App\Http\Requests\Goals\AddGoalToLibraryRequest;
 use App\Http\Requests\MyTeams\UpdateProfileSharedWithRequest;
-use App\Http\Requests\ShareMyGoalRequest;
-use App\Models\ConversationTopic;
-use App\Models\ExcusedReason;
-use App\Models\Goal;
-use App\Models\GoalType;
-use App\Models\EmployeeShare;
-use App\Models\Participant;
-use App\Models\SharedProfile;
-use App\Models\User;
-use App\Scopes\NonLibraryScope;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use App\Models\Tag;
 
 class MyTeamController extends Controller
 {
@@ -357,6 +358,16 @@ class MyTeamController extends Controller
             $id = $goal->id;
             $add_tag_goal = Goal::withoutGlobalScope(NonLibraryScope::class)->findOrFail($id);
             $add_tag_goal->tags()->sync($tags);
+        }
+
+        // create Dashboard Notification displayed on Home page
+        foreach ($request->itemsToShare as $user_id) {
+            DashboardNotification::create([
+                'user_id' => $user_id,
+                'notification_type' => 'GB',        // Goal Bank
+                'comment' => $goal->user->name . ' added a new goal to your goal bank.',
+                'related_id' => $goal->id,
+            ]);
         }
         
         return response()->json(['success' => true, 'message' => 'Goal added to library successfully']);
