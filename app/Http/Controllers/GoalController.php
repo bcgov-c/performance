@@ -165,10 +165,11 @@ class GoalController extends Controller
             $goal->save();
         };
 
-        $affected = DashboardNotification::wherein('notification_type', ['GC', 'GR'])
-        ->where('related_id', $goal->id)
-        ->wherenull('status')
-        ->update(['status' => 'R']);
+        // Commented by JP to avoid the new added message always marked as 'READ'
+        // $affected = DashboardNotification::wherein('notification_type', ['GC', 'GR'])
+        // ->where('related_id', $goal->id)
+        // ->wherenull('status')
+        // ->update(['status' => 'R']);
 
         return view('goal.show', compact('goal', 'linkedGoals'));
     }
@@ -684,7 +685,11 @@ class GoalController extends Controller
                 }
             }
             else {
-                if ((session()->get('original-auth-id') != null) and ($user->reporting_to == session()->get('original-auth-id'))) {
+
+                // add a message when the commemt was added by Shared with  
+                $is_by_shared_with = $user->sharedWith->contains('shared_with', $comment->user_id);
+                                       
+                if ((session()->get('original-auth-id') != null) and ($is_by_shared_with or ($user->reporting_to == session()->get('original-auth-id')))) {
                     //add dashboard notification
                     $newNotify = new DashboardNotification;
                     $newNotify->user_id = Auth::id();
