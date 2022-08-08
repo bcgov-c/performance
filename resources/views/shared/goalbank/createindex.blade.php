@@ -784,5 +784,8 @@
         background-color: #f2dede;
         border-color: #ebccd1;
     }
-    
+    .multiselect-container{
+        height: 350px; 
+        overflow-y: scroll;
+    }
 </style> 

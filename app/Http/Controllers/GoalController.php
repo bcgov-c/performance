@@ -69,10 +69,7 @@ class GoalController extends Controller
 
         $query = Goal::where('user_id', $authId)
         ->with('user')
-        ->with('goalType')
-        ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
-        ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
-        ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id');
+        ->with('goalType');
         $type = 'past';
                 
         /*
@@ -122,6 +119,9 @@ class GoalController extends Controller
             $type = 'supervisor';
             return view('goal.index', compact('goals', 'type', 'goaltypes', 'user', 'tags', 'type_desc_str'));
         }
+        $query = $query->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
+        ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
+        ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id');
         $query = $query->where('status', '<>', 'active')->select('goals.*', DB::raw('group_concat(distinct tags.name) as tagnames'), 'goal_types.name as typename');
         
         if(isset($request->title) && $request->title != ''){
@@ -133,8 +133,8 @@ class GoalController extends Controller
         if(isset($request->tag_id) && $request->tag_id != 0){
             $query = $query->where('goal_tags.tag_id', '=', "$request->tag_id");
         }
-        if(isset($request->start_date) && $request->start_date != ''){
-            $start_date_array = explode('-', $request->start_date);
+        if(isset($request->filter_start_date) && $request->filter_start_date != ''){
+            $start_date_array = explode('-', $request->filter_start_date);
             if(count($start_date_array) == 2) {
                 $from = date_create(trim($start_date_array[0]));
                 $to = date_create(trim($start_date_array[1]));                
@@ -143,8 +143,8 @@ class GoalController extends Controller
                 $query = $query->whereBetween('goals.start_date', [$from, $to]);
             }
         }
-        if(isset($request->target_date) && $request->target_date != ''){
-            $target_date_array = explode('-', $request->target_date);
+        if(isset($request->filter_target_date) && $request->filter_target_date != ''){
+            $target_date_array = explode('-', $request->filter_target_date);
             if(count($target_date_array) == 2) {
                 $from = date_create(trim($target_date_array[0]));
                 $to = date_create(trim($target_date_array[1]));                
