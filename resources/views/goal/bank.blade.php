@@ -401,3 +401,9 @@
         });
         
 </script>    
+<style>
+    .multiselect-container{
+        height: 350px; 
+        overflow-y: scroll;
+    }
+</style>    

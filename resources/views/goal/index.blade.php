@@ -67,13 +67,13 @@
                         <div class="col">
                             <label>
                                 Start Date
-                                <input type="text" class="form-control" name="start_date" value="{{request()->start_date ?? 'Any'}}">
+                                <input type="text" class="form-control" name="filter_start_date" value="{{request()->filter_start_date ?? 'Any'}}">
                             </label>
                         </div>
                         <div class="col">
                             <label>
                                 End Date
-                                <input type="text" class="form-control" name="target_date" value="{{request()->target_date ?? 'Any'}}">
+                                <input type="text" class="form-control" name="filter_target_date" value="{{request()->filter_target_date ?? 'Any'}}">
                             </label>
                         </div>
                     </div>
@@ -454,7 +454,7 @@
             $(":button").addClass('text-left');            
         });
         
-        $('input[name="start_date"]').daterangepicker({
+        $('input[name="filter_start_date"]').daterangepicker({
                 autoUpdateInput: false,
                 locale: {
                     cancelLabel: 'Any',
@@ -464,10 +464,10 @@
                 $(this).val(picker.startDate.format('MMM DD, YYYY') + ' - ' + picker.endDate.format('MMM DD, YYYY'));
                 $("#filter-menu").submit();
             }).on('cancel.daterangepicker', function(ev, picker) {
-                $('input[name="start_date"]').val('Any');
+                $('input[name="filter_start_date"]').val('Any');
             });
             
-        $('input[name="target_date"]').daterangepicker({
+        $('input[name="filter_target_date"]').daterangepicker({
                 autoUpdateInput: false,
                 locale: {
                     cancelLabel: 'Any',
@@ -477,7 +477,7 @@
                 $(this).val(picker.startDate.format('MMM DD, YYYY') + ' - ' + picker.endDate.format('MMM DD, YYYY'));
                 $("#filter-menu").submit();
             }).on('cancel.daterangepicker', function(ev, picker) {
-                $('input[name="target_date"]').val('Any');
+                $('input[name="filter_target_date"]').val('Any');
             });    
             
             $('#filter-menu select, #filter-menu input').change(function () {
@@ -497,6 +497,12 @@
         color: #a94442;
         background-color: #f2dede;
         border-color: #ebccd1;
+    }
+    
+    
+    .multiselect-container{
+        height: 350px; 
+        overflow-y: scroll;
     }
 </style>    
  
