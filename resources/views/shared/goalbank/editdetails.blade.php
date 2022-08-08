@@ -217,3 +217,17 @@
 	</x-slot>
 
 </x-side-layout>
+
+
+
+<style>
+    .alert-danger {
+        color: #a94442;
+        background-color: #f2dede;
+        border-color: #ebccd1;
+    }
+    .multiselect-container{
+        height: 350px; 
+        overflow-y: scroll;
+    }
+</style> 
