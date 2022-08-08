@@ -49,6 +49,38 @@
             @endforeach
             @else
              <div class="col-12 col-sm-12">
+                 
+                <form action="" method="get" id="filter-menu">
+                    <div class="row">
+                        <div class="col">
+                            <label>
+                                Title
+                                <input type="text" name="title" class="form-control" value="{{request()->title}}">
+                            </label>
+                        </div>
+                        <div class="col">
+                            <x-dropdown :list="$goaltypes" label="Goal Type" name="goal_type" :selected="request()->goal_type"></x-dropdown>
+                        </div>
+                        <div class="col">
+                            <x-dropdown :list="$tagsList" label="Tags" name="tag_id" :selected="request()->tag_id"></x-dropdown>
+                        </div>
+                        <div class="col">
+                            <label>
+                                Start Date
+                                <input type="text" class="form-control" name="start_date" value="{{request()->start_date ?? 'Any'}}">
+                            </label>
+                        </div>
+                        <div class="col">
+                            <label>
+                                End Date
+                                <input type="text" class="form-control" name="target_date" value="{{request()->target_date ?? 'Any'}}">
+                            </label>
+                        </div>
+                    </div>
+                    <input name="sortby" id="sortby" value="{{$sortby}}" type="hidden">
+                    <input name="sortorder" id="sortorder" value="{{$sortorder}}" type="hidden">
+                </form> 
+                 
                 @include('goal.partials.target-table',['goals'=>$goals])
             </div>
             @endif
@@ -154,7 +186,14 @@
   </div>
 </div>
     @push('css')
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
         <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}">
+    @endpush
+    
+    @push('js')
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+        <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
     @endpush
 
     <x-slot name="js">
@@ -392,6 +431,8 @@
     </script>
     </x-slot>
 
+    
+    
 </x-side-layout>
 
 <script>    
@@ -412,6 +453,36 @@
             $(":button").removeClass('text-center');
             $(":button").addClass('text-left');            
         });
+        
+        $('input[name="start_date"]').daterangepicker({
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Any',
+                    format: 'MMM DD, YYYY'
+                }
+            }).on('apply.daterangepicker', function(ev, picker) {
+                $(this).val(picker.startDate.format('MMM DD, YYYY') + ' - ' + picker.endDate.format('MMM DD, YYYY'));
+                $("#filter-menu").submit();
+            }).on('cancel.daterangepicker', function(ev, picker) {
+                $('input[name="start_date"]').val('Any');
+            });
+            
+        $('input[name="target_date"]').daterangepicker({
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Any',
+                    format: 'MMM DD, YYYY'
+                }
+            }).on('apply.daterangepicker', function(ev, picker) {
+                $(this).val(picker.startDate.format('MMM DD, YYYY') + ' - ' + picker.endDate.format('MMM DD, YYYY'));
+                $("#filter-menu").submit();
+            }).on('cancel.daterangepicker', function(ev, picker) {
+                $('input[name="target_date"]').val('Any');
+            });    
+            
+            $('#filter-menu select, #filter-menu input').change(function () {
+                $("#filter-menu").submit();
+            });
               
 </script>    
 

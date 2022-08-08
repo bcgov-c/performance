@@ -5,6 +5,8 @@
   <thead>
     <tr>
       <th scope="col">Title</th>
+      <th scope="col">Goal Type</th>
+      <th scope="col">Tags</th>
       <th scope="col">Start Date</th>
       <th scope="col">End Date</th>
       <th scope="col">Status</th>
@@ -19,6 +21,8 @@
           {{ $goal->title }}
         </a>
       </th>
+      <td onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">{{ $goal->typename }}</td>
+      <td onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">{{ $goal->tagnames }}</td>
       <td onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">{{ $goal->start_date_human }}</td>
       <td onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">{{ $goal->target_date_human }}</td>
       <td>
