@@ -44,6 +44,13 @@
                 <label for="search">
                     &nbsp;
                 </label>
+                <input type="button" id="search-btn" value="Search" class="form-control btn btn-primary" />
+            </div>
+
+            <div class="form-group col-md-1">
+                <label for="search">
+                    &nbsp;
+                </label>
                 <input type="button" id="reset-btn" value="Reset" class="form-control btn btn-secondary" />
             </div>
         </div>
@@ -62,9 +69,10 @@
                     <th>User Name</th>
                     <th>IDIR</th>
                     <th>Employee ID</th>
-                    <th>User ID</th>
+                    <th>Organization</th>
                     <th>Login Method</th>
                     <th>Identity Provider</th>
+                    <th>User ID</th>
                     <th>Login IP</th>
                     <th>Logout at</th>
 				</tr>
@@ -80,7 +88,7 @@
     <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 
 	<style>
-    #accesslog-table_filter {
+    #accesslog-table_filter label {
         display: none;
     }
 
@@ -101,6 +109,7 @@
 
     $(function() {
  
+
         // Datatables
         var oTable = $('#accesslog-table').DataTable({
             "scrollX": true,
@@ -110,7 +119,8 @@
             serverSide: true,
             // select: true,
             'order': [[ 0, 'desc']],
-            
+
+
             ajax: {
                 url: '{!! route('sysadmin.system_security.access_logs') !!}',
                 data: function (data) {
@@ -123,13 +133,14 @@
                 {data: 'id', name: 'id', className: "dt-nowrap" },
                 {data: 'login_at', name: 'login_at', className: "dt-nowrap" },
                 {data: 'name', name: 'users.name', className: "dt-nowrap" },
-                {data: 'idir',  name: 'users.idir',  className: "dt-nowrap" },
+                {data: 'idir',  name: 'idir',  className: "dt-nowrap" },
                 {data: 'employee_id',  name: 'users.employee_id',  className: "dt-nowrap" },
-                {data: 'user_id',  name: 'user_id',  className: "dt-nowrap" },
+                {data: 'organization',  name: 'organization',  className: "dt-nowrap" },
                 {data: 'login_method', name: 'login_method'},
                 {data: 'identity_provider', name: 'identity_provider'},
+                {data: 'user_id',  name: 'user_id',  className: "dt-nowrap" },
                 {data: 'login_ip', name: 'login_ip'},
-                {data: 'logout_at', name: 'logout_at'},
+                {data: 'logout_at', name: 'logout_at', className: "dt-nowrap" },
 
             ],
             columnDefs: [
@@ -142,17 +153,23 @@
 
         });
 
+        // add export button on right
+        $("#accesslog-table_filter").append('<button id="export-btn" value="export" class="btn-sm btn-primary">Export All</button> ');
 
 
-        $('#user').on('keyup change', function () {
-            oTable.draw();
-        });
+        // $('#user').on('keyup change', function () {
+        //     oTable.draw();
+        // });
 
-        $('#login_method').on('change', function () {
-            oTable.columns( 'login_method:name' ).search( this.value ).draw();            
-        });
+        // $('#login_method').on('change', function () {
+        //     oTable.columns( 'login_method:name' ).search( this.value ).draw();            
+        // });
 
-        $('.date-range-filter').on('change', function () {
+        // $('.date-range-filter').on('change', function () {
+        //     oTable.draw();
+        // });
+
+        $('#search-btn').on('click', function() {
             oTable.draw();
         });
 
@@ -163,6 +180,13 @@
 
             oTable.search( '' ).columns().search( '' ).draw();
         });
+
+        $('#export-btn').on('click', function() {
+            export_url = '{{ route("sysadmin.system_security.access_logs_export") }}';
+			let _url = export_url;
+			window.location.href = _url;
+        });
+
 
     });
 
