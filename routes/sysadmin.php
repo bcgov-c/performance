@@ -170,6 +170,7 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
 
     // System Security -- Access Log 
     Route::get('/sysadmin/system-security/access-logs', [AccessLogController::class, 'index'])->name('sysadmin.system_security.access_logs');
+    Route::get('/sysadmin/system-security/access-logs-export', [AccessLogController::class, 'export'])->name('sysadmin.system_security.access_logs_export');
 
     // System Security -- Access Organizations
     Route::resource('/sysadmin/system-security/access-orgs', AccessOrganizationsController::class)->except(['create', 'store', 'show', 'destroy']);
