@@ -508,7 +508,11 @@ class GoalController extends Controller
             } else {
                 $sortorder = 'ASC';
             }
+        } else {
+            $query = $query->orderby($sortby, $sortorder);    
         }
+        
+        
         
         
         // $query = $query->groupBy('goals.id');
