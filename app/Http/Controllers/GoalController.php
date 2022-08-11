@@ -35,12 +35,6 @@ class GoalController extends Controller
         $goaltypes = GoalType::all()->toArray();
         $tags = Tag::all()->toArray();
         $user = User::find($authId);
-        
-        array_unshift($goaltypes, [
-            "id" => "0",
-            "description" => '',
-            "name" => "Any"
-        ]);
               
         $tagsList = Tag::all()->toArray();
         array_unshift($tagsList, [
@@ -118,7 +112,13 @@ class GoalController extends Controller
             ->paginate(8);
             $type = 'supervisor';
             return view('goal.index', compact('goals', 'type', 'goaltypes', 'user', 'tags', 'type_desc_str'));
-        }
+        }       
+        array_unshift($goaltypes, [
+            "id" => "0",
+            "description" => '',
+            "name" => "Any"
+        ]);        
+        
         $query = $query->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
         ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id');
@@ -153,9 +153,9 @@ class GoalController extends Controller
                 $query = $query->whereBetween('goals.target_date', [$from, $to]);
             }
         }
-                
+      
+        $goals = $query->groupBy('title');
         $goals = $query->paginate(4);
-                
         $sortby = '';
         $sortorder = 'ASC';
         
