@@ -664,11 +664,13 @@
                         }
 
                         //Is Locked
+                        /*
                         if (result.is_locked) {
                             $("#locked-message").removeClass("d-none");
                             $("#unsignoff-form-block").hide();
                             $("#signoff-form-block").hide();
                         }
+                        */
 
                         //Additional Info to Capture
                         if (result.conversation_topic_id == 1) {
