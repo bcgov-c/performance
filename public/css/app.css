@@ -3999,7 +3999,6 @@ input[type=button].btn-block {
 .nav-pills .nav-link.active,
 .nav-pills .show > .nav-link {
   color: #fff;
-  background-color: #1A5A96;
 }
 
 .nav-fill > .nav-link,
@@ -12333,7 +12332,7 @@ body:not(.layout-fixed) .main-sidebar .sidebar {
   color: #c2c7d0;
 }
 [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link:hover, [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link:focus {
-  background-color: #FCBA19;
+  background-color: #1A5A96;
   color: #fff;
 }
 [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active, [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active:hover, [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active:focus {
