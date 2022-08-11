@@ -30,9 +30,12 @@ class DashboardNotification extends Model
       return $this->belongsTo(Goal::class, 'related_id')->withoutGlobalScopes();
   }
  
-
   public function conversation() {
       return $this->belongsTo(Conversation::class, 'related_id');
+  }
+
+  public function sharedProfile() {
+        return $this->belongsTo(SharedProfile::class, 'related_id');
   }
 
   public function getUrlAttribute() {
