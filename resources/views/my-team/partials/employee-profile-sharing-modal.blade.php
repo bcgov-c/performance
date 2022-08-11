@@ -71,5 +71,10 @@
             max-height: 80vh;
             overflow-y: auto;
         }
+        .p-3{
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+        
     </style>
 @endpush
