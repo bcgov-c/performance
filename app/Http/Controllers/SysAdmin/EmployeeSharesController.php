@@ -3,24 +3,25 @@
 namespace App\Http\Controllers\SysAdmin;
 
 use Validator;
-use App\Models\User;
 use App\Models\Goal;
+use App\Models\User;
 use App\Models\Conversation;
-use App\Models\SharedElement;
-// use App\Models\EmployeeShare;
-use App\Models\SharedProfile;
-use App\Models\ConversationParticipant;
 use App\Models\EmployeeDemo;
+// use App\Models\EmployeeShare;
+use Illuminate\Http\Request;
+use App\Models\SharedElement;
+use App\Models\SharedProfile;
 use App\Models\OrganizationTree;
 use Yajra\Datatables\Datatables;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Models\DashboardNotification;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Session;
+use App\Models\ConversationParticipant;
 // use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
 
 
@@ -213,6 +214,15 @@ class EmployeeSharesController extends Controller
                         , 'comment' => $reason
                         , 'shared_by' => $current_user->id]
                     );
+
+                    // Dashboard message added when an shared employee's profile (goals, conversations, or both)
+                    DashboardNotification::create([
+                        'user_id' => $result->shared_id,
+                        'notification_type' => 'SP',         
+                        'comment' => 'Your profile has been shared with ' . $result->sharedWith->name,
+                        'related_id' => $result->id,
+                    ]);
+                    
                 }
             }
         }

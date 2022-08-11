@@ -49,6 +49,12 @@
                         @case('CS')
                             Title: {{$notification->conversation ? $notification->conversation->topic->name : ''}} | Date: {{$notification->created_at->format('M d, Y H:i A')}}
                             @break
+                        @case('SP')
+                            Elements: {{$notification->sharedProfile ? $notification->sharedProfile->shared_element_name : ''}} | Date: {{$notification->created_at->format('M d, Y H:i A')}} 
+                        @break
+                        @case('')
+                            Date: {{$notification->created_at->format('M d, Y H:i A')}}
+                            @break
                         @endswitch
                       </div>
                   </div>

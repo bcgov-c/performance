@@ -60,6 +60,12 @@ class DashboardController extends Controller
                                     ->whereNull('goals.deleted_at')
                                     ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB']);
                         })
+                        ->orWhereExists(function ($query) {
+                            return $query->select(DB::raw(1))
+                                    ->from('shared_profiles')
+                                    ->whereColumn('dashboard_notifications.related_id', 'shared_profiles.id')
+                                    ->whereIn('dashboard_notifications.notification_type', ['SP']);
+                        })
                         ->orWhere('dashboard_notifications.notification_type', '')
                         ;    
                 })
@@ -80,7 +86,14 @@ class DashboardController extends Controller
                                                 ->whereColumn('dashboard_notifications.related_id', 'goals.id')
                                                 ->whereNull('goals.deleted_at')
                                                 ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB']);
-                                    });    
+                                    })
+                                    ->orWhereExists(function ($query) {
+                                        return $query->select(DB::raw(1))
+                                                ->from('shared_profiles')
+                                                ->whereColumn('dashboard_notifications.related_id', 'shared_profiles.id')
+                                                ->whereIn('dashboard_notifications.notification_type', ['SP']);
+                                    })
+                                    ->orWhere('dashboard_notifications.notification_type', '');    
                                 });
         $supervisorTooltip = 'If your current supervisor in the Performance Development Platform is incorrect, please have your supervisor submit a service request through AskMyHR and choose the category: <span class="text-primary">My Team or Organization > HR Software Systems Support > Position / Reporting Updates</span>';        
         $sharedList = SharedProfile::where('shared_id', Auth::id())->with('sharedWithUser')->get();
