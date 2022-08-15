@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
         //
         Commands\SendDailyNotification::class,
         Commands\NotificationProcess::class,
+        Commands\BuildAdminOrgUsers::class,
     ];
 
     /**
@@ -50,6 +51,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:SyncUserProfile')
         ->timezone('America/Vancouver')
         ->dailyAt('00:25');
+
+        $schedule->command('command:BuildAdminOrgUsers')
+        ->timezone('America/Vancouver')
+        ->dailyAt('01:30');
 
         $schedule->command('command:notificationProcess')
         ->dailyAt('01:00');
