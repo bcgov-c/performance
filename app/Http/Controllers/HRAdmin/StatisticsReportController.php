@@ -79,45 +79,30 @@ class StatisticsReportController extends Controller
         $types->prepend( new GoalType()  ) ;
 
 
-        $matched_user_ids = User::join('employee_demo', function($join) {
-                                    $join->on('employee_demo.guid', '=', 'users.guid');
-                                    // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-                                    // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
-                            }) 
-                            // ->whereExists(function ($query) {
-                            //     $query->select(DB::raw(1))
-                            //         ->from('admin_orgs')
-                            //         //   ->whereColumn('admin_orgs.organization', 'employee_demo.organization')
-                            //         //   ->whereColumn('admin_orgs.level1_program', 'employee_demo.level1_program')
-                            //         //   ->whereColumn('admin_orgs.level2_division', 'employee_demo.level2_division')
-                            //         //   ->whereColumn('admin_orgs.level3_branch',  'employee_demo.level3_branch')
-                            //         //   ->whereColumn('admin_orgs.level4', 'employee_demo.level4')
-                            //         ->whereRAW('(admin_orgs.organization = employee_demo.organization OR (admin_orgs.organization = "" OR admin_orgs.organization IS NULL))')
-                            //         ->whereRAW('(admin_orgs.level1_program = employee_demo.level1_program OR (admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL))')
-                            //         ->whereRAW('(admin_orgs.level2_division = employee_demo.level2_division OR (admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL))')
-                            //         ->whereRAW('(admin_orgs.level3_branch = employee_demo.level3_branch OR (admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL))')
-                            //         ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR (admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL))')
-                            //         ->where('admin_orgs.user_id', '=', Auth::id() );
-                            // })
-                            ->join('admin_orgs', function ($j1) {
-                                $j1->on(function ($j1a) {
-                                    $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
-                                } )
-                                ->on(function ($j2a) {
-                                    $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
-                                } )
-                                ->on(function ($j3a) {
-                                    $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
-                                } )
-                                ->on(function ($j4a) {
-                                    $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
-                                } )
-                                ->on(function ($j5a) {
-                                    $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
-                                } );
-                            })
-                            ->where('admin_orgs.user_id', '=', Auth::id())
-                            ->pluck('users.id');
+        // $matched_user_ids = User::join('employee_demo', function($join) {
+        //                             $join->on('employee_demo.guid', '=', 'users.guid');
+        //                             // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+        //                             // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+        //                     }) 
+        //                     ->join('admin_orgs', function ($j1) {
+        //                         $j1->on(function ($j1a) {
+        //                             $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+        //                         } )
+        //                         ->on(function ($j2a) {
+        //                             $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+        //                         } )
+        //                         ->on(function ($j3a) {
+        //                             $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+        //                         } )
+        //                         ->on(function ($j4a) {
+        //                             $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+        //                         } )
+        //                         ->on(function ($j5a) {
+        //                             $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+        //                         } );
+        //                     })
+        //                     ->where('admin_orgs.user_id', '=', Auth::id())
+        //                     ->pluck('users.id');
 
         foreach($types as $type)
         {
@@ -147,7 +132,14 @@ class StatisticsReportController extends Controller
                         ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                             return $q->where('employee_demo.level4', $level4->name);
                         })
-                        ->whereIn('A.id', $matched_user_ids);
+                        // ->whereIn('A.id', $matched_user_ids);
+                        ->whereExists(function ($query) {
+                            $query->select(DB::raw(1))
+                                    ->from('admin_org_users')
+                                    ->whereColumn('admin_org_users.allowed_user_id', 'A.id')
+                                    ->whereIn('admin_org_users.access_type', [0,1])
+                                    ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                        });
                         // ->whereExists(function ($query) {
                         //     $query->select(DB::raw(1))
                         //           ->from('admin_orgs')
@@ -201,7 +193,14 @@ class StatisticsReportController extends Controller
                         })
                         // ->where('acctlock', 0)
                         ->whereBetween('goals_count', $range)
-                        ->whereIn('A.id', $matched_user_ids);
+                        // ->whereIn('A.id', $matched_user_ids);
+                        ->whereExists(function ($query) {
+                            $query->select(DB::raw(1))
+                                    ->from('admin_org_users')
+                                    ->whereColumn('admin_org_users.allowed_user_id', 'A.id')
+                                    ->whereIn('admin_org_users.access_type', [0,1])
+                                    ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                        });
                         // ->whereExists(function ($query) {
                         //     $query->select(DB::raw(1))
                         //             ->from('admin_orgs')
@@ -241,13 +240,17 @@ class StatisticsReportController extends Controller
         $count_raw .= $level2 ? "     and employee_demo.level2_division = '". addslashes($level2->name) ."'" : '';
         $count_raw .= $level3 ? "     and employee_demo.level3_branch = '". addslashes($level3->name) ."'" : '';
         $count_raw .= $level4 ? "     and employee_demo.level4 = '". addslashes($level4->name) ."'" : '';
-        $count_raw .= "     and exists (select 1 from admin_orgs ";
-        $count_raw .= "                  where admin_orgs.organization = employee_demo.organization ";
-        $count_raw .= "                    and admin_orgs.level1_program = employee_demo.level1_program ";
-        $count_raw .= "                    and admin_orgs.level2_division = employee_demo.level2_division ";
-        $count_raw .= "                    and admin_orgs.level3_branch = employee_demo.level3_branch ";
-        $count_raw .= "                    and admin_orgs.level4 = employee_demo.level4 ";
-        $count_raw .= "                    and admin_orgs.user_id = ".  Auth::id()  .") ";
+        $count_raw .= "     and exists (select 1 from admin_org_users ";
+        $count_raw .= "                  where admin_org_users.allowed_user_id = users.id ";
+        $count_raw .= "                    and admin_org_users.access_type in (0,1) ";
+        $count_raw .= "                    and admin_org_users.granted_to_id = ".  Auth::id()  .") ";
+        // $count_raw .= "     and exists (select 1 from admin_orgs ";
+        // $count_raw .= "                  where admin_orgs.organization = employee_demo.organization ";
+        // $count_raw .= "                    and admin_orgs.level1_program = employee_demo.level1_program ";
+        // $count_raw .= "                    and admin_orgs.level2_division = employee_demo.level2_division ";
+        // $count_raw .= "                    and admin_orgs.level3_branch = employee_demo.level3_branch ";
+        // $count_raw .= "                    and admin_orgs.level4 = employee_demo.level4 ";
+        // $count_raw .= "                    and admin_orgs.user_id = ".  Auth::id()  .") ";
         $count_raw .= ") as count";
 
         $sql = Tag::selectRaw($count_raw);
@@ -279,23 +282,14 @@ class StatisticsReportController extends Controller
                           ->from('goal_tags')
                           ->whereColumn('goals.id', 'goal_tags.goal_id');
                 })
-                ->whereIn('users.id', $matched_user_ids);
-                // ->whereExists(function ($query) {
-                //     $query->select(DB::raw(1))
-                //             ->from('admin_orgs')
-                //         //     ->whereColumn('admin_orgs.organization', 'employee_demo.organization')
-                //         //    ->whereColumn('admin_orgs.level1_program', 'employee_demo.level1_program')
-                //         //   ->whereColumn('admin_orgs.level2_division', 'employee_demo.level2_division')
-                //         //   ->whereColumn('admin_orgs.level3_branch',  'employee_demo.level3_branch')
-                //         //   ->whereColumn('admin_orgs.level4', 'employee_demo.level4')
-                //             ->whereRAW('(admin_orgs.organization = employee_demo.organization OR (admin_orgs.organization = "" OR admin_orgs.organization IS NULL))')
-                //             ->whereRAW('(admin_orgs.level1_program = employee_demo.level1_program OR (admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL))')
-                //             ->whereRAW('(admin_orgs.level2_division = employee_demo.level2_division OR (admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL))')
-                //             ->whereRAW('(admin_orgs.level3_branch = employee_demo.level3_branch OR (admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL))')
-                //             ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR (admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL))')
-                //             ->where('admin_orgs.user_id', '=', Auth::id() );
-
-                // });
+                // ->whereIn('users.id', $matched_user_ids);
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('admin_org_users')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                            ->whereIn('admin_org_users.access_type', [0,1])
+                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                });
 
         $tags = $sql->get();
         $blank_count = $sql2->count();
@@ -373,24 +367,31 @@ class StatisticsReportController extends Controller
                 //             ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR (admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL))')
                 //             ->where('admin_orgs.user_id', '=', Auth::id() );
                 // });
-                ->join('admin_orgs', function ($j1) {
-                    $j1->on(function ($j1a) {
-                        $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
-                    } )
-                    ->on(function ($j2a) {
-                        $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
-                    } )
-                    ->on(function ($j3a) {
-                        $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
-                    } )
-                    ->on(function ($j4a) {
-                        $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
-                    } )
-                    ->on(function ($j5a) {
-                        $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
-                    } );
-                })
-                ->where('admin_orgs.user_id', '=', Auth::id());
+                // ->join('admin_orgs', function ($j1) {
+                //     $j1->on(function ($j1a) {
+                //         $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+                //     } )
+                //     ->on(function ($j2a) {
+                //         $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+                //     } )
+                //     ->on(function ($j3a) {
+                //         $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+                //     } )
+                //     ->on(function ($j4a) {
+                //         $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+                //     } )
+                //     ->on(function ($j5a) {
+                //         $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+                //     } );
+                // })
+                // ->where('admin_orgs.user_id', '=', Auth::id());
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('admin_org_users')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'A.id')
+                            ->whereIn('admin_org_users.access_type', [0,1])
+                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                });
 
         $users = $sql->get();
 
@@ -531,24 +532,31 @@ class StatisticsReportController extends Controller
                     //             ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR (admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL))')
                     //             ->where('admin_orgs.user_id', '=', Auth::id() );
                     // });
-                    ->join('admin_orgs', function ($j1) {
-                        $j1->on(function ($j1a) {
-                            $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
-                        } )
-                        ->on(function ($j2a) {
-                            $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
-                        } )
-                        ->on(function ($j3a) {
-                            $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
-                        } )
-                        ->on(function ($j4a) {
-                            $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
-                        } )
-                        ->on(function ($j5a) {
-                            $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
-                        } );
-                    })
-                    ->where('admin_orgs.user_id', '=', Auth::id());
+                    // ->join('admin_orgs', function ($j1) {
+                    //     $j1->on(function ($j1a) {
+                    //         $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+                    //     } )
+                    //     ->on(function ($j2a) {
+                    //         $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+                    //     } )
+                    //     ->on(function ($j3a) {
+                    //         $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+                    //     } )
+                    //     ->on(function ($j4a) {
+                    //         $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+                    //     } )
+                    //     ->on(function ($j5a) {
+                    //         $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+                    //     } );
+                    // })
+                    // ->where('admin_orgs.user_id', '=', Auth::id());
+                    ->whereExists(function ($query) {
+                        $query->select(DB::raw(1))
+                                ->from('admin_org_users')
+                                ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                                ->whereIn('admin_org_users.access_type', [0,1])
+                                ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                    });
         
         $users = $sql->get();
 
@@ -689,24 +697,31 @@ class StatisticsReportController extends Controller
                 //             ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR (admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL))')
                 //             ->where('admin_orgs.user_id', '=', Auth::id() );
                 // });
-                ->join('admin_orgs', function ($j1) {
-                    $j1->on(function ($j1a) {
-                        $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
-                    } )
-                    ->on(function ($j2a) {
-                        $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
-                    } )
-                    ->on(function ($j3a) {
-                        $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
-                    } )
-                    ->on(function ($j4a) {
-                        $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
-                    } )
-                    ->on(function ($j5a) {
-                        $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
-                    } );
-                })
-                ->where('admin_orgs.user_id', '=', Auth::id());
+                // ->join('admin_orgs', function ($j1) {
+                //     $j1->on(function ($j1a) {
+                //         $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+                //     } )
+                //     ->on(function ($j2a) {
+                //         $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+                //     } )
+                //     ->on(function ($j3a) {
+                //         $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+                //     } )
+                //     ->on(function ($j4a) {
+                //         $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+                //     } )
+                //     ->on(function ($j5a) {
+                //         $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+                //     } );
+                // })
+                // ->where('admin_orgs.user_id', '=', Auth::id());
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('admin_org_users')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                            ->whereIn('admin_org_users.access_type', [0,2])
+                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                });
 
         $next_due_users = $sql_2->get();
         $data = array();
@@ -792,24 +807,31 @@ class StatisticsReportController extends Controller
         //                 ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR (admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL))')
         //                 ->where('admin_orgs.user_id', '=', Auth::id() );
         // });
-        ->join('admin_orgs', function ($j1) {
-            $j1->on(function ($j1a) {
-                $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
-            } )
-            ->on(function ($j2a) {
-                $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
-            } )
-            ->on(function ($j3a) {
-                $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
-            } )
-            ->on(function ($j4a) {
-                $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
-            } )
-            ->on(function ($j5a) {
-                $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
-            } );
-        })
-        ->where('admin_orgs.user_id', '=', Auth::id());
+        // ->join('admin_orgs', function ($j1) {
+        //     $j1->on(function ($j1a) {
+        //         $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+        //     } )
+        //     ->on(function ($j2a) {
+        //         $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+        //     } )
+        //     ->on(function ($j3a) {
+        //         $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+        //     } )
+        //     ->on(function ($j4a) {
+        //         $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+        //     } )
+        //     ->on(function ($j5a) {
+        //         $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+        //     } );
+        // })
+        // ->where('admin_orgs.user_id', '=', Auth::id());
+        ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                    ->from('admin_org_users')
+                    ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                    ->whereIn('admin_org_users.access_type', [0,2])
+                    ->where('admin_org_users.granted_to_id', '=', Auth::id());
+        });
 
         $conversations = $sql->get();
 
@@ -877,24 +899,31 @@ class StatisticsReportController extends Controller
         //             ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR (admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL))')
         //             ->where('admin_orgs.user_id', '=', Auth::id() );
         // })
-        ->join('admin_orgs', function ($j1) {
-            $j1->on(function ($j1a) {
-                $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
-            } )
-            ->on(function ($j2a) {
-                $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
-            } )
-            ->on(function ($j3a) {
-                $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
-            } )
-            ->on(function ($j4a) {
-                $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
-            } )
-            ->on(function ($j5a) {
-                $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
-            } );
+        // ->join('admin_orgs', function ($j1) {
+        //     $j1->on(function ($j1a) {
+        //         $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+        //     } )
+        //     ->on(function ($j2a) {
+        //         $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+        //     } )
+        //     ->on(function ($j3a) {
+        //         $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+        //     } )
+        //     ->on(function ($j4a) {
+        //         $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+        //     } )
+        //     ->on(function ($j5a) {
+        //         $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+        //     } );
+        // })
+        // ->where('admin_orgs.user_id', '=', Auth::id())
+        ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                    ->from('admin_org_users')
+                    ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                    ->whereIn('admin_org_users.access_type', [0,2])
+                    ->where('admin_org_users.granted_to_id', '=', Auth::id());
         })
-        ->where('admin_orgs.user_id', '=', Auth::id())
         ->get();
 
         foreach($topics as $topic)
@@ -989,24 +1018,31 @@ class StatisticsReportController extends Controller
                 //             ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR (admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL))')
                 //             ->where('admin_orgs.user_id', '=', Auth::id() );
                 // });
-                ->join('admin_orgs', function ($j1) {
-                    $j1->on(function ($j1a) {
-                        $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
-                    } )
-                    ->on(function ($j2a) {
-                        $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
-                    } )
-                    ->on(function ($j3a) {
-                        $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
-                    } )
-                    ->on(function ($j4a) {
-                        $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
-                    } )
-                    ->on(function ($j5a) {
-                        $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
-                    } );
-                })
-                ->where('admin_orgs.user_id', '=', Auth::id());
+                // ->join('admin_orgs', function ($j1) {
+                //     $j1->on(function ($j1a) {
+                //         $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+                //     } )
+                //     ->on(function ($j2a) {
+                //         $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+                //     } )
+                //     ->on(function ($j3a) {
+                //         $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+                //     } )
+                //     ->on(function ($j4a) {
+                //         $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+                //     } )
+                //     ->on(function ($j5a) {
+                //         $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+                //     } );
+                // })
+                // ->where('admin_orgs.user_id', '=', Auth::id());
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('admin_org_users')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                            ->whereIn('admin_org_users.access_type', [0,2])
+                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                });
                 
         // SQL - Chart 2
         $sql_chart2 = Conversation::selectRaw("conversations.*, users.employee_id, employee_demo.employee_name, 
@@ -1096,24 +1132,31 @@ class StatisticsReportController extends Controller
                 //             ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR (admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL))')
                 //             ->where('admin_orgs.user_id', '=', Auth::id() );
                 // }) 
-                ->join('admin_orgs', function ($j1) {
-                    $j1->on(function ($j1a) {
-                        $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
-                    } )
-                    ->on(function ($j2a) {
-                        $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
-                    } )
-                    ->on(function ($j3a) {
-                        $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
-                    } )
-                    ->on(function ($j4a) {
-                        $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
-                    } )
-                    ->on(function ($j5a) {
-                        $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
-                    } );
+                // ->join('admin_orgs', function ($j1) {
+                //     $j1->on(function ($j1a) {
+                //         $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+                //     } )
+                //     ->on(function ($j2a) {
+                //         $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+                //     } )
+                //     ->on(function ($j3a) {
+                //         $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+                //     } )
+                //     ->on(function ($j4a) {
+                //         $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+                //     } )
+                //     ->on(function ($j5a) {
+                //         $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+                //     } );
+                // })
+                // ->where('admin_orgs.user_id', '=', Auth::id())
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('admin_org_users')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                            ->whereIn('admin_org_users.access_type', [0,2])
+                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 })
-                ->where('admin_orgs.user_id', '=', Auth::id())
                 ->with('topic:id,name')
                 ->with('signoff_user:id,name')
                 ->with('signoff_supervisor:id,name');
@@ -1178,24 +1221,31 @@ class StatisticsReportController extends Controller
             //             ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR (admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL))')
             //             ->where('admin_orgs.user_id', '=', Auth::id() );
             // }) 
-            ->join('admin_orgs', function ($j1) {
-                $j1->on(function ($j1a) {
-                    $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
-                } )
-                ->on(function ($j2a) {
-                    $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
-                } )
-                ->on(function ($j3a) {
-                    $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
-                } )
-                ->on(function ($j4a) {
-                    $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
-                } )
-                ->on(function ($j5a) {
-                    $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
-                } );
+            // ->join('admin_orgs', function ($j1) {
+            //     $j1->on(function ($j1a) {
+            //         $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+            //     } )
+            //     ->on(function ($j2a) {
+            //         $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+            //     } )
+            //     ->on(function ($j3a) {
+            //         $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+            //     } )
+            //     ->on(function ($j4a) {
+            //         $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+            //     } )
+            //     ->on(function ($j5a) {
+            //         $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+            //     } );
+            // })
+            // ->where('admin_orgs.user_id', '=', Auth::id())
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                        ->from('admin_org_users')
+                        ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                        ->whereIn('admin_org_users.access_type', [0,2])
+                        ->where('admin_org_users.granted_to_id', '=', Auth::id());
             })
-            ->where('admin_orgs.user_id', '=', Auth::id())
             ->with('topic:id,name')
             ->with('signoff_user:id,name')
             ->with('signoff_supervisor:id,name')
@@ -1391,7 +1441,7 @@ class StatisticsReportController extends Controller
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.guid', '=', 'users.guid');
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-                    //$join->on('employee_demo.empl_record', '=', 'users.empl_record');
+                    // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
@@ -1423,24 +1473,34 @@ class StatisticsReportController extends Controller
                 //             ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR (admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL))')
                 //             ->where('admin_orgs.user_id', '=', Auth::id() );
                 // });
-                ->join('admin_orgs', function ($j1) {
-                    $j1->on(function ($j1a) {
-                        $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
-                    } )
-                    ->on(function ($j2a) {
-                        $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
-                    } )
-                    ->on(function ($j3a) {
-                        $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
-                    } )
-                    ->on(function ($j4a) {
-                        $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
-                    } )
-                    ->on(function ($j5a) {
-                        $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
-                    } );
+                // ->join('admin_orgs', function ($j1) {
+                //     $j1->on(function ($j1a) {
+                //         $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+                //     } )
+                //     ->on(function ($j2a) {
+                //         $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+                //     } )
+                //     ->on(function ($j3a) {
+                //         $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+                //     } )
+                //     ->on(function ($j4a) {
+                //         $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+                //     } )
+                //     ->on(function ($j5a) {
+                //         $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+                //     } );
+                // })
+                // ->where('admin_orgs.user_id', '=', Auth::id())
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('admin_org_users')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                            ->whereIn('admin_org_users.access_type', [0])
+                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 })
-                ->where('admin_orgs.user_id', '=', Auth::id());
+                // ->join('admin_org_users', 'users.id', 'admin_org_users.allowed_user_id')
+                // ->where('admin_org_users.granted_to_id', '=', Auth::id())
+                ;
                 
 
 
@@ -1523,24 +1583,31 @@ class StatisticsReportController extends Controller
             //             ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR (admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL))')
             //             ->where('admin_orgs.user_id', '=', Auth::id() );
             // })
-            ->join('admin_orgs', function ($j1) {
-                $j1->on(function ($j1a) {
-                    $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
-                } )
-                ->on(function ($j2a) {
-                    $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
-                } )
-                ->on(function ($j3a) {
-                    $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
-                } )
-                ->on(function ($j4a) {
-                    $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
-                } )
-                ->on(function ($j5a) {
-                    $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
-                } );
+            // ->join('admin_orgs', function ($j1) {
+            //     $j1->on(function ($j1a) {
+            //         $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+            //     } )
+            //     ->on(function ($j2a) {
+            //         $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+            //     } )
+            //     ->on(function ($j3a) {
+            //         $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+            //     } )
+            //     ->on(function ($j4a) {
+            //         $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+            //     } )
+            //     ->on(function ($j5a) {
+            //         $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+            //     } );
+            // })
+            // ->where('admin_orgs.user_id', '=', Auth::id())
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                        ->from('admin_org_users')
+                        ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                        ->whereIn('admin_org_users.access_type', [0])
+                        ->where('admin_org_users.granted_to_id', '=', Auth::id());
             })
-            ->where('admin_orgs.user_id', '=', Auth::id())
             ->with('sharedWith');
 
 
@@ -1647,24 +1714,31 @@ class StatisticsReportController extends Controller
                     //         ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR (admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL))')
                     //         ->where('admin_orgs.user_id', '=', Auth::id() );
                     // });
-                    ->join('admin_orgs', function ($j1) {
-                        $j1->on(function ($j1a) {
-                            $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
-                        } )
-                        ->on(function ($j2a) {
-                            $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
-                        } )
-                        ->on(function ($j3a) {
-                            $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
-                        } )
-                        ->on(function ($j4a) {
-                            $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
-                        } )
-                        ->on(function ($j5a) {
-                            $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
-                        } );
-                    })
-                    ->where('admin_orgs.user_id', '=', Auth::id());
+                    // ->join('admin_orgs', function ($j1) {
+                    //     $j1->on(function ($j1a) {
+                    //         $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+                    //     } )
+                    //     ->on(function ($j2a) {
+                    //         $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+                    //     } )
+                    //     ->on(function ($j3a) {
+                    //         $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+                    //     } )
+                    //     ->on(function ($j4a) {
+                    //         $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+                    //     } )
+                    //     ->on(function ($j5a) {
+                    //         $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+                    //     } );
+                    // })
+                    // ->where('admin_orgs.user_id', '=', Auth::id());
+                    ->whereExists(function ($query) {
+                        $query->select(DB::raw(1))
+                                ->from('admin_org_users')
+                                ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                                ->whereIn('admin_org_users.access_type', [0])
+                                ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                    });
                  
         $users = $sql->get();
 
@@ -1746,24 +1820,31 @@ class StatisticsReportController extends Controller
                 //           ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR (admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL))')
                 //            ->where('admin_orgs.user_id', '=', Auth::id() );
                 // })
-                ->join('admin_orgs', function ($j1) {
-                    $j1->on(function ($j1a) {
-                        $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
-                    } )
-                    ->on(function ($j2a) {
-                        $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
-                    } )
-                    ->on(function ($j3a) {
-                        $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
-                    } )
-                    ->on(function ($j4a) {
-                        $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
-                    } )
-                    ->on(function ($j5a) {
-                        $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
-                    } );
+                // ->join('admin_orgs', function ($j1) {
+                //     $j1->on(function ($j1a) {
+                //         $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+                //     } )
+                //     ->on(function ($j2a) {
+                //         $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+                //     } )
+                //     ->on(function ($j3a) {
+                //         $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+                //     } )
+                //     ->on(function ($j4a) {
+                //         $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+                //     } )
+                //     ->on(function ($j5a) {
+                //         $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+                //     } );
+                // })
+                // ->where('admin_orgs.user_id', '=', Auth::id())
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('admin_org_users')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                            ->whereIn('admin_org_users.access_type', [0])
+                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 })
-                ->where('admin_orgs.user_id', '=', Auth::id())
                 ->with('excuseReason') ;
 
         $users = $sql->get();
