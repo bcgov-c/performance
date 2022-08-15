@@ -1283,19 +1283,28 @@ class StatisticsReportController extends Controller
                 );
         
                 $columns = ["Employee ID", "Employee Name", "Email",
-                                "Next Conversation Due",
+                                "Next Conversation Due", 'Overdue Group',
                                 "Organization", "Level 1", "Level 2", "Level 3", "Level 4", "Reporting To",
                            ];
         
                 $callback = function() use($users, $columns) {
                     $file = fopen('php://output', 'w');
                     fputcsv($file, $columns);
-        
+
                     foreach ($users as $user) {
+
+                        $group_name = '';
+                        foreach ($this->overdue_groups as $key => $range) {
+                            if (($user->overdue_in_days >= $range[0] ) && ( $user->overdue_in_days <= $range[1])) {
+                                $group_name = $key;
+                            }
+                        }
+
                         $row['Employee ID'] = $user->employee_id;
                         $row['Name'] = $user->employee_name;
                         $row['Email'] = $user->email;
                         $row['Next Conversation Due'] = $user->next_due_date;
+                        $row['Overdue Group'] = $group_name;
                         $row['Organization'] = $user->organization;
                         $row['Level 1'] = $user->level1_program;
                         $row['Level 2'] = $user->level2_division;
@@ -1303,7 +1312,8 @@ class StatisticsReportController extends Controller
                         $row['Level 4'] = $user->level4;
                         $row['Reporting To'] = $user->reportingManager ? $user->reportingManager->name : '';
         
-                        fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Next Conversation Due'], $row['Organization'],
+                        fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Next Conversation Due'], 
+                                    $row['Overdue Group'], $row['Organization'],
                                     $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], $row['Reporting To'] ));
                     }
         
