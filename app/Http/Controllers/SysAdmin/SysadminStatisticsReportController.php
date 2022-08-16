@@ -117,39 +117,47 @@ class SysadminStatisticsReportController extends Controller
                 'groups' => []
             ];
 
-            // each group 
-            foreach($this->groups as $key => $range)
-            {
                 
-                $sql = User::selectRaw('count(goals_count) as goals_count')
-                        ->from(DB::raw( $from_stmt ))
-                        ->join('employee_demo', function($join) {
-                            $join->on('employee_demo.employee_id', '=', 'A.employee_id');
-                            //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
-                        })
-                        ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                            return $q->where('employee_demo.organization', $level0->name);
-                        })
-                        ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                            return $q->where('employee_demo.level1_program', $level1->name);
-                        })
-                        ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                            return $q->where('employee_demo.level2_division', $level2->name);
-                        })
-                        ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                            return $q->where('employee_demo.level3_branch', $level3->name);
-                        })
-                        ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                            return $q->where('employee_demo.level4', $level4->name);
-                        })
-                        // ->where('acctlock', 0)
-                        ->whereBetween('goals_count', $range);
+            // $sql = User::selectRaw('count(goals_count) as goals_count')
+            $sql = User::selectRaw("case when goals_count between 0 and 0  then '0'  
+                                        when goals_count between 1 and 5  then '1-5'
+                                        when goals_count between 6 and 10 then '6-10'
+                                        when goals_count  > 10            then '>10'
+                                end AS group_key, count(*) as goals_count")
+                    ->from(DB::raw( $from_stmt ))
+                    ->groupBy('group_key')
+                    ->join('employee_demo', function($join) {
+                        $join->on('employee_demo.employee_id', '=', 'A.employee_id');
+                        //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
+                    })
+                    ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                        return $q->where('employee_demo.organization', $level0->name);
+                    })
+                    ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                        return $q->where('employee_demo.level1_program', $level1->name);
+                    })
+                    ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                        return $q->where('employee_demo.level2_division', $level2->name);
+                    })
+                    ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                        return $q->where('employee_demo.level3_branch', $level3->name);
+                    })
+                    ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                        return $q->where('employee_demo.level4', $level4->name);
+                    });
+                    // ->where('acctlock', 0)
+                    // ->whereBetween('goals_count', $range);
 
-                $goals_count = $sql->get()->first()->goals_count;
+            $goals_count_array = $sql->pluck( 'goals_count','group_key' )->toArray();
+
+            foreach($this->groups as $key => $range) {
+                $goals_count = 0;
+                if (array_key_exists( $key, $goals_count_array)) {
+                        $goals_count = $goals_count_array[$key];
+                }
 
                 array_push( $data[$goal_id]['groups'], [ 'name' => $key, 'value' => $goals_count, 
-                             'goal_id' => $goal_id, 
-                             //'ids' =>  $subset ? $subset->pluck('id')->toArray() : [],
+                    'goal_id' => $goal_id, 
                 ]);
             }
 
@@ -851,7 +859,7 @@ class SysadminStatisticsReportController extends Controller
                 );
         
                 $columns = ["Employee ID", "Employee Name", "Email",
-                                "Next Conversation Due",
+                                "Next Conversation Due",  'Due Date Category',
                                 "Organization", "Level 1", "Level 2", "Level 3", "Level 4", "Reporting To",
                            ];
         
@@ -860,10 +868,19 @@ class SysadminStatisticsReportController extends Controller
                     fputcsv($file, $columns);
         
                     foreach ($users as $user) {
+
+                        $group_name = '';
+                        foreach ($this->overdue_groups as $key => $range) {
+                            if (($user->overdue_in_days >= $range[0] ) && ( $user->overdue_in_days <= $range[1])) {
+                                $group_name = $key;
+                            }
+                        }
+
                         $row['Employee ID'] = $user->employee_id;
                         $row['Name'] = $user->employee_name;
                         $row['Email'] = $user->email;
                         $row['Next Conversation Due'] = $user->next_due_date;
+                        $row['Due Date Category'] = $group_name;
                         $row['Organization'] = $user->organization;
                         $row['Level 1'] = $user->level1_program;
                         $row['Level 2'] = $user->level2_division;
@@ -871,7 +888,8 @@ class SysadminStatisticsReportController extends Controller
                         $row['Level 4'] = $user->level4;
                         $row['Reporting To'] = $user->reportingManager ? $user->reportingManager->name : '';
         
-                        fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Next Conversation Due'], $row['Organization'],
+                        fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Next Conversation Due'], 
+                                    $row['Due Date Category'], $row['Organization'],
                                     $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], $row['Reporting To'] ));
                     }
         
