@@ -44,10 +44,22 @@ class BuildAdminOrgUsers extends Command
      */
     public function handle()
     {
+
+
+
         $switch = strtolower(env('PRCS_BUILD_ADMIN_ORG_USERS'));
         $manualoverride = (strtolower($this->option('manual')) ? true : false);
   
         if ($switch == 'on' || $manualoverride) {
+
+            $start_time = Carbon::now();
+            $audit_id = JobSchedAudit::insertGetId(
+                [
+                    'job_name' => $this->signature,
+                    'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
+                    'status' => 'Initiated'
+                ]
+            );
 
             $this->info( now() );
             $this->info('Build Assigned Admin Org Users');
@@ -105,16 +117,30 @@ class BuildAdminOrgUsers extends Command
             
             $this->info( now() );
 
+            $end_time = Carbon::now();
+            JobSchedAudit::updateOrInsert(
+                [
+                    'id' => $audit_id
+                ],
+                [
+                    'job_name' => $this->signature,
+                    'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
+                    'end_time' => date('Y-m-d H:i:s', strtotime($end_time)),
+                    'status' => 'Completed'
+                ]
+            );
+
         } else {
             $start_time = Carbon::now()->format('c');
             $audit_id = JobSchedAudit::insertGetId(
-            [
-                'job_name' => 'command:buildAdminOrgUsers',
-                'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
-                'status' => 'Disabled'
-            ]
+                [
+                    'job_name' => 'command:buildAdminOrgUsers',
+                    'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
+                    'status' => 'Disabled',
+                    'detail' => 'Process is currently disabled; or "PRCS_BUILD_ADMIN_ORG_USERS=on" is currently missing in the .env file.',
+                ]
             );
-            $this->info( 'Process is currently disabled; or "PRCS_BUILD_ORG_TREE=on" is currently missing in the .env file.');
+            $this->info( 'Process is currently disabled; or "PRCS_BUILD_ADMIN_ORG_USERS=on" is currently missing in the .env file.');
         }
 
         return 0;
