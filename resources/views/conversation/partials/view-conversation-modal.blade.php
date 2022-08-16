@@ -68,7 +68,6 @@
 
                     <div class="row">
                         <div class="col-md-8">
-                            <textarea class="form-control supervisor-comment info_comment1 mb-4 d-none" name="info_comment1" id="info_comment1_edit"></textarea>
                             <textarea class="form-control supervisor-comment info_comment1 mb-4 btn-conv-edit" name="info_comment1" id="info_comment1" data-id="info_comment1" data-name="info_comment1"></textarea>
                             <span id="info_comment1" class="info_comment1"></span>
                         </div>
@@ -83,7 +82,6 @@
 
                     <div class="row">
                         <div class="col-md-8">
-                            <textarea class="form-control supervisor-comment info_comment2 mb-4 d-none" name="info_comment2" id="info_comment2_edit"></textarea>
                             <textarea class="form-control supervisor-comment info_comment2 mb-4 btn-conv-edit" name="info_comment2" id="info_comment2" data-id="info_comment2" data-name="info_comment2"></textarea>
                             <span id="info_comment2" class="info_comment2"></span>
                         </div>
@@ -97,8 +95,7 @@
                     <h6 id="info_capture3">What support will the supervisor (and others) provide? By when?</h6>
                     <div class="row">
                         <div class="col-md-8">
-                            <textarea class="form-control supervisor-comment info_comment3 mb-4 d-none" name="info_comment3" id="info_comment3_edit"></textarea>
-                            <textarea class="form-control supervisor-comment info_comment3 mb-4 btn-conv-edit" name="info_comment3" id="info_comment3" data-id="info_comment3" data-name="info_comment3"></textarea>
+                           <textarea class="form-control supervisor-comment info_comment3 mb-4 btn-conv-edit" name="info_comment3" id="info_comment3" data-id="info_comment3" data-name="info_comment3"></textarea>
 
                         </div>
                         <div class="col-md-4">
@@ -112,7 +109,6 @@
                     <h6 id="info_capture4" >Supervisor Comments (optional) – provide feedback on area(s) for growth identified by employee above </h6>
                     <div class="row" >
                         <div class="col-md-8">
-                             <textarea class="form-control supervisor-comment info_comment6 mb-4 d-none" name="info_comment6" id="info_comment6_edit"></textarea>
                              <textarea class="form-control supervisor-comment info_comment6 mb-4 btn-conv-edit" name="info_comment6" id="info_comment6" data-id="info_comment6" data-name="info_comment6"></textarea>
 
                         </div>
@@ -134,7 +130,6 @@
 
                     <div class="row">
                         <div class="col-md-8">
-                            <textarea class="form-control info_comment4 mb-4 employee-comment d-none" name="info_comment4" id="info_comment4_edit"></textarea>
                             <textarea class="form-control info_comment4 mb-4 employee-comment btn-conv-edit" data-name="info_comment4" data-id="info_comment4" name="info_comment4" id="info_comment4"></textarea>
                         </div>
                         <div class="col-md-4">
@@ -146,7 +141,6 @@
                     <h6>Supervisor Comments and Action Items</h6>
                     <div class="row">
                         <div class="col-md-8">
-                            <textarea class="form-control info_comment5 mb-4 supervisor-comment d-none" name="info_comment5" id="info_comment5_edit"></textarea>
                             <textarea class="form-control info_comment5 mb-4 supervisor-comment btn-conv-edit" name="info_comment5" id="info_comment5" data-id="info_comment5" data-name="info_comment5"></textarea>
                             <span id="info_comment5" class="info_comment5"></span>
                         </div>
