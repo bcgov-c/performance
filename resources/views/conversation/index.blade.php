@@ -172,6 +172,7 @@
         @include('conversation.partials.delete-hidden-form')
 
     <x-slot name="js">
+        <script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
         <script>
             $("#participant_id").select2({
                 maximumSelectionLength: 1
@@ -533,7 +534,7 @@
                             isNotThirdPerson = false;
                         }
                         $('#employee-signoff-questions').removeClass('d-none');
-          
+
                         if (!isSupervisor) {
                             $("#employee-signoff-questions").find('.sup-inputs').find('input').prop('disabled', true);
                             $("#employee-signoff-questions").find('.emp-inputs').find('input').prop('disabled', false);
@@ -551,7 +552,7 @@
                                 $("#info_comment3").removeClass('enable-not-allowed').prop('readonly', false);
                                 $("#info_comment3_edit").removeClass('enable-not-allowed').prop('readonly', false); 
                                 
-                                $("#info_comment2").addClass('enable-not-allowed').prop('readonly', true); 
+                                $("#info_comment2").addClass('enable-not-allowed').prop('readonly', true);                                 
                                 $("#info_comment6").addClass('enable-not-allowed').prop('readonly', true);
                             }
                             
@@ -571,7 +572,7 @@
                             $('#supervisor-signoff-message').find('.time').html("on " + result.supervisor_signoff_time);
                             $("textarea.employee-comment").addClass('enable-not-allowed').prop('readonly', true);
                             if (result.conversation_topic_id == 3) {
-                                $("#info_comment1").addClass('enable-not-allowed').prop('readonly', true);    
+                                $("#info_comment1").addClass('enable-not-allowed').prop('readonly', true);                                   
                                 $("#info_comment3").addClass('enable-not-allowed').prop('readonly', true);
                             }
                         }
@@ -746,6 +747,79 @@
                         });
                         $('#conv_participant').text(participants);
                         //originalData = result.info_comment1+result.info_comment2+result.info_comment3+result.info_comment4+result.info_comment5+'';
+                    
+                        if(!$('#info_comment1').attr("readonly")) {
+                            CKEDITOR.replace('info_comment1', {
+                                toolbar: "Custom",
+                                toolbar_Custom: [
+                                    ["Bold", "Italic", "Underline"],
+                                    ["NumberedList", "BulletedList"],
+                                    ["Outdent", "Indent"],
+                                    ["Link"],
+                                ],
+                                disableNativeSpellChecker: false
+                            });
+                        }
+                        if(!$('#info_comment2').attr("readonly")) {
+                            CKEDITOR.replace('info_comment2', {
+                                toolbar: "Custom",
+                                toolbar_Custom: [
+                                    ["Bold", "Italic", "Underline"],
+                                    ["NumberedList", "BulletedList"],
+                                    ["Outdent", "Indent"],
+                                    ["Link"],
+                                ],
+                                disableNativeSpellChecker: false
+                            });
+                        }
+                        if(!$('#info_comment3').attr("readonly")) {
+                            CKEDITOR.replace('info_comment3', {
+                                toolbar: "Custom",
+                                toolbar_Custom: [
+                                    ["Bold", "Italic", "Underline"],
+                                    ["NumberedList", "BulletedList"],
+                                    ["Outdent", "Indent"],
+                                    ["Link"],
+                                ],
+                                disableNativeSpellChecker: false
+                            });
+                        }
+                        if(!$('#info_comment4').attr("readonly")) {
+                            CKEDITOR.replace('info_comment4', {
+                                toolbar: "Custom",
+                                toolbar_Custom: [
+                                    ["Bold", "Italic", "Underline"],
+                                    ["NumberedList", "BulletedList"],
+                                    ["Outdent", "Indent"],
+                                    ["Link"],
+                                ],
+                                disableNativeSpellChecker: false
+                            });
+                        }
+                        if(!$('#info_comment5').attr("readonly")) {
+                            CKEDITOR.replace('info_comment5', {
+                                toolbar: "Custom",
+                                toolbar_Custom: [
+                                    ["Bold", "Italic", "Underline"],
+                                    ["NumberedList", "BulletedList"],
+                                    ["Outdent", "Indent"],
+                                    ["Link"],
+                                ],
+                                disableNativeSpellChecker: false
+                            });
+                        }
+                        if(!$('#info_comment6').attr("readonly")) {
+                            CKEDITOR.replace('info_comment6', {
+                                toolbar: "Custom",
+                                toolbar_Custom: [
+                                    ["Bold", "Italic", "Underline"],
+                                    ["NumberedList", "BulletedList"],
+                                    ["Outdent", "Indent"],
+                                    ["Link"],
+                                ],
+                                disableNativeSpellChecker: false
+                            });
+                        }
                     }
                     , error: function(error) {
                         var errors = error.responseJSON.errors;
@@ -758,7 +832,9 @@
                 $('.modal-body').find('.error').html('');
                 $('.modal-body').find('input[type=radio]').prop('checked', false);
             });
+            
         </script>
+        
     </x-slot>
 
 </x-side-layout>
