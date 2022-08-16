@@ -291,13 +291,17 @@
                 $(this).html("<div class='spinner-border spinner-border-sm' role='status'></div>");
                 $(".error-date-alert").hide();
                 const that = this;
+                const item = $(that).data('id');
+                const va = CKEDITOR.instances[item].getData();
+                
                 $.ajax({
                     url: '/conversation/' + conversation_id
                     , type: 'PUT'
                     , data: {
                         _token: '{{ csrf_token() }}'
                         , field: $(that).data('name'), // e.target.getAttribute('data-name'),
-                        value: $("#" + $(that).data('id') + '_edit').val()
+                        //value: $("#" + $(that).data('id') + '_edit').val()
+                        value:va
                     }
                     , success: function(result) {
                         toReloadPage = true;
@@ -819,6 +823,54 @@
                                     ["Link"],
                                 ],
                                 disableNativeSpellChecker: false
+                            });
+                        }
+                        
+                        if(!$('#info_comment1').attr("readonly")) {
+                            CKEDITOR.instances['info_comment1'].on('contentDom', function() {
+                                this.document.on('click', function(event){
+                                     $('button[data-id=info_comment1]').removeClass("d-none");
+                                 });
+                            });
+                        }
+                        
+                        if(!$('#info_comment2').attr("readonly")) {
+                            CKEDITOR.instances['info_comment2'].on('contentDom', function() {
+                                this.document.on('click', function(event){
+                                     $('button[data-id=info_comment2]').removeClass("d-none");
+                                 });
+                            });
+                        }
+                        
+                        if(!$('#info_comment3').attr("readonly")) {
+                            CKEDITOR.instances['info_comment3'].on('contentDom', function() {
+                                this.document.on('click', function(event){
+                                     $('button[data-id=info_comment3]').removeClass("d-none");
+                                 });
+                            });
+                        }
+                        
+                        if(!$('#info_comment4').attr("readonly")) {
+                            CKEDITOR.instances['info_comment4'].on('contentDom', function() {
+                                this.document.on('click', function(event){
+                                     $('button[data-id=info_comment4]').removeClass("d-none");
+                                 });
+                            });
+                        }
+                        
+                        if(!$('#info_comment5').attr("readonly")) {
+                            CKEDITOR.instances['info_comment5'].on('contentDom', function() {
+                                this.document.on('click', function(event){
+                                     $('button[data-id=info_comment5]').removeClass("d-none");
+                                 });
+                            });
+                        }
+                        
+                        if(!$('#info_comment6').attr("readonly")) {
+                            CKEDITOR.instances['info_comment6'].on('contentDom', function() {
+                                this.document.on('click', function(event){
+                                     $('button[data-id=info_comment6]').removeClass("d-none");
+                                 });
                             });
                         }
                     }
