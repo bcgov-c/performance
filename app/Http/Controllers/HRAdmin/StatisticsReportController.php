@@ -1283,7 +1283,7 @@ class StatisticsReportController extends Controller
                 );
         
                 $columns = ["Employee ID", "Employee Name", "Email",
-                                "Next Conversation Due", 'Overdue Group',
+                                "Next Conversation Due", 'Due Date Category',
                                 "Organization", "Level 1", "Level 2", "Level 3", "Level 4", "Reporting To",
                            ];
         
@@ -1304,7 +1304,7 @@ class StatisticsReportController extends Controller
                         $row['Name'] = $user->employee_name;
                         $row['Email'] = $user->email;
                         $row['Next Conversation Due'] = $user->next_due_date;
-                        $row['Overdue Group'] = $group_name;
+                        $row['Due Date Category'] = $group_name;
                         $row['Organization'] = $user->organization;
                         $row['Level 1'] = $user->level1_program;
                         $row['Level 2'] = $user->level2_division;
@@ -1313,7 +1313,7 @@ class StatisticsReportController extends Controller
                         $row['Reporting To'] = $user->reportingManager ? $user->reportingManager->name : '';
         
                         fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Next Conversation Due'], 
-                                    $row['Overdue Group'], $row['Organization'],
+                                    $row['Due Date Category'], $row['Organization'],
                                     $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], $row['Reporting To'] ));
                     }
         
