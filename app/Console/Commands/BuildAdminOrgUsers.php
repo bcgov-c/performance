@@ -25,7 +25,7 @@ class BuildAdminOrgUsers extends Command
      *
      * @var string
      */
-    protected $description = 'Build assigned accessible users based on admin_orgs  and shared_profiles tables';
+    protected $description = 'Build assigned users based on admin_orgs and shared_profiles tables';
 
     /**
      * Create a new command instance.
