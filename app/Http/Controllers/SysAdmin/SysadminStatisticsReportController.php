@@ -1306,8 +1306,6 @@ class SysadminStatisticsReportController extends Controller
                 $row['Excused Start Date'] = $user->excused_start_date;
                 $row['Excused End Date'] = $user->excused_end_date;
                 $row['Excused Reason'] = $user->excuseReason ? $user->excuseReason->name : '';
-                // $row['Shared'] = $user->shared;
-                // $row['Shared with'] = implode(', ', $user->sharedWith->map( function ($item, $key) { return $item ? $item->sharedWith->name : null; })->toArray() );
                 $row['Organization'] = $user->organization;
                 $row['Level 1'] = $user->level1_program;
                 $row['Level 2'] = $user->level2_division;
