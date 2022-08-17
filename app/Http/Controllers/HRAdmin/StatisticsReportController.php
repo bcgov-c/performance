@@ -165,14 +165,14 @@ class StatisticsReportController extends Controller
                 'groups' => []
             ];
 
-            // $sql = User::selectRaw('count(goals_count) as goals_count')
             $sql = User::selectRaw("case when goals_count between 0 and 0  then '0'  
-                                            when goals_count between 1 and 5  then '1-5'
-                                            when goals_count between 6 and 10 then '6-10'
-                                            when goals_count  > 10            then '>10'
-                                    end AS group_key, count(*) as goals_count")
+                                    when goals_count between 1 and 5  then '1-5'
+                                    when goals_count between 6 and 10 then '6-10'
+                                    when goals_count  > 10            then '>10'
+                            end AS group_key, count(*) as goals_count")
+                ->from(DB::raw( $from_stmt ))
+                ->groupBy('group_key')
                     ->from(DB::raw( $from_stmt ))
-                    ->groupBy('group_key')
                     ->join('employee_demo', function($join) {
                         $join->on('employee_demo.guid', '=', 'A.guid');
                         //$join->on('employee_demo.employee_id', '=', 'A.employee_id');
@@ -203,19 +203,36 @@ class StatisticsReportController extends Controller
                                 ->whereIn('admin_org_users.access_type', [0,1])
                                 ->where('admin_org_users.granted_to_id', '=', Auth::id());
                     });
+                    // ->whereExists(function ($query) {
+                    //     $query->select(DB::raw(1))
+                    //             ->from('admin_orgs')
+                    //             // ->whereColumn('admin_orgs.organization', 'employee_demo.organization')
+                    //             // ->whereColumn('admin_orgs.level1_program', 'employee_demo.level1_program')
+                    //             // ->whereColumn('admin_orgs.level2_division', 'employee_demo.level2_division')
+                    //             // ->whereColumn('admin_orgs.level3_branch',  'employee_demo.level3_branch')
+                    //             // ->whereColumn('admin_orgs.level4', 'employee_demo.level4')
+                    //             ->whereRAW('(admin_orgs.organization = employee_demo.organization OR (admin_orgs.organization = "" OR admin_orgs.organization IS NULL))')
+                    //             ->whereRAW('(admin_orgs.level1_program = employee_demo.level1_program OR (admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL))')
+                    //             ->whereRAW('(admin_orgs.level2_division = employee_demo.level2_division OR (admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL))')
+                    //             ->whereRAW('(admin_orgs.level3_branch = employee_demo.level3_branch OR (admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL))')
+                    //             ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR (admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL))')
+                    //             ->where('admin_orgs.user_id', '=', Auth::id() );
+                    // });
 
-            $goals_count_array = $sql->pluck( 'goals_count','group_key' )->toArray();
+                $goals_count_array = $sql->pluck( 'goals_count','group_key' )->toArray();
 
-            foreach($this->groups as $key => $range) {
-                $goals_count = 0;
-                if (array_key_exists( $key, $goals_count_array)) {
-                        $goals_count = $goals_count_array[$key];
+                foreach($this->groups as $key => $range) {
+                    $goals_count = 0;
+                    if (array_key_exists( $key, $goals_count_array)) {
+                            $goals_count = $goals_count_array[$key];
+                    }
+    
+                    array_push( $data[$goal_id]['groups'], [ 'name' => $key, 'value' => $goals_count, 
+                        'goal_id' => $goal_id, 
+                                                                                            
+                    ]);
                 }
-
-                array_push( $data[$goal_id]['groups'], [ 'name' => $key, 'value' => $goals_count, 
-                    'goal_id' => $goal_id, 
-                ]);
-            }
+            
 
         }
 
