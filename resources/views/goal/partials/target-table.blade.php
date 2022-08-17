@@ -22,8 +22,25 @@
         </a>
       </th>
       <td onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">{{ $goal->typename }}</td>
-      <td onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">{{ $goal->tagnames }}</td>
-      <td onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">{{ $goal->start_date_human }}</td>
+      <td onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">
+          <?php
+          $tags_arr = explode(",", $goal->tagnames);
+          $total_tags = count($tags_arr);
+          $i = 0;
+          if($total_tags > 0) {
+            foreach($tags_arr as $tag_item) {
+                $i++;
+                if ($i < $total_tags) {
+                  echo $tag_item."<br/>";
+                } else {
+                  echo $tag_item;  
+                }
+            }
+          }          
+          ?>
+          </td>
+      <td onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">{{ $goal->start_date_human }}
+      </td>
       <td onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">{{ $goal->target_date_human }}</td>
       <td>
         @include('goal.partials.status-change')

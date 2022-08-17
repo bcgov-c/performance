@@ -6,6 +6,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+            
             <div class="modal-body p-4">
                 <div class="row">
                     <div class="col-12">
