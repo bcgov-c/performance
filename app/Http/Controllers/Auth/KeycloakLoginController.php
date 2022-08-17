@@ -66,7 +66,7 @@ class KeycloakLoginController extends Controller
             } else {
 
                 return redirect('/login')
-                    ->with('error-psft', 'You do not have active PeopleSoft HCM account.');
+                    ->with('error-psft', 'You do not have active PeopleSoft HCM account or not authority to access.');
 
             }
 
@@ -140,17 +140,14 @@ class KeycloakLoginController extends Controller
         // $isUser = User::where('source_type', 'HCM')
         //                 ->where('guid', $guid)
         //                 ->where('acctlock', 0)->first();
-        $isUser = User::where('guid', $guid)
-                        ->where('acctlock', 0)->first();
-
-
-        // // Step 2: if no user find, then find Authenicated User by IDIR 
-        // if (!$isUser) {
-        //     $isUser = User::where('source_type', 'HCM')
-        //                    ->where('idir', $idir)
-        //                    ->where('acctlock', 0)
-        //                    ->first();
-        // }
+        $isUser = User::join('employee_demo','employee_demo.guid','users.guid')
+                        ->join('access_organizations','employee_demo.organization','access_organizations.organization')
+                        ->where('access_organizations.allow_inapp_msg', 'Y')
+                        ->whereNull('employee_demo.date_deleted')
+                        ->where('users.guid', $guid)
+                        ->where('users.acctlock', 0)
+                        ->select('users.*')
+                        ->first();
  
         // User was found, then update the signin information
         if ($isUser) {
