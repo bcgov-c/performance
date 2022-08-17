@@ -140,21 +140,6 @@ class StatisticsReportController extends Controller
                                     ->whereIn('admin_org_users.access_type', [0,1])
                                     ->where('admin_org_users.granted_to_id', '=', Auth::id());
                         });
-                        // ->whereExists(function ($query) {
-                        //     $query->select(DB::raw(1))
-                        //           ->from('admin_orgs')
-                        //         //   ->whereColumn('admin_orgs.organization', 'employee_demo.organization')
-                        //         //   ->whereColumn('admin_orgs.level1_program', 'employee_demo.level1_program')
-                        //         //   ->whereColumn('admin_orgs.level2_division', 'employee_demo.level2_division')
-                        //         //   ->whereColumn('admin_orgs.level3_branch',  'employee_demo.level3_branch')
-                        //         //   ->whereColumn('admin_orgs.level4', 'employee_demo.level4')
-                        //           ->whereRAW('(admin_orgs.organization = employee_demo.organization OR (admin_orgs.organization = "" OR admin_orgs.organization IS NULL))')
-                        //           ->whereRAW('(admin_orgs.level1_program = employee_demo.level1_program OR (admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL))')
-                        //           ->whereRAW('(admin_orgs.level2_division = employee_demo.level2_division OR (admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL))')
-                        //           ->whereRAW('(admin_orgs.level3_branch = employee_demo.level3_branch OR (admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL))')
-                        //           ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR (admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL))')
-                        //           ->where('admin_orgs.user_id', '=', Auth::id() );
-                        // });
 
             $goals_average = $sql->get()->first()->goals_average;
 
