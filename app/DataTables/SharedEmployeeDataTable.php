@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class SharedEmployeeDataTable extends DataTable
 {
@@ -49,16 +51,27 @@ class SharedEmployeeDataTable extends DataTable
                 return view('my-team.partials.view-btn', compact(["row", "yesOrNo"])); // $row['id'];
             })
             ->addColumn('excused', function ($row) {
-                // $yesOrNo = ($row->id % 2 !== 0) ? 'Yes' : 'No';
-                $yesOrNo = ($row->excused_start_date !== null) ? 'Yes' : 'No';
-
-                $excused = json_encode([
-                    'start_date' => $row->excused_start_date,
-                    'end_date' => $row->excused_end_date,
-                    'reason_id' => $row->excused_reason_id
-                ]);
-                // return view('my-team.partials.switch', compact(["yesOrNo"])); // $row['id'];
-                // return $row;
+                $check1 = ($row->excused_start_date !== null);
+                $check2 = ($row->excused_end_date !== null);
+                if($check1 && $check2) {
+                    $check3 = ($row->excused_start_date <= $row->excused_end_date);
+                    $newDate = new Carbon(Carbon::today()->toDateString());
+                    $check4 = ($newDate->between($row->excused_start_date, $row->excused_end_date));
+                } else {
+                    $check3 = false;
+                    $check4 = false;
+                }
+                if($check1 && $check2 && $check3 && $check4) {
+                    $yesOrNo = 'Yes';
+                    $excused = json_encode([
+                        'start_date' => $row->excused_start_date,
+                        'end_date' => $row->excused_end_date,
+                        'reason_id' => $row->excused_reason_id
+                    ]);
+                } else {
+                    $yesOrNo = 'No';
+                    $excused = null;
+                }
                 return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo"]));
             });
     }
