@@ -63,6 +63,21 @@
                 <div class="col-sm-6">
                     <x-input label="End Date" type="date" name="target_date" id="target_date" :value="$goal->target_date ? $goal->target_date->format('Y-m-d') : ''" />
                 </div>
+                
+                @if(session()->has('is_bank')) 
+                <div class="col-6">
+                    <!-- <label> -->
+                        <b>Mandatory/Suggested</b>
+                        <select class="form-control" name="is_mandatory">
+                            <option value="1" @if($goal->is_mandatory == 1) selected @endif>Mandatory</option>
+                            <option value="0" @if($goal->is_mandatory == 0) selected @endif>Suggested</option>
+                        </select>
+                    <!-- </label> -->
+                </div>
+                <div class="col-6">&nbsp;</div>
+                <div class="col-12">&nbsp;</div>
+                @endif
+   
                 <div class="col-12 text-center mb-3">
                     <x-button type="submit" class="btn-lg"> Save </x-button>
                 </div>
