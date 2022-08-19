@@ -764,7 +764,21 @@
                                 ],
                                 disableNativeSpellChecker: false
                             });
+                        } else {
+                            CKEDITOR.replace('info_comment1', {
+                                toolbar: "Custom",
+                                toolbar_Custom: [
+                                    ["Bold", "Italic", "Underline"],
+                                    ["NumberedList", "BulletedList"],
+                                    ["Outdent", "Indent"],
+                                    ["Link"],
+                                ],
+                                disableNativeSpellChecker: false,
+                                readOnly: true
+                            });
                         }
+                        
+                        
                         if(!$('#info_comment2').attr("readonly")) {
                             CKEDITOR.replace('info_comment2', {
                                 toolbar: "Custom",
@@ -776,7 +790,22 @@
                                 ],
                                 disableNativeSpellChecker: false
                             });
+                        }else {
+                            CKEDITOR.replace('info_comment2', {
+                                toolbar: "Custom",
+                                toolbar_Custom: [
+                                    ["Bold", "Italic", "Underline"],
+                                    ["NumberedList", "BulletedList"],
+                                    ["Outdent", "Indent"],
+                                    ["Link"],
+                                ],
+                                disableNativeSpellChecker: false,
+                                readOnly: true
+                            });
                         }
+                        
+                        
+                        
                         if(!$('#info_comment3').attr("readonly")) {
                             CKEDITOR.replace('info_comment3', {
                                 toolbar: "Custom",
@@ -788,7 +817,20 @@
                                 ],
                                 disableNativeSpellChecker: false
                             });
+                        }else {
+                            CKEDITOR.replace('info_comment3', {
+                                toolbar: "Custom",
+                                toolbar_Custom: [
+                                    ["Bold", "Italic", "Underline"],
+                                    ["NumberedList", "BulletedList"],
+                                    ["Outdent", "Indent"],
+                                    ["Link"],
+                                ],
+                                disableNativeSpellChecker: false,
+                                readOnly: true
+                            });
                         }
+                        
                         if(!$('#info_comment4').attr("readonly")) {
                             CKEDITOR.replace('info_comment4', {
                                 toolbar: "Custom",
@@ -800,7 +842,21 @@
                                 ],
                                 disableNativeSpellChecker: false
                             });
+                        }else {
+                            CKEDITOR.replace('info_comment4', {
+                                toolbar: "Custom",
+                                toolbar_Custom: [
+                                    ["Bold", "Italic", "Underline"],
+                                    ["NumberedList", "BulletedList"],
+                                    ["Outdent", "Indent"],
+                                    ["Link"],
+                                ],
+                                disableNativeSpellChecker: false,
+                                readOnly: true
+                            });
                         }
+                        
+                        
                         if(!$('#info_comment5').attr("readonly")) {
                             CKEDITOR.replace('info_comment5', {
                                 toolbar: "Custom",
@@ -812,7 +868,20 @@
                                 ],
                                 disableNativeSpellChecker: false
                             });
+                        }else {
+                            CKEDITOR.replace('info_comment5', {
+                                toolbar: "Custom",
+                                toolbar_Custom: [
+                                    ["Bold", "Italic", "Underline"],
+                                    ["NumberedList", "BulletedList"],
+                                    ["Outdent", "Indent"],
+                                    ["Link"],
+                                ],
+                                disableNativeSpellChecker: false,
+                                readOnly: true
+                            });
                         }
+                        
                         if(!$('#info_comment6').attr("readonly")) {
                             CKEDITOR.replace('info_comment6', {
                                 toolbar: "Custom",
@@ -823,6 +892,18 @@
                                     ["Link"],
                                 ],
                                 disableNativeSpellChecker: false
+                            });
+                        }else {
+                            CKEDITOR.replace('info_comment6', {
+                                toolbar: "Custom",
+                                toolbar_Custom: [
+                                    ["Bold", "Italic", "Underline"],
+                                    ["NumberedList", "BulletedList"],
+                                    ["Outdent", "Indent"],
+                                    ["Link"],
+                                ],
+                                disableNativeSpellChecker: false,
+                                readOnly: true
                             });
                         }
                         
