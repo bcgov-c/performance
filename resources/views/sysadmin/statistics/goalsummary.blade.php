@@ -6,17 +6,20 @@
 		@include('sysadmin.statistics.partials.tabs')
     </x-slot>
 
-	<div class="d-flex justify-content-end mb-4">
+	<div class="d-flex justify-content-end mb-4 no-print">
         <a class="btn btn-primary" id="btn_print">Print</a>
     </div>
 
-	<form id="filter-form">
+	<form id="filter-form" class="no-print">
 
 		<input type="hidden" name="filter_params" value="{{ old('filter') }}">
 		
 		@include('sysadmin.statistics.partials.filter',['formaction' => route('sysadmin.statistics.goalsummary') ])
 
 	</form>
+
+<h1 class="mt-3 print-only">Shared Employees Summary</h1>
+<h5 class="mb-3 print-only">Created on {{ \Carbon\Carbon::now()->format('M d, Y') }}</h5>	
 
 <span id="pdf-output">
 
@@ -26,7 +29,7 @@
 			<div class="card text-center text-secondary" >
 				<div class="card-header border-0 px-5" >
 					<div class="d-table" style="min-height: 4em;">
-						<p class="card-text d-table-cell align-middle h6">Average Active {{ $type['name'] }} Goals Per Employee</p> 
+						<p class="card-text d-table-cell align-middle h6 font-weight-bold">Average Active {{ $type['name'] }} Goals Per Employee</p> 
 					</div>
 				</div>
 				<div class="card-body pt-2 pb-4">
@@ -37,35 +40,40 @@
 		@endforeach
 	</div>
 
+	<p class="print-only page-break">&nbsp;</p>
+
 	<div class="row justify-content-center">
-		<div class="col-sm-12 col-md-6 col-xl-3">
-		<div class="card">
-			<div class="card-body">
-				<div class=" chart has-fixed-height" id="pie_basic_1">
-					Loading...
-				</div>
-			</div>
-		</div>
-		</div>
-		<div class="col-sm-12 col-md-6 col-xl-3">
-		<div class="card">
-			<div class="card-body">
-				<div class="chart has-fixed-height" id="pie_basic_2">
-					Loading...
-				</div>
-			</div>
-		</div>
-		</div>
-		<div class="col-sm-12 col-md-6 col-xl-3">
+		<div class="col-sm-12 col-md-10 col-xl-3">
 			<div class="card">
-			<div class="card-body">
-				<div class=" chart has-fixed-height" id="pie_basic_3">
-					Loading...
+				<div class="card-body">
+					<div class=" chart has-fixed-height" id="pie_basic_1">
+						Loading...
+					</div>
 				</div>
 			</div>
+		</div>
+		<div class="col-sm-12 col-md-10 col-xl-3">
+			<div class="card">
+				<div class="card-body">
+					<div class="chart has-fixed-height" id="pie_basic_2">
+						Loading...
+					</div>
+				</div>
 			</div>
 		</div>
-		<div class="col-sm-12 col-md-6 col-xl-3">
+
+		<p class="print-only page-break">&nbsp;</p>
+
+		<div class="col-sm-12 col-md-10 col-xl-3">
+			<div class="card">
+				<div class="card-body">
+					<div class=" chart has-fixed-height" id="pie_basic_3">
+						Loading...
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-12 col-md-10 col-xl-3">
 			<div class="card">
 			<div class="card-body">
 				<div class=" chart has-fixed-height" id="pie_basic_4">
@@ -77,9 +85,10 @@
 	
 	</div>
 
+	<p class="print-only page-break">&nbsp;</p>
 
 	<div class="row justify-content-center">
-		<div class="col-sm-12 ">
+		<div class="col-sm-10">
 			<div class="card">
 				<div class="card-body">
 					<div class="bar-chart has-fixed-height" id="bar_basic_1">
@@ -95,32 +104,51 @@
 
 <x-slot name="css">
 <style>
-	
-.chart {
-	min-height:300px;
-	/* min-width: 100px; */
-}
 
-.bar-chart {
-	min-height:500px;
+@media screen {
+	.chart {
+		min-height:400px;
+		/* min-width: 100px; */
+	}
+
+	.bar-chart {
+		min-height:500px;
+	}
+
+	.print-only {
+		display: none;
+	}
+
 }
 
 @media print {
 
-	@page { size:letter }
-
+	@page { size:letter } 
 	body { 
-		max-width:600px !important;
-		text-align: center !important;
+		max-width: 800px !important;
 	}	 
-
-  	a.btn {
-		display:none;
+	.no-print, .no-print *
+	{
+		display: none !important;
 	}
 	.chart {
-		margin-left: 50px; 
-	}
+			/* min-width:  180px;  */
+			margin-left: 10% !important; 
+		}	
 
+	.bar-chart {
+			margin-left: 0px !important; 
+		}
+
+	.row {
+		display: block;
+	}
+	.page-break  { 
+		display:block; 
+		page-break-before : always ; 
+
+	}
+  
 }
 
 </style>
@@ -179,7 +207,7 @@ $(function()  {
 				triggerEvent: true,
 				textStyle: {
 					fontSize: 15,
-					fontWeight: 500,
+					fontWeight: 1000,
 					color: '#6c757d',
 				},
 				subtextStyle: {
@@ -251,7 +279,7 @@ $(function()  {
 				name: myData['name'],
 				type: 'pie',
 				// radius: '50%',
-				radius: [20, 60],
+				radius: ['15%', '50%'],
 				center: ['50%', '50%'],
 				itemStyle: {
 					normal: {
