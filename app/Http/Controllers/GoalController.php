@@ -35,6 +35,8 @@ class GoalController extends Controller
         $goaltypes = GoalType::all()->toArray();
         $tags = Tag::all()->toArray();
         $user = User::find($authId);
+        
+        $request->session()->forget('is_bank');
               
         $tagsList = Tag::all()->toArray();
         array_unshift($tagsList, [
@@ -341,6 +343,9 @@ class GoalController extends Controller
             $input["measure_of_success"] = $request->measure_of_success;
             $input["goal_type_id"] = $request->goal_type_id;
             $input["tag_ids"] = $request->tag_ids;
+            if(isset($request->is_mandatory)){
+                $input["is_mandatory"] = $request->is_mandatory;
+            }
         }
         
         $tags = '';
@@ -569,6 +574,8 @@ class GoalController extends Controller
         }
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
         $goals_count = count($bankGoals);
+        
+        $request->session()->put('is_bank', true);
 
         return view('goal.bank', array_merge(compact('bankGoals', 'tags', 'tagsList', 'goalTypes', 'type_desc_str', 'mandatoryOrSuggested', 'createdBy', 'goals_count', 'sortby','sortorder'), $suggestedGoalsData));
     }
