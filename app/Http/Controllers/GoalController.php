@@ -42,6 +42,20 @@ class GoalController extends Controller
             "name" => "Any"
         ]);   
         
+        $sysstatus = \Config::get("global.status");
+        
+        $statusList[0]['id'] = 'inactive';
+        $statusList[0]['name'] = 'Inactive';
+        $i = 1;
+        foreach($sysstatus as $statusname => $statusitem) {
+            if($statusname != 'active') {
+                $statusList[$i]['id'] = $statusname;
+                $statusList[$i]['name'] = ucwords($statusname);
+                $i++;
+            }
+        }
+       
+
         $createdBy = Goal::withoutGlobalScope(NonLibraryScope::class)
             ->where('is_library', true)
             ->whereHas('sharedWith', function($query) {
@@ -133,6 +147,9 @@ class GoalController extends Controller
         if(isset($request->tag_id) && $request->tag_id != 0){
             $query = $query->where('goal_tags.tag_id', '=', "$request->tag_id");
         }
+        if(isset($request->status) && $request->status != ''){
+            $query = $query->where('goals.status', 'LIKE', "$request->status");
+        }
         if(isset($request->filter_start_date) && $request->filter_start_date != ''){
             $start_date_array = explode('-', $request->filter_start_date);
             if(count($start_date_array) == 2) {
@@ -153,13 +170,29 @@ class GoalController extends Controller
                 $query = $query->whereBetween('goals.target_date', [$from, $to]);
             }
         }
+        
+        $sortorder = 'ASC';
+        $sortby = '';
+        if(isset($request->sortorder) && $request->sortorder != 'ASC'){
+            $sortorder = 'DESC';            
+        }         
+        if(isset($request->sortby) && $request->sortby != ''){
+            $sortby = $request->sortby;
+            $query = $query->orderBy($sortby, $sortorder);
+        }
+        
       
         $goals = $query->groupBy('title');
         $goals = $query->paginate(4);
-        $sortby = '';
-        $sortorder = 'ASC';
         
-        return view('goal.index', compact('goals', 'type', 'goaltypes', 'tagsList', 'sortby', 'sortorder', 'createdBy', 'user', 'employees', 'tags', 'type_desc_str'));
+        if ($sortorder == 'ASC') {
+            $sortorder = 'DESC';
+        } else {
+            $sortorder = 'ASC';
+        }
+        
+        
+        return view('goal.index', compact('goals', 'type', 'goaltypes', 'tagsList', 'sortby', 'sortorder', 'createdBy', 'user', 'employees', 'tags', 'type_desc_str', 'statusList'));
     }
 
     /**

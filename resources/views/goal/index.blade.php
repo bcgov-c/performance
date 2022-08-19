@@ -62,6 +62,9 @@
                             <x-dropdown :list="$goaltypes" label="Goal Type" name="goal_type" :selected="request()->goal_type"></x-dropdown>
                         </div>
                         <div class="col">
+                            <x-dropdown :list="$statusList" label="Status" name="status" :selected="request()->status"></x-dropdown>                      
+                        </div>
+                        <div class="col">
                             <x-dropdown :list="$tagsList" label="Tags" name="tag_id" :selected="request()->tag_id"></x-dropdown>
                         </div>
                         <div class="col">
@@ -465,6 +468,7 @@
                 $("#filter-menu").submit();
             }).on('cancel.daterangepicker', function(ev, picker) {
                 $('input[name="filter_start_date"]').val('Any');
+                $("#filter-menu").submit();
             });
             
         $('input[name="filter_target_date"]').daterangepicker({
@@ -478,11 +482,17 @@
                 $("#filter-menu").submit();
             }).on('cancel.daterangepicker', function(ev, picker) {
                 $('input[name="filter_target_date"]').val('Any');
+                $("#filter-menu").submit();
             });    
             
             $('#filter-menu select, #filter-menu input').change(function () {
                 $("#filter-menu").submit();
             });
+            
+            function sort(obj){
+                $('#sortby').val(obj);
+                $("#filter-menu").submit();
+            }
               
 </script>    
 
