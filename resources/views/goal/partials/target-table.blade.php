@@ -4,12 +4,12 @@
 
   <thead>
     <tr>
-      <th scope="col">Title</th>
-      <th scope="col">Goal Type</th>
-      <th scope="col">Tags</th>
-      <th scope="col">Start Date</th>
-      <th scope="col">End Date</th>
-      <th scope="col">Status</th>
+        <th scope="col"><a href="javascript:sort('title');">Title</a></th>
+      <th scope="col"><a href="javascript:sort('goal_type_id');">Goal Type</a></th>
+      <th scope="col"><a href="javascript:sort('tagnames');">Tags</a></th>
+      <th scope="col"><a href="javascript:sort('start_date');">Start Date</a></th>
+      <th scope="col"><a href="javascript:sort('target_date');">End Date</a></th>
+      <th scope="col"><a href="javascript:sort('status');">Status</a></th>
       <th> </th>
     </tr>
   </thead>
