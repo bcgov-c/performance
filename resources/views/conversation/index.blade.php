@@ -628,7 +628,7 @@
                             $("button.btn-conv-cancel").hide();
                             $("#viewConversationModal").find('textarea').each((index, e) => $(e).prop('readonly', true));
                             $('#viewConversationModal').data('is-frozen', 1);
-                            $("#team_member_agreement").prop('disabled', true);
+                            $("#team_member_agreement").prop('disabled', false);
                             if (result.supervisor_signoff_id && isSupervisor) {
                                 $("#viewConversationModal .sup-inputs").find('input:radio').each((index, e) => $(e).prop('disabled', true));
                             } 
