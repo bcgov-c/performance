@@ -183,12 +183,12 @@ class ExcuseEmployeesController extends Controller
                 } );
             } )
             ->where('ao1.user_id', '=', Auth::id())
-            ->when($level0, function($q) use($level0) {return $q->where('organization', $level0->name);})
-            ->when($level1, function($q) use($level1) {return $q->where('level1_program', $level1->name);})
-            ->when($level2, function($q) use($level2) {return $q->where('level2_division', $level2->name);})
-            ->when($level3, function($q) use($level3) {return $q->where('level3_branch', $level3->name);})
-            ->when($level4, function($q) use($level4) {return $q->where('level4', $level4->name);})
-            ->when($request->criteria == 'name', function($q) use($request){return $q->where('employee_name', 'like', "%" . $request->search_text . "%");})
+            ->when($level0, function($q) use($level0) {return $q->where('employee_demo.organization', $level0->name);})
+            ->when($level1, function($q) use($level1) {return $q->where('employee_demo.level1_program', $level1->name);})
+            ->when($level2, function($q) use($level2) {return $q->where('employee_demo.level2_division', $level2->name);})
+            ->when($level3, function($q) use($level3) {return $q->where('employee_demo.level3_branch', $level3->name);})
+            ->when($level4, function($q) use($level4) {return $q->where('employee_demo.level4', $level4->name);})
+            ->when($request->criteria == 'name', function($q) use($request){return $q->where('employee_demo.employee_name', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'job', function($q) use($request){return $q->where('jobcode_desc', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'dpt', function($q) use($request){return $q->where('deptid', 'like', "%" . $request->search_text . "%");})
@@ -196,7 +196,7 @@ class ExcuseEmployeesController extends Controller
                 return $q->where(function ($query2) use ($request) {
                     if($request->search_text) {
                         $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
-                        ->orWhere('employee_name', 'like', "%" . $request->search_text . "%")
+                        ->orWhere('employee_demo.employee_name', 'like', "%" . $request->search_text . "%")
                         ->orWhere('jobcode_desc', 'like', "%" . $request->search_text . "%")
                         ->orWhere('deptid', 'like', "%" . $request->search_text . "%");
                     }
@@ -204,7 +204,7 @@ class ExcuseEmployeesController extends Controller
             })
             ->select (
                 'employee_demo.employee_id',
-                'employee_name', 
+                'employee_demo.employee_name', 
                 'employee_demo.jobcode_desc',
                 'users.excused_start_date',
                 'users.excused_end_date',
