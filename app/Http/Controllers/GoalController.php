@@ -580,7 +580,11 @@ class GoalController extends Controller
         
         $request->session()->put('is_bank', true);
 
-        return view('goal.bank', array_merge(compact('bankGoals', 'tags', 'tagsList', 'goalTypes', 'type_desc_str', 'mandatoryOrSuggested', 'createdBy', 'goals_count', 'sortby','sortorder'), $suggestedGoalsData));
+        // this is redirect from DashboardController with the related id, then open modal box
+        $open_modal_id = (session('open_modal_id'));
+
+        return view('goal.bank', array_merge(compact('bankGoals', 'tags', 'tagsList', 'goalTypes', 'type_desc_str', 'mandatoryOrSuggested', 'createdBy', 'goals_count', 'sortby','sortorder',
+                                'open_modal_id'), $suggestedGoalsData));
     }
 
     private function getDropdownValues(&$mandatoryOrSuggested, &$createdBy, &$goalTypes, &$tagsList) {

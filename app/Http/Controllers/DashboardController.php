@@ -10,10 +10,105 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\DashboardNotification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
+use Yajra\Datatables\Datatables;
 
 class DashboardController extends Controller
 {
-    public function index() {
+    public function index(Request $request) {
+
+        $notifications = DashboardNotification::where('user_id', Auth::id())
+                        ->where(function ($q)  {
+                            $q->whereExists(function ($query) {
+                                return $query->select(DB::raw(1))
+                                        ->from('conversations')
+                                        ->whereColumn('dashboard_notifications.related_id', 'conversations.id')
+                                        ->whereNull('conversations.deleted_at')
+                                        ->whereIn('dashboard_notifications.notification_type', ['CA', 'CS']);
+                        })
+                        ->orWhereExists(function ($query) {
+                            return $query->select(DB::raw(1))
+                                    ->from('goals')
+                                    ->whereColumn('dashboard_notifications.related_id', 'goals.id')
+                                    ->whereNull('goals.deleted_at')
+                                    ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB']);
+                        })
+                        ->orWhereExists(function ($query) {
+                            return $query->select(DB::raw(1))
+                                    ->from('shared_profiles')
+                                    ->whereColumn('dashboard_notifications.related_id', 'shared_profiles.id')
+                                    ->whereIn('dashboard_notifications.notification_type', ['SP']);
+                        })
+                        ->orWhere('dashboard_notifications.notification_type', '');    
+                })
+                ->orderby('status', 'asc')->orderby('created_at', 'desc');
+
+        if($request->ajax()) {
+
+            return Datatables::of($notifications)
+                ->addColumn('item_detail', function ($notification) {
+
+                    $text = '<span class="font-weight-bold">'.$notification->comment.'</span><br/>';
+                    // $text .= '<span>sjskaj |  sadasdad  |dkajsdkjkjadskjdkja</span>';
+
+                    switch($notification->notification_type) {
+                        case 'GC':
+                        case 'GR':
+                            $text .= 'Title: '.$notification->relatedGoal->title.' | Goal Type: '.$notification->relatedGoal->goalType->name. ' | Date: '.$notification->created_at->format('M d, Y H:i A');
+                            break;
+                        case 'GB':
+                            $text .= 'Title: '.$notification->relatedGoal->title. ' | Type: '.$notification->relatedGoal->mandatory_status_descr. ' | Date: '.$notification->created_at->format('M d, Y H:i A');
+                        break;
+                    case 'CA':
+                    case 'CS':
+                            $text .= 'Title: '.($notification->conversation ? $notification->conversation->topic->name : '').' | Date: '.$notification->created_at->format('M d, Y H:i A');
+                        break;
+                    case 'SP':
+                            $text .= 'Elements: '.($notification->sharedProfile ? $notification->sharedProfile->shared_element_name : ''). ' | Date: '.$notification->created_at->format('M d, Y H:i A');
+                        break;
+                    case '':
+                            $text .= 'Date: '.$notification->created_at->format('M d, Y H:i A');
+                        break;
+                    }
+
+                    return '<table class="inner" style="border:none">'. 
+                        '<tr>'.
+
+                        '<td class="'. ($notification->status == 'R' ? 'read' : 'new') .' pr-1">&nbsp;</td>'.
+                        '<td class="pr-3" style="vertical-align:middle"><input type="checkbox" id="itemCheck'. 
+                                $notification->id .'" name="itemCheck[]" value="'. 
+                                $notification->id .'" class="dt-body-center"></td>'. 
+                        '<td>'.$text.'</td>'.
+                        '</tr>'.
+                        '</table>';
+                })
+                ->addColumn('action', function ($notification) {
+
+                    $text = "";
+                    if ($notification->related_id) {
+                        $link = 'location.href=\''. route("dashboardmessage.show", $notification->id) . '\'" ';
+                        // if ($notification->notification_type == 'SP' ) {
+                        //     $link = "open_shared_profile_modal()";  
+                        // }
+
+                        $text .= '<button onclick="'. $link . '"' .
+                                // 'data-toggle="tooltip" data-placement="bottom" title="Click to view the details." '.
+                                'data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Now hover out." '.
+                                'class="notification-modal btn btn-sm btn-primary" value="'. $notification->id .'">View</button>';
+                    }
+                    $text .= '<button class="btn btn-danger btn-sm ml-2 delete-dn" data-id="'. $notification->id .
+                                '" data-comment="'. $notification->comment . '"><i class="fas fa-trash-alt"></i></button>';
+
+                    return $text;
+                })
+                ->rawColumns(['item_detail', 'action'])
+                //->removeColumn('password')
+                ->make(true);
+
+        }
+
+        $matched_dn_ids = $notifications->select(['id'])->pluck('id');
+        $old_selected_dn_ids = isset($old['selected_dn_ids']) ? json_decode($old['selected_dn_ids']) : [];
+
         $greetings = "";
 
         /* This sets the $time variable to the current hour in the 24 hour clock format */
@@ -44,57 +139,57 @@ class DashboardController extends Controller
         // $tab = (Route::current()->getName() == 'dashboard.notifications') ? 'notifications' : 'todo';
         $tab = (Route::current()->getName() == 'dashboard.notifications') ? 'notifications' : 'notifications';
         // $notifications = DashboardNotification::where('user_id', Auth::id())->get();
-        $notifications = DashboardNotification::where('user_id', Auth::id())
-                ->where(function ($q)  {
-                        $q->whereExists(function ($query) {
-                            return $query->select(DB::raw(1))
-                                    ->from('conversations')
-                                    ->whereColumn('dashboard_notifications.related_id', 'conversations.id')
-                                    ->whereNull('conversations.deleted_at')
-                                    ->whereIn('dashboard_notifications.notification_type', ['CA', 'CS']);
-                        })
-                        ->orWhereExists(function ($query) {
-                            return $query->select(DB::raw(1))
-                                    ->from('goals')
-                                    ->whereColumn('dashboard_notifications.related_id', 'goals.id')
-                                    ->whereNull('goals.deleted_at')
-                                    ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB']);
-                        })
-                        ->orWhereExists(function ($query) {
-                            return $query->select(DB::raw(1))
-                                    ->from('shared_profiles')
-                                    ->whereColumn('dashboard_notifications.related_id', 'shared_profiles.id')
-                                    ->whereIn('dashboard_notifications.notification_type', ['SP']);
-                        })
-                        ->orWhere('dashboard_notifications.notification_type', '')
-                        ;    
-                })
-            ->orderby('status', 'asc')->orderby('created_at', 'desc')
-            ->paginate(8);
-        $notifications_unread = DashboardNotification::where('user_id', Auth::id())->where('status', null)
-                                ->where(function ($q)  {
-                                    $q->whereExists(function ($query) {
-                                        return $query->select(DB::raw(1))
-                                                ->from('conversations')
-                                                ->whereColumn('dashboard_notifications.related_id', 'conversations.id')
-                                                ->whereNull('conversations.deleted_at')
-                                                ->whereIn('dashboard_notifications.notification_type', ['CA', 'CS']);
-                                    })
-                                    ->orWhereExists(function ($query) {
-                                        return $query->select(DB::raw(1))
-                                                ->from('goals')
-                                                ->whereColumn('dashboard_notifications.related_id', 'goals.id')
-                                                ->whereNull('goals.deleted_at')
-                                                ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB']);
-                                    })
-                                    ->orWhereExists(function ($query) {
-                                        return $query->select(DB::raw(1))
-                                                ->from('shared_profiles')
-                                                ->whereColumn('dashboard_notifications.related_id', 'shared_profiles.id')
-                                                ->whereIn('dashboard_notifications.notification_type', ['SP']);
-                                    })
-                                    ->orWhere('dashboard_notifications.notification_type', '');    
-                                });
+        // $notifications = DashboardNotification::where('user_id', Auth::id())
+        //         ->where(function ($q)  {
+        //                 $q->whereExists(function ($query) {
+        //                     return $query->select(DB::raw(1))
+        //                             ->from('conversations')
+        //                             ->whereColumn('dashboard_notifications.related_id', 'conversations.id')
+        //                             ->whereNull('conversations.deleted_at')
+        //                             ->whereIn('dashboard_notifications.notification_type', ['CA', 'CS']);
+        //                 })
+        //                 ->orWhereExists(function ($query) {
+        //                     return $query->select(DB::raw(1))
+        //                             ->from('goals')
+        //                             ->whereColumn('dashboard_notifications.related_id', 'goals.id')
+        //                             ->whereNull('goals.deleted_at')
+        //                             ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB']);
+        //                 })
+        //                 ->orWhereExists(function ($query) {
+        //                     return $query->select(DB::raw(1))
+        //                             ->from('shared_profiles')
+        //                             ->whereColumn('dashboard_notifications.related_id', 'shared_profiles.id')
+        //                             ->whereIn('dashboard_notifications.notification_type', ['SP']);
+        //                 })
+        //                 ->orWhere('dashboard_notifications.notification_type', '')
+        //                 ;    
+        //         })
+        //     ->orderby('status', 'asc')->orderby('created_at', 'desc')
+        //     ->paginate(8);
+        // $notifications_unread = DashboardNotification::where('user_id', Auth::id())->where('status', null)
+        //                         ->where(function ($q)  {
+        //                             $q->whereExists(function ($query) {
+        //                                 return $query->select(DB::raw(1))
+        //                                         ->from('conversations')
+        //                                         ->whereColumn('dashboard_notifications.related_id', 'conversations.id')
+        //                                         ->whereNull('conversations.deleted_at')
+        //                                         ->whereIn('dashboard_notifications.notification_type', ['CA', 'CS']);
+        //                             })
+        //                             ->orWhereExists(function ($query) {
+        //                                 return $query->select(DB::raw(1))
+        //                                         ->from('goals')
+        //                                         ->whereColumn('dashboard_notifications.related_id', 'goals.id')
+        //                                         ->whereNull('goals.deleted_at')
+        //                                         ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB']);
+        //                             })
+        //                             ->orWhereExists(function ($query) {
+        //                                 return $query->select(DB::raw(1))
+        //                                         ->from('shared_profiles')
+        //                                         ->whereColumn('dashboard_notifications.related_id', 'shared_profiles.id')
+        //                                         ->whereIn('dashboard_notifications.notification_type', ['SP']);
+        //                             })
+        //                             ->orWhere('dashboard_notifications.notification_type', '');    
+        //                         });
         $supervisorTooltip = 'If your current supervisor in the Performance Development Platform is incorrect, please have your supervisor submit a service request through AskMyHR and choose the category: <span class="text-primary">My Team or Organization > HR Software Systems Support > Position / Reporting Updates</span>';        
         $sharedList = SharedProfile::where('shared_id', Auth::id())->with('sharedWithUser')->get();
         $profilesharedTooltip = 'If this information is incorrect, please discuss with your supervisor first and escalate to your organization\'s Strategic Human Resources shop if you are unable to resolve.';
@@ -106,7 +201,11 @@ class DashboardController extends Controller
             foreach ($messages as $message) {}
         }
 
-        return view('dashboard.index', compact('greetings', 'tab', 'supervisorTooltip', 'sharedList', 'profilesharedTooltip', 'notifications', 'notifications_unread', 'message'));
+        $open_modal = (session('open')) ? true : false;
+
+        return view('dashboard.index', compact('greetings', 'tab', 'supervisorTooltip', 'sharedList', 'profilesharedTooltip', 
+                    // 'notifications', 'notifications_unread', 
+                    'message', 'matched_dn_ids','old_selected_dn_ids', 'open_modal'));
     }
 
     public function show(Request $request, $id) {
@@ -118,7 +217,14 @@ class DashboardController extends Controller
             $notification->status = 'R';
             $notification->save();
 
-            return redirect( $notification->url );
+            $url = $notification->url;
+
+            if ($notification->notification_type == 'SP' ) {
+                // $url .= '?open=1';
+                return redirect( $url )->with('open', '1');
+            }
+
+            return redirect( $url )->with('open_modal_id', $notification->related_id );
         }
 
         return redirect()->back();
@@ -138,9 +244,13 @@ class DashboardController extends Controller
 
     public function destroyall(Request $request)
     {
-        $ids = $request->ids;
-        DashboardNotification::wherein('id',explode(",",$ids))->delete();
-        return redirect()->back();
+        
+        $ids = $request->ids ? json_decode($request->ids) : [];
+
+        DashboardNotification::wherein('id', $ids)->delete();
+        // return redirect()->back();
+        return response()->noContent();
+
         // return redirect()->to('/route');
         // header("Refresh:0");
         // return back();
@@ -153,33 +263,73 @@ class DashboardController extends Controller
 
     public function updatestatus(Request $request)
     {
-        $ids = $request->ids;
+
+        $ids = $request->ids ? json_decode($request->ids) : [];
+
+// return $ids;        
         // var check = confirm($ids);
         // dd("RESULTS: " . $ids);
-        DashboardNotification::wherein('id',explode(",",$ids))->update(['status' => 'R']);
+
+        DashboardNotification::wherein('id', $ids)->update(['status' => 'R']);
         // return route::get('dashboard.notifications');
-        return redirect()->back();
+        // return redirect()->back();
         // $notification = DashboardNotification::where('id', 4)->update(['status' => 'S']);
         // window.location.reload();
         // return redirect()->to('/route');
         // header("Refresh:0");
         // return back();
-        // return response()->json(['success'=>"Notification(s) updated successfully."]);
+        return response()->json(['success'=>"Notification(s) updated successfully."]);
     }
 
-    public function resetstatus(request $request)
+    public function resetstatus(Request $request)
     {
-        $ids = $request->ids;
-        DashboardNotification::wherein('id',explode(",",$ids))->update(['status' => null]);
+
+        $ids = $request->ids ? json_decode($request->ids) : [];
+        DashboardNotification::wherein('id',$ids)->update(['status' => null]);
         // DashboardNotification::where('id',5)->update(['status' => 'D']);
         // header("Refresh:0");
         // return back();
         // window.location.reload();
         // return redirect()->to('/route');
-        return redirect()->back();
-        // return response()->json(['success'=>"Notification(s) updated successfully."]);
+        // return redirect()->back();
+        return response()->json(['success'=>"Notification(s) updated successfully."]);
     }
     
+    public function badgeCount(Request $request) {
+
+        if($request->ajax()) {
+            $badge_count = DashboardNotification::where('user_id', Auth::id())
+                            ->where(function ($q)  {
+                                $q->whereExists(function ($query) {
+                                    return $query->select(DB::raw(1))
+                                            ->from('conversations')
+                                            ->whereColumn('dashboard_notifications.related_id', 'conversations.id')
+                                            ->whereNull('conversations.deleted_at')
+                                            ->whereIn('dashboard_notifications.notification_type', ['CA', 'CS']);
+                            })
+                            ->orWhereExists(function ($query) {
+                                return $query->select(DB::raw(1))
+                                        ->from('goals')
+                                        ->whereColumn('dashboard_notifications.related_id', 'goals.id')
+                                        ->whereNull('goals.deleted_at')
+                                        ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB']);
+                            })
+                            ->orWhereExists(function ($query) {
+                                return $query->select(DB::raw(1))
+                                        ->from('shared_profiles')
+                                        ->whereColumn('dashboard_notifications.related_id', 'shared_profiles.id')
+                                        ->whereIn('dashboard_notifications.notification_type', ['SP']);
+                            })
+                            ->orWhere('dashboard_notifications.notification_type', '');
+                        })
+                        ->whereNull('status')
+                        ->count();
+                            
+            return response()->json(['count'=> $badge_count]);
+        }
+
+    }
+
     
     public function revertIdentity(Request $request) {
          $oldUserId = $request->session()->get('existing_user_id');

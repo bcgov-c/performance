@@ -199,8 +199,11 @@ class ConversationController extends Controller
             $textAboveFilter = 'The list below contains all planned conversations that have yet to be signed-off by both employee and supervisor. Once a conversation has been signed-off by both participants, it will move to the Completed Conversations tab and become an official performance development record for the employee.';
         }
           
-                
-        return view($view, compact('type', 'conversations', 'myTeamConversations', 'conversationTopics', 'conversationMessage', 'viewType', 'reportees', 'topics', 'textAboveFilter', 'user', 'supervisor_conversations'));
+        // redirect from DashboardController with the related id, then open modal box
+        $open_modal_id = (session('open_modal_id'));
+
+        return view($view, compact('type', 'conversations', 'myTeamConversations', 'conversationTopics', 'conversationMessage', 'viewType', 'reportees', 'topics', 'textAboveFilter', 'user', 
+                                    'supervisor_conversations', 'open_modal_id'));
     }
 
     /**
