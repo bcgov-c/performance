@@ -966,8 +966,19 @@
                 $('.modal-body').find('.error').html('');
                 $('.modal-body').find('input[type=radio]').prop('checked', false);
             });
-            
+        
         </script>
+
+@isset($open_modal_id)
+        // when redirect from dashboardController, and then open the modal box
+        <script>
+            $(function() {
+                conversation_id = {{ $open_modal_id }};
+                updateConversation(conversation_id);
+                $('#viewConversationModal').modal('show');
+            });
+        </script>
+@endisset        
         
     </x-slot>
 

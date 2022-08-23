@@ -54,6 +54,9 @@ class DashboardNotification extends Model
           case 'CS':
               $url = route("conversation.upcoming");
               break;
+          case 'SP':
+              $url = route("dashboard");
+            break;
         }
       
       return $url;
