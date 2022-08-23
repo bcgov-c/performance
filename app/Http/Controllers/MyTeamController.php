@@ -194,6 +194,16 @@ class MyTeamController extends Controller
             array_push($sharedProfile, SharedProfile::updateOrCreate($insert));
         }
 
+        foreach ($sharedProfile as $result) {
+            // Dashboard message added when an shared employee's profile (goals, conversations, or both)
+            DashboardNotification::create([
+                'user_id' => $result->shared_id,
+                'notification_type' => 'SP',         
+                'comment' => 'Your profile has been shared with ' . $result->sharedWith->name,
+                'related_id' => $result->id,
+            ]);
+        }
+
         DB::commit();
         return $this->respondeWith($sharedProfile);
     }
