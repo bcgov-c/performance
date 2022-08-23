@@ -374,6 +374,21 @@
                     enableCaseInsensitiveFiltering: true
                 });
             });
+
+
+@isset($open_modal_id)
+            // this is redirect from DashboardController with the related id, then open modal box
+            $(function() {
+                related_id = {{ $open_modal_id }};
+                $("#goal_form").find('input[name=selected_goal]').val ( related_id );
+
+                $.get('/goal/goalbank/'+related_id+'?add=true', function (data) {
+                    $("#goal-detail-modal").find('.data-placeholder').html(data);
+                    $("#goal-detail-modal").modal('show');
+                });
+            });
+@endisset             
+
         </script>
     @endpush
 </x-side-layout>
@@ -402,7 +417,6 @@
             selector: '[data-toggle-select]',
             trigger: 'click',
         });
-        
 </script>    
 <style>
     .multiselect-container{
@@ -410,3 +424,5 @@
         overflow-y: scroll;
     }
 </style>    
+
+

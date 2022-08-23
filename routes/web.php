@@ -1,6 +1,7 @@
 <?php
-use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserPreferenceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,8 +24,9 @@ use Illuminate\Support\Facades\Route;
         Route::delete('/dashboard/{id}',[DashboardController::class, 'destroy'])->name('dashboard.destroy');
         Route::delete('/dashboarddeleteall',[DashboardController::class, 'destroyall'])->name('dashboard.destroyall');
         Route::post('/dashboardupdatestatus',[DashboardController::class, 'updatestatus'])->name('dashboard.updatestatus');
-        Route::get('/dashboardresetstatus', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard.notifications');
+        // Route::get('/dashboardresetstatus', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard.notifications');
         Route::post('/dashboardresetstatus',[DashboardController::class, 'resetstatus'])->name('dashboard.resetstatus');
+        Route::get('/dashboardmessage-badgecount',[DashboardController::class, 'badgeCount'])->name('dashboard.badgecount');
         Route::middleware(['auth'])->group(function () {
             require __DIR__ . '/goal.php';
             require __DIR__ . '/conversation.php';
@@ -39,5 +41,13 @@ use Illuminate\Support\Facades\Route;
         return view('my-performance');
     })->middleware(['auth'])->name('my-performance');
 
+    
+
     require __DIR__.'/auth.php';
     Route::get('dashboard/revert-identity', [DashboardController::class, 'revertIdentity'])->name('dashboard.revert-identity');
+
+    // Route::middleware(['auth'])->group(function() {
+    //     Route::resource('user-preference', UserPreferenceController::class)->only(['index', 'store']);
+    // });
+    
+    
