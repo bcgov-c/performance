@@ -46,9 +46,11 @@ class GoalController extends Controller
         
         $sysstatus = \Config::get("global.status");
         
-        $statusList[0]['id'] = 'inactive';
-        $statusList[0]['name'] = 'Inactive';
-        $i = 1;
+        $statusList[0]['id'] = '0';
+        $statusList[0]['name'] = 'Any';
+        $statusList[1]['id'] = 'inactive';
+        $statusList[1]['name'] = 'Inactive';
+        $i = 2;
         foreach($sysstatus as $statusname => $statusitem) {
             if($statusname != 'active') {
                 $statusList[$i]['id'] = $statusname;
@@ -149,7 +151,7 @@ class GoalController extends Controller
         if(isset($request->tag_id) && $request->tag_id != 0){
             $query = $query->where('goal_tags.tag_id', '=', "$request->tag_id");
         }
-        if(isset($request->status) && $request->status != ''){
+        if(isset($request->status) && $request->status != 0){
             $query = $query->where('goals.status', 'LIKE', "$request->status");
         }
         if(isset($request->filter_start_date) && $request->filter_start_date != ''){
