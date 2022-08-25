@@ -856,10 +856,15 @@ class GoalController extends Controller
 
     public function updateStatus($id, $status)
     {
-        $goal = Goal::findOrFail($id);
-        $goal->status = $status;
-
-        $goal->save();
+       $has_goal = DB::table('goals')                        
+                            ->where('id', $id)
+                            ->count();     
+       if($has_goal){
+           DB::table('goals')
+            ->where('id', $id) 
+            ->limit(1) 
+            ->update(array('status' => $status)); 
+       }
         return redirect()->back();
     }
 
