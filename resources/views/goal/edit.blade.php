@@ -133,6 +133,10 @@
                 enableFiltering: true,
                 enableCaseInsensitiveFiltering: true
             });
+            
+            var curr_start_date = $( "#start_date" ).val();
+            $( "#target_date" ).attr("min",curr_start_date);    
+            
         });
     </script>
     <script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
