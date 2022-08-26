@@ -174,26 +174,41 @@ class GoalController extends Controller
                 $query = $query->whereBetween('goals.target_date', [$from, $to]);
             }
         }
+        //$authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
         
-        $sortorder = 'ASC';
-        $sortby = '';
-        if(isset($request->sortorder) && $request->sortorder != 'ASC'){
-            $sortorder = 'DESC';            
-        }         
+        if(!session()->has('sortby')) {
+            $sortby = '';
+            $sortorder = 'ASC';
+            session()->put('sortby', '');
+            session()->put('sortorder', 'ASC');
+        }        
+        
         if(isset($request->sortby) && $request->sortby != ''){
-            $sortby = $request->sortby;
-            $query = $query->orderBy($sortby, $sortorder);
+            $session_sortby = session()->get('sortby');
+            if ($session_sortby != $request->sortby) {
+                session()->put('sortby', $request->sortby);
+                session()->put('sortorder', 'ASC');
+                $sortby = $request->sortby;
+                $sortorder = 'ASC';
+            } else {                 
+                $sortby = $request->sortby;
+                if (session()->get('sortorder') == 'ASC'){
+                    $sortorder = 'DESC';
+                } else {
+                    $sortorder = 'ASC';
+                }
+                session()->put('sortorder',$sortorder);
+            }                     
+        } else {
+            $sortby = session()->get('sortby');
+            $sortorder = session()->get('sortorder');  
         }
+                
         
+        $query = $query->orderBy($sortby, $sortorder);
       
         $goals = $query->groupBy('title');
         $goals = $query->paginate(4);
-        
-        if ($sortorder == 'ASC') {
-            $sortorder = 'DESC';
-        } else {
-            $sortorder = 'ASC';
-        }
         
         
         return view('goal.index', compact('goals', 'type', 'goaltypes', 'tagsList', 'sortby', 'sortorder', 'createdBy', 'user', 'employees', 'tags', 'type_desc_str', 'statusList'));
