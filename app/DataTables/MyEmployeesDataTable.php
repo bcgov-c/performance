@@ -57,6 +57,11 @@ class MyEmployeesDataTable extends DataTable
                 return view('my-team.partials.view-btn', compact(["row", "yesOrNo"])); // $row['id'];
             })
             ->addColumn('excused', function ($row) {
+                $excused = json_encode([
+                    'start_date' => $row->excused_start_date,
+                    'end_date' => $row->excused_end_date,
+                    'reason_id' => $row->excused_reason_id
+                ]);
                 $check1 = ($row->excused_start_date !== null);
                 $check2 = ($row->excused_end_date !== null);
                 if($check1 && $check2) {
@@ -69,14 +74,8 @@ class MyEmployeesDataTable extends DataTable
                 }
                 if($check1 && $check2 && $check3 && $check4) {
                     $yesOrNo = 'Yes';
-                    $excused = json_encode([
-                        'start_date' => $row->excused_start_date,
-                        'end_date' => $row->excused_end_date,
-                        'reason_id' => $row->excused_reason_id
-                    ]);
                 } else {
                     $yesOrNo = 'No';
-                    $excused = null;
                 }
                 return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo"]));
             })
