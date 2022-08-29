@@ -28,6 +28,11 @@
     <script>
         (function () {
             $(document).on('click', '.btn-submit', function(e) {
+                var confirmResult = confirm ("Are you sure you want to update the excused status of this employee?");
+                if (!confirmResult) {
+                    e.preventDefault();
+                    return false;
+                }
                 e.preventDefault();
                 const $form = $(this).parents('form');
                 $.ajax({
@@ -54,6 +59,10 @@
                         });
                     }
                 });
+            });
+            $(document).on('click', '.btn-reset', function(e) {
+                $("#employee-excused-modal").find("input[name=excused_start_date]").val(null);
+                $("#employee-excused-modal").find("input[name=excused_end_date]").val(null);
             });
             $(document).on('click', '#share-my-goals-btn', function () {
                 $("#shareMyGoalsModal").modal('show');
