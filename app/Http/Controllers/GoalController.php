@@ -203,9 +203,10 @@ class GoalController extends Controller
             $sortby = session()->get('sortby');
             $sortorder = session()->get('sortorder');  
         }
-                
         
-        $query = $query->orderBy($sortby, $sortorder);
+        if($sortby != '') {
+            $query = $query->orderBy($sortby, $sortorder);
+        }
       
         $goals = $query->groupBy('title');
         $goals = $query->paginate(4);
