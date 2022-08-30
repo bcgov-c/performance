@@ -749,6 +749,26 @@ class GoalController extends Controller
         foreach ($request->goal_ids as $goal_id) {
             $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->find($goal_id);
             $newGoal = $this->copyFromLibrary($goal);
+            
+            //add tags to new goal
+            $orggoal_id = $goal_id;
+            $newgoal_id = $newGoal->id;
+            $tags = DB::table('goal_tags')                        
+                    ->where('goal_id', $orggoal_id)
+                    ->get();    
+            if(count($tags) > 0) {
+                foreach($tags as $tag){
+                    $tag_id = $tag->tag_id;
+                    DB::table('goal_tags')->insert(
+                        array(
+                               'goal_id'     =>   $newgoal_id, 
+                               'tag_id'   =>   $tag_id,
+                               'created_at'   =>   date('Y-m-d h:i:s a', time()),
+                               'updated_at'   =>   date('Y-m-d h:i:s a', time())
+                        )
+                    );
+                }
+            }             
         }
         return redirect()->route('goal.current');
     }
