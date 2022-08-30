@@ -5,12 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class GoalBankOrg extends Model
+class GoalSharedWith extends Model
 {
     use HasFactory;
 
+    protected $table = 'goals_shared_with';
+
     protected $fillable = [
-        'goal_id','version','organization','level1_program','level2_division','level3_branch','level4'
+        'goal_id', 
+        'user_id',    
+        'reason',
     ];
 
     public function goal() {
@@ -19,5 +23,10 @@ class GoalBankOrg extends Model
 
     }
 
+    public function user() {
+
+        return $this->belongsTo('App\Models\User');        
+
+    }
 
 }

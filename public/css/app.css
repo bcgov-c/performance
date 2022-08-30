@@ -3999,6 +3999,7 @@ input[type=button].btn-block {
 .nav-pills .nav-link.active,
 .nav-pills .show > .nav-link {
   color: #fff;
+  background-color: #1A5A96;
 }
 
 .nav-fill > .nav-link,
@@ -12308,7 +12309,7 @@ body:not(.layout-fixed) .main-sidebar .sidebar {
 }
 [class*=sidebar-dark-] .nav-sidebar > .nav-item.menu-open > .nav-link, [class*=sidebar-dark-] .nav-sidebar > .nav-item:hover > .nav-link,
 [class*=sidebar-dark-] .nav-sidebar > .nav-item > .nav-link:focus {
-  background-color: #1A5A96;
+  background-color: #FCBA19;
   color: #fff;
 }
 [class*=sidebar-dark-] .nav-sidebar > .nav-item > .nav-link.active {
@@ -12332,11 +12333,12 @@ body:not(.layout-fixed) .main-sidebar .sidebar {
   color: #c2c7d0;
 }
 [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link:hover, [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link:focus {
-  background-color: #1A5A96;
+  background-color: #FCBA19;
   color: #fff;
 }
 [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active, [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active:hover, [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active:focus {
-  color: #FCBA19;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #003366;
 }
 [class*=sidebar-dark-] .nav-flat .nav-item .nav-treeview .nav-treeview {
   border-color: rgba(255, 255, 255, 0.9);
@@ -14161,7 +14163,7 @@ body.text-sm .control-sidebar {
   color: #fff;
 }
 .control-sidebar-dark .nav-tabs {
-  background-color: #FFFFFF;
+  background-color: #FCBA19;
   border-bottom: 0;
   margin-bottom: 5px;
 }
@@ -43236,6 +43238,12 @@ a.text-muted:hover {
   font-weight: bold;
 }
 
+[class*=sidebar-dark-] .nav-sidebar > .nav-item.menu-open > .nav-link, [class*=sidebar-dark-] .nav-sidebar > .nav-item:hover > .nav-link,
+[class*=sidebar-dark-] .nav-sidebar > .nav-item > .nav-link:focus {
+  background-color: #FFF;
+  color: #fff;
+}
+
 a.btn:not(.btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-light, .btn-dark, .btn-link),
 a.btn:not(.btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-light, .btn-dark, .btn-link):hover,
 a.btn:not(.btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-light, .btn-dark, .btn-link):active,
@@ -43251,4 +43259,26 @@ a.btn:not(.btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-warning,
 
 div.border-primary a {
   font-weight: bold !important;
+}
+
+[class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active, [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active:hover, [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active:focus {
+  color: #FCBA19;
+}
+
+[class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link:hover, [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link:focus {
+  background-color: #1A5A96;
+  color: #fff;
+}
+
+/* Menu item under User Menu (Main Header - Navbar */
+li.user-menu a.acct-pref {
+  background: #f2f2f2;
+  color: #003366 !important;
+  border-radius: 0.25rem;
+}
+
+li.user-menu a.acct-pref:active,
+li.user-menu a.acct-pref:hover {
+  background: #003366;
+  color: white !important;
 }

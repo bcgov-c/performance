@@ -50,12 +50,17 @@ class SendMail
     // Send the email using Queue
     public $useQueue;  
 
+    // Special fields for Conversation Due notification (use for avoid sent duplication)
+    public $notify_user_id;
+    public $overdue_user_id;
+    public $notify_due_date;
+    public $notify_for_days;
 
     // Private property
     private $generic_template;  
     private $default_email_prod_region;  // Azure - principle name 
     private $default_email_test_region;  // Azure - principle name 
-
+   
     public function __construct() 
     {
         //$this->toAddresses = [];
@@ -78,6 +83,7 @@ class SendMail
         $this->default_email_prod_region = "travis.clark@gov.bc.ca";
         $this->default_email_test_region = "HRadministror1@extest.gov.bc.ca";
 
+
     }
 
     public function sendMailWithoutGenericTemplate() 
@@ -91,17 +97,19 @@ class SendMail
         return $this->sendMailUsingSMPTServer();
     }
 
-
     public function sendMailWithGenericTemplate() 
     {
 
         $this->generic_template = GenericTemplate::where('template',$this->template)->first(); 
 
         // Bind variable
-        $keys = $this->generic_template->binds->pluck('bind')->toArray();
-
-        $this->subject = str_replace( $keys, $this->bindvariables, $this->generic_template->subject);
-        $this->body = str_replace( $keys, $this->bindvariables, $this->generic_template->body);
+        if ($this->generic_template) {
+            $keys = $this->generic_template->binds->pluck('bind')->toArray();
+            $this->subject = str_replace( $keys, $this->bindvariables, $this->generic_template->subject);
+            $this->body = str_replace( $keys, $this->bindvariables, $this->generic_template->body);
+        } else {
+            throw new \ErrorException('Generic Template ' . $this->template . ' not found.');
+        }
 
         if ($this->generic_template->sender == 2) {
             // Override the sender based on the generic template definition
@@ -131,6 +139,9 @@ class SendMail
         // find the user profile if the sender ID provided
         $sender = User::where('id', $this->sender_id)->first();
         $from = $sender ?  ( (preg_match('/^\w+@gov\.bc\.ca$/i', $sender->email) > 0) ? $sender->email : '')  : '';
+        if (empty($from)) {
+            $from = env('MAIL_FROM_ADDRESS');
+        }
 
         if (App::environment(['production'])) {
             // No special handling to avoid to send to the real users
@@ -139,7 +150,7 @@ class SendMail
             /* replace the body with the send out message, and also override the recipients */
             $this->body = "<h4>Note: The following message is the content was sent out from Performance application (Region: ". App::environment() .")</h4>".      
                           "<hr>".
-                          "<p><b>From: </b>". ( empty($from) ? env('MAIL_FROM_ADDRESS') : $from ) . "</p>".
+                          "<p><b>From: </b>". $from . "</p>".
                           "<p><b>To: </b>". implode('; ', $a_toRecipients->toArray() ). "</p>".
                           "<p><b>cc: </b>". implode('; ', $a_ccRecipients->toArray() ). "</p>".
                           "<p><b>Bcc: </b>". implode('; ', $a_bccRecipients->toArray() ). "</p>".
@@ -188,18 +199,27 @@ class SendMail
                 $bResult = false;
             }
         }
-        
+
         if ($this->saveToLog) {
             // Insert Notification log
             $notification_log = NotificationLog::Create([  
                 'recipients' => ' ',        // Not in Use
                 'sender_id' => $this->sender_id,
+                'sender_email' => $from,
                 'subject' => $this->subject,
                 'description' => addslashes($this->body),
                 'alert_type' => $this->alertType,
                 'alert_format' => $this->alertFormat,
+
+                // special fields for conversation due notification (use in the schedule command)
+                'notify_user_id' => $this->notify_user_id,
+                'overdue_user_id' => $this->overdue_user_id, 
+                'notify_due_date' => $this->notify_due_date, 
+                'notify_for_days' => $this->notify_for_days,
+
                 'template_id' => $this->generic_template ? $this->generic_template->id : null,
                 'status' => $bResult, 
+                'use_queue' => $this->useQueue,
                 'date_sent' => now(),
             ]);
 

@@ -150,14 +150,14 @@
                         } else { text = data; }
                         return '<span>' + text + "</span>";
                     },
-                    targets: 2
+                    targets: 3
                 },
 
                 {
                     render: function (data, type, full, meta) {
                         return '<div data-toggle="tooltip" class="text-truncate-30" title="' + data + '">' + data + "</div>";
                     },
-                    targets: 1
+                    targets: 2
                 },
 				{
 					render: function (data, type, full, meta) {

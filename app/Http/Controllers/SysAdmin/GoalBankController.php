@@ -710,20 +710,33 @@ class GoalBankController extends Controller
             ->join('users', 'employee_demo.guid', 'users.guid')
             ->whereIn('employee_demo.employee_id', $selected_emp_ids )
             ->distinct()
-            ->select ('users.id')
+            ->select ('users.id', 'users.employee_id')
             ->orderBy('employee_demo.employee_name')
             ->get() ;
+
+            $newly_added_emp_ids = [];
             foreach ($toRecipients as $newId) {
-                $result = DB::table('goals_shared_with')
-                ->updateOrInsert(
-                    ['goal_id' => $resultrec->id
-                    , 'user_id' => $newId->id
-                    ],
-                    []
-                );
+                // $result = DB::table('goals_shared_with')
+                // ->updateOrInsert(
+                //     ['goal_id' => $resultrec->id
+                //     , 'user_id' => $newId->id
+                //     ],
+                //     []
+                // );
+
+                $sharedWith = \App\Models\GoalSharedWith::updateOrCreate([
+                        'goal_id' => $resultrec->id,
+                        'user_id' => $newId->id,
+                    ],[
+                    ]); 
+
+                if ($sharedWith->wasRecentlyCreated) {
+                    array_push($newly_added_emp_ids, $newId->employee_id);
+                }
+
             }
 
-            $notify_audiences = $selected_emp_ids;
+            $notify_audiences = $newly_added_emp_ids;
         }
 
         if($request->opt_audience == "byOrg") {
@@ -733,6 +746,8 @@ class GoalBankController extends Controller
             ->distinct()
             ->orderBy('id')
             ->get();
+
+            $newly_added_emp_ids = [];
             foreach($organizationList as $org1) {
                 $result = DB::table('goal_bank_orgs')
                 ->insert(
@@ -750,17 +765,21 @@ class GoalBankController extends Controller
                 if(!$result){
                     break;
                 }
+
+                // new organization tree id
+                $org1_emplid_ids = $this->get_employees_by_selected_org_nodes($org1->id);
+                $newly_added_emp_ids = array_merge($newly_added_emp_ids, $org1_emplid_ids);
+
             }
             
-            $notify_audiences = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
-
+            $notify_audiences = $newly_added_emp_ids;
         }
 
         // notify_on_dashboard when new goal added
         $this->notify_on_dashboard($resultrec, $notify_audiences);
 
         // // Send Out Email notification when new goal added
-        // $this->notify_employees($resultrec, $notify_audiences);
+        $this->notify_employees($resultrec, $notify_audiences);
 
         return redirect()->route(request()->segment(1).'.goalbank')
             ->with('success', 'Create new goal bank successful.');
@@ -1089,22 +1108,48 @@ class GoalBankController extends Controller
             ->get();
 
             $resultrec = Goal::withoutGlobalScopes()->findorfail( $request->goal_id );
-    
+
+            $notify_audiences = [];
+            $newly_added_emp_ids = [];
             foreach($organizationList as $org1) {
-                $result = DB::table('goal_bank_orgs')
-                ->updateorinsert(
-                    ['goal_id' => $resultrec->id
+                // $result = DB::table('goal_bank_orgs')
+                // ->updateorinsert(
+                //     ['goal_id' => $resultrec->id
+                //     , 'organization' => $org1->organization
+                //     , 'level1_program' => $org1->level1_program
+                //     , 'level2_division' => $org1->level2_division
+                //     , 'level3_branch' => $org1->level3_branch
+                //     , 'level4' => $org1->level4
+                //     ],
+                // );
+                // if(!$result){
+                //     break;
+                // }
+
+                $goal_bank_org = \App\Models\GoalBankOrg::updateOrCreate([
+                      'goal_id' => $resultrec->id
                     , 'organization' => $org1->organization
                     , 'level1_program' => $org1->level1_program
                     , 'level2_division' => $org1->level2_division
                     , 'level3_branch' => $org1->level3_branch
                     , 'level4' => $org1->level4
-                    ],
-                );
-                if(!$result){
-                    break;
+                ]); 
+
+                // new organization tree id
+                if ($goal_bank_org->wasRecentlyCreated) {
+                   $org1_emplid_ids = $this->get_employees_by_selected_org_nodes($org1->id);
+                   $newly_added_emp_ids = array_merge($newly_added_emp_ids, $org1_emplid_ids);
                 }
+
             }
+
+        $notify_audiences = $newly_added_emp_ids;
+
+        // notify_on_dashboard when new goal added
+        $this->notify_on_dashboard($resultrec, $notify_audiences);
+
+         // // Send Out Email notification when new goal added
+        $this->notify_employees($resultrec, $notify_audiences);
 
         return redirect()->route(request()->segment(1).'.goalbank.manageindex')
             ->with('success', 'Goal update successful.');
@@ -1127,19 +1172,40 @@ class GoalBankController extends Controller
         ->join('users', 'employee_demo.guid', 'users.guid')
         ->whereIn('employee_demo.employee_id', $aselected_emp_ids)
         ->distinct()
-        ->select ('users.id')
+        ->select ('users.id','users.employee_id')
         ->orderBy('employee_demo.employee_name')
         ->get() ;
 
+        $notify_audiences = [];
+        $newly_added_emp_ids = [];
         foreach ($toRecipients as $newId) {
-            $result = DB::table('goals_shared_with')
-            ->updateOrInsert(
-                ['goal_id' => $resultrec->id
-                , 'user_id' => $newId->id
-                ],
-                []
-            );
+            // $result = DB::table('goals_shared_with')
+            // ->updateOrInsert(
+            //     ['goal_id' => $resultrec->id
+            //     , 'user_id' => $newId->id
+            //     ],
+            //     []
+            // );
+
+            $sharedWith = \App\Models\GoalSharedWith::updateOrCreate([
+                'goal_id' => $resultrec->id,
+                'user_id' => $newId->id,
+            ],[
+            ]); 
+
+            if ($sharedWith->wasRecentlyCreated) {
+                array_push($newly_added_emp_ids, $newId->employee_id);
+            }
+         
         }
+
+        $notify_audiences = $newly_added_emp_ids;
+
+        // notify_on_dashboard when new goal added
+        $this->notify_on_dashboard($resultrec, $notify_audiences);
+
+        // // Send Out Email notification when new goal added
+        $this->notify_employees($resultrec, $notify_audiences);		
 
         return redirect()->route(request()->segment(1).'.goalbank.manageindex')
             ->with('success', 'Goal update successful.');
@@ -1716,7 +1782,7 @@ class GoalBankController extends Controller
                     $j5a->whereRAW('organization_trees.level4 = employee_demo.level4 OR ((organization_trees.level4 = "" OR organization_trees.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
                 } );
             } )
-            ->whereIn('organization_trees.id', $selected_org_nodes)
+            ->where('organization_trees.id', $selected_org_nodes)
             ->pluck('employee_id'); 
         return ($employees ? $employees->toArray() : []); 
     }
@@ -1739,23 +1805,38 @@ class GoalBankController extends Controller
     
     }
 
-
     protected function notify_employees($goalBank, $employee_ids)
     {
         // find user id based on the employee_id
-        $bcc_user_ids = User::whereIn('employee_id', $employee_ids)->pluck('id');
-        
-        // Send Out Email Notification to Employee
-        $sendMail = new SendMail();
-        $sendMail->bccRecipients = $bcc_user_ids;  
-        $sendMail->sender_id = null;
-        $sendMail->useQueue = false;
-        $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
-        array_push($sendMail->bindvariables, "");
-        array_push($sendMail->bindvariables, $goalBank->user ? $goalBank->user->name : '');   // Person who added goal to goal bank
-        array_push($sendMail->bindvariables, $goalBank->title);       // goal title
-        array_push($sendMail->bindvariables, $goalBank->mandatory_status_descr);           // Mandatory or suggested status
-        // $response = $sendMail->sendMailWithGenericTemplate();
+        // $bcc_user_ids = User::whereIn('employee_id', $employee_ids)->pluck('id');
+        $notify_users = User::whereIn('employee_id', $employee_ids)
+                                ->with('userPreference')
+                                ->select('id','name', 'guid')
+                                ->get();
+
+        // Add dasboard message to each participant_id
+        foreach ($notify_users as $user) {
+
+            if ($user && $user->allow_email_notification && $user->userPreference->goal_bank_flag == 'Y') {
+
+                // Send Out Email Notification to Employee
+                $sendMail = new \App\MicrosoftGraph\SendMail();
+                $sendMail->toRecipients = [ $user->id ];  
+                $sendMail->sender_id = null; 
+                $sendMail->useQueue = false;
+                $sendMail->saveToLog = true;
+                $sendMail->alert_type = 'N';
+                $sendMail->alert_format = 'E';
+
+                $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
+                array_push($sendMail->bindvariables, $user->id);                // Recipient of the email 
+                array_push($sendMail->bindvariables, $goalBank->user ? $goalBank->user->name : '');   // Person who added goal to goal bank
+                array_push($sendMail->bindvariables, $goalBank->title);       // goal title
+                array_push($sendMail->bindvariables, $goalBank->mandatory_status_descr);           // Mandatory or suggested status
+                $response = $sendMail->sendMailWithGenericTemplate();
+            }
+        }
     }
+
 
 }
