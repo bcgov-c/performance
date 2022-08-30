@@ -158,7 +158,9 @@ class EmployeeListController extends Controller
                 'employee_demo.level3_branch',
                 'employee_demo.level4',
                 'employee_demo.deptid',
-                'users.id'
+                'users.id',
+                'employee_demo.employee_status',
+                'employee_demo.employee_status_long',
             );
             return Datatables::of($query)->addIndexColumn()
             ->addColumn('activeGoals', function($row) {
@@ -166,11 +168,19 @@ class EmployeeListController extends Controller
                 return $countActiveGoals;
             })
             ->addColumn('nextConversationDue', function ($row) {
-                $nextConversation = Conversation::nextConversationDue(User::find($row["id"]));
+                if($row->employee_status == 'A') {
+                    $nextConversation = Conversation::nextConversationDue(User::find($row["id"]));
+                } else {
+                    $nextConversation = 'Paused';
+                }
                 return $nextConversation;
             })
             ->addColumn('excused', function ($row) {
-                $yesOrNo = ($row->excused_start_date !== null) ? 'Yes' : 'No';
+                if($row->employee_status == 'A') {
+                    $yesOrNo = ($row->excused_start_date !== null) ? 'Yes' : 'No';
+                } else {
+                    $yesOrNo = 'Yes';
+                }
                 return $yesOrNo;
             })
             ->addColumn('shared', function ($row) {
@@ -231,6 +241,8 @@ class EmployeeListController extends Controller
                 'employee_demo.deptid',
                 'employee_demo.date_deleted',
                 'users.id',
+                'employee_demo.employee_status',
+                'employee_demo.employee_status_long',
             );
             return Datatables::of($query)
             ->addIndexColumn()
@@ -239,11 +251,19 @@ class EmployeeListController extends Controller
                 return $countActiveGoals;
             })
             ->addColumn('nextConversationDue', function ($row) {
-                $nextConversation = Conversation::nextConversationDue(User::find($row["id"]));
+                if($row->employee_status == 'A') {
+                    $nextConversation = Conversation::nextConversationDue(User::find($row["id"]));
+                } else {
+                    $nextConversation = 'Paused';
+                }
                 return $nextConversation;
             })
             ->addColumn('excused', function ($row) {
-                $yesOrNo = ($row->excused_start_date !== null) ? 'Yes' : 'No';
+                if($row->employee_status == 'A') {
+                    $yesOrNo = ($row->excused_start_date !== null) ? 'Yes' : 'No';
+                } else {
+                    $yesOrNo = 'Yes';
+                }
                 return $yesOrNo;
             })
             ->addColumn('shared', function ($row) {

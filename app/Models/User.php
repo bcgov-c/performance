@@ -194,6 +194,10 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\EmployeeDemo', 'employee_id', 'id');
     }
     
+    public function employee_demo() {
+        return $this->hasMany('App\Models\EmployeeDemo', 'guid', 'guid');
+    }
+    
     public function users() {
         return $this->hasMany('App\Models\User');
     }

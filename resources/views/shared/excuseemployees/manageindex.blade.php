@@ -81,6 +81,8 @@
                             , name: 'excused_start_date', searchable: true, visible: true, className: 'dt-nowrap show-modal'},
                         {title: 'Excused End Date', ariaTitle: 'Excused End Date', target: 0, type: 'num', data: 'excused_end_date'
                             , name: 'excused_end_date', searchable: true, visible: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Employee Status', ariaTitle: 'Employee Status', target: 0, type: 'string', data: 'employee_status_long'
+                            , name: 'employee_demo.employee_status_long', searchable: false, visible: true, className: 'dt-nowrap show-modal'},
                         {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization'
                             , name: 'employee_demo.organization', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program'
