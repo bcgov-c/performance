@@ -315,6 +315,9 @@
                 let isChecked = $('#select_all')[0].checked
                 if (isChecked === false) {
                     total_count = 0;
+                    $('#addMultipleGoalButton').prop('disabled', true);
+                } else {
+                    $('#addMultipleGoalButton').prop('disabled', false);
                 }
                 $('#addMultipleGoalButton').find('span.selected_count').html("("+total_count+")");
             });
