@@ -8,6 +8,7 @@ use App\Models\EmployeeDemo;
 use App\Models\ExcusedReason;
 use App\Models\OrganizationTree;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use App\Http\Controllers\Controller;
@@ -80,7 +81,8 @@ class ExcuseEmployeesController extends Controller
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql->select([ 
+        $matched_emp_ids = $sql
+        ->select([ 
             'employee_demo.employee_id'
             , 'employee_demo.employee_name'
             , 'employee_demo.jobcode_desc'
@@ -162,9 +164,16 @@ class ExcuseEmployeesController extends Controller
             $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
             $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
             $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+            $newDate = new Carbon(Carbon::today()->toDateString());
             $query = User::withoutGlobalScopes()
-            ->whereNotNull('excused_start_date')
             ->leftjoin('employee_demo', 'users.guid', '=', 'employee_demo.guid')
+            ->where(function($qry1) use ($request, $newDate) {
+                $qry1->where(function($qry1a) use ($request, $newDate) {
+                    $qry1a->whereDate('excused_start_date', '<=', $newDate)
+                    ->whereDate('excused_end_date', '>=', $newDate);
+                })
+                ->orWhere('employee_demo.employee_status', '<>', 'A');
+            })
             ->join('admin_orgs as ao1', function ($j1) {
                 $j1->on(function ($j1a) {
                     $j1a->whereRAW('ao1.organization = employee_demo.organization OR ((ao1.organization = "" OR ao1.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
@@ -215,21 +224,27 @@ class ExcuseEmployeesController extends Controller
                 'employee_demo.level4',
                 'employee_demo.deptid',
                 'users.id',
+                'employee_demo.employee_status',
+                'employee_demo.employee_status_long',
             );
             return Datatables::of($query)
             ->addIndexColumn()
             ->addcolumn('action', function($row){
-                return '<button 
-                class="btn btn-xs btn-primary modalbutton" 
-                role="button" 
-                data-id="' . $row->id . '" 
-                data-excused_start_date="' . $row->excused_start_date . '" 
-                data-excused_end_date="' . $row->excused_end_date . '" 
-                data-excused_reason_id="' . $row->excused_reason_id . '" 
-                data-employee_name="' . $row->employee_name . '" 
-                data-toggle="modal"
-                data-target="#editModal"
-                role="button">Update</button>';
+                if($row->employee_status == 'A') {
+                    return '<button 
+                    class="btn btn-xs btn-primary modalbutton" 
+                    role="button" 
+                    data-id="' . $row->id . '" 
+                    data-excused_start_date="' . $row->excused_start_date . '" 
+                    data-excused_end_date="' . $row->excused_end_date . '" 
+                    data-excused_reason_id="' . $row->excused_reason_id . '" 
+                    data-employee_name="' . $row->employee_name . '" 
+                    data-toggle="modal"
+                    data-target="#editModal"
+                    role="button">Update</button>';
+                } else {
+                    return '';
+                }
             })
             ->rawColumns(['action'])
             ->make(true);
@@ -888,7 +903,9 @@ class ExcuseEmployeesController extends Controller
         })
         ->when( $request->search_text && $request->criteria == 'dpt', function ($q) use($request) {
             return $q->whereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
-        });
+        })
+        ->where('employee_demo.employee_status', '=', 'A')
+        ->whereNull('employee_demo.date_deleted');
 
         return $demoWhere;
     }

@@ -29,10 +29,17 @@ class SharedEmployeeDataTable extends DataTable
                 $text = $row['active_goals_count'] . " Goals";
                 return view('my-team.partials.link-to-profile', compact(['row', 'text']));
             })->addColumn('nextConversationDue', function ($row) {
-                $text = Conversation::nextConversationDue(User::find($row["id"]));
-                $landingPage = 'conversation.templates';
-                return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
-            })/* ->addColumn('latestConversation', function ($row) {
+                foreach($row->employee_demo as $demo) {
+                    if($demo->employee_status == 'A') {
+                        $text = Conversation::nextConversationDue(User::find($row["id"]));
+                        $landingPage = 'conversation.templates';
+                        return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
+                    } else {
+                        return 'Paused';
+                    }
+                }
+            })
+            /* ->addColumn('latestConversation', function ($row) {
                 if( !$row['is_conversation_shared_with_auth_user']) {
                     return "-";
                 }
@@ -51,27 +58,33 @@ class SharedEmployeeDataTable extends DataTable
                 return view('my-team.partials.view-btn', compact(["row", "yesOrNo"])); // $row['id'];
             })
             ->addColumn('excused', function ($row) {
-                $excused = json_encode([
-                    'start_date' => $row->excused_start_date,
-                    'end_date' => $row->excused_end_date,
-                    'reason_id' => $row->excused_reason_id
-                ]);
-                $check1 = ($row->excused_start_date !== null);
-                $check2 = ($row->excused_end_date !== null);
-                if($check1 && $check2) {
-                    $check3 = ($row->excused_start_date <= $row->excused_end_date);
-                    $newDate = new Carbon(Carbon::today()->toDateString());
-                    $check4 = ($newDate->between($row->excused_start_date, $row->excused_end_date));
-                } else {
-                    $check3 = false;
-                    $check4 = false;
+                foreach($row->employee_demo as $demo) {
+                    if($demo->employee_status == 'A') {
+                        $excused = json_encode([
+                            'start_date' => $row->excused_start_date,
+                            'end_date' => $row->excused_end_date,
+                            'reason_id' => $row->excused_reason_id
+                        ]);
+                        $check1 = ($row->excused_start_date !== null);
+                        $check2 = ($row->excused_end_date !== null);
+                        if($check1 && $check2) {
+                            $check3 = ($row->excused_start_date <= $row->excused_end_date);
+                            $newDate = new Carbon(Carbon::today()->toDateString());
+                            $check4 = ($newDate->between($row->excused_start_date, $row->excused_end_date));
+                        } else {
+                            $check3 = false;
+                            $check4 = false;
+                        }
+                        if($check1 && $check2 && $check3 && $check4) {
+                            $yesOrNo = 'Yes';
+                        } else {
+                            $yesOrNo = 'No';
+                        }
+                        return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo"]));
+                    } else {
+                        return 'Yes';
+                    }
                 }
-                if($check1 && $check2 && $check3 && $check4) {
-                    $yesOrNo = 'Yes';
-                } else {
-                    $yesOrNo = 'No';
-                }
-                return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo"]));
             });
     }
 
