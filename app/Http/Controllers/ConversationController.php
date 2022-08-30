@@ -265,22 +265,31 @@ class ConversationController extends Controller
                 'comment' => $conversation->user->name . ' would like to schedule a performance conversation with you.',
                 'related_id' => $conversation->id,
             ]);
+
+
+            // Send Out email when the conversation added
+            $user = User::where('id', $value)
+                            ->with('userPreference')
+                            ->select('id','name','guid')
+                            ->first();
+
+            if ($user && $user->allow_email_notification && $user->userPreference->conversation_setup_flag == 'Y') {                            
+
+                $topic = ConversationTopic::find($request->conversation_topic_id);
+                $sendMail = new \App\MicrosoftGraph\SendMail();
+                $sendMail->toRecipients = [ $value ];
+                $sendMail->sender_id = null;  // default sender is System
+                $sendMail->useQueue = false;
+                $sendMail->template = 'ADVICE_SCHEDULE_CONVERSATION';
+                array_push($sendMail->bindvariables, $user->name);
+                array_push($sendMail->bindvariables, $conversation->user->name );
+                array_push($sendMail->bindvariables, $conversation->topic->name );
+                array_push($sendMail->bindvariables, $conversation->warningMessage()[0] );
+                $response = $sendMail->sendMailWithGenericTemplate();
+            }
+
         }
 
-        // Send a notification to all participants that you would like to schedule a conversation      
-        $names = User::whereIn('employee_id', $request->participant_id)->pluck('name');
-
-        $topic = ConversationTopic::find($request->conversation_topic_id);
-        $sendMail = new \App\MicrosoftGraph\SendMail();
-        $sendMail->toRecipients = $request->participant_id;
-        $sendMail->sender_id = null;  // default sender is System
-        $sendMail->useQueue = false;
-        $sendMail->template = 'ADVICE_SCHEDULE_CONVERSATION';
-        array_push($sendMail->bindvariables, implode(", ", $names->toArray() ) );
-        array_push($sendMail->bindvariables, $conversation->user->name );
-        array_push($sendMail->bindvariables, $conversation->topic->name );
-        array_push($sendMail->bindvariables, $conversation->warningMessage()[0] );
-        // $response = $sendMail->sendMailWithGenericTemplate();
 
         if(request()->ajax()){
             return response()->json(['success' => true, 'message' => 'Conversation Created successfully']);
@@ -464,6 +473,28 @@ class ConversationController extends Controller
                         'comment' => $signoff_user->name . ' has selected the "disagree" option on a performance conversation with you.',
                         'related_id' => $conversation->id,
                     ]);
+
+
+                     // Send a email notification to the participants when someone sign the conversation
+                    $user = User::where('id', $signoff_user->reporting_to)
+                                ->with('userPreference')
+                                ->select('id','name','guid')
+                                ->first();
+
+                    if ($user && $user->allow_email_notification && $user->userPreference->conversation_disagree_flag == 'Y') {                            
+
+                        $topic = ConversationTopic::find($request->conversation_topic_id);
+                        $sendMail = new \App\MicrosoftGraph\SendMail();
+                        $sendMail->toRecipients = [ $user->id ];
+                        $sendMail->sender_id = null;  // default sender is System
+                        $sendMail->useQueue = false;
+                        $sendMail->template = 'CONVERSATION_DISAGREED';
+                        array_push($sendMail->bindvariables, $user->name);
+                        array_push($sendMail->bindvariables, $signoff_user->name );   //Person who signed the conversation 
+                        array_push($sendMail->bindvariables, $conversation->topic->name );  // Conversation topic
+                        $response = $sendMail->sendMailWithGenericTemplate();
+                    }
+
                 }
             }
 
@@ -488,19 +519,29 @@ class ConversationController extends Controller
                 'comment' => $current_user->name . ' signed your performance conversation.',
                 'related_id' => $conversation->id,
             ]);
-        }
 
-        // Send a email notification to the participants when someone sign the conversation
-        $topic = ConversationTopic::find($request->conversation_topic_id);
-        $sendMail = new \App\MicrosoftGraph\SendMail();
-        $sendMail->toRecipients = $to_ids;
-        $sendMail->sender_id = null;  // default sender is System
-        $sendMail->useQueue = false;
-        $sendMail->template = 'CONVERSATION_SIGN_OFF';
-        array_push($sendMail->bindvariables, implode(", ", $to_names) );
-        array_push($sendMail->bindvariables, $current_user->name );   //Person who signed the conversation 
-        array_push($sendMail->bindvariables, $conversation->topic->name );  // Conversation topic
-        // $response = $sendMail->sendMailWithGenericTemplate();
+
+            // Send a email notification to the participants when someone sign the conversation
+            $user = User::where('id', $value)
+                    ->with('userPreference')
+                    ->select('id','name','guid')
+                    ->first();
+
+            if ($user && $user->allow_email_notification && $user->userPreference->conversation_signoff_flag == 'Y') {                            
+    
+                $topic = ConversationTopic::find($request->conversation_topic_id);
+                $sendMail = new \App\MicrosoftGraph\SendMail();
+                $sendMail->toRecipients = [ $value ];
+                $sendMail->sender_id = null;  // default sender is System
+                $sendMail->useQueue = false;
+                $sendMail->template = 'CONVERSATION_SIGN_OFF';
+                array_push($sendMail->bindvariables, $user->name);
+                array_push($sendMail->bindvariables, $current_user->name );   //Person who signed the conversation 
+                array_push($sendMail->bindvariables, $conversation->topic->name );  // Conversation topic
+                $response = $sendMail->sendMailWithGenericTemplate();
+            }
+
+        }      
 
         return response()->json(['success' => true, 'Message' => 'Sign Off Successfull', 'data' => $conversation]);
     }
