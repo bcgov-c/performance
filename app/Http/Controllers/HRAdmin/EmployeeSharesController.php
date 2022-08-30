@@ -222,6 +222,33 @@ class EmployeeSharesController extends Controller
                         'comment' => 'Your profile has been shared with ' . $result->sharedWith->name,
                         'related_id' => $result->id,
                     ]);
+
+
+                    // Send email to person who their profile was shared 
+                    $user = User::where('id', $result->shared_id)
+                                ->with('userPreference')
+                                ->select('id','name','guid')
+                                ->first();
+
+                    if ($user && $user->allow_email_notification && $user->userPreference->share_profile_flag == 'Y') {
+
+                        // Send Out Email Notification to Employee
+                        $sendMail = new \App\MicrosoftGraph\SendMail();
+                        $sendMail->toRecipients = [ $user->id ];  
+                        $sendMail->sender_id = null; 
+                        $sendMail->useQueue = false;
+                        $sendMail->saveToLog = true;
+                        $sendMail->alert_type = 'N';
+                        $sendMail->alert_format = 'E';
+
+                        $sendMail->template = 'PROFILE_SHARED';
+                        array_push($sendMail->bindvariables, $user->name);                 // Recipient of the email
+                        array_push($sendMail->bindvariables, $result->sharedWith->name);   // Person who added goal to goal bank
+                        array_push($sendMail->bindvariables, $result->sharedElementName);  // Shared element
+                        array_push($sendMail->bindvariables, $result->comment);             // comment
+                        $response = $sendMail->sendMailWithGenericTemplate();
+                    }
+
                 }
             }
         }

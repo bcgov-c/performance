@@ -68,7 +68,9 @@ class User extends Authenticatable
     protected $appends = [
         'is_goal_shared_with_auth_user',
         'is_conversation_shared_with_auth_user',
-        'is_shared'
+        'is_shared',
+        'allow_inapp_notification',
+        'allow_email_notification',
     ];
 
     public function goals() {
@@ -223,6 +225,38 @@ class User extends Authenticatable
     public function sharedWith()
     {
         return $this->hasMany('App\Models\SharedProfile','shared_id','id');
+    }
+
+    public function userPreference()
+    {
+        return $this->belongsTo('App\Models\UserPreference','id','user_id')->withDefault();
+    }
+
+    public function getAllowInappNotificationAttribute() {
+
+        $organization = EmployeeDemo::join('access_organizations', 'employee_demo.organization', 'access_organizations.organization')
+                            ->where('access_organizations.allow_inapp_msg', 'Y')
+                            ->where('employee_demo.guid', $this->guid)
+                            ->first(); 
+
+        return ($organization ? true : false);                            
+
+    }
+
+    public function getAllowEmailNotificationAttribute() {
+
+        if (env('PRCS_EMAIL_NOTIFICATION', null) != 'on') {
+            return false;
+        }
+
+        $organization = EmployeeDemo::join('access_organizations', 'employee_demo.organization', 'access_organizations.organization')
+                            ->where('access_organizations.allow_email_msg', 'Y')
+                            ->where('employee_demo.guid', $this->guid)
+                            ->select('employee_demo.guid', 'employee_demo.organization')
+                            ->first(); 
+
+        return ($organization ? true : false);                            
+
     }
 
 }
