@@ -278,7 +278,7 @@ class GenericTemplateSeeder extends Seeder
     // 9. CONVERSATION_REMINDER
     //
     $template = GenericTemplate::updateOrCreate([
-      'template' => 'CONVERSATION_DUE',
+      'template' => 'CONVERSATION_REMINDER',
     ],[
       'description' =>  'Send out email notification when conversation will be due in 1 week or 1 month',
       'instructional_text' => 'N/A',
@@ -304,7 +304,7 @@ class GenericTemplateSeeder extends Seeder
     // 9. PROFILE_SHARED
     //
     $template = GenericTemplate::updateOrCreate([
-      'template' => 'CONVERSATION_DUE',
+      'template' => 'PROFILE_SHARED',
     ],[
       'description' =>  'Your profile was shared',
       'instructional_text' => 'N/A',
