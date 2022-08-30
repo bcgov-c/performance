@@ -221,5 +221,121 @@ class GenericTemplateSeeder extends Seeder
       'description' => 'List of overdue employees: table with ID, name, email, organization, level 1, level 2, level 3, level 4, supervisor',
     ]);        
 
+    //
+    // 7. CONVERSATION_DISAGREED
+    //
+    $template = GenericTemplate::updateOrCreate([
+      'template' => 'CONVERSATION_DISAGREED',
+    ],[
+      'description' =>  'Send out an email notification when a conversation has been disagreed',
+      'instructional_text' => 'N/A',
+      'sender' => '2',
+      'subject' => 'PDP - %2 disagree on your %3 Conversation',
+      'body' => "<p>Hello %1,</p><p>%2 just disagreed on your %3 conversation. Please visit www.performance.gov.bc.ca to view the details.</p><p>Thank you!</p>",
+    ]);
+
+    $template->binds()->delete();
+
+    $template->binds()->create([
+      'seqno' => 0,
+      'bind' => '%1', 
+      'description' => 'Recipient of the email',
+    ]);        
+    $template->binds()->create([
+      'seqno' => 1,
+      'bind' => '%2', 
+      'description' => 'Person who disagree the conversation',
+    ]);        
+    $template->binds()->create([
+      'seqno' => 2,
+      'bind' => '%3', 
+      'description' => 'Conversation topic',
+    ]); 
+
+
+    //
+    // 8. CONVERSATION_DUE
+    //
+    $template = GenericTemplate::updateOrCreate([
+      'template' => 'CONVERSATION_DUE',
+    ],[
+      'description' =>  'Send out email notification when conversation is overdue',
+      'instructional_text' => 'N/A',
+      'sender' => '2',
+      'subject' => 'OVERDUE - your next performance conversation is past due',
+      'body' => "<p>Hello %1,</p>",
+    ]);
+
+    $template->binds()->delete();
+
+    $template->binds()->create([
+      'seqno' => 0,
+      'bind' => '%1', 
+      'description' => 'Recipient of the email',
+    ]);        
+
+    //
+    // 9. CONVERSATION_REMINDER
+    //
+    $template = GenericTemplate::updateOrCreate([
+      'template' => 'CONVERSATION_DUE',
+    ],[
+      'description' =>  'Send out email notification when conversation will be due in 1 week or 1 month',
+      'instructional_text' => 'N/A',
+      'sender' => '2',
+      'subject' => 'REMINDER - your next performance conversation is due in %2',
+      'body' => "<p>Hello %1,</p><p>Your conversation is due in %2</p>",
+    ]);
+
+    $template->binds()->delete();
+
+    $template->binds()->create([
+      'seqno' => 0,
+      'bind' => '%1', 
+      'description' => 'Recipient of the email',
+    ]);   
+    $template->binds()->create([
+      'seqno' => 1,
+      'bind' => '%2', 
+      'description' => 'Due in 1 month or 1 week',
+    ]);   
+    
+    //
+    // 9. PROFILE_SHARED
+    //
+    $template = GenericTemplate::updateOrCreate([
+      'template' => 'CONVERSATION_DUE',
+    ],[
+      'description' =>  'Your profile was shared',
+      'instructional_text' => 'N/A',
+      'sender' => '2',
+      'subject' => 'PDP - Your Goal Profile was shared',
+      'body' => "<p>Hello %1,</p><p>Your profile shared with %2. Share element: %3.</p><p>Please log in to www.performance.gov.bc.ca to view more details and add the goal to your profile as needed.</p><p>Thanks!</p>",
+    ]);
+
+    $template->binds()->delete();
+
+    $template->binds()->create([
+      'seqno' => 0,
+      'bind' => '%1', 
+      'description' => 'Recipient of the email',
+    ]);   
+    $template->binds()->create([
+      'seqno' => 1,
+      'bind' => '%2', 
+      'description' => 'Person who see with your profile',
+    ]); 
+    $template->binds()->create([
+      'seqno' => 2,
+      'bind' => '%3', 
+      'description' => 'Shared element',
+    ]); 
+    $template->binds()->create([
+      'seqno' => 3,
+      'bind' => '%4', 
+      'description' => 'Comment',
+    ]); 
+
+
   }
 }

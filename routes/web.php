@@ -46,8 +46,8 @@ use App\Http\Controllers\UserPreferenceController;
     require __DIR__.'/auth.php';
     Route::get('dashboard/revert-identity', [DashboardController::class, 'revertIdentity'])->name('dashboard.revert-identity');
 
-    // Route::middleware(['auth'])->group(function() {
-    //     Route::resource('user-preference', UserPreferenceController::class)->only(['index', 'store']);
-    // });
+    Route::middleware(['auth'])->group(function() {
+        Route::resource('user-preference', UserPreferenceController::class)->only(['index', 'store']);
+    });
     
     

@@ -204,6 +204,34 @@ class MyTeamController extends Controller
             ]);
         }
 
+        // Send out email to the user when his profile was shared
+        foreach ($sharedProfile as $result) {
+
+            $user = User::where('id', $result->shared_id)
+                            ->with('userPreference')
+                            ->select('id','name','guid')
+                            ->first();
+
+            if ($user && $user->allow_email_notification && $user->userPreference->share_profile_flag == 'Y') {
+
+                // Send Out Email Notification to Employee
+                $sendMail = new \App\MicrosoftGraph\SendMail();
+                $sendMail->toRecipients = [ $user->id ];  
+                $sendMail->sender_id = null; 
+                $sendMail->useQueue = false;
+                $sendMail->saveToLog = true;
+                $sendMail->alert_type = 'N';
+                $sendMail->alert_format = 'E';
+
+                $sendMail->template = 'PROFILE_SHARED';
+                array_push($sendMail->bindvariables, $user->name);                 // Recipient of the email
+                array_push($sendMail->bindvariables, $result->sharedWith->name);   // Person who added goal to goal bank
+                array_push($sendMail->bindvariables, $result->sharedElementName);  // Shared element
+                array_push($sendMail->bindvariables, $result->comment);             // comment
+                $response = $sendMail->sendMailWithGenericTemplate();
+            }
+        }
+
         DB::commit();
         return $this->respondeWith($sharedProfile);
     }
@@ -379,7 +407,35 @@ class MyTeamController extends Controller
                 'related_id' => $goal->id,
             ]);
         }
-        
+
+        // Send out email to the user when the Goal Bank added
+        foreach ($request->itemsToShare as $user_id) {
+
+            $user = User::where('id', $user_id)
+                            ->with('userPreference')
+                            ->select('id','name','guid')
+                            ->first();
+
+            if ($user && $user->allow_email_notification && $user->userPreference->goal_bank_flag == 'Y') {
+
+                // Send Out Email Notification to Employee
+                $sendMail = new \App\MicrosoftGraph\SendMail();
+                $sendMail->toRecipients = [ $user->id ];  
+                $sendMail->sender_id = null; 
+                $sendMail->useQueue = false;
+                $sendMail->saveToLog = true;
+                $sendMail->alert_type = 'N';
+                $sendMail->alert_format = 'E';
+
+                $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
+                array_push($sendMail->bindvariables, $user->name);                            // Recipient of the email
+                array_push($sendMail->bindvariables, $goal->user ? $goal->user->name : '');   // Person who added goal to goal bank
+                array_push($sendMail->bindvariables, $goal->title);                           // goal title
+                array_push($sendMail->bindvariables, $goal->mandatory_status_descr);          // Mandatory or suggested status
+                $response = $sendMail->sendMailWithGenericTemplate();
+            }
+        }
+                
         return response()->json(['success' => true, 'message' => 'Goal added to library successfully']);
         // return redirect()->back();
     }

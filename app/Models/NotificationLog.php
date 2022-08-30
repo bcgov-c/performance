@@ -17,12 +17,16 @@ class NotificationLog extends Model
         'alert_type',
         'alert_format',
         'sender_id',
-        'notify_user_id',          // InApp -- notify to 
+        'sender_email',
+        'notify_user_id',           // notify user id  (team member or Supervisor)
+        'overdue_user_id',          // conversation overdue user (team member or Supervisor
         'notify_due_date',
         'notify_for_days',          // InApp -- notify for due in days e.g. conversation due date
         'template_id',
         'status',
         'date_sent',
+        'use_queue',
+
     ];
 
     public const ALERT_FORMAT = 

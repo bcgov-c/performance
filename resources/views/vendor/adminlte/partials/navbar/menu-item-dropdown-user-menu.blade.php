@@ -68,6 +68,9 @@
                     {{ __('adminlte::menu.profile') }}
                 </a>
             @endif
+            <a class="acct-pref nav-link mb-3" href="{{ route('user-preference.index') }}">
+                <i class="mr-3 fas fa-fw fa-address-card "></i><span>Account Preference</span>
+            </a>
             <a class="btn btn-default btn-flat float-right @if(!$profile_url) btn-block @endif"
                href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 <i class="fa fa-fw fa-power-off text-red"></i>

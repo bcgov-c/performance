@@ -11,19 +11,21 @@ class NotifyMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $subject, $body, $from;
+    public $subject, $body, $from_email;
+
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($from,  $subject, $body)
+    public function __construct($from_email,  $subject, $body)
     {
         //
-        $this->from = $from;
+        // $this->from = $from;
         $this->subject = $subject;
         $this->body = $body;
+        $this->from_email = $from_email;
         
     }
 
@@ -34,8 +36,8 @@ class NotifyMail extends Mailable
      */
     public function build()
     {
-        return $this->subject( $this->subject )
-                    ->from ( $this->from )
+        return $this->from( $this->from_email  )
+                    ->subject( $this->subject )
                     ->view('emails.generic-template');
     }
 }
