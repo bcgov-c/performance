@@ -40,14 +40,17 @@ class DashboardController extends Controller
                         })
                         ->orWhere('dashboard_notifications.notification_type', '');    
                 })
-                ->orderby('status', 'asc')->orderby('created_at', 'desc');
+                // ->orderby('status', 'asc')->orderby('created_at', 'desc');
+                ->orderby('created_at', 'desc');
 
         if($request->ajax()) {
 
             return Datatables::of($notifications)
                 ->addColumn('item_detail', function ($notification) {
 
-                    $text = '<span class="font-weight-bold">'.$notification->comment.'</span><br/>';
+                    $text = '<span ';
+                    $text .= ($notification->status == 'R' ? '' : 'class="font-weight-bold"');
+                    $text .= '>'.$notification->comment.'</span><br/>';
                     // $text .= '<span>sjskaj |  sadasdad  |dkajsdkjkjadskjdkja</span>';
 
                     switch($notification->notification_type) {
@@ -73,7 +76,7 @@ class DashboardController extends Controller
                     return '<table class="inner" style="border:none">'. 
                         '<tr>'.
 
-                        '<td class="'. ($notification->status == 'R' ? 'read' : 'new') .' pr-1">&nbsp;</td>'.
+                        // '<td class="'. ($notification->status == 'R' ? 'read' : 'new') .' pr-1">&nbsp;</td>'.
                         '<td class="pr-3" style="vertical-align:middle"><input type="checkbox" id="itemCheck'. 
                                 $notification->id .'" name="itemCheck[]" value="'. 
                                 $notification->id .'" class="dt-body-center"></td>'. 
@@ -93,10 +96,10 @@ class DashboardController extends Controller
                         $text .= '<button onclick="'. $link . '"' .
                                 // 'data-toggle="tooltip" data-placement="bottom" title="Click to view the details." '.
                                 'data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Now hover out." '.
-                                'class="notification-modal btn btn-sm btn-primary" value="'. $notification->id .'">View</button>';
+                                'class="notification-modal btn btn-sm btn-primary mt-2" value="'. $notification->id .'">View</button>';
                     }
-                    $text .= '<button class="btn btn-danger btn-sm ml-2 delete-dn" data-id="'. $notification->id .
-                                '" data-comment="'. $notification->comment . '"><i class="fas fa-trash-alt"></i></button>';
+                    $text .= '<button class="btn btn-danger btn-sm ml-2 delete-dn mt-2"  data-id="'. $notification->id .
+                                '" data-comment="'. $notification->comment . '"><i class="fas fa-trash-alt fa-lg" ></i></button>';
 
                     return $text;
                 })
