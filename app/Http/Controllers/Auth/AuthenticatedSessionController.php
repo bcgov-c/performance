@@ -35,6 +35,15 @@ class AuthenticatedSessionController extends Controller
 
         $request->authenticate();
 
+        // additional checking
+        $result  = $this->canLoginIn($request, Auth::user());
+
+        if (!$result) {
+            $request->session()->invalidate();
+            return redirect('/login')
+                    ->with('error-psft', 'You do not have active PeopleSoft HCM account or not authority to access.');
+        }
+
         $request->session()->regenerate();
 
         // Assign Role "employee"
@@ -87,6 +96,42 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    protected function canLoginIn($request, $auth_user)
+    {
+
+        // dd([$keycloak_user, $keycloak_user->user['idir_user_guid'], $keycloak_user->user['idir_username'] ]);
+        $guid = $auth_user->guid;
+
+        if (empty( $guid)) {
+            if (str_contains( $auth_user->email, '@example.com')) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        // Step 1: find the Authenicated User by GUID 
+        // $isUser = User::where('source_type', 'HCM')
+        //                 ->where('guid', $guid)
+        //                 ->where('acctlock', 0)->first();
+        $isUser = User::join('employee_demo','employee_demo.guid','users.guid')
+                        ->join('access_organizations','employee_demo.organization','access_organizations.organization')
+                        ->where('access_organizations.allow_login', 'Y')
+                        ->whereNull('employee_demo.date_deleted')
+                        ->where('users.guid', $guid)
+                        ->where('users.acctlock', 0)
+                        ->select('users.*')
+                        ->first();
+
+        // User was found, then update the signin information
+        if ($isUser || str_contains( $auth_user->email, '@example.com') ) {
+            return true;
+        } else {
+            return false;
+        }
+        
     }
 
     protected function assignSupervisorRole(User $user)

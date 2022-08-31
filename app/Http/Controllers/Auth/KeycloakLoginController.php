@@ -142,7 +142,7 @@ class KeycloakLoginController extends Controller
         //                 ->where('acctlock', 0)->first();
         $isUser = User::join('employee_demo','employee_demo.guid','users.guid')
                         ->join('access_organizations','employee_demo.organization','access_organizations.organization')
-                        ->where('access_organizations.allow_inapp_msg', 'Y')
+                        ->where('access_organizations.allow_login', 'Y')
                         ->whereNull('employee_demo.date_deleted')
                         ->where('users.guid', $guid)
                         ->where('users.acctlock', 0)
