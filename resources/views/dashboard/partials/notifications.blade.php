@@ -1,6 +1,6 @@
 <div>
 
-    <table style="height: 2em;" class="ml-4">
+    <table style="height: 2em;" class="ml-3">
         <tbody>
           <tr>
             <td class="align-middle">
@@ -33,6 +33,7 @@
             </tr>
     </table>
 
+    <hr class="separator"/>
 
     <table class="table" id="notification-table" style="width:100%;">
         <thead>
@@ -81,6 +82,17 @@
             border-left: 3px solid #ffffff;
         }
 
+        .table tr.odd:first-child td {
+            border-top: none !important;
+        }
+        
+        hr.separator {
+                border: 1px solid #EED202;
+                border-radius: 5px;
+                padding: 0px;
+                margin: 2px;
+        }
+
     </style>
 </x-slot>
 
@@ -118,6 +130,11 @@
                 url: '{!! route("dashboard") !!}',
                 data: function (d) {}
             },
+            "createdRow": function( row, data, dataIndex){
+                if( data.status == 'R'){
+                    $(row).addClass('bg-light');
+                } 
+            },
             "fnDrawCallback": function() {
 
                 list = ( $('#notification-table input:checkbox') );
@@ -150,7 +167,7 @@
             },
             columns: [
                 {data: 'item_detail', name: 'item_detail', orderable: false, searchable: false,  width: '80%', className: 'py-1' },
-                {data: 'action', name: 'action', orderable: false, searchable: false, width: '20%', className: 'dt-right dt-nowrap my-0'}
+                {data: 'action', name: 'action', orderable: false, searchable: false, width: '20%', className: 'dt-right dt-nowrap my-0'},
             ]
         });
 
