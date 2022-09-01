@@ -100,6 +100,17 @@ div.border-primary a {
   color: #fff;
 }
 
+[class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active, [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active:hover, [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active:focus {
+    background-color: rgba(255, 255, 255, 0);
+    color: #FCBA19;
+}
+
+[class*=sidebar-dark-] .nav-sidebar > .nav-item.menu-open > .nav-link, [class*=sidebar-dark-] .nav-sidebar > .nav-item:hover > .nav-link,
+[class*=sidebar-dark-] .nav-sidebar > .nav-item > .nav-link:focus {
+  background-color: #1A5A96;
+  color: #fff;
+}
+
 
 /* Menu item under User Menu (Main Header - Navbar */
 li.user-menu a.acct-pref
