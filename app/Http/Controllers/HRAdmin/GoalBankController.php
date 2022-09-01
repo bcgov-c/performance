@@ -728,6 +728,8 @@ class GoalBankController extends Controller
             ->select ('users.id', 'users.employee_id')
             ->orderBy('employee_demo.employee_name')
             ->get() ;
+
+            $newly_added_emp_ids = [];
             foreach ($toRecipients as $newId) {
                 // $result = DB::table('goals_shared_with')
                 // ->updateOrInsert(
