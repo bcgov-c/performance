@@ -94,16 +94,21 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
+
+    shared_element = {{ (Route::current()->getName() == 'my-team.statistics.goalsummary' ? '1' : 
+                         (Route::current()->getName() == 'my-team.statistics.conversationsummary' ? '2' : '0'))  }};
+
     $('#dd_level0').select2({
         placeholder: 'select organization',
         allowClear: true,
         ajax: {
-            url: '/hradmin/statistics/org-organizations'
+            url: '/my-team/statistics/org-organizations'
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
                 var query = {
-                    'q': params.term
+                    'q': params.term,
+                    'shared_element': shared_element
                 , }
                 return query;
             }
@@ -120,12 +125,13 @@
         placeholder: 'select level 1',
         allowClear: true,
         ajax: {
-            url: '/hradmin/statistics/org-programs' 
+            url: '/my-team/statistics/org-programs' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
                 var query = {
                     'q': params.term,
+                    'shared_element': shared_element,
                     'level0': $('#dd_level0').children("option:selected").val()
                 , }
                 return query;
@@ -143,12 +149,13 @@
         placeholder: 'select level 2',
         allowClear: true,
         ajax: {
-            url: '/hradmin/statistics/org-divisions' 
+            url: '/my-team/statistics/org-divisions' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
                 var query = {
                     'q': params.term,
+                    'shared_element': shared_element,
                     'level0': $('#dd_level0').children("option:selected").val(),
                     'level1': $('#dd_level1').children("option:selected").val()
                 , }
@@ -167,12 +174,13 @@
         placeholder: 'select level 3',
         allowClear: true,
         ajax: {
-            url: '/hradmin/statistics/org-branches' 
+            url: '/my-team/statistics/org-branches' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
                 var query = {
                     'q': params.term,
+                    'shared_element': shared_element,
                     'level0': $('#dd_level0').children("option:selected").val(),
                     'level1': $('#dd_level1').children("option:selected").val(),
                     'level2': $('#dd_level2').children("option:selected").val()
@@ -192,12 +200,13 @@
         placeholder: 'select level 4',
         allowClear: true,
         ajax: {
-            url: '/hradmin/statistics/org-level4' 
+            url: '/my-team/statistics/org-level4' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
                 var query = {
                     'q': params.term,
+                    'shared_element': shared_element,
                     'level0': $('#dd_level0').children("option:selected").val(),
                     'level1': $('#dd_level1').children("option:selected").val(),
                     'level2': $('#dd_level2').children("option:selected").val(),
