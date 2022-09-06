@@ -1,3 +1,16 @@
+<style>
+
+.panel-heading  a:before {
+   
+   float: right;
+   transition: all 0.5s;
+}
+.panel-heading.active a:before {
+	-webkit-transform: rotate(180deg);
+	-moz-transform: rotate(180deg);
+	transform: rotate(180deg);
+} 
+</style>    
 <x-side-layout title="{{ __('My Conversations - Performance Development Platform') }}">
     <h3>
         @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
@@ -174,6 +187,112 @@
 
     <x-slot name="js">
         <script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
+        
+        <script>            
+            CKEDITOR.replace('info_comment1', {
+                toolbar: "Custom",
+                toolbar_Custom: [
+                    ["Bold", "Italic", "Underline"],
+                    ["NumberedList", "BulletedList"],
+                    ["Outdent", "Indent"],
+                    ["Link"],
+                ],
+                disableNativeSpellChecker: false
+            });
+            CKEDITOR.replace('info_comment2', {
+                toolbar: "Custom",
+                toolbar_Custom: [
+                    ["Bold", "Italic", "Underline"],
+                    ["NumberedList", "BulletedList"],
+                    ["Outdent", "Indent"],
+                    ["Link"],
+                ],
+                disableNativeSpellChecker: false
+            });
+            CKEDITOR.replace('info_comment3', {
+                toolbar: "Custom",
+                toolbar_Custom: [
+                    ["Bold", "Italic", "Underline"],
+                    ["NumberedList", "BulletedList"],
+                    ["Outdent", "Indent"],
+                    ["Link"],
+                ],
+                disableNativeSpellChecker: false
+            });
+            CKEDITOR.replace('info_comment4', {
+                toolbar: "Custom",
+                toolbar_Custom: [
+                    ["Bold", "Italic", "Underline"],
+                    ["NumberedList", "BulletedList"],
+                    ["Outdent", "Indent"],
+                    ["Link"],
+                ],
+                disableNativeSpellChecker: false
+            });
+            CKEDITOR.replace('info_comment5', {
+                toolbar: "Custom",
+                toolbar_Custom: [
+                    ["Bold", "Italic", "Underline"],
+                    ["NumberedList", "BulletedList"],
+                    ["Outdent", "Indent"],
+                    ["Link"],
+                ],
+                disableNativeSpellChecker: false
+            });
+            CKEDITOR.replace('info_comment6', {
+                toolbar: "Custom",
+                toolbar_Custom: [
+                    ["Bold", "Italic", "Underline"],
+                    ["NumberedList", "BulletedList"],
+                    ["Outdent", "Indent"],
+                    ["Link"],
+                ],
+                disableNativeSpellChecker: false
+            });
+            CKEDITOR.replace('info_comment7', {
+                toolbar: "Custom",
+                toolbar_Custom: [
+                    ["Bold", "Italic", "Underline"],
+                    ["NumberedList", "BulletedList"],
+                    ["Outdent", "Indent"],
+                    ["Link"],
+                ],
+                disableNativeSpellChecker: false
+            });
+            CKEDITOR.replace('info_comment8', {
+                toolbar: "Custom",
+                toolbar_Custom: [
+                    ["Bold", "Italic", "Underline"],
+                    ["NumberedList", "BulletedList"],
+                    ["Outdent", "Indent"],
+                    ["Link"],
+                ],
+                disableNativeSpellChecker: false
+            });
+            CKEDITOR.replace('info_comment9', {
+                toolbar: "Custom",
+                toolbar_Custom: [
+                    ["Bold", "Italic", "Underline"],
+                    ["NumberedList", "BulletedList"],
+                    ["Outdent", "Indent"],
+                    ["Link"],
+                ],
+                disableNativeSpellChecker: false
+            });
+            CKEDITOR.replace('info_comment10', {
+                toolbar: "Custom",
+                toolbar_Custom: [
+                    ["Bold", "Italic", "Underline"],
+                    ["NumberedList", "BulletedList"],
+                    ["Outdent", "Indent"],
+                    ["Link"],
+                ],
+                disableNativeSpellChecker: false
+            });
+            
+            
+        </script>    
+        
         <script>
             $("#participant_id").select2({
                 maximumSelectionLength: 1
@@ -275,12 +394,13 @@
                 if($(this).attr("readonly")) {
                     return;
                 }
-                $(element_id).toggleClass('d-none');
+                //$(element_id).toggleClass('d-none');
                 $('.btn-conv-save').filter("[data-name=" + elementName + "]").removeClass("d-none");
                 $('.btn-conv-cancel').filter("[data-name=" + elementName + "]").removeClass("d-none");
-                $('.btn-conv-edit').filter("[data-name=" + elementName + "]").addClass("d-none");
+                //$('.btn-conv-edit').filter("[data-name=" + elementName + "]").addClass("d-none");
                 $('.btn-conv-edit').prop('readonly', true);
-                $(element_id).val($("[data-name=" + elementName + "]").val());
+                $('.btn-conv-edit').filter("[data-name=" + elementName + "]").prop('readonly', false);
+                //$(element_id).val($("[data-name=" + elementName + "]").val());
                 $(element_id).focus();
                 // Enable Edit.
                 // Disable view
@@ -293,6 +413,7 @@
                 const that = this;
                 const item = $(that).data('id');
                 const va = CKEDITOR.instances[item].getData();
+                //const va = $("#" + $(that).data('id')).val();
                 
                 $.ajax({
                     url: '/conversation/' + conversation_id
@@ -313,7 +434,7 @@
                         $('.btn-conv-edit').filter("[data-name=" + elementName + "]").removeClass("d-none");
                         // Update View
                         if ($("#" + $(that).data('id') + '_edit').is('textarea')) {
-                            $("#" + $(that).data('id')).val($("#" + $(that).data('id') + '_edit').val());
+                            $("#" + $(that).data('id')).val($("#" + $(that).data('id')).val());
                         } else {
                             updateConversation(conversation_id)
                         }
@@ -375,14 +496,160 @@
                     return;
                 }
                 const url = ($(this).data('action') === 'unsignoff') ? '/conversation/unsign-off/' + conversation_id : '/conversation/sign-off/' + conversation_id;
-                const data = ($(this).data('action') === 'unsignoff') ? $('#unsign-off-form').serialize() : $('#'+formType+'sign_off_form').serialize() + '&' +
+                const data = ($(this).data('action') === 'unsignoff') ? $('#unsign-off-form').serialize() + '&' + $.param({
+                        'employee_id': $('#employee_id').val()
+                    })
+                    : $('#'+formType+'sign_off_form').serialize() + '&' +
                     $.param({
                         'employee_id': $('#employee_id').val()
                     });
+
                 $(this).html("<div class='spinner-border spinner-border-sm' role='status'></div>");
                 const that = this;
                 $("span.error").html("");
                 $(".alert.common-error").hide();
+                
+                
+                var info_comment1_data = CKEDITOR.instances['info_comment1'].getData();
+                        var info_comment2_data = CKEDITOR.instances['info_comment2'].getData();
+                        var info_comment3_data = CKEDITOR.instances['info_comment3'].getData();
+                        var info_comment4_data = CKEDITOR.instances['info_comment4'].getData();
+                        var info_comment5_data = CKEDITOR.instances['info_comment5'].getData();
+                        var info_comment6_data = CKEDITOR.instances['info_comment6'].getData();
+                        var info_comment7_data = CKEDITOR.instances['info_comment7'].getData();
+                        var info_comment8_data = CKEDITOR.instances['info_comment8'].getData();
+                        var info_comment9_data = CKEDITOR.instances['info_comment9'].getData();
+                        var info_comment10_data = CKEDITOR.instances['info_comment10'].getData();
+                        var info_comment11_data = $('#info_comment11').val();
+                        
+                        $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment1', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment1_data
+                                }
+                            });
+                       
+                        
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment2', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment2_data
+                                }
+                            });
+                        
+                        
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment3', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment3_data
+                                }
+                            });
+                        
+                        
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment4', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment4_data
+                                }
+                            });
+                       
+                        
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment5', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment5_data
+                                }
+                            });
+                       
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment6', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment6_data
+                                }
+                            });
+                       
+                        
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment7', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment7_data
+                                }
+                            });
+                        
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment8', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment8_data
+                                }
+                            });
+                       
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment9', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment9_data
+                                }
+                            });
+                        
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment10', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment10_data
+                                }
+                            });
+                        
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment11', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment11_data
+                                }
+                            });
+                
+                
+                
                 $.ajax({
                     url: url
                     , type: 'POST'
@@ -450,12 +717,158 @@
                     , $('#delete-conversation-form').data('action').replace('xxx', $(this).data('id'))
                 ).submit();
             });
+            
+            var modal_edit = false;
+            <?php if ($type == 'upcoming'){ ?>
+                var modal_edit = true;
+            <?php } ?>
+            
             $(document).on('hide.bs.modal', '#viewConversationModal', function(e) {
                 if (toReloadPage) {
                     window.location.reload();
                 } else {
-                    if (isContentModified() && !confirm("If you continue you will lose any unsaved information.")) {
-                        e.preventDefault();
+                    if (modal_edit ==  true){
+                    if (isContentModified() && confirm("Your comments will be saved when you close the window.")) {
+                        //e.preventDefault();
+                        var info_comment1_data = CKEDITOR.instances['info_comment1'].getData();
+                        var info_comment2_data = CKEDITOR.instances['info_comment2'].getData();
+                        var info_comment3_data = CKEDITOR.instances['info_comment3'].getData();
+                        var info_comment4_data = CKEDITOR.instances['info_comment4'].getData();
+                        var info_comment5_data = CKEDITOR.instances['info_comment5'].getData();
+                        var info_comment6_data = CKEDITOR.instances['info_comment6'].getData();
+                        var info_comment7_data = CKEDITOR.instances['info_comment7'].getData();
+                        var info_comment8_data = CKEDITOR.instances['info_comment8'].getData();
+                        var info_comment9_data = CKEDITOR.instances['info_comment9'].getData();
+                        var info_comment10_data = CKEDITOR.instances['info_comment10'].getData();
+                        var info_comment11_data = $('#info_comment11').val();
+                        
+                        $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment1', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment1_data
+                                }
+                            });
+                       
+                        
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment2', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment2_data
+                                }
+                            });
+                        
+                        
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment3', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment3_data
+                                }
+                            });
+                        
+                        
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment4', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment4_data
+                                }
+                            });
+                       
+                        
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment5', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment5_data
+                                }
+                            });
+                       
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment6', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment6_data
+                                }
+                            });
+                       
+                        
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment7', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment7_data
+                                }
+                            });
+                        
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment8', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment8_data
+                                }
+                            });
+                       
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment9', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment9_data
+                                }
+                            });
+                        
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment10', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment10_data
+                                }
+                            });
+                        
+                            $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comment11', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:info_comment11_data
+                                }
+                            });
+                        
+                    }
                     }
                 }
             });
@@ -488,9 +901,18 @@
                 $.ajax({
                     url: '/conversation/' + conversation_id
                     , success: function(result) {
-                        $("#viewConversationModal").find('textarea').prop('disable', false);
                         isSupervisor = result.view_as_supervisor;
+                        topic_id = result.topic.id;
                         disable_signoff = result.disable_signoff;
+                        employee_signed = false;
+                        supervisor_signed = false;
+                        
+                        if (typeof result.signoff_user_id === 'number') {
+                            employee_signed = true;                            
+                        }
+                        if (typeof result.supervisor_signoff_id === 'number') {
+                            supervisor_signed = true;                            
+                        }                    
                         $('#conv_participant_edit').val('');
                         $('#conv_participant').val('');
                         $('#conv_title').text(result.topic.name);
@@ -501,24 +923,54 @@
                         $('#conv_time_edit').val(result.time);
                         $('#conv_comment').text(result.comment);
                         $('#conv_comment_edit').text(result.comment);
-                        $('#info_comment1').val(result.info_comment1);
-                        $('#info_comment1_edit').val(result.info_comment1);
-                        $('#info_comment2').val(result.info_comment2);
-                        $('#info_comment2_edit').val(result.info_comment2);
-                        $('#info_comment3').val(result.info_comment3);
-                        $('#info_comment3_edit').val(result.info_comment3);
-                        $('#info_comment4').val(result.info_comment4);
-                        $('#info_comment4_edit').val(result.info_comment4);
-                        $('#info_comment5').val(result.info_comment5);
-                        $('#info_comment5_edit').val(result.info_comment5);
-                        $('#info_comment6').val(result.info_comment6);
-                        $('#info_comment6_edit').val(result.info_comment6);
-                        $('#team_member_agreement').prop('checked', result.team_member_agreement ? true : false);
-                        $('#team_member_agreement_2').prop('checked', result.team_member_agreement ? true : false);
+                        //$('#info_comment1').val(result.info_comment1);
+                        CKEDITOR.instances['info_comment1'].setData(result.info_comment1);
+                        CKEDITOR.instances['info_comment2'].setData(result.info_comment2);
+                        CKEDITOR.instances['info_comment3'].setData(result.info_comment3);
+                        CKEDITOR.instances['info_comment4'].setData(result.info_comment4);
+                        CKEDITOR.instances['info_comment5'].setData(result.info_comment5);
+                        CKEDITOR.instances['info_comment6'].setData(result.info_comment6);
+                        CKEDITOR.instances['info_comment7'].setData(result.info_comment7);
+                        CKEDITOR.instances['info_comment8'].setData(result.info_comment8);
+                        CKEDITOR.instances['info_comment9'].setData(result.info_comment9);
+                        CKEDITOR.instances['info_comment10'].setData(result.info_comment10);
+                        $('#info_comment11').val(result.info_comment11);
+                        
+                        
+                        $('[name="check_one"]').removeAttr('checked');
+                        $('[name="check_two"]').removeAttr('checked');
+                        $('[name="check_one_"]').removeAttr('checked');
+                        $('[name="check_two_"]').removeAttr('checked');
+                        
+                        if (result.empl_agree1 == 1) {
+                            $("input[name=check_one][value=1]").prop('checked', true);
+                        } 
+                        if (result.empl_agree1 == 0) {
+                            $("input[name=check_one][value=0]").prop('checked', true);
+                        }
+                        if (result.empl_agree2 == 1) {
+                            $("input[name=check_two][value=1]").prop('checked', true);
+                        } 
+                        if (result.empl_agree2 == 0) {
+                            $("input[name=check_two][value=0]").prop('checked', true);
+                        }
+                        
+                        if (result.supv_agree1 == 1) {
+                            $("input[name=check_one_][value=1]").prop('checked', true);
+                        } 
+                        if (result.supv_agree1 == 0) {
+                            $("input[name=check_one_][value=0]").prop('checked', true);
+                        }
+                        if (result.supv_agree2 == 1) {
+                            $("input[name=check_two_][value=1]").prop('checked', true);
+                        } 
+                        if (result.supv_agree2 == 0) {
+                            $("input[name=check_two_][value=0]").prop('checked', true);
+                        }
+                        
 
                         $("#locked-message").addClass("d-none");
-                        $("#unsignoff-form-block").show();
-                        $("#signoff-form-block").show();
+                        
                         user1 = result.conversation_participants.find((p) => p.participant_id === currentUser);
                         user2 = result.conversation_participants.find((p) => p.participant_id !== currentUser);
                         let isNotThirdPerson = true;
@@ -534,53 +986,73 @@
                             $('#viewConversationModal').data('is-frozen', 1);
                             $('#viewConversationModal').data('is-not-allowed', 1);
 
-                            $('#signoff-form-block').find("#signoff-emp-id-input").hide();
-                            $('#unsignoff-form-block').hide();
                             isNotThirdPerson = false;
                         }
                         $('#employee-signoff-questions').removeClass('d-none');
+                        
 
                         if (!isSupervisor) {
-                            $("#employee-signoff-questions").find('.sup-inputs').find('input').prop('disabled', true);
-                            $("#employee-signoff-questions").find('.emp-inputs').find('input').prop('disabled', false);
-                            $('#supervisor-signoff-questions').addClass('d-none');
-                            //$('#employee-signoff-message').addClass('d-none');
-                            $('#supervisor-signoff-message').removeClass('d-none');
-                            $('#supervisor-signoff-message').find('.name').html(user2.participant.name);
-                            $('#employee-signoff-message').find('.name').html(user1.participant.name);
-                            $('#employee-signoff-message').find('.time').html("on " + result.sign_off_time);
-                            $('#supervisor-signoff-message').find('.time').html("on " + result.supervisor_signoff_time);
-                            $("textarea.supervisor-comment").addClass('enable-not-allowed').prop('readonly', true);
-                            if (result.conversation_topic_id == 3) {
-                                $("#info_comment1").removeClass('enable-not-allowed').prop('readonly', false); 
-                                $("#info_comment1_edit").removeClass('enable-not-allowed').prop('readonly', false); 
-                                $("#info_comment3").removeClass('enable-not-allowed').prop('readonly', false);
-                                $("#info_comment3_edit").removeClass('enable-not-allowed').prop('readonly', false); 
-                                
-                                $("#info_comment2").addClass('enable-not-allowed').prop('readonly', true);                                 
-                                $("#info_comment6").addClass('enable-not-allowed').prop('readonly', true);
+                            CKEDITOR.instances['info_comment1'].setReadOnly(true);
+                            CKEDITOR.instances['info_comment2'].setReadOnly(true);
+                            CKEDITOR.instances['info_comment3'].setReadOnly(true);
+                            CKEDITOR.instances['info_comment5'].setReadOnly(true);
+                            CKEDITOR.instances['info_comment6'].setReadOnly(true);                            
+                            $('#info_comment11').prop('disabled', true);
+                            $('.supervisor-sign-off').prop('disabled', true);
+                            
+                            CKEDITOR.instances['info_comment4'].setReadOnly(false);
+                            CKEDITOR.instances['info_comment7'].setReadOnly(false);
+                            CKEDITOR.instances['info_comment8'].setReadOnly(false);
+                            CKEDITOR.instances['info_comment9'].setReadOnly(false);
+                            CKEDITOR.instances['info_comment10'].setReadOnly(false);
+                            $('.employee-sign-off').prop('disabled', false);
+                            $('#team_member_agreement').prop('disabled', false);
+                            
+                            if(employee_signed == false) {                                
+                                $('#signoff-emp-id-input').html('<div id="emp-signoff-row"><div class="my-2">Enter your 6 digit employee ID to indicate you have read and accept the performance review:</div><input type="text" id="employee_id" class="form-control d-inline w-50"><button class="btn btn-primary btn-sign-off ml-2" type="button">Sign with my employee ID</button><br><span class="text-danger error" data-error-for="employee_id"></span></div>');                                
+                                $('#unsign-off-block').html('');
+
+                            } else {
+                                $('#unsignoff-emp-id-input').html('<input type="text" id="employee_id" class="form-control d-inline w-50"><button data-action="unsignoff" class="btn btn-primary btn-sign-off ml-2" type="button">Un-Sign</button><br><span class="text-danger error" data-error-for="employee_id"></span>');
+                                $('#sign-off-block').html('');
                             }
                             
+                            $("input[name=check_one_]").prop('disabled', true);
+                            $("input[name=check_two_]").prop('disabled', true);
+                            
                         } else {
-                            $("#team_member_agreement").prop('disabled', true);
-
-//                             $('#employee-signoff-questions').addClass('d-none');
-                            $("#employee-signoff-questions").find('.sup-inputs').find('input').prop('disabled', false);
-                            $("#employee-signoff-questions").find('.emp-inputs').find('input').prop('disabled', true);
-
-                            $('#supervisor-signoff-questions').removeClass('d-none');
-                            $('#employee-signoff-message').removeClass('d-none');
-                            // $('#supervisor-signoff-message').addClass('d-none');
-                            $('#supervisor-signoff-message').find('.name').html(user1.participant.name);
-                            $('#employee-signoff-message').find('.name').html(user2.participant.name);
-                            $('#employee-signoff-message').find('.time').html("on " + result.sign_off_time);
-                            $('#supervisor-signoff-message').find('.time').html("on " + result.supervisor_signoff_time);
-                            $("textarea.employee-comment").addClass('enable-not-allowed').prop('readonly', true);
-                            if (result.conversation_topic_id == 3) {
-                                $("#info_comment1").addClass('enable-not-allowed').prop('readonly', true);                                   
-                                $("#info_comment3").addClass('enable-not-allowed').prop('readonly', true);
+                            CKEDITOR.instances['info_comment1'].setReadOnly(false);
+                            CKEDITOR.instances['info_comment2'].setReadOnly(false);
+                            CKEDITOR.instances['info_comment3'].setReadOnly(false);
+                            CKEDITOR.instances['info_comment5'].setReadOnly(false);
+                            CKEDITOR.instances['info_comment6'].setReadOnly(false);
+                            $('#info_comment11').prop('disabled', false);
+                            $('.supervisor-sign-off').prop('disabled', false);
+                            
+                            CKEDITOR.instances['info_comment4'].setReadOnly(true);
+                            CKEDITOR.instances['info_comment7'].setReadOnly(true);
+                            CKEDITOR.instances['info_comment8'].setReadOnly(true);
+                            CKEDITOR.instances['info_comment9'].setReadOnly(true);
+                            CKEDITOR.instances['info_comment10'].setReadOnly(true);
+                            $('.employee-sign-off').prop('disabled', true);
+                            $('#team_member_agreement').prop('disabled', true);
+      
+                            if(supervisor_signed == false) {
+                                $('#signoff-sup-id-input').html('<div id="emp-signoff-row"><div class="my-2">Enter your 6 digit employee ID to indicate you have read and accept the performance review:</div><input type="text" id="employee_id" class="form-control d-inline w-50"><button class="btn btn-primary btn-sign-off ml-2" type="button">Sign with my employee ID</button><br><span class="text-danger error" data-error-for="employee_id"></span></div>');                                
+                                $('#unsign-off-block').html('');
+                            } else {
+                                $('#unsignoff-sup-id-input').html('<input type="text" id="employee_id" class="form-control d-inline w-50"><button data-action="unsignoff" class="btn btn-primary btn-sign-off ml-2" type="button">Un-Sign</button><br><span class="text-danger error" data-error-for="employee_id"></span>');
+                                $('#sign-off-block').html('');
                             }
+                            
+                            $("input[name=check_one]").prop('disabled', true);
+                            $("input[name=check_two]").prop('disabled', true);
+                            
                         }
+                        
+
+                        $('#team_member_agreement').prop('checked', result.team_member_agreement ? true : false);
+                        $('#team_member_agreement_2').prop('checked', result.team_member_agreement ? true : false);
 
                         $("#employee-sign_off_form").find('input:radio[name="check_one"][value="'+result.empl_agree1+'"]').prop('checked', true);
                         $("#employee-sign_off_form").find('input:radio[name="check_two"][value="'+result.empl_agree2+'"]').prop('checked', true);
@@ -655,6 +1127,7 @@
                             $('#unsign-off-form').attr('action', $('#unsign-off-form').data('action-url').replace('xxx', conversation_id));
                         }
                         $('#questions-to-consider').html('');
+                        /*
                         if(result.topic.id == 4){
                             $('#comment_area6').hide();   
                             $('#info_to_capture').removeClass('d-none');
@@ -668,6 +1141,134 @@
                             $('#comment_area6').hide(); 
                             $('#info_to_capture').addClass('d-none');
                         }
+                        */
+                       $('#div-info-comment1').show();
+                       $('#div-info-comment2').show();
+                       $('#div-info-comment3').show();
+                       $('#div-info-comment4').show();
+                       $('#div-info-comment5').show();
+                       $('#div-info-comment6').show();
+                       $('#div-info-comment7').show();
+                       $('#div-info-comment8').show();
+                       $('#div-info-comment9').show();
+                       $('#div-info-comment10').show();
+                       $('#div-info-comment11').show();
+                       if(result.topic.id == 1){
+                           $('#div-info-comment9').hide();
+                           $('#div-info-comment10').hide();
+                           
+                           $('#div-info-comment11').hide();
+                           
+                           $('#tip-info-comment4').html('<b>Self Summary (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Consider accomplishments, areas for growth, changes to your goals, learning opportunities, etc."> </i>');
+                           $('#desc-info-comment4').html('Describe your performance since your last check-in and identify areas to focus on moving forward.');
+                           $('#tip-info-comment7').html('<b>Additional Comments (optional)</b>');
+                           $('#tip-info-comment8').html('<b>Action Items (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
+                           
+                           $('#tip-info-comment1').html('<b>Appreciation (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Provide an overview of the actions or results being celebrated. Be as specific as possible about timing, activities, and outcomes achieved. Highlight behaviours, competencies, and corporate values that you feel contributed to the success."> </i>');
+                           $('#desc-info-comment1').html('Highlight what has gone well.');
+                           $('#tip-info-comment2').html('<b>Coaching (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Provide specific examples of actions, outcomes or behaviours where there is opportunity for growth. Capture information on any additional assistance or training offered to support improvement."> </i>');
+                           $('#desc-info-comment2').html('Identify areas where things could be (even) better.');
+                           $('#tip-info-comment3').html('<b>Evaluation (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Be as specific as possible, use examples, and focus on observable behaviours and business results."> </i>');
+                           $('#desc-info-comment3').html('Provide an overall summary of performance.');
+                           $('#tip-info-comment5').html('<b>Additional Comments (optional)</b>');
+                           $('#tip-info-comment6').html('<b>Action Items (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
+                           $('#desc-info-comment6').html('Capture actions to take as a result of this conversation.');
+                           
+                           
+                       }else if(result.topic.id == 2){
+                           $('#div-info-comment8').hide();
+                           $('#div-info-comment9').hide();
+                           $('#div-info-comment10').hide();
+                           
+                           $('#div-info-comment3').hide();
+                           $('#div-info-comment5').hide();
+                           $('#div-info-comment6').hide();
+                           $('#div-info-comment11').hide();                           
+                           
+                           $('#tip-info-comment4').html('<b>Comments (optional)</b>');
+                           $('#tip-info-comment7').html('<b>Action Items (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
+                           $('#desc-info-comment7').html('Capture actions to take a result of this conversation.');
+                           
+                           $('#tip-info-comment1').html('<b>Comments (optional)</b>');
+                           $('#tip-info-comment2').html('<b>Action Items (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
+                           $('#desc-info-comment2').html('Capture actions to take a result of this conversation.');
+                            
+                       }else if(result.topic.id == 3){
+                           
+                           
+                           $('#div-info-comment6').hide();
+                           $('#div-info-comment11').hide();
+                           
+                           $('#tip-info-comment4').html('<b>Career Goal Statement (Optional)</b>');
+                           $('#desc-info-comment4').html('Your personal vision for the future of your career.');
+                           $('#tip-info-comment7').html('<b>Strengths (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate areas of strength to build on for career advancement."> </i>');
+                           $('#desc-info-comment7').html('Identity your top 1 to 3 strengths.');
+                           $('#tip-info-comment8').html('<b>Areas for Growth (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate areas for growth in the short to medium term to assist with career advancement."> </i>');
+                           $('#desc-info-comment8').html('Identity 1 to 3 areas you\'d most like to grow.');
+                           $('#tip-info-comment9').html('<b>Additional Comments (optional)</b>');
+                           $('#tip-info-comment10').html('<b>Action Items (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
+                           $('#desc-info-comment10').html('Caputre actions to take as a result of this conversation.');
+                           
+                           $('#tip-info-comment1').html('<b>Employee Strengths (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Comment on strengths identified by employee, note additonal areas of strength as required, and provide examples where appropriate."> </i>');
+                           $('#desc-info-comment1').html('Provide feedback on strength(s) identified by employee.');
+                           $('#tip-info-comment2').html('<b>Employee Growth (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Comment on areas for growth identified by employee, note additional areas of growth as required, and provide examples where appropriate."> </i>');
+                           $('#desc-info-comment2').html('Provide feedback on area(s) for growth identified by employee.');
+                           $('#tip-info-comment3').html('<b>Additional Comments (optional)</b>');
+                           $('#tip-info-comment5').html('<b>Aciton Items (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activites and areas for further discussion. Consider creating a goal in My Goals for yourself or the Goal Bank for your employee to track progress."> </i>');
+                           $('#desc-info-comment5').html('Capture actions to take as a result of this conversation.');
+                           
+                           
+                       }else if(result.topic.id == 4){
+                           $('#div-info-comment9').hide();
+                           $('#div-info-comment10').hide();
+                           
+                           $('#div-info-comment5').hide();
+                           $('#div-info-comment6').hide();
+                           
+                           $('#tip-info-comment4').html('<b>Self Summary (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Consider accomplishments, areas for improvement, support required to successd, etc."> </i>');
+                           $('#desc-info-comment4').html('Describe your performance since your last check-in and areas to focus on moving forward.');
+                           $('#tip-info-comment7').html('<b>Additional Comments (optional)</b>');
+                           $('#tip-info-comment8').html('<b>Action Items (optional) </b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
+                           $('#desc-info-comment8').html('Capture actions to take as a result of this conversation.');
+                           
+                           $('#tip-info-comment1').html('<b>Evaluation</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Be as specific as possible, use examples, and focus on observable behaviours and business results."> </i>');
+                           $('#desc-info-comment1').html('Provide an overall summary of performance.');
+                           $('#tip-info-comment2').html('<b>What must the employee accomplish? By when?</b>');
+                           $('#tip-info-comment3').html('<b>What support will the supervisor (and others) provide? By When?</b>');
+                           $('#tip-info-comment11').html('<b>When will a follow up meeting occur?</b>');
+                           
+                            
+                       }else if(result.topic.id == 5){
+                           $('#div-info-comment8').hide();
+                           $('#div-info-comment9').hide();
+                           $('#div-info-comment10').hide();
+                           
+                           $('#div-info-comment3').hide();
+                           $('#div-info-comment5').hide();
+                           $('#div-info-comment6').hide();
+                           $('#div-info-comment11').hide();
+                           
+                           $('#tip-info-comment4').html('<b>Comments (optional)</b>');
+                           $('#tip-info-comment7').html('<b>Action Items (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
+                           $('#desc-info-comment7').html('Capture actions to take a result of this conversation.');
+                           
+                           $('#tip-info-comment1').html('<b>Comments (optional)</b>');
+                           $('#tip-info-comment2').html('<b>Action Items (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
+                           $('#desc-info-comment2').html('Capture actions to take a result of this conversation.');
+                       }else{
+                            $('#div-info-comment1').hide();
+                            $('#div-info-comment2').hide();
+                            $('#div-info-comment3').hide();
+                            $('#div-info-comment4').hide();
+                            $('#div-info-comment5').hide();
+                            $('#div-info-comment6').hide();
+                            $('#div-info-comment7').hide();
+                            $('#div-info-comment8').hide();
+                            $('#div-info-comment9').hide();
+                            $('#div-info-comment10').hide();
+                            $('#div-info-comment11').hide();
+                       }
+                       
 
                         //Is Locked
                         /*
@@ -708,10 +1309,12 @@
                           // $('#questions-to-consider').append('<li>' + question + '</li>');
                           $('#questions-to-consider').append(question);
                         }); */
-                        $('#questions-to-consider').append(result.questions);
-
+                        $('#questions-to-consider').html(result.questions);
+                        $('#preparing-for-conversation').html(result.preparing_for_conversation);
+                      
                         // result.questions
                         $('#template-title').text(result.topic.name + ' Template');
+                        $('#template-header').text(result.topic.name);
                         // $('#conv_participant_edit').next(".select2-container").hide();
 
                         $('body').on('click', function (e) {
@@ -752,208 +1355,6 @@
                         });
                         $('#conv_participant').text(participants);
                         //originalData = result.info_comment1+result.info_comment2+result.info_comment3+result.info_comment4+result.info_comment5+'';
-                    
-                        if(!$('#info_comment1').attr("readonly")) {
-                            CKEDITOR.replace('info_comment1', {
-                                toolbar: "Custom",
-                                toolbar_Custom: [
-                                    ["Bold", "Italic", "Underline"],
-                                    ["NumberedList", "BulletedList"],
-                                    ["Outdent", "Indent"],
-                                    ["Link"],
-                                ],
-                                disableNativeSpellChecker: false
-                            });
-                        } else {
-                            CKEDITOR.replace('info_comment1', {
-                                toolbar: "Custom",
-                                toolbar_Custom: [
-                                    ["Bold", "Italic", "Underline"],
-                                    ["NumberedList", "BulletedList"],
-                                    ["Outdent", "Indent"],
-                                    ["Link"],
-                                ],
-                                disableNativeSpellChecker: false,
-                                readOnly: true
-                            });
-                        }
-                        
-                        
-                        if(!$('#info_comment2').attr("readonly")) {
-                            CKEDITOR.replace('info_comment2', {
-                                toolbar: "Custom",
-                                toolbar_Custom: [
-                                    ["Bold", "Italic", "Underline"],
-                                    ["NumberedList", "BulletedList"],
-                                    ["Outdent", "Indent"],
-                                    ["Link"],
-                                ],
-                                disableNativeSpellChecker: false
-                            });
-                        }else {
-                            CKEDITOR.replace('info_comment2', {
-                                toolbar: "Custom",
-                                toolbar_Custom: [
-                                    ["Bold", "Italic", "Underline"],
-                                    ["NumberedList", "BulletedList"],
-                                    ["Outdent", "Indent"],
-                                    ["Link"],
-                                ],
-                                disableNativeSpellChecker: false,
-                                readOnly: true
-                            });
-                        }
-                        
-                        
-                        
-                        if(!$('#info_comment3').attr("readonly")) {
-                            CKEDITOR.replace('info_comment3', {
-                                toolbar: "Custom",
-                                toolbar_Custom: [
-                                    ["Bold", "Italic", "Underline"],
-                                    ["NumberedList", "BulletedList"],
-                                    ["Outdent", "Indent"],
-                                    ["Link"],
-                                ],
-                                disableNativeSpellChecker: false
-                            });
-                        }else {
-                            CKEDITOR.replace('info_comment3', {
-                                toolbar: "Custom",
-                                toolbar_Custom: [
-                                    ["Bold", "Italic", "Underline"],
-                                    ["NumberedList", "BulletedList"],
-                                    ["Outdent", "Indent"],
-                                    ["Link"],
-                                ],
-                                disableNativeSpellChecker: false,
-                                readOnly: true
-                            });
-                        }
-                        
-                        if(!$('#info_comment4').attr("readonly")) {
-                            CKEDITOR.replace('info_comment4', {
-                                toolbar: "Custom",
-                                toolbar_Custom: [
-                                    ["Bold", "Italic", "Underline"],
-                                    ["NumberedList", "BulletedList"],
-                                    ["Outdent", "Indent"],
-                                    ["Link"],
-                                ],
-                                disableNativeSpellChecker: false
-                            });
-                        }else {
-                            CKEDITOR.replace('info_comment4', {
-                                toolbar: "Custom",
-                                toolbar_Custom: [
-                                    ["Bold", "Italic", "Underline"],
-                                    ["NumberedList", "BulletedList"],
-                                    ["Outdent", "Indent"],
-                                    ["Link"],
-                                ],
-                                disableNativeSpellChecker: false,
-                                readOnly: true
-                            });
-                        }
-                        
-                        
-                        if(!$('#info_comment5').attr("readonly")) {
-                            CKEDITOR.replace('info_comment5', {
-                                toolbar: "Custom",
-                                toolbar_Custom: [
-                                    ["Bold", "Italic", "Underline"],
-                                    ["NumberedList", "BulletedList"],
-                                    ["Outdent", "Indent"],
-                                    ["Link"],
-                                ],
-                                disableNativeSpellChecker: false
-                            });
-                        }else {
-                            CKEDITOR.replace('info_comment5', {
-                                toolbar: "Custom",
-                                toolbar_Custom: [
-                                    ["Bold", "Italic", "Underline"],
-                                    ["NumberedList", "BulletedList"],
-                                    ["Outdent", "Indent"],
-                                    ["Link"],
-                                ],
-                                disableNativeSpellChecker: false,
-                                readOnly: true
-                            });
-                        }
-                        
-                        if(!$('#info_comment6').attr("readonly")) {
-                            CKEDITOR.replace('info_comment6', {
-                                toolbar: "Custom",
-                                toolbar_Custom: [
-                                    ["Bold", "Italic", "Underline"],
-                                    ["NumberedList", "BulletedList"],
-                                    ["Outdent", "Indent"],
-                                    ["Link"],
-                                ],
-                                disableNativeSpellChecker: false
-                            });
-                        }else {
-                            CKEDITOR.replace('info_comment6', {
-                                toolbar: "Custom",
-                                toolbar_Custom: [
-                                    ["Bold", "Italic", "Underline"],
-                                    ["NumberedList", "BulletedList"],
-                                    ["Outdent", "Indent"],
-                                    ["Link"],
-                                ],
-                                disableNativeSpellChecker: false,
-                                readOnly: true
-                            });
-                        }
-                        
-                        if(!$('#info_comment1').attr("readonly")) {
-                            CKEDITOR.instances['info_comment1'].on('contentDom', function() {
-                                this.document.on('click', function(event){
-                                     $('button[data-id=info_comment1]').removeClass("d-none");
-                                 });
-                            });
-                        }
-                        
-                        if(!$('#info_comment2').attr("readonly")) {
-                            CKEDITOR.instances['info_comment2'].on('contentDom', function() {
-                                this.document.on('click', function(event){
-                                     $('button[data-id=info_comment2]').removeClass("d-none");
-                                 });
-                            });
-                        }
-                        
-                        if(!$('#info_comment3').attr("readonly")) {
-                            CKEDITOR.instances['info_comment3'].on('contentDom', function() {
-                                this.document.on('click', function(event){
-                                     $('button[data-id=info_comment3]').removeClass("d-none");
-                                 });
-                            });
-                        }
-                        
-                        if(!$('#info_comment4').attr("readonly")) {
-                            CKEDITOR.instances['info_comment4'].on('contentDom', function() {
-                                this.document.on('click', function(event){
-                                     $('button[data-id=info_comment4]').removeClass("d-none");
-                                 });
-                            });
-                        }
-                        
-                        if(!$('#info_comment5').attr("readonly")) {
-                            CKEDITOR.instances['info_comment5'].on('contentDom', function() {
-                                this.document.on('click', function(event){
-                                     $('button[data-id=info_comment5]').removeClass("d-none");
-                                 });
-                            });
-                        }
-                        
-                        if(!$('#info_comment6').attr("readonly")) {
-                            CKEDITOR.instances['info_comment6'].on('contentDom', function() {
-                                this.document.on('click', function(event){
-                                     $('button[data-id=info_comment6]').removeClass("d-none");
-                                 });
-                            });
-                        }
                     }
                     , error: function(error) {
                         var errors = error.responseJSON.errors;
@@ -977,6 +1378,16 @@
                 updateConversation(conversation_id);
                 $('#viewConversationModal').modal('show');
             });
+
+            
+             $('.panel-collapse').on('show.bs.collapse', function () {
+                $(this).siblings('.panel-heading').addClass('active');
+              });
+
+              $('.panel-collapse').on('hide.bs.collapse', function () {
+                $(this).siblings('.panel-heading').removeClass('active');
+              });
+            
         </script>
 @endisset        
         
