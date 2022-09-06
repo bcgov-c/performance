@@ -1161,7 +1161,21 @@
                 $('.modal-body').find('.error').html('');
                 $('.modal-body').find('input[type=radio]').prop('checked', false);
             });
-        
+            
+            function sessionWarning() {
+                saveComments();
+                alert('Your comments is autosaved.');
+            }            
+            
+            const minutes = 15;
+            const SessionTime = 1000 * 60 * minutes;
+            $(document).ready(function () {                
+                const myTimeout = setTimeout(sessionWarning, SessionTime);                
+            });
+            
+            function sessionWarningStop() {
+                clearTimeout(SessionTime);
+            }
         </script>
 
 @isset($open_modal_id)
