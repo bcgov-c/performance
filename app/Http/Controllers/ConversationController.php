@@ -305,6 +305,13 @@ class ConversationController extends Controller
         
         $conversation_id = $conversation->id;
         $conversation->disable_signoff = false;
+             
+        $conversation_topic_details = DB::table('conversation_topics')   
+                            ->select('conversation_topics.*')
+                            ->join('conversations','conversations.conversation_topic_id','=','conversation_topics.id')  
+                            ->where('conversations.id', $conversation_id)
+                            ->get(); 
+        $conversation->preparing_for_conversation = $conversation_topic_details[0]->preparing_for_conversation;
         
         if(!session()->has('view-profile-as')) {
             $current_user = auth()->user()->id;
@@ -368,8 +375,7 @@ class ConversationController extends Controller
         }
         $request->session()->put('view_as_supervisor', $view_as_supervisor);
         $conversation->view_as_supervisor = $view_as_supervisor;
-        //error_log($conversation->view_as_supervisor);
-
+        //error_log(print_r($conversation,true));
         return $conversation;
     }
 
@@ -421,7 +427,6 @@ class ConversationController extends Controller
     public function signOff(SignoffRequest $request, Conversation $conversation)
     {
         $view_as_supervisor = session()->get('view_as_supervisor');
-        
         $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
         $current_employee = DB::table('employee_demo')
                             ->select('employee_demo.employee_id')
@@ -429,8 +434,12 @@ class ConversationController extends Controller
                             ->where('users.id', $authId)
                             ->get();
         
-        if ($current_employee[0]->employee_id != $request->employee_id) {
-            return response()->json(['success' => false, 'Message' => 'Invalide Employee ID', 'data' => $conversation]);            
+        if (count($current_employee) > 0 ){
+            if ($current_employee[0]->employee_id != $request->employee_id) {
+                return response()->json(['success' => false, 'Message' => 'Invalide Employee ID', 'data' => $conversation]);            
+            }
+        } else {
+            return response()->json(['success' => false, 'Message' => 'Invalide Employee ID', 'data' => $conversation]);   
         }
   
         //if (!$conversation->is_with_supervisor) {
@@ -507,15 +516,17 @@ class ConversationController extends Controller
 
     public function unsignOff(UnSignoffRequest $request, Conversation $conversation)
     {
+        error_log('-------------------');
         $view_as_supervisor = session()->get('view_as_supervisor');
 
         $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
+        error_log(print_r($authId,true));
         $current_employee = DB::table('employee_demo')
                             ->select('employee_demo.employee_id')
                             ->join('users', 'employee_demo.guid', '=', 'users.guid')
                             ->where('users.id', $authId)
                             ->get();
-        
+        error_log(print_r($current_employee,true));
         if ($current_employee[0]->employee_id != $request->employee_id) {
             return response()->json(['success' => false, 'Message' => 'Invalide Employee ID', 'data' => $conversation]);            
         }
