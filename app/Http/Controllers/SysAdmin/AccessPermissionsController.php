@@ -274,12 +274,12 @@ class AccessPermissionsController extends Controller
                 ['reason' => $request->input('reason')  ]
             );
 
-            if($request->input('accessselect') == '4') {
-                $delete_result = DB::table('admin_orgs')
-                ->where('user_id', $newId->id)
-                // ->where('version', '!=', '1')
-                ->delete();
-            }
+            // if($request->input('accessselect') == '4') {
+            //     $delete_result = DB::table('admin_orgs')
+            //     ->where('user_id', $newId->id)
+            //     // ->where('version', '!=', '1')
+            //     ->delete();
+            // }
 
             if($request->input('accessselect') == '3') {
                 foreach($organizationList as $org1) {
