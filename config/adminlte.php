@@ -384,6 +384,11 @@ return [
                     'url'  => 'sysadmin/system-security/access-logs',
                     'active' => ['sysadmin/system-security/*']
                 ],
+                [
+                    'text' => 'Welcome Message',
+                    'url'  => 'sysadmin/messageeditor/index',
+                    'active' => ['sysadmin/messageeditor/*']
+                ],
             ],
         ],
         [
