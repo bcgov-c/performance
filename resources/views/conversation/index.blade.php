@@ -290,7 +290,7 @@
                 disableNativeSpellChecker: false
             });
             
-            
+            modal_open = false;
         </script>    
         
         <script>
@@ -763,6 +763,7 @@
                 $.ajax({
                     url: '/conversation/' + conversation_id
                     , success: function(result) {
+                        modal_open = true;
                         isSupervisor = result.view_as_supervisor;
                         topic_id = result.topic.id;
                         disable_signoff = result.disable_signoff;
@@ -1231,8 +1232,10 @@
             });
             
             function sessionWarning() {
-                saveComments();
-                alert('Your comments is autosaved.');
+                if (modal_open == true) {
+                    saveComments();
+                    alert('Your comments is autosaved.');
+                }
             }            
             
             const minutes = 15;
