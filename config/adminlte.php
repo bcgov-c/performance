@@ -386,7 +386,7 @@ return [
                 ],
                 [
                     'text' => 'Welcome Message',
-                    'url'  => 'sysadmin/messageeditor/index',
+                    'url'  => 'sysadmin/messageeditor',
                     'active' => ['sysadmin/messageeditor/*']
                 ],
             ],

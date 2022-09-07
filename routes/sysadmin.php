@@ -237,7 +237,7 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::post('/sysadmin/accesspermissions/accessupdate/{id}', [AccessPermissionsController::class, 'manageUpdate']);
     });
 
-    //Welcome Message
+    //Welcome Message Editor
     Route::group(['middleware' => ['auth']], function() {    
         Route::get('/sysadmin/messageeditor', [MessageEditorController::class, 'index'])->name('sysadmin.messageeditor');
         Route::get('/sysadmin/messageeditor/index', [MessageEditorController::class, 'index'])->name('sysadmin.messageeditor.index');

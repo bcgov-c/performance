@@ -31,7 +31,6 @@ class MessageEditorController extends Controller
     public function update(Request $request) 
     {
         $result = DashboardMessage::where('id', '=', 1)->update([
-            // 'title' => $request->title,
             'message' => $request->message,
             'status' => $request->status ? 1 : 0
         ]);
