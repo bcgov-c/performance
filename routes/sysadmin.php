@@ -14,6 +14,7 @@ use App\Http\Controllers\SysAdmin\AccessPermissionsController;
 use App\Http\Controllers\SysAdmin\UnlockConversationController;
 use App\Http\Controllers\SysAdmin\AccessOrganizationsController;
 use App\Http\Controllers\SysAdmin\SysadminStatisticsReportController;
+use App\Http\Controllers\SysAdmin\MessageEditorController;
 
 
 Route::group(['middleware' => ['role:Sys Admin']], function () 
@@ -239,6 +240,13 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/accesspermissions/manageexistingaccessadmin/{user_id}', [AccessPermissionsController::class, 'getAdminOrgs'])->name('sysadmin.accesspermissions.manageexistingaccessadmin');
         Route::get('/sysadmin/accesspermissions/accessedit/{id}', [AccessPermissionsController::class, 'manageEdit'])->name('sysadmin.accesspermissions.accessedit');
         Route::post('/sysadmin/accesspermissions/accessupdate/{id}', [AccessPermissionsController::class, 'manageUpdate']);
+    });
+
+    //Welcome Message
+    Route::group(['middleware' => ['auth']], function() {    
+        Route::get('/sysadmin/messageeditor', [MessageEditorController::class, 'index'])->name('sysadmin.messageeditor');
+        Route::get('/sysadmin/messageeditor/index', [MessageEditorController::class, 'index'])->name('sysadmin.messageeditor.index');
+        Route::post('/sysadmin/messageeditor/update', [MessageEditorController::class, 'update'])->name('sysadmin.messageeditor.update');
     });
 
     // Route::get('/sysadmin/org-organizations', [SysadminController::class,'getOrganizations']);
