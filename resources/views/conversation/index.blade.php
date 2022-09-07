@@ -589,6 +589,7 @@
                     if (modal_edit ==  true){
                         if (isContentModified() && confirm("Your comments will be saved when you close the window.")) {
                             //e.preventDefault();
+                            modal_open = false;
                             saveComments();
                         }
                     }
