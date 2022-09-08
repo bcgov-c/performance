@@ -419,7 +419,10 @@ class GoalController extends Controller
 
     public function goalBank(Request $request) {
         $tags = Tag::all()->toArray();
-        $tags_input = $request->tag_ids;     
+        $tags_input = $request->tag_ids;   
+        
+        $authId = Auth::id();
+        $user = User::find($authId);
 
         $adminGoals = Goal::withoutGlobalScopes()
         ->join('goal_bank_orgs', 'goals.id', '=', 'goal_bank_orgs.goal_id')
@@ -599,7 +602,7 @@ class GoalController extends Controller
         // this is redirect from DashboardController with the related id, then open modal box
         $open_modal_id = (session('open_modal_id'));
 
-        return view('goal.bank', array_merge(compact('bankGoals', 'tags', 'tagsList', 'goalTypes', 'type_desc_str', 'mandatoryOrSuggested', 'createdBy', 'goals_count', 'sortby','sortorder',
+        return view('goal.bank', array_merge(compact('bankGoals', 'tags', 'user', 'tagsList', 'goalTypes', 'type_desc_str', 'mandatoryOrSuggested', 'createdBy', 'goals_count', 'sortby','sortorder',
                                 'open_modal_id'), $suggestedGoalsData));
     }
 
@@ -658,6 +661,9 @@ class GoalController extends Controller
 
     public function library(Request $request)
     {
+        $authId = Auth::id();
+        $user = User::find($authId);
+        
         $query = Goal::whereIn('id', [997, 998, 999]);
         $expanded = false;
         $currentSearch = "";
