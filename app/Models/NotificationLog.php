@@ -49,6 +49,13 @@ class NotificationLog extends Model
 
     }
 
+    public function notify_user() {
+
+        return $this->belongsTo('App\Models\User','notify_user_id','id')->select('name', 'id', 'email');        
+
+    }
+
+
     public function sender() {
 
         return $this->belongsTo('App\Models\User')->select('name', 'id', 'email');        

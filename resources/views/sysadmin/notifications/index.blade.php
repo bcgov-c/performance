@@ -51,7 +51,7 @@
 				<div class="col-md-2 mb-2">
 				<label for="alert_format">Alert Format</label>
 				<select  class="form-control @error('alert_format') is-invalid @enderror" id="alert_format" name="alert_format">
-					<option value="">Select Alert Format</option>
+					<option value="">All </option>
 					@foreach ($alert_format_list as $key => $value)
 					  <option value="{{ $key }}" {{ old('alert_format') == $value ?? 'selected'}}>{{ $value }}</option>
 					@endforeach
@@ -79,7 +79,7 @@
 					<th>Recipients</th>
 					<th>Alert Type</th>
 					<th>Alert Format</th>
-					<th>Description</th>
+					<th>Action</th>
 				</tr>
 			</thead>
 		</table>
@@ -133,25 +133,25 @@
         },
         columns: [
             {data: 'id', name: 'id'},
-			{data: 'date_sent', name: 'date_sent'},
-            {data: 'subject', name: 'subject' },
+			{data: 'date_sent', name: 'date_sent', className: 'dt-nowrap'},
+            {data: 'subject', name: 'subject', className: 'dt-nowrap'},
             {data: 'recipients', name: 'recipients'},
             {data: 'alert_type_name', name: 'alert_type_name'},
             {data: 'alert_format_name', name: 'alert_format_name'},
             {data: 'action', name: 'action', orderable: false, searchable: false}
         ],
 		columnDefs: [
-                {
-                    render: function (data, type, full, meta) {
-                        console.log(data);
-                        array_tos = data.split(";");
-                        if (array_tos.length > 5) {
-                            text = '( ' + array_tos.length + ' recipients )';
-                        } else { text = data; }
-                        return '<span>' + text + "</span>";
-                    },
-                    targets: 2
-                },
+                // {
+                //     render: function (data, type, full, meta) {
+                //         console.log(data);
+                //         array_tos = data.split(";");
+                //         if (array_tos.length > 5) {
+                //             text = '( ' + array_tos.length + ' recipients )';
+                //         } else { text = data; }
+                //         return '<span>' + text + "</span>";
+                //     },
+                //     targets: 3
+                // },
 
                 {
                     render: function (data, type, full, meta) {
