@@ -11,7 +11,6 @@ use App\Models\NotificationLog;
 use App\Models\OrganizationTree;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -35,28 +34,15 @@ class NotificationController extends Controller
                     $query->whereBetween('date_sent', [$date_sent_from, $date_sent_to] );
                 })
                 ->when($recipients, function ($query) use($recipients) { 
-                    if (App::environment(['production'])) {
-                        $query->whereHas('recipients.recipient', function ($query) use($recipients) { 
-                            $query->whereRaw("lower(name) like  '%". strtolower($recipients) . "%'"); 
-                        });        
-                    } else {
-                        $query->where(function ($q) use($recipients) {
-                            $q->whereRaw("lower(description) like  '%". strtolower($recipients) . "%'") 
-                              ->orWhereExists(function ($q2) use($recipients) {
-                                    $q2->select(DB::raw(1))
-                                        ->from('users')
-                                        ->whereColumn('notification_logs.notify_user_id', 'users.id')
-                                        ->whereRaw("lower(users.name) like '%". strtolower($recipients) . "%'"); 
-                            });
-                        });
-                    }
+                    $query->whereHas('recipients.recipient', function ($query) use($recipients) { 
+                        $query->whereRaw("lower(name) like  '%". strtolower($recipients) . "%'"); 
+                    });        
                 })
                 ->when($alert_format, function ($query) use($alert_format) {
                         $query->where('alert_format', $alert_format);
                 })
-                ->select(['id', 'subject', 'recipients', 'alert_type', 'alert_format', 'notify_user_id', 'description','date_sent','created_at'])
-                ->with(['recipients'])
-                ->with(['notify_user']);
+                ->select(['id', 'subject', 'recipients', 'alert_type', 'alert_format', 'description','date_sent','created_at'])
+                ->with(['recipients']);
 
 
             return Datatables::of($notifications)
@@ -67,26 +53,13 @@ class NotificationController extends Controller
                      return $notification->alert_format_name(); 
                 })
                 ->addColumn('recipients', function ($notification) {
-                    if ($notification->notify_user_id) {
-                        return $notification->notify_user->name;
-                    }
-
                     $userIds = $notification->recipients()->pluck('recipient_id')->toArray();
                     $users = User::whereIn('id', $userIds)->pluck('name');
-
-                    if ($users->count() > 1) 
-                       return $users->count() . ' recipients';
-                    else if ($users->count() == 1) 
-                       return $users[0];
-                    else 
-                        return '';
+                     return implode('; ', $users->toArray() );
                 })
                 ->addColumn('action', function ($notification) {
-                    if ($notification->alert_format == 'E') {
-                        return '<a href="#" class="notification-modal btn btn-xs btn-primary" value="'. $notification->id .'"><i class="glyphicon glyphicon-envelope"></i>View</a>';
-                    } else {
-                        return '';
-                    }
+
+                    return '<a href="#" class="notification-modal btn btn-xs btn-primary" value="'. $notification->id .'"><i class="glyphicon glyphicon-envelope"></i>View</a>';
                 })
                 //->removeColumn('password')
                 ->make(true);
