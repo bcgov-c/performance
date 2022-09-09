@@ -106,9 +106,11 @@
                             </table>
                         </div>
                     </div>
+                    @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
                     <div class="text-center">
                         <x-button id="addMultipleGoalButton" disabled>Add Selected Goals to Your Profile <span class="selected_count">(0)</span></x-button>
                     </div>
+                    @endif
                 </div>
             </div>
         </form>
