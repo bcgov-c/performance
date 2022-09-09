@@ -858,7 +858,7 @@ class GoalController extends Controller
                         $sendMail->saveToLog = true;
                         $sendMail->alert_type = 'N';
                         $sendMail->alert_format = 'E';
-                        $sendMail->template = 'SUPERVISOR_COMMENT_MY_GOAL';
+                        $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
 
                         array_push($sendMail->bindvariables, $goal->user->name);    // %1 Recipient of the email
                         array_push($sendMail->bindvariables,  $user->name );        // %2 Person who added the comment
@@ -893,7 +893,7 @@ class GoalController extends Controller
                         $sendMail->saveToLog = true;
                         $sendMail->alert_type = 'N';
                         $sendMail->alert_format = 'E';
-                        $sendMail->template = 'SUPERVISOR_COMMENT_MY_GOAL';
+                        $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
 
                         array_push($sendMail->bindvariables, $goal->user->name);
                         array_push($sendMail->bindvariables,  $user->reportingManager->name );    // %2 Person who added the comment
