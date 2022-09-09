@@ -58,7 +58,7 @@ class GenericTemplateSeeder extends Seeder
       'instructional_text' => 'N/A',
       'sender' => '2',
       'subject' => 'PDP - A New Goal Has Been Added to Your Goal Bank',
-      'body' => "<p>Hello %1,</p><p>%2 has added a %4 goal to your goal bank. The goal is called: %3.</p><p>Please log in to www.performance.gov.bc.ca to view more details and add the goal to your profile as needed.</p><p>Thanks!</p>",
+      'body' => "<p>Hello %1,</p><p>%2 has added a %4 goal to your goal bank. The goal is called: %3.</p><p>Please log in to https://performance.gov.bc.ca to view more details and add the goal to your profile as needed.</p><p>Thanks!</p>",
     ]);
 
     $template->binds()->delete();
@@ -91,11 +91,11 @@ class GenericTemplateSeeder extends Seeder
     $template = GenericTemplate::updateOrCreate([
       'template' => 'SUPERVISOR_COMMENT_MY_GOAL',
     ], [
-      'description' =>  'Send out email notification when supervisor adds a comment to employee\'s goal',
+      'description' =>  '** Not in Use **',
       'instructional_text' => 'You can add parameters',
       'sender' => '2',
       'subject' => 'PDP - %2 Added a Comment on One of Your Goals',
-      'body' => "<p>Hello %1,</p><p>%2 added a comment on one of your goals in the Performance Development Platform.</p><p>Goal title: %3</p><p>Comment added:<br>%4</p><p>Log in to performance.gov.bc.ca to view and respond if required.</p><p>Thanks!</p>",
+      'body' => "<p>Hello %1,</p><p>%2 added a comment on one of your goals in the Performance Development Platform.</p><p>Goal title: %3</p><p>Comment added:<br />%4</p><p>Log in to https://performance.gov.bc.ca for details.</p><p>Thanks!</p>",
     ]);
 
     $template->binds()->delete();
@@ -131,7 +131,7 @@ class GenericTemplateSeeder extends Seeder
       'instructional_text' => 'You can add parameters',
       'sender' => '2',
       'subject' => 'PDP - %2 Added a Comment on One of Your Goals',
-      'body' => "<p>Hello %1,</p><p>%2 added a comment on one of your goals in the Performance Development Platform.</p><p>Goal title: %3</p><p>Comment added:<br>%4</p><p>Log in to performance.gov.bc.ca to view and respond if required.</p><p>Thanks!</p>",
+      'body' => "<p>Hello %1,</p><p>%2 added a comment on one of your goals in the Performance Development Platform.</p><p>Goal title: %3</p><p>Comment added:<br />%4</p><p>Log in to performance.gov.bc.ca to view the details.</p><p>Thanks!</p>",
     ]);
 
     $template->binds()->delete();
@@ -169,7 +169,7 @@ class GenericTemplateSeeder extends Seeder
       'instructional_text' => 'You can add parameters',
       'sender' => '2',
       'subject' => 'PDP - %2 Would Like to Have a %3 Conversation With You',
-      'body' => "<p>Hi %1,</p><p>%2 would like to have a %3 conversation with you in the Performance Development Platform. Please work with %2 to schedule a time in your Outlook calendar.</p><p>The deadline to complete your next performance conversation is %4.</p><p>Thank you!</p><p>www.performance.gov.bc.ca</p><p><br></p>",
+      'body' => "<p>Hi %1,</p><p>%2 would like to have a %3 conversation with you in the Performance Development Platform. Please work with %2 to schedule a time in your Outlook calendar.</p><p>The deadline to complete your next performance conversation is %4.</p><p>Thank you!</p><p>https://www.performance.gov.bc.ca</p><p>&nbsp;</p>",
     ]);
 
     $template->binds()->delete();
@@ -201,11 +201,11 @@ class GenericTemplateSeeder extends Seeder
     $template = GenericTemplate::updateOrCreate([
       'template' => 'WEEKLY_OVERDUE_SUMMARY',
     ], [
-      'description' =>  'Send out email notification to HR Administrator with a list of employees who are overdue for a conversation',
+      'description' =>  ' Send out email notification to HR Administrator with a list of employees who are overdue for a conversation',
       'instructional_text' => 'You can add parameters',
       'sender' => '2',
       'subject' => 'PDP - Past Due Performance Conversations',
-      'body' => "<p>Hello %1,</p><p>The following employees are overdue for a conversation in the Performance Development Platform:</p><p>%2</p><p><br></p>",
+      'body' => "<p>Hello %1,</p><p>The following employees are overdue for a conversation in the Performance Development Platform:</p><p>%2</p><p>&nbsp;</p>",
     ]);
 
     $template->binds()->delete();
@@ -227,11 +227,11 @@ class GenericTemplateSeeder extends Seeder
     $template = GenericTemplate::updateOrCreate([
       'template' => 'CONVERSATION_DISAGREED',
     ],[
-      'description' =>  'Send out an email notification when a conversation has been disagreed',
-      'instructional_text' => 'N/A',
+      'description' =>  'Send out an email notification when someone selects "disagree" on a performance conversation',
+      'instructional_text' => 'You can add parameters',
       'sender' => '2',
-      'subject' => 'PDP - %2 disagree on your %3 Conversation',
-      'body' => "<p>Hello %1,</p><p>%2 just disagreed on your %3 conversation. Please visit www.performance.gov.bc.ca to view the details.</p><p>Thank you!</p>",
+      'subject' => 'PDP - %2 Has Selected "Disagree" on Your %3 Conversation',
+      'body' => "<p>Hello %1,</p><p>%2 just selected &quot;disagree&quot; on your %3 conversation. Please visit https://performance.gov.bc.ca to view the details.</p><p>Thank you!</p>",
     ]);
 
     $template->binds()->delete();
@@ -262,8 +262,8 @@ class GenericTemplateSeeder extends Seeder
       'description' =>  'Send out email notification when conversation is overdue',
       'instructional_text' => 'N/A',
       'sender' => '2',
-      'subject' => 'OVERDUE - your next performance conversation is past due',
-      'body' => "<p>Hello %1,</p>",
+      'subject' => 'PDP - Your Performance Conversation is Past Due',
+      'body' => "<p>Hello %1,</p><p>Your next performance conversation was due on %2. Please work with your supervisor to schedule and complete this conversation as soon as possible.</p><p>Thank you!</p><p>https://www.performance.gov.bc.ca</p>",
     ]);
 
     $template->binds()->delete();
@@ -272,7 +272,12 @@ class GenericTemplateSeeder extends Seeder
       'seqno' => 0,
       'bind' => '%1', 
       'description' => 'Recipient of the email',
-    ]);        
+    ]);    
+    $template->binds()->create([
+      'seqno' => 1,
+      'bind' => '%2', 
+      'description' => 'Next conversation due date',
+    ]);     
 
     //
     // 9. CONVERSATION_REMINDER
@@ -283,8 +288,8 @@ class GenericTemplateSeeder extends Seeder
       'description' =>  'Send out email notification when conversation will be due in 1 week or 1 month',
       'instructional_text' => 'N/A',
       'sender' => '2',
-      'subject' => 'REMINDER - your next performance conversation is due in %2',
-      'body' => "<p>Hello %1,</p><p>Your conversation is due in %2</p>",
+      'subject' => 'PDP - Your Next Performance Conversation is Due by %2',
+      'body' => "<p>Hello %1,</p><p>A reminder that your next conversation in the Performance Development Platform is due by %2. Please work with your supervisor to schedule this conversation at your earliest convenience.</p><p>Thank you!</p><p>https://www.performance.gov.bc.ca</p>",
     ]);
 
     $template->binds()->delete();
@@ -297,7 +302,7 @@ class GenericTemplateSeeder extends Seeder
     $template->binds()->create([
       'seqno' => 1,
       'bind' => '%2', 
-      'description' => 'Due in 1 month or 1 week',
+      'description' => 'Next conversation due date',
     ]);   
     
     //
@@ -306,11 +311,11 @@ class GenericTemplateSeeder extends Seeder
     $template = GenericTemplate::updateOrCreate([
       'template' => 'PROFILE_SHARED',
     ],[
-      'description' =>  'Your profile was shared',
+      'description' =>  'Send out email notification when your profile was shared',
       'instructional_text' => 'N/A',
       'sender' => '2',
-      'subject' => 'PDP - Your Goal Profile was shared',
-      'body' => "<p>Hello %1,</p><p>Your profile shared with %2. Share element: %3.</p><p>Please log in to www.performance.gov.bc.ca to view more details and add the goal to your profile as needed.</p><p>Thanks!</p>",
+      'subject' => 'PDP - Your Profile Has Been Shared with %2',
+      'body' => "<p>Hello %1,</p><p>Your Performance Development Platform profile has been shared with %2.</p><p>Element(s) that have been shared: %3.</p><p>Thank you!</p><p>https://www.performance.gov.bc.ca</p>",
     ]);
 
     $template->binds()->delete();
@@ -323,7 +328,7 @@ class GenericTemplateSeeder extends Seeder
     $template->binds()->create([
       'seqno' => 1,
       'bind' => '%2', 
-      'description' => 'Person who see with your profile',
+      'description' => 'Delegated supervisor',
     ]); 
     $template->binds()->create([
       'seqno' => 2,
