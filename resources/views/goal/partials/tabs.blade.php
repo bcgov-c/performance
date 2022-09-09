@@ -17,7 +17,7 @@
           @endif
         </x-button>
     </div>
-    <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'goal.past' ? 'border-primary' : ''}}">
+    <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'goal.library' ? 'border-primary' : ''}}">
         <x-button role="tab" :href="route('goal.library')" style="">
           @if ((session()->get('original-auth-id') != Auth::id() && session()->get('original-auth-id') != null ))
               {{ $user->name }}'s Goal Bank

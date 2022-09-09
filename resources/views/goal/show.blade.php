@@ -19,7 +19,7 @@
                             <div class="px-3 pb-3">
                                 {{ $goal->user->name}}
                                 <span class="float-right">
-                                    @if ($goal->user_id === Auth::id())
+                                    @if ($goal->user_id === Auth::id() && (session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
                                     @include("goal.partials.status-change")
                                     @else
                                     <x-goal-status :status="$goal->status"></x-goal-status>

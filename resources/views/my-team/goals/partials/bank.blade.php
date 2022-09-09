@@ -1,9 +1,11 @@
 <p>
 Create a goal for your employees to use in their own profile. Goals can be suggested (for example, a learning goal to help increase team skill or capacity in a relevant area) or mandatory (for example, a work goal detailing a new priority that all employees are responsible for). Employees will be notified when a new goal has been added to their Goal Bank.
 </p>
+@if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
 <x-button id="add-goal-to-library-btn" class="my-2">
     Add Goal to Bank
 </x-button>
+@endif
 <div class="row">
     @foreach ($suggestedGoals as $goal)
     <div class="col-12 col-lg-6 col-xl-4">

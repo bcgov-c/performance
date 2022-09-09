@@ -2,11 +2,13 @@
     <h3>
         {{$goal->title}}
         @if ($showAddBtn ?? false)
+        @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
         <div class="float-right">
             <x-button type="button" class="float-right" icon="plus-circle" id="addBankGoalToUserBtn" data-id="{{$goal->id}}">
                 Add goal
             </x-button>
         </div>
+        @endif
         @endif
     </h3>
     @if (!($showAddBtn ?? false))
