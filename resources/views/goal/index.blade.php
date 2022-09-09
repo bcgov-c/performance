@@ -306,6 +306,8 @@
     });
 
     $(document).on('click', '.btn-submit', function(e){
+        $('.btn-submit').prop('disabled',true);
+        $('.btn-submit').html('<span class="spinner-border spinner-border-sm" role="status"></span>');
         e.preventDefault();
         for (var i in CKEDITOR.instances){
             CKEDITOR.instances[i].updateElement();
