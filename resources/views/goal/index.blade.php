@@ -323,6 +323,8 @@
                 }
             },
             error: function (error){
+                $('.btn-submit').prop('disabled',false);
+                $('.btn-submit').html('Save Changes');
                 $('.alert-danger').show();
                 $('.modal-body').animate({scrollTop: 0},100);
                 var errors = error.responseJSON.errors;
