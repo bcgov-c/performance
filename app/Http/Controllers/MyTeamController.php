@@ -196,12 +196,20 @@ class MyTeamController extends Controller
 
         foreach ($sharedProfile as $result) {
             // Dashboard message added when an shared employee's profile (goals, conversations, or both)
-            DashboardNotification::create([
-                'user_id' => $result->shared_id,
-                'notification_type' => 'SP',         
-                'comment' => 'Your profile has been shared with ' . $result->sharedWith->name,
-                'related_id' => $result->id,
-            ]);
+            // DashboardNotification::create([
+            //     'user_id' => $result->shared_id,
+            //     'notification_type' => 'SP',         
+            //     'comment' => 'Your profile has been shared with ' . $result->sharedWith->name,
+            //     'related_id' => $result->id,
+            // ]);
+            // Use Class to create DashboardNotification
+			$notification = new \App\MicrosoftGraph\SendDashboardNotification();
+			$notification->user_id = $result->shared_id;
+			$notification->notification_type = 'SP';
+			$notification->comment = 'Your profile has been shared with ' . $result->sharedWith->name;
+			$notification->related_id =  $result->id;
+            $notification->notify_user_id = $result->shared_id;
+			$notification->send(); 
         }
 
         // Send out email to the user when his profile was shared
@@ -400,12 +408,20 @@ class MyTeamController extends Controller
 
         // create Dashboard Notification displayed on Home page
         foreach ($request->itemsToShare as $user_id) {
-            DashboardNotification::create([
-                'user_id' => $user_id,
-                'notification_type' => 'GB',        // Goal Bank
-                'comment' => $goal->user->name . ' added a new goal to your goal bank.',
-                'related_id' => $goal->id,
-            ]);
+            // DashboardNotification::create([
+            //     'user_id' => $user_id,
+            //     'notification_type' => 'GB',        // Goal Bank
+            //     'comment' => $goal->user->name . ' added a new goal to your goal bank.',
+            //     'related_id' => $goal->id,
+            // ]);
+            // Use Class to create DashboardNotification
+			$notification = new \App\MicrosoftGraph\SendDashboardNotification();
+			$notification->user_id =  $user_id;
+			$notification->notification_type = 'GB';
+			$notification->comment = $goal->user->name . ' added a new goal to your goal bank.';
+			$notification->related_id = $goal->id;
+            $notification->notify_user_id = $user_id;
+			$notification->send(); 
         }
 
         // Send out email to the user when the Goal Bank added

@@ -1795,12 +1795,21 @@ class GoalBankController extends Controller
 
         // Add dasboard message to each participant_id
         foreach ($notify_users_ids as $key => $value) {
-            DashboardNotification::create([
-                    'user_id' => $value,
-                    'notification_type' => 'GB',        // Goal Bank
-                    'comment' => $goalBank->user->name . ' added a new goal to your goal bank.',
-                    'related_id' => $goalBank->id,
-            ]);
+            // DashboardNotification::create([
+            //         'user_id' => $value,
+            //         'notification_type' => 'GB',        // Goal Bank
+            //         'comment' => $goalBank->user->name . ' added a new goal to your goal bank.',
+            //         'related_id' => $goalBank->id,
+            // ]);
+            // Use Class to create DashboardNotification
+			$notification = new \App\MicrosoftGraph\SendDashboardNotification();
+			$notification->user_id = $value;
+			$notification->notification_type = 'GB';
+			$notification->comment = $goalBank->user->name . ' added a new goal to your goal bank.';
+			$notification->related_id = $goalBank->id;
+			$notification->notify_user_id =  $value;
+			$notification->send(); 
+            
         }
     
     }

@@ -259,12 +259,19 @@ class ConversationController extends Controller
 
         // create a message on the participant's dasboard under home page
         foreach ($request->participant_id as $key => $value) {
-            DashboardNotification::create([
-                'user_id' => $value,
-                'notification_type' => 'CA',        // Conversation Added
-                'comment' => $conversation->user->name . ' would like to schedule a performance conversation with you.',
-                'related_id' => $conversation->id,
-            ]);
+            // DashboardNotification::create([
+            //     'user_id' => $value,
+            //     'notification_type' => 'CA',        // Conversation Added
+            //     'comment' => $conversation->user->name . ' would like to schedule a performance conversation with you.',
+            //     'related_id' => $conversation->id,
+            // ]);
+            $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+			$notification->user_id = $value;
+			$notification->notification_type = 'CA';
+			$notification->comment = $conversation->user->name . ' would like to schedule a performance conversation with you.';
+			$notification->related_id = $conversation->id;
+            $notification->notify_user_id = $value;
+			$notification->send(); 
 
 
             // Send Out email when the conversation added
@@ -476,12 +483,20 @@ class ConversationController extends Controller
             if ($request->team_member_agreement) {
                 $signoff_user = User::where('id', $authId)->first();
                     if ($signoff_user && $signoff_user->reporting_to ) {
-                        DashboardNotification::create([
-                        'user_id' => $signoff_user->reporting_to,
-                        'notification_type' => 'CS',        // Conversation signoff 
-                        'comment' => $signoff_user->name . ' has selected the "disagree" option on a performance conversation with you.',
-                        'related_id' => $conversation->id,
-                    ]);
+                    //     DashboardNotification::create([
+                    //     'user_id' => $signoff_user->reporting_to,
+                    //     'notification_type' => 'CS',        // Conversation signoff 
+                    //     'comment' => $signoff_user->name . ' has selected the "disagree" option on a performance conversation with you.',
+                    //     'related_id' => $conversation->id,
+                    // ]);
+                    // Use Class to create DashboardNotification
+                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                    $notification->user_id = $signoff_user->reporting_to;
+                    $notification->notification_type = 'CS';
+                    $notification->comment = $signoff_user->name . ' has selected the "disagree" option on a performance conversation with you.';
+                    $notification->related_id = $conversation->id;
+                    $notification->notify_user_id =  $signoff_user->reporting_to;
+                    $notification->send(); 
 
 
                      // Send a email notification to the participants when someone sign the conversation
@@ -522,12 +537,20 @@ class ConversationController extends Controller
 
         // create a message on the dasboard under home page when signoff 
         foreach ($to_ids as $key => $value) {
-            DashboardNotification::create([
-                'user_id' => $value,
-                'notification_type' => 'CS',        // Conversation signoff 
-                'comment' => $current_user->name . ' signed your performance conversation.',
-                'related_id' => $conversation->id,
-            ]);
+            // DashboardNotification::create([
+            //     'user_id' => $value,
+            //     'notification_type' => 'CS',        // Conversation signoff 
+            //     'comment' => $current_user->name . ' signed your performance conversation.',
+            //     'related_id' => $conversation->id,
+            // ]);
+            // Use Class to create DashboardNotification
+			$notification = new \App\MicrosoftGraph\SendDashboardNotification();
+			$notification->user_id = $value;
+			$notification->notification_type = 'CS';
+			$notification->comment = $current_user->name . ' signed your performance conversation.';
+			$notification->related_id = $conversation->id;
+            $notification->notify_user_id = $value;
+			$notification->send(); 
 
 
             // Send a email notification to the participants when someone sign the conversation
