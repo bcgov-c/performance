@@ -49,8 +49,10 @@ class DashboardController extends Controller
                 ->addColumn('item_detail', function ($notification) {
 
                     $text = '<span ';
-                    $text .= ($notification->status == 'R' ? '' : 'class="font-weight-bold"');
-                    $text .= '>'.$notification->comment.'</span><br/>';
+                    $text .= ($notification->status == 'R' ? '' : 'class="font-weight-bold"');                    
+                    $text .= '>'.$notification->comment.'</span>';
+                    $text .= $notification->status == 'R' ? '' : '<span class="badge badge-pill badge-primary ml-2">New</span>' ;
+                    $text .= '<br/>';
                     // $text .= '<span>sjskaj |  sadasdad  |dkajsdkjkjadskjdkja</span>';
 
                     switch($notification->notification_type) {
