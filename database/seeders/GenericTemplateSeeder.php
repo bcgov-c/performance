@@ -306,7 +306,7 @@ class GenericTemplateSeeder extends Seeder
     ]);   
     
     //
-    // 9. PROFILE_SHARED
+    // 10. PROFILE_SHARED
     //
     $template = GenericTemplate::updateOrCreate([
       'template' => 'PROFILE_SHARED',
@@ -341,6 +341,70 @@ class GenericTemplateSeeder extends Seeder
       'description' => 'Comment',
     ]); 
 
+
+    //
+    // 11. SUPV_CONV_REMINDER
+    //
+    $template = GenericTemplate::updateOrCreate([
+      'template' => 'SUPV_CONV_REMINDER',
+    ],[
+      'description' =>  'Send out an email notification to the supervisor when one of their employee\'s has an upcoming conversation deadline',
+      'instructional_text' => 'N/A',
+      'sender' => '2',
+      'subject' => 'PDP - %2\'s Next Conversation Due Date is %3',
+      'body' => "<p>Hello %1,</p><p>A reminder that %2&#39;s next conversation in the Performance Development Platform is due by %3. Please work with %2 to schedule and complete this conversation at your earliest convenience.</p><p>Thank you!</p><p>https://www.performance.gov.bc.ca</p>",
+    ]);
+
+    $template->binds()->delete();
+
+    $template->binds()->create([
+      'seqno' => 0,
+      'bind' => '%1', 
+      'description' => 'Supervisor who is receiving the email',
+    ]);   
+    $template->binds()->create([
+      'seqno' => 1,
+      'bind' => '%2', 
+      'description' => 'Employee who has an upcoming conversation due',
+    ]); 
+    $template->binds()->create([
+      'seqno' => 2,
+      'bind' => '%3', 
+      'description' => 'Next conversation due date for the employee',
+    ]); 
+
+
+    //
+    // 12. SUPV_CONV_REMINDER
+    //
+    $template = GenericTemplate::updateOrCreate([
+      'template' => 'SUPV_CONV_DUE',
+    ],[
+      'description' =>  'Send out email notification to supervisor when an employee\'s conversation is past due',
+      'instructional_text' => 'N/A',
+      'sender' => '2',
+      'subject' => 'PDP - %2\'s Conversation is Past Due',
+      'body' => "<p>Hello %1,</p><p>%2&#39;s next conversation in the Performance Development Platform was due by %3. Please work with %2 to schedule and complete this conversation as soon as possible.</p><p>Thank you!</p><p>https://www.performance.gov.bc.ca</p>",
+    ]);
+
+    $template->binds()->delete();
+
+    $template->binds()->create([
+      'seqno' => 0,
+      'bind' => '%1', 
+      'description' => 'Supervisor who is receiving the email',
+    ]);   
+    $template->binds()->create([
+      'seqno' => 1,
+      'bind' => '%2', 
+      'description' => 'Employee who has an upcoming conversation due',
+    ]); 
+    $template->binds()->create([
+      'seqno' => 2,
+      'bind' => '%3', 
+      'description' => 'Next conversation due date for the employee',
+    ]); 
+   
 
   }
 }
