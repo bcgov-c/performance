@@ -232,7 +232,7 @@
                 data: {
                 },
                 success: function (data) {
-                    $('.badge').html( data.count );
+                    $('#count-badge').html( data.count );
                 }
             });
         }
