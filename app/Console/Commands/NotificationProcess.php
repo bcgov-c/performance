@@ -100,7 +100,7 @@ class NotificationProcess extends Command
             $now = Carbon::now();
             $dayDiff = $now->diffInDays($dueDate, false);
 // Override for testing                        
-// $dayDiff = 11;
+// $dayDiff = -1;
 
             $dueIndays = 0;
             $msg = '';
@@ -133,29 +133,43 @@ class NotificationProcess extends Command
                     $sent_count += 1;
 
 
+                    // Use Class to create DashboardNotification
+                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                    $notification->user_id = $user->id;
+                    $notification->notification_type = '';
+                    $notification->comment = $msg;
+                    $notification->related_id = null;
+                   
+                    $notification->notify_user_id = $user->id;
+                    $notification->overdue_user_id = null; 
+                    $notification->notify_due_date = $dueDate->format('Y-m-d');
+                    $notification->notify_for_days = $dueIndays;
+
+                    $notification->send(); 
+
                     // DashBoard Message
-                    DashboardNotification::create([
-                        'user_id' => $user->id,
-                        'notification_type' => '',        // Conversation Added
-                        'comment' => $msg,
-                        'related_id' => null,
-                    ]);
+                    // DashboardNotification::create([
+                    //     'user_id' => $user->id,
+                    //     'notification_type' => '',        // Conversation Added
+                    //     'comment' => $msg,
+                    //     'related_id' => null,
+                    // ]);
 
                     // Write to Log table
-                    $notification_log = NotificationLog::Create([  
-                        'recipients' => ' ',        // Not in Use
-                        'sender_id' => 0,           
-                        'subject' => $msg,
-                        'description' => '',
-                        'alert_type' => 'N',
-                        'alert_format' => 'A',
-                        'notify_user_id' => $user->id,
-                        'overdue_user_id' => null,
-                        'notify_due_date' => $dueDate->format('Y-m-d'),
-                        'notify_for_days' => $dueIndays,
-                        'template_id' => null,
-                        'date_sent' => now(),
-                    ]);
+                    // $notification_log = NotificationLog::Create([  
+                    //     'recipients' => ' ',        // Not in Use
+                    //     'sender_id' => 0,           
+                    //     'subject' => $msg,
+                    //     'description' => '',
+                    //     'alert_type' => 'N',
+                    //     'alert_format' => 'A',
+                    //     'notify_user_id' => $user->id,
+                    //     'overdue_user_id' => null,
+                    //     'notify_due_date' => $dueDate->format('Y-m-d'),
+                    //     'notify_for_days' => $dueIndays,
+                    //     'template_id' => null,
+                    //     'date_sent' => now(),
+                    // ]);
 
                 } else {
                     $skip_count += 1;
@@ -181,7 +195,7 @@ class NotificationProcess extends Command
                     ->join('access_organizations','employee_demo.organization','access_organizations.organization')
                     ->where('access_organizations.allow_inapp_msg', 'Y')
                     ->whereNull('date_deleted')
-// ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                            
+->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                            
                     ->groupBy('users.id')
                     ->select('users.*')
                     ->get();
@@ -212,16 +226,16 @@ class NotificationProcess extends Command
                 $now = Carbon::now();
                 $dayDiff = $now->diffInDays($dueDate, false);
 // Override for testing                        
-// $dayDiff = 11;                
+$dayDiff = 11;                
 
                 $dueIndays = 0;
                 $msg = '';
-                // if ($dayDiff >= 7 and $dayDiff <= 30) {
-                //     $msg = 'REMINDER - your next performance conversation is due in 1 month';
-                //     $dueIndays = 30;
-                // }
+                if ($dayDiff >= 7 and $dayDiff <= 30) {
+                    $msg = 'REMINDER - ' . $user->name . '\'s next performance conversation is due in 1 month';
+                    $dueIndays = 30;
+                }
                 if ($dayDiff >= 0 and $dayDiff < 7) {
-                    $msg = 'REMINDER - ' . $user->name . '\'s conversation due date is one week away';
+                    $msg = 'REMINDER - ' . $user->name . '\'s performance conversation due date is one week away';
                     $dueIndays = 7;
                 }
                 if ($dayDiff < 0) {  
@@ -244,76 +258,49 @@ class NotificationProcess extends Command
                         $this->info( $due . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' ' . $dueIndays);
                         $sent_count += 1;
     
+                        // Use Class to create DashboardNotification
+                        $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                        $notification->user_id = $manager_id;
+                        $notification->notification_type = '';
+                        $notification->comment = $msg;
+                        $notification->related_id = null;
+
+                        $notification->notify_user_id = $manager_id;
+                        $notification->overdue_user_id = $user->id; 
+                        $notification->notify_due_date = $dueDate->format('Y-m-d');
+                        $notification->notify_for_days = $dueIndays;
+
+                        $notification->send(); 
+
                         // DashBoard Message
-                        DashboardNotification::create([
-                            'user_id' => $manager_id,
-                            'notification_type' => '',        // Conversation Added
-                            'comment' => $msg,
-                            'related_id' => null,
-                        ]);
+                        // DashboardNotification::create([
+                        //     'user_id' => $manager_id,
+                        //     'notification_type' => '',        // Conversation Added
+                        //     'comment' => $msg,
+                        //     'related_id' => null,
+                        // ]);
     
                         // Write to Log table
-                        $notification_log = NotificationLog::Create([  
-                            'recipients' => ' ',        // Not in Use
-                            'sender_id' => 0,           
-                            'subject' => $msg,
-                            'description' => '',
-                            'alert_type' => 'N',
-                            'alert_format' => 'A',
-                            'notify_user_id' => $manager_id,
-                            'overdue_user_id' => $user->id,
-                            'notify_due_date' => $dueDate->format('Y-m-d'),
-                            'notify_for_days' => $dueIndays,
-                            'template_id' => null,
-                            'date_sent' => now(),
-                        ]);
+                        // $notification_log = NotificationLog::Create([  
+                        //     'recipients' => ' ',        // Not in Use
+                        //     'sender_id' => 0,           
+                        //     'subject' => $msg,
+                        //     'description' => '',
+                        //     'alert_type' => 'N',
+                        //     'alert_format' => 'A',
+                        //     'notify_user_id' => $manager_id,
+                        //     'overdue_user_id' => $user->id,
+                        //     'notify_due_date' => $dueDate->format('Y-m-d'),
+                        //     'notify_for_days' => $dueIndays,
+                        //     'template_id' => null,
+                        //     'date_sent' => now(),
+                        // ]);
     
                     } else {
                         $skip_count += 1;
                     }
                 }
         
-                // if ($bSend) {
-
-                //     // check the notification sent or not 
-                //     $log = NotificationLog::where('alert_type', 'N')
-                //                         ->where('alert_format', 'E')
-                //                         ->where('notify_user_id',  $manager_id)
-                //                         ->where('overdue_user_id',  $user->id)
-                //                         ->where('notify_due_date', $dueDate->format('Y-m-d') )
-                //                         ->where('notify_for_days', $dueIndays)
-                //                         ->first();
-
-                //     // Send Email for team members
-                //     if (!$log) {
-                //         $this->info( $due . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' ' . $dueIndays);
-                //         $sent_count += 1;
-
-                //         $sendMail = new \App\MicrosoftGraph\SendMail();
-                //         $sendMail->toRecipients = [$manager_id];
-                //         // $sendMail->ccRecipients = [$user->id];  // test
-                //         // $sendMail->bccRecipients = [$user->id]; // test 
-                //         $sendMail->sender_id = null;  // default sender is System
-                //         $sendMail->useQueue = false;
-                //         $sendMail->saveToLog = true;
-
-                //         $sendMail->alert_type = 'N';
-                //         $sendMail->alert_format = 'E';
-                //         $sendMail->notify_user_id = $manager_id;
-                //         $sendMail->overdue_user_id = $user->id; 
-                //         $sendMail->notify_due_date = $dueDate->format('Y-m-d');
-                //         $sendMail->notify_for_days = $dueIndays;
-
-                //         $sendMail->template = $template;
-                //         array_push($sendMail->bindvariables, $bind1 );
-                //         array_push($sendMail->bindvariables, $bind2 );
-                //         array_push($sendMail->bindvariables, $bind3 );
-                //         $response = $sendMail->sendMailWithGenericTemplate();    
-
-                //     } else {
-                //         $skip_count += 1;
-                //     }
-                // } 
 
            }
 
@@ -365,7 +352,7 @@ class NotificationProcess extends Command
             $template = 'CONVERSATION_REMINDER';
             $bSend = false;
             $bind1 = $user->name;
-            $bind2 = $dueDate;
+            $bind2 = $dueDate->format('M d, Y');
             if ($dayDiff >= 7 and $dayDiff <= 30) {
                 $dueIndays = 30;
                 if ($pref->conversation_due_month == 'Y') {
@@ -479,7 +466,7 @@ class NotificationProcess extends Command
                     $pref = new UserPreference;
                     $pref->user_id = $user->manager_id;
                 }
-                
+
                 $due = Conversation::nextConversationDue( $user );
 
                 $dueDate = \Carbon\Carbon::create($due);
@@ -491,19 +478,19 @@ class NotificationProcess extends Command
 
                 $dueIndays = 0;
                 $subject = '';
-                $template = 'CONVERSATION_REMINDER';
+                $template = 'SUPV_CONV_REMINDER';
                 $bSend = false;
-                $bind1 = $user->name;
-                $bind2 = $dueDate;
+                $bind1 = $user->reportingManager->name;
+                $bind2 = $user->name;
+                $bind3 = $dueDate->format('M d, Y');
 
-                // if ($dayDiff >= 7 and $dayDiff <= 30) {
-                //     $dueIndays = 30;
-                //     $bind2 = '1 month';
-                //     if ($pref->team_conversation_due_month == 'Y') {
-                //         // $subject = 'REMINDER - your next performance conversation is due in 1 month';
-                //         $bSend = true;
-                //     }
-                // }
+                if ($dayDiff >= 7 and $dayDiff <= 30) {
+                    $dueIndays = 30;
+                    if ($pref->team_conversation_due_month == 'Y') {
+                        // $subject = 'REMINDER - your next performance conversation is due in 1 month';
+                        $bSend = true;
+                    }
+                }
                 if ($dayDiff >= 0 and $dayDiff < 7) {
                     $dueIndays = 7;
                     if ($pref->team_conversation_due_week == 'Y') {
@@ -513,7 +500,7 @@ class NotificationProcess extends Command
                 }
                 if ($dayDiff < 0) {  
                     $dueIndays = 0;
-                    $template = 'CONVERSATION_DUE';
+                    $template = 'SUPV_CONV_DUE';
                     if ($pref->team_conversation_due_past == 'Y') {
                         // $subject = 'OVERDUE - your next performance conversation is past due';
                         $bSend = true;
@@ -554,6 +541,7 @@ class NotificationProcess extends Command
                         $sendMail->template = $template;
                         array_push($sendMail->bindvariables, $bind1 );
                         array_push($sendMail->bindvariables, $bind2 );
+                        array_push($sendMail->bindvariables, $bind3 );
                         $response = $sendMail->sendMailWithGenericTemplate();    
 
                     } else {

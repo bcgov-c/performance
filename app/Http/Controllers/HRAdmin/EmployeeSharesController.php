@@ -216,12 +216,20 @@ class EmployeeSharesController extends Controller
                     );
 
                     // Dashboard message added when an shared employee's profile (goals, conversations, or both); 
-                    DashboardNotification::create([
-                        'user_id' => $result->shared_id,
-                        'notification_type' => 'SP',         
-                        'comment' => 'Your profile has been shared with ' . $result->sharedWith->name,
-                        'related_id' => $result->id,
-                    ]);
+                    // DashboardNotification::create([
+                    //     'user_id' => $result->shared_id,
+                    //     'notification_type' => 'SP',         
+                    //     'comment' => 'Your profile has been shared with ' . $result->sharedWith->name,
+                    //     'related_id' => $result->id,
+                    // ]);
+                    // Use Class to create DashboardNotification
+                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                    $notification->user_id = $result->shared_id;
+                    $notification->notification_type = 'SP';
+                    $notification->comment = 'Your profile has been shared with ' . $result->sharedWith->name;
+                    $notification->related_id = $result->id;
+                    $notification->notify_user_id = $result->shared_id;
+                    $notification->send(); 
 
 
                     // Send email to person who their profile was shared 
