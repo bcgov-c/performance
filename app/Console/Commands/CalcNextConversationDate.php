@@ -86,7 +86,7 @@ class CalcNextConversationDate extends Command
         }
         
         EmployeeDemo::whereNotNull('guid')
-        ->where('organization', 'like', '%BC Public Service%')
+        // ->where('organization', 'like', '%BC Public Service%')
         ->whereDate('date_updated', '>', $last_cutoff_time)
         ->orderBy('employee_id')
         ->chunk(100, function($employeeDemo) {
