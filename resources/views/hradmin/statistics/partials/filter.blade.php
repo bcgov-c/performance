@@ -241,6 +241,8 @@
     });
 
     $('#btn_search_reset').click(function() {
+        event.preventDefault();
+
         $('#dd_level0').val(null).trigger('change');
         $('#dd_level1').val(null).trigger('change');
         $('#dd_level2').val(null).trigger('change');
@@ -249,6 +251,8 @@
         // $('#job_titles').val(null).trigger('change');
         // $('#active_since').val(null);
         // $('#search_text').val(null);
+        
+        $( "#filter-form" ).submit();
     });
 
     </script>
