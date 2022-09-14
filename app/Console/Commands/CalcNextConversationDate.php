@@ -96,14 +96,21 @@ class CalcNextConversationDate extends Command
                     if(($demo->employee_status == 'A' && $jr->current_employee_status != 'A') || ($demo->employee_status != 'A' && $jr->current_employee_status == 'A')) {
                         $user = User::where('guid', '=', $demo->guid)->first();
                         if ($user){
-                            $lastConversation = Conversation::getLastConv([], $user);
-                            $nextConversation = Conversation::nextConversationDue($user);
+                            $lastConv = Conversation::whereNotNull('signoff_user_id')
+                            ->whereNotNull('supervisor_signoff_id')
+                            ->whereNotNull('sign_off_time')
+                            ->select('sign_off_time')
+                            ->orderBy('sign_off_time', 'desc')
+                            ->first();
                             $newJr = new EmployeeDemoJunior;
                             $newJr->last_employee_status = $jr->current_employee_status;
                             $newJr->current_employee_status = $demo->employee_status;
                             $newJr->due_Date_paused = ($demo->employee_status != 'A' ? 'Y' : 'N');
-                            $newJr->last_conversation_date = $lastConversation;
-                            $newJr->next_conversation_date = ($demo->employee_status == 'A' ? $nextConversation : null);
+                            $newJr->last_conversation_date = (($lastConv && $lastConv->sign_off_time) ?? $lastConv->sign_off_time);
+                            // Standard + 4 months of last signed off conversation
+                            $newJr->next_conversation_date = (($demo->employee_status == 'A' && $lastConv && $lastConv->sign_off_time) ?? $lastConv->sign_off_time->addMonth(4));
+                            // Manual excused from users table
+                            
                             $newJr->save();
                         } else {
                             // skip
@@ -114,15 +121,21 @@ class CalcNextConversationDate extends Command
                 } else {
                     $user = User::where('guid', '=', $demo->guid)->first();
                     if ($user){
-                        $lastConversation = Conversation::getLastConv([], $user);
-                        $nextConversation = Conversation::nextConversationDue($user);
+                        $lastConv = Conversation::whereNotNull('signoff_user_id')
+                        ->whereNotNull('supervisor_signoff_id')
+                        ->whereNotNull('sign_off_time')
+                        ->select('sign_off_time')
+                        ->orderBy('sign_off_time', 'desc')
+                        ->first();
                         $newJr = new EmployeeDemoJunior;
-                        $newJr->guid = $demo->guid;
                         $newJr->last_employee_status = null;
                         $newJr->current_employee_status = $demo->employee_status;
-                        $newJr->due_date_paused = ($demo->employee_status != 'A' ? 'Y' : 'N');
-                        $newJr->last_conversation_date = $lastConversation;
-                        $newJr->next_conversation_date = ($demo->employee_status == 'A' ? $nextConversation : null);
+                        $newJr->due_Date_paused = ($demo->employee_status != 'A' ? 'Y' : 'N');
+                        $newJr->last_conversation_date = (($lastConv && $lastConv->sign_off_time) ?? $lastConv->sign_off_time);
+                        // Standard + 4 months of last signed off conversation
+                        $newJr->next_conversation_date = (($demo->employee_status == 'A' && $lastConv && $lastConv->sign_off_time) ?? $lastConv->sign_off_time->addMonth(4));
+                        // Manual excused from users table
+                        
                         $newJr->save();
                     } else {
                         // skip
