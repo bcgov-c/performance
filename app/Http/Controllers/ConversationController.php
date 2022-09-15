@@ -452,10 +452,10 @@ class ConversationController extends Controller
         
         if (count($current_employee) > 0 ){
             if ($current_employee[0]->employee_id != $request->employee_id) {
-                return response()->json(['success' => false, 'Message' => 'Invalide Employee ID', 'data' => $conversation]);            
+                return response()->json(['success' => false, 'Message' => 'Invalid Employee ID', 'data' => $conversation]);            
             }
         } else {
-            return response()->json(['success' => false, 'Message' => 'Invalide Employee ID', 'data' => $conversation]);   
+            return response()->json(['success' => false, 'Message' => 'Invalid Employee ID', 'data' => $conversation]);   
         }
   
         //if (!$conversation->is_with_supervisor) {
@@ -592,7 +592,7 @@ class ConversationController extends Controller
                             ->get();
         error_log(print_r($current_employee,true));
         if ($current_employee[0]->employee_id != $request->employee_id) {
-            return response()->json(['success' => false, 'Message' => 'Invalide Employee ID', 'data' => $conversation]);            
+            return response()->json(['success' => false, 'Message' => 'Invalid Employee ID', 'data' => $conversation]);            
         }
         
         //if (!$conversation->is_with_supervisor) {
