@@ -465,6 +465,17 @@
             $(document).on('click', '.btn-sign-off', function(e) {
                 const formType = 'employee-';
                 const isUnsignOff = $(this).data('action') === 'unsignoff';
+                
+                const agree_1 = $('#'+formType+'sign_off_form').find('input:radio[name="check_one'+(isSupervisor? '_' : '') +'"]:checked').val();
+                const agree_2 = $('#'+formType+'sign_off_form').find('input:radio[name="check_two'+(isSupervisor? '_' : '') +'"]:checked').val();
+                const agree_3 = $('#'+formType+'sign_off_form').find('input:radio[name="check_three'+(isSupervisor? '_' : '') +'"]:checked').val();
+                
+                if(!isUnsignOff) {
+                    if (typeof agree_1 === 'undefined' || typeof agree_2 === 'undefined') {
+                        alert('Please indicate if you agree or disagree with each of the statements before signing off');
+                        return;
+                    }
+                }
 
                 const agreements = [
                     $('#'+formType+'sign_off_form').find('input:radio[name="check_one'+(isSupervisor? '_' : '') +'"]:checked').val(),
@@ -989,8 +1000,12 @@
                             isNotThirdPerson = false;
                         }
                         $('#employee-signoff-questions').removeClass('d-none');
+                        $('#employee-signoff-message').find('.name').html(user1.participant.name);
+                        $('#supervisor-signoff-message').find('.name').html(user2.participant.name);
                         
-
+                        $('#employee-unsignoff-message').find('.name').html(user1.participant.name);
+                        $('#supervisor-unsignoff-message').find('.name').html(user2.participant.name);
+ 
                         if (!isSupervisor) {
                             CKEDITOR.instances['info_comment1'].setReadOnly(true);
                             CKEDITOR.instances['info_comment2'].setReadOnly(true);
@@ -1106,6 +1121,7 @@
                             } 
                             if (result.signoff_user_id && !isSupervisor) {
                                 $("#viewConversationModal .emp-inputs").find('input:radio').each((index, e) => $(e).prop('disabled', true));
+                                $("#team_member_agreement").prop('disabled', true);
                             }
                             if (result.signoff_user_id && result.supervisor_signoff_id) {
                                 $("#questions-to-consider").hide();
@@ -1225,7 +1241,7 @@
                            $('#div-info-comment5').hide();
                            $('#div-info-comment6').hide();
                            
-                           $('#tip-info-comment4').html('<b>Self Summary (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Consider accomplishments, areas for improvement, support required to successd, etc."> </i>');
+                           $('#tip-info-comment4').html('<b>Self Summary (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Consider accomplishments, areas for improvement, support required to succeed, etc."> </i>');
                            $('#desc-info-comment4').html('Describe your performance since your last check-in and areas to focus on moving forward.');
                            $('#tip-info-comment7').html('<b>Additional Comments (optional)</b>');
                            $('#tip-info-comment8').html('<b>Action Items (optional) </b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
@@ -1394,3 +1410,10 @@
     </x-slot>
 
 </x-side-layout>
+
+<style>
+    .panel-heading{
+        opacity: 0.75;
+    }
+    
+</style>    
