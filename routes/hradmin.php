@@ -60,8 +60,8 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::post('/hradmin/goalbank/deletegoal/{id}', [GoalBankController::class, 'deletegoal'])->name('hradmin.goalbank.deletegoal');
         Route::get('/hradmin/goalbank/updategoal', [GoalBankController::class, 'updategoal'])->name('hradmin.goalbank.updategoalget');
         Route::post('/hradmin/goalbank/updategoal', [GoalBankController::class, 'updategoal'])->name('hradmin.goalbank.updategoal');
-        Route::get('/hradmin/goalbank/updategoalone', [GoalBankController::class, 'updategoalone'])->name('hradmin.goalbank.updategoaloneget');
-        Route::post('/hradmin/goalbank/updategoalone', [GoalBankController::class, 'updategoalone'])->name('hradmin.goalbank.updategoalone');
+        Route::get('/hradmin/goalbank/updategoalone/{id}', [GoalBankController::class, 'updategoalone'])->name('hradmin.goalbank.updategoaloneget');
+        Route::post('/hradmin/goalbank/updategoalone/{id}', [GoalBankController::class, 'updategoalone'])->name('hradmin.goalbank.updategoalone');
         Route::get('/hradmin/goalbank/updategoaldetails/{id}', [GoalBankController::class, 'updategoaldetails'])->name('hradmin.goalbank.updategoaldetailsget');
         Route::post('/hradmin/goalbank/updategoaldetails/{id}', [GoalBankController::class, 'updategoaldetails'])->name('hradmin.goalbank.updategoaldetails');
         Route::get('/hradmin/goalbank/addnewgoal', [GoalBankController::class, 'addnewgoal'])->name('hradmin.goalbank.addnewgoalget');
