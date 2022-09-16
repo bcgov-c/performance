@@ -519,8 +519,96 @@
                 const that = this;
                 $("span.error").html("");
                 $(".alert.common-error").hide();
-                
-                
+                saveComments();                
+                $.ajax({
+                    url: url
+                    , type: 'POST'
+                    , data: data
+                    , success: function(result) {
+                        if (result.success) {
+                            location.reload();
+                        } else {
+                            $('.error').html(result.Message);
+                        }
+                    }
+                    , error: function(error) {
+                        const errors = error.responseJSON.errors;
+                        const errorElements = Object.keys(errors);
+                        if (errorElements.includes('employee_id')) {
+                            errorElements.forEach((element) => {
+                                $("span.error").filter('[data-error-for="' + element + '"]').html(errors[element][0]);
+                            });
+                        }
+                        delete errors['employee_id'];
+                        const commonErrorMessage = Object.values(errors)[0];
+                        if (commonErrorMessage) {
+                            $(".alert.common-error").find('span').html(commonErrorMessage);
+                            $(".alert.common-error").show();
+                        }
+
+
+                    }
+                    , complete: function() {
+                        const btnText = ($(that).data('action') === 'unsignoff') ? 'Unsign' : 'Sign with my employee ID';
+                        $(that).html(btnText)
+                    }
+                });
+
+            });
+
+
+            $(document).on('click', '.btn-conv-cancel', function(e) {
+                $("." + $(this).data('id')).toggleClass('d-none');
+                const elementName = $(this).data('name');
+                $('.btn-conv-save').filter("[data-name=" + elementName + "]").addClass("d-none");
+                $('.btn-conv-cancel').filter("[data-name=" + elementName + "]").addClass("d-none");
+                $('.btn-conv-edit').filter("[data-name=" + elementName + "]").removeClass("d-none");
+                $('.btn-conv-edit').prop('readonly', false);
+                $('.enable-not-allowed').prop('readonly', true);
+                if ($("#"+elementName+"_edit").is('textarea'))
+                    $("#"+elementName+"_edit").val($("#"+elementName).val());
+            });
+
+            $(document).on('click', '.btn-view-conversation', function(e) {
+                conversation_id = e.currentTarget.getAttribute('data-id');
+                updateConversation(conversation_id);
+            });
+
+            $(document).on('click', '.delete-btn', function() {
+                if($(this).data('disallowed')) {
+                    alert("This record of conversation cannot be deleted because it has been signed by at least one participant. Un-sign the conversation if you wish to delete it.")
+                    return;
+                }
+                if (!confirm('Are you sure you want to delete this conversation ?')) {
+                    return;
+                }
+                $('#delete-conversation-form').attr(
+                    'action'
+                    , $('#delete-conversation-form').data('action').replace('xxx', $(this).data('id'))
+                ).submit();
+            });
+            
+            var modal_edit = false;
+            <?php if ($type == 'upcoming'){ ?>
+                var modal_edit = true;
+            <?php } ?>
+            
+            $(document).on('hide.bs.modal', '#viewConversationModal', function(e) {
+                if (toReloadPage) {
+                    window.location.reload();
+                } else {
+                    window.location.reload();
+                    if (modal_edit ==  true){
+                        if (isContentModified() && confirm("Your comments will be saved when you close the window.")) {
+                            //e.preventDefault();
+                            modal_open = false;
+                            saveComments();
+                        }
+                    }
+                }
+            });
+            
+            function saveComments() {
                 var info_comment1_data = CKEDITOR.instances['info_comment1'].getData();
                         var info_comment2_data = CKEDITOR.instances['info_comment2'].getData();
                         var info_comment3_data = CKEDITOR.instances['info_comment3'].getData();
@@ -889,6 +977,7 @@
                 $("#viewConversationModal").find("input, textarea").prop("readonly", false);
                 $('#viewConversationModal').data('is-frozen', 0);
             });
+            
 
             $(document).on('change', '#team_member_agreement', function () {
                 if ($(this).prop('checked')) {
@@ -1026,7 +1115,6 @@
                             if(employee_signed == false) {                                
                                 $('#signoff-emp-id-input').html('<div id="emp-signoff-row"><div class="my-2">Enter your 6 digit employee ID to indicate you have read and accept the performance review:</div><input type="text" id="employee_id" class="form-control d-inline w-50"><button class="btn btn-primary btn-sign-off ml-2" type="button">Sign with my employee ID</button><br><span class="text-danger error" data-error-for="employee_id"></span></div>');                                
                                 $('#unsign-off-block').html('');
-
                             } else {
                                 $('#unsignoff-emp-id-input').html('<input type="text" id="employee_id" class="form-control d-inline w-50"><button data-action="unsignoff" class="btn btn-primary btn-sign-off ml-2" type="button">Un-Sign</button><br><span class="text-danger error" data-error-for="employee_id"></span>');
                                 $('#sign-off-block').html('');
