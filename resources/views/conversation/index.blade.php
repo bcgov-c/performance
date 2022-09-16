@@ -597,6 +597,7 @@
                 if (toReloadPage) {
                     window.location.reload();
                 } else {
+                    window.location.reload();
                     if (modal_edit ==  true){
                         if (isContentModified() && confirm("Your comments will be saved when you close the window.")) {
                             //e.preventDefault();
@@ -752,6 +753,7 @@
                 $("#viewConversationModal").find("input, textarea").prop("readonly", false);
                 $('#viewConversationModal').data('is-frozen', 0);
             });
+            
 
             $(document).on('change', '#team_member_agreement', function () {
                 if ($(this).prop('checked')) {
@@ -891,7 +893,6 @@
                             if(employee_signed == false) {                                
                                 $('#signoff-emp-id-input').html('<div id="emp-signoff-row"><div class="my-2">Enter your 6 digit employee ID to indicate you have read and accept the performance review:</div><input type="text" id="employee_id" class="form-control d-inline w-50"><button class="btn btn-primary btn-sign-off ml-2" type="button">Sign with my employee ID</button><br><span class="text-danger error" data-error-for="employee_id"></span></div>');                                
                                 $('#unsign-off-block').html('');
-
                             } else {
                                 CKEDITOR.instances['info_comment4'].setReadOnly(true);
                                 CKEDITOR.instances['info_comment7'].setReadOnly(true);
