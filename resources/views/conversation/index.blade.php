@@ -1518,7 +1518,7 @@
 
 <style>
     .panel-heading{
-        opacity: 0.75;
+        opacity: 0.5;
     }
     .acc-title {
 	display: block;
