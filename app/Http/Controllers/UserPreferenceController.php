@@ -59,7 +59,7 @@ class UserPreferenceController extends Controller
         
         $pref->goal_comment_flag = $request->has('goal_comment_flag') ? $request->goal_comment_flag : 'N';
         $pref->goal_bank_flag = $request->has('goal_bank_flag') ? $request->goal_bank_flag : 'N';
-        $pref->share_profile_flag = $request->has('share_profile_flag') ? $request->goal_comment_flag : 'N';
+        $pref->share_profile_flag = $request->has('share_profile_flag') ? $request->share_profile_flag : 'N';
 
         $pref->conversation_setup_flag = 'Y';   // always assign to 'Y'
         $pref->conversation_signoff_flag = 'Y';   // always assign to 'Y'

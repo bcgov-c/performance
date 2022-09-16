@@ -204,6 +204,7 @@
                             ["Bold", "Italic", "Underline"],
                             ["NumberedList", "BulletedList"],
                             ["Outdent", "Indent"],
+                            ["Link"],
                         ],
                     });
 
