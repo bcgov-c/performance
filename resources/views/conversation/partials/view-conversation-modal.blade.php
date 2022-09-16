@@ -61,7 +61,8 @@
                         <div class="card-header panel-heading bg-primary" id="heading_1">
                         <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_1" aria-expanded="false" aria-controls="collapse_1">
                                 <button class="btn btn-link" style="color:white">
-                                Suggested Discussion Questions
+                                <span class="acc-title">Suggested Discussion Questions</span>
+                                <span class="acc-status" id="caret_1"><i class="fas fa-caret-down"></i></span>
                                 </button>
                         </h5>
                         </div>
@@ -77,7 +78,8 @@
                         <div class="card-header panel-heading bg-primary" id="heading_2">
                         <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_2" aria-expanded="false" aria-controls="collapse_2">
                                 <button class="btn btn-link" style="color:white">
-                                Preparing For Conversation
+                                    <span class="acc-title">Preparing For Conversation</span>
+                                    <span class="acc-status"  id="caret_2"><i class="fas fa-caret-down"></i></span>                                
                                 </button>
                         </h5>
                         </div>

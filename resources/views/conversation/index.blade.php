@@ -1411,9 +1411,41 @@
 
 </x-side-layout>
 
+<script>
+  $('#collapse_1').on('show.bs.collapse', function () {
+    $('#caret_1').html('<i class="fas fa-caret-up"></i>');
+  });
+  $('#collapse_1').on('hide.bs.collapse', function () {
+    $('#caret_1').html('<i class="fas fa-caret-down"></i>');
+  });
+
+  $('#collapse_2').on('show.bs.collapse', function () {
+    $('#caret_2').html('<i class="fas fa-caret-up"></i>');
+  });  
+  $('#collapse_2').on('hide.bs.collapse', function () {
+    $('#caret_2').html('<i class="fas fa-caret-down"></i>');
+  }); 
+    
+</script>
+
 <style>
     .panel-heading{
         opacity: 0.75;
+    }
+    .acc-title {
+	display: block;
+	height: 22px;
+	position:absolute;
+	top:11px;
+	left:20px;
+    }
+    .acc-status {
+	display: block;
+	width: 22px;
+	height: 22px;
+	position:absolute;
+	top:11px;
+	right:11px;
     }
     
 </style>    
