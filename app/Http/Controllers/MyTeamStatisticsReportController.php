@@ -1897,8 +1897,8 @@ class MyTeamStatisticsReportController extends Controller
                     employee_name, employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division,
                     employee_demo.level3_branch, employee_demo.level4,
                     case when date(SYSDATE()) not between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01') 
-                                or employee_demo.employee_status <> 'A'
-                        then 'Yes' else 'No' end as excused")
+                            and employee_demo.employee_status = 'A'
+                        then 'No' else 'Yes' end as excused")
                     ->join('employee_demo', function($join) {
                          $join->on('employee_demo.guid', '=', 'users.guid');
                         // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
@@ -2009,18 +2009,18 @@ class MyTeamStatisticsReportController extends Controller
                             users.excused_reason_id, users.reporting_to,
                     employee_demo.employee_name, employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
                     case when date(SYSDATE()) not between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01') 
-                                or employee_demo.employee_status <> 'A'
-                        then 'Yes' else 'No' end as excused")
+                            and employee_demo.employee_status = 'A'
+                            then 'No' else 'Yes' end as excused")
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.guid', '=', 'users.guid');
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
                 ->when( $request->legend == 'Yes', function($q) use($request) {
-                    $q->whereRaw(" ( date(SYSDATE()) between excused_start_date and excused_end_date) = 1 ");
+                    $q->whereRaw(" ( date(SYSDATE()) between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01')) or employee_demo.employee_status <> 'A' ");
                 }) 
                 ->when( $request->legend == 'No', function($q) use($request) {
-                    $q->whereRaw(" ( date(SYSDATE()) between excused_start_date and excused_end_date) is NULL ");
+                    $q->whereRaw(" ( date(SYSDATE()) not between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01')) and employee_demo.employee_status ='A' ");
                 })
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
