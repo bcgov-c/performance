@@ -1838,7 +1838,7 @@ class GoalBankController extends Controller
                 $sendMail->alert_format = 'E';
 
                 $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
-                array_push($sendMail->bindvariables, $user->id);                // Recipient of the email 
+                array_push($sendMail->bindvariables, $user->name);                // Recipient of the email 
                 array_push($sendMail->bindvariables, $goalBank->user ? $goalBank->user->name : '');   // Person who added goal to goal bank
                 array_push($sendMail->bindvariables, $goalBank->title);       // goal title
                 array_push($sendMail->bindvariables, $goalBank->mandatory_status_descr);           // Mandatory or suggested status
