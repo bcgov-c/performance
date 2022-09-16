@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header bg-primary">
                 <h5 id="template-header"></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:white">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -61,7 +61,7 @@
                         <div class="card-header panel-heading bg-primary" id="heading_1">
                         <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_1" aria-expanded="false" aria-controls="collapse_1">
                                 <button class="btn btn-link" style="color:white">
-                                Suggested Discussion Questions
+                                Employee Comments
                                 </button>
                         </h5>
                         </div>
@@ -337,7 +337,7 @@
                                             <div id="emp-unsignoff-row">                                                
                                                 <div id="unsignoff-emp-id-input"></div>                                            
                                             </div> 
-                                            <div class="mt-3 alert alert-default-warning alert-dismissible" id="employee-unsignoff-message">
+                                            <div class="mt-3 alert alert-default-warning alert-dismissible" id="employee-signoff-message">
                                                     <span class="h5"><i class="icon fas fa-exclamation-circle"></i><b class="name"></b> has <b class="not d-none">not</b> signed this record of conversation <span class="time"></span></span>
                                             </div>
                                     </div>
@@ -363,7 +363,7 @@
                                             <div id="sup-unsignoff-row">
                                                 <div id="unsignoff-sup-id-input"></div>
                                             </div>      
-                                            <div class="mt-3 alert alert-default-warning alert-dismissible" id="supervisor-unsignoff-message">
+                                            <div class="mt-3 alert alert-default-warning alert-dismissible" id="supervisor-signoff-message">
                                                 <span class="h5"><i class="icon fas fa-exclamation-circle"></i><b class="name"></b> has <b class="not d-none">not</b> signed this record of conversation <span class="time"></span></span>
                                             </div>                                               
                                         </div> 
