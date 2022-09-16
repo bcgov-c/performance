@@ -282,6 +282,8 @@ class ConversationController extends Controller
 
             if ($user && $user->allow_email_notification && $user->userPreference->conversation_setup_flag == 'Y') {                            
 
+                $due = Conversation::nextConversationDue( $user );
+
                 $topic = ConversationTopic::find($request->conversation_topic_id);
                 $sendMail = new \App\MicrosoftGraph\SendMail();
                 $sendMail->toRecipients = [ $value ];
@@ -291,7 +293,7 @@ class ConversationController extends Controller
                 array_push($sendMail->bindvariables, $user->name);
                 array_push($sendMail->bindvariables, $conversation->user->name );
                 array_push($sendMail->bindvariables, $conversation->topic->name );
-                array_push($sendMail->bindvariables, $conversation->warningMessage()[0] );
+                array_push($sendMail->bindvariables, $due );
                 $response = $sendMail->sendMailWithGenericTemplate();
             }
 
