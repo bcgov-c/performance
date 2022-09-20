@@ -99,8 +99,6 @@ class CalcNextConversationDate extends Command
                 $due_Date_paused = $demo->employee_status != 'A' ? 'Y' : 'N';
                 // get user info
                 $user = User::where('guid', '=', $demo->guid)->first();
-                $counter += 1;
-                echo 'Processed '.$counter; echo "\r";
                 if ($user) {
                     // echo 'User:'.$user->id.$user->name; echo "\r\n";
                     // get last conversation details
@@ -195,9 +193,11 @@ class CalcNextConversationDate extends Command
                     // skip, no user info, do not process
                     // echo 'Skipping:'.$demo->guid.' - '.$demo->employee_name.' - No user details'; echo "\r\n";
                 }
+                $counter += 1;
+                echo 'Processed '.$counter; echo "\r";
             }
         });
-        echo "\r\n";
+        echo 'Processed '.$counter; echo "\r\n";
 
         DB::table('stored_dates')->updateOrInsert(
             [
@@ -207,7 +207,7 @@ class CalcNextConversationDate extends Command
             'value' => $start_time,
             ]
         );
-        $this->info( 'Last Run Date Updated to: ' . $start_time);
+        $this->info( 'Last Run Date Updated to: '.$start_time);
 
         $end_time = Carbon::now();
         DB::table('job_sched_audit')->updateOrInsert(
@@ -216,14 +216,15 @@ class CalcNextConversationDate extends Command
             ],
             [
                 'job_name' => $job_name,
-                'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
-                'end_time' => date('Y-m-d H:i:s', strtotime($end_time)),
-                'cutoff_time' => date('Y-m-d H:i:s', strtotime($last_cutoff_time)),
+                'start_time' => date('Y-m-d H:i:s',strtotime($start_time)),
+                'end_time' => date('Y-m-d H:i:s',strtotime($end_time)),
+                'cutoff_time' => date('Y-m-d H:i:s',strtotime($last_cutoff_time)),
                 'status' => 'Completed',
+                'details' => 'Processed '.$counter.' rows from '.date('Y-m-d H:i:s',strtotime($last_cutoff_time)).'.',
             ]
         );
 
-        $this->info('CalcNextConversationDate, Completed: ' . $end_time);
+        $this->info('CalcNextConversationDate, Completed: '.$end_time);
 
     } 
     
