@@ -609,226 +609,6 @@
             });
             
             function saveComments() {
-                var info_comment1_data = CKEDITOR.instances['info_comment1'].getData();
-                        var info_comment2_data = CKEDITOR.instances['info_comment2'].getData();
-                        var info_comment3_data = CKEDITOR.instances['info_comment3'].getData();
-                        var info_comment4_data = CKEDITOR.instances['info_comment4'].getData();
-                        var info_comment5_data = CKEDITOR.instances['info_comment5'].getData();
-                        var info_comment6_data = CKEDITOR.instances['info_comment6'].getData();
-                        var info_comment7_data = CKEDITOR.instances['info_comment7'].getData();
-                        var info_comment8_data = CKEDITOR.instances['info_comment8'].getData();
-                        var info_comment9_data = CKEDITOR.instances['info_comment9'].getData();
-                        var info_comment10_data = CKEDITOR.instances['info_comment10'].getData();
-                        var info_comment11_data = $('#info_comment11').val();
-                        
-                        $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment1', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment1_data
-                                }
-                            });
-                       
-                        
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment2', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment2_data
-                                }
-                            });
-                        
-                        
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment3', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment3_data
-                                }
-                            });
-                        
-                        
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment4', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment4_data
-                                }
-                            });
-                       
-                        
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment5', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment5_data
-                                }
-                            });
-                       
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment6', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment6_data
-                                }
-                            });
-                       
-                        
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment7', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment7_data
-                                }
-                            });
-                        
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment8', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment8_data
-                                }
-                            });
-                       
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment9', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment9_data
-                                }
-                            });
-                        
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment10', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment10_data
-                                }
-                            });
-                        
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment11', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment11_data
-                                }
-                            });
-                
-                
-                
-                $.ajax({
-                    url: url
-                    , type: 'POST'
-                    , data: data
-                    , success: function(result) {
-                        if (result.success) {
-                            location.reload();
-                        } else {
-                            $('.error').html(result.Message);
-                        }
-                    }
-                    , error: function(error) {
-                        const errors = error.responseJSON.errors;
-                        const errorElements = Object.keys(errors);
-                        if (errorElements.includes('employee_id')) {
-                            errorElements.forEach((element) => {
-                                $("span.error").filter('[data-error-for="' + element + '"]').html(errors[element][0]);
-                            });
-                        }
-                        delete errors['employee_id'];
-                        const commonErrorMessage = Object.values(errors)[0];
-                        if (commonErrorMessage) {
-                            $(".alert.common-error").find('span').html(commonErrorMessage);
-                            $(".alert.common-error").show();
-                        }
-
-
-                    }
-                    , complete: function() {
-                        const btnText = ($(that).data('action') === 'unsignoff') ? 'Unsign' : 'Sign with my employee ID';
-                        $(that).html(btnText)
-                    }
-                });
-
-            });
-
-
-            $(document).on('click', '.btn-conv-cancel', function(e) {
-                $("." + $(this).data('id')).toggleClass('d-none');
-                const elementName = $(this).data('name');
-                $('.btn-conv-save').filter("[data-name=" + elementName + "]").addClass("d-none");
-                $('.btn-conv-cancel').filter("[data-name=" + elementName + "]").addClass("d-none");
-                $('.btn-conv-edit').filter("[data-name=" + elementName + "]").removeClass("d-none");
-                $('.btn-conv-edit').prop('readonly', false);
-                $('.enable-not-allowed').prop('readonly', true);
-                if ($("#"+elementName+"_edit").is('textarea'))
-                    $("#"+elementName+"_edit").val($("#"+elementName).val());
-            });
-
-            $(document).on('click', '.btn-view-conversation', function(e) {
-                conversation_id = e.currentTarget.getAttribute('data-id');
-                updateConversation(conversation_id);
-            });
-
-            $(document).on('click', '.delete-btn', function() {
-                if($(this).data('disallowed')) {
-                    alert("This record of conversation cannot be deleted because it has been signed by at least one participant. Un-sign the conversation if you wish to delete it.")
-                    return;
-                }
-                if (!confirm('Are you sure you want to delete this conversation ?')) {
-                    return;
-                }
-                $('#delete-conversation-form').attr(
-                    'action'
-                    , $('#delete-conversation-form').data('action').replace('xxx', $(this).data('id'))
-                ).submit();
-            });
-            
-            var modal_edit = false;
-            <?php if ($type == 'upcoming'){ ?>
-                var modal_edit = true;
-            <?php } ?>
-            
-            $(document).on('hide.bs.modal', '#viewConversationModal', function(e) {
-                if (toReloadPage) {
-                    window.location.reload();
-                } else {
-                    if (modal_edit ==  true){
-                    if (isContentModified() && confirm("Your comments will be saved when you close the window.")) {
-                        //e.preventDefault();
                         var info_comment1_data = CKEDITOR.instances['info_comment1'].getData();
                         var info_comment2_data = CKEDITOR.instances['info_comment2'].getData();
                         var info_comment3_data = CKEDITOR.instances['info_comment3'].getData();
@@ -840,137 +620,32 @@
                         var info_comment9_data = CKEDITOR.instances['info_comment9'].getData();
                         var info_comment10_data = CKEDITOR.instances['info_comment10'].getData();
                         var info_comment11_data = $('#info_comment11').val();
-                        
+    
+                        var comments = {};
+                        comments['info_comment1'] = info_comment1_data;
+                        comments['info_comment2'] = info_comment2_data;
+                        comments['info_comment3'] = info_comment3_data;
+                        comments['info_comment4'] = info_comment4_data;
+                        comments['info_comment5'] = info_comment5_data;
+                        comments['info_comment6'] = info_comment6_data;
+                        comments['info_comment7'] = info_comment7_data;
+                        comments['info_comment8'] = info_comment8_data;
+                        comments['info_comment9'] = info_comment9_data;
+                        comments['info_comment10'] = info_comment10_data;
+                        comments['info_comment11'] = info_comment11_data;
+
                         $.ajax({
                                 url: '/conversation/' + conversation_id
                                 , type: 'PUT'
                                 , data: {
                                     _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment1', // e.target.getAttribute('data-name'),
+                                    , field: 'info_comments', // e.target.getAttribute('data-name'),
                                     //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment1_data
+                                    value:comments
                                 }
                             });
                        
-                        
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment2', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment2_data
-                                }
-                            });
-                        
-                        
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment3', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment3_data
-                                }
-                            });
-                        
-                        
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment4', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment4_data
-                                }
-                            });
-                       
-                        
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment5', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment5_data
-                                }
-                            });
-                       
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment6', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment6_data
-                                }
-                            });
-                       
-                        
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment7', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment7_data
-                                }
-                            });
-                        
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment8', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment8_data
-                                }
-                            });
-                       
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment9', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment9_data
-                                }
-                            });
-                        
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment10', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment10_data
-                                }
-                            });
-                        
-                            $.ajax({
-                                url: '/conversation/' + conversation_id
-                                , type: 'PUT'
-                                , data: {
-                                    _token: '{{ csrf_token() }}'
-                                    , field: 'info_comment11', // e.target.getAttribute('data-name'),
-                                    //value: $("#" + $(that).data('id') + '_edit').val()
-                                    value:info_comment11_data
-                                }
-                            });
-                        
-                    }
-                    }
-                }
-            });
+            }
 
             $(document).on('show.bs.modal', '#viewConversationModal', function(e) {
                 $("#viewConversationModal").find("textarea").val('');
@@ -1089,11 +764,19 @@
                             isNotThirdPerson = false;
                         }
                         $('#employee-signoff-questions').removeClass('d-none');
-                        $('#employee-signoff-message').find('.name').html(user1.participant.name);
-                        $('#supervisor-signoff-message').find('.name').html(user2.participant.name);
-                        
-                        $('#employee-unsignoff-message').find('.name').html(user1.participant.name);
-                        $('#supervisor-unsignoff-message').find('.name').html(user2.participant.name);
+                        if (isSupervisor) {
+                            $('#employee-signoff-message').find('.name').html(user2.participant.name);
+                            $('#supervisor-signoff-message').find('.name').html(user1.participant.name);
+                            
+                            $('#employee-unsignoff-message').find('.name').html(user2.participant.name);
+                            $('#supervisor-unsignoff-message').find('.name').html(user1.participant.name);
+                        } else {
+                            $('#employee-signoff-message').find('.name').html(user1.participant.name);
+                            $('#supervisor-signoff-message').find('.name').html(user2.participant.name);
+                            
+                            $('#employee-unsignoff-message').find('.name').html(user1.participant.name);
+                            $('#supervisor-unsignoff-message').find('.name').html(user2.participant.name);
+                        }
  
                         if (!isSupervisor) {
                             CKEDITOR.instances['info_comment1'].setReadOnly(true);

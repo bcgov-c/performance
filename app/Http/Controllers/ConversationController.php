@@ -413,8 +413,12 @@ class ConversationController extends Controller
      */
     public function update(UpdateRequest $request, Conversation $conversation)
     {
-        if ($request->field != 'conversation_participant_id') {
+        if ($request->field != 'conversation_participant_id' && $request->field != 'info_comments') {
             $conversation->{$request->field} = $request->value;
+        } elseif($request->field == 'info_comments'){
+          foreach ($request->value as $key => $value) {
+                $conversation->{$key} = $value;
+            }
         } elseif ($request->field == 'conversation_participant_id') {
             ConversationParticipant::where('conversation_id', $conversation->id)->delete();
             foreach ($request->value as $key => $value) {
