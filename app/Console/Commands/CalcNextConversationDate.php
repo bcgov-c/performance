@@ -88,9 +88,6 @@ class CalcNextConversationDate extends Command
         }
         $counter = 0;
         EmployeeDemo::whereNotNull('guid')
-        // ->where('organization', 'like', '%BC Public Service%')
-        // ->whereIn('employee_id', ['163102', '111908', '062149', '108057'])
-        // ->where('employee_name', 'like', '%Zehra%')
         ->whereDate('date_updated', '>', $last_cutoff_time)
         ->orderBy('employee_id')
         ->chunk(1000, function($employeeDemo) use (&$counter) {
@@ -100,7 +97,6 @@ class CalcNextConversationDate extends Command
                 // get user info
                 $user = User::where('guid', '=', $demo->guid)->first();
                 if ($user) {
-                    // echo 'User:'.$user->id.$user->name; echo "\r\n";
                     // get last conversation details
                     $lastConv = Conversation::join('conversation_participants', 'conversations.id', '=', 'conversation_participants.conversation_id')
                     ->join('users', 'users.id', '=', 'conversation_participants.participant_id')
@@ -122,7 +118,6 @@ class CalcNextConversationDate extends Command
                         $initNextConversationDate = $lastConv->sign_off_time->addMonth(4)->format('M d, Y');
                         // echo 'Last Conversation Date:'.$lastConversationDate; echo "\r\n";
                     } else {
-                        // echo 'Not found conversation'; echo "\r\n";
                         // no last conversation, use randomizer to assign initial next conversation date
                         $lastConversationDate = null;
                         $initNextConversationDate = $user->joining_date->addMonth(4)->format('M d, Y');
@@ -182,23 +177,19 @@ class CalcNextConversationDate extends Command
                         $newJr->current_employee_status = $demo->employee_status;
                         $newJr->due_Date_paused = $due_Date_paused;
                         $newJr->last_conversation_date = $lastConversationDate ? (new Carbon($lastConversationDate)) : null;
-                        // echo 'Storing Last Conversation Date:'.$newJr->last_conversation_date; echo "\r\n";
                         $newJr->next_conversation_date = $initNextConversationDate ? (new Carbon($initNextConversationDate)) : null;
                         $newJr->save();
                     } else {
                         // no change, do not update
-                        // echo 'Skipping:'.$demo->guid.' - '.$demo->employee_name.' - No change'; echo "\r\n";
                     }
                 } else {
                     // skip, no user info, do not process
-                    // echo 'Skipping:'.$demo->guid.' - '.$demo->employee_name.' - No user details'; echo "\r\n";
                 }
                 $counter += 1;
                 echo 'Processed '.$counter; echo "\r";
             }
         });
         echo 'Processed '.$counter; echo "\r\n";
-
         DB::table('stored_dates')->updateOrInsert(
             [
             'name' => 'CalcNextConversationDate',
@@ -208,7 +199,6 @@ class CalcNextConversationDate extends Command
             ]
         );
         $this->info( 'Last Run Date Updated to: '.$start_time);
-
         $end_time = Carbon::now();
         DB::table('job_sched_audit')->updateOrInsert(
             [
@@ -223,9 +213,7 @@ class CalcNextConversationDate extends Command
                 'details' => 'Processed '.$counter.' rows from '.date('Y-m-d H:i:s',strtotime($last_cutoff_time)).'.',
             ]
         );
-
         $this->info('CalcNextConversationDate, Completed: '.$end_time);
-
     } 
     
 }
