@@ -760,10 +760,10 @@
 					$('#pageLoader').show();
 				});
 
-				$(window).resize(function(){
-					location.reload();
-					return;
-				});
+				// $(window).resize(function(){
+				// 	location.reload();
+				// 	return;
+				// });
 
 			});
 			// Model -- Confirmation Box
