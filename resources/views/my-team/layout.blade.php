@@ -335,7 +335,9 @@
                 const excusedData = $(this).data("user-excused");
                 $("#employee-excused-modal").find("input[name=excused_start_date]").val(excusedData.start_date);
                 $("#employee-excused-modal").find("input[name=excused_end_date]").val(excusedData.end_date);
-                $("#employee-excused-modal").find("input[name=excused_reason_id]").val(excusedData.reason_id);
+                $("#employee-excused-modal").find("select[name=excused_reason_id]").val(excusedData.reason_id);
+                console.log('enddate ' + excusedData.end_date);
+                console.log('reason id ' + excusedData.reason_id);
                 // debugger;
             });
 

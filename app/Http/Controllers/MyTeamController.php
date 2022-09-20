@@ -150,7 +150,7 @@ class MyTeamController extends Controller
         $excusedreasons = ExcusedReason::all();
         $excusedprofile = DB::table(users)
             ->where('id', $user_id)
-            ->select('id', 'name', 'excused_start_date', 'excused_end_date')
+            ->select('id', 'name', 'excused_start_date', 'excused_end_date', 'excused_reason_id')
             ->get();
         return view('my-team.partials.employee-excused-modal', $excusedreasons);
         // return $this->respondeWith($sharedProfiles);

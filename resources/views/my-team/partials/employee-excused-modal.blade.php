@@ -21,11 +21,11 @@
                     <input type="hidden" name="user_id" value="">
                     <div class="row">
                         <div class="col-5 mt-1">
-                            <x-input class="form-control" type="date" label="From" name="excused_start_date" value="$currentProfile->excused_start_date"/>
+                            <x-input class="form-control" type="date" label="From" name="excused_start_date" value=""/>
                             <small class="text-danger error-excused_start_date"></small>
                         </div>
                         <div class="col-5 mt-1">
-                            <x-input  class="form-control" type="date" label="To" name="excused_end_date" value="$currentProfile->excused_end_date" />
+                            <x-input  class="form-control" type="date" label="To" name="excused_end_date" value="" />
                             <small class="text-danger error-excused_end_date"></small>
                         </div>
                         <div class="col-2 mt-1">
@@ -33,7 +33,7 @@
                             <x-button id='btn-reset' type="button" class="btn-reset">Reset Dates</x-button>
                         </div>
                         <div class="col-6 mt-1">
-                            <x-dropdown :list="$eReasons" label="Reasons" name="excused_reason_id" value="$currentProfile->excused_reason_id"/>
+                            <x-dropdown :list="$eReasons" label="Reasons" name="excused_reason_id" value=""/>
                             <small class="text-danger error-excused_reason_id"></small>
                         </div>
                         <div class="col-12 text-left pb-5 mt-3">
