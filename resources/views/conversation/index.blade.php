@@ -868,6 +868,8 @@
                             $('#supervisor-signoff-message').find('.not').removeClass('d-none');
                             $('#supervisor-signoff-message').find('.time').addClass('d-none');
                             $('#viewConversationModal').data('supervisor-signoff', 0);
+                            
+                            $('#supervisor-unsignoff-message').find('.not').removeClass('d-none');
                         }
                         if (!!result.signoff_user_id) {
                             $('#employee-signoff-message').find('.not').addClass('d-none');
@@ -877,6 +879,9 @@
                             $('#employee-signoff-message').find('.not').removeClass('d-none');
                             $('#employee-signoff-message').find('.time').addClass('d-none');
                             $('#viewConversationModal').data('employee-signoff', 0);
+                            
+                            
+                            $('#employee-unsignoff-message').find('.not').removeClass('d-none');
                         }
 
                         if (result.signoff_user_id || result.supervisor_signoff_id) {
