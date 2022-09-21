@@ -210,7 +210,7 @@
 				// 	location.reload();
 				// 	return;
 				// });
-
+ 
 			});
 
 		</script>
