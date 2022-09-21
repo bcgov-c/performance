@@ -224,7 +224,7 @@
 				// 	location.reload();
 				// 	return;
 				// });
-
+ 
 			});
 
 		</script>

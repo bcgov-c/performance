@@ -729,7 +729,7 @@
 				// $(window).resize(function(){
 				// 	location.reload();
 				// 	return;
-				// });
+				// }); 
 
 
 				$('body').popover({

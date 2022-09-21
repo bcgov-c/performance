@@ -616,7 +616,7 @@
 			// $(window).resize(function(){
 			// 	location.reload();
 			// 	return;
-			// });
+			// }); 
 
 
 		</script>
