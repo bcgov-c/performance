@@ -761,7 +761,7 @@
 				// $(window).resize(function(){
 				// 	location.reload();
 				// 	return;
-				// });
+				// }); 
 
 			});
 			// Model -- Confirmation Box
