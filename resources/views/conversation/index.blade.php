@@ -837,7 +837,7 @@
                         }
                         
 
-                        //$('#team_member_agreement').prop('checked', result.team_member_agreement ? true : false);
+                        $('.team_member_agreement').prop('checked', result.team_member_agreement ? true : false);
                         //$('#team_member_agreement_2').prop('checked', result.team_member_agreement ? true : false);
 
                         $("#employee-sign_off_form").find('input:radio[name="check_one"][value="'+result.empl_agree1+'"]').prop('checked', true);
