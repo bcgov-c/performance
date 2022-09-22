@@ -599,7 +599,7 @@
                 } else {
                     window.location.reload();
                     if (modal_edit ==  true){
-                        if (isContentModified() && confirm("Your comments will be saved when you close the window.")) {
+                        if (isContentModified() && confirm("Save your comments before closing? Yes / No")) {
                             //e.preventDefault();
                             modal_open = false;
                             saveComments();
@@ -1186,7 +1186,7 @@
             function sessionWarning() {
                 if (modal_open == true) {
                     saveComments();
-                    alert('Your comments is autosaved.');
+                    alert('Your comments have been autosaved.');
                 }
             }            
             
