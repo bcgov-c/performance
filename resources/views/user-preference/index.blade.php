@@ -13,6 +13,12 @@
         <div class="px-4"></div>
         <div class="card-body">
             <h4 class=" text-primary">Notifications</h4>
+
+            <div>
+                <br>
+                All of the activities below will generate a notification on your PDP home page.  Please indicate which activities should also generate an email notification for you.
+            </div>
+
             <p class="font-weight-bold pt-4">I want to receive an email when someone:</p>
             
             <div class="form-check">
