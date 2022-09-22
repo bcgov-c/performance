@@ -26,12 +26,12 @@ class UserPreference extends Model
         'conversation_signoff_flag' => 'Y', 
         'conversation_disagree_flag' => 'Y', 
         
-        'conversation_due_month' => 'N', 
-        'conversation_due_week' => 'N', 
+        'conversation_due_month' => 'Y', 
+        'conversation_due_week' => 'Y', 
         'conversation_due_past' => 'Y',
 
-        'team_conversation_due_month' => 'N', 
-        'team_conversation_due_week' => 'N', 
+        'team_conversation_due_month' => 'Y', 
+        'team_conversation_due_week' => 'Y', 
         'team_conversation_due_past' => 'Y',
     ];
 
