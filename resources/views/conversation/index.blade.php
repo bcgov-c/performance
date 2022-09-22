@@ -834,7 +834,7 @@
                             CKEDITOR.instances['info_comment9'].setReadOnly(true);
                             CKEDITOR.instances['info_comment10'].setReadOnly(true);
                             $('.employee-sign-off').prop('disabled', true);
-                            $('#team_member_agreement').prop('disabled', true);
+                            $('.team_member_agreement').prop('disabled', true);
       
                             if(supervisor_signed == false) {
                                 $('#signoff-sup-id-input').html('<div id="emp-signoff-row"><div class="my-2">Enter your 6 digit employee ID to indicate you have read and accept the performance review:</div><input type="text" id="employee_id" class="form-control d-inline w-50"><button class="btn btn-primary btn-sign-off ml-2" type="button">Sign with my employee ID</button><br><span class="text-danger error" data-error-for="employee_id"></span></div>');                                
@@ -861,8 +861,8 @@
                         }
                         
 
-                        $('#team_member_agreement').prop('checked', result.team_member_agreement ? true : false);
-                        $('#team_member_agreement_2').prop('checked', result.team_member_agreement ? true : false);
+                        //$('#team_member_agreement').prop('checked', result.team_member_agreement ? true : false);
+                        //$('#team_member_agreement_2').prop('checked', result.team_member_agreement ? true : false);
 
                         $("#employee-sign_off_form").find('input:radio[name="check_one"][value="'+result.empl_agree1+'"]').prop('checked', true);
                         $("#employee-sign_off_form").find('input:radio[name="check_two"][value="'+result.empl_agree2+'"]').prop('checked', true);
@@ -907,7 +907,7 @@
                             
                             $('#employee-unsignoff-message').find('.not').removeClass('d-none');
                         }
-
+                        
                         if (result.signoff_user_id || result.supervisor_signoff_id) {
                             // Freeze content.
                             $("button.btn-conv-edit").hide();
@@ -915,13 +915,12 @@
                             $("button.btn-conv-cancel").hide();
                             $("#viewConversationModal").find('textarea').each((index, e) => $(e).prop('readonly', true));
                             $('#viewConversationModal').data('is-frozen', 1);
-                            $("#team_member_agreement").prop('disabled', false);
+                            $(".team_member_agreement").prop('disabled', true);
                             if (result.supervisor_signoff_id && isSupervisor) {
                                 $("#viewConversationModal .sup-inputs").find('input:radio').each((index, e) => $(e).prop('disabled', true));
                             } 
                             if (result.signoff_user_id && !isSupervisor) {
                                 $("#viewConversationModal .emp-inputs").find('input:radio').each((index, e) => $(e).prop('disabled', true));
-                                $("#team_member_agreement").prop('disabled', true);
                             }
                             if (result.signoff_user_id && result.supervisor_signoff_id) {
                                 $("#questions-to-consider").hide();
