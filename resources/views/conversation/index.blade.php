@@ -599,7 +599,7 @@
                 } else {
                     window.location.reload();
                     if (modal_edit ==  true){
-                        if (isContentModified() && confirm("Save your comments before closing? Yes / No")) {
+                        if (isContentModified() && confirm('Click "OK" to save content and exit. Click "Cancel" to exit without saving.')) {
                             //e.preventDefault();
                             modal_open = false;
                             saveComments();
