@@ -245,7 +245,9 @@
 				$('#btn_search').click(function(e) {
 					e.preventDefault();
 					//List
-						$('#currenttable').DataTable().rows().invalidate().draw();
+					$('#currenttable').DataTable().rows().invalidate().draw();
+                                        	
+                       	
 					// $('#currenttable').DataTable().destroy();
 					// $('#currenttable').empty();
 					// $('#currenttable').DataTable(
