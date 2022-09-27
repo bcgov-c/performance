@@ -927,18 +927,6 @@
                                 $("#questions-to-consider").hide();
                                 $("#questions-to-consider").prev().hide();
                             }
-                            
-                            //either employee or supervisor signed off, both of them cannot edit/add comment anymore
-                            CKEDITOR.instances['info_comment1'].setReadOnly(true);
-                            CKEDITOR.instances['info_comment2'].setReadOnly(true);
-                            CKEDITOR.instances['info_comment3'].setReadOnly(true);
-                            CKEDITOR.instances['info_comment5'].setReadOnly(true);
-                            CKEDITOR.instances['info_comment6'].setReadOnly(true);  
-                            CKEDITOR.instances['info_comment7'].setReadOnly(true);  
-                            CKEDITOR.instances['info_comment8'].setReadOnly(true);  
-                            CKEDITOR.instances['info_comment9'].setReadOnly(true);  
-                            CKEDITOR.instances['info_comment10'].setReadOnly(true);  
-                            $('#info_comment11').prop('disabled', true);
                         }
                         if (isNotThirdPerson) {
                             const currentEmpSignoffDone = isSupervisor ? !!result.supervisor_signoff_id : !!result.signoff_user_id
