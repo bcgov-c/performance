@@ -592,16 +592,14 @@
             <?php if ($type == 'upcoming'){ ?>
                 var modal_edit = true;
             <?php } ?>
-            
             $(document).on('hide.bs.modal', '#viewConversationModal', function(e) {
                 if (toReloadPage) {
                     window.location.reload();
                 } else {
                     window.location.reload();
-                    if (modal_edit ==  true){
+                    if (modal_edit ==  true){                        
                         if (isContentModified() && confirm('Click "OK" to save content and exit. Click "Cancel" to exit without saving.')) {
-                            //e.preventDefault();
-                            modal_open = false;
+                            modal_open=false;
                             saveComments();
                         }
                     }
@@ -1179,6 +1177,15 @@
                     }
                 });
             }
+            
+            function sessionWarning() {
+                if (modal_open == true) {
+                    saveComments();
+                    alert('Your comments have been autosaved.');
+                }
+                
+            }            
+            
 
             $('.modal').on('hidden.bs.modal', function(){
                 $('.modal-body').find('#employee_id').val('');
@@ -1186,12 +1193,6 @@
                 $('.modal-body').find('input[type=radio]').prop('checked', false);
             });
             
-            function sessionWarning() {
-                if (modal_open == true) {
-                    saveComments();
-                    alert('Your comments have been autosaved.');
-                }
-            }            
             
             const minutes = 15;
             const SessionTime = 1000 * 60 * minutes;
