@@ -480,7 +480,8 @@ $dayDiff = 11;
                 $subject = '';
                 $template = 'SUPV_CONV_REMINDER';
                 $bSend = false;
-                $bind1 = $user->reportingManager->name;
+                // $bind1 = $user->reportingManager->name;
+                $bind1 = $user->reportingManager ? $user->reportingManager->name : '';
                 $bind2 = $user->name;
                 $bind3 = $dueDate->format('M d, Y');
 
