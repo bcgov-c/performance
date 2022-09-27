@@ -290,7 +290,7 @@
                 disableNativeSpellChecker: false
             });
             
-            modal_open = false;
+             modal_open=false;
         </script>    
         
         <script>
@@ -674,7 +674,7 @@
                 $.ajax({
                     url: '/conversation/' + conversation_id
                     , success: function(result) {
-                        modal_open = true;
+                         modal_open=true;
                         isSupervisor = result.view_as_supervisor;
                         topic_id = result.topic.id;
                         disable_signoff = result.disable_signoff;
@@ -799,16 +799,16 @@
                                 $('#signoff-emp-id-input').html('<div id="emp-signoff-row"><div class="my-2">Enter your 6 digit employee ID to indicate you have read and accept the performance review:</div><input type="text" id="employee_id" class="form-control d-inline w-50"><button class="btn btn-primary btn-sign-off ml-2" type="button">Sign with my employee ID</button><br><span class="text-danger error" data-error-for="employee_id"></span></div>');                                
                                 $('#unsign-off-block').html('');
                             } else {
-                                CKEDITOR.instances['info_comment4'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment7'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment8'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment9'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment10'].setReadOnly(true);
-                                $('.employee-sign-off').prop('disabled', true);
-                                $('#team_member_agreement').prop('disabled', true)
-                                modal_open = false;
-                                $("input[name=check_one]").prop('disabled', true);
-                                $("input[name=check_two]").prop('disabled', true);
+                                CKEDITOR.instances['info_comment4'].setReadOnly( true );
+                                CKEDITOR.instances['info_comment7'].setReadOnly( true );
+                                CKEDITOR.instances['info_comment8'].setReadOnly( true );
+                                CKEDITOR.instances['info_comment9'].setReadOnly( true );
+                                CKEDITOR.instances['info_comment10'].setReadOnly( true );
+                                $('.employee-sign-off').prop( 'disabled', true );
+                                $('#team_member_agreement').prop( 'disabled', true )
+                                modal_open=false;
+                                $("input[name=check_one]").prop( 'disabled', true );
+                                $("input[name=check_two]").prop( 'disabled', true );
                                 
                                 $('#unsignoff-emp-id-input').html('<input type="text" id="employee_id" class="form-control d-inline w-50"><button data-action="unsignoff" class="btn btn-primary btn-sign-off ml-2" type="button">Un-Sign</button><br><span class="text-danger error" data-error-for="employee_id"></span>');
                                 $('#sign-off-block').html('');
@@ -838,16 +838,16 @@
                                 $('#signoff-sup-id-input').html('<div id="emp-signoff-row"><div class="my-2">Enter your 6 digit employee ID to indicate you have read and accept the performance review:</div><input type="text" id="employee_id" class="form-control d-inline w-50"><button class="btn btn-primary btn-sign-off ml-2" type="button">Sign with my employee ID</button><br><span class="text-danger error" data-error-for="employee_id"></span></div>');                                
                                 $('#unsign-off-block').html('');
                             } else {
-                                CKEDITOR.instances['info_comment1'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment2'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment3'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment5'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment6'].setReadOnly(true);
-                                $('#info_comment11').prop('disabled', true);
-                                $('.supervisor-sign-off').prop('disabled', true);   
-                                modal_open = false;
-                                $("input[name=check_one_]").prop('disabled', true);
-                                $("input[name=check_two_]").prop('disabled', true);
+                                CKEDITOR.instances['info_comment1'].setReadOnly( true );
+                                CKEDITOR.instances['info_comment2'].setReadOnly( true );
+                                CKEDITOR.instances['info_comment3'].setReadOnly( true );
+                                CKEDITOR.instances['info_comment5'].setReadOnly( true );
+                                CKEDITOR.instances['info_comment6'].setReadOnly( true );
+                                $('#info_comment11').prop( 'disabled', true );
+                                $('.supervisor-sign-off').prop( 'disabled', true );   
+                                modal_open=false;
+                                $("input[name=check_one_]").prop( 'disabled', true );
+                                $("input[name=check_two_]").prop( 'disabled', true );
                                 
                                 $('#unsignoff-sup-id-input').html('<input type="text" id="employee_id" class="form-control d-inline w-50"><button data-action="unsignoff" class="btn btn-primary btn-sign-off ml-2" type="button">Un-Sign</button><br><span class="text-danger error" data-error-for="employee_id"></span>');
                                 $('#sign-off-block').html('');
@@ -929,16 +929,16 @@
                             }
                             
                             //either employee or supervisor signed off, both of them cannot edit/add comment anymore
-                            CKEDITOR.instances['info_comment1'].setReadOnly(true);
-                            CKEDITOR.instances['info_comment2'].setReadOnly(true);
-                            CKEDITOR.instances['info_comment3'].setReadOnly(true);
-                            CKEDITOR.instances['info_comment5'].setReadOnly(true);
-                            CKEDITOR.instances['info_comment6'].setReadOnly(true);  
-                            CKEDITOR.instances['info_comment7'].setReadOnly(true);  
-                            CKEDITOR.instances['info_comment8'].setReadOnly(true);  
-                            CKEDITOR.instances['info_comment9'].setReadOnly(true);  
-                            CKEDITOR.instances['info_comment10'].setReadOnly(true);  
-                            $('#info_comment11').prop('disabled', true);
+                            CKEDITOR.instances['info_comment1'].setReadOnly( true );
+                            CKEDITOR.instances['info_comment2'].setReadOnly( true );
+                            CKEDITOR.instances['info_comment3'].setReadOnly( true );
+                            CKEDITOR.instances['info_comment5'].setReadOnly( true );
+                            CKEDITOR.instances['info_comment6'].setReadOnly( true );  
+                            CKEDITOR.instances['info_comment7'].setReadOnly( true );  
+                            CKEDITOR.instances['info_comment8'].setReadOnly( true );  
+                            CKEDITOR.instances['info_comment9'].setReadOnly( true );  
+                            CKEDITOR.instances['info_comment10'].setReadOnly( true );  
+                            $('#info_comment11').prop( 'disabled', true );
                         }
                         if (isNotThirdPerson) {
                             const currentEmpSignoffDone = isSupervisor ? !!result.supervisor_signoff_id : !!result.signoff_user_id
