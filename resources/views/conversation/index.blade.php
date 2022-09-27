@@ -686,7 +686,8 @@
                         }
                         if (typeof result.supervisor_signoff_id === 'number') {
                             supervisor_signed = true;                            
-                        }                    
+                        }    
+                                                
                         $('#conv_participant_edit').val('');
                         $('#conv_participant').val('');
                         $('#conv_title').text(result.topic.name);
@@ -909,7 +910,7 @@
                             $(".team_member_agreement").prop('disabled', true);
                         }
                         
-                        if (result.signoff_user_id || result.supervisor_signoff_id) {
+                        if (employee_signed || supervisor_signed) {
                             // Freeze content.
                             $("button.btn-conv-edit").hide();
                             $("button.btn-conv-save").hide();
@@ -931,6 +932,7 @@
                             CKEDITOR.instances['info_comment1'].setReadOnly( true );
                             CKEDITOR.instances['info_comment2'].setReadOnly( true );
                             CKEDITOR.instances['info_comment3'].setReadOnly( true );
+                            CKEDITOR.instances['info_comment4'].setReadOnly( true );
                             CKEDITOR.instances['info_comment5'].setReadOnly( true );
                             CKEDITOR.instances['info_comment6'].setReadOnly( true );  
                             CKEDITOR.instances['info_comment7'].setReadOnly( true );  
