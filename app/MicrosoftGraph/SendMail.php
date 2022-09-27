@@ -143,7 +143,8 @@ class SendMail
             $from = env('MAIL_FROM_ADDRESS');
         }
 
-        if (App::environment(['production'])) {
+        // if (App::environment(['production'])) {
+        if (App::environment(['prod'])) {
             // No special handling to avoid to send to the real users
         } else {
 
@@ -224,7 +225,8 @@ class SendMail
             ]);
 
             // Update Recipients
-            if (App::environment(['production'])) {
+            // if (App::environment(['production'])) {
+            if (App::environment(['prod'])) {
                 foreach ($this->toRecipients as $recipient_id) {
                     $notification_log->recipients()->updateOrCreate([
                         'recipient_id' => $recipient_id,
