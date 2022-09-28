@@ -263,10 +263,11 @@
                                             
                                             <div class="mt-3">
                                                     <label style="font-weight: normal;">
-                                                        <input type="checkbox" class="team_member_agreement" name="team_member_agreement" id="team_member_agreement" value="1">&nbsp;Team member disagrees with the information contained in this performance review.
+                                                        <input type="checkbox" class="team_member_agreement" name="team_member_agreement" id="signoff_team_member_agreement" value="1">&nbsp;Team member disagrees with the information contained in this performance review.
                                                     </label>
-                                                </div>
+                                                    <p><span class="agree-message text-danger error"></span></p>
                                             </div>
+                                        </div>
                                             
                                             <div id="emp-signoff-row">                                                
                                                 <div id="signoff-emp-id-input"></div>                                            
@@ -331,7 +332,7 @@
                                             
                                             <div class="mt-3">
                                                     <label style="font-weight: normal;">
-                                                        <input type="checkbox" class="team_member_agreement" name="team_member_agreement" id="team_member_agreement" value="1">&nbsp;Team member disagrees with the information contained in this performance review.
+                                                        <input type="checkbox" class="team_member_agreement" name="team_member_agreement" id="unsingoff-team_member_agreement" value="1">&nbsp;Team member disagrees with the information contained in this performance review.
                                                     </label>
                                                 </div>
                                             </div>

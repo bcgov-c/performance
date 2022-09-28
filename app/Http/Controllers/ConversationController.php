@@ -445,6 +445,69 @@ class ConversationController extends Controller
 
         return redirect()->back();
     }
+    
+    public function agreement(Conversation $conversation)
+    {
+        $view_as_supervisor = session()->get('view_as_supervisor');
+        $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
+
+        if (!$view_as_supervisor){            
+            // #646 Create a message for the supervisor when the people check on Team member disagrees 
+            // with the information contained in this performance review
+            if ($conversation->id) {
+		$conversation->team_member_agreement = 0;
+                $conversation->update();
+                return response()->json(['success' => true, 'Message' => 'Your agree supervisor comments.', 'data' => $conversation]);
+            }
+        }
+    }
+    
+    public function disagreement(Conversation $conversation)
+    {
+        $view_as_supervisor = session()->get('view_as_supervisor');
+        $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
+
+        if (!$view_as_supervisor){            
+            // #646 Create a message for the supervisor when the people check on Team member disagrees 
+            // with the information contained in this performance review
+            if ($conversation->id) {
+		$signoff_user = User::where('id', $authId)->first();
+                $conversation->team_member_agreement = 1;
+                
+                if ($signoff_user && $signoff_user->reporting_to ) {
+                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                    $notification->user_id = $signoff_user->reporting_to;
+                    $notification->notification_type = 'CS';
+                    $notification->comment = $signoff_user->name . ' has selected the "disagree" option on a performance conversation with you.';
+                    $notification->related_id = $conversation->id;
+                    $notification->notify_user_id =  $signoff_user->reporting_to;
+                    $notification->send(); 
+
+                     // Send a email notification to the participants when someone sign the conversation
+                    $user = User::where('id', $signoff_user->reporting_to)
+                                ->with('userPreference')
+                                ->select('id','name','guid')
+                                ->first();
+
+                    if ($user && $user->allow_email_notification && $user->userPreference->conversation_disagree_flag == 'Y') {     
+                        $topic = ConversationTopic::find($request->conversation_topic_id);
+                        $sendMail = new \App\MicrosoftGraph\SendMail();
+                        $sendMail->toRecipients = [ $user->id ];
+                        $sendMail->sender_id = null;  // default sender is System
+                        $sendMail->useQueue = false;
+                        $sendMail->template = 'CONVERSATION_DISAGREED';
+                        array_push($sendMail->bindvariables, $user->name);
+                        array_push($sendMail->bindvariables, $signoff_user->name );   //Person who signed the conversation 
+                        array_push($sendMail->bindvariables, $conversation->topic->name );  // Conversation topic
+                        $response = $sendMail->sendMailWithGenericTemplate();
+                    }
+
+                }
+                $conversation->update();
+                return response()->json(['success' => true, 'Message' => 'Your disagree notification has been sent.', 'data' => $conversation]);
+            }
+        }
+    }
 
     public function signOff(SignoffRequest $request, Conversation $conversation)
     {
@@ -478,56 +541,10 @@ class ConversationController extends Controller
             $conversation->empl_agree1 = $request->check_one;
             $conversation->empl_agree2 = $request->check_two;
             $conversation->empl_agree3 = $request->check_three;
-            $conversation->team_member_agreement = $request->team_member_agreement;
 
             if (!$conversation->initial_signoff) {
                 $conversation->initial_signoff = Carbon::now();
             }
-
-            // #646 Create a message for the supervisor when the people check on Team member disagrees 
-            // with the information contained in this performance review
-            if ($request->team_member_agreement) {
-                $signoff_user = User::where('id', $authId)->first();
-                    if ($signoff_user && $signoff_user->reporting_to ) {
-                    //     DashboardNotification::create([
-                    //     'user_id' => $signoff_user->reporting_to,
-                    //     'notification_type' => 'CS',        // Conversation signoff 
-                    //     'comment' => $signoff_user->name . ' has selected the "disagree" option on a performance conversation with you.',
-                    //     'related_id' => $conversation->id,
-                    // ]);
-                    // Use Class to create DashboardNotification
-                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                    $notification->user_id = $signoff_user->reporting_to;
-                    $notification->notification_type = 'CS';
-                    $notification->comment = $signoff_user->name . ' has selected the "disagree" option on a performance conversation with you.';
-                    $notification->related_id = $conversation->id;
-                    $notification->notify_user_id =  $signoff_user->reporting_to;
-                    $notification->send(); 
-
-
-                     // Send a email notification to the participants when someone sign the conversation
-                    $user = User::where('id', $signoff_user->reporting_to)
-                                ->with('userPreference')
-                                ->select('id','name','guid')
-                                ->first();
-
-                    if ($user && $user->allow_email_notification && $user->userPreference->conversation_disagree_flag == 'Y') {                            
-
-                        $topic = ConversationTopic::find($request->conversation_topic_id);
-                        $sendMail = new \App\MicrosoftGraph\SendMail();
-                        $sendMail->toRecipients = [ $user->id ];
-                        $sendMail->sender_id = null;  // default sender is System
-                        $sendMail->useQueue = false;
-                        $sendMail->template = 'CONVERSATION_DISAGREED';
-                        array_push($sendMail->bindvariables, $user->name);
-                        array_push($sendMail->bindvariables, $signoff_user->name );   //Person who signed the conversation 
-                        array_push($sendMail->bindvariables, $conversation->topic->name );  // Conversation topic
-                        $response = $sendMail->sendMailWithGenericTemplate();
-                    }
-
-                }
-            }
-
         }
         $conversation->update();
 
@@ -586,7 +603,6 @@ class ConversationController extends Controller
 
     public function unsignOff(UnSignoffRequest $request, Conversation $conversation)
     {
-        error_log('-------------------');
         $view_as_supervisor = session()->get('view_as_supervisor');
 
         $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
