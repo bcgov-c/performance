@@ -476,7 +476,15 @@ class ConversationController extends Controller
                 
                 if ($signoff_user && $signoff_user->reporting_to ) {
                     $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                    $notification->user_id = $signoff_user->reporting_to;
+                    
+                    
+                    $conversation_participants = DB::table('conversation_participants')                        
+                            ->where('conversation_id', $conversation->id)
+                            ->where('participant_id', '<>', $authId)
+                            ->first();
+                    //error_log(print_r($conversation_participants->participant_id,true));
+                    $notification->user_id = $conversation_participants->participant_id;
+                    
                     $notification->notification_type = 'CS';
                     $notification->comment = $signoff_user->name . ' has selected the "disagree" option on a performance conversation with you.';
                     $notification->related_id = $conversation->id;
@@ -484,11 +492,11 @@ class ConversationController extends Controller
                     $notification->send(); 
 
                      // Send a email notification to the participants when someone sign the conversation
-                    $user = User::where('id', $signoff_user->reporting_to)
+                    $user = User::where('id', $conversation_participants->participant_id)
                                 ->with('userPreference')
                                 ->select('id','name','guid')
                                 ->first();
-
+                    //error_log(print_r($user,true));
                     if ($user && $user->allow_email_notification && $user->userPreference->conversation_disagree_flag == 'Y') {     
                         $topic = ConversationTopic::find($request->conversation_topic_id);
                         $sendMail = new \App\MicrosoftGraph\SendMail();
