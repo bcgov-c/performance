@@ -497,8 +497,9 @@ class ConversationController extends Controller
                                 ->select('id','name','guid')
                                 ->first();
                     //error_log(print_r($user,true));
+                    error_log(print_r($conversation->conversation_topic_id,true));
                     if ($user && $user->allow_email_notification && $user->userPreference->conversation_disagree_flag == 'Y') {     
-                        $topic = ConversationTopic::find($request->conversation_topic_id);
+                        $topic = ConversationTopic::find($conversation->conversation_topic_id);
                         $sendMail = new \App\MicrosoftGraph\SendMail();
                         $sendMail->toRecipients = [ $user->id ];
                         $sendMail->sender_id = null;  // default sender is System
