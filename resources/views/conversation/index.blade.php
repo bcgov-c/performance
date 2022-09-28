@@ -652,11 +652,33 @@
             });
             
 
-            $(document).on('change', '#team_member_agreement', function () {
+            $(document).on('change', '.team_member_agreement', function () {
                 if ($(this).prop('checked')) {
                     if (!confirm("Ticking this box will send a notification to your supervisor that you disagree with this performance review. Continue/Cancel")) {
                         $(this).prop("checked", false);
+                    } else {
+                        const url = '/conversation/disagreement/' + conversation_id;
+                        $.ajax({
+                            url: url
+                            , type: 'GET'
+                            , success: function(result) {
+                                if (result.success) {
+                                    $('.agree-message').html('Your disagree notification has been sent.');
+                                } 
+                            }
+                        });
                     }
+                } else {
+                    const url = '/conversation/agreement/' + conversation_id;
+                        $.ajax({
+                            url: url
+                            , type: 'GET'
+                            , success: function(result) {
+                                if (result.success) {
+                                    $('.agree-message').html('You agreed with this performance review.');
+                                } 
+                            }
+                        });
                 }
             });
 
@@ -793,7 +815,7 @@
                             CKEDITOR.instances['info_comment9'].setReadOnly(false);
                             CKEDITOR.instances['info_comment10'].setReadOnly(false);
                             $('.employee-sign-off').prop('disabled', false);
-                            $('#team_member_agreement').prop('disabled', false);
+                            $('.team_member_agreement').prop('disabled', false);
                             
                             if(employee_signed == false) {                                
                                 $('#signoff-emp-id-input').html('<div id="emp-signoff-row"><div class="my-2">Enter your 6 digit employee ID to indicate you have read and accept the performance review:</div><input type="text" id="employee_id" class="form-control d-inline w-50"><button class="btn btn-primary btn-sign-off ml-2" type="button">Sign with my employee ID</button><br><span class="text-danger error" data-error-for="employee_id"></span></div>');                                
@@ -805,7 +827,7 @@
                                 CKEDITOR.instances['info_comment9'].setReadOnly( true );
                                 CKEDITOR.instances['info_comment10'].setReadOnly( true );
                                 $('.employee-sign-off').prop( 'disabled', true );
-                                $('#team_member_agreement').prop( 'disabled', true )
+                                $('.team_member_agreement').prop( 'disabled', true )
                                 modal_open=false;
                                 $("input[name=check_one]").prop( 'disabled', true );
                                 $("input[name=check_two]").prop( 'disabled', true );
