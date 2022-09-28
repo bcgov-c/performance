@@ -15,9 +15,4 @@
             </option>
         @endforeach
     </select>
-    <small class="text-danger error-{{$attributes['name'] ?? '' ? preg_replace('/\[.*?\]/', '', $attributes['name']) : ''}}">
-        @if ($showError !== 'false') 
-            {{ $errors->first($attributes['name']) }}
-        @endif
-    </small>
 </label>

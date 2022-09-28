@@ -32,7 +32,7 @@ class EditSuggestedGoalRequest extends FormRequest
             'how' => 'nullable',
             'measure_of_success' => 'nullable',
             'goal_type_id' => 'required|exists:goal_types,id',
-            'tag_ids' => 'nullable|array',
+            'tag_ids' => 'required|array',
             'tag_ids.*' => 'exists:tags,id'
         ];
     }
