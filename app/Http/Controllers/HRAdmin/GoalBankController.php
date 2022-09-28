@@ -37,7 +37,7 @@ class GoalBankController extends Controller
 
         $errors = session('errors');
 
-        $request->firstTime = true;
+        $request->firstTime = true;        
 
         $old_selected_emp_ids = []; // $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $old_selected_org_nodes = []; // $request->old_selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
@@ -682,12 +682,15 @@ class GoalBankController extends Controller
 
     public function savenewgoal(Request $request) 
     {
-        if ($request->input('title') == '' || $request->input('what') == '') {
+        
+        if ($request->input('title') == '' || $request->input('what') == '' || $request->input('tag_ids') == '') {
             if($request->input('title') == '') {
                 $request->session()->flash('title_miss', 'The title field is required');
-            } elseif($request->input('what') == '') {
+            } elseif($request->input('tag_ids') == '') {
+                $request->session()->flash('tags_miss', 'The tags field is required');
+            }   elseif($request->input('what') == '') {
                 $request->session()->flash('what_miss', 'The description field is required');
-            }                
+            }             
             return \Redirect::route('hradmin.goalbank')->with('message', " There are one or more errors on the page. Please review and try again.");
         }       
         
@@ -1226,6 +1229,18 @@ class GoalBankController extends Controller
     public function updategoaldetails(Request $request, $id) 
     {
         $resultrec = Goal::withoutGlobalScopes()->findorfail( $id );
+        
+        if ($request->title == '' || $request->what== ''  || $request->tag_ids== '') {
+            if($request->title == '') {
+                $request->session()->flash('title_miss', 'The title field is required');
+            } elseif($request->what == '') {
+                $request->session()->flash('what_miss', 'The description field is required');
+            } elseif($request->tag_ids == '') {
+                $request->session()->flash('tags_miss', 'The tags field is required');
+            }                 
+            return \Redirect::route('hradmin.goalbank.editdetails', [$id])->with('message', " There are one or more errors on the page. Please review and try again.");
+        } 
+        
         $resultrec->update(
             ['goal_type_id' => $request->input('goal_type_id')
             , 'title' => $request->input('title')

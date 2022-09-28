@@ -46,10 +46,12 @@
 			<div class="row">
 				<div class="col-md-4">
 					<b>Tags</b>
-					<i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resource/goal-setting?t=5' target=\'_blank\'><u>View full list of tag descriptions.</u></a>"></i>					
+					<i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>."></i>					
 					<!-- <x-dropdown :list="$tags" data-tooltip-trigger='hover' data-toggle="tooltip" name="tag_ids[]" id="tags" class="tags" multiple/>					 -->
-					<x-dropdown :list="$tags" name="tag_ids[]" id="tags" class="tags" multiple/>					
-					<small  class="text-danger error-tag_ids"></small>
+					<x-dropdown :list="$tags" name="tag_ids[]" id="tags" class="tags" multiple/>						
+					@if(session()->has('tags_miss'))
+                                            <small class="text-danger">The tags field is required</small>
+                                        @endif
 				</div>
 			</div>
 			<div class="row">
@@ -62,8 +64,8 @@
 						<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> you will achieve it. 
 					</p>
 					<x-textarea id="what" name="what"/>
-					@if(session()->has('title_miss'))
-                                            <small class="text-danger">The title field is required</small>
+					@if(session()->has('what_miss'))
+                                            <small class="text-danger">The description field is required</small>
                                         @endif
 				</div>
 			</div>

@@ -14,6 +14,14 @@
 	<form id="notify-form" action="{{ route(request()->segment(1).'.goalbank.updategoaldetails', $request->id) }}" method="post">
 		@csrf
 
+                @if(Session::has('message'))
+                <div class="col-12">                    
+                    <div class="alert alert-danger" style="display:">
+                        <i class="fa fa-info-circle"></i> {{ Session::get('message') }}
+                    </div>
+                </div>
+                @endif
+                
 		<div class="row">
 				<div class="col col-md-2">
 					<b> Goal Type </b>
@@ -24,7 +32,9 @@
 				<b> Goal Title </b>
 				<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>
 				<x-input name="title" :value="$goaldetail->title" />
-				<small class="text-danger error-title"></small>
+				@if(session()->has('title_miss'))                           
+                                    <small class="text-danger">The title field is required</small>
+                                @endif
 			</div>
 			<div class="col col-md-2">
 				<x-dropdown :list="$mandatoryOrSuggested" label="Mandatory/Suggested" name="is_mandatory" :selected="$goaldetail->is_mandatory" />
@@ -33,9 +43,11 @@
 		<div class="row">
 			<div class="col-md-4">
 				<b>Tags</b>
-				<i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resource/goal-setting?t=5' target=\'_blank\'><u>View full list of tag descriptions.</u></a>"></i>				
+				<i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>."></i>				
 				<x-dropdown :list="$tags" name="tag_ids[]" :selected="array_column($goaldetail->tags->toArray(), 'id')" class="tags" multiple/>								
-				<small  class="text-danger error-tag_ids"></small>
+				@if(session()->has('tags_miss'))                           
+                                    <small class="text-danger">The tags field is required</small>
+                                @endif
 			</div>
 		</div>
 		<div class="row">
@@ -48,7 +60,9 @@
 					<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> you will achieve it. 
 				</p>
 				<x-textarea id="what" name="what" :value="$goaldetail->what" />
-				<small class="text-danger error-what"></small>
+				@if(session()->has('what_miss'))
+                                    <small class="text-danger">The description field is required</small>
+                                @endif
 			</div>
 		</div>
 		<div class="row">
