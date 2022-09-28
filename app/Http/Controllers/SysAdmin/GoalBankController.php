@@ -34,7 +34,7 @@ class GoalBankController extends Controller
 
         $goalTypes = GoalType::all()->toArray();
         $this->getDropdownValues($mandatoryOrSuggested);
-        $tags = Tag::all(["id","name"])->toArray();
+        $tags = Tag::all(["id","name"])->sortBy("name")->toArray();
 
         $errors = session('errors');
 
@@ -196,7 +196,7 @@ class GoalBankController extends Controller
 
         $old_selected_emp_ids = []; // $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $old_selected_org_nodes = []; // $request->old_selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
-        $tags = Tag::all(["id","name"])->toArray();
+        $tags = Tag::all(["id","name"])->sortBy("name")->toArray();
 
         if ($errors) {
             $old = session()->getOldInput();
@@ -367,7 +367,7 @@ class GoalBankController extends Controller
 
         $old_selected_emp_ids = []; // $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $old_selected_org_nodes = []; // $request->old_selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
-        $tags = Tag::all(["id","name"])->toArray();
+        $tags = Tag::all(["id","name"])->sortBy("name")->toArray();
 
         if ($errors) {
             $old = session()->getOldInput();
@@ -492,7 +492,7 @@ class GoalBankController extends Controller
 
         $old_selected_emp_ids = []; // $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $old_selected_org_nodes = []; // $request->old_selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
-        $tags = Tag::all(["id","name"])->toArray();
+        $tags = Tag::all(["id","name"])->sortBy("name")->toArray();
         $aold_selected_emp_ids = []; // $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $aold_selected_org_nodes = []; // $request->old_selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
         $atags = Tag::all(["id","name"])->toArray();
@@ -644,7 +644,7 @@ class GoalBankController extends Controller
 
         $errors = session('errors');
 
-        $tags = Tag::all(["id","name"])->toArray();
+        $tags = Tag::all(["id","name"])->sortBy("name")->toArray();
 
         $goal_id = $id;
 
