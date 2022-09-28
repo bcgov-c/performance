@@ -35,6 +35,7 @@ class AddGoalToLibraryRequest extends FormRequest
             'is_mandatory' => 'required|boolean',
             'start_date' => 'nullable',
             'target_date' => 'nullable',
+            'tag_ids' => 'required|array',
             'tag_ids.*' => 'exists:tags,id'
         ];
     }

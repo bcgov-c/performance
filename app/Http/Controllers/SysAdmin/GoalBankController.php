@@ -665,12 +665,14 @@ class GoalBankController extends Controller
 
     public function savenewgoal(Request $request) 
     {
-        if ($request->input('title') == '' || $request->input('what') == '') {
+        if ($request->input('title') == '' || $request->input('what') == '' || $request->input('tag_ids') == '') {
             if($request->input('title') == '') {
                 $request->session()->flash('title_miss', 'The title field is required');
-            } elseif($request->input('what') == '') {
+            } elseif($request->input('tag_ids') == '') {
+                $request->session()->flash('tags_miss', 'The tags field is required');
+            }   elseif($request->input('what') == '') {
                 $request->session()->flash('what_miss', 'The description field is required');
-            }                
+            }               
             return \Redirect::route('sysadmin.goalbank')->with('message', " There are one or more errors on the page. Please review and try again.");
         }  
         // dd($request->userCheck);
@@ -1148,6 +1150,18 @@ class GoalBankController extends Controller
     public function updategoaldetails(Request $request, $id) 
     {
         $resultrec = Goal::withoutGlobalScopes()->findorfail( $id );
+        
+        if ($request->title == '' || $request->what== ''  || $request->tag_ids== '') {
+            if($request->title == '') {
+                $request->session()->flash('title_miss', 'The title field is required');
+            } elseif($request->what == '') {
+                $request->session()->flash('what_miss', 'The description field is required');
+            } elseif($request->tag_ids == '') {
+                $request->session()->flash('tags_miss', 'The tags field is required');
+            }                 
+            return \Redirect::route('sysadmin.goalbank.editdetails', [$id])->with('message', " There are one or more errors on the page. Please review and try again.");
+        } 
+        
         $resultrec->update(
             [ 'goal_type_id' => $request->input('goal_type_id')
             , 'title' => $request->input('title')
