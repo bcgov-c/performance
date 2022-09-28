@@ -33,7 +33,7 @@ class GoalController extends Controller
     {
         $authId = Auth::id();
         $goaltypes = GoalType::all()->toArray();
-        $tags = Tag::all()->toArray();
+        $tags = Tag::all()->sortBy("name")->toArray();
         $user = User::find($authId);
         
         $request->session()->forget('is_bank');
@@ -319,7 +319,7 @@ class GoalController extends Controller
         ->firstOrFail();
 
         $goaltypes = GoalType::all()->toArray();
-        $tags = Tag::all(["id","name", "description"])->toArray();
+        $tags = Tag::all(["id","name", "description"])->sortBy("name")->toArray();
         
         $type_desc_arr = array();
         foreach($goaltypes as $goalType) {
@@ -420,7 +420,7 @@ class GoalController extends Controller
     }
 
     public function goalBank(Request $request) {
-        $tags = Tag::all()->toArray();
+        $tags = Tag::all()->sortBy("name")->toArray();
         $tags_input = $request->tag_ids;   
         
         $authId = Auth::id();
