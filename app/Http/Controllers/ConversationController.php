@@ -13,7 +13,6 @@ use App\Models\SharedProfile;
 use App\Models\ConversationTopic;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use App\Models\DashboardNotification;
 use Illuminate\Support\Facades\Route;
 use App\Models\ConversationParticipant;
@@ -32,11 +31,8 @@ class ConversationController extends Controller
     public function index(Request $request, $viewType = 'conversations')
     {
         $authId = Auth::id();
-        Log::info('$authId='.$authId);
         $user = User::find($authId);
-        Log::info('$user='.$user);
         $supervisor = $user->reportingManager()->first();
-        Log::info('$supervisor='.$supervisor);
         $supervisorId = (!$supervisor) ? null : $supervisor->id;
         $conversationMessage = Conversation::warningMessage();
         $conversationTopics = ConversationTopic::all();
