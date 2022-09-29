@@ -663,7 +663,7 @@
                             , type: 'GET'
                             , success: function(result) {
                                 if (result.success) {
-                                    $('.agree-message').html('Your disagree notification has been sent.');
+                                    //$('.agree-message').html('Your disagree notification has been sent.');
                                 } 
                             }
                         });
@@ -675,7 +675,7 @@
                             , type: 'GET'
                             , success: function(result) {
                                 if (result.success) {
-                                    $('.agree-message').html('You agreed with this performance review.');
+                                    //$('.agree-message').html('You agreed with this performance review.');
                                 } 
                             }
                         });
