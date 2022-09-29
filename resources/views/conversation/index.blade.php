@@ -722,17 +722,57 @@
                         $('#conv_comment').text(result.comment);
                         $('#conv_comment_edit').text(result.comment);
                         //$('#info_comment1').val(result.info_comment1);
-                        CKEDITOR.instances['info_comment1'].setData(result.info_comment1);
-                        CKEDITOR.instances['info_comment2'].setData(result.info_comment2);
-                        CKEDITOR.instances['info_comment3'].setData(result.info_comment3);
-                        CKEDITOR.instances['info_comment4'].setData(result.info_comment4);
-                        CKEDITOR.instances['info_comment5'].setData(result.info_comment5);
-                        CKEDITOR.instances['info_comment6'].setData(result.info_comment6);
-                        CKEDITOR.instances['info_comment7'].setData(result.info_comment7);
-                        CKEDITOR.instances['info_comment8'].setData(result.info_comment8);
-                        CKEDITOR.instances['info_comment9'].setData(result.info_comment9);
-                        CKEDITOR.instances['info_comment10'].setData(result.info_comment10);
-                        $('#info_comment11').val(result.info_comment11);
+                        
+                        //set comments based on topic id. for swtich old template to new version
+                        var comment1 = result.info_comment1;
+                        var comment2 = result.info_comment2;
+                        var comment3 = result.info_comment3;
+                        var comment4 = result.info_comment4;
+                        var comment5 = result.info_comment5;
+                        var comment6 = result.info_comment6;
+                        var comment7 = result.info_comment7;
+                        var comment8 = result.info_comment8;
+                        var comment9 = result.info_comment9;
+                        var comment10 = result.info_comment10;
+                        var comment11 = result.info_comment11;
+                        
+                        if (topic_id == 2 || topic_id == 4  || topic_id == 5) {
+                            if (comment1 == '') {
+                                comment1 = result.info_comment5;
+                            }
+                        }
+                        if (topic_id == 3) {
+                            if (comment7 == '') {
+                                comment7 = result.info_comment1;
+                            }
+                            if (comment8 == '') {
+                                comment8 = result.info_comment3;
+                            }
+                            if (comment9 == '') {
+                                comment9 = result.info_comment4;
+                            }
+                            if (comment1 == '') {
+                                comment1 = result.info_comment2;
+                            }
+                            if (comment2 == '') {
+                                comment2 = result.info_comment6;
+                            }
+                            if (comment3 == '') {
+                                comment3 = result.info_comment5;
+                            }
+                        }
+                                                
+                        CKEDITOR.instances['info_comment1'].setData(comment1);
+                        CKEDITOR.instances['info_comment2'].setData(comment2);
+                        CKEDITOR.instances['info_comment3'].setData(comment3);
+                        CKEDITOR.instances['info_comment4'].setData(comment4);
+                        CKEDITOR.instances['info_comment5'].setData(comment5);
+                        CKEDITOR.instances['info_comment6'].setData(comment6);
+                        CKEDITOR.instances['info_comment7'].setData(comment7);
+                        CKEDITOR.instances['info_comment8'].setData(comment8);
+                        CKEDITOR.instances['info_comment9'].setData(comment9);
+                        CKEDITOR.instances['info_comment10'].setData(comment10);
+                        $('#info_comment11').val(comment11);
                         
                         
                         $('[name="check_one"]').removeAttr('checked');
