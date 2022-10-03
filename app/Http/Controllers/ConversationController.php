@@ -90,16 +90,16 @@ class ConversationController extends Controller
             }
             $myTeamQuery = clone $query;
 
-            if ($sharedSupervisorIds) {
-                // With my Supervisor            
-                $query->where(function($query) use ($sharedSupervisorIds) {
-                    $query->whereIn('user_id', $sharedSupervisorIds)->
-                    orWhereHas('conversationParticipants', function ($query) use ($sharedSupervisorIds) {
-                        $query->whereIn('participant_id', $sharedSupervisorIds);
-                    });
+            // With my Supervisor            
+            $query->where(function($query) use ($sharedSupervisorIds) {
+                $query->whereIn('user_id', $sharedSupervisorIds)->
+                orWhereHas('conversationParticipants', function ($query) use ($sharedSupervisorIds) {
+                    $query->whereIn('participant_id', $sharedSupervisorIds);
                 });
+            });
             
-                // With My Team
+             // With My Team
+             if ($user->reporting_to) {
                 $myTeamQuery->where(function($query) use ($sharedSupervisorIds) {
                     $query->whereNotIn('user_id', $sharedSupervisorIds)->
                     orWhereHas('conversationParticipants', function ($query) use ($sharedSupervisorIds) {
@@ -173,14 +173,12 @@ class ConversationController extends Controller
             // get Conversations with my supervisor
             $sharedSupervisorIds = SharedProfile::where('shared_id', Auth::id())->with('sharedWithUser')->get()->pluck('shared_with')->toArray();
             array_push($sharedSupervisorIds, $supervisorId);
-            if ($sharedSupervisorIds) {
-                $query->where(function($query) use ($sharedSupervisorIds) {
-                    $query->whereIn('user_id', $sharedSupervisorIds)->
-                    orWhereHas('conversationParticipants', function ($query) use ($sharedSupervisorIds) {
-                        $query->whereIn('participant_id', $sharedSupervisorIds);
-                    });
+            $query->where(function($query) use ($sharedSupervisorIds) {
+                $query->whereIn('user_id', $sharedSupervisorIds)->
+                orWhereHas('conversationParticipants', function ($query) use ($sharedSupervisorIds) {
+                    $query->whereIn('participant_id', $sharedSupervisorIds);
                 });
-            }
+            });
             
 
             $conversations = $query->orderBy('id', 'DESC')->paginate(10);
