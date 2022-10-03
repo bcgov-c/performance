@@ -90,7 +90,6 @@ class ConversationController extends Controller
             }
             $myTeamQuery = clone $query;
 
-           
             // With my Supervisor            
             $query->where(function($query) use ($sharedSupervisorIds) {
                 $query->whereIn('user_id', $sharedSupervisorIds)->
@@ -100,14 +99,16 @@ class ConversationController extends Controller
             });
             
              // With My Team
-            $myTeamQuery->where(function($query) use ($sharedSupervisorIds) {
-                $query->whereNotIn('user_id', $sharedSupervisorIds)->
-                orWhereHas('conversationParticipants', function ($query) use ($sharedSupervisorIds) {
-                    $query->whereNotIn('participant_id', $sharedSupervisorIds);
+             if ($user->reporting_to) {
+                $myTeamQuery->where(function($query) use ($sharedSupervisorIds) {
+                    $query->whereNotIn('user_id', $sharedSupervisorIds)->
+                    orWhereHas('conversationParticipants', function ($query) use ($sharedSupervisorIds) {
+                        $query->whereNotIn('participant_id', $sharedSupervisorIds);
+                    });
                 });
-            });
             
-            $myTeamQuery->whereNotIn('user_id', $sharedSupervisorIds);
+                $myTeamQuery->whereNotIn('user_id', $sharedSupervisorIds);
+            }
             $myTeamQuery->where('signoff_user_id','<>', $authId); 
             
             $type = 'past';
