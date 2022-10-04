@@ -682,10 +682,10 @@
                     $('#pageLoader').show();
                 });
 
-                $(window).resize(function(){
-                    location.reload();
-                    return;
-                });
+                // $(window).resize(function(){
+                //     location.reload();
+                //     return;
+                // });
 
 				$('#ebtn_search').click(function(e) {
 					e.preventDefault();
