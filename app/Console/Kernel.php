@@ -61,6 +61,7 @@ class Kernel extends ConsoleKernel
         ->dailyAt('02:00');
 
         $schedule->command('command:NotificationProcess')
+        ->appendOutputTo(storage_path('logs/NotificationProcess.log'))
         ->dailyAt('01:00');
 
     }
