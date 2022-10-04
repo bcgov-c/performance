@@ -99,7 +99,7 @@ class ConversationController extends Controller
             });
             
              // With My Team
-             if ($user->reporting_to) {
+             if ($sharedSupervisorIds && $sharedSupervisorIds[0]) {
                 $myTeamQuery->where(function($query) use ($sharedSupervisorIds) {
                     $query->whereNotIn('user_id', $sharedSupervisorIds)->
                     orWhereHas('conversationParticipants', function ($query) use ($sharedSupervisorIds) {
