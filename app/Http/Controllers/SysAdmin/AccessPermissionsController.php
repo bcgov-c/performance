@@ -1000,13 +1000,13 @@ class AccessPermissionsController extends Controller
     public function manageDestroy(Request $request) {
         $query = DB::table('model_has_roles')
         ->where('model_id', '=', $request->input('model_id'))
-        ->wherein('role_id', [3, 4])
+        ->where('role_id', '=', $request->input('role_id'))
         ->delete();
-        // if($query) {
+        if ($request->input('role_id') == 3) {
             $orgs = DB::table('admin_orgs')
             ->where('user_id', '=', $request->input('model_id'))
             ->delete();
-        // }
+        }
         return redirect()->back();
     }
 

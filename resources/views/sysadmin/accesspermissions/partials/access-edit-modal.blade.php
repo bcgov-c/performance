@@ -7,7 +7,6 @@
         <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-primary">
-                    {{-- <h5 class="modal-title" id="accessDetailLabel">Edit Employee Access Level</h5> --}}
                     <h5 class="modal-title" type="hidden" id="accessDetailLabel">Edit Employee Access Level</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -24,6 +23,7 @@
                     <div class="row  p-3">
                         <div class="col col-4">
                             <input id="model_id" name="model_id" type="hidden" value="secret">
+                            <input id="role_id" name="role_id" type="hidden" value="secret">
                             <label for='accessselect' title='Access Level Tooltip'>Access Level
                             <select name="accessselect" class="form-control" id="accessselect">
                                 @foreach($roles as $rid => $desc)
