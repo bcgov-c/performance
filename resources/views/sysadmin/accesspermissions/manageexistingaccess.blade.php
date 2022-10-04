@@ -109,6 +109,7 @@
                     $('#reason').val(reason);
                     $('#accessselect').val(role_id);
                     $('#model_id').val(model_id);
+                    $('#role_id').val(role_id);
                     $('#accessDetailLabel').text('Edit Employee Access Level:  '+email);
                     $('#saveButton').prop('disabled', current == model_id);
                     $('removeButton').prop('disabled', current == model_id);
@@ -174,15 +175,16 @@
                 });
 
                 $('#removeButton').on('click', function(event) {
-                    console.log('Delete button clicked');
                     var model_id = $('#model_id').val();
+                    var role_id = $('#role_id').val();
                     var token = $('meta[name="csrf-token"]').attr('content');
                     event.preventDefault();
                     $.ajax ( {
                         type: 'POST',
-                        url: 'manageexistingaccessdelete/'+model_id,
+                        url: 'manageexistingaccessdelete/'+model_id+'/'+role_id,
                         data: {
                             'model_id':model_id,
+                            'role_id':role_id,
                             '_token':token,
                             '_method':"DELETE",
                         },
