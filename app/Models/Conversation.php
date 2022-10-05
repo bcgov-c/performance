@@ -273,7 +273,7 @@ class Conversation extends Model
                     $diff < 0 ? "danger" : ($diff < 1 ? "warning" : "success")
                 ];
             } else {
-                $msg = "Employee is excused";
+                $msg = "Employee is currently excused and their conversation deadline is paused";
                 return [
                     $msg, "success"
                 ];
