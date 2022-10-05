@@ -50,14 +50,14 @@ class SendDashboardNotification
     {
 
         // Eligible User's organization (check against Allow Access Oragnizations)
-        $user = User::join('employee_demo','employee_demo.guid','users.guid')
-                        ->join('access_organizations','employee_demo.organization','access_organizations.organization')
-                        ->where('access_organizations.allow_inapp_msg', 'Y')
-                        ->whereNull('date_deleted')                                                
-                        ->where('users.id',  $this->user_id)
-                        ->first();
+        // $user = User::join('employee_demo','employee_demo.guid','users.guid')
+        //                 ->join('access_organizations','employee_demo.organization','access_organizations.organization')
+        //                 ->where('access_organizations.allow_inapp_msg', 'Y')
+        //                 ->whereNull('date_deleted')                                                
+        //                 ->where('users.id',  $this->user_id)
+        //                 ->first();
 
-        if ($user) {
+        // if ($user) {
 
             // DashBoard Message
             DashboardNotification::create([
@@ -85,7 +85,7 @@ class SendDashboardNotification
                     'date_sent' => now(),
                 ]);
             }
-        }
+        // }
 
     }
 

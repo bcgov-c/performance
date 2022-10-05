@@ -62,11 +62,11 @@ class NotificationProcess extends Command
         $this->info( now() );
         $this->info("Supervisor Dashboard Notification (In-App) -- Conversation Due (end)");
 
-        $this->info( now() );
-        $this->info("Email Notification -- Conversation Due (start)");
-        $this->sendEmployeeEmailNotificationsWhenConversationDue();
-        $this->info( now() );
-        $this->info("Email Notification -- Conversation Due (end)");
+        // $this->info( now() );
+        // $this->info("Email Notification -- Conversation Due (start)");
+        // $this->sendEmployeeEmailNotificationsWhenConversationDue();
+        // $this->info( now() );
+        // $this->info("Email Notification -- Conversation Due (end)");
 
         $this->info( now() );
         $this->info("Supervisor Email Notification -- Conversation Due (start)");
@@ -84,17 +84,26 @@ class NotificationProcess extends Command
 
         // Eligible Users (check against Allow Access Oragnizations)
         $users = User::join('employee_demo','employee_demo.guid','users.guid')
+                        ->join('employee_demo_jr','employee_demo.guid','employee_demo_jr.guid')
                         ->join('access_organizations','employee_demo.organization','access_organizations.organization')
+                        ->where('employee_demo_jr.due_date_paused', 'N')
                         ->where('access_organizations.allow_inapp_msg', 'Y')
-                        ->whereNull('date_deleted')
+                        ->whereNull('employee_demo.date_deleted')
 // ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                                                    
-                    ->groupBy('users.id')
-                    ->select('users.*')
-                    ->get();
+                        ->select('users.*', 'employee_demo_jr.next_conversation_date' )
+                        ->orderBy('users.guid')
+                        ->get();
 
+        $prev_guid = '';
         foreach ($users as $index => $user) {
 
-            $due = Conversation::nextConversationDue( $user );
+            // Avoid deuplicate email send out 
+            if ($user->guid == $prev_guid) {
+                continue;
+            }
+
+            //$due = Conversation::nextConversationDue( $user );
+            $due = $user->next_conversation_date;
 
             $dueDate = \Carbon\Carbon::create($due);
             $now = Carbon::now();
@@ -176,6 +185,8 @@ class NotificationProcess extends Command
                 }
             }
 
+            $prev_guid = $user->guid;
+
         }
 
         $this->info("Total selected users              : " . $users->count() );
@@ -192,16 +203,23 @@ class NotificationProcess extends Command
 
         // Eligible Users (check against Allow Access Oragnizations)
         $users = User::join('employee_demo','employee_demo.guid','users.guid')
+                    ->join('employee_demo_jr','employee_demo.guid','employee_demo_jr.guid')
                     ->join('access_organizations','employee_demo.organization','access_organizations.organization')
+                    ->where('employee_demo_jr.due_date_paused', 'N')
                     ->where('access_organizations.allow_inapp_msg', 'Y')
                     ->whereNull('date_deleted')
-->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                            
-                    ->groupBy('users.id')
-                    ->select('users.*')
+//->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                            
+                    ->select('users.*', 'employee_demo_jr.next_conversation_date' )
+                    ->orderBy('users.guid')
                     ->get();
 
-                    
+        $prev_guid = '';    
         foreach ($users as $index => $user) {
+
+            // Avoid deuplicate email send out 
+            if ($user->guid == $prev_guid) {
+                continue;
+            }
 
             // Look for direct report manager and Shared with
             $manager_ids = SharedProfile::where('shared_id', $user->id)
@@ -220,13 +238,26 @@ class NotificationProcess extends Command
             // process  each managers 
             foreach ($manager_ids as $manager_id) {
 
-                $due = Conversation::nextConversationDue( $user );
+                // check whether the manager can recieve In-App Message
+                $mgr = User::join('employee_demo','employee_demo.guid','users.guid')
+                            ->join('access_organizations','employee_demo.organization','access_organizations.organization')
+                            ->where('access_organizations.allow_inapp_msg', 'Y')
+                            ->whereNull('date_deleted')                                                
+                            ->where('users.id',  $manager_id)
+                            ->first();
+
+                if (!$mgr) {
+                    continue;
+                }
+
+                // $due = Conversation::nextConversationDue( $user );
+                $due = $user->next_conversation_date;
 
                 $dueDate = \Carbon\Carbon::create($due);
                 $now = Carbon::now();
                 $dayDiff = $now->diffInDays($dueDate, false);
 // Override for testing                        
-$dayDiff = 11;                
+//$dayDiff = 11;                
 
                 $dueIndays = 0;
                 $msg = '';
@@ -253,9 +284,9 @@ $dayDiff = 11;
                                         ->where('notify_due_date', $dueDate->format('Y-m-d') )
                                         ->where('notify_for_days', $dueIndays)
                                         ->first();
-    
+
                     if (!$log) {
-                        $this->info( $due . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' ' . $dueIndays);
+                        $this->info( $due . ' - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' ' . $dueIndays);
                         $sent_count += 1;
     
                         // Use Class to create DashboardNotification
@@ -300,9 +331,10 @@ $dayDiff = 11;
                         $skip_count += 1;
                     }
                 }
-        
 
            }
+
+           $prev_guid = $user->guid;
 
         }
 
@@ -321,15 +353,23 @@ $dayDiff = 11;
 
         // Eligible Users (check against Allow Access Oragnizations)
         $users = User::join('employee_demo','employee_demo.guid','users.guid')
+                        ->join('employee_demo_jr','employee_demo.guid','employee_demo_jr.guid')
                         ->join('access_organizations','employee_demo.organization','access_organizations.organization')
                         ->where('access_organizations.allow_email_msg', 'Y')
                         ->whereNull('employee_demo.date_deleted')
-                    ->groupBy('users.id')
-                    ->select('users.*')
-// ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                 
+                        ->where('employee_demo_jr.due_date_paused', 'N')
+                    ->select('users.*', 'employee_demo_jr.next_conversation_date' )
+                    ->orderBy('users.guid')
+//  ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                 
                     ->get();
 
+        $prev_guid = '';
         foreach ($users as $index => $user) {
+
+            // Avoid deuplicate email send out 
+            if ($user->guid == $prev_guid) {
+                continue;
+            }
 
             // User Prference 
             $pref = UserPreference::where('user_id', $user->id)->first();
@@ -338,8 +378,9 @@ $dayDiff = 11;
                 $pref->user_id = $user->id;
             }
             
-            $due = Conversation::nextConversationDue( $user );
-
+            // $due = Conversation::nextConversationDue( $user );
+            $due = $user->next_conversation_date;
+       
             $dueDate = \Carbon\Carbon::create($due);
             $now = Carbon::now();
             $dayDiff = $now->diffInDays($dueDate, false);
@@ -416,6 +457,8 @@ $dayDiff = 11;
                 }
             } 
 
+            $prev_guid = $user->guid;
+
         }
 
         $this->info("Total selected users              : " . $users->count() );
@@ -432,15 +475,23 @@ $dayDiff = 11;
 
         // Eligible Users (check against Allow Access Oragnizations)
         $users = User::join('employee_demo','employee_demo.guid','users.guid')
+                        ->join('employee_demo_jr','employee_demo.guid','employee_demo_jr.guid')
                         ->join('access_organizations','employee_demo.organization','access_organizations.organization')
                         ->where('access_organizations.allow_email_msg', 'Y')
                         ->whereNull('employee_demo.date_deleted')
-                    ->groupBy('users.id')
-                    ->select('users.*')
+                        ->where('employee_demo_jr.due_date_paused', 'N')
+                    ->select('users.*', 'employee_demo_jr.next_conversation_date' )
+                    ->orderBy('users.guid')
 // ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                        
                     ->get();
 
+        $prev_guid = '';
         foreach ($users as $index => $user) {
+
+            // Avoid deuplicate email send out 
+            if ($user->guid == $prev_guid) {
+                continue;
+            }
 
             // Look for direct report manager and Shared with
             $manager_ids = SharedProfile::where('shared_id', $user->id)
@@ -460,6 +511,18 @@ $dayDiff = 11;
             // process  each managers 
             foreach ($manager_ids as $manager_id) {
 
+                // check whether the manager can recieve In-App Message
+                $mgr = User::join('employee_demo','employee_demo.guid','users.guid')
+                        ->join('access_organizations','employee_demo.organization','access_organizations.organization')
+                        ->where('access_organizations.allow_email_msg', 'Y')
+                        ->whereNull('date_deleted')                                                
+                        ->where('users.id',  $manager_id)
+                        ->first();
+
+                if (!$mgr) {
+                    continue;
+                }
+
                 // User Prference 
                 $pref = UserPreference::where('user_id', $user->manager_id)->first();
                 if (!$pref) {
@@ -467,7 +530,8 @@ $dayDiff = 11;
                     $pref->user_id = $user->manager_id;
                 }
 
-                $due = Conversation::nextConversationDue( $user );
+                // $due = Conversation::nextConversationDue( $user );
+                $due = $user->next_conversation_date;
 
                 $dueDate = \Carbon\Carbon::create($due);
                 $now = Carbon::now();
@@ -550,6 +614,8 @@ $dayDiff = 11;
                 } 
 
            }
+
+           $prev_guid = $user->guid;
 
         }
 
