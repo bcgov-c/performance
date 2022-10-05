@@ -10,6 +10,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\EmployeeDemo;
+use App\Models\EmployeeDemoJunior;
 
 class User extends Authenticatable
 {
@@ -32,6 +33,7 @@ class User extends Authenticatable
         'reporting_id',
         'employee_id',
         'empl_record',
+        'excused_flag',
         'excused_start_date',
         'excused_end_date',
         'excused_reason_id',
@@ -205,6 +207,16 @@ class User extends Authenticatable
 
     public function employees() {
         return $this->hasMany('App\Models\EmployeeDemo', 'employee_id', 'id');
+    }
+    
+    public function employee_demo() {
+        return $this->hasMany('App\Models\EmployeeDemo', 'guid', 'guid');
+    }
+    
+    public function employee_demo_jr() {
+        $instance = $this->hasMany('App\Models\EmployeeDemoJunior', 'guid', 'guid');
+        $instance->getQuery()->orderBy('id', 'desc')->first();
+        return $instance;
     }
     
     public function users() {

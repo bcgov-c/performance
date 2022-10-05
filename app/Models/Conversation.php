@@ -194,9 +194,14 @@ class Conversation extends Model
             if ($lastConv->sign_off_time->addMonths(4)->lt(Carbon::now())) {
                 $nextDueDate = $lastConv->sign_off_time->addMonths(4);    
                 return [
-                    //  $msg1,   
-                    $msg.$nextDueDate->format('d-M-y'),
-                    "danger"
+                    // $msg3 . $nextDueDate->format('d-M-y'),
+                    $msg. $nextDueDate->format('d-M-y'),
+                    $diff < 0 ? "danger" : ($diff < 1 ? "warning" : "success")
+                ];
+            } else {
+                $msg = "Employee is currently excused and their conversation deadline is paused";
+                return [
+                    $msg, "success"
                 ];
             }
             $nextDueDate = $lastConv->sign_off_time->addMonths(4);
