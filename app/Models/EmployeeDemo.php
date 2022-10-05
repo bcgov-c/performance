@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 // use Illuminate\Database\Eloquent\Builder;
+use App\Models\User;
 
 class EmployeeDemo extends Model
 {
@@ -43,7 +44,11 @@ class EmployeeDemo extends Model
     ];
 
     public function users() {
-        return $this->belongsToMany('App/Model/User', 'id', 'employee_id');
+        return $this->belongsToMany('App\Model\User', 'id', 'employee_id');
+    }
+
+    public function dr_count() {
+        return $this->belongsToMany('App\Model\User', 'users', 'id', 'supervisor_emplid')->count();
     }
 
 //     protected function setKeysForSaveQuery(Builder $query)
