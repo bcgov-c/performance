@@ -9,6 +9,7 @@ use App\Models\User;
 use GuzzleHttp\Client;
 use Microsoft\Graph\Graph;
 use App\Models\Conversation;
+use App\Models\JobSchedAudit;
 use App\Models\SharedProfile;
 use App\Models\UserPreference;
 use App\Models\NotificationLog;
@@ -18,6 +19,7 @@ use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 
 class NotificationProcess extends Command
 {
+
     /**
      * The name and signature of the console command.
      *
@@ -40,6 +42,8 @@ class NotificationProcess extends Command
     public function __construct()
     {
         parent::__construct();
+
+        $this->details = '';
     }
 
     /**
@@ -50,29 +54,48 @@ class NotificationProcess extends Command
     public function handle()
     {
 
-        $this->info( now() );
-        $this->info("Dashboard Notification (In-App) -- Conversation Due (start)");
+        $start_time = Carbon::now();
+        $audit_id = JobSchedAudit::insertGetId([
+            'job_name' => $this->signature,
+            'start_time' => date('Y-m-d H:i:s', strtotime( now() )),
+            'status' => 'Initiated'
+        ]);
+
+        $this->logInfo( now() );
+        $this->logInfo("Dashboard Notification (In-App) -- Conversation Due (start)");
         $this->dashboardNotificationsConversationDue();
-        $this->info( now() );
-        $this->info("Dashboard Notification (In-App) -- Conversation Due (end)");
+        $this->logInfo( now() );
+        $this->logInfo("Dashboard Notification (In-App) -- Conversation Due (end)");
 
-        $this->info( now() );
-        $this->info("Supervisor Dashboard Notification (In-App) -- Conversation Due (start)");
+        $this->logInfo( now() );
+        $this->logInfo("Supervisor Dashboard Notification (In-App) -- Conversation Due (start)");
         $this->supervisorDashboardNotificationsConversationDue();
-        $this->info( now() );
-        $this->info("Supervisor Dashboard Notification (In-App) -- Conversation Due (end)");
+        $this->logInfo( now() );
+        $this->logInfo("Supervisor Dashboard Notification (In-App) -- Conversation Due (end)");
 
-        // $this->info( now() );
-        // $this->info("Email Notification -- Conversation Due (start)");
-        // $this->sendEmployeeEmailNotificationsWhenConversationDue();
-        // $this->info( now() );
-        // $this->info("Email Notification -- Conversation Due (end)");
+        $this->logInfo( now() );
+        $this->logInfo("Email Notification -- Conversation Due (start)");
+        $this->sendEmployeeEmailNotificationsWhenConversationDue();
+        $this->logInfo( now() );
+        $this->logInfo("Email Notification -- Conversation Due (end)");
 
-        $this->info( now() );
-        $this->info("Supervisor Email Notification -- Conversation Due (start)");
+        $this->logInfo( now() );
+        $this->logInfo("Supervisor Email Notification -- Conversation Due (start)");
         $this->sendSupervisorEmailNotificationsWhenTeamConversationDue();
-        $this->info( now() );
-        $this->info("Supervisor Email Notification -- Conversation Due (end)");
+        $this->logInfo( now() );
+        $this->logInfo("Supervisor Email Notification -- Conversation Due (end)");
+
+        $end_time = Carbon::now();
+        JobSchedAudit::updateOrInsert([
+           'id' => $audit_id
+        ],[
+            'job_name' => $this->signature,
+            'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
+            'end_time' => date('Y-m-d H:i:s', strtotime($end_time)),
+            'cutoff_time' => date('Y-m-d H:i:s', strtotime($start_time)),
+            'details' => $this->details,
+            'status' => 'Completed'
+        ]);
 
     }
 
@@ -81,196 +104,53 @@ class NotificationProcess extends Command
 
         $sent_count = 0;
         $skip_count = 0;
+        $row_count = 0;
 
         // Eligible Users (check against Allow Access Oragnizations)
-        $users = User::join('employee_demo','employee_demo.guid','users.guid')
+        $sql = User::join('employee_demo','employee_demo.guid','users.guid')
                         ->join('employee_demo_jr','employee_demo.guid','employee_demo_jr.guid')
                         ->join('access_organizations','employee_demo.organization','access_organizations.organization')
+                        ->where('employee_demo.guid','<>','')
                         ->where('employee_demo_jr.due_date_paused', 'N')
                         ->where('access_organizations.allow_inapp_msg', 'Y')
                         ->whereNull('employee_demo.date_deleted')
 // ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                                                    
                         ->select('users.*', 'employee_demo_jr.next_conversation_date' )
-                        ->orderBy('users.guid')
-                        ->get();
+                        ->orderBy('users.guid');
 
         $prev_guid = '';
-        foreach ($users as $index => $user) {
+        $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
 
-            // Avoid deuplicate email send out 
-            if ($user->guid == $prev_guid) {
-                continue;
-            }
+            foreach ($chunk as $index => $user) {
 
-            //$due = Conversation::nextConversationDue( $user );
-            $due = $user->next_conversation_date;
-
-            $dueDate = \Carbon\Carbon::create($due);
-            $now = Carbon::now();
-            $dayDiff = $now->diffInDays($dueDate, false);
-// Override for testing                        
-// $dayDiff = -1;
-
-            $dueIndays = 0;
-            $msg = '';
-            if ($dayDiff >= 7 and $dayDiff <= 30) {
-                $msg = 'REMINDER - your next performance conversation is due in 1 month';
-                $dueIndays = 30;
-            }
-            if ($dayDiff >= 0 and $dayDiff < 7) {
-                $msg = 'REMINDER - your next performance conversation is due in 1 week';
-                $dueIndays = 7;
-            }
-            if ($dayDiff < 0) {  
-                $msg = 'OVERDUE - your next performance conversation is past due';
-                $dueIndays = 0;
-            }
-
-            if ($msg) {
-
-                // check the notification sent or not 
-                $log = NotificationLog::where('alert_type', 'N')
-                                    ->where('alert_format', 'A')
-                                    ->where('notify_user_id',  $user->id)
-                                    ->whereNull('overdue_user_id')
-                                    ->where('notify_due_date', $dueDate->format('Y-m-d') )
-                                    ->where('notify_for_days', $dueIndays)
-                                    ->first();
-
-                if (!$log) {
-                    $this->info( $due . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' ' . $dueIndays);
-                    $sent_count += 1;
-
-
-                    // Use Class to create DashboardNotification
-                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                    $notification->user_id = $user->id;
-                    $notification->notification_type = '';
-                    $notification->comment = $msg;
-                    $notification->related_id = null;
-                   
-                    $notification->notify_user_id = $user->id;
-                    $notification->overdue_user_id = null; 
-                    $notification->notify_due_date = $dueDate->format('Y-m-d');
-                    $notification->notify_for_days = $dueIndays;
-
-                    $notification->send(); 
-
-                    // DashBoard Message
-                    // DashboardNotification::create([
-                    //     'user_id' => $user->id,
-                    //     'notification_type' => '',        // Conversation Added
-                    //     'comment' => $msg,
-                    //     'related_id' => null,
-                    // ]);
-
-                    // Write to Log table
-                    // $notification_log = NotificationLog::Create([  
-                    //     'recipients' => ' ',        // Not in Use
-                    //     'sender_id' => 0,           
-                    //     'subject' => $msg,
-                    //     'description' => '',
-                    //     'alert_type' => 'N',
-                    //     'alert_format' => 'A',
-                    //     'notify_user_id' => $user->id,
-                    //     'overdue_user_id' => null,
-                    //     'notify_due_date' => $dueDate->format('Y-m-d'),
-                    //     'notify_for_days' => $dueIndays,
-                    //     'template_id' => null,
-                    //     'date_sent' => now(),
-                    // ]);
-
-                } else {
-                    $skip_count += 1;
-                }
-            }
-
-            $prev_guid = $user->guid;
-
-        }
-
-        $this->info("Total selected users              : " . $users->count() );
-        $this->info("Total notification skipped (sent) : " . $skip_count );
-        $this->info("Total notification created        : " . $sent_count );
-
-    }
-
-
-    protected function supervisorDashboardNotificationsConversationDue() {
-
-        $sent_count = 0;
-        $skip_count = 0;
-
-        // Eligible Users (check against Allow Access Oragnizations)
-        $users = User::join('employee_demo','employee_demo.guid','users.guid')
-                    ->join('employee_demo_jr','employee_demo.guid','employee_demo_jr.guid')
-                    ->join('access_organizations','employee_demo.organization','access_organizations.organization')
-                    ->where('employee_demo_jr.due_date_paused', 'N')
-                    ->where('access_organizations.allow_inapp_msg', 'Y')
-                    ->whereNull('date_deleted')
-//->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                            
-                    ->select('users.*', 'employee_demo_jr.next_conversation_date' )
-                    ->orderBy('users.guid')
-                    ->get();
-
-        $prev_guid = '';    
-        foreach ($users as $index => $user) {
-
-            // Avoid deuplicate email send out 
-            if ($user->guid == $prev_guid) {
-                continue;
-            }
-
-            // Look for direct report manager and Shared with
-            $manager_ids = SharedProfile::where('shared_id', $user->id)
-                                ->where('shared_item', 'like',  '%"2"%' ) 
-                                ->orderBy('id')
-                                ->pluck('shared_with');
-            if ($user->reporting_to) {        
-                $manager_ids->push($user->reporting_to);
-            }
-
-            // if no manager found, then next 
-            if ($manager_ids->count() == 0) {
-                    continue;
-            }
-
-            // process  each managers 
-            foreach ($manager_ids as $manager_id) {
-
-                // check whether the manager can recieve In-App Message
-                $mgr = User::join('employee_demo','employee_demo.guid','users.guid')
-                            ->join('access_organizations','employee_demo.organization','access_organizations.organization')
-                            ->where('access_organizations.allow_inapp_msg', 'Y')
-                            ->whereNull('date_deleted')                                                
-                            ->where('users.id',  $manager_id)
-                            ->first();
-
-                if (!$mgr) {
+                // Avoid deuplicate email send out 
+                if ($user->guid == $prev_guid) {
                     continue;
                 }
 
-                // $due = Conversation::nextConversationDue( $user );
+                $row_count += 1;
+
+                //$due = Conversation::nextConversationDue( $user );
                 $due = $user->next_conversation_date;
 
                 $dueDate = \Carbon\Carbon::create($due);
                 $now = Carbon::now();
                 $dayDiff = $now->diffInDays($dueDate, false);
-// Override for testing                        
-//$dayDiff = 11;                
+    // Override for testing                        
+    // $dayDiff = -1;
 
                 $dueIndays = 0;
                 $msg = '';
                 if ($dayDiff >= 7 and $dayDiff <= 30) {
-                    $msg = 'REMINDER - ' . $user->name . '\'s next performance conversation is due in 1 month';
+                    $msg = 'REMINDER - your next performance conversation is due in 1 month';
                     $dueIndays = 30;
                 }
                 if ($dayDiff >= 0 and $dayDiff < 7) {
-                    $msg = 'REMINDER - ' . $user->name . '\'s performance conversation due date is one week away';
+                    $msg = 'REMINDER - your next performance conversation is due in 1 week';
                     $dueIndays = 7;
                 }
                 if ($dayDiff < 0) {  
-                    $msg = 'OVERDUE - ' . $user->name . '\'s next performance conversation is past due';
+                    $msg = 'OVERDUE - your next performance conversation is past due';
                     $dueIndays = 0;
                 }
 
@@ -279,25 +159,26 @@ class NotificationProcess extends Command
                     // check the notification sent or not 
                     $log = NotificationLog::where('alert_type', 'N')
                                         ->where('alert_format', 'A')
-                                        ->where('notify_user_id',  $manager_id)
-                                        ->where('overdue_user_id',  $user->id)
+                                        ->where('notify_user_id',  $user->id)
+                                        ->whereNull('overdue_user_id')
                                         ->where('notify_due_date', $dueDate->format('Y-m-d') )
                                         ->where('notify_for_days', $dueIndays)
                                         ->first();
 
                     if (!$log) {
-                        $this->info( $due . ' - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' ' . $dueIndays);
+                        $this->logInfo( $due . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' ' . $dueIndays);
                         $sent_count += 1;
-    
+
+
                         // Use Class to create DashboardNotification
                         $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                        $notification->user_id = $manager_id;
+                        $notification->user_id = $user->id;
                         $notification->notification_type = '';
                         $notification->comment = $msg;
                         $notification->related_id = null;
-
-                        $notification->notify_user_id = $manager_id;
-                        $notification->overdue_user_id = $user->id; 
+                    
+                        $notification->notify_user_id = $user->id;
+                        $notification->overdue_user_id = null; 
                         $notification->notify_due_date = $dueDate->format('Y-m-d');
                         $notification->notify_for_days = $dueIndays;
 
@@ -305,12 +186,12 @@ class NotificationProcess extends Command
 
                         // DashBoard Message
                         // DashboardNotification::create([
-                        //     'user_id' => $manager_id,
+                        //     'user_id' => $user->id,
                         //     'notification_type' => '',        // Conversation Added
                         //     'comment' => $msg,
                         //     'related_id' => null,
                         // ]);
-    
+
                         // Write to Log table
                         // $notification_log = NotificationLog::Create([  
                         //     'recipients' => ' ',        // Not in Use
@@ -319,29 +200,184 @@ class NotificationProcess extends Command
                         //     'description' => '',
                         //     'alert_type' => 'N',
                         //     'alert_format' => 'A',
-                        //     'notify_user_id' => $manager_id,
-                        //     'overdue_user_id' => $user->id,
+                        //     'notify_user_id' => $user->id,
+                        //     'overdue_user_id' => null,
                         //     'notify_due_date' => $dueDate->format('Y-m-d'),
                         //     'notify_for_days' => $dueIndays,
                         //     'template_id' => null,
                         //     'date_sent' => now(),
                         // ]);
-    
+
                     } else {
                         $skip_count += 1;
                     }
                 }
 
-           }
+                $prev_guid = $user->guid;
 
-           $prev_guid = $user->guid;
+            }
 
-        }
+        });
 
-        $this->info("Total selected users              : " . $users->count() );
-        $this->info("Total notification skipped (sent) : " . $skip_count );
-        $this->info("Total notification created        : " . $sent_count );
+        $this->logInfo("Total selected users              : " . $row_count );
+        $this->logInfo("Total notification skipped (sent) : " . $skip_count );
+        $this->logInfo("Total notification created        : " . $sent_count );
 
+    }
+
+
+    protected function supervisorDashboardNotificationsConversationDue() {
+
+        $sent_count = 0;
+        $skip_count = 0;
+        $row_count = 0;
+
+        // Eligible Users (check against Allow Access Oragnizations)
+        $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+                    ->join('employee_demo_jr','employee_demo.guid','employee_demo_jr.guid')
+                    ->join('access_organizations','employee_demo.organization','access_organizations.organization')
+                    ->where('employee_demo.guid','<>','')
+                    ->where('employee_demo_jr.due_date_paused', 'N')
+                    ->where('access_organizations.allow_inapp_msg', 'Y')
+                    ->whereNull('date_deleted')
+//->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                            
+                    ->select('users.*', 'employee_demo_jr.next_conversation_date' )
+                    ->orderBy('users.guid');
+
+        $prev_guid = '';    
+        $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
+
+            foreach ($chunk as $index => $user) {
+
+                // Avoid deuplicate email send out 
+                if ($user->guid == $prev_guid) {
+                    continue;
+                }
+
+                $row_count += 1;
+
+                // Look for direct report manager and Shared with
+                $manager_ids = SharedProfile::where('shared_id', $user->id)
+                                    ->where('shared_item', 'like',  '%"2"%' ) 
+                                    ->orderBy('id')
+                                    ->pluck('shared_with');
+                if ($user->reporting_to) {        
+                    $manager_ids->push($user->reporting_to);
+                }
+
+                // if no manager found, then next 
+                if ($manager_ids->count() == 0) {
+                        continue;
+                }
+
+                // process  each managers 
+                foreach ($manager_ids as $manager_id) {
+
+                    // check whether the manager can recieve In-App Message
+                    $mgr = User::join('employee_demo','employee_demo.guid','users.guid')
+                                ->join('access_organizations','employee_demo.organization','access_organizations.organization')
+                                ->where('access_organizations.allow_inapp_msg', 'Y')
+                                ->whereNull('date_deleted')                                                
+                                ->where('users.id',  $manager_id)
+                                ->first();
+
+                    if (!$mgr) {
+                        continue;
+                    }
+
+                    // $due = Conversation::nextConversationDue( $user );
+                    $due = $user->next_conversation_date;
+
+                    $dueDate = \Carbon\Carbon::create($due);
+                    $now = Carbon::now();
+                    $dayDiff = $now->diffInDays($dueDate, false);
+    // Override for testing                        
+    //$dayDiff = 11;                
+
+                    $dueIndays = 0;
+                    $msg = '';
+                    if ($dayDiff >= 7 and $dayDiff <= 30) {
+                        $msg = 'REMINDER - ' . $user->name . '\'s next performance conversation is due in 1 month';
+                        $dueIndays = 30;
+                    }
+                    if ($dayDiff >= 0 and $dayDiff < 7) {
+                        $msg = 'REMINDER - ' . $user->name . '\'s performance conversation due date is one week away';
+                        $dueIndays = 7;
+                    }
+                    if ($dayDiff < 0) {  
+                        $msg = 'OVERDUE - ' . $user->name . '\'s next performance conversation is past due';
+                        $dueIndays = 0;
+                    }
+
+                    if ($msg) {
+
+                        // check the notification sent or not 
+                        $log = NotificationLog::where('alert_type', 'N')
+                                            ->where('alert_format', 'A')
+                                            ->where('notify_user_id',  $manager_id)
+                                            ->where('overdue_user_id',  $user->id)
+                                            ->where('notify_due_date', $dueDate->format('Y-m-d') )
+                                            ->where('notify_for_days', $dueIndays)
+                                            ->first();
+
+                        if (!$log) {
+                            $this->logInfo( $due . ' - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' ' . $dueIndays);
+                            $sent_count += 1;
+        
+                            // Use Class to create DashboardNotification
+                            $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                            $notification->user_id = $manager_id;
+                            $notification->notification_type = '';
+                            $notification->comment = $msg;
+                            $notification->related_id = null;
+
+                            $notification->notify_user_id = $manager_id;
+                            $notification->overdue_user_id = $user->id; 
+                            $notification->notify_due_date = $dueDate->format('Y-m-d');
+                            $notification->notify_for_days = $dueIndays;
+
+                            $notification->send(); 
+
+                            // DashBoard Message
+                            // DashboardNotification::create([
+                            //     'user_id' => $manager_id,
+                            //     'notification_type' => '',        // Conversation Added
+                            //     'comment' => $msg,
+                            //     'related_id' => null,
+                            // ]);
+        
+                            // Write to Log table
+                            // $notification_log = NotificationLog::Create([  
+                            //     'recipients' => ' ',        // Not in Use
+                            //     'sender_id' => 0,           
+                            //     'subject' => $msg,
+                            //     'description' => '',
+                            //     'alert_type' => 'N',
+                            //     'alert_format' => 'A',
+                            //     'notify_user_id' => $manager_id,
+                            //     'overdue_user_id' => $user->id,
+                            //     'notify_due_date' => $dueDate->format('Y-m-d'),
+                            //     'notify_for_days' => $dueIndays,
+                            //     'template_id' => null,
+                            //     'date_sent' => now(),
+                            // ]);
+        
+                        } else {
+                            $skip_count += 1;
+                        }
+                    }
+
+                }
+
+                $prev_guid = $user->guid;
+
+            }
+
+        });
+
+        $this->logInfo("Total selected users              : " . $row_count  );
+        $this->logInfo("Total notification skipped (sent) : " . $skip_count );
+        $this->logInfo("Total notification created        : " . $sent_count );
 
     }
 
@@ -350,222 +386,72 @@ class NotificationProcess extends Command
 
         $sent_count = 0;
         $skip_count = 0;
+        $row_count = 0;
 
         // Eligible Users (check against Allow Access Oragnizations)
-        $users = User::join('employee_demo','employee_demo.guid','users.guid')
+        $sql = User::join('employee_demo','employee_demo.guid','users.guid')
                         ->join('employee_demo_jr','employee_demo.guid','employee_demo_jr.guid')
                         ->join('access_organizations','employee_demo.organization','access_organizations.organization')
+                        ->where('employee_demo.guid','<>','')
                         ->where('access_organizations.allow_email_msg', 'Y')
                         ->whereNull('employee_demo.date_deleted')
                         ->where('employee_demo_jr.due_date_paused', 'N')
-                    ->select('users.*', 'employee_demo_jr.next_conversation_date' )
-                    ->orderBy('users.guid')
-//  ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                 
-                    ->get();
+                        ->select('users.*', 'employee_demo_jr.next_conversation_date' )
+//  ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                                     
+                        ->orderBy('users.guid');
 
         $prev_guid = '';
-        foreach ($users as $index => $user) {
+        $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
 
-            // Avoid deuplicate email send out 
-            if ($user->guid == $prev_guid) {
-                continue;
-            }
+            foreach ($chunk as $index => $user) {
 
-            // User Prference 
-            $pref = UserPreference::where('user_id', $user->id)->first();
-            if (!$pref) {
-                $pref = new UserPreference;
-                $pref->user_id = $user->id;
-            }
-            
-            // $due = Conversation::nextConversationDue( $user );
-            $due = $user->next_conversation_date;
-       
-            $dueDate = \Carbon\Carbon::create($due);
-            $now = Carbon::now();
-            $dayDiff = $now->diffInDays($dueDate, false);
-// Override for testing                        
-// $dayDiff = -1;                   
-
-
-            $dueIndays = 0;
-            $subject = '';
-            $template = 'CONVERSATION_REMINDER';
-            $bSend = false;
-            $bind1 = $user->name;
-            $bind2 = $dueDate->format('M d, Y');
-            if ($dayDiff >= 7 and $dayDiff <= 30) {
-                $dueIndays = 30;
-                if ($pref->conversation_due_month == 'Y') {
-                    // $subject = 'REMINDER - your next performance conversation is due in 1 month';
-                    $bSend = true;
-                }
-            }
-            if ($dayDiff >= 0 and $dayDiff < 7) {
-                $dueIndays = 7;
-                if ($pref->conversation_due_week == 'Y') {
-                    // $subject = 'REMINDER - your next performance conversation is due in 1 week';
-                    $bSend = true;
-                }
-            }
-            if ($dayDiff < 0) {  
-                $template = 'CONVERSATION_DUE';
-                if ($pref->conversation_due_past == 'Y') {
-                    // $subject = 'OVERDUE - your next performance conversation is past due';
-                    $bSend = true;
-                }
-            }
-      
-            if ($bSend) {
-
-                // check the notification sent or not 
-                $log = NotificationLog::where('alert_type', 'N')
-                                    ->where('alert_format', 'E')
-                                    ->where('notify_user_id',  $user->id)
-                                    ->whereNull('overdue_user_id')
-                                    ->where('notify_due_date', $dueDate->format('Y-m-d') )
-                                    ->where('notify_for_days', $dueIndays)
-                                    ->first();
-
-                // Send Email for team members
-                if (!$log) {
-                    $this->info( $due . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' ' . $dueIndays);
-                    $sent_count += 1;
-
-                    $sendMail = new \App\MicrosoftGraph\SendMail();
-                    $sendMail->toRecipients = [$user->id];
-                    // $sendMail->ccRecipients = [$user->id];  // test
-                    // $sendMail->bccRecipients = [$user->id]; // test 
-                    $sendMail->sender_id = null;  // default sender is System
-                    $sendMail->useQueue = false;
-                    $sendMail->saveToLog = true;
-
-                    $sendMail->alert_type = 'N';
-                    $sendMail->alert_format = 'E';
-                    $sendMail->notify_user_id = $user->id;
-                    $sendMail->overdue_user_id = null; 
-                    $sendMail->notify_due_date = $dueDate->format('Y-m-d');
-                    $sendMail->notify_for_days = $dueIndays;
-
-                    $sendMail->template = $template;
-                    array_push($sendMail->bindvariables, $bind1 );
-                    array_push($sendMail->bindvariables, $bind2 );
-                    $response = $sendMail->sendMailWithGenericTemplate();    
-
-                } else {
-                    $skip_count += 1;
-                }
-            } 
-
-            $prev_guid = $user->guid;
-
-        }
-
-        $this->info("Total selected users              : " . $users->count() );
-        $this->info("Total notification skipped (sent) : " . $skip_count );
-        $this->info("Total notification created        : " . $sent_count );
-
-    }
-
-
-    protected function sendSupervisorEmailNotificationsWhenTeamConversationDue() {
-
-        $sent_count = 0;
-        $skip_count = 0;
-
-        // Eligible Users (check against Allow Access Oragnizations)
-        $users = User::join('employee_demo','employee_demo.guid','users.guid')
-                        ->join('employee_demo_jr','employee_demo.guid','employee_demo_jr.guid')
-                        ->join('access_organizations','employee_demo.organization','access_organizations.organization')
-                        ->where('access_organizations.allow_email_msg', 'Y')
-                        ->whereNull('employee_demo.date_deleted')
-                        ->where('employee_demo_jr.due_date_paused', 'N')
-                    ->select('users.*', 'employee_demo_jr.next_conversation_date' )
-                    ->orderBy('users.guid')
-// ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                        
-                    ->get();
-
-        $prev_guid = '';
-        foreach ($users as $index => $user) {
-
-            // Avoid deuplicate email send out 
-            if ($user->guid == $prev_guid) {
-                continue;
-            }
-
-            // Look for direct report manager and Shared with
-            $manager_ids = SharedProfile::where('shared_id', $user->id)
-                                ->where('shared_item', 'like',  '%"2"%' ) 
-                                ->orderBy('id')
-                                ->pluck('shared_with');
-            if ($user->reporting_to) {        
-                $manager_ids->push($user->reporting_to);
-            }
-
-            // if no manager found, then next 
-            if ($manager_ids->count() == 0) {
-                    continue;
-            }
-
-
-            // process  each managers 
-            foreach ($manager_ids as $manager_id) {
-
-                // check whether the manager can recieve In-App Message
-                $mgr = User::join('employee_demo','employee_demo.guid','users.guid')
-                        ->join('access_organizations','employee_demo.organization','access_organizations.organization')
-                        ->where('access_organizations.allow_email_msg', 'Y')
-                        ->whereNull('date_deleted')                                                
-                        ->where('users.id',  $manager_id)
-                        ->first();
-
-                if (!$mgr) {
+                // Avoid deuplicate email send out 
+                if ($user->guid == $prev_guid) {
                     continue;
                 }
+
+                $row_count += 1;
 
                 // User Prference 
-                $pref = UserPreference::where('user_id', $user->manager_id)->first();
+                $pref = UserPreference::where('user_id', $user->id)->first();
                 if (!$pref) {
                     $pref = new UserPreference;
-                    $pref->user_id = $user->manager_id;
+                    $pref->user_id = $user->id;
                 }
-
+                
                 // $due = Conversation::nextConversationDue( $user );
                 $due = $user->next_conversation_date;
-
+        
                 $dueDate = \Carbon\Carbon::create($due);
                 $now = Carbon::now();
                 $dayDiff = $now->diffInDays($dueDate, false);
-// Override for testing                        
-// $dayDiff = -1;                   
+    // Override for testing                        
+    // $dayDiff = -1;                   
 
 
                 $dueIndays = 0;
                 $subject = '';
-                $template = 'SUPV_CONV_REMINDER';
+                $template = 'CONVERSATION_REMINDER';
                 $bSend = false;
-                $bind1 = $user->reportingManager->name;
-                $bind2 = $user->name;
-                $bind3 = $dueDate->format('M d, Y');
-
+                $bind1 = $user->name;
+                $bind2 = $dueDate->format('M d, Y');
                 if ($dayDiff >= 7 and $dayDiff <= 30) {
                     $dueIndays = 30;
-                    if ($pref->team_conversation_due_month == 'Y') {
+                    if ($pref->conversation_due_month == 'Y') {
                         // $subject = 'REMINDER - your next performance conversation is due in 1 month';
                         $bSend = true;
                     }
                 }
                 if ($dayDiff >= 0 and $dayDiff < 7) {
                     $dueIndays = 7;
-                    if ($pref->team_conversation_due_week == 'Y') {
+                    if ($pref->conversation_due_week == 'Y') {
                         // $subject = 'REMINDER - your next performance conversation is due in 1 week';
                         $bSend = true;
                     }
                 }
                 if ($dayDiff < 0) {  
-                    $dueIndays = 0;
-                    $template = 'SUPV_CONV_DUE';
-                    if ($pref->team_conversation_due_past == 'Y') {
+                    $template = 'CONVERSATION_DUE';
+                    if ($pref->conversation_due_past == 'Y') {
                         // $subject = 'OVERDUE - your next performance conversation is past due';
                         $bSend = true;
                     }
@@ -576,19 +462,19 @@ class NotificationProcess extends Command
                     // check the notification sent or not 
                     $log = NotificationLog::where('alert_type', 'N')
                                         ->where('alert_format', 'E')
-                                        ->where('notify_user_id',  $manager_id)
-                                        ->where('overdue_user_id',  $user->id)
+                                        ->where('notify_user_id',  $user->id)
+                                        ->whereNull('overdue_user_id')
                                         ->where('notify_due_date', $dueDate->format('Y-m-d') )
                                         ->where('notify_for_days', $dueIndays)
                                         ->first();
 
                     // Send Email for team members
                     if (!$log) {
-                        $this->info( $due . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' ' . $dueIndays);
+                        $this->logInfo( $due . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' ' . $dueIndays);
                         $sent_count += 1;
 
                         $sendMail = new \App\MicrosoftGraph\SendMail();
-                        $sendMail->toRecipients = [$manager_id];
+                        $sendMail->toRecipients = [$user->id];
                         // $sendMail->ccRecipients = [$user->id];  // test
                         // $sendMail->bccRecipients = [$user->id]; // test 
                         $sendMail->sender_id = null;  // default sender is System
@@ -597,15 +483,14 @@ class NotificationProcess extends Command
 
                         $sendMail->alert_type = 'N';
                         $sendMail->alert_format = 'E';
-                        $sendMail->notify_user_id = $manager_id;
-                        $sendMail->overdue_user_id = $user->id; 
+                        $sendMail->notify_user_id = $user->id;
+                        $sendMail->overdue_user_id = null; 
                         $sendMail->notify_due_date = $dueDate->format('Y-m-d');
                         $sendMail->notify_for_days = $dueIndays;
 
                         $sendMail->template = $template;
                         array_push($sendMail->bindvariables, $bind1 );
                         array_push($sendMail->bindvariables, $bind2 );
-                        array_push($sendMail->bindvariables, $bind3 );
                         $response = $sendMail->sendMailWithGenericTemplate();    
 
                     } else {
@@ -613,16 +498,189 @@ class NotificationProcess extends Command
                     }
                 } 
 
-           }
+                $prev_guid = $user->guid;
 
-           $prev_guid = $user->guid;
+            }
 
-        }
+        });
 
-        $this->info("Total selected users              : " . $users->count() );
-        $this->info("Total notification skipped (sent) : " . $skip_count );
-        $this->info("Total notification created        : " . $sent_count );
+        $this->logInfo("Total selected users              : " . $row_count );
+        $this->logInfo("Total notification skipped (sent) : " . $skip_count );
+        $this->logInfo("Total notification created        : " . $sent_count );
 
+    }
+
+
+    protected function sendSupervisorEmailNotificationsWhenTeamConversationDue() {
+
+        $sent_count = 0;
+        $skip_count = 0;
+        $row_count = 0;
+
+        // Eligible Users (check against Allow Access Oragnizations)
+        $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+                        ->join('employee_demo_jr','employee_demo.guid','employee_demo_jr.guid')
+                        ->join('access_organizations','employee_demo.organization','access_organizations.organization')
+                        ->where('employee_demo.guid','<>','')
+                        ->where('access_organizations.allow_email_msg', 'Y')
+                        ->whereNull('employee_demo.date_deleted')
+                        ->where('employee_demo_jr.due_date_paused', 'N')
+                    ->select('users.*', 'employee_demo_jr.next_conversation_date' )
+// ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                                            
+                    ->orderBy('users.guid');
+
+        $prev_guid = '';
+        $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
+
+            foreach ($chunk as $index => $user) {
+
+                // Avoid deuplicate email send out 
+                if ($user->guid == $prev_guid) {
+                    continue;
+                }
+
+                $row_count += 1;
+
+                // Look for direct report manager and Shared with
+                $manager_ids = SharedProfile::where('shared_id', $user->id)
+                                    ->where('shared_item', 'like',  '%"2"%' ) 
+                                    ->orderBy('id')
+                                    ->pluck('shared_with');
+                if ($user->reporting_to) {        
+                    $manager_ids->push($user->reporting_to);
+                }
+
+                // if no manager found, then next 
+                if ($manager_ids->count() == 0) {
+                        continue;
+                }
+
+
+                // process  each managers 
+                foreach ($manager_ids as $manager_id) {
+
+                    // check whether the manager can recieve In-App Message
+                    $mgr = User::join('employee_demo','employee_demo.guid','users.guid')
+                            ->join('access_organizations','employee_demo.organization','access_organizations.organization')
+                            ->where('access_organizations.allow_email_msg', 'Y')
+                            ->whereNull('date_deleted')                                                
+                            ->where('users.id',  $manager_id)
+                            ->first();
+
+                    if (!$mgr) {
+                        continue;
+                    }
+
+                    // User Prference 
+                    $pref = UserPreference::where('user_id', $user->manager_id)->first();
+                    if (!$pref) {
+                        $pref = new UserPreference;
+                        $pref->user_id = $user->manager_id;
+                    }
+
+                    // $due = Conversation::nextConversationDue( $user );
+                    $due = $user->next_conversation_date;
+
+                    $dueDate = \Carbon\Carbon::create($due);
+                    $now = Carbon::now();
+                    $dayDiff = $now->diffInDays($dueDate, false);
+    // Override for testing                        
+    // $dayDiff = -1;                   
+
+
+                    $dueIndays = 0;
+                    $subject = '';
+                    $template = 'SUPV_CONV_REMINDER';
+                    $bSend = false;
+                    // $bind1 = $user->reportingManager->name;
+                    $bind1 = $user->reportingManager ? $user->reportingManager->name : '';
+                    $bind2 = $user->name;
+                    $bind3 = $dueDate->format('M d, Y');
+
+                    if ($dayDiff >= 7 and $dayDiff <= 30) {
+                        $dueIndays = 30;
+                        if ($pref->team_conversation_due_month == 'Y') {
+                            // $subject = 'REMINDER - your next performance conversation is due in 1 month';
+                            $bSend = true;
+                        }
+                    }
+                    if ($dayDiff >= 0 and $dayDiff < 7) {
+                        $dueIndays = 7;
+                        if ($pref->team_conversation_due_week == 'Y') {
+                            // $subject = 'REMINDER - your next performance conversation is due in 1 week';
+                            $bSend = true;
+                        }
+                    }
+                    if ($dayDiff < 0) {  
+                        $dueIndays = 0;
+                        $template = 'SUPV_CONV_DUE';
+                        if ($pref->team_conversation_due_past == 'Y') {
+                            // $subject = 'OVERDUE - your next performance conversation is past due';
+                            $bSend = true;
+                        }
+                    }
+            
+                    if ($bSend) {
+
+                        // check the notification sent or not 
+                        $log = NotificationLog::where('alert_type', 'N')
+                                            ->where('alert_format', 'E')
+                                            ->where('notify_user_id',  $manager_id)
+                                            ->where('overdue_user_id',  $user->id)
+                                            ->where('notify_due_date', $dueDate->format('Y-m-d') )
+                                            ->where('notify_for_days', $dueIndays)
+                                            ->first();
+
+                        // Send Email for team members
+                        if (!$log) {
+                            $this->logInfo( $due . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' ' . $dueIndays);
+                            $sent_count += 1;
+
+                            $sendMail = new \App\MicrosoftGraph\SendMail();
+                            $sendMail->toRecipients = [$manager_id];
+                            // $sendMail->ccRecipients = [$user->id];  // test
+                            // $sendMail->bccRecipients = [$user->id]; // test 
+                            $sendMail->sender_id = null;  // default sender is System
+                            $sendMail->useQueue = false;
+                            $sendMail->saveToLog = true;
+
+                            $sendMail->alert_type = 'N';
+                            $sendMail->alert_format = 'E';
+                            $sendMail->notify_user_id = $manager_id;
+                            $sendMail->overdue_user_id = $user->id; 
+                            $sendMail->notify_due_date = $dueDate->format('Y-m-d');
+                            $sendMail->notify_for_days = $dueIndays;
+
+                            $sendMail->template = $template;
+                            array_push($sendMail->bindvariables, $bind1 );
+                            array_push($sendMail->bindvariables, $bind2 );
+                            array_push($sendMail->bindvariables, $bind3 );
+                            $response = $sendMail->sendMailWithGenericTemplate();    
+
+                        } else {
+                            $skip_count += 1;
+                        }
+                    } 
+
+                }
+
+                $prev_guid = $user->guid;
+
+            }
+
+        });
+
+        $this->logInfo("Total selected users              : " . $row_count );
+        $this->logInfo("Total notification skipped (sent) : " . $skip_count );
+        $this->logInfo("Total notification created        : " . $sent_count );
+
+    }
+
+
+    protected function logInfo($text) {
+
+        $this->info( $text );
+        $this->details .= $text . PHP_EOL;
 
     }
 
