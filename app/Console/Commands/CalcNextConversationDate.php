@@ -7,9 +7,11 @@ use App\Models\Conversation;
 use App\Models\User;
 use App\Models\EmployeeDemo;
 use App\Models\EmployeeDemoJunior;
+use App\Models\ExcusedClassification;
 use App\Models\JobSchedAudit;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
@@ -48,8 +50,10 @@ class CalcNextConversationDate extends Command
      */
     public function handle()
     {
+        $processname = 'CalcNextConversationDate';
 
         $start_time = Carbon::now()->format('c');
+        $current_cutoff_datetime = $start_time;
         $this->info( 'CalcNextConversationDate, Started: '. $start_time);
 
         $job_name = 'command:CalcNextConversationDate';
@@ -86,24 +90,26 @@ class CalcNextConversationDate extends Command
                 ]
             );
         }
+
+        //Process all employees;
         $counter = 0;
-        EmployeeDemo::whereNotNull('guid')
+        $ClassificationArray = ExcusedClassification::select('jobcode')->get()->toArray();
+        EmployeeDemo::leftjoin('users', 'users.guid', 'employee_demo.guid')
+        // ->where('employee_name', 'like', '$travis%')
+        ->whereNotNull('employee_demo.guid')
         ->whereDate('date_updated', '>', $last_cutoff_time)
-        ->orderBy('employee_id')
-        ->chunk(1000, function($employeeDemo) use (&$counter) {
+        ->orderBy('employee_demo.employee_id')
+        ->chunk(1000, function($employeeDemo) use (&$counter, $ClassificationArray, $processname) {
             foreach ($employeeDemo as $demo) {
-                $assumeChange = true;
-                $due_Date_paused = $demo->employee_status != 'A' ? 'Y' : 'N';
-                // get user info
-                $user = User::where('guid', '=', $demo->guid)->first();
-                if ($user) {
+                if ($demo->guid) {
+                    // YES GUID
                     // get last conversation details
-                    $lastConv = Conversation::join('conversation_participants', 'conversations.id', '=', 'conversation_participants.conversation_id')
-                    ->join('users', 'users.id', '=', 'conversation_participants.participant_id')
+                    $lastConv = Conversation::join('conversation_participants', 'conversations.id', 'conversation_participants.conversation_id')
+                    ->join('users', 'users.id', 'conversation_participants.participant_id')
                     ->whereNotNull('signoff_user_id')
                     ->whereNotNull('supervisor_signoff_id')
                     ->whereNotNull('sign_off_time')
-                    ->where('participant_id', '=', $user->id)
+                    ->where('participant_id', '=', $demo->users->id)
                     ->whereRaw('cast(users.employee_id as unsigned) = signoff_user_id')
                     ->select('users.employee_id', 'conversations.sign_off_time')
                     ->orderBy('sign_off_time', 'desc')
@@ -120,13 +126,13 @@ class CalcNextConversationDate extends Command
                     } else {
                         // no last conversation, use randomizer to assign initial next conversation date
                         $lastConversationDate = null;
-                        $initNextConversationDate = $user->joining_date->addMonth(4)->format('M d, Y');
+                        $initNextConversationDate = $demo->users->joining_date->addMonth(4)->format('M d, Y');
                     }
                     // post go-live hard-coded initial next conversation due dates
                     $virtualHardDate = Carbon::createFromDate(2022, 10, 14);
                     if ($virtualHardDate->gt($initNextConversationDate)) {
                         // distribute next conversation date, based on last digit of employee ID
-                        $DDt = abs (($user->id % 10) - 1) * 5 + (($user->id % 5));
+                        $DDt = abs (($demo->employee_id % 10) - 1) * 5 + (($demo->employee_id % 5));
                         $initNextConversationDate = $virtualHardDate->addDays($DDt)->format('M d, Y');
                     }
                     // calcualte initial last conversation date; init next conversation minus 4 months
@@ -136,19 +142,101 @@ class CalcNextConversationDate extends Command
                     }
                     // get last stored detail in junior table
                     $jr = EmployeeDemoJunior::where('guid', '=', $demo->guid)->orderBy('id', 'desc')->first();
+                    $changeType = '';
+                    $new_last_employee_status = null;
+                    $new_last_classification = null;
+                    $new_last_classification_descr = null;
+                    $new_last_manual_excuse = 'N';
+                    $excuseType = null;
+                    $jr_inarray = false;
+                    $demo_inarray = false;
                     if ($jr) {
-                        $lastEmployeeStatus = $jr->current_employee_status;
-                        if ($jr->current_employee_status == 'A' && $demo->employee_status != 'A') {
-                            // no next conversation date
-                            $initLastConversationDate = null;
+                        // Previous JR record exist
+                        $new_last_employee_status = $jr->current_employee_status;
+                        $new_last_classification = $jr->current_classification;
+                        $new_last_classification_descr = $jr->current_classification_descr;
+                        $new_last_manual_excuse = $jr->current_manual_excuse ?? 'N';
+                        if ($jr->current_employee_status == 'A' 
+                            && $demo->employee_status != 'A') {
+                            // STATUS CHANGE
+                            $changeType = 'statusStartExcuse';
+                            $excuseType = 'A';
                         }
-                        if ($jr->current_employee_status != 'A' && $demo->employee_status == 'A'){
+                        if ($jr->current_employee_status != 'A' 
+                            && $demo->employee_status == 'A') {
+                            // STATUS CHANGE
+                            $changeType = 'statusEndExcuse';
+                        }
+                        $jr_inarray = in_array($jr->current_classification, $ClassificationArray);
+                        $demo_inarray = in_array($demo->jobcode, $ClassificationArray);
+                        if ($jr->current_employee_status == 'A' 
+                            && $demo->employee_status == 'A'
+                            && $jr_inarray == false
+                            && $demo_inarray) {
+                            // CLASSIFICATION CHANGE
+                            $changeType = 'classStartExcuse';
+                            $excuseType = 'A';
+                        }
+                        if ($jr->current_employee_status == 'A' 
+                            && $demo->employee_status == 'A'
+                            && $jr_inarray 
+                            && $demo_inarray == false) {
+                            // CLASSIFICATION CHANGE
+                            $changeType = 'classEndExcuse';
+                        }
+                        if ($jr->current_employee_status == 'A' 
+                            && $demo->employee_status == 'A' 
+                            && $jr_inarray == false
+                            && $demo_inarray == false
+                            && ($jr->current_manual_excuse || $jr->current_manual_excuse != 'Y') 
+                            && $demo->excused_flag) {
+                            // MANUAL CHANGE
+                            $changeType = 'manualStartExcuse';
+                            $excuseType = 'M';
+                        }
+                        if ($jr->current_employee_status == 'A' 
+                            && $demo->employee_status == 'A'
+                            && $jr_inarray == false
+                            && $demo_inarray == false
+                            && $jr->current_manual_excuse == 'Y' 
+                            && $demo->excused_flag != null) {
+                            // MANUAL CHANGE
+                            $changeType = 'manualEndExcuse';
+                        }
+                        if (in_array($changeType, ['statusEndExcuse', 'classEndExcuse', 'manualEndExcuse'])) {
                             // re-calc next conversation date
-                            $prevActive = EmployeeDemoJunior::where('guid', '=', $demo->guid)->where('current_employee_status', '=', 'A')->where('id', '<', $jr->id)->orderBy('id', 'desc')->first();
+                            $prevActive = EmployeeDemoJunior::where('guid', $demo->guid)
+                            ->where('current_employee_status', 'A')
+                            ->whereNotIn('current_classification', $ClassificationArray)
+                            ->where(function ($manual) {
+                                return $manual->whereNull('current_manual_excuse')    
+                                ->orWhere('current_manual_excuse', 'N');
+                            })
+                            ->where('id', '<', $jr->id)
+                            ->orderBy('id', 'desc')
+                            ->first();
                             if ($prevActive) {
-                                $nextRow = EmployeeDemoJunior::where('guid', '=', $demo->guid)->where('current_employee_status', '!=', 'A')->where('id', '<=', $jr->id)->where('id', '>', $prevActive->id)->orderBy('id')->first();
+                                $nextRow = EmployeeDemoJunior::where('guid', $demo->guid)
+                                ->where(function ($q) use ($ClassificationArray) {
+                                    return $q->where('current_employee_status', '!=', 'A')
+                                    ->orWhereIn('current_classification', $ClassificationArray)
+                                    ->orwhere('current_manual_excuse', 'Y');
+                                })
+                                ->where('id', '<=', $jr->id)
+                                ->where('id', '>', $prevActive->id)
+                                ->orderBy('id')
+                                ->first();
                             } else {
-                                $nextRow = EmployeeDemoJunior::where('guid', '=', $demo->guid)->where('current_employee_status', '!=', 'A')->where('id', '<=', $jr->id)->orderBy('id')->first();
+                                $nextRow = EmployeeDemoJunior::where('guid', $demo->guid)
+                                // ->where('current_employee_status', '!=', 'A')
+                                ->where(function ($q) use ($ClassificationArray) {
+                                    return $q->where('current_employee_status', '!=', 'A')
+                                    ->orWhereIn('current_classification', $ClassificationArray)
+                                    ->orwhere('current_manual_excuse', 'Y');
+                                })
+                                ->where('id', '<=', $jr->id)
+                                ->orderBy('id')
+                                ->first();
                             }
                             $newStartDate = $initLastConversationDate->format('M d, Y');
                             $newEndDate = (new Carbon($nextRow->date_updated));
@@ -161,29 +249,46 @@ class CalcNextConversationDate extends Command
                                 $initNextConversationDate = $newEndDate->format('M d, Y');
                             }
                         }
-                        if (($jr->current_employee_status == 'A' && $demo->employee_status == 'A') || ($jr->current_employee_status != 'A' && $demo->employee_status != 'A')) {
-                            // no employee status change, no update needed
-                            $assumeChange = false;
-                        }
                     } else {
-                        // no previous junior detail
-                        $lastEmployeeStatus = null;
+                        // NO Previous JR record exist, store details to junior table
+                        if ($demo->employee_status != 'A') {
+                            $changeType = 'statusNewExcuse';
+                        } else {
+                            if ($demo_inarray) {
+                                $changeType = 'classNewExcuse';
+                            } else {
+                                if ($demo->excused_flag) {
+                                    $changeType = 'manualNewExcuse';
+                                } else {
+                                    $changeType = 'noExcuse';
+                                }
+                            }
+                        }
                     }
-                    if ($assumeChange) {
-                        //store details to junior table
+                    $excusedArrayTypes = ['statusStartExcuse', 'classStartExcuse', 'manualStartExcuse', 'statusNewExcuse', 'classNewExcuse', 'manualNewExcuse'];
+                    if ($changeType != 'noExcuse') {
+                        $excused = ($demo->employee_status != 'A' || $demo_inarray || $demo->excused_flag);
                         $newJr = new EmployeeDemoJunior;
                         $newJr->guid = $demo->guid;
-                        $newJr->last_employee_status = $lastEmployeeStatus;
                         $newJr->current_employee_status = $demo->employee_status;
-                        $newJr->due_Date_paused = $due_Date_paused;
+                        $newJr->current_classification = $demo->jobcode;
+                        $newJr->current_classification_descr = $demo->jobcode_desc;
+                        $newJr->current_manual_excuse = $demo->excused_flag ? 'Y' : 'N';
+                        $newJr->due_Date_paused = in_array($changeType, $excusedArrayTypes) ? 'Y' : 'N';
+                        $newJr->last_employee_status = $new_last_employee_status;
+                        $newJr->last_classification = $new_last_classification;
+                        $newJr->last_classification_descr = $new_last_classification_descr;
+                        $newJr->last_manual_excuse = $new_last_manual_excuse;
+                        $newJr->excused_type = $excuseType;
                         $newJr->last_conversation_date = $lastConversationDate ? (new Carbon($lastConversationDate)) : null;
                         $newJr->next_conversation_date = $initNextConversationDate ? (new Carbon($initNextConversationDate)) : null;
                         $newJr->save();
                     } else {
-                        // no change, do not update
+                        // SKIP if no change
                     }
                 } else {
-                    // skip, no user info, do not process
+                    // NO GUID
+                    Log:info(Carbon::now()->format('c').' - '.$processname.' - Employee ID['.$demo->employee_id.' does not have GUID in Employee Demo table.');
                 }
                 $counter += 1;
                 echo 'Processed '.$counter; echo "\r";
