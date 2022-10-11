@@ -253,12 +253,15 @@ class CalcNextConversationDate extends Command
                         // NO Previous JR record exist, store details to junior table
                         if ($demo->employee_status != 'A') {
                             $changeType = 'statusNewExcuse';
+                            $excuseType = 'A';
                         } else {
                             if ($demo_inarray) {
                                 $changeType = 'classNewExcuse';
+                                $excuseType = 'A';
                             } else {
                                 if ($demo->excused_flag) {
                                     $changeType = 'manualNewExcuse';
+                                    $excuseType = 'M';
                                 } else {
                                     $changeType = 'noExcuse';
                                 }
@@ -282,6 +285,8 @@ class CalcNextConversationDate extends Command
                         $newJr->excused_type = $excuseType;
                         $newJr->last_conversation_date = $lastConversationDate ? (new Carbon($lastConversationDate)) : null;
                         $newJr->next_conversation_date = $initNextConversationDate ? (new Carbon($initNextConversationDate)) : null;
+                        $newJr->created_by_id = $processname;
+                        $newJr->updated_by_id = $processname;
                         $newJr->save();
                     } else {
                         // SKIP if no change
