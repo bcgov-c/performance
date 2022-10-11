@@ -44,12 +44,12 @@ class EmployeeDemo extends Model
     ];
 
     public function users() {
-        return $this->belongsToMany('App\Model\User', 'id', 'employee_id');
+        return $this->hasOne(User::class, 'guid', 'guid');
     }
 
-    public function dr_count() {
-        return $this->belongsToMany('App\Model\User', 'users', 'id', 'supervisor_emplid')->count();
-    }
+    // public function dr_count() {
+    //     return $this->belongsToMany('App\Models\User', 'users', 'id', 'supervisor_emplid')->count();
+    // }
 
 //     protected function setKeysForSaveQuery(Builder $query)
 //     {
