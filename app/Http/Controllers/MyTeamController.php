@@ -496,7 +496,15 @@ class MyTeamController extends Controller
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
         
         $employees_list = array();
-        $i = 0;
+        
+        $myself = DB::table('users')
+                    ->select('id', 'name')
+                    ->where('id', Auth::id())
+                    ->first();
+        $employees_list[0]["id"] = $myself->id;
+        $employees_list[0]["name"] = $myself->name;
+        
+        $i = 1;
         if(count($employees)>0) {
             foreach ($employees as $employee) {
                 $employees_list[$i]["id"] = $employee->id;
@@ -518,7 +526,7 @@ class MyTeamController extends Controller
                 $i++;
             }
         }
-        
+        usort($employees_list, fn($a, $b) => $a['name'] <=> $b['name']);
         
         $type = 'upcoming';
         $disableEdit = false;
