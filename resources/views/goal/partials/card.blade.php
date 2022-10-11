@@ -1,7 +1,11 @@
     <div class="card card-primary shadow">
         <div class="card-header p-1">
             <div class="d-flex">
-                <a href="{{route("goal.show", $goal->id)}}" class="p-2">
+                @if(isset($from) && $from == 'bank') 
+                    <a href="{{route("goal.edit", $goal->id)}}" class="p-2">
+                @else
+                    <a href="{{route("goal.show", $goal->id)}}" class="p-2">
+                @endif
                     <p class="card-title">
                         {{ $goal->start_date_human}}
                             <span class="mx-4">&#8212;</span>
