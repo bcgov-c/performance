@@ -34,7 +34,8 @@ class Kernel extends ConsoleKernel
         ->dailyAt('08:00');
 
         $schedule->command('command:NotificationProcess')    
-        ->dailyAt('3:00');
+        ->dailyAt('7:50')
+        ->appendOutputTo(storage_path('logs/notification.log'));
 
         $schedule->command('command:ExportDatabaseToBI')
         ->timezone('America/Vancouver')
