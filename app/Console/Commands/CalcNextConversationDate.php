@@ -97,6 +97,7 @@ class CalcNextConversationDate extends Command
         $ClassificationArray = ExcusedClassification::select('jobcode')->get()->toArray();
         EmployeeDemo::leftjoin('users', 'users.guid', 'employee_demo.guid')
         ->whereNotNull('employee_demo.guid')
+        ->whereRaw("TRIM(employee_demo.guid) <> ''")
         ->whereNull('employee_demo.date_deleted')
         ->orderBy('employee_demo.employee_id')
         ->chunk(1000, function($employeeDemo) use (&$counter, $ClassificationArray, $processname) {
@@ -325,7 +326,7 @@ class CalcNextConversationDate extends Command
                     if ($details == '') {
                         $details = 'Unidentified';
                     }
-                    Log::info(Carbon::now()->format('c').' - ['.$processname.' - '.$details.'] does not have GUID in Employee Demo table.');
+                    Log::info(Carbon::now()->format('c').' - '.$processname.' - ['.$details.'] does not have GUID in Employee Demo table.');
                 }
                 $counter += 1;
                 echo 'Processed '.$counter; echo "\r";
