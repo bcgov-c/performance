@@ -55,9 +55,11 @@ class NotificationProcess extends Command
     {
 
         $start_time = Carbon::now();
-        $audit_id = JobSchedAudit::insertGetId([
+
+        $this->task = JobSchedAudit::Create([
             'job_name' => $this->signature,
-            'start_time' => date('Y-m-d H:i:s', strtotime( now() )),
+            'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
+            'cutoff_time' => date('Y-m-d H:i:s', strtotime($start_time)),
             'status' => 'Initiated'
         ]);
 
@@ -86,17 +88,12 @@ class NotificationProcess extends Command
         $this->logInfo("Supervisor Email Notification -- Conversation Due (end)");
 
         $end_time = Carbon::now();
-        JobSchedAudit::updateOrInsert([
-           'id' => $audit_id
-        ],[
-            'job_name' => $this->signature,
-            'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
-            'end_time' => date('Y-m-d H:i:s', strtotime($end_time)),
-            'cutoff_time' => date('Y-m-d H:i:s', strtotime($start_time)),
-            'details' => $this->details,
-            'status' => 'Completed'
-        ]);
+        $this->taskJob->end_time = date('Y-m-d H:i:s', strtotime($end_time));
+        $this->taskJob->details = $this->details;
+        $this->taskJob->status = 'Completed';
+        $this->taskJob->save();
 
+        return 0; 
     }
 
 
@@ -681,6 +678,10 @@ class NotificationProcess extends Command
 
         $this->info( $text );
         $this->details .= $text . PHP_EOL;
+
+        // write to log
+        $this->task->details = $this->details;
+        $this->task->save();
 
     }
 
