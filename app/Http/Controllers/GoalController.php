@@ -211,8 +211,9 @@ class GoalController extends Controller
         $goals = $query->groupBy('title');
         $goals = $query->paginate(4);
         
+        $from = 'goal';        
         
-        return view('goal.index', compact('goals', 'type', 'goaltypes', 'tagsList', 'sortby', 'sortorder', 'createdBy', 'user', 'employees', 'tags', 'type_desc_str', 'statusList'));
+        return view('goal.index', compact('goals', 'type', 'goaltypes', 'tagsList', 'sortby', 'sortorder', 'createdBy', 'user', 'employees', 'tags', 'type_desc_str', 'statusList','from'));
     }
 
     /**
@@ -603,9 +604,16 @@ class GoalController extends Controller
 
         // this is redirect from DashboardController with the related id, then open modal box
         $open_modal_id = (session('open_modal_id'));
+        
+        $from = 'bank';
+        $shared_employees = DB::table('shared_profiles')
+                    ->select('shared_profiles.shared_id', 'users.name')
+                    ->join('users', 'users.id', '=', 'shared_profiles.shared_id')
+                    ->where('shared_profiles.shared_with', Auth::id())
+                    ->get();
 
         return view('goal.bank', array_merge(compact('bankGoals', 'tags', 'user', 'tagsList', 'goalTypes', 'type_desc_str', 'mandatoryOrSuggested', 'createdBy', 'goals_count', 'sortby','sortorder',
-                                'open_modal_id'), $suggestedGoalsData));
+                                'open_modal_id','from','shared_employees'), $suggestedGoalsData));
     }
 
     private function getDropdownValues(&$mandatoryOrSuggested, &$createdBy, &$goalTypes, &$tagsList) {

@@ -21,9 +21,16 @@ class EmployeeDemoJunior extends Model
         'guid',
         'last_employee_status',
         'current_employee_status',
+        'last_classification',
+        'current_classification',
+        'last_manual_excuse',
+        'current_manual_excuse',
         'last_conversation_date',
         'next_conversation_date',
         'due_date_paused',
+        'excused_type',
+        'created_by_id',
+        'updated_by_id',
     ];
 
 }
