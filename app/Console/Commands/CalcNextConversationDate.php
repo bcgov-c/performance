@@ -306,7 +306,7 @@ class CalcNextConversationDate extends Command
                     }
                 } else {
                     // NO GUID
-                    Log::info(Carbon::now()->format('c').' - '.$processname.' - Employee ID['.$demo->employee_id.' does not have GUID in Employee Demo table.');
+                    Log::info(Carbon::now()->format('c').' - '.$processname.' - eMail['.$demo->employee_email.'] does not have GUID in Employee Demo table.');
                 }
                 $counter += 1;
                 echo 'Processed '.$counter; echo "\r";
