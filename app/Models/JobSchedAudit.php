@@ -10,6 +10,7 @@ class JobSchedAudit extends Model
 {
 
     public $table = 'job_sched_audit';
+    public $timestamps = false;
 
     use HasFactory;
 
