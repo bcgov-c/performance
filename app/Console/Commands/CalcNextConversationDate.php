@@ -306,7 +306,26 @@ class CalcNextConversationDate extends Command
                     }
                 } else {
                     // NO GUID
-                    Log::info(Carbon::now()->format('c').' - '.$processname.' - eMail['.$demo->employee_email.'] does not have GUID in Employee Demo table.');
+                    $details = '';
+                    if ($demo->employee_id) {
+                        $details = 'EmplID='.$demo->employee_id;
+                    }
+                    if ($demo->employee_email) {
+                        if ($details) {
+                            $details = $details.'|';
+                        }
+                        $details = $details.'eMail='.$demo->employee_email;
+                    }
+                    if ($demo->employee_name) {
+                        if ($details) {
+                            $details = $details.'|';
+                        }
+                        $details = $details.'Name='.$demo->employee_name;
+                    }
+                    if ($details == '') {
+                        $details = 'Unidentified';
+                    }
+                    Log::info(Carbon::now()->format('c').' - ['.$processname.' - '.$details.'] does not have GUID in Employee Demo table.');
                 }
                 $counter += 1;
                 echo 'Processed '.$counter; echo "\r";
