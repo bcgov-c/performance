@@ -2,38 +2,33 @@
 
 namespace App\Console\Commands;
 
+use Illuminate\Console\Command;
 use DateTime;
 use DateTimeZone;
 use Carbon\Carbon;
 use App\Models\User;
-// use GuzzleHttp\Client;
-// use Microsoft\Graph\Graph;
-// use App\Models\Conversation;
 use App\Models\JobSchedAudit;
 use App\Models\SharedProfile;
 use App\Models\UserPreference;
 use App\Models\NotificationLog;
-use Illuminate\Console\Command;
 use App\Models\DashboardNotification;
-// use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 
-class NotificationProcess extends Command
+class NotifyProcess extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'command:NotificationProcess';
+    protected $signature = 'command:notifyProcess';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Trigger the event notification';
-    
+    protected $description = 'Command description';
+
     /**
      * Create a new command instance.
      *
@@ -53,7 +48,6 @@ class NotificationProcess extends Command
      */
     public function handle()
     {
-
         $start_time = Carbon::now();
 
         $this->task = JobSchedAudit::Create([
@@ -93,9 +87,8 @@ class NotificationProcess extends Command
         $this->task->status = 'Completed';
         $this->task->save();
 
-        return 0; 
+        return 0;
     }
-
 
     protected function dashboardNotificationsConversationDue() {
 
