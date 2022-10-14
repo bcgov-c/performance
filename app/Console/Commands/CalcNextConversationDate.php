@@ -125,14 +125,14 @@ class CalcNextConversationDate extends Command
                     ->join('users', 'users.id', 'conversation_participants.participant_id')
                     ->whereNotNull('signoff_user_id')
                     ->whereNotNull('supervisor_signoff_id')
-                    ->where('participant_id', '=', $demo->users->id)
-                    // ->whereRaw('cast(users.employee_id as unsigned) = signoff_user_id')
-                    ->where('users.id', 'signoff_user_id')
+                    ->where('participant_id', $demo->users->id)
+                    ->with('user')
+                    ->where('signoff_user_id', $demo->users->id)
                     ->orderBy('conversations.sign_off_time', 'desc')
                     ->first();
                     if ($lastConv) {
                         // use last conversation + 4 months as initial next conversation date
-                        $lastConversationDate = $lastConv->getLastSignOffDateAttribute();
+                        $lastConversationDate = $lastConv->getLastSignOffDateAttribute()->format('M d, Y');
                         $initNextConversationDate = $lastConv->getLastSignOffDateAttribute()->addMonth(4)->format('M d, Y');
                         // echo 'Last Conversation Date:'.$lastConversationDate; echo "\r\n";
                     } else {
