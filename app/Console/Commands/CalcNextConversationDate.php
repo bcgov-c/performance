@@ -126,7 +126,8 @@ class CalcNextConversationDate extends Command
                     ->whereNotNull('signoff_user_id')
                     ->whereNotNull('supervisor_signoff_id')
                     ->where('participant_id', '=', $demo->users->id)
-                    ->whereRaw('cast(users.employee_id as unsigned) = signoff_user_id')
+                    // ->whereRaw('cast(users.employee_id as unsigned) = signoff_user_id')
+                    ->where('users.id', 'signoff_user_id')
                     ->orderBy('conversations.sign_off_time', 'desc')
                     ->first();
                     if ($lastConv) {
