@@ -34,8 +34,8 @@ class User extends Authenticatable
         'employee_id',
         'empl_record',
         'excused_flag',
-        'excused_start_date',
-        'excused_end_date',
+        // 'excused_start_date',
+        // 'excused_end_date',
         'excused_reason_id',
         'joining_date',
         'acctlock',
@@ -73,6 +73,11 @@ class User extends Authenticatable
         'is_shared',
         'allow_inapp_notification',
         'allow_email_notification',
+    ];
+
+    public const is_excused = [
+        1 => 'Yes',
+        0 => 'No',
     ];
 
     public function goals() {

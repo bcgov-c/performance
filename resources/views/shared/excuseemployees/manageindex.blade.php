@@ -77,10 +77,12 @@
                             , name: 'employee_demo.employee_name', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc'
                             , name: 'employee_demo.jobcode_desc', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Excused Start Date', ariaTitle: 'Excused Start Date', target: 0, type: 'num', data: 'excused_start_date'
-                            , name: 'excused_start_date', searchable: true, visible: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Excused End Date', ariaTitle: 'Excused End Date', target: 0, type: 'num', data: 'excused_end_date'
-                            , name: 'excused_end_date', searchable: true, visible: true, className: 'dt-nowrap show-modal'},
+                        // {title: 'Excused Start Date', ariaTitle: 'Excused Start Date', target: 0, type: 'num', data: 'excused_start_date'
+                        //     , name: 'excused_start_date', searchable: true, visible: true, className: 'dt-nowrap show-modal'},
+                        // {title: 'Excused End Date', ariaTitle: 'Excused End Date', target: 0, type: 'num', data: 'excused_end_date'
+                        //     , name: 'excused_end_date', searchable: true, visible: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Excused Status', ariaTitle: 'Excused Status', target: 0, type: 'string', data: 'excused_status'
+                            , name: 'excused_status', searchable: false, visible: true, className: 'dt-nowrap show-modal'},
                         {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization'
                             , name: 'employee_demo.organization', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program'

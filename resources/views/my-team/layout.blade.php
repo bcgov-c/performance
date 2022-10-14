@@ -323,11 +323,13 @@
                 const userName = $(this).data("user-name");
                 $("#employee-excused-modal").find(".user-name").html(userName);
                 $("#employee-excused-modal").find("input[name=user_id]").val($(this).data('user-id'));
-                const excusedData = $(this).data("user-excused");
-                $("#employee-excused-modal").find("input[name=excused_start_date]").val(excusedData.start_date);
-                $("#employee-excused-modal").find("input[name=excused_end_date]").val(excusedData.end_date);
-                $("#employee-excused-modal").find("input[name=excused_reason_id]").val(excusedData.reason_id);
-                debugger;
+                $("#employee-excused-modal").find("select[name=excused_flag]").val($(this).data("user-row").excused_flag);
+                $("#employee-excused-modal").find("select[name=excused_reason_id]").val($(this).data("user-row").excused_reason_id);
+                // if (!($(this).data("user-demo").employee_status === 'A') && !in_array($(this).data("user-demo").jobcode, $ClassificationArray)) {
+                //     $("#employee-excused-modal").find("select[name=excused_flag]").attr('disabled', true);
+                //     $("#employee-excused-modal").find("select[name=excused_reason_id]").attr('disabled', true);
+                //     $("#employee-excused-modal").find("button[name=excused_update_btn]").attr('disabled', true);
+                // }
             });
 
             var conversation_id = 0;
