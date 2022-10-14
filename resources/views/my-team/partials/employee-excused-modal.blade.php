@@ -20,24 +20,16 @@
                     @csrf
                     <input type="hidden" name="user_id" value="">
                     <div class="row">
-                        <div class="col-5 mt-1">
-                            <x-input class="form-control" type="date" label="From" name="excused_start_date" value=""/>
-                            <small class="text-danger error-excused_start_date"></small>
-                        </div>
-                        <div class="col-5 mt-1">
-                            <x-input  class="form-control" type="date" label="To" name="excused_end_date" value="" />
-                            <small class="text-danger error-excused_end_date"></small>
-                        </div>
                         <div class="col-2 mt-1">
-                            <br>
-                            <x-button id='btn-reset' type="button" class="btn-reset">Reset Dates</x-button>
+                            <x-dropdown :list="$yesOrNo" label="Excused" name="excused_flag" value=""/>
+                            {{-- <span class="font-weight:normal">&nbsp Excuse &nbsp<strong><span class="user-name"></span></strong></span> --}}
                         </div>
-                        <div class="col-6 mt-1">
-                            <x-dropdown :list="$eReasons" label="Reasons" name="excused_reason_id" value=""/>
-                            <small class="text-danger error-excused_reason_id"></small>
+                        <div class="col-10 mt-1">
+                            <x-dropdown :list="$eReasons" label="Reason" name="excused_reason_id" value=""/>
+                            {{-- <small class="text-danger error-excused_reason_id"></small> --}}
                         </div>
                         <div class="col-12 text-left pb-5 mt-3">
-                            <x-button type="button" class="btn-md btn-submit">Update</x-button>
+                            <x-button type="button" class="btn-md btn-submit" name="excused_update_btn" >Update</x-button>
                         </div>
                     </div>
                 </form>

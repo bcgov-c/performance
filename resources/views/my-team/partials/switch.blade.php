@@ -1,1 +1,1 @@
-<x-button style="link" class="excused-btn" data-user-id="{{$row->id}}" data-user-name="{{$row->name}}" data-user-excused="{{$excused}}" data-toggle="modal" data-target="#employee-excused-modal">{{ $yesOrNo }}</x-button>
+<x-button style="link" class="excused-btn" data-user-row="{{$row}}" data-user-demo="{{$row->employee_demo}}" data-user-id="{{$row->id}}" data-user-name="{{$row->name}}" data-user-excuse_flag="{{$row->excuse_flag}}" data-toggle="modal" data-target="#employee-excused-modal">{{ $yesOrNo }}</x-button>

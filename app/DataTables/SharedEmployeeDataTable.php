@@ -5,6 +5,7 @@ namespace App\DataTables;
 use App\Models\Conversation;
 use App\Models\SharedProfile;
 use App\Models\User;
+use App\Models\ExcusedClassification;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
@@ -29,62 +30,33 @@ class SharedEmployeeDataTable extends DataTable
                 $text = $row['active_goals_count'] . " Goals";
                 return view('my-team.partials.link-to-profile', compact(['row', 'text']));
             })->addColumn('nextConversationDue', function ($row) {
-                foreach($row->employee_demo as $demo) {
-                    if($demo->employee_status == 'A') {
-                        $text = Conversation::nextConversationDue(User::find($row["id"]));
-                        $landingPage = 'conversation.templates';
-                        return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
-                    } else {
-                        return 'Paused';
-                    }
+                if ($row->employee_demo_jr[0]->due_date_paused != 'Y') {
+                    $text = Carbon::parse($row->employee_demo_jr[0]->next_conversation_date)->format('M d, Y');
+                } else {
+                    $text =  'Paused';
                 }
+                $landingPage = 'conversation.templates';
+                return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
             })
-            /* ->addColumn('latestConversation', function ($row) {
-                if( !$row['is_conversation_shared_with_auth_user']) {
-                    return "-";
-                }
-                $conversation = $row->latestConversation[0] ?? null;
-                return view('my-team.partials.conversation', compact(["row", "conversation"]));
-            })->addColumn('upcomingConversation', function ($row) {
-                if( !$row['is_conversation_shared_with_auth_user']) {
-                    return "-";
-                }
-                $removeBlankLink = true;
-                $conversation = $row->upcomingConversation[0] ?? null;
-                return view('my-team.partials.conversation', compact(["row", "conversation", 'removeBlankLink']));
-            }) */
             ->addColumn('shared', function ($row) {
                 $yesOrNo = ($row->is_shared) ? 'Yes' : 'No';
                 return view('my-team.partials.view-btn', compact(["row", "yesOrNo"])); // $row['id'];
             })
-            ->addColumn('excused', function ($row) {
-                foreach($row->employee_demo as $demo) {
-                    if($demo->employee_status == 'A') {
-                        $excused = json_encode([
-                            'start_date' => $row->excused_start_date,
-                            'end_date' => $row->excused_end_date,
-                            'reason_id' => $row->excused_reason_id
-                        ]);
-                        $check1 = ($row->excused_start_date !== null);
-                        $check2 = ($row->excused_end_date !== null);
-                        if($check1 && $check2) {
-                            $check3 = ($row->excused_start_date <= $row->excused_end_date);
-                            $newDate = new Carbon(Carbon::today()->toDateString());
-                            $check4 = ($newDate->between($row->excused_start_date, $row->excused_end_date));
-                        } else {
-                            $check3 = false;
-                            $check4 = false;
-                        }
-                        if($check1 && $check2 && $check3 && $check4) {
-                            $yesOrNo = 'Yes';
-                        } else {
-                            $yesOrNo = 'No';
-                        }
-                        return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo"]));
-                    } else {
-                        return 'Yes';
-                    }
+            ->addColumn('excused_flag', function ($row) {
+                $ClassificationArray = ExcusedClassification::select('jobcode')->get()->toArray();
+                if ($row->employee_demo[0]->employee_status == 'A' && in_array($row->employee_demo[0]->jobcode, $ClassificationArray) == false) {
+                    $excused = json_encode([
+                        'excused_flag' => $row->excused_flag,
+                        'reason_id' => $row->excused_reason_id
+                    ]);
+                    $yesOrNo = $row->excused_flag ? 'Yes' : 'No';
+                    return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo"]));
+                } else {
+                    return 'Yes';
                 }
+            })
+            ->addColumn('direct-reports', function($row) {
+                return view('my-team.partials.direct-report-col', compact(["row"]));
             });
     }
 
@@ -99,6 +71,8 @@ class SharedEmployeeDataTable extends DataTable
         return $model->newQuery()->whereIn('id', SharedProfile::where('shared_with', Auth::id())->pluck('shared_id') )
             ->withCount('activeGoals')
             ->with('upcomingConversation')
+            ->with('employee_demo')
+            ->with('employee_demo_jr')
             ->with('latestConversation');
     }
 
@@ -147,33 +121,17 @@ class SharedEmployeeDataTable extends DataTable
                 ->exportable(false)
                 ->printable(false)
                 ->addClass('text-center'),
-            /* Column::computed('upcomingConversation')
-                ->title('Upcoming Conversation')
-                ->exportable(false)
-                ->printable(false)
-                ->addClass('text-center'),
-            Column::computed('latestConversation')
-                ->title('Last Conversation')
-                ->exportable(false)
-                ->printable(false)
-                ->addClass('text-center'), */
             Column::computed('shared')
                 ->exportable(false)
                 ->printable(false)
                 ->width(60)
                 ->addClass('text-center'),
-            Column::computed('excused')
+            Column::computed('excused_flag')
+                ->title('Excused')
                 ->exportable(false)
                 ->printable(false)
                 ->width(60)
-                ->addClass('text-center')
-            /* new Column([
-                'title' => 'Type',
-                'data' => 'goal_type.name',
-                'name' => 'goalType.name'
-            ]),
-            'start_date',
-            'target_date', */
+                ->addClass('text-center'),
         ];
     }
 }
