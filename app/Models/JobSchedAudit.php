@@ -24,4 +24,14 @@ class JobSchedAudit extends Model
         'status',
     ];
 
+    // Static function for gettig the list of status
+    public static function job_status_options() {
+
+        return self::whereNotNull('status')
+                ->select('status')
+                ->distinct()
+                ->orderBy('status')
+                ->pluck('status');
+    }
+
 }
