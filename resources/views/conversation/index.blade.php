@@ -607,31 +607,36 @@
             });
             
             function saveComments() {
+                var isSupervisor = $('#viewmode').val();
+                if(isSupervisor == 1) {
                         var info_comment1_data = CKEDITOR.instances['info_comment1'].getData();
                         var info_comment2_data = CKEDITOR.instances['info_comment2'].getData();
                         var info_comment3_data = CKEDITOR.instances['info_comment3'].getData();
-                        var info_comment4_data = CKEDITOR.instances['info_comment4'].getData();
                         var info_comment5_data = CKEDITOR.instances['info_comment5'].getData();
                         var info_comment6_data = CKEDITOR.instances['info_comment6'].getData();
-                        var info_comment7_data = CKEDITOR.instances['info_comment7'].getData();
-                        var info_comment8_data = CKEDITOR.instances['info_comment8'].getData();
-                        var info_comment9_data = CKEDITOR.instances['info_comment9'].getData();
-                        var info_comment10_data = CKEDITOR.instances['info_comment10'].getData();
                         var info_comment11_data = $('#info_comment11').val();
     
                         var comments = {};
                         comments['info_comment1'] = info_comment1_data;
                         comments['info_comment2'] = info_comment2_data;
                         comments['info_comment3'] = info_comment3_data;
-                        comments['info_comment4'] = info_comment4_data;
                         comments['info_comment5'] = info_comment5_data;
                         comments['info_comment6'] = info_comment6_data;
+                        comments['info_comment11'] = info_comment11_data;
+                } else {                       
+                        var info_comment4_data = CKEDITOR.instances['info_comment4'].getData();                       
+                        var info_comment7_data = CKEDITOR.instances['info_comment7'].getData();
+                        var info_comment8_data = CKEDITOR.instances['info_comment8'].getData();
+                        var info_comment9_data = CKEDITOR.instances['info_comment9'].getData();
+                        var info_comment10_data = CKEDITOR.instances['info_comment10'].getData();
+    
+                        var comments = {};                        
+                        comments['info_comment4'] = info_comment4_data;                        
                         comments['info_comment7'] = info_comment7_data;
                         comments['info_comment8'] = info_comment8_data;
                         comments['info_comment9'] = info_comment9_data;
                         comments['info_comment10'] = info_comment10_data;
-                        comments['info_comment11'] = info_comment11_data;
-
+                }
                         $.ajax({
                                 url: '/conversation/' + conversation_id
                                 , type: 'PUT'
@@ -842,6 +847,8 @@
                         }
  
                         if (!isSupervisor) {
+                            $('#viewmode').val(0);
+                            
                             CKEDITOR.instances['info_comment1'].setReadOnly(true);
                             CKEDITOR.instances['info_comment2'].setReadOnly(true);
                             CKEDITOR.instances['info_comment3'].setReadOnly(true);
@@ -881,6 +888,8 @@
                             $("input[name=check_two_]").prop('disabled', true);
                             
                         } else {
+                            $('#viewmode').val(1);
+                        
                             CKEDITOR.instances['info_comment1'].setReadOnly(false);
                             CKEDITOR.instances['info_comment2'].setReadOnly(false);
                             CKEDITOR.instances['info_comment3'].setReadOnly(false);
