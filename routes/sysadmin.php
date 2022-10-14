@@ -7,6 +7,8 @@ use App\Http\Controllers\SysAdmin\GoalBankController;
 use App\Http\Controllers\SysAdmin\AccessLogController;
 use App\Http\Controllers\SysAdmin\EmployeeListController;
 use App\Http\Controllers\SysAdmin\NotificationController;
+use App\Http\Controllers\SysAdmin\JobSchedAuditController;
+use App\Http\Controllers\SysAdmin\MessageEditorController;
 use App\Http\Controllers\SysAdmin\EmployeeSharesController;
 use App\Http\Controllers\SysAdmin\SysAdminSharedController;
 use App\Http\Controllers\SysAdmin\ExcuseEmployeesController;
@@ -14,7 +16,6 @@ use App\Http\Controllers\SysAdmin\AccessPermissionsController;
 use App\Http\Controllers\SysAdmin\UnlockConversationController;
 use App\Http\Controllers\SysAdmin\AccessOrganizationsController;
 use App\Http\Controllers\SysAdmin\SysadminStatisticsReportController;
-use App\Http\Controllers\SysAdmin\MessageEditorController;
 
 
 Route::group(['middleware' => ['role:Sys Admin']], function () 
@@ -173,6 +174,11 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/notifications/job-titles', [NotificationController::class,'getJobTitles']);
         Route::get('/sysadmin/notifications/employees/{id}', [NotificationController::class,'getEmployees']);
         Route::get('/sysadmin/notifications/employee-list', [NotificationController::class, 'getDatatableEmployees'])->name('sysadmin.notifications.employee.list');
+    });
+
+    //  Job Schedule Audit 
+    Route::middleware(['auth'])->prefix('sysadmin')->name('sysadmin.')->group(function() {    
+        Route::resource('/job-schedule-audit', JobSchedAuditController::class)->only(['index','show']);
     });
 
     // System Security -- Access Log 
