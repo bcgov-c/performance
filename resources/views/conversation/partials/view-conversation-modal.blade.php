@@ -6,6 +6,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:white">
                     <span aria-hidden="true">&times;</span>
                 </button>
+                <input type="hidden" name="viewmode" id="viewmode" value="0">
             </div>
             
             <div class="modal-body p-4">
