@@ -16,7 +16,6 @@ class AddIndexOverdueInfoInNotificationLogsTable extends Migration
         Schema::table('notification_logs', function (Blueprint $table) {
             //
             $table->index(['alert_type','alert_format', 'notify_user_id', 'overdue_user_id', 'notify_due_date', 'notify_for_days'],'overdue_notify_log');	
-            $table->index(['date_sent']);	
             $table->index(['subject']);	
         });
     }
@@ -31,7 +30,6 @@ class AddIndexOverdueInfoInNotificationLogsTable extends Migration
         Schema::table('notification_logs', function (Blueprint $table) {
             //
             $table->dropIndex('overdue_notify_log');	
-            $table->dropIndex(['date_sent']);	
             $table->dropIndex(['subject']);	
         });
     }
