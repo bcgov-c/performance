@@ -17,7 +17,6 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         //
         Commands\SendDailyNotification::class,
-        Commands\NotificationProcess::class,
         Commands\BuildAdminOrgUsers::class,
     ];
 
@@ -57,28 +56,11 @@ class Kernel extends ConsoleKernel
         ->timezone('America/Vancouver')
         ->dailyAt('02:00');
 
-        $schedule->command('command:NotificationProcess')    
-        // ->dailyAt('13:00')
-        ->hourly(45)
-        ->between('9:00', '22:00')
-        ->appendOutputTo(storage_path('logs/notification.log'));
-
-        $schedule->command('command:notifyProcess')
-        // ->dailyAt('12:00')
-        ->hourly(25)
-        ->between('9:00', '22:00')
-        ->appendOutputTo(storage_path('logs/notifyProcess.log'));  
-
-        $schedule->command('command:notifyProcessTest')
-        // ->dailyAt('12:30')
-        ->hourlyAt(5)
-        ->between('9:00', '22:00')
-        ->appendOutputTo(storage_path('logs/notifyProcessTest.log'));    
-
-        // $schedule->command('command:NotificationProcess')
-        //             ->timezone('America/Vancouver')
-        //             ->dailyAt('3:00')
-        //             ->appendOutputTo(storage_path('logs/NotificationProcess.log'));    
+        $schedule->command('command:NotifyConversationDue')    
+        ->dailyAt('02:30')
+        // ->hourlyAt(45)
+        // ->between('9:00', '22:00')
+        ->appendOutputTo(storage_path('logs/NotifyConversationDue.log'));
 
     }
 
