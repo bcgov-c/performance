@@ -5,6 +5,7 @@ namespace App\DataTables;
 use App\Models\Conversation;
 use App\Models\SharedProfile;
 use App\Models\User;
+use App\Models\EmployeeDemoJunior;
 use App\Models\ExcusedClassification;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Html\Column;
@@ -28,13 +29,17 @@ class SharedEmployeeDataTable extends DataTable
                 $text = $row['active_goals_count'] . " Goals";
                 return view('my-team.partials.link-to-profile', compact(['row', 'text']));
             })->addColumn('nextConversationDue', function ($row) {
-                if ($row->employee_demo_jr[0]->due_date_paused != 'Y') {
-                    $text = Carbon::parse($row->employee_demo_jr[0]->next_conversation_date)->format('M d, Y');
+                if ($row->excused_flag) {
+                    return 'Paused';
+                } 
+                $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
+                if  ($jr->due_date_paused != 'Y') {
+                    $text = Carbon::parse($jr->next_conversation_date)->format('M d, Y');
+                    $landingPage = 'conversation.templates';
+                    return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
                 } else {
-                    $text =  'Paused';
+                    return 'Paused';
                 }
-                $landingPage = 'conversation.templates';
-                return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
             })
             ->addColumn('shared', function ($row) {
                 $yesOrNo = ($row->is_shared) ? 'Yes' : 'No';
