@@ -4,6 +4,7 @@ namespace App\DataTables;
 
 use App\Models\Conversation;
 use App\Models\User;
+use App\Models\EmployeeDemoJunior;
 use App\Models\ExcusedClassification;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Html\Column;
@@ -42,13 +43,17 @@ class MyEmployeesDataTable extends DataTable
                 $landingPage = 'goal.current';
                 return view('my-team.partials.link-to-profile', compact(['row', 'text', 'landingPage']));
             })->addColumn('nextConversationDue', function ($row) {
-                if ($row->due_date_paused != 'Y') {
-                    $text = Carbon::parse($row->next_conversation_date)->format('M d, Y');
+                if ($row->excused_flag) {
+                    return 'Paused';
+                } 
+                $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
+                if  ($jr->due_date_paused != 'Y') {
+                    $text = Carbon::parse($jr->next_conversation_date)->format('M d, Y');
+                    $landingPage = 'conversation.templates';
+                    return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
                 } else {
-                    $text =  'Paused';
+                    return 'Paused';
                 }
-                $landingPage = 'conversation.templates';
-                return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
             })
             ->addColumn('shared', function ($row) {
                 $yesOrNo = $row->is_shared ? "Yes" : "No";
@@ -56,7 +61,7 @@ class MyEmployeesDataTable extends DataTable
             })
             ->addColumn('excused_flag', function ($row) {
                 $ClassificationArray = ExcusedClassification::select('jobcode')->get()->toArray();
-                if ($row->employee_demo[0]->employee_status == 'A' && in_array($row->employee_demo[0]->jobcode, $ClassificationArray) == false) {
+                if ($row->employee_demo->employee_status == 'A' && in_array($row->employee_demo->jobcode, $ClassificationArray) == false) {
                     $excused = json_encode([
                         'excused_flag' => $row->excused_flag,
                         'reason_id' => $row->excused_reason_id
