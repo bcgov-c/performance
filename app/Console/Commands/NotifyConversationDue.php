@@ -13,14 +13,14 @@ use App\Models\UserPreference;
 use App\Models\NotificationLog;
 use App\Models\DashboardNotification;
 
-class NotifyProcessTest extends Command
+class NotifyConversationDue extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'command:notifyProcessTest';
+    protected $signature = 'command:notifyConversationDue';
 
     /**
      * The console command description.
@@ -58,28 +58,28 @@ class NotifyProcessTest extends Command
         ]);
 
         $this->logInfo( now() );
-        $this->logInfo("Dashboard Notification (In-App) -- Conversation Due (start)");
+        $this->logInfo("(1) Dashboard Notification (In-App) -- Conversation Due (start)");
         $this->dashboardNotificationsConversationDue();
         $this->logInfo( now() );
-        $this->logInfo("Dashboard Notification (In-App) -- Conversation Due (end)");
+        $this->logInfo("(1) Dashboard Notification (In-App) -- Conversation Due (end)");
 
         $this->logInfo( now() );
-        $this->logInfo("Supervisor Dashboard Notification (In-App) -- Conversation Due (start)");
+        $this->logInfo("(2) Supervisor Dashboard Notification (In-App) -- Conversation Due (start)");
         $this->supervisorDashboardNotificationsConversationDue();
         $this->logInfo( now() );
-        $this->logInfo("Supervisor Dashboard Notification (In-App) -- Conversation Due (end)");
+        $this->logInfo("(2) Supervisor Dashboard Notification (In-App) -- Conversation Due (end)");
 
         $this->logInfo( now() );
-        $this->logInfo("Email Notification -- Conversation Due (start)");
+        $this->logInfo("(3) Email Notification -- Conversation Due (start)");
         $this->sendEmployeeEmailNotificationsWhenConversationDue();
         $this->logInfo( now() );
-        $this->logInfo("Email Notification -- Conversation Due (end)");
+        $this->logInfo("(3) Email Notification -- Conversation Due (end)");
 
         $this->logInfo( now() );
-        $this->logInfo("Supervisor Email Notification -- Conversation Due (start)");
+        $this->logInfo("(4) Supervisor Email Notification -- Conversation Due (start)");
         $this->sendSupervisorEmailNotificationsWhenTeamConversationDue();
         $this->logInfo( now() );
-        $this->logInfo("Supervisor Email Notification -- Conversation Due (end)");
+        $this->logInfo("(4) Supervisor Email Notification -- Conversation Due (end)");
 
         $end_time = Carbon::now();
         $this->task->end_time = date('Y-m-d H:i:s', strtotime($end_time));
