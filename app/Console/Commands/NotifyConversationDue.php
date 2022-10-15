@@ -27,7 +27,7 @@ class NotifyConversationDue extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Conversation Due Notification';
 
     /**
      * Create a new command instance.
