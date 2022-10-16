@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Conversation;
 use App\Models\EmployeeDemo;
+use App\Models\EmployeeDemoJunior;
+use App\Models\ExcusedClassification;
 use App\Models\OrganizationTree;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -83,25 +86,24 @@ class MyOrganizationController extends Controller
             $level3 = $request->dd_level3 ? OrganizationTree::where('organization_trees.id', $request->dd_level3)->first() : null;
             $level4 = $request->dd_level4 ? OrganizationTree::where('organization_trees.id', $request->dd_level4)->first() : null;
             $query = User::withoutGlobalScopes()
-            ->join('employee_demo', 'users.guid', '=', 'employee_demo.guid')
-            ->join('admin_orgs', function ($j1) {
-                $j1->on(function ($j1a) {
-                    $j1a->whereRAW('(admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL)))');
-                } )
-                ->on(function ($j2a) {
-                    $j2a->whereRAW('(admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL)))');
-                } )
-                ->on(function ($j3a) {
-                    $j3a->whereRAW('(admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL)))');
-                } )
-                ->on(function ($j4a) {
-                    $j4a->whereRAW('(admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL)))');
-                } )
-                ->on(function ($j5a) {
-                    $j5a->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL)))');
-                } );
-            } )
-            ->where('admin_orgs.user_id', '=', $authId)
+            ->leftjoin('employee_demo', 'users.guid', 'employee_demo.guid')
+            // ->leftJoin('employee_demo_jr', 'users.guid', 'employee_demo_jr.guid')
+            ->leftJoin('employee_demo_jr', function ($jr) {
+                return $jr->on('users.guid', 'employee_demo_jr.guid')
+                ->whereRaw("employee_demo_jr.id = (select max(a.id) from employee_demo_jr a where a.guid = employee_demo_jr.guid)");
+                })
+            ->whereExists(function ($orgs) use ($authId) {
+                return $orgs->select('admin_orgs.user_id')
+                ->from('admin_orgs')
+                ->whereRAW('(admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL)))')
+                ->whereRAW('(admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL)))')
+                ->whereRAW('(admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL)))')
+                ->whereRAW('(admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL)))')
+                ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL)))')
+                ->where('admin_orgs.user_id', $authId)
+                ;
+            })
+            ->whereNull('employee_demo.date_deleted')
             ->when($level0, function($q) use($level0) {return $q->where('employee_demo.organization', $level0->name);})
             ->when($level1, function($q) use($level1) {return $q->where('employee_demo.level1_program', $level1->name);})
             ->when($level2, function($q) use($level2) {return $q->where('employee_demo.level2_division', $level2->name);})
@@ -123,6 +125,8 @@ class MyOrganizationController extends Controller
             })
             ->select
             (
+                'users.id',
+                'users.guid',
                 'employee_demo.employee_id',
                 'employee_demo.employee_name', 
                 'employee_demo.jobcode_desc',
@@ -132,8 +136,10 @@ class MyOrganizationController extends Controller
                 'employee_demo.level3_branch',
                 'employee_demo.level4',
                 'employee_demo.deptid',
-                'users.excused_start_date',
-                'users.id'
+                'users.excused_flag',
+                'employee_demo.employee_status',
+                'employee_demo_jr.due_date_paused',
+                'employee_demo_jr.next_conversation_date',
             );
             return Datatables::of($query)->addIndexColumn()
             ->addColumn('activeGoals', function($row) {
@@ -141,12 +147,39 @@ class MyOrganizationController extends Controller
                 return $countActiveGoals;
             })
             ->addColumn('nextConversationDue', function ($row) {
-                $nextConversation = Conversation::nextConversationDue(User::find($row["id"]));
-                return $nextConversation;
+                if ($row->excused_flag) {
+                    return 'Paused';
+                } 
+                $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
+                if (!$jr) {
+                    return '';
+                }
+                if  ($jr->due_date_paused != 'Y') {
+                    $text = Carbon::parse($jr->next_conversation_date)->format('M d, Y');
+                    // $landingPage = 'conversation.templates';
+                    // return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
+                    return $text;
+                } else {
+                    return 'Paused';
+                }
             })
             ->addColumn('excused', function ($row) {
-                $yesOrNo = ($row->excused_start_date !== null) ? 'Yes' : 'No';
-                return $yesOrNo;
+                $ClassificationArray = ExcusedClassification::select('jobcode')->get()->toArray();
+                $demo = EmployeeDemo::where('guid', $row->guid)->getQuery()->first();
+                if (!$demo) {
+                    return '';
+                }
+                if ($demo->employee_status == 'A' && in_array($demo->jobcode, $ClassificationArray) == false) {
+                    $excused = json_encode([
+                        'excused_flag' => $row->excused_flag,
+                        'reason_id' => $row->excused_reason_id
+                    ]);
+                    $yesOrNo = $row->excused_flag ? 'Yes' : 'No';
+                    // return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo"]));
+                    return $yesOrNo;
+                } else {
+                    return 'Yes';
+                }
             })
             ->addColumn('shared', function ($row) {
                 $yesOrNo = $row->is_shared ? "Yes" : "No";
