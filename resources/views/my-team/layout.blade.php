@@ -323,7 +323,7 @@
                 const userName = $(this).data("user-name");
                 $("#employee-excused-modal").find(".user-name").html(userName);
                 $("#employee-excused-modal").find("input[name=user_id]").val($(this).data('user-id'));
-                $("#employee-excused-modal").find("select[name=excused_flag]").val($(this).data("user-row").excused_flag);
+                $("#employee-excused-modal").find("select[name=excused_flag]").val($(this).data("user-row").excused_flag ?? 0);
                 $("#employee-excused-modal").find("select[name=excused_reason_id]").val($(this).data("user-row").excused_reason_id);
                 // if (!($(this).data("user-demo").employee_status === 'A') && !in_array($(this).data("user-demo").jobcode, $ClassificationArray)) {
                 //     $("#employee-excused-modal").find("select[name=excused_flag]").attr('disabled', true);
