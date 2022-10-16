@@ -5,6 +5,7 @@ namespace App\DataTables;
 use App\Models\Conversation;
 use App\Models\SharedProfile;
 use App\Models\User;
+use App\Models\EmployeeDemo;
 use App\Models\EmployeeDemoJunior;
 use App\Models\ExcusedClassification;
 use Illuminate\Support\Facades\Auth;
@@ -49,7 +50,8 @@ class SharedEmployeeDataTable extends DataTable
             })
             ->addColumn('excused_flag', function ($row) {
                 $ClassificationArray = ExcusedClassification::select('jobcode')->get()->toArray();
-                if ($row->employee_demo[0]->employee_status == 'A' && in_array($row->employee_demo[0]->jobcode, $ClassificationArray) == false) {
+                $demo = EmployeeDemo::where('guid', $row->guid)->getQuery()->first();
+                if ($demo->employee_status == 'A' && in_array($row->jobcode, $ClassificationArray) == false) {
                     $excused = json_encode([
                         'excused_flag' => $row->excused_flag,
                         'reason_id' => $row->excused_reason_id
