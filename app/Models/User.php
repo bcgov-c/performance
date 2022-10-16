@@ -215,11 +215,11 @@ class User extends Authenticatable
     }
     
     public function employee_demo() {
-        return $this->hasMany('App\Models\EmployeeDemo', 'guid', 'guid');
+        return $this->hasOne('App\Models\EmployeeDemo', 'guid', 'guid');
     }
     
     public function employee_demo_jr() {
-        $instance = $this->hasMany('App\Models\EmployeeDemoJunior', 'guid', 'guid');
+        $instance = $this->hasOne('App\Models\EmployeeDemoJunior', 'guid', 'guid');
         $instance->getQuery()->orderBy('id', 'desc')->first();
         return $instance;
     }

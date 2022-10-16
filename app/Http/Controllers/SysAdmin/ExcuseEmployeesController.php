@@ -5,8 +5,10 @@ namespace App\Http\Controllers\SysAdmin;
 
 
 use App\Models\EmployeeDemo;
+use App\Models\EmployeeDemoJunior;
 use App\Models\ExcusedReason;
 use App\Models\OrganizationTree;
+use App\Models\AdminOrg;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
@@ -163,19 +165,25 @@ class ExcuseEmployeesController extends Controller
             $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
             $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
             $query = User::withoutGlobalScopes()
-            ->whereNotNull('excused_start_date')
-            ->leftjoin('employee_demo', 'users.guid', '=', 'employee_demo.guid')
-            ->when($level0, function($q) use($level0) {return $q->where('organization', $level0->name);})
-            ->when($level1, function($q) use($level1) {return $q->where('level1_program', $level1->name);})
-            ->when($level2, function($q) use($level2) {return $q->where('level2_division', $level2->name);})
-            ->when($level3, function($q) use($level3) {return $q->where('level3_branch', $level3->name);})
-            ->when($level4, function($q) use($level4) {return $q->where('level4', $level4->name);})
-            ->when($request->criteria == 'name', function($q) use($request){return $q->where('employee_name', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'job', function($q) use($request){return $q->where('jobcode_desc', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'dpt', function($q) use($request){return $q->where('deptid', 'like', "%" . $request->search_text . "%");})
+            ->leftjoin('employee_demo', 'users.guid', 'employee_demo.guid')
+            ->leftjoin('employee_demo_jr', 'users.guid', 'employee_demo_jr.guid')
+            ->whereRaw("employee_demo_jr.id = (select max(a.id) from employee_demo_jr a where a.guid = employee_demo_jr.guid)")
+            ->where(function($where){
+                $where->where('employee_demo_jr.due_date_paused', 'Y')
+                ->orWhere('users.excused_flag', 1);
+            })
+            ->whereNull('employee_demo.date_deleted')
+            ->when($level0, function($q) use($level0) {$q->where('organization', $level0->name);})
+            ->when($level1, function($q) use($level1) {$q->where('level1_program', $level1->name);})
+            ->when($level2, function($q) use($level2) {$q->where('level2_division', $level2->name);})
+            ->when($level3, function($q) use($level3) {$q->where('level3_branch', $level3->name);})
+            ->when($level4, function($q) use($level4) {$q->where('level4', $level4->name);})
+            ->when($request->criteria == 'name', function($q) use($request){$q->where('employee_name', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'emp', function($q) use($request){$q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'job', function($q) use($request){$q->where('jobcode_desc', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'dpt', function($q) use($request){$q->where('deptid', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'all', function($q) use ($request) {
-                return $q->where(function ($query2) use ($request) {
+                $q->where(function ($query2) use ($request) {
                     if($request->search_text) {
                         $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
                         ->orWhere('employee_name', 'like', "%" . $request->search_text . "%")
@@ -186,10 +194,8 @@ class ExcuseEmployeesController extends Controller
             })
             ->select (
                 'employee_demo.employee_id',
-                'employee_name', 
+                'employee_demo.employee_name', 
                 'employee_demo.jobcode_desc',
-                'users.excused_start_date',
-                'users.excused_end_date',
                 'employee_demo.organization',
                 'employee_demo.level1_program',
                 'employee_demo.level2_division',
@@ -197,23 +203,51 @@ class ExcuseEmployeesController extends Controller
                 'employee_demo.level4',
                 'employee_demo.deptid',
                 'users.id',
+                'users.guid',
+                'users.name',
+                'users.excused_flag',
+                'employee_demo.employee_status',
             );
+            Log::info($query->toSql());
             return Datatables::of($query)
             ->addIndexColumn()
-            ->addcolumn('action', function($row){
-                return '<button 
-                class="btn btn-xs btn-primary modalbutton" 
-                role="button" 
-                data-id="' . $row->id . '" 
-                data-excused_start_date="' . $row->excused_start_date . '" 
-                data-excused_end_date="' . $row->excused_end_date . '" 
-                data-excused_reason_id="' . $row->excused_reason_id . '" 
-                data-employee_name="' . $row->employee_name . '" 
-                data-toggle="modal"
-                data-target="#editModal"
-                role="button">Update</button>';
+            ->editColumn('employee_demo.employee_name', function($row) {
+                return $row->employee_name ? $row->employee_name : $row->name;
             })
-            ->rawColumns(['action'])
+            ->addColumn('excused_status', function($row) {
+                $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
+                if ($jr) {
+                    if ($jr->excused_type) {
+                        if ($jr->excused_type == 'A') {
+                            return 'Auto';
+                        }
+                        if ($jr->excused_type == 'M' ) {
+                            return 'Manual';
+                        }
+                    }
+                }
+                if ($row->excused_flag) {
+                    return 'Manual';
+                }
+                return '';
+            })
+            ->addcolumn('action', function($row) {
+                if($row->employee_status == 'A') {
+                    return '<button 
+                    class="btn btn-xs btn-primary modalbutton" 
+                    role="button" 
+                    data-id="' . $row->id . '" 
+                    data-excused_flag="' . $row->excused_flag . '" 
+                    data-excused_reason_id="' . $row->excused_reason_id . '" 
+                    data-employee_name="' . $row->employee_name . '" 
+                    data-toggle="modal"
+                    data-target="#editModal"
+                    role="button">Update</button>';
+                } else {
+                    return '';
+                }
+            })
+            ->rawColumns(['employee_name', 'excused_status', 'action'])
             ->make(true);
         }
     }
@@ -876,7 +910,7 @@ class ExcuseEmployeesController extends Controller
         $excused_start_date = $users->excused_start_date;
         $excused_end_date = $users->excused_end_date;
         $excused_reason_id = $users->excused_reason_id;
-        $employee_name = $employee_demo->employee_name;
+        $employee_name = $users->employee_demo->employee_name;
         $reasons = ExcusedReason::all();
         return view('shared.excuseemployees.partials.excused-edit-modal', compact('id', 'excused_start_date', 'excused_end_date', 'excused_reason_id', 'employee_name', 'reasons'));
     }
