@@ -108,8 +108,9 @@
 
             $('#editModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
-                var excused_start_date = button.data('excused_start_date');
-                var excused_end_date = button.data('excused_end_date');
+                // var excused_start_date = button.data('excused_start_date');
+                // var excused_end_date = button.data('excused_end_date');
+                var excused_flag = button.data('excused_flag');
                 var excused_reason_id = button.data('excused_reason_id');
                 var employee_name = button.data('employee_name');
                 var current = {{ auth()->user()->id }};
@@ -121,9 +122,12 @@
                 // $('#reason').prop('disabled', current == model_id);
 
 
-                $('#start_date').val(excused_start_date);
-                $('#target_date').val(excused_end_date);
-                $('#excused_reason_id').val(excused_reason_id);
+                // $('#start_date').val(excused_start_date);
+                // $('#target_date').val(excused_end_date);
+                $('#excused_flag').val(excused_flag);
+                // $('#excused_reason_id').val(excused_reason_id);
+                $("#editModal").find("select[name=excused_reason_id]").val(excused_reason_id ?? 1);
+                // $("#editModal").find("select[name=excused_reason_id]").val(4);
                 $('#excusedDetailLabel').text('Edit Employee Excuse:  '+employee_name);
                 // $('#saveButton').prop('disabled', current == model_id);
                 // $('removeButton').prop('disabled', current == model_id);

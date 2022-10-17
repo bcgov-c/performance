@@ -15,33 +15,34 @@
                 <div class="mt-4 p-3">
                     <div class="row">
                         <div class="col-12">
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+                            <p>Excusing an employee will remove them from any reporting and will pause the employee’s conversation deadlines. Employees will automatically be excused if 1) they are on leave or inactive status in PeopleSoft; or 2) if they are a DM, ADM, or Executive Lead covered by a different performance review process. You should only use this form to manually excuse an employee if they fit into one of the categories listed in the dropdown box below."</p>
                         </div>
                     </div>
                 </div>
                 <div class="modal-body p-3">
                     <div class="row  p-3">
-                        <div class="col col-md-4">
-                            <x-input label="Start Date " class="error-start" type="date" id="start_date" name="start_date" />
+                        <div class="col-2 mt-1">
+                            <x-dropdown :list="$yesOrNo" label="Excused" name="excused_flag" id="excused_flag" value=""/>
                         </div>
-                        <div class="col col-md-4">
-                            <x-input label="End Date " class="error-target" type="date" id="target_date" name="target_date" />
+                        <div class="col-10 mt-1">
+                            <x-dropdown :list="$reasons" label="Reason" name="excused_reason_id" id="excused_reason_id" value=""/>
+                            {{-- <small class="text-danger error-excused_reason_id"></small> --}}
                         </div>
-                    </div>
-                    <div class="row  p-3">
-                        <label for='reasons' title='Excused Reasons Tooltip'>Reason
-                            <select name="reasons" class="form-control" id="reasons">
-                                @foreach($reasons as $reason)
-                                    <option value = {{ $reason->id }} {{ '$reason->id' == '$excused_reason_id' ? "selected" : "" }}> {{ $reason->name }} </option>
-                                @endforeach
-                            </select>
-                        </label>
+                        {{-- <div class="col-10 mt-1">
+                            <label for='reasons' title='Excused Reasons Tooltip'>Reason
+                                <select name="reasons" class="form-control" id="reasons">
+                                    @foreach($reasons as $reason)
+                                        <option value = {{ $reason->id }} {{ '$reason->id' == '$excused_reason_id' ? "selected" : "" }}> {{ $reason->name }} </option>
+                                    @endforeach
+                                </select>
+                            </label>
+                        </div> --}}
                     </div>
                 </div>
                 <div class="modal-footer p-3">
-                    <div class="col">
+                    {{-- <div class="col">
                         <button id="removeButton" name="removeButton" type="button" class="btn btn-outline-danger float-left" onClick="return confirm('Are you sure?')" aria-label="Remove Access">Remove Excuse</button>
-                    </div>
+                    </div> --}}
                     <div class="col">
                         <button id="cancelButton" name="cancelButton" type="button" class="btn btn-secondary float-right" style="margin:5px;" data-dismiss="modal" aria-label="Cancel">Cancel</button>                    
                         <div class="space"></div>
