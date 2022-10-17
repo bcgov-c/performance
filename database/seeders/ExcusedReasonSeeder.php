@@ -17,22 +17,34 @@ class ExcusedReasonSeeder extends Seeder
     {
         $excused_reasons = [
             [
-                'name' => 'Medical Leave',
-                'description' => 'Medical Leave'
+                'id' => 1,
+                'name' => 'PeopleSoft Status',
+                'description' => 'PeopleSoft Status'
             ],
             [
-                'name' => 'Secondment',
-                'description' => 'Secondment'
+                'id' => 2,
+                'name' => 'Classification',
+                'description' => 'Classification'
             ],
             [
-                'name' => 'Other Leave',
-                'description' => 'Other Leave'
+                'id' => 3,
+                'name' => 'Casual Employee',
+                'description' => 'Casual Employee'
+            ],
+            [
+                'id' => 4,
+                'name' => 'Leave Not Captured in PeopleSoft',
+                'description' => 'Leave Not Captured in PeopleSoft'
+            ],
+            [
+                'id' => 5,
+                'name' => 'Student',
+                'description' => 'Student'
             ]
         ];
 
         foreach ($excused_reasons as $excused_reason) {
-            ExcusedReason::updateOrCreate([
-                'name' => $excused_reason['name'],
+            ExcusedReason::updateOrCreate(['id' => $excused_reason['id']
             ], $excused_reason);
         }
     }
