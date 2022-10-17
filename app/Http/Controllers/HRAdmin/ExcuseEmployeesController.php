@@ -365,22 +365,11 @@ class ExcuseEmployeesController extends Controller
     {
         $input = $request->all();
         $rules = [
-            'start_date' => 'required|date',
-            'target_date' => 'required|date|after_or_equal:start_date',
             'excused_reason' => 'required'
         ];
         $messages = [
             'required' => 'The :attribute field is required.',
         ];
-        if($request->start_date == '') {
-            $request->session()->flash('start_date_missing', 'The start date field is required');
-        } 
-        if ($request->target_date == '') {
-            $request->session()->flash('target_date_missing', 'The target date field is required');
-        } 
-        if ($request->target_date < $request->start_date) {
-            $request->session()->flash('date_error', 'The date fields are wrong');
-        }
         
         $validator = Validator::make($input, $rules, $messages);
         if ($validator->fails()) {
@@ -406,8 +395,7 @@ class ExcuseEmployeesController extends Controller
 
         foreach ($selection as $newId) {
             $result = User::where('id', '=', $newId->id)->update([
-                'excused_start_date' => $request->start_date,
-                'excused_end_date' => $request->target_date,
+                'excused_flag' => 1,
                 'excused_reason_id' => $request->excused_reason
             ]);
         }
