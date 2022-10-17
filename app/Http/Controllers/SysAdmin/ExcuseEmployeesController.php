@@ -154,7 +154,12 @@ class ExcuseEmployeesController extends Controller
         $criteriaList = $this->search_criteria_list();
         $reasons = ExcusedReason::all();
 
-        return view('shared.excuseemployees.manageindex', compact ('request', 'criteriaList', 'reasons'));
+        $yesOrNo = [
+            [ "id" => 0, "name" => 'No' ],
+            [ "id" => 1, "name" => 'Yes' ],
+        ];
+
+        return view('shared.excuseemployees.manageindex', compact ('request', 'criteriaList', 'reasons', 'yesOrNo'));
     }
 
 
@@ -357,7 +362,6 @@ class ExcuseEmployeesController extends Controller
     {
         $input = $request->all();
         $rules = [
-            'excused_flag' => 'required',
             'excused_reason' => 'required'
         ];
         $messages = [
@@ -371,9 +375,9 @@ class ExcuseEmployeesController extends Controller
             ->withErrors($validator)
             ->withInput();
         }
-        
-        $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
 
+        $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
+        Log::info($selected_emp_ids);
         $selection = EmployeeDemo::select('users.id')
             ->join('users', 'employee_demo.guid', 'users.guid')
             ->whereIn('employee_demo.employee_id', $selected_emp_ids )

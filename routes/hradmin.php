@@ -122,7 +122,7 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('/hradmin/excuseemployees/manageindex', [ExcuseEmployeesController::class, 'manageindex'])->name('hradmin.excuseemployees.manageindex');
         Route::get('/hradmin/excuseemployees/manageindexlist', [ExcuseEmployeesController::class, 'manageindexlist'])->name('hradmin.excuseemployees.manageindexlist');
         Route::get('/hradmin/excuseemployees/manageindexedit/{id}', [ExcuseEmployeesController::class, 'manageindexedit'])->name('hradmin.excuseemployees.manageindexedit');
-        // Route::get('/hradmin/excuseemployees/manageindexupdate/{id}', [ExcuseEmployeesController::class, 'manageindexupdate'])->name('hradmin.excuseemployees.manageindexupdate');
+        Route::get('/hradmin/excuseemployees/manageindexupdate/{id}', [ExcuseEmployeesController::class, 'manageindexupdate'])->name('hradmin.excuseemployees.manageindexupdate');
         Route::post('/hradmin/excuseemployees/manageindexupdate/{id}', [ExcuseEmployeesController::class, 'manageindexupdate']);
         Route::get('/hradmin/excuseemployees/manageindexclear/{id}', [ExcuseEmployeesController::class, 'manageindexclear']);
 
