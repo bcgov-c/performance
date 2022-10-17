@@ -220,7 +220,7 @@ class ExcuseEmployeesController extends Controller
                 if ($row->excused_flag) {
                     return 'Manual';
                 }
-                return '';
+                return 'No';
             })
             ->addcolumn('action', function($row) {
                 if($row->employee_status == 'A') {

@@ -169,11 +169,9 @@ class MyTeamController extends Controller
     public function updateExcuseDetails(UpdateExcuseRequest $request)
     // public function updateExcuseDetails(Request $request)
     {
-        Log::info($request);
         $excused = User::find($request->user_id);
         $excused->excused_flag = $request->excused_flag;
         $excused->excused_reason_id = $request->excused_reason_id;
-        Log::info($excused);
         $excused->save();
 
         return response()->json(['success' => true, 'message' => 'Participant Excused settings updated successfully']);
