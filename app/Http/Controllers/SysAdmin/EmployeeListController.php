@@ -125,48 +125,40 @@ class EmployeeListController extends Controller
             $level3 = $request->dd_level3 ? OrganizationTree::where('organization_trees.id', $request->dd_level3)->first() : null;
             $level4 = $request->dd_level4 ? OrganizationTree::where('organization_trees.id', $request->dd_level4)->first() : null;
             $query = User::withoutGlobalScopes()
-            ->leftjoin('employee_demo', 'users.guid','employee_demo.guid')
-            ->leftjoin('employee_demo_jr', 'users.guid', 'employee_demo_jr.guid')
-            ->whereRaw("employee_demo_jr.id = (select max(a.id) from employee_demo_jr a where a.guid = employee_demo_jr.guid)")
-            ->whereNull('employee_demo.date_deleted')
-            ->when($level0, function($q) use($level0) {$q->where('employee_demo.organization', $level0->name);})
-            ->when($level1, function($q) use($level1) {$q->where('employee_demo.level1_program', $level1->name);})
-            ->when($level2, function($q) use($level2) {$q->where('employee_demo.level2_division', $level2->name);})
-            ->when($level3, function($q) use($level3) {$q->where('employee_demo.level3_branch', $level3->name);})
-            ->when($level4, function($q) use($level4) {$q->where('employee_demo.level4', $level4->name);})
-            ->when($request->criteria == 'name', function($q) use($request){$q->where('employee_demo.employee_name', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'emp', function($q) use($request){$q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'job', function($q) use($request){$q->where('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'dpt', function($q) use($request){$q->where('employee_demo.deptid', 'like', "%" . $request->search_text . "%");})
-            ->when([$request->criteria == 'all', $request->search_text], function($q) use ($request) 
-            {
-                $q->where(function ($query2) use ($request) 
-                {
-                    $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
-                    ->orWhere('employee_demo.employee_name', 'like', "%" . $request->search_text . "%")
-                    ->orWhere('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%")
-                    ->orWhere('employee_demo.deptid', 'like', "%" . $request->search_text . "%");
-                });
-            })
+            ->from('users as u')
+            ->leftjoin('employee_demo as d', 'u.guid', 'd.guid')
+            ->leftjoin('employee_demo_jr as j', 'u.guid', 'j.guid')
+            ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and d.date_deleted is null")
+            ->when($level0, function($q) use($level0) {$q->where('d.organization', $level0->name);})
+            ->when($level1, function($q) use($level1) {$q->where('d.level1_program', $level1->name);})
+            ->when($level2, function($q) use($level2) {$q->where('d.level2_division', $level2->name);})
+            ->when($level3, function($q) use($level3) {$q->where('d.level3_branch', $level3->name);})
+            ->when($level4, function($q) use($level4) {$q->where('d.level4', $level4->name);})
+            ->when($request->criteria == 'name', function($q) use($request){$q->whereRAW("d.employee_name like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'emp', function($q) use($request){$q->whereRAW("d.employee_id like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'job', function($q) use($request){$q->whereRAW("d.jobcode_desc like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'dpt', function($q) use($request){$q->whereRAW("d.deptid like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRAW("(d.employee_id like '%".$request->search_text."%' or d.employee_name like '%".$request->search_text."%' or d.jobcode_desc like '%".$request->search_text."%' or d.deptid like '%".$request->search_text."%')");})
             ->select
             (
-                'employee_demo.employee_id',
-                'employee_demo.employee_name', 
-                'employee_demo.jobcode_desc',
-                'employee_demo.organization',
-                'employee_demo.level1_program',
-                'employee_demo.level2_division',
-                'employee_demo.level3_branch',
-                'employee_demo.level4',
-                'employee_demo.deptid',
-                'users.id',
-                'users.guid',
-                'users.name',
-                'users.excused_flag',
-                'employee_demo_jr.due_date_paused',
-                'employee_demo_jr.next_conversation_date',
-                'employee_demo_jr.excused_type',
-                'employee_demo.employee_status',
+                'u.id',
+                'u.guid',
+                'u.name',
+                'u.excused_flag',
+                'd.employee_id',
+                'd.employee_name', 
+                'd.jobcode_desc',
+                'd.organization',
+                'd.level1_program',
+                'd.level2_division',
+                'd.level3_branch',
+                'd.level4',
+                'd.deptid',
+                'd.date_deleted',
+                'd.employee_status',
+                'j.due_date_paused',
+                'j.next_conversation_date',
+                'j.excused_type',
             );
             return Datatables::of($query)->addIndexColumn()
             ->addColumn('activeGoals', function($row) {
@@ -227,49 +219,40 @@ class EmployeeListController extends Controller
             $level3 = $request->dd_level3 ? OrganizationTree::where('organization_trees.id', $request->dd_level3)->first() : null;
             $level4 = $request->dd_level4 ? OrganizationTree::where('organization_trees.id', $request->dd_level4)->first() : null;
             $query = User::withoutGlobalScopes()
-            ->leftjoin('employee_demo', 'users.guid', 'employee_demo.guid')
-            ->leftjoin('employee_demo_jr', 'users.guid', 'employee_demo_jr.guid')
-            ->whereRaw("employee_demo_jr.id = (select max(a.id) from employee_demo_jr a where a.guid = employee_demo_jr.guid)")
-            ->whereNotNull('employee_demo.date_deleted')
-            ->when($level0, function($q) use($level0) {$q->where('employee_demo.organization', $level0->name);})
-            ->when($level1, function($q) use($level1) {$q->where('employee_demo.level1_program', $level1->name);})
-            ->when($level2, function($q) use($level2) {$q->where('employee_demo.level2_division', $level2->name);})
-            ->when($level3, function($q) use($level3) {$q->where('employee_demo.level3_branch', $level3->name);})
-            ->when($level4, function($q) use($level4) {$q->where('employee_demo.level4', $level4->name);})
-            ->when($request->criteria == 'name', function($q) use($request){$q->where('employee_demo.employee_name', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'emp', function($q) use($request){$q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'job', function($q) use($request){$q->where('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'dpt', function($q) use($request){$q->where('employee_demo.deptid', 'like', "%" . $request->search_text . "%");})
-            ->when([$request->criteria == 'all', $request->search_text], function($q) use ($request) 
-            {
-                $q->where(function ($query2) use ($request) 
-                {
-                    $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
-                    ->orWhere('employee_demo.employee_name', 'like', "%" . $request->search_text . "%")
-                    ->orWhere('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%")
-                    ->orWhere('employee_demo.deptid', 'like', "%" . $request->search_text . "%");
-                });
-            })
+            ->from('users as u')
+            ->leftjoin('employee_demo as d', 'u.guid', 'd.guid')
+            ->leftjoin('employee_demo_jr as j', 'u.guid', 'j.guid')
+            ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and d.date_deleted is not null")
+            ->when($level0, function($q) use($level0) {$q->where('d.organization', $level0->name);})
+            ->when($level1, function($q) use($level1) {$q->where('d.level1_program', $level1->name);})
+            ->when($level2, function($q) use($level2) {$q->where('d.level2_division', $level2->name);})
+            ->when($level3, function($q) use($level3) {$q->where('d.level3_branch', $level3->name);})
+            ->when($level4, function($q) use($level4) {$q->where('d.level4', $level4->name);})
+            ->when($request->criteria == 'name', function($q) use($request){$q->whereRAW("d.employee_name like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'emp', function($q) use($request){$q->whereRAW("d.employee_id like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'job', function($q) use($request){$q->whereRAW("d.jobcode_desc like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'dpt', function($q) use($request){$q->whereRAW("d.deptid like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRAW("(d.employee_id like '%".$request->search_text."%' or d.employee_name like '%".$request->search_text."%' or d.jobcode_desc like '%".$request->search_text."%' or d.deptid like '%".$request->search_text."%')");})
             ->select
             (
-                'employee_demo.employee_id',
-                'employee_demo.employee_name', 
-                'employee_demo.jobcode_desc',
-                'employee_demo.organization',
-                'employee_demo.level1_program',
-                'employee_demo.level2_division',
-                'employee_demo.level3_branch',
-                'employee_demo.level4',
-                'employee_demo.deptid',
-                'employee_demo.date_deleted',
-                'users.id',
-                'users.guid',
-                'users.name',
-                'users.excused_flag',
-                'employee_demo_jr.due_date_paused',
-                'employee_demo_jr.next_conversation_date',
-                'employee_demo_jr.excused_type',
-                'employee_demo.employee_status',
+                'u.id',
+                'u.guid',
+                'u.name',
+                'u.excused_flag',
+                'd.employee_id',
+                'd.employee_name', 
+                'd.jobcode_desc',
+                'd.organization',
+                'd.level1_program',
+                'd.level2_division',
+                'd.level3_branch',
+                'd.level4',
+                'd.deptid',
+                'd.date_deleted',
+                'd.employee_status',
+                'j.due_date_paused',
+                'j.next_conversation_date',
+                'j.excused_type',
             );
             return Datatables::of($query)
             ->addIndexColumn()
