@@ -174,110 +174,28 @@ class Conversation extends Model
 
     public static function warningMessage() {
         $lastConv = self::getLastConv();
-
         $authId = Auth::id();
         $user = User::find($authId);
 
-        foreach($user->employee_demo as $demo) {
-            if($demo->employee_status == 'A') {
-
-                $check1 = ($user->excused_start_date !== null);
-                $check2 = ($user->excused_end_date !== null);
-                if($check1 && $check2) {
-                    $check3 = ($user->excused_start_date <= $user->excused_end_date);
-                    $newDate = new Carbon(Carbon::today()->toDateString());
-                    $check4 = ($newDate->between($user->excused_start_date, $user->excused_end_date));
-                } else {
-                    $check3 = false;
-                    $check4 = false;
-                }
-                if($check1 && $check2 && $check3 && $check4) {
-                    $msg = "Employee is excused until ";
-                    $endDate = new Carbon($user->excused_end_date);
-                    return [
-                        // $msg. $user->excused_end_date->format('d-M-y'), "success"
-                        $msg. $endDate->format('d-M-y'), "success"
-                    ];
-                } 
-                
-                if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null )){
-                    // $msg1 = "You are required to complete a performance conversation every 4 months at minimum. You are overdue. Please complete a conversation as soon as possible.";
-                    // $msg2 = "Your next performance conversation is due by ";
-                    // $msg3 = "You must complete your first performance conversation by ";            
-                    $msg = "Next performance conversation is due by ";            
-                } else {
-                    // $msg1 = $user->name . " is required to complete a performance conversation every 4 months at minimum. It is overdue. Please complete a conversation as soon as possible.";
-                    // $msg2 = $user->name . "'s next performance conversation is due by ";
-                    // $msg3 = $user->name . " must complete the first performance conversation by ";    
-                    $msg = "Next performance conversation is due by ";                        
-                }
-
-
-                if ($lastConv) {
-
-                    if($check1 && $check2) {
-                        $check5 = ($lastConv->sign_off_time->addMonths(4)->between($user->excused_start_date, $user->excused_end_date));
-                    }
-                    $tempNextDueDate = $lastConv->sign_off_time->addMonths(4);    
-                    if($check1 && $check2 && $check5) {
-                        $newStartDate = new Carbon($user->excused_start_date);
-                        $newEndDate = new Carbon($user->excused_end_date);
-                        $diffInDays = $tempNextDueDate->diffInDays($newStartDate);
-                        $tempNextDueDate->addDays($diffInDays);
-                    }
-
-                    $nextDueDate = $tempNextDueDate;    
-                    if ($tempNextDueDate->lt(Carbon::now())) {
-                        return [
-                            //  $msg1,   
-                            $msg.$nextDueDate->format('d-M-y'),
-                            "danger"
-                        ];
-                    }
-                    // $nextDueDate = $tempNextDueDate;
-                    $diff = Carbon::now()->diffInMonths($tempNextDueDate, false);
-                    return [
-                        // "Your last performance conversation was completed on ".$lastConv->sign_off_time->format('d-M-y').". 
-                        // $msg2. $lastConv->sign_off_time->addMonths(4)->format('d-M-y'),
-                        $msg. $nextDueDate->format('d-M-y'),
-                        $diff < 0 ? "danger" : ($diff < 1 ? "warning" : "success")
-                    ];
-                }
-                $user = Auth::user();
-                $nextDueDate = $user->joining_date ?  : '';
-                $diff = Carbon::now()->diffInMonths($nextDueDate, false);
-
-                if ((!$nextDueDate) || (Carbon::createFromDate(2022, 10, 14)->gt($nextDueDate))) {
-                    $DDt = abs (($user->id % 10) - 1) * 5 + (($user->id % 5));
-                    $nextDueDate = Carbon::createFromDate(2022, 10, 14)->addDays($DDt);
-                }
-
-                if($check1 && $check2) {
-                    $check5 = ($nextDueDate->between($user->excused_start_date, $user->excused_end_date));
-                }
-                if($check1 && $check2 && $check5) {
-                    $newStartDate = new Carbon($user->excused_start_date);
-                    $newEndDate = new Carbon($user->excused_end_date);
-                    $diffInDays = $nextDueDate->diffInDays($newStartDate);
-                    $newEndDate->addDays($diffInDays);
-                }
-
-                /* dd([
-                    Carbon::now()->format('d-M-y'),
-                    $nextDueDate->format('d-M-y'),
-                    $diff
-                ]); */
+        $jr = EmployeeDemoJunior::where('guid', $user->guid)->getQuery()->orderBy('id', 'desc')->first();
+        if ($jr->excused_type == 'A' || $user->excused_flag) {
+            $msg = "Employee is currently excused and their conversation deadline is paused";
+            return [
+                $msg, "success"
+            ];
+        } else {
+            $msg = "Next performance conversation is due by ";            
+            if (Carbon::now()->gte($jr->next_conversation_date)) {
                 return [
-                    // $msg3 . $nextDueDate->format('d-M-y'),
-                    $msg. $nextDueDate->format('d-M-y'),
-                    $diff < 0 ? "danger" : ($diff < 1 ? "warning" : "success")
-                ];
-            } else {
-                $msg = "Employee is currently excused and their conversation deadline is paused";
-                return [
-                    $msg, "success"
+                    $msg.Carbon::parse($jr->next_conversation_date)->format('M d, Y'),
+                    "danger"
                 ];
             }
+            $diff = Carbon::now()->diffInMonths(Carbon::parse($jr->next_conversation_date), false);
+            return [
+                $msg.Carbon::parse($jr->next_conversation_date)->format('M d, Y'),
+                $diff < 0 ? "danger" : ($diff < 1 ? "warning" : "success")
+            ];
         }
     }
 

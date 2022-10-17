@@ -44,16 +44,21 @@ class MyEmployeesDataTable extends DataTable
                 $landingPage = 'goal.current';
                 return view('my-team.partials.link-to-profile', compact(['row', 'text', 'landingPage']));
             })->addColumn('nextConversationDue', function ($row) {
-                if ($row->excused_flag) {
-                    return 'Paused';
-                } 
                 $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
-                if  ($jr->due_date_paused != 'Y') {
+                if ($jr->excused_type == 'A') {
+                    $text = 'Paused';
+                    $landingPage = 'conversation.templates';
+                    return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
+                }
+                if ($row->excused_flag) {
+                    $text = 'Paused';
+                    $landingPage = 'conversation.templates';
+                    return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
+                }
+                if ($jr->next_conversation_date) {
                     $text = Carbon::parse($jr->next_conversation_date)->format('M d, Y');
                     $landingPage = 'conversation.templates';
                     return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
-                } else {
-                    return 'Paused';
                 }
             })
             ->addColumn('shared', function ($row) {
@@ -61,18 +66,20 @@ class MyEmployeesDataTable extends DataTable
                 return view('my-team.partials.view-btn', compact(["row", "yesOrNo"])); // $row['id'];
             })
             ->addColumn('excused_flag', function ($row) {
-                $ClassificationArray = ExcusedClassification::select('jobcode')->get()->toArray();
-                $demo = EmployeeDemo::where('guid', $row->guid)->getQuery()->first();
-                if ($demo->employee_status == 'A' && in_array($row->jobcode, $ClassificationArray) == false) {
-                    $excused = json_encode([
-                        'excused_flag' => $row->excused_flag,
-                        'reason_id' => $row->excused_reason_id
-                    ]);
-                    $yesOrNo = $row->excused_flag ? 'Yes' : 'No';
-                    return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo"]));
-                } else {
-                    return 'Yes';
+                $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
+                if ($jr) {
+                    if ($jr->excused_type) {
+                        if ($jr->excused_type == 'A') {
+                            return 'Auto';
+                        }
+                    }
                 }
+                $excused = json_encode([
+                    'excused_flag' => $row->excused_flag,
+                    'reason_id' => $row->excused_reason_id
+                ]);
+                $yesOrNo = $row->excused_flag ? 'Yes' : 'No';
+                return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo"]));
             })
             ->addColumn('direct-reports', function($row) {
                 return view('my-team.partials.direct-report-col', compact(["row"]));
