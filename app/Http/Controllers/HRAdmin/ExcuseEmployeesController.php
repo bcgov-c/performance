@@ -363,6 +363,7 @@ class ExcuseEmployeesController extends Controller
     {
         $input = $request->all();
         $rules = [
+            'excused_flag' => 'required',
             'excused_reason' => 'required'
         ];
         $messages = [
@@ -377,11 +378,7 @@ class ExcuseEmployeesController extends Controller
             ->withInput();
         }
 
-        // $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
-        $selected_emp_ids = $request->userCheck ? $request->userCheck : [];
-        // $request->userCheck = $selected_emp_ids;
-        $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
-        $employee_ids = ($request->userCheck) ? $request->userCheck : [];
+        $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
 
         $selection = EmployeeDemo::select('users.id')
             ->join('users', 'employee_demo.guid', 'users.guid')
@@ -846,7 +843,6 @@ class ExcuseEmployeesController extends Controller
             ->where('admin_orgs.user_id', $authId)
             ;
         } )
-        ->whereNull('employee_demo.date_deleted')
         ->when( $level0, function ($q) use($level0) {
             return $q->where('employee_demo.organization', $level0->name);
         })
@@ -1047,12 +1043,9 @@ class ExcuseEmployeesController extends Controller
      */
     public function manageindexedit(Request $request, $id) {
         $users = User::where('id', '=', $id)
-        ->select('id', 'excused_start_date', 'excused_end_date', 'excused_reason_id')
+        ->select('id', 'excused_reason_id')
         ->leftjoin('employee_demo', 'users.guid', '=', 'employee_demo.guid')
         ->get();
-        // dd($users);
-        $excused_start_date = $users->excused_start_date;
-        $excused_end_date = $users->excused_end_date;
         $excused_reason_id = $users->excused_reason_id;
         $employee_name = $users->employee_demo->employee_name;
         $reasons = ExcusedReason::all();

@@ -100,8 +100,9 @@ class ExcuseEmployeesController extends Controller
         
         $criteriaList = $this->search_criteria_list();
         $reasons = ExcusedReason::all();
+        $yesOrNo = [0 =>'No', 1 => 'Yes'];
 
-        return view('shared.excuseemployees.addindex', compact('criteriaList','matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'reasons') );
+        return view('shared.excuseemployees.addindex', compact('criteriaList','matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'reasons', 'yesOrNo') );
     
     }
 
@@ -356,6 +357,7 @@ class ExcuseEmployeesController extends Controller
     {
         $input = $request->all();
         $rules = [
+            'excused_flag' => 'required',
             'excused_reason' => 'required'
         ];
         $messages = [
@@ -370,9 +372,7 @@ class ExcuseEmployeesController extends Controller
             ->withInput();
         }
         
-        $selected_emp_ids = $request->userCheck ? $request->userCheck : [];
-        $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
-        $employee_ids = ($request->userCheck) ? $request->userCheck : [];
+        $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
 
         $selection = EmployeeDemo::select('users.id')
             ->join('users', 'employee_demo.guid', 'users.guid')
@@ -384,7 +384,7 @@ class ExcuseEmployeesController extends Controller
 
         foreach ($selection as $newId) {
             $result = User::where('id', '=', $newId->id)->update([
-                'excused_flag' => 1,
+                'excused_flag' => true,
                 'excused_reason_id' => $request->excused_reason
             ]);
         }
