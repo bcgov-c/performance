@@ -38,7 +38,7 @@ class MyTeamController extends Controller
         $tags = Tag::all()->toArray();
         $goaltypes = GoalType::all();
         $eReasons = ExcusedReason::all();
-        $yesOrNo = [0 =>'No', 1 => 'Yws'];
+        $yesOrNo = [0 =>'No', 1 => 'Yes'];
         $conversationTopics = ConversationTopic::all();
         // $participants = Participant::all();
 
