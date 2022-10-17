@@ -71,17 +71,17 @@
 
         <div class="container-fluid">
 			<br>
-			<h6 class="text-bold">Step 2. Enter date range and reason for excusing selected employee(s)</h6> 
+			<h6 class="text-bold">Step 2. Select reason for excusing selected employee(s)</h6> 
 			<br>
 			<div class="card col-md-6" >
 				<div class="card-body">
 					<div class="row">
-						<div class="col">
+						{{-- <div class="col">
 							<x-input label="Start Date " class="error-start" type="date" id="start_date" name="start_date" value="{{ Request::old('start_date') }}" />
 						</div>
 						<div class="col">
 							<x-input label="End Date " class="error-target" type="date" id="target_date" name="target_date" value="{{ Request::old('target_date') }}" />
-						</div>
+						</div> --}}
 						<div class="col">
 							<label for='excuse_reason'>Reason
 								{{-- <x-dropdown :list="$reasons" class="multiple" id="excuse_reason" name="excuse_reason" :selected="request()->excused_reason"></x-dropdown> --}}
@@ -119,7 +119,7 @@
 		<br>
 		<h6 class="text-bold">Step 4. Excuse selected employee(s)</h6>
 		<br>
-		<div class="col-md-3 mb-2">
+		<div class="col-md-4 mb-2">
 			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveExcuseModal()" id="btn_send" name="btn_send" value="btn_send">Excuse Employee(s)</button>
 			<button class="btn btn-secondary mt-2">Cancel</button>
 		</div>
@@ -468,25 +468,16 @@
 
 			});
 
-			// $(window).on('beforeunload', function(){
-			// 	$('#pageLoader').show();
-			// });
-
-			// $(window).resize(function(){
-			// 	location.reload();
-			// 	return;
-			// });
-                        
-                        @if(session()->has('start_date_missing'))                           
-                            $('#start_date').addClass('is-invalid');
-                        @endif
-                        @if(session()->has('target_date_missing'))                           
-                            $('#target_date').addClass('is-invalid');
-                        @endif
-                        @if(session()->has('date_error'))      
-                            $('#start_date').addClass('is-invalid');
-                            $('#target_date').addClass('is-invalid');
-                        @endif
+			@if(session()->has('start_date_missing'))                           
+				$('#start_date').addClass('is-invalid');
+			@endif
+			@if(session()->has('target_date_missing'))                           
+				$('#target_date').addClass('is-invalid');
+			@endif
+			@if(session()->has('date_error'))      
+				$('#start_date').addClass('is-invalid');
+				$('#target_date').addClass('is-invalid');
+			@endif
 
 		</script>
 	</x-slot>

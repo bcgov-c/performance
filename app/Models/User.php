@@ -34,8 +34,6 @@ class User extends Authenticatable
         'employee_id',
         'empl_record',
         'excused_flag',
-        // 'excused_start_date',
-        // 'excused_end_date',
         'excused_reason_id',
         'joining_date',
         'acctlock',
