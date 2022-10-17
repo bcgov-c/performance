@@ -146,7 +146,9 @@ class CalcNextConversationDate extends Command
                         $initNextConversationDate = $demo->users->joining_date->addMonth(4)->format('M d, Y');
                     }
                     // post go-live hard-coded initial next conversation due dates
-                    $virtualHardDate = Carbon::createFromDate(2022, 10, 14);
+                    // $virtualHardDate = Carbon::createFromDate(2022, 10, 14);
+                    // Moved 1 month forward
+                    $virtualHardDate = Carbon::createFromDate(2022, 11, 14);
                     if ($virtualHardDate->gt($initNextConversationDate)) {
                         // distribute next conversation date, based on last digit of employee ID
                         $DDt = abs (($demo->employee_id % 10) - 1) * 5 + (($demo->employee_id % 5));
