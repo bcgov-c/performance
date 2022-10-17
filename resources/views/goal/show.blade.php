@@ -73,7 +73,12 @@
                             <div class="d-flex flex-row my-2">
                                 {{-- <x-profile-pic></x-profile-pic> --}}
                                 <div class="border flex-fill p-2 rounded">
-                                    <b>{{$comment->user->name}}</b> on {{$comment->created_at->format('M d, Y H:i A')}}<br>
+                                    <b>{{$comment->user->name}}</b> on 
+                                        @if ($comment->updated_at != $comment->created_at)
+                                            {{$comment->updated_at->format('M d, Y H:i A')}} - (edited)<br>
+                                        @else
+                                            {{$comment->created_at->format('M d, Y H:i A')}}<br>
+                                        @endif
                                     <div class="comment-text">
                                         {!! (!$comment->trashed()) ? $comment->comment : '<i>Comment is deleted.</i>' !!}
                                     </div>
@@ -87,7 +92,13 @@
                                         <div class="card mt-2 p-2 d-flex flex-row bg-light">
                                             {{-- <x-profile-pic></x-profile-pic> --}}
                                             <div class="flex-fill">
-                                                <b>{{$reply->user->name}}</b> on {{$reply->created_at->format('M d, Y H:i A')}}<br>
+                                                <b>{{$reply->user->name}}</b> on 
+                                                    @if ($reply->updated_at != $reply->created_at)
+                                                        {{$reply->updated_at->format('M d, Y H:i A')}} - (edited)<br>
+                                                    @else
+                                                        {{$reply->created_at->format('M d, Y H:i A')}}<br>
+                                                    @endif
+                                               
                                                 <div class="comment-text">
                                                     {!! (!$reply->trashed()) ? $reply->comment : '<i>Comment is deleted.</i>' !!}
                                                 </div>
@@ -230,7 +241,9 @@
             const commentId = $(this).data("comment-id");
             const form = document.getElementById("delete-comment-form");
             fetch(form.action.replace("xxx", commentId),{method:'POST', body: new FormData(form)});
-            window.location.reload();
+            setTimeout(function(){
+                window.location.reload();
+             }, 1000);
         }
     });
 
@@ -260,6 +273,10 @@
         const form = document.getElementById("edit-comment-form");
         $(form).find(".comment").val(data);
         fetch(form.action.replace("xxx", commentId), {method:'POST', body: new FormData(form)});
+        
+        setTimeout(function(){
+                window.location.reload();
+             }, 1000);
     });
 
 
