@@ -33,4 +33,8 @@ class EmployeeDemoJunior extends Model
         'updated_by_id',
     ];
 
+    public function users() {
+        return $this->hasOne(User::class, 'guid', 'guid');
+    }
+
 }
