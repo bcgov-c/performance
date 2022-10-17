@@ -10,7 +10,7 @@
                 </button>
             </div>
             <div class="p-4">
-                <p>All employees are required to complete at least one performance conversation every four months. Employees may be excused from completing a conversation only if they fit into one of the categories listed in the dropdown box below. Excusing them will remove the employee from any reporting and will pause the employee’s conversation deadlines during the date range selected.</p>
+                <p>Excusing an employee will remove them from any reporting and will pause the employee’s conversation deadlines. Employees will automatically be excused if 1) they are on leave or inactive status in PeopleSoft; or 2) if they are a DM, ADM, or Executive Lead covered by a different performance review process. You should only use this form to manually excuse an employee if they fit into one of the categories listed in the dropdown box below.</p>
                 <u><strong>Declaration</strong></u>
                 <p>I wish to excuse <strong><span class="user-name"></span></strong> from the Performance Development process during the date range selected.</p>
                 <div class="alert alert-default-warning alert-dismissible">

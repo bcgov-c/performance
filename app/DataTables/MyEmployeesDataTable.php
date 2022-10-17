@@ -67,19 +67,21 @@ class MyEmployeesDataTable extends DataTable
             })
             ->addColumn('excused_flag', function ($row) {
                 $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
-                if ($jr) {
-                    if ($jr->excused_type) {
-                        if ($jr->excused_type == 'A') {
-                            return 'Auto';
-                        }
-                    }
-                }
+                $excused_type = $jr->excused_type;
                 $excused = json_encode([
                     'excused_flag' => $row->excused_flag,
                     'reason_id' => $row->excused_reason_id
                 ]);
+                if ($jr) {
+                    if ($jr->excused_type) {
+                        if ($jr->excused_type == 'A') {
+                            $yesOrNo = 'Auto';
+                            return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo", "excused_type"]));
+                        }
+                    }
+                }
                 $yesOrNo = $row->excused_flag ? 'Yes' : 'No';
-                return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo"]));
+                return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo", "excused_type"]));
             })
             ->addColumn('direct-reports', function($row) {
                 return view('my-team.partials.direct-report-col', compact(["row"]));
