@@ -178,24 +178,26 @@ class Conversation extends Model
         $user = User::find($authId);
 
         $jr = EmployeeDemoJunior::where('guid', $user->guid)->getQuery()->orderBy('id', 'desc')->first();
-        if ($jr->excused_type == 'A' || $user->excused_flag) {
+        if ((isset($jr->excused_type) && $jr->excused_type == 'A') || $user->excused_flag) {
             $msg = "Employee is currently excused and their conversation deadline is paused";
             return [
                 $msg, "success"
             ];
         } else {
-            $msg = "Next performance conversation is due by ";            
-            if (Carbon::now()->gte($jr->next_conversation_date)) {
+            $msg = "Next performance conversation is due by ";
+            if(isset($jr->next_conversation_date)){
+                if (Carbon::now()->gte($jr->next_conversation_date)) {
+                    return [
+                        $msg.Carbon::parse($jr->next_conversation_date)->format('M d, Y'),
+                        "danger"
+                    ];
+                }
+                $diff = Carbon::now()->diffInMonths(Carbon::parse($jr->next_conversation_date), false);
                 return [
                     $msg.Carbon::parse($jr->next_conversation_date)->format('M d, Y'),
-                    "danger"
+                    $diff < 0 ? "danger" : ($diff < 1 ? "warning" : "success")
                 ];
             }
-            $diff = Carbon::now()->diffInMonths(Carbon::parse($jr->next_conversation_date), false);
-            return [
-                $msg.Carbon::parse($jr->next_conversation_date)->format('M d, Y'),
-                $diff < 0 ? "danger" : ($diff < 1 ? "warning" : "success")
-            ];
         }
     }
 
