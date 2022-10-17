@@ -87,11 +87,8 @@ class MyOrganizationController extends Controller
             $level4 = $request->dd_level4 ? OrganizationTree::where('organization_trees.id', $request->dd_level4)->first() : null;
             $query = User::withoutGlobalScopes()
             ->leftjoin('employee_demo', 'users.guid', 'employee_demo.guid')
-            // ->leftJoin('employee_demo_jr', 'users.guid', 'employee_demo_jr.guid')
-            ->leftJoin('employee_demo_jr', function ($jr) {
-                return $jr->on('users.guid', 'employee_demo_jr.guid')
-                ->whereRaw("employee_demo_jr.id = (select max(a.id) from employee_demo_jr a where a.guid = employee_demo_jr.guid)");
-                })
+            ->leftjoin('employee_demo_jr', 'users.guid', 'employee_demo_jr.guid')
+            ->whereRaw("employee_demo_jr.id = (select max(a.id) from employee_demo_jr a where a.guid = employee_demo_jr.guid)")
             ->whereExists(function ($orgs) use ($authId) {
                 return $orgs->select('admin_orgs.user_id')
                 ->from('admin_orgs')
