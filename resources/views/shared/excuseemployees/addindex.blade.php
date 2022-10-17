@@ -82,7 +82,11 @@
 						<div class="col">
 							<x-input label="End Date " class="error-target" type="date" id="target_date" name="target_date" value="{{ Request::old('target_date') }}" />
 						</div> --}}
+                        {{-- <div class="col-2 mt-1"> --}}
+                            {{-- <x-dropdown :list="$yesOrNo" label="Excused" name="excused_flag" value=""/> --}}
+                        {{-- </div> --}}
 						<div class="col">
+							<input type="hidden" id="excused_flag" name="excused_flag" value=1>
 							<label for='excuse_reason'>Reason
 								{{-- <x-dropdown :list="$reasons" class="multiple" id="excuse_reason" name="excuse_reason" :selected="request()->excused_reason"></x-dropdown> --}}
 								<select id="excused_reason" name="excused_reason" class="form-control">

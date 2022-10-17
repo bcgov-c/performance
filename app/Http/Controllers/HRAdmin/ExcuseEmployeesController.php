@@ -155,7 +155,12 @@ class ExcuseEmployeesController extends Controller
         $criteriaList = $this->search_criteria_list();
         $reasons = ExcusedReason::all();
 
-        return view('shared.excuseemployees.manageindex', compact ('request', 'criteriaList', 'reasons'));
+        $yesOrNo = [
+            [ "id" => 0, "name" => 'No' ],
+            [ "id" => 1, "name" => 'Yes' ],
+        ];
+
+        return view('shared.excuseemployees.manageindex', compact ('request', 'criteriaList', 'reasons', 'yesOrNo'));
     }
 
 
@@ -230,7 +235,8 @@ class ExcuseEmployeesController extends Controller
                 return 'No';
             })
             ->addcolumn('action', function($row) {
-                if($row->employee_status == 'A') {
+                $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
+                if($jr->excused_type != 'A') {
                     return '<button 
                     class="btn btn-xs btn-primary modalbutton" 
                     role="button" 
@@ -365,7 +371,6 @@ class ExcuseEmployeesController extends Controller
     {
         $input = $request->all();
         $rules = [
-            'excused_flag' => 'required',
             'excused_reason' => 'required'
         ];
         $messages = [
@@ -1047,13 +1052,14 @@ class ExcuseEmployeesController extends Controller
      */
     public function manageindexedit(Request $request, $id) {
         $users = User::where('id', '=', $id)
-        ->select('id', 'excused_reason_id')
+        ->select('id', 'excused_flag', 'excused_reason_id')
         ->leftjoin('employee_demo', 'users.guid', '=', 'employee_demo.guid')
         ->get();
+        $excused_flag = $users->excused_flag;
         $excused_reason_id = $users->excused_reason_id;
         $employee_name = $users->employee_demo->employee_name;
         $reasons = ExcusedReason::all();
-        return view('shared.excuseemployees.partials.excused-edit-modal', compact('id', 'excused_start_date', 'excused_end_date', 'excused_reason_id', 'employee_name', 'reasons'));
+        return view('shared.excuseemployees.partials.excused-edit-modal', compact('id', 'excused_flag', 'excused_reason_id', 'employee_name', 'reasons'));
     }
 
     /**
@@ -1063,9 +1069,10 @@ class ExcuseEmployeesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function manageindexupdate(Request $request, $Id) {
+    public function manageindexupdate(Request $request) {
         $query = User::where('id', '=', $request->id)
-        ->update(['excused_start_date' => $request->excused_start_date, 'excused_end_date' => $request->excused_end_date, 'excused_reason_id' => $request->excused_reason_id]);
+        ->update(['excused_flag' => $request->excused_flag, 'excused_reason_id' => $request->excused_reason_id]);
+        // return response()->json(['success' => true, 'message' => 'Participant Excused settings updated successfully']);
         return redirect()->back();
     }
 
@@ -1077,7 +1084,7 @@ class ExcuseEmployeesController extends Controller
      */
     public function manageindexclear(Request $request) {
         $query = User::where('id', '=', $request->id)
-        ->update(['excused_start_date' => null, 'excused_end_date' => null, 'excused_reason_id' => null]);
+        ->update(['excused_flag' => 0, 'excused_reason_id' => null]);
         return redirect()->back();
     }
 
