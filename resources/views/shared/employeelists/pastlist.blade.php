@@ -71,23 +71,23 @@
                     columns: 
                     [
                         {title: 'Employee ID', ariaTitle: 'Employee ID', target: 0, type: 'string', data: 'employee_id'
-                            , name: 'employee_demo.employee_id', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'd.employee_id', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name'
-                            , name: 'employee_demo.employee_name', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'd.employee_name', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc'
-                            , name: 'employee_demo.jobcode_desc', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'd.jobcode_desc', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization'
-                            , name: 'employee_demo.organization', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'd.organization', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program'
-                            , name: 'employee_demo.level1_program', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'd.level1_program', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division'
-                            , name: 'employee_demo.level2_division', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'd.level2_division', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch'
-                            , name: 'employee_demo.level3_branch', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'd.level3_branch', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4'
-                            , name: 'employee_demo.level4', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'd.level4', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid'
-                            , name: 'employee_demo.deptid', searchable: true, className: 'dt-nowrap show-modal'},
+                            , name: 'd.deptid', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Active Goals', ariaTitle: 'Active Goals', target: 0, type: 'string', data: 'activeGoals'
                             , name: 'activeGoals', searchable: false},
                         {title: 'Next Conversation', ariaTitle: 'Next Conversation', target: 0, type: 'date', data: 'nextConversationDue'
@@ -99,9 +99,9 @@
                         {title: 'Direct Reports', ariaTitle: 'Direct Reports', target: 0, type: 'string', data: 'reportees'
                             , name: 'reportees', searchable: false},
                         {title: 'Date Deleted', ariaTitle: 'Date Deleted', target: 0, type: 'date', data: 'date_deleted'
-                            , name: 'employee_demo.date_deleted', searchable: false, className: 'dt-nowrap show-modal'},
+                            , name: 'd.date_deleted', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'num', data: 'id'
-                            , name: 'users.id', searchable: true, visible: false},
+                            , name: 'u.id', searchable: true, visible: false},
                     ],
                 } );
             } );
