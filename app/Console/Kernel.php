@@ -28,20 +28,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
-        $schedule->command('notify:daily')
-        ->dailyAt('08:00');
-
-        $schedule->command('command:NotifyConversationDue')    
-        ->dailyAt('02:30')
-        ->appendOutputTo(storage_path('logs/NotifyConversationDue.log'));
-
-        $schedule->command('command:NotifyConversationDue')    
-        // ->dailyAt('02:30')
-        ->hourlyAt(45)
-        ->between('08:00', '22:00')
-        ->appendOutputTo(storage_path('logs/NotifyConversationDue.log'));
-
+        // $schedule->command('inspire')->hourly(); 
         $schedule->command('command:ExportDatabaseToBI')
         ->timezone('America/Vancouver')
         ->dailyAt('00:00');
@@ -65,6 +52,19 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:CalcNextConversationDate')
         ->timezone('America/Vancouver')
         ->dailyAt('02:00');
+
+        $schedule->command('command:NotifyConversationDue')    
+        ->dailyAt('02:30')
+        ->appendOutputTo(storage_path('logs/NotifyConversationDue.log'));
+        
+        $schedule->command('command:NotifyConversationDue')    
+        // ->dailyAt('02:30')
+        ->hourlyAt(30)
+        ->between('08:00', '22:00')
+        ->appendOutputTo(storage_path('logs/NotifyConversationDue.log'));
+
+        $schedule->command('notify:daily')
+        ->dailyAt('08:00');
 
     }
 
