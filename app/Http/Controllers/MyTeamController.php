@@ -13,8 +13,10 @@ use App\Models\ExcusedReason;
 use App\Models\SharedProfile;
 use App\Scopes\NonLibraryScope;
 use App\Models\ConversationTopic;
+use App\Models\ExcusedClassification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Models\DashboardNotification;
 use App\DataTables\MyEmployeesDataTable;
 use App\Http\Requests\ShareMyGoalRequest;
@@ -36,6 +38,7 @@ class MyTeamController extends Controller
         $tags = Tag::all()->toArray();
         $goaltypes = GoalType::all();
         $eReasons = ExcusedReason::all();
+        $yesOrNo = [0 =>'No', 1 => 'Yws'];
         $conversationTopics = ConversationTopic::all();
         // $participants = Participant::all();
 
@@ -94,8 +97,15 @@ class MyTeamController extends Controller
                 $i++;
             }
         }
-        
-        return view('my-team/my-employees',compact('goals', 'tags', 'employees', 'employees_list', 'goaltypes', 'type_desc_str', 'conversationTopics', 'type', 'myEmpTable', 'sharedEmpTable', 'eReasons', 'showSignoff'));
+
+        $ClassificationArray = ExcusedClassification::select('jobcode')->get()->toArray();
+
+        $yesOrNo = [
+            [ "id" => 0, "name" => 'No' ],
+            [ "id" => 1, "name" => 'Yes' ],
+        ];
+
+        return view('my-team/my-employees',compact('goals', 'tags', 'employees', 'employees_list', 'goaltypes', 'type_desc_str', 'conversationTopics', 'type', 'myEmpTable', 'sharedEmpTable', 'eReasons', 'showSignoff', 'yesOrNo', 'ClassificationArray'));
         // return $myEmployeesDataTable->render('my-team/my-employees',compact('goals', 'employees', 'goaltypes', 'conversationTopics', 'participants', 'type'));
     }
 
@@ -148,19 +158,19 @@ class MyTeamController extends Controller
 
     public function getProfileExcused($user_id) {
         $excusedreasons = ExcusedReason::all();
-        $excusedprofile = DB::table(users)
+        $excusedprofile = DB::table('users')
             ->where('id', $user_id)
-            ->select('id', 'name', 'excused_start_date', 'excused_end_date', 'excused_reason_id')
+            ->select('id', 'name', 'excused_flag', 'excused_reason_id')
             ->get();
-        return view('my-team.partials.employee-excused-modal', $excusedreasons);
+        return view('my-team.partials.employee-excused-modal', compact('excusedreasons', 'excusedprofile'));
         // return $this->respondeWith($sharedProfiles);
     }
 
     public function updateExcuseDetails(UpdateExcuseRequest $request)
+    // public function updateExcuseDetails(Request $request)
     {
         $excused = User::find($request->user_id);
-        $excused->excused_start_date = $request->excused_start_date;
-        $excused->excused_end_date = $request->excused_end_date;
+        $excused->excused_flag = $request->excused_flag;
         $excused->excused_reason_id = $request->excused_reason_id;
         $excused->save();
 

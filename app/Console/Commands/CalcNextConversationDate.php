@@ -94,13 +94,18 @@ class CalcNextConversationDate extends Command
 
         //Process all employees;
         $counter = 0;
+        $updatecounter = 0;
         $ClassificationArray = ExcusedClassification::select('jobcode')->get()->toArray();
         EmployeeDemo::leftjoin('users', 'users.guid', 'employee_demo.guid')
         ->whereNotNull('employee_demo.guid')
         ->whereRaw("TRIM(employee_demo.guid) <> ''")
-        ->whereNull('employee_demo.date_deleted')
+        // ->whereNull('employee_demo.date_deleted')
+        ->whereRaw("employee_demo.employee_status = (select min(a.employee_status) from employee_demo a where a.guid = employee_demo.guid)")
+        ->whereRaw("employee_demo.empl_record = (select min(a.empl_record) from employee_demo a where a.guid = employee_demo.guid and a.employee_status = employee_demo.employee_status)")
+        ->distinct()
         ->orderBy('employee_demo.employee_id')
-        ->chunk(1000, function($employeeDemo) use (&$counter, $ClassificationArray, $processname) {
+        ->orderBy('employee_demo.empl_record')
+        ->chunk(1000, function($employeeDemo) use (&$counter, &$updatecounter, $ClassificationArray, $processname) {
             foreach ($employeeDemo as $demo) {
                 $changeType = 'noChange';
                 $new_last_employee_status = null;
@@ -125,16 +130,15 @@ class CalcNextConversationDate extends Command
                     ->join('users', 'users.id', 'conversation_participants.participant_id')
                     ->whereNotNull('signoff_user_id')
                     ->whereNotNull('supervisor_signoff_id')
-                    ->whereNotNull('sign_off_time')
-                    ->where('participant_id', '=', $demo->users->id)
-                    ->whereRaw('cast(users.employee_id as unsigned) = signoff_user_id')
-                    ->select('users.employee_id', 'conversations.sign_off_time')
-                    ->orderBy('sign_off_time', 'desc')
+                    ->where('participant_id', $demo->users->id)
+                    ->with('user')
+                    ->where('signoff_user_id', $demo->users->id)
+                    ->orderBy('conversations.sign_off_time', 'desc')
                     ->first();
                     if ($lastConv) {
                         // use last conversation + 4 months as initial next conversation date
-                        $lastConversationDate = $lastConv->sign_off_time->format('M d, Y');
-                        $initNextConversationDate = $lastConv->sign_off_time->addMonth(4)->format('M d, Y');
+                        $lastConversationDate = $lastConv->getLastSignOffDateAttribute()->format('M d, Y');
+                        $initNextConversationDate = $lastConv->getLastSignOffDateAttribute()->addMonth(4)->format('M d, Y');
                         // echo 'Last Conversation Date:'.$lastConversationDate; echo "\r\n";
                     } else {
                         // no last conversation, use randomizer to assign initial next conversation date
@@ -194,8 +198,8 @@ class CalcNextConversationDate extends Command
                             && $demo->employee_status == 'A' 
                             && $jr_inarray == false
                             && $demo_inarray == false
-                            && ($jr->current_manual_excuse || $jr->current_manual_excuse != 'Y') 
-                            && $demo->excused_flag) {
+                            && (!$jr->current_manual_excuse || $jr->current_manual_excuse == 'N') 
+                            && $demo->excused_flag == 1) {
                             // MANUAL CHANGE
                             $changeType = 'manualStartExcuse';
                             $excuseType = 'M';
@@ -205,7 +209,8 @@ class CalcNextConversationDate extends Command
                             && $jr_inarray == false
                             && $demo_inarray == false
                             && $jr->current_manual_excuse == 'Y' 
-                            && $demo->excused_flag != null) {
+                            // && (!$demo->excused_flag || $demo->excused_flag == 0)) {
+                            && !$demo->excused_flag) {
                             // MANUAL CHANGE
                             $changeType = 'manualEndExcuse';
                         }
@@ -302,7 +307,9 @@ class CalcNextConversationDate extends Command
                         $newJr->created_by_id = $processname;
                         $newJr->updated_by_id = $processname;
                         $newJr->save();
-                    } else {
+                        $updatecounter += 1;
+                        echo 'GUID '.$newJr->guid.'.  $changeType '.$changeType.'.  EMPLID '.$demo->employee_id.'.'; echo "\r\n";
+                } else {
                         // SKIP if no change
                     }
                 } else {
@@ -329,10 +336,10 @@ class CalcNextConversationDate extends Command
                     Log::info(Carbon::now()->format('c').' - '.$processname.' - ['.$details.'] does not have GUID in Employee Demo table.');
                 }
                 $counter += 1;
-                echo 'Processed '.$counter; echo "\r";
+                echo 'Processed '.$counter.'.  Updated '.$updatecounter.'.'; echo "\r";
             }
         });
-        echo 'Processed '.$counter; echo "\r\n";
+        echo 'Processed '.$counter.'.  Updated '.$updatecounter.'.'; echo "\r\n";
         DB::table('stored_dates')->updateOrInsert(
             [
             'name' => 'CalcNextConversationDate',
@@ -353,7 +360,7 @@ class CalcNextConversationDate extends Command
                 'end_time' => date('Y-m-d H:i:s',strtotime($end_time)),
                 'cutoff_time' => date('Y-m-d H:i:s',strtotime($last_cutoff_time)),
                 'status' => 'Completed',
-                'details' => 'Processed '.$counter.' rows from '.date('Y-m-d H:i:s',strtotime($last_cutoff_time)).'.',
+                'details' => 'Processed '.$counter.' and Updated '.$updatecounter.' rows.',
             ]
         );
         $this->info('CalcNextConversationDate, Completed: '.$end_time);
