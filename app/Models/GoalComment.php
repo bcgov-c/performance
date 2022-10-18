@@ -20,10 +20,20 @@ class GoalComment extends Model
     }
 
     public function canBeDeleted() {
-        return ($this->user_id === Auth::id());
+        if (!session()->has('original-auth-id')) {
+            return ($this->user_id === Auth::id());
+        } else {
+            return ($this->user_id === session()->get('original-auth-id'));
+        }
+        
     }
 
     public function canBeEdited() {
-        return (!$this->trashed()) && $this->user_id === Auth::id();
+        if (!session()->has('original-auth-id')) {
+            return (!$this->trashed()) && $this->user_id === Auth::id();
+        } else {
+            return (!$this->trashed()) && $this->user_id === session()->get('original-auth-id');
+        }
+        
     }
 }
