@@ -24,9 +24,11 @@
                             <x-dropdown :list="$yesOrNo" label="Excused" name="excused_flag" value=""/>
                             {{-- <span class="font-weight:normal">&nbsp Excuse &nbsp<strong><span class="user-name"></span></strong></span> --}}
                         </div>
-                        <div class="col-10 mt-1">
+                        <div class="col-10 mt-1" id="divReason1">
                             <x-dropdown :list="$eReasons" label="Reason" name="excused_reason_id" value=""/>
-                            {{-- <small class="text-danger error-excused_reason_id"></small> --}}
+                        </div>
+                        <div class="col-10 mt-1" id="divReason2">
+                            <x-dropdown :list="$eReasons2" label="Reason" name="excused_reason_id2" value=""/>
                         </div>
                         <div class="col-12 text-left pb-5 mt-3">
                             <x-button type="button" class="btn-md btn-submit" name="excused_update_btn" >Update</x-button>
