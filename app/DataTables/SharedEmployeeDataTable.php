@@ -56,6 +56,7 @@ class SharedEmployeeDataTable extends DataTable
             ->addColumn('excused_flag', function ($row) {
                 $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
                 $excused_type = $jr->excused_type;
+                $current_status = $jr->current_employee_status;
                 $excused = json_encode([
                     'excused_flag' => $row->excused_flag,
                     'reason_id' => $row->excused_reason_id
@@ -64,12 +65,12 @@ class SharedEmployeeDataTable extends DataTable
                     if ($jr->excused_type) {
                         if ($jr->excused_type == 'A') {
                             $yesOrNo = 'Auto';
-                            return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo", "excused_type"]));
+                            return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo", "excused_type", "current_status"]));
                         }
                     }
                 }
                 $yesOrNo = $row->excused_flag ? 'Yes' : 'No';
-                return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo", "excused_type"]));
+                return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo", "excused_type", "current_status"]));
             })
             ->addColumn('direct-reports', function($row) {
                 return view('my-team.partials.direct-report-col', compact(["row"]));
