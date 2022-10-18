@@ -132,15 +132,15 @@ class NotifyConversationDue extends Command
                 $dueIndays = 0;
                 $msg = '';
                 if ($dayDiff >= 7 and $dayDiff <= 30) {
-                    $msg = 'REMINDER - your next performance conversation is due in 1 month';
+                    $msg = 'REMINDER - your next performance conversation is due in 1 month' . ' (' . $due . ')';
                     $dueIndays = 30;
                 }
                 if ($dayDiff >= 0 and $dayDiff < 7) {
-                    $msg = 'REMINDER - your next performance conversation is due in 1 week';
+                    $msg = 'REMINDER - your next performance conversation is due in 1 week' . ' (' . $due . ')';
                     $dueIndays = 7;
                 }
                 if ($dayDiff < 0) {  
-                    $msg = 'OVERDUE - your next performance conversation is past due';
+                    $msg = 'OVERDUE - your next performance conversation is past due' . ' (' . $due . ')';
                     $dueIndays = 0;
                 }
 
@@ -287,15 +287,15 @@ class NotifyConversationDue extends Command
                     $dueIndays = 0;
                     $msg = '';
                     if ($dayDiff >= 7 and $dayDiff <= 30) {
-                        $msg = 'REMINDER - ' . $user->name . '\'s next performance conversation is due in 1 month';
+                        $msg = 'REMINDER - ' . $user->name . '\'s next performance conversation is due in 1 month' . ' (' . $due . ')';
                         $dueIndays = 30;
                     }
                     if ($dayDiff >= 0 and $dayDiff < 7) {
-                        $msg = 'REMINDER - ' . $user->name . '\'s performance conversation due date is one week away';
+                        $msg = 'REMINDER - ' . $user->name . '\'s performance conversation due date is one week away' . ' (' . $due . ')';
                         $dueIndays = 7;
                     }
                     if ($dayDiff < 0) {  
-                        $msg = 'OVERDUE - ' . $user->name . '\'s next performance conversation is past due';
+                        $msg = 'OVERDUE - ' . $user->name . '\'s next performance conversation is past due' . ' (' . $due . ')';
                         $dueIndays = 0;
                     }
 
