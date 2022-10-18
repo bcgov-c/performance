@@ -137,32 +137,32 @@ class MyOrganizationController extends Controller
                     return 'Paused';
                 } 
                 $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
-                if (!$jr) {
-                    return '';
+                if ($jr) {
+                    if  ($jr->due_date_paused != 'Y') {
+                        $text = Carbon::parse($jr->next_conversation_date)->format('M d, Y');
+                        return $text;
+                    } else {
+                        return 'Paused';
+                    }
                 }
-                if  ($jr->due_date_paused != 'Y') {
-                    $text = Carbon::parse($jr->next_conversation_date)->format('M d, Y');
-                    return $text;
-                } else {
-                    return 'Paused';
-                }
+                return '';
             })
             ->addColumn('excused', function ($row) {
-                $ClassificationArray = ExcusedClassification::select('jobcode')->get()->toArray();
-                $demo = EmployeeDemo::where('guid', $row->guid)->getQuery()->first();
-                if (!$demo) {
-                    return '';
+                $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
+                if ($jr) {
+                    if ($jr->excused_type) {
+                        if ($jr->excused_type == 'A') {
+                            return 'Auto';
+                        }
+                        if ($jr->excused_type == 'M' ) {
+                            return 'Manual';
+                        }
+                    }
                 }
-                if ($demo->employee_status == 'A' && in_array($demo->jobcode, $ClassificationArray) == false) {
-                    $excused = json_encode([
-                        'excused_flag' => $row->excused_flag,
-                        'reason_id' => $row->excused_reason_id
-                    ]);
-                    $yesOrNo = $row->excused_flag ? 'Yes' : 'No';
-                    return $yesOrNo;
-                } else {
-                    return 'Yes';
+                if ($row->excused_flag) {
+                    return 'Manual';
                 }
+                return 'No';
             })
             ->addColumn('shared', function ($row) {
                 $yesOrNo = $row->is_shared ? "Yes" : "No";

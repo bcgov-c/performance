@@ -5,6 +5,7 @@
             @include('shared.excuseemployees.partials.tabs')
         </div>
     </div>
+    @include('shared/excuseemployees/partials/excused-edit-modal')
 
     <div class="card">
         <div class="card-body">
@@ -14,8 +15,10 @@
             </div>
         </div>    
     </div>   
-    @include('shared/excuseemployees/partials/excused-edit-modal')
 
+    @push('css')
+        <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}">
+    @endpush
     @push('css')
         <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="stylesheet">
         <x-slot name="css">
@@ -91,8 +94,8 @@
                             , name: 'd.level4', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid'
                             , name: 'd.deptid', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action'
-                            , name: 'action', orderable: false, searchable: false},
+                        // {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action'
+                        //     , name: 'action', orderable: false, searchable: false},
                         {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'num', data: 'id'
                             , name: 'id', searchable: false, visible: false},
                     ]
@@ -108,31 +111,33 @@
 
             $('#editModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
-                // var excused_start_date = button.data('excused_start_date');
-                // var excused_end_date = button.data('excused_end_date');
-                var excused_flag = button.data('excused_flag');
-                var excused_reason_id = button.data('excused_reason_id');
+                var excused_flag = button.data('excused').excused_flag;
+                var excused_reason_id = button.data('excused').reason_id;
+                var excused_reason_id2 = button.data('excused').reason_id;
                 var employee_name = button.data('employee_name');
-                var current = {{ auth()->user()->id }};
-                // $('#reason').val(reason);
-                // $('#model_id').val(model_id);
-                // $('#saveButton').prop('disabled', current == model_id);
-                // $('removeButton').prop('disabled', current == model_id);
-                // $('#accessselect').prop('disabled', current == model_id);
-                // $('#reason').prop('disabled', current == model_id);
-
-
-                // $('#start_date').val(excused_start_date);
-                // $('#target_date').val(excused_end_date);
-                $('#excused_flag').val(excused_flag);
-                // $('#excused_reason_id').val(excused_reason_id);
-                $("#editModal").find("select[name=excused_reason_id]").val(excused_reason_id ?? 1);
-                // $("#editModal").find("select[name=excused_reason_id]").val(4);
+                var excused_type = button.data('excused-type');
+                var user_id = button.data('user-id');
+                var current_status = button.data('current_status');
                 $('#excusedDetailLabel').text('Edit Employee Excuse:  '+employee_name);
-                // $('#saveButton').prop('disabled', current == model_id);
-                // $('removeButton').prop('disabled', current == model_id);
-                // $('#accessselect').prop('disabled', current == model_id);
-                // $('#reason').prop('disabled', current == model_id);
+                $("#editModal").find(".employee_name").html(employee_name);
+                $("#editModal").find("input[name=user_id]").val(user_id);
+                $("#editModal").find("select[name=excused_flag]").val(excused_flag ?? 0);
+                $("#editModal").find("select[name=excused_reason_id]").val(excused_reason_id ?? 3);
+                $("#editModal").find("select[name=excused_reason_id2]").attr('disabled', true);
+                if (excused_type == 'A') {
+                    $("#editModal").find("select[name=excused_reason_id2]").val(current_status == 'A' ? 2 : 1);
+                    $("#editModal").find("select[name=excused_flag]").attr('disabled', true);
+                    $("#editModal").find("select[name=excused_reason_id]").attr('disabled', true);
+                    $("#divReason1").hide();
+                    $("#divReason2").show();
+                    $("#editModal").find("button[name=saveExcuseButton]").attr('disabled', true);
+                } else {
+                    $("#editModal").find("select[name=excused_flag]").attr('disabled', false);
+                    $("#editModal").find("select[name=excused_reason_id]").attr('disabled', false);
+                    $("#divReason1").show();
+                    $("#divReason2").hide();
+                    $("#editModal").find("button[name=saveExcuseButton]").attr('disabled', false);
+                }
             });
 
             $('#editModal').on('hidden.bs.modal', function(event) {
@@ -141,13 +146,6 @@
                     table.clear();
                     table.draw();
                 };
-            });
-
-            $('#cancelButton').on('click', function(event) {
-                // if($.fn.DataTable.isDataTable( '#admintable' )) {
-                //     table = $('#admintable').DataTable();
-                //     table.destroy();
-                // };
             });
 
             $('#accessselect').on('change', function(event) {
@@ -160,25 +158,6 @@
                 } else {
                     $('#admintable').hide();
                 };
-            });
-
-            $('#removeButton').on('click', function(event) {
-                console.log('Delete button clicked');
-                var model_id = $('#model_id').val();
-                var token = $('meta[name="csrf-token"]').attr('content');
-                event.preventDefault();
-                $.ajax ( {
-                    type: 'POST',
-                    url: 'manageindexclear/'+model_id,
-                    data: {
-                        'model_id':model_id,
-                        '_token':token,
-                        '_method':"DELETE",
-                    },
-                    success: function (result) {
-                        window.location.href = 'manageindex';
-                    }
-                });
             });
 
             $(window).on('beforeunload', function(){
