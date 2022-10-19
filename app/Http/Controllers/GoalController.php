@@ -48,9 +48,7 @@ class GoalController extends Controller
         
         $statusList[0]['id'] = '0';
         $statusList[0]['name'] = 'Any';
-        $statusList[1]['id'] = 'inactive';
-        $statusList[1]['name'] = 'Inactive';
-        $i = 2;
+        $i = 1;
         foreach($sysstatus as $statusname => $statusitem) {
             if($statusname != 'active') {
                 $statusList[$i]['id'] = $statusname;
