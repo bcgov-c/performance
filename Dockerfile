@@ -121,5 +121,3 @@ RUN sed -i 's/^exec /service cron start\n\nexec /' /usr/local/bin/apache2-foregr
 #CMD /usr/local/bin/apache2-foreground
 
 #RUN /usr/local/bin/apache2-foreground
-
-CMD /usr/local/bin/start
