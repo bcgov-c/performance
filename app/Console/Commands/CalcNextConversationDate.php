@@ -55,7 +55,7 @@ class CalcNextConversationDate extends Command
         $start_time = Carbon::now()->format('c');
         // $current_cutoff_datetime = $start_time;
         $this->info( 'CalcNextConversationDate, Started: '. $start_time);
-        Log::info($start_time.' - '.$processname.' - Started.');
+        // Log::info($start_time.' - '.$processname.' - Started.');
 
         $job_name = 'command:CalcNextConversationDate';
         $status = 'Initiated';
@@ -335,7 +335,7 @@ class CalcNextConversationDate extends Command
                     if ($details == '') {
                         $details = 'Unidentified';
                     }
-                    Log::info(Carbon::now()->format('c').' - '.$processname.' - ['.$details.'] does not have GUID in Employee Demo table.');
+                    // Log::info(Carbon::now()->format('c').' - '.$processname.' - ['.$details.'] does not have GUID in Employee Demo table.');
                 }
                 $counter += 1;
                 echo 'Processed '.$counter.'.  Updated '.$updatecounter.'.'; echo "\r";
@@ -366,7 +366,7 @@ class CalcNextConversationDate extends Command
             ]
         );
         $this->info('CalcNextConversationDate, Completed: '.$end_time);
-        Log::info($end_time->format('c').' - '.$processname.' - Finished');
+        // Log::info($end_time->format('c').' - '.$processname.' - Finished');
     } 
     
 }
