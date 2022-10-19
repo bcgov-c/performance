@@ -1,7 +1,7 @@
 <!-- Modal -->
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" >
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <form id="modal-form" class="form-control" action="manageindexupdate" method="post" enctype="multipart/form-data">
+        <form id="modal-form" action="manageindexupdate" method="post">
             @csrf
             <div class="modal-content">
                 <div class="modal-header bg-primary">
@@ -18,7 +18,7 @@
                         <div class="alert alert-default-warning alert-dismissible">
                             <span class="h5"><i class="icon fas fa-exclamation-triangle"></i>Note: By doing so, this employee will not show up in PDP reports.</span>
                         </div>
-                        <input type="hidden" name="user_id" value="">
+                        <input type="hidden" name="id" value="">
                         <div class="row">
                             <div class="col-2 mt-1">
                                 <x-dropdown :list="$yesOrNo" label="Excused" name="excused_flag" id="excused_flag" value=""/>
@@ -40,7 +40,3 @@
     </div>
 
 </div>
-
-.button {
-
-}
