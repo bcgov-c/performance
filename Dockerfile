@@ -95,6 +95,9 @@ COPY --chown=www-data:www-data server_files/opcache.ini /usr/local/etc/php/conf.
 COPY --chown=www-data:www-data server_files/mods-enabled/expires.load /etc/apache2/mods-enabled/expires.load
 COPY --chown=www-data:www-data server_files/mods-enabled/headers.load /etc/apache2/mods-enabled/headers.load
 COPY --chown=www-data:www-data server_files/mods-enabled/rewrite.load /etc/apache2/mods-enabled/rewrite.load
+COPY --chown=www-data:www-data server_files/start.sh /usr/local/bin/start
+
+RUN chmod +x /usr/local/bin/start
 
 # Create cache and session storage structure
 RUN bash -c 'mkdir -p /var/www/html/storage{app,framework,logs}'
