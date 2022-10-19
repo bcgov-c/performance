@@ -59,15 +59,13 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('command:NotifyConversationDue')
         ->timezone('America/Vancouver')    
-        ->dailyAt('02:30')
-        ->appendOutputTo(storage_path('/tmp/NotifyConversationDue.log'));
+        ->dailyAt('02:30');
         
         $schedule->command('command:NotifyConversationDue')    
         ->timezone('America/Vancouver')
         // ->dailyAt('02:30')
         ->hourlyAt(30)
-        ->between('08:00', '22:00')
-        ->appendOutputTo(storage_path('/tmp/NotifyConversationDue.log'));
+        ->between('08:00', '22:00');
 
         $schedule->command('notify:daily')
         ->dailyAt('08:00');
