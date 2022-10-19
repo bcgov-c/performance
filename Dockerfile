@@ -96,6 +96,9 @@ COPY --chown=www-data:www-data server_files/mods-enabled/expires.load /etc/apach
 COPY --chown=www-data:www-data server_files/mods-enabled/headers.load /etc/apache2/mods-enabled/headers.load
 COPY --chown=www-data:www-data server_files/mods-enabled/rewrite.load /etc/apache2/mods-enabled/rewrite.load
 
+# JP add on Oct 18, 2022
+COPY --chown=www-data:www-data server_files/start.sh /usr/local/bin/start
+
 # Create cache and session storage structure
 RUN bash -c 'mkdir -p /var/www/html/storage{app,framework,logs}'
 RUN chmod -R 755 /var/www/html/storage
@@ -105,6 +108,7 @@ RUN chmod 4111 /usr/bin/sudo
 RUN useradd -l -u 1001510000 -c "1001510000" 1001510000 && \
     addgroup crond-users && \
     chgrp crond-users /var/run/crond.pid && \
+	chmod +x /usr/local/bin/start && \
     usermod -a -G crond-users 1001510000
 
 
@@ -118,3 +122,6 @@ RUN sed -i 's/^exec /service cron start\n\nexec /' /usr/local/bin/apache2-foregr
 #CMD /usr/local/bin/apache2-foreground
 
 #RUN /usr/local/bin/apache2-foreground
+
+# JP add on Oct 18, 2022
+CMD ["/usr/local/bin/start"]
