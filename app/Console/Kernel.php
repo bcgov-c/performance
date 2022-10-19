@@ -53,10 +53,6 @@ class Kernel extends ConsoleKernel
         ->timezone('America/Vancouver')
         ->dailyAt('02:00');
 
-        $schedule->command('command:CalcNextConversationDate')
-        ->timezone('America/Vancouver')
-        ->dailyAt('05:00');
-
         $schedule->command('command:NotifyConversationDue')
         ->timezone('America/Vancouver')    
         ->dailyAt('02:30')
