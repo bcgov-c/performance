@@ -178,7 +178,7 @@ class SendMail
                     ->bcc( $a_bccRecipients )   
                     ->queue(new NotifyMail($from, $this->subject, $this->body ));
 
-                Log::info( $log_text . ' was successfully sent.' );
+                // Log::info( $log_text . ' was successfully sent.' );
                 $bResult = true;
             } catch (Exception $e) {
                 Log::error($e); 
@@ -191,7 +191,7 @@ class SendMail
                     ->bcc( $a_bccRecipients )
                     ->send(new NotifyMail($from, $this->subject, $this->body ));
 
-                Log::info( $log_text . ' was successfully sent.' );
+                // Log::info( $log_text . ' was successfully sent.' );
                 $bResult = true;
                 
             } catch (Exception $e) {
