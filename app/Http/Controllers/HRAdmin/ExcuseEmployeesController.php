@@ -1060,7 +1060,7 @@ class ExcuseEmployeesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function manageindexupdate(Request $request, $id) {
+    public function manageindexupdate(Request $request) {
         $query = User::where('id', '=', $request->id)
         ->update(['excused_flag' => $request->excused_flag, 'excused_reason_id' => $request->excused_reason_id]);
         return redirect()->back();

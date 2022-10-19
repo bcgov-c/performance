@@ -120,6 +120,7 @@
                 var current_status = button.data('current_status');
                 $('#excusedDetailLabel').text('Edit Employee Excuse:  '+employee_name);
                 $("#editModal").find(".employee_name").html(employee_name);
+                $("#editModal").find("input[name=id]").val(user_id);
                 $("#editModal").find("input[name=user_id]").val(user_id);
                 $("#editModal").find("select[name=excused_flag]").val(excused_flag ?? 0);
                 $("#editModal").find("select[name=excused_reason_id]").val(excused_reason_id ?? 3);
