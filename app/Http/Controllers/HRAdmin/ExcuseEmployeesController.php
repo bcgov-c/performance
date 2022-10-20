@@ -314,11 +314,12 @@ class ExcuseEmployeesController extends Controller
             ->join('employee_demo', 'employee_demo.guid', 'u.guid')
             ->join('employee_demo_jr as j', 'j.guid', 'u.guid')
             ->join('employee_demo_jr as k', 'k.guid', 'u.guid')
-            ->whereRAW("k.id = (select min(m.id) from employee_demo_jr m where m.guid = k.guid and m.id > j.id and m.excused_type is null and k.excused_type is null)")
-            ->whereRAW("not exists (select 1 from employee_demo_jr x where x.guid = j.guid and x.id < k.id and x.id > j.id and x.excused_type is null and k.excused_type is null)")
-            // ->where('j.id', '<', 'k.id')
             ->whereNotNull('j.excused_type')
             ->whereNull('k.excused_type')
+            ->whereRAW('j.id < k.id')
+            ->whereRAW("k.id = (select min(m.id) from employee_demo_jr m where m.guid = k.guid and m.id > j.id and m.excused_type is null)")
+            ->whereRAW("j.id = (select min(n.id) from employee_demo_jr n where n.guid = k.guid and n.id < k.id and not n.excused_type is null)")
+            ->whereRAW("not exists (select x.id from employee_demo_jr x where x.guid = j.guid and x.id > j.id and x.id < k.id and x.excused_type is null)")
             ->leftjoin('users as n', 'n.id', 'j.updated_by_id')
             ->distinct()
             ->whereExists(function ($orgs) use ($authId) {
@@ -337,9 +338,9 @@ class ExcuseEmployeesController extends Controller
             ->when($level4, function($q) use($level4) {$q->where('employee_demo.level4', $level4->name);})
             ->when($request->criteria == 'name', function($q) use($request){$q->whereRAW("employee_demo.employee_name like '%".$request->search_text."%'");})
             ->when($request->criteria == 'emp', function($q) use($request){$q->whereRAW("employee_demo.employee_id like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'ext', function($q) use($request){$q->whereRAW("excusedtype like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'exb', function($q) use($request){$q->whereRAW("n_name like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRAW("(employee_demo.employee_id like '%".$request->search_text."%' or employee_demo.employee_name like '%".$request->search_text."%' or excused_type like '%".$request->search_text."%' or n-name like '%".$request->search_text."%')");})
+            ->when($request->criteria == 'ext', function($q) use($request){$q->whereRAW("j.excused_type like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'exb', function($q) use($request){$q->whereRAW("n.name like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRAW("(employee_demo.employee_id like '%".$request->search_text."%' or employee_demo.employee_name like '%".$request->search_text."%' or j.excused_type like '%".$request->search_text."%' or n.name like '%".$request->search_text."%')");})
             ->selectRAW ("
                 u.id
                 , u.guid
@@ -363,6 +364,7 @@ class ExcuseEmployeesController extends Controller
                 , case when j.excused_type = 'A' then 'Auto' else case when j.excused_type = 'M' then 'Manual' else 'No' end end as excusedtype
                 , case when j.excused_type = 'A' then 'System' else n.name end as n_name
             ");
+
             return Datatables::of($query)
             ->addIndexColumn()
             ->editColumn('employee_demo.employee_name', function($row) {
