@@ -51,10 +51,11 @@ class CalcNextConversationDate extends Command
     public function handle()
     {
         $processname = 'CalcNextConversationDate';
+        $DefaultCreatorName = 'System';
 
         $start_time = Carbon::now()->format('c');
         // $current_cutoff_datetime = $start_time;
-        $this->info( 'CalcNextConversationDate, Started: '. $start_time);
+        $this->info( $processname.', Started: '. $start_time);
         // Log::info($start_time.' - '.$processname.' - Started.');
 
         $job_name = 'command:CalcNextConversationDate';
@@ -105,7 +106,7 @@ class CalcNextConversationDate extends Command
         ->distinct()
         ->orderBy('employee_demo.employee_id')
         ->orderBy('employee_demo.empl_record')
-        ->chunk(1000, function($employeeDemo) use (&$counter, &$updatecounter, $ClassificationArray, $processname) {
+        ->chunk(1000, function($employeeDemo) use (&$counter, &$updatecounter, $ClassificationArray, $DefaultCreatorName) {
             foreach ($employeeDemo as $demo) {
                 $changeType = 'noChange';
                 $new_last_employee_status = null;
@@ -123,6 +124,8 @@ class CalcNextConversationDate extends Command
                 $prevPause = null;
                 $prevDate = null;
                 $lastDateCalculated = false;
+                $excused_updated_by = $DefaultCreatorName;
+                $excused_updated_at = null;
                 if ($demo->guid) {
                     // YES GUID
                     // get last conversation details
@@ -205,6 +208,8 @@ class CalcNextConversationDate extends Command
                             // MANUAL CHANGE
                             $changeType = 'manualStartExcuse';
                             $excuseType = 'M';
+                            $excused_updated_by = $demo->excused_updated_by;
+                            $excused_updated_at = $demo->excused_updated_at;
                         }
                         if ($jr->current_employee_status == 'A' 
                             && $demo->employee_status == 'A'
@@ -215,6 +220,8 @@ class CalcNextConversationDate extends Command
                             && !$demo->excused_flag) {
                             // MANUAL CHANGE
                             $changeType = 'manualEndExcuse';
+                            $excused_updated_by = $demo->excused_updated_by;
+                            $excused_updated_at = $demo->excused_updated_at;
                         }
                         if (in_array($changeType, ['statusEndExcuse', 'classEndExcuse', 'manualEndExcuse'])) {
                             // re-calc next conversation date
@@ -283,6 +290,8 @@ class CalcNextConversationDate extends Command
                                 if ($demo->excused_flag) {
                                     $changeType = 'manualNewExcuse';
                                     $excuseType = 'M';
+                                    $excused_updated_by = $demo->excused_updated_by;
+                                    $excused_updated_at = $demo->excused_updated_at;
                                 } else {
                                     $changeType = 'noExcuse';
                                     $excuseType = null;
@@ -306,8 +315,11 @@ class CalcNextConversationDate extends Command
                         $newJr->excused_type = $excuseType;
                         $newJr->last_conversation_date = $lastConversationDate ? Carbon::parse($lastConversationDate) : null;
                         $newJr->next_conversation_date = $initNextConversationDate ? Carbon::parse($initNextConversationDate) : null;
-                        $newJr->created_by_id = $processname;
-                        $newJr->updated_by_id = $processname;
+                        $newJr->created_by_id = $DefaultCreatorName;
+                        $newJr->updated_by_id = $excused_updated_by ?? $DefaultCreatorName;
+                        if($excused_updated_at) {
+                            $newJr->updated_at = $excused_updated_at;
+                        }
                         $newJr->save();
                         $updatecounter += 1;
                         echo 'GUID '.$newJr->guid.'.  $changeType '.$changeType.'.  EMPLID '.$demo->employee_id.'.'; echo "\r\n";
