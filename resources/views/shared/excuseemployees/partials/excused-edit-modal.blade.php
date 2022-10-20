@@ -1,7 +1,7 @@
 <!-- Modal -->
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" >
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <form id="modal-form" action="manageindexupdate" method="post">
+        <form id="modal-form" action="{{ route(request()->segment(1).'.excuseemployees.manageindexupdate') }}" method="post">
             @csrf
             <div class="modal-content">
                 <div class="modal-header bg-primary">
