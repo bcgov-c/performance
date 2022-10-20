@@ -20,8 +20,11 @@
                         </div>
                         <input type="hidden" name="id" value="">
                         <div class="row">
-                            <div class="col-2 mt-1">
+                            <div class="col-2 mt-1" id="divExcuse1">
                                 <x-dropdown :list="$yesOrNo" label="Excused" name="excused_flag" id="excused_flag" value=""/>
+                            </div>
+                             <div class="col-2 mt-1" id="divExcuse2">
+                                <x-dropdown :list="$yesOrNo2" label="Excused" name="excused_flag2" id="excused_flag2" value=""/>
                             </div>
                             <div class="col-10 mt-1" id="divReason1">
                                 <x-dropdown :list="$reasons" label="Reason" name="excused_reason_id" id="excused_reason_id" value=""/>
@@ -30,7 +33,7 @@
                                 <x-dropdown :list="$reasons2" label="Reason" name="excused_reason_id2" id="excused_reason_id2" value=""/>
                             </div>
                             <div class="col-12 text-left pb-5 mt-3">
-                                <x-button id="saveExcuseButton" type="submit" class="btn btn-primary" onClick="return confirm('Are you sure?')" role="save" data-toggle="modal" data-target="#updateModal" name="saveExcuseButton" aria-label="Save Changes">Update</x-button>
+                                <x-button id="saveExcuseButton" type="submit" class="btn btn-primary" onClick="return confirm('Are you sure?')" role="save" data-toggle="modal" data-target="#editModal" name="saveExcuseButton" aria-label="Save Changes">Update</x-button>
                             </div>
                         </div>
                     </div>
