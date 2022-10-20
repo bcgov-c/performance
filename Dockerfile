@@ -102,7 +102,6 @@ RUN chmod +x /usr/local/bin/start
 # Create cache and session storage structure
 RUN bash -c 'mkdir -p /var/www/html/storage{app,framework,logs}'
 RUN chmod -R 755 /var/www/html/storage
-RUN chown -R www-data:www-data /var/www/html/storage/app /var/www/html/storage/framework /var/www/html/storage/logs
 
 RUN chmod 4111 /usr/bin/sudo
 
