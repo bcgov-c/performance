@@ -98,7 +98,7 @@
                     {title: 'Excused Reason ID', ariaTitle: 'Excused Reason ID', target: 0, type: 'string', data: 'reason_id', name: 'reason_id', className: 'dt-nowrap show-modal', visible: false},
                     {title: 'Reason', ariaTitle: 'Reason', target: 0, type: 'string', data: 'reason_name', name: 'reason_name', className: 'dt-nowrap show-modal'},
                     {title: 'Created By', ariaTitle: 'Created By', target: 0, type: 'string', data: 'excusedbyname', name: 'excusedbyname', className: 'dt-nowrap show-modal'},
-                    {title: 'Created At', ariaTitle: 'Created At', target: 0, type: 'string', data: 'j.created_by_id', name: 'j.created_by_id', className: 'dt-nowrap show-modal'},
+                    {title: 'Created At', ariaTitle: 'Created At', target: 0, type: 'string', data: 'created_by_id', name: 'j.created_by_id', className: 'dt-nowrap show-modal'},
                     {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', className: 'dt-nowrap show-modal'},
                     {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', className: 'dt-nowrap show-modal'},
                     {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', className: 'dt-nowrap show-modal'},
