@@ -477,15 +477,15 @@ class ExcuseEmployeesController extends Controller
 
             $sql = clone $demoWhere; 
 
-            $employees = $sql->leftjoin('excused_reasons as r', 'r.id', 'u.excused_reason_id')
+            $employees = $sql->leftjoin('excused_reasons as r', 'r.id', 'users.excused_reason_id')
             ->leftjoin('users as ub', 'ub.id', 'j.updated_by_id')
             ->selectRAW("
-                u.id
-                , u.guid
-                , u.excused_flag
-                , u.excused_reason_id
-                , u.excused_updated_by
-                , u.excused_updated_at
+                users.id
+                , users.guid
+                , users.excused_flag
+                , users.excused_reason_id
+                , users.excused_updated_by
+                , users.excused_updated_at
                 , employee_demo.employee_id
                 , employee_demo.employee_name
                 , employee_demo.jobcode
@@ -505,10 +505,10 @@ class ExcuseEmployeesController extends Controller
                 , j.updated_by_id
                 , j.updated_at
                 , ub.name as excusedbyname
-                , case when j.excused_type = 'A' then case when j.current_employee_status = 'A' then 2 else 1 end else u.excused_reason_id end as reason_id
+                , case when j.excused_type = 'A' then case when j.current_employee_status = 'A' then 2 else 1 end else users.excused_reason_id end as reason_id
                 , case when j.excused_type = 'A' then case when j.current_employee_status = 'A' then 'Classification' else 'PeopleSoft Status' end else case when j.current_manual_excuse = 'Y' then r.name else '' end end as reason_name
-                , case when j.excused_type = 'A' then 'Auto' else case when u.excused_flag = 1 then 'Manual' else 'No' end end as excusedtype
-                , case when j.excused_type = 'A' then 'Auto' else case when u.excused_flag = 1 then 'Manual' else 'No' end end as excusedlink
+                , case when j.excused_type = 'A' then 'Auto' else case when users.excused_flag = 1 then 'Manual' else 'No' end end as excusedtype
+                , case when j.excused_type = 'A' then 'Auto' else case when users.excused_flag = 1 then 'Manual' else 'No' end end as excusedlink
                 ");
 
             return Datatables::of($employees)
@@ -1067,7 +1067,6 @@ class ExcuseEmployeesController extends Controller
         ->select('id', 'excused_start_date', 'excused_end_date', 'excused_reason_id')
         ->leftjoin('employee_demo', 'users.guid', '=', 'employee_demo.guid')
         ->get();
-        // dd($users);
         $excused_start_date = $users->excused_start_date;
         $excused_end_date = $users->excused_end_date;
         $excused_reason_id = $users->excused_reason_id;
@@ -1084,7 +1083,6 @@ class ExcuseEmployeesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function manageindexupdate(Request $request) {
-        dd($request);
         $query = User::where('id', '=', $request->id)
         ->update(['excused_flag' => $request->excused_flag
         , 'excused_reason_id' => $request->excused_reason_id
