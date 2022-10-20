@@ -172,7 +172,7 @@ class SendMail
         if ($this->useQueue) {
 
             
-            try {
+            // try {
                 Mail::to( $a_toRecipients )
                     ->cc( $a_ccRecipients )
                     ->bcc( $a_bccRecipients )   
@@ -180,12 +180,12 @@ class SendMail
 
                 // Log::info( $log_text . ' was successfully sent.' );
                 $bResult = true;
-            } catch (Exception $e) {
-                Log::error($e); 
-                $bResult = false;
-            }
+            // } catch (Exception $e) {
+            //     Log::error($e); 
+            //     $bResult = false;
+            // }
         } else {
-            try {
+            // try {
                 Mail::to( $a_toRecipients )
                     ->cc( $a_ccRecipients )
                     ->bcc( $a_bccRecipients )
@@ -194,11 +194,11 @@ class SendMail
                 // Log::info( $log_text . ' was successfully sent.' );
                 $bResult = true;
                 
-            } catch (Exception $e) {
-                Log::error( $log_text . ' was failed to sent out.' ); 
-                Log::error($e); 
-                $bResult = false;
-            }
+            // } catch (Exception $e) {
+            //     Log::error( $log_text . ' was failed to sent out.' ); 
+            //     Log::error($e); 
+            //     $bResult = false;
+            // }
         }
 
         if ($this->saveToLog) {
