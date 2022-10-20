@@ -100,8 +100,17 @@ class ExcuseEmployeesController extends Controller
         
         $criteriaList = $this->search_criteria_list();
         $reasons = ExcusedReason::where('id', '>', 2)->get();
+        $reasons2 = ExcusedReason::where('id', '<=', 2)->get();
+        $yesOrNo = [
+            [ "id" => 0, "name" => 'No' ],
+            [ "id" => 1, "name" => 'Yes' ],
+        ];
+        $yesOrNo2 = [
+            [ "id" => 0, "name" => 'No' ],
+            [ "id" => 1, "name" => 'Yes' ],
+        ];
 
-        return view('shared.excuseemployees.addindex', compact('criteriaList','matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'reasons') );
+        return view('shared.excuseemployees.addindex', compact('criteriaList','matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'reasons', 'reasons2', 'yesOrNo', 'yesOrNo2') );
     
     }
 
@@ -246,6 +255,144 @@ class ExcuseEmployeesController extends Controller
     }
 
 
+    public function managehistory(Request $request)
+    {
+        $errors = session('errors');
+
+        if ($errors) {
+            $old = session()->getOldInput();
+            $request->dd_level0 = isset($old['dd_level0']) ? $old['dd_level0'] : null;
+            $request->dd_level1 = isset($old['dd_level1']) ? $old['dd_level1'] : null;
+            $request->dd_level2 = isset($old['dd_level2']) ? $old['dd_level2'] : null;
+            $request->dd_level3 = isset($old['dd_level3']) ? $old['dd_level3'] : null;
+            $request->dd_level4 = isset($old['dd_level4']) ? $old['dd_level4'] : null;
+            $request->criteria = isset($old['criteria']) ? $old['criteria'] : null;
+            $request->search_text = isset($old['search_text']) ? $old['search_text'] : null;
+        } 
+
+        if ($request->btn_search) {
+            session()->put('_old_input', [
+                'dd_level0' => $request->dd_level0,
+                'dd_level1' => $request->dd_level1,
+                'dd_level2' => $request->dd_level2,
+                'dd_level3' => $request->dd_level3,
+                'dd_level4' => $request->dd_level4,
+                'criteria' => $request->criteria,
+                'search_text' => $request->search_text,
+            ]);
+        }
+
+        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
+        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
+        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
+        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
+        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+
+        $request->session()->flash('level0', $level0);
+        $request->session()->flash('level1', $level1);
+        $request->session()->flash('level2', $level2);
+        $request->session()->flash('level3', $level3);
+        $request->session()->flash('level4', $level4);
+
+        $criteriaList = $this->search_criteria_list();
+        return view('shared.excuseemployees.managehistory', compact ('request', 'criteriaList'));
+    }
+
+
+    public function managehistorylist(Request $request) {
+        $authId = Auth::id();
+        if ($request->ajax()) {
+            $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
+            $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
+            $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
+            $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
+            $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+            $query = User::withoutGlobalScopes()
+            ->from('users as u')
+            ->join('employee_demo', 'employee_demo.guid', 'u.guid')
+            ->join('employee_demo_jr as j', 'j.guid', 'u.guid')
+            ->join('employee_demo_jr as k', 'k.guid', 'u.guid')
+            ->whereRAW("k.id = (select min(m.id) from employee_demo_jr m where m.guid = k.guid and m.id > j.id and m.excused_type is null and k.excused_type is null)")
+            ->whereRAW("not exists (select 1 from employee_demo_jr x where x.guid = j.guid and x.id < k.id and x.id > j.id and x.excused_type is null and k.excused_type is null)")
+            // ->where('j.id', '<', 'k.id')
+            ->whereNotNull('j.excused_type')
+            ->whereNull('k.excused_type')
+            ->leftjoin('users as n', 'n.id', 'j.updated_by_id')
+            ->distinct()
+            ->whereExists(function ($orgs) use ($authId) {
+                $orgs->select('o.user_id')
+                ->from('admin_orgs as o')
+                ->whereRAW('o.user_id = '.$authId.' and (o.organization = employee_demo.organization or ((o.organization = "" or o.organization IS null) and (employee_demo.organization = "" or employee_demo.organization is null)))'
+                .' and (o.level1_program = employee_demo.level1_program or ((o.level1_program = "" or o.level1_program IS null) and (employee_demo.level1_program = "" or employee_demo.level1_program is null)))'
+                .' and (o.level2_division = employee_demo.level2_division or ((o.level2_division = "" or o.level2_division IS null) and (employee_demo.level2_division = "" or employee_demo.level2_division is null)))'
+                .' and (o.level3_branch = employee_demo.level3_branch or ((o.level3_branch = "" or o.level3_branch IS null) and (employee_demo.level3_branch = "" or employee_demo.level3_branch is null)))'
+                .' and (o.level4 = employee_demo.level4 or ((o.level4 = "" or o.level4 IS null) and (employee_demo.level4 = "" or employee_demo.level4 is null)))');
+            })
+            ->when($level0, function($q) use($level0) {$q->where('employee_demo.organization', $level0->name);})
+            ->when($level1, function($q) use($level1) {$q->where('employee_demo.level1_program', $level1->name);})
+            ->when($level2, function($q) use($level2) {$q->where('employee_demo.level2_division', $level2->name);})
+            ->when($level3, function($q) use($level3) {$q->where('employee_demo.level3_branch', $level3->name);})
+            ->when($level4, function($q) use($level4) {$q->where('employee_demo.level4', $level4->name);})
+            ->when($request->criteria == 'name', function($q) use($request){$q->whereRAW("employee_demo.employee_name like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'emp', function($q) use($request){$q->whereRAW("employee_demo.employee_id like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'ext', function($q) use($request){$q->whereRAW("excusedtype like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'exb', function($q) use($request){$q->whereRAW("n_name like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRAW("(employee_demo.employee_id like '%".$request->search_text."%' or employee_demo.employee_name like '%".$request->search_text."%' or excused_type like '%".$request->search_text."%' or n-name like '%".$request->search_text."%')");})
+            ->selectRAW ("
+                u.id
+                , u.guid
+                , u.name
+                , u.employee_id
+                , employee_demo.employee_name
+                , employee_demo.jobcode
+                , employee_demo.jobcode_desc
+                , employee_demo.organization
+                , employee_demo.level1_program
+                , employee_demo.level2_division
+                , employee_demo.level3_branch
+                , employee_demo.level4
+                , employee_demo.deptid
+                , j.created_at as j_created_at
+                , j.excused_type as j_excused_type
+                , j.updated_by_id
+                , n.name as updated_name
+                , k.created_at as k_created_at
+                , k.excused_type as k_excused_type
+                , case when j.excused_type = 'A' then 'Auto' else case when j.excused_type = 'M' then 'Manual' else 'No' end end as excusedtype
+                , case when j.excused_type = 'A' then 'System' else n.name end as n_name
+            ");
+            return Datatables::of($query)
+            ->addIndexColumn()
+            ->editColumn('employee_demo.employee_name', function($row) {
+                return $row->employee_name ? $row->employee_name : $row->name;
+            })
+            ->editColumn('updated_name', function($row) {
+                return $row->j_excused_type == 'A' ? 'System' : ($row->updated_name ?? $row->id);
+            })
+            ->editColumn('j_excused_type', function($row) {
+                if ($row->j_excused_type == 'A') {
+                    return 'Auto';
+                }
+                if ($row->j_excused_type == 'M' ) {
+                    return 'Manual';
+                }
+                return '';
+            })
+            ->editColumn('k_excused_type', function($row) {
+                if ($row->k_excused_type == 'A') {
+                    return 'Auto';
+                }
+                if ($row->k_excused_type == 'M' ) {
+                    return 'Manual';
+                }
+                return '';
+            })
+            // ->rawColumns(['excused_status'])
+            ->make(true);
+        }
+    }
+
+
     public function loadOrganizationTree(Request $request) {
 
         $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
@@ -342,9 +489,39 @@ class ExcuseEmployeesController extends Controller
 
             $sql = clone $demoWhere; 
 
-            $employees = $sql->select([ 'employee_id', 'employee_name', 'jobcode_desc', 'employee_email', 
-                'employee_demo.organization', 'employee_demo.level1_program', 'employee_demo.level2_division',
-                'employee_demo.level3_branch','employee_demo.level4', 'employee_demo.deptid']);
+            $employees = $sql->leftjoin('excused_reasons as r', 'r.id', 'u.excused_reason_id')
+            ->leftjoin('users as ub', 'ub.id', 'j.updated_by_id')
+            ->selectRAW("
+                u.id
+                , u.guid
+                , u.excused_flag
+                , u.excused_reason_id
+                , u.excused_updated_by
+                , u.excused_updated_at
+                , employee_demo.employee_id
+                , employee_demo.employee_name
+                , employee_demo.jobcode
+                , employee_demo.jobcode_desc
+                , employee_demo.employee_email
+                , employee_demo.organization
+                , employee_demo.level1_program
+                , employee_demo.level2_division
+                , employee_demo.level3_branch
+                , employee_demo.level4
+                , employee_demo.deptid
+                , employee_demo.employee_status
+                , j.due_date_paused
+                , j.excused_type
+                , j.current_manual_excuse
+                , j.created_by_id
+                , j.updated_by_id
+                , j.updated_at
+                , ub.name as excusedbyname
+                , case when j.excused_type = 'A' then case when j.current_employee_status = 'A' then 2 else 1 end else u.excused_reason_id end as reason_id
+                , case when j.excused_type = 'A' then case when j.current_employee_status = 'A' then 'Classification' else 'PeopleSoft Status' end else case when j.current_manual_excuse = 'Y' then r.name else '' end end as reason_name
+                , case when j.excused_type = 'A' then 'Auto' else case when u.excused_flag = 1 then 'Manual' else 'No' end end as excusedtype
+                , case when j.excused_type = 'A' then 'Auto' else case when u.excused_flag = 1 then 'Manual' else 'No' end end as excusedlink
+                ");
 
             return Datatables::of($employees)
                 ->addColumn('select_users', static function ($employee) {
@@ -820,63 +997,38 @@ class ExcuseEmployeesController extends Controller
             'all' => 'All',
             'emp' => 'Employee ID', 
             'name'=> 'Employee Name',
-            'job' => 'Classification', 
-            'dpt' => 'Department ID'
+            'ext' => 'Excuse Type', 
+            'exb' => 'Excused By'
         ];
     }
 
     protected function baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4) {
         // Base Where Clause
         $authId = Auth::id();
-        $demoWhere = EmployeeDemo::whereExists(function ($orgs) use ($authId) {
+        return User::leftjoin('employee_demo', 'employee_demo.guid', 'users.guid')
+        ->leftjoin('employee_demo_jr as j', 'j.guid', 'users.guid')
+        ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and employee_demo.date_deleted is null and not employee_demo.employee_id is null")
+        ->when( $level0, function ($q) use($level0) { $q->where('employee_demo.organization', $level0->name); }) 
+        ->when( $level1, function ($q) use($level1) { $q->where('employee_demo.level1_program', $level1->name); })
+        ->when( $level2, function ($q) use($level2) { $q->where('employee_demo.level2_division', $level2->name);  })
+        ->when( $level3, function ($q) use($level3) { $q->where('employee_demo.level3_branch', $level3->name); })
+        ->when( $level4, function ($q) use($level4) { $q->where('employee_demo.level4', $level4->name); })
+        ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) { $q->whereRaw("employee_demo.employee_id like '%".$request->search_text."%' or employee_demo.employee_name like '%".$request->search_text."%' or employee_demo.jobcode_desc like '%".$request->search_text."%' or employee_demo.deptid like '%".$request->search_text."%'"); })
+        ->when( $request->search_text && $request->criteria == 'emp', function ($q) use($request) { $q->whereRaw("employee_demo.employee_id like '%" . $request->search_text . "%'"); })
+        ->when( $request->search_text && $request->criteria == 'name', function ($q) use($request) { $q->whereRaw("employee_demo.employee_name like '%" . $request->search_text . "%'"); })
+        ->when( $request->search_text && $request->criteria == 'ext', function ($q) use($request) { $q->whereRaw("excuse_type like '%" . $request->search_text . "%'"); })
+        ->when( $request->search_text && $request->criteria == 'exb', function ($q) use($request) { $q->whereRaw("n_name like '%" . $request->search_text . "%'"); })
+        ->whereExists(function ($orgs) use ($authId) {
             return $orgs->select('admin_orgs.user_id')
             ->from('admin_orgs')
+            ->where('admin_orgs.user_id', $authId)
             ->whereRAW('(admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL)))')
             ->whereRAW('(admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL)))')
             ->whereRAW('(admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL)))')
             ->whereRAW('(admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL)))')
             ->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL)))')
-            ->where('admin_orgs.user_id', $authId)
             ;
-        } )
-        ->when( $level0, function ($q) use($level0) {
-            return $q->where('employee_demo.organization', $level0->name);
-        })
-        ->when( $level1, function ($q) use($level1) {
-            return $q->where('employee_demo.level1_program', $level1->name);
-        })
-        ->when( $level2, function ($q) use($level2) {
-            return $q->where('employee_demo.level2_division', $level2->name);
-        })
-        ->when( $level3, function ($q) use($level3) {
-            return $q->where('employee_demo.level3_branch', $level3->name);
-        })
-        ->when( $level4, function ($q) use($level4) {
-            return $q->where('employee_demo.level4', $level4->name);
-        })
-        ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
-            $q->where(function($query) use ($request) {
-                
-                return $query->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->search_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->search_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->search_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
-            });
-        })
-        ->when( $request->search_text && $request->criteria == 'emp', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->search_text) . "%'");
-        })
-        ->when( $request->search_text && $request->criteria == 'name', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->search_text) . "%'");
-        })
-        ->when( $request->search_text && $request->criteria == 'job', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->search_text) . "%'");
-        })
-        ->when( $request->search_text && $request->criteria == 'dpt', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
         });
-
-        return $demoWhere;
     }
 
     protected function ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4) {

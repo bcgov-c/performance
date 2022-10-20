@@ -133,16 +133,20 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
     Route::group(['middleware' => ['auth']], function() {    
         Route::get('/sysadmin/excuseemployees', [ExcuseEmployeesController::class, 'addindex'])->name('sysadmin.excuseemployees');
         Route::get('/sysadmin/excuseemployees/addindex', [ExcuseEmployeesController::class, 'addindex'])->name('sysadmin.excuseemployees.addindex');
-        Route::post('/sysadmin/excuseemployees/saveexcuse', [ExcuseEmployeesController::class, 'saveexcuse'])->name('sysadmin.excuseemployees.saveexcuse');
         Route::post('/sysadmin/excuseemployees/addindex', [ExcuseEmployeesController::class, 'addindex'])->name('sysadmin.excuseemployees.search');
+        Route::get('/sysadmin/excuseemployees/saveexcuse', [ExcuseEmployeesController::class, 'saveexcuse'])->name('sysadmin.excuseemployees.saveexcuse');
+        Route::post('/sysadmin/excuseemployees/saveexcuse', [ExcuseEmployeesController::class, 'saveexcuse']);
         Route::get('/sysadmin/excuseemployees/employee-list', [ExcuseEmployeesController::class, 'getDatatableEmployees'])->name('sysadmin.excuseemployees.employee.list');
+
+        Route::get('/sysadmin/excuseemployees/managehistory', [ExcuseEmployeesController::class, 'managehistory'])->name('sysadmin.excuseemployees.managehistory');
+        Route::get('/sysadmin/excuseemployees/managehistorylist', [ExcuseEmployeesController::class, 'managehistorylist'])->name('sysadmin.excuseemployees.managehistorylist');
 
         Route::get('/sysadmin/excuseemployees/manageindex', [ExcuseEmployeesController::class, 'manageindex'])->name('sysadmin.excuseemployees.manageindex');
         Route::get('/sysadmin/excuseemployees/manageindexlist', [ExcuseEmployeesController::class, 'manageindexlist'])->name('sysadmin.excuseemployees.manageindexlist');
         Route::get('/sysadmin/excuseemployees/manageindexedit/{id}', [ExcuseEmployeesController::class, 'manageindexedit'])->name('sysadmin.excuseemployees.manageindexedit');
         Route::post('/sysadmin/excuseemployees/manageindex/{id}', [ExcuseEmployeesController::class, 'manageindex']);
         Route::get('/sysadmin/excuseemployees/manageindexupdate', [ExcuseEmployeesController::class, 'manageindexupdate'])->name('sysadmin.excuseemployees.manageindexupdate');
-        Route::post('/sysadmin/excuseemployees/manageindexupdate', [ExcuseEmployeesController::class, 'manageindexupdate']);
+        Route::post('/sysadmin/excuseemployees/manageindexupdate', [ExcuseEmployeesController::class, 'manageindexupdate'])->name('sysadmin.excuseemployees.manageindexupdate');
         Route::get('/sysadmin/excuseemployees/manageindexclear/{id}', [ExcuseEmployeesController::class, 'manageindexclear']);
 
         Route::get('/sysadmin/excuseemployees/org-tree', [ExcuseEmployeesController::class,'loadOrganizationTree']);
