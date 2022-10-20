@@ -6,6 +6,8 @@
         </div>
     </div>
 
+    @include('shared/excuseemployees/partials/excused-edit-modal')
+
 	<p class="px-3">Follow the steps below to select an employee and excuse them from the Performance Development process. This will remove the employee from any reporting and will pause the employee’s conversation deadlines during the date range selected.</p>
 
         @if(Session::has('message'))
@@ -471,6 +473,44 @@
 				} );
 
 			});
+
+            $('#editModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget);
+                var excused_flag = button.data('excused').excused_flag;
+                var excused_reason_id = button.data('excused').reason_id;
+                var excused_reason_id2 = button.data('excused').reason_id;
+                var employee_name = button.data('employee_name');
+                var excused_type = button.data('excused-type');
+                var user_id = button.data('user-id');
+                var current_status = button.data('current_status');
+                $('#excusedDetailLabel').text('Edit Employee Excuse:  '+employee_name);
+                $("#editModal").find(".employee_name").html(employee_name);
+                $("#editModal").find("input[name=id]").val(user_id);
+                $("#editModal").find("input[name=user_id]").val(user_id);
+                $("#editModal").find("select[name=excused_flag]").val(excused_flag ?? 0);
+                $("#editModal").find("select[name=excused_flag2]").val(1);
+                $("#editModal").find("select[name=excused_reason_id]").val(excused_reason_id ?? 3);
+                $("#editModal").find("select[name=excused_flag2]").attr('disabled', true);
+                $("#editModal").find("select[name=excused_reason_id2]").attr('disabled', true);
+                if (excused_type == 'A') {
+                    $("#editModal").find("select[name=excused_reason_id2]").val(current_status == 'A' ? 2 : 1);
+                    // $("#editModal").find("select[name=excused_flag]").attr('disabled', true);
+                    $("#editModal").find("select[name=excused_reason_id]").attr('disabled', true);
+                    $("#divReason1").hide();
+                    $("#divReason2").show();
+                    $("#divExcuse1").hide();
+                    $("#divExcuse2").show();
+                    $("#editModal").find("button[name=saveExcuseButton]").attr('disabled', true);
+                } else {
+                    // $("#editModal").find("select[name=excused_flag]").attr('disabled', false);
+                    $("#editModal").find("select[name=excused_reason_id]").attr('disabled', false);
+                    $("#divReason1").show();
+                    $("#divReason2").hide();
+                    $("#divExcuse1").show();
+                    $("#divExcuse2").hide();
+                    $("#editModal").find("button[name=saveExcuseButton]").attr('disabled', false);
+                }
+            });
 
 			@if(session()->has('start_date_missing'))                           
 				$('#start_date').addClass('is-invalid');
