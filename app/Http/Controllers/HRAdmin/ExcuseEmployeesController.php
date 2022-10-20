@@ -489,15 +489,15 @@ class ExcuseEmployeesController extends Controller
 
             $sql = clone $demoWhere; 
 
-            $employees = $sql->leftjoin('excused_reasons as r', 'r.id', 'u.excused_reason_id')
+            $employees = $sql->leftjoin('excused_reasons as r', 'r.id', 'users.excused_reason_id')
             ->leftjoin('users as ub', 'ub.id', 'j.updated_by_id')
             ->selectRAW("
-                u.id
-                , u.guid
-                , u.excused_flag
-                , u.excused_reason_id
-                , u.excused_updated_by
-                , u.excused_updated_at
+                users.id
+                , users.guid
+                , users.excused_flag
+                , users.excused_reason_id
+                , users.excused_updated_by
+                , users.excused_updated_at
                 , employee_demo.employee_id
                 , employee_demo.employee_name
                 , employee_demo.jobcode
@@ -517,17 +517,59 @@ class ExcuseEmployeesController extends Controller
                 , j.updated_by_id
                 , j.updated_at
                 , ub.name as excusedbyname
-                , case when j.excused_type = 'A' then case when j.current_employee_status = 'A' then 2 else 1 end else u.excused_reason_id end as reason_id
+                , case when j.excused_type = 'A' then case when j.current_employee_status = 'A' then 2 else 1 end else users.excused_reason_id end as reason_id
                 , case when j.excused_type = 'A' then case when j.current_employee_status = 'A' then 'Classification' else 'PeopleSoft Status' end else case when j.current_manual_excuse = 'Y' then r.name else '' end end as reason_name
-                , case when j.excused_type = 'A' then 'Auto' else case when u.excused_flag = 1 then 'Manual' else 'No' end end as excusedtype
-                , case when j.excused_type = 'A' then 'Auto' else case when u.excused_flag = 1 then 'Manual' else 'No' end end as excusedlink
+                , case when j.excused_type = 'A' then 'Auto' else case when users.excused_flag = 1 then 'Manual' else 'No' end end as excusedtype
+                , case when j.excused_type = 'A' then 'Auto' else case when users.excused_flag = 1 then 'Manual' else 'No' end end as excusedlink
                 ");
 
             return Datatables::of($employees)
                 ->addColumn('select_users', static function ($employee) {
                         return '<input pid="1335" type="checkbox" id="userCheck'. 
                             $employee->employee_id .'" name="userCheck[]" value="'. $employee->employee_id .'" class="dt-body-center">';
-                })->rawColumns(['select_users','action'])
+                })
+                ->editColumn('excusedbyname', function($row) {
+                    if($row->excused_type == 'A' || $row->current_manual_excuse == 'Y') {
+                        return $row->excusedbyname ?? $row->updated_by_id;
+                    } else {
+                        return '';
+                    }
+                })
+                ->editColumn('j.created_by_id', function($row) {
+                    if($row->excused_type == 'A' || $row->current_manual_excuse == 'Y') {
+                        $datestr = Carbon::parse($row->updated_at)->format('M d, Y');
+                        return $datestr;
+                    } else {
+                        return '';
+                    }
+                })
+                ->editColumn('excusedlink', function($row) {
+                    $text = $row->excusedlink;
+                    $excused_type = $row->excused_type;
+                    $current_status = $row->current_employee_status;
+                    $excused = json_encode([
+                        'excused_flag' => $row->excused_flag,
+                        'reason_id' => $row->excused_reason_id
+                    ]);
+                    $reasons = ExcusedReason::where('id', '>', 2)->get();
+                    $reasons2 = ExcusedReason::where('id', '<=', 2)->get();
+
+                    $reasons = ExcusedReason::where('id', '>', 2)->get();
+                    $reasons2 = ExcusedReason::where('id', '<=', 2)->get();
+
+                    $yesOrNo = [
+                        [ "id" => 0, "name" => 'No' ],
+                        [ "id" => 1, "name" => 'Yes' ],
+                    ];
+
+                    $yesOrNo2 = [
+                        [ "id" => 0, "name" => 'No' ],
+                        [ "id" => 1, "name" => 'Yes' ],
+                    ];
+
+                    return view('shared.excuseemployees.partials.link', compact(["row", "excused", "text", "excused_type", "current_status", "yesOrNo", "yesOrNo2"]));
+                })
+                ->rawColumns(['select_users','action'])
                 ->make(true);
         }
     }

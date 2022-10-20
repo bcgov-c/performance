@@ -145,7 +145,7 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/excuseemployees/manageindexlist', [ExcuseEmployeesController::class, 'manageindexlist'])->name('sysadmin.excuseemployees.manageindexlist');
         Route::get('/sysadmin/excuseemployees/manageindexedit/{id}', [ExcuseEmployeesController::class, 'manageindexedit'])->name('sysadmin.excuseemployees.manageindexedit');
         Route::post('/sysadmin/excuseemployees/manageindex/{id}', [ExcuseEmployeesController::class, 'manageindex']);
-        Route::get('/sysadmin/excuseemployees/manageindexupdate', [ExcuseEmployeesController::class, 'manageindexupdate'])->name('sysadmin.excuseemployees.manageindexupdate');
+        Route::get('/sysadmin/excuseemployees/manageindexupdate', [ExcuseEmployeesController::class, 'manageindexupdate'])->name('sysadmin.excuseemployees.manageindexupdateget');
         Route::post('/sysadmin/excuseemployees/manageindexupdate', [ExcuseEmployeesController::class, 'manageindexupdate'])->name('sysadmin.excuseemployees.manageindexupdate');
         Route::get('/sysadmin/excuseemployees/manageindexclear/{id}', [ExcuseEmployeesController::class, 'manageindexclear']);
 
