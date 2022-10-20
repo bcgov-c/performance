@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\GoalType;
 use App\Models\Conversation;
 use Illuminate\Http\Request;
+use App\Models\SharedProfile;
 use App\Models\OrganizationTree;
 use App\Models\ConversationTopic;
 use Illuminate\Support\Facades\DB;
@@ -48,7 +49,7 @@ class MyTeamStatisticsReportController extends Controller
 
     Public function goalSummary_from_statement($goal_type_id)
     {
-        $from_stmt = "(select users.id, users.employee_id, users.empl_record, users.guid, users.reporting_to, 
+        $from_stmt = "(select users.id, users.email, users.employee_id, users.empl_record, users.guid, users.reporting_to, 
                         users.excused_start_date, users.excused_end_date, 
                         (select count(*) from goals where user_id = users.id
                         and status = 'active' and deleted_at is null and is_library = 0 ";
@@ -106,6 +107,15 @@ class MyTeamStatisticsReportController extends Controller
         //                     ->where('admin_orgs.user_id', '=', Auth::id())
         //                     ->pluck('users.id');
 
+        // To Speed up performance
+        $first_sql = SharedProfile::where('shared_with', Auth::id())
+                                    ->where('shared_item', 'like', '%1%')
+                                    ->select('shared_id');
+        $members = User::where('reporting_to', Auth::id())->select('id')
+                                    ->union($first_sql)
+                                    ->pluck('id');
+
+
         foreach($types as $type)
         {
             $goal_id = $type->id ? $type->id : '';
@@ -119,6 +129,8 @@ class MyTeamStatisticsReportController extends Controller
                             // $join->on('employee_demo.employee_id', '=', 'A.employee_id');
                             // $join->on('employee_demo.empl_record', '=', 'A.empl_record');
                         })
+                        ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+                        ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                             return $q->where('employee_demo.organization', $level0->name);
                         })
@@ -146,17 +158,18 @@ class MyTeamStatisticsReportController extends Controller
                             $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01")')
                                   ->where('employee_demo.employee_status', 'A');
                         })
-                        ->where( function($query)  {
-                            $query->whereIn('id',function($q){
-                                    $q->select('id')->from('users')
-                                          ->where('reporting_to', Auth::id()); 
-                                })
-                                ->orWhereIn('id',function($q) {
-                                    $q->select('shared_id')->from('shared_profiles')
-                                      ->where('shared_with', Auth::id())
-                                      ->where('shared_item', 'like', '%1%'); 
-                                });
-                        });
+                        ->whereIn('A.id', $members );
+                        // ->where( function($query)  {
+                        //     $query->whereIn('A.id',function($q){
+                        //             $q->select('id')->from('users')
+                        //                   ->where('reporting_to', Auth::id()); 
+                        //         })
+                        //         ->orWhereIn('A.id',function($q) {
+                        //             $q->select('shared_id')->from('shared_profiles')
+                        //               ->where('shared_with', Auth::id())
+                        //               ->where('shared_item', 'like', '%1%'); 
+                        //         });
+                        // });
 
             $goals_average = $sql->get()->first()->goals_average;
 
@@ -180,6 +193,8 @@ class MyTeamStatisticsReportController extends Controller
                         //$join->on('employee_demo.employee_id', '=', 'A.employee_id');
                         //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
                     })
+                    ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+                    ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                     ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                         return $q->where('employee_demo.organization', $level0->name);
                     })
@@ -209,17 +224,18 @@ class MyTeamStatisticsReportController extends Controller
                     //             ->whereIn('admin_org_users.access_type', [0,1])
                     //             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                     // });
-                    ->where( function($query)  {
-                        $query->whereIn('id',function($q){
-                                $q->select('id')->from('users')
-                                      ->where('reporting_to', Auth::id()); 
-                            })
-                            ->orWhereIn('id',function($q) {
-                                $q->select('shared_id')->from('shared_profiles')
-                                  ->where('shared_with', Auth::id())
-                                  ->where('shared_item', 'like', '%1%'); 
-                            });
-                    });
+                    ->whereIn('A.id', $members );
+                    // ->where( function($query)  {
+                    //     $query->whereIn('A.id',function($q){
+                    //             $q->select('id')->from('users')
+                    //                   ->where('reporting_to', Auth::id()); 
+                    //         })
+                    //         ->orWhereIn('A.id',function($q) {
+                    //             $q->select('shared_id')->from('shared_profiles')
+                    //               ->where('shared_with', Auth::id())
+                    //               ->where('shared_item', 'like', '%1%'); 
+                    //         });
+                    // });
                     // ->whereExists(function ($query) {
                     //     $query->select(DB::raw(1))
                     //             ->from('admin_orgs')
@@ -290,6 +306,8 @@ class MyTeamStatisticsReportController extends Controller
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'A.empl_record');
                 })
+                ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+                ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
                 })
@@ -323,17 +341,18 @@ class MyTeamStatisticsReportController extends Controller
                     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01")')
                           ->where('employee_demo.employee_status', 'A');
                 })
-                ->where( function($query)  {
-                    $query->whereIn('users.id',function($q){
-                            $q->select('id')->from('users')
-                                  ->where('reporting_to', Auth::id()); 
-                        })
-                        ->orWhereIn('users.id',function($q) {
-                            $q->select('shared_id')->from('shared_profiles')
-                              ->where('shared_with', Auth::id())
-                              ->where('shared_item', 'like', '%1%'); 
-                        });
-                });
+                ->whereIn('users.id', $members );
+                // ->where( function($query)  {
+                //     $query->whereIn('users.id',function($q){
+                //             $q->select('id')->from('users')
+                //                   ->where('reporting_to', Auth::id()); 
+                //         })
+                //         ->orWhereIn('users.id',function($q) {
+                //             $q->select('shared_id')->from('shared_profiles')
+                //               ->where('shared_with', Auth::id())
+                //               ->where('shared_item', 'like', '%1%'); 
+                //         });
+                // });
 
         $tags = $sql->get();
         $blank_count = $sql2->count();
@@ -365,6 +384,14 @@ class MyTeamStatisticsReportController extends Controller
         $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
         $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
 
+        // To Speed up performance
+        $first_sql = SharedProfile::where('shared_with', Auth::id())
+                                    ->where('shared_item', 'like', '%1%')
+                                    ->select('shared_id');
+        $members = User::where('reporting_to', Auth::id())->select('id')
+                                    ->union($first_sql)
+                                    ->pluck('id');
+
 
         $from_stmt = $this->goalSummary_from_statement($request->goal);
 
@@ -376,6 +403,8 @@ class MyTeamStatisticsReportController extends Controller
                     // $join->on('employee_demo.employee_id', '=', 'A.employee_id');
                     //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
                 })
+                ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+                ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                 ->whereNotNull('A.guid')
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
@@ -440,17 +469,18 @@ class MyTeamStatisticsReportController extends Controller
                     $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01") ')
                           ->where('employee_demo.employee_status', 'A');
                 })
-                ->where( function($query)  {
-                    $query->whereIn('id',function($q){
-                            $q->select('id')->from('users')
-                                  ->where('reporting_to', Auth::id()); 
-                        })
-                        ->orWhereIn('id',function($q) {
-                            $q->select('shared_id')->from('shared_profiles')
-                              ->where('shared_with', Auth::id())
-                              ->where('shared_item', 'like', '%1%'); 
-                        });
-                });
+                ->whereIn('A.id', $members );
+                // ->where( function($query)  {
+                //     $query->whereIn('A.id',function($q){
+                //             $q->select('id')->from('users')
+                //                   ->where('reporting_to', Auth::id()); 
+                //         })
+                //         ->orWhereIn('A.id',function($q) {
+                //             $q->select('shared_id')->from('shared_profiles')
+                //               ->where('shared_with', Auth::id())
+                //               ->where('shared_item', 'like', '%1%'); 
+                //         });
+                // });
 
         $users = $sql->get();
 
@@ -510,6 +540,14 @@ class MyTeamStatisticsReportController extends Controller
         $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
         $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
 
+        // To Speed up performance
+        $first_sql = SharedProfile::where('shared_with', Auth::id())
+                            ->where('shared_item', 'like', '%1%')
+                            ->select('shared_id');
+        $members = User::where('reporting_to', Auth::id())->select('id')
+                            ->union($first_sql)
+                            ->pluck('id');
+
         $tags = Tag::when($request->tag, function ($q) use($request) {
                         return $q->where('name', $request->tag);
                     })
@@ -553,6 +591,8 @@ class MyTeamStatisticsReportController extends Controller
                         // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                         // $join->on('employee_demo.empl_record', '=', 'A.empl_record');
                     })
+                    ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+                    ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                     ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                         return $q->where('employee_demo.organization', $level0->name);
                     })
@@ -637,17 +677,18 @@ class MyTeamStatisticsReportController extends Controller
                     //             ->whereIn('admin_org_users.access_type', [0,1])
                     //             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                     // });
-                    ->where( function($query)  {
-                        $query->whereIn('id',function($q){
-                                $q->select('id')->from('users')
-                                      ->where('reporting_to', Auth::id()); 
-                            })
-                            ->orWhereIn('id',function($q) {
-                                $q->select('shared_id')->from('shared_profiles')
-                                  ->where('shared_with', Auth::id())
-                                  ->where('shared_item', 'like', '%1%'); 
-                            });
-                    });
+                    ->whereIn('users.id', $members );
+                    // ->where( function($query)  {
+                    //     $query->whereIn('users.id',function($q){
+                    //             $q->select('id')->from('users')
+                    //                   ->where('reporting_to', Auth::id()); 
+                    //         })
+                    //         ->orWhereIn('users.id',function($q) {
+                    //             $q->select('shared_id')->from('shared_profiles')
+                    //               ->where('shared_with', Auth::id())
+                    //               ->where('shared_item', 'like', '%1%'); 
+                    //         });
+                    // });
         
         $users = $sql->get();
 
@@ -731,26 +772,19 @@ class MyTeamStatisticsReportController extends Controller
         $request->session()->flash('level3', $level3);
         $request->session()->flash('level4', $level4);
 
+        // To Speed up performance
+        $first_sql = SharedProfile::where('shared_with', Auth::id())
+                ->where('shared_item', 'like', '%1%')
+                ->select('shared_id');
+        $members = User::where('reporting_to', Auth::id())->select('id')
+                ->union($first_sql)
+                ->pluck('id');
+
         // Chart1 -- Overdue
         $sql_2 = User::selectRaw("users.employee_id, users.empl_record, employee_name, 
                                 employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division,
                                 employee_demo.level3_branch, employee_demo.level4,
-                        DATEDIFF (
-                            COALESCE (
-                                (select
-                                    DATE_ADD( DATE(GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )) , interval 122 + 1 day)  
-                                    from conversations A 
-                                where A.user_id = users.id
-                                    and signoff_user_id is not null      
-                                    and supervisor_signoff_id is not null)
-
-                                ,   case when users.joining_date < '2022-10-14' then 
-                                        DATE_ADD('2022-10-14', INTERVAL 
-                                        abs(((cast(users.id AS signed) % 10) - 1) * 5) + (cast(users.id AS signed) % 5) day)
-                                    else 
-                                        joining_date
-                                    end 
-                            ) 
+                        DATEDIFF ( j.next_conversation_date
                         , curdate() )
                     as overdue_in_days")
                 ->join('employee_demo', function($join) {
@@ -758,6 +792,8 @@ class MyTeamStatisticsReportController extends Controller
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
+                ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+                ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N')")
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
                 })
@@ -817,17 +853,18 @@ class MyTeamStatisticsReportController extends Controller
                 //             ->whereIn('admin_org_users.access_type', [0,2])
                 //             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 // });
-                ->where( function($query)  {
-                    $query->whereIn('id',function($q){
-                            $q->select('id')->from('users')
-                                  ->where('reporting_to', Auth::id()); 
-                        })
-                        ->orWhereIn('id',function($q) {
-                            $q->select('shared_id')->from('shared_profiles')
-                              ->where('shared_with', Auth::id())
-                              ->where('shared_item', 'like', '%2%'); 
-                        });
-                });
+                ->whereIn('users.id', $members );
+                // ->where( function($query)  {
+                //     $query->whereIn('users.id',function($q){
+                //             $q->select('id')->from('users')
+                //                   ->where('reporting_to', Auth::id()); 
+                //         })
+                //         ->orWhereIn('users.id',function($q) {
+                //             $q->select('shared_id')->from('shared_profiles')
+                //               ->where('shared_with', Auth::id())
+                //               ->where('shared_item', 'like', '%2%'); 
+                //         });
+                // });
 
         $next_due_users = $sql_2->get();
         $data = array();
@@ -852,6 +889,8 @@ class MyTeamStatisticsReportController extends Controller
             // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
             // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
         })
+        ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+        ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N')")
         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.organization', $level0->name);
         })
@@ -881,22 +920,7 @@ class MyTeamStatisticsReportController extends Controller
         //                     (select joining_date from users where id = conversations.user_id)
         //                 ) 
         //         , DATE_ADD( DATE_FORMAT(sysdate(), '%Y-%m-%d'), INTERVAL -122 day) ) < 0 ")
-        ->whereRaw("DATEDIFF (
-                        COALESCE (
-                            (select 
-                                DATE_ADD( DATE(GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )) , interval 122 + 1 day)  
-                                from conversations A 
-                            where A.user_id = users.id
-                                and signoff_user_id is not null      
-                                and supervisor_signoff_id is not null)
-
-                            ,   case when users.joining_date < '2022-10-14' then 
-                                    DATE_ADD('2022-10-14', INTERVAL 
-                                    abs(((cast(users.id AS signed) % 10) - 1) * 5) + (cast(users.id AS signed) % 5) day)
-                                else 
-                                    joining_date
-                                end 
-                        ) 
+        ->whereRaw("DATEDIFF ( j.next_conversation_date
                     , curdate() ) > 0 ")
         // ->whereExists(function ($query) {
         //     $query->select(DB::raw(1))
@@ -942,17 +966,18 @@ class MyTeamStatisticsReportController extends Controller
             $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
                   ->where('employee_demo.employee_status', 'A');
         })
-        ->where( function($query)  {
-            $query->whereIn('users.id',function($q){
-                    $q->select('id')->from('users')
-                          ->where('reporting_to', Auth::id()); 
-                })
-                ->orWhereIn('users.id',function($q) {
-                    $q->select('shared_id')->from('shared_profiles')
-                      ->where('shared_with', Auth::id())
-                      ->where('shared_item', 'like', '%2%'); 
-                });
-        });
+        ->whereIn('users.id', $members );
+        // ->where( function($query)  {
+        //     $query->whereIn('users.id',function($q){
+        //             $q->select('id')->from('users')
+        //                   ->where('reporting_to', Auth::id()); 
+        //         })
+        //         ->orWhereIn('users.id',function($q) {
+        //             $q->select('shared_id')->from('shared_profiles')
+        //               ->where('shared_with', Auth::id())
+        //               ->where('shared_item', 'like', '%2%'); 
+        //         });
+        // });
 
         $conversations = $sql->get();
 
@@ -990,6 +1015,8 @@ class MyTeamStatisticsReportController extends Controller
             // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
             // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
         })
+        ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+        ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.organization', $level0->name);
         })
@@ -1049,17 +1076,18 @@ class MyTeamStatisticsReportController extends Controller
             $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
                   ->where('employee_demo.employee_status', 'A');
         })
-        ->where( function($query)  {
-            $query->whereIn('users.id',function($q){
-                    $q->select('id')->from('users')
-                          ->where('reporting_to', Auth::id()); 
-                })
-                ->orWhereIn('users.id',function($q) {
-                    $q->select('shared_id')->from('shared_profiles')
-                      ->where('shared_with', Auth::id())
-                      ->where('shared_item', 'like', '%2%'); 
-                });
-        })
+        ->whereIn('users.id', $members )
+        // ->where( function($query)  {
+        //     $query->whereIn('users.id',function($q){
+        //             $q->select('id')->from('users')
+        //                   ->where('reporting_to', Auth::id()); 
+        //         })
+        //         ->orWhereIn('users.id',function($q) {
+        //             $q->select('shared_id')->from('shared_profiles')
+        //               ->where('shared_with', Auth::id())
+        //               ->where('shared_item', 'like', '%2%'); 
+        //         });
+        // })
         ->get();
 
         foreach($topics as $topic)
@@ -1084,46 +1112,28 @@ class MyTeamStatisticsReportController extends Controller
         $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
         $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
 
+        // To Speed up performance
+        $first_sql = SharedProfile::where('shared_with', Auth::id())
+                            ->where('shared_item', 'like', '%1%')
+                            ->select('shared_id');
+        $members = User::where('reporting_to', Auth::id())->select('id')
+                            ->union($first_sql)
+                            ->pluck('id');
+
         // SQL - Chart 1
         $sql_chart1 = User::selectRaw("users.*, employee_demo.employee_name, 
                         employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
-                    DATEDIFF (
-                        COALESCE (
-                            (select 
-                                DATE_ADD( DATE(GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )) , interval 122 + 1 day)  
-                                from conversations A 
-                            where A.user_id = users.id
-                                and signoff_user_id is not null      
-                                and supervisor_signoff_id is not null)
-
-                            ,   case when users.joining_date < '2022-10-14' then 
-                                    DATE_ADD('2022-10-14', INTERVAL 
-                                    abs(((cast(users.id AS signed) % 10) - 1) * 5) + (cast(users.id AS signed) % 5) day)
-                                else 
-                                    joining_date
-                                end 
-                        ) 
-                    , curdate() )
+                    DATEDIFF ( j.next_conversation_date
+                            , curdate() )
                     as overdue_in_days,
-                    COALESCE (
-                        (select 
-                            DATE_ADD( DATE(GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )) , interval 122 + 1 day)  
-                            from conversations A 
-                                where A.user_id = users.id
-                                    and signoff_user_id is not null      
-                                    and supervisor_signoff_id is not null)
-                        ,    case when users.joining_date < '2022-10-14' then 
-                                DATE_ADD('2022-10-14', INTERVAL 
-                                abs(((cast(users.id AS signed) % 10) - 1) * 5) + (cast(users.id AS signed) % 5) day)
-                            else 
-                                joining_date
-                            end 
-                    ) as next_due_date")
+                    j.next_conversation_date as next_due_date")
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.guid', '=', 'users.guid');
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
+                ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+                ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
                 })
@@ -1183,35 +1193,23 @@ class MyTeamStatisticsReportController extends Controller
                 //             ->whereIn('admin_org_users.access_type', [0,2])
                 //             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 // });
-                ->where( function($query)  {
-                    $query->whereIn('id',function($q){
-                            $q->select('id')->from('users')
-                                  ->where('reporting_to', Auth::id()); 
-                        })
-                        ->orWhereIn('id',function($q) {
-                            $q->select('shared_id')->from('shared_profiles')
-                              ->where('shared_with', Auth::id())
-                              ->where('shared_item', 'like', '%2%'); 
-                        });
-                });
+                ->whereIn('users.id', $members );
+                // ->where( function($query)  {
+                //     $query->whereIn('users.id',function($q){
+                //             $q->select('id')->from('users')
+                //                   ->where('reporting_to', Auth::id()); 
+                //         })
+                //         ->orWhereIn('users.id',function($q) {
+                //             $q->select('shared_id')->from('shared_profiles')
+                //               ->where('shared_with', Auth::id())
+                //               ->where('shared_item', 'like', '%2%'); 
+                //         });
+                // });
                 
         // SQL - Chart 2
-        $sql_chart2 = Conversation::selectRaw("conversations.*, users.employee_id, employee_demo.employee_name, 
+        $sql_chart2 = Conversation::selectRaw("conversations.*, users.employee_id, employee_demo.employee_name, users.email,
                         employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
-                        COALESCE (
-                            (select 
-                                DATE_ADD( DATE(GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )) , interval 122 + 1 day)  
-                                from conversations A 
-                                    where A.user_id = users.id
-                                        and signoff_user_id is not null      
-                                        and supervisor_signoff_id is not null)
-                            ,    case when (select joining_date from users where id = conversations.user_id) < '2022-10-14' then 
-                                    DATE_ADD('2022-10-14', INTERVAL 
-                                    abs(((cast(users.id AS signed) % 10) - 1) * 5) + (cast(users.id AS signed) % 5) day)
-                                else 
-                                    (select joining_date from users where id = conversations.user_id)
-                                end 
-                        ) as next_due_date")
+                        j.next_conversation_date as next_due_date")
                 // ->whereIn('id', $selected_ids)
                 // ->whereRaw("DATEDIFF (
                 //     COALESCE (
@@ -1223,23 +1221,8 @@ class MyTeamStatisticsReportController extends Controller
                 //             (select joining_date from users where id = conversations.user_id)
                 //         ) 
                 // , DATE_ADD( DATE_FORMAT(sysdate(), '%Y-%m-%d'), INTERVAL -122 day) ) < 0 ")
-                ->whereRaw("DATEDIFF (
-                    COALESCE (
-                        (select 
-                            DATE_ADD( DATE(GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )) , interval 122 + 1 day)  
-                            from conversations A 
-                        where A.user_id = users.id
-                            and signoff_user_id is not null      
-                            and supervisor_signoff_id is not null)
-
-                        ,   case when users.joining_date < '2022-10-14' then 
-                                DATE_ADD('2022-10-14', INTERVAL 
-                                abs(((cast(users.id AS signed) % 10) - 1) * 5) + (cast(users.id AS signed) % 5) day)
-                            else 
-                                joining_date
-                            end 
-                    ) 
-                , curdate() ) > 0 ")
+                ->whereRaw("DATEDIFF ( j.next_conversation_date
+                            , curdate() ) > 0 ")
                 ->where(function ($query)  {
                     return $query->whereNull('signoff_user_id')
                                  ->orwhereNull('supervisor_signoff_id');
@@ -1250,6 +1233,8 @@ class MyTeamStatisticsReportController extends Controller
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
+                ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+                ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
                 })
@@ -1312,44 +1297,34 @@ class MyTeamStatisticsReportController extends Controller
                 //             ->whereIn('admin_org_users.access_type', [0,2])
                 //             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 // })
-                ->where( function($query)  {
-                    $query->whereIn('id',function($q){
-                            $q->select('id')->from('users')
-                                  ->where('reporting_to', Auth::id()); 
-                        })
-                        ->orWhereIn('id',function($q) {
-                            $q->select('shared_id')->from('shared_profiles')
-                              ->where('shared_with', Auth::id())
-                              ->where('shared_item', 'like', '%2%'); 
-                        });
-                })
+                ->whereIn('users.id', $members )
+                // ->where( function($query)  {
+                //     $query->whereIn('users.id',function($q){
+                //             $q->select('id')->from('users')
+                //                   ->where('reporting_to', Auth::id()); 
+                //         })
+                //         ->orWhereIn('users.id',function($q) {
+                //             $q->select('shared_id')->from('shared_profiles')
+                //               ->where('shared_with', Auth::id())
+                //               ->where('shared_item', 'like', '%2%'); 
+                //         });
+                // })
                 ->with('topic:id,name')
                 ->with('signoff_user:id,name')
                 ->with('signoff_supervisor:id,name');
 
          // SQL for Chart 3
-         $sql_chart3 = Conversation::selectRaw("conversations.*, users.employee_id, employee_demo.employee_name, 
+         $sql_chart3 = Conversation::selectRaw("conversations.*, users.employee_id, employee_demo.employee_name, users.email,
                     employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
-                    COALESCE (
-                        (select 
-                            DATE_ADD( DATE(GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )) , interval 122 + 1 day)  
-                            from conversations A 
-                                where A.user_id = users.id
-                                    and signoff_user_id is not null      
-                                    and supervisor_signoff_id is not null)
-                        ,    case when (select joining_date from users where id = conversations.user_id) < '2022-10-14' then 
-                                DATE_ADD('2022-10-14', INTERVAL 
-                                abs(((cast(users.id AS signed) % 10) - 1) * 5) + (cast(users.id AS signed) % 5) day)
-                            else 
-                                (select joining_date from users where id = conversations.user_id)
-                            end 
-                    ) as next_due_date")
+                    j.next_conversation_date as next_due_date")
             ->join('users', 'users.id', 'conversations.user_id') 
             ->join('employee_demo', function($join) {
                 $join->on('employee_demo.guid', '=', 'users.guid');
                 // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
             })
+            ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+            ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
             ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                 return $q->where('employee_demo.organization', $level0->name);
             })
@@ -1416,17 +1391,18 @@ class MyTeamStatisticsReportController extends Controller
             //             ->whereIn('admin_org_users.access_type', [0,2])
             //             ->where('admin_org_users.granted_to_id', '=', Auth::id());
             // })
-            ->where( function($query)  {
-                $query->whereIn('id',function($q){
-                        $q->select('id')->from('users')
-                              ->where('reporting_to', Auth::id()); 
-                    })
-                    ->orWhereIn('id',function($q) {
-                        $q->select('shared_id')->from('shared_profiles')
-                          ->where('shared_with', Auth::id())
-                          ->where('shared_item', 'like', '%2%'); 
-                    });
-            })
+            ->whereIn('users.id', $members )
+            // ->where( function($query)  {
+            //     $query->whereIn('users.id',function($q){
+            //             $q->select('id')->from('users')
+            //                   ->where('reporting_to', Auth::id()); 
+            //         })
+            //         ->orWhereIn('users.id',function($q) {
+            //             $q->select('shared_id')->from('shared_profiles')
+            //               ->where('shared_with', Auth::id())
+            //               ->where('shared_item', 'like', '%2%'); 
+            //         });
+            // })
             ->with('topic:id,name')
             ->with('signoff_user:id,name')
             ->with('signoff_supervisor:id,name')
@@ -1626,6 +1602,13 @@ class MyTeamStatisticsReportController extends Controller
         $request->session()->flash('level3', $level3);
         $request->session()->flash('level4', $level4);
 
+		// To Speed up performance
+        $first_sql = SharedProfile::where('shared_with', Auth::id())
+                                    ->where('shared_item', 'like', '%1%')
+                                    ->select('shared_id');
+        $members = User::where('reporting_to', Auth::id())->select('id')
+                                    ->union($first_sql)
+                                    ->pluck('id');
 
         $sql = User::selectRaw("users.employee_id, users.empl_record,
                 case when (select count(*) from shared_profiles A where A.shared_id = users.id) > 0 then 'Yes' else 'No' end as shared")
@@ -1634,6 +1617,8 @@ class MyTeamStatisticsReportController extends Controller
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
+                ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+                ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
                 })
@@ -1695,17 +1680,18 @@ class MyTeamStatisticsReportController extends Controller
                 // })
                 // ->join('admin_org_users', 'users.id', 'admin_org_users.allowed_user_id')
                 // ->where('admin_org_users.granted_to_id', '=', Auth::id())
-                ->where( function($query)  {
-                    $query->whereIn('id',function($q){
-                            $q->select('id')->from('users')
-                                  ->where('reporting_to', Auth::id()); 
-                        })
-                        ->orWhereIn('id',function($q) {
-                            $q->select('shared_id')->from('shared_profiles')
-                              ->where('shared_with', Auth::id());
-                        });
-                })
-                ;
+                ->whereIn('users.id', $members );
+                // ->where( function($query)  {
+                //     $query->whereIn('users.id',function($q){
+                //             $q->select('id')->from('users')
+                //                   ->where('reporting_to', Auth::id()); 
+                //         })
+                //         ->orWhereIn('users.id',function($q) {
+                //             $q->select('shared_id')->from('shared_profiles')
+                //               ->where('shared_with', Auth::id());
+                //         });
+                // })
+                // ;
 
 // dd([$sql->toSql(), $sql->getBindings() ] );
         $users = $sql->get();
@@ -1739,6 +1725,13 @@ class MyTeamStatisticsReportController extends Controller
         $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
         $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
 
+		// To Speed up performance
+        $first_sql = SharedProfile::where('shared_with', Auth::id())
+                                    ->where('shared_item', 'like', '%1%')
+                                    ->select('shared_id');
+        $members = User::where('reporting_to', Auth::id())->select('id')
+                                    ->union($first_sql)
+                                    ->pluck('id');        
 
       $selected_ids = $request->ids ? explode(',', $request->ids) : [];
 
@@ -1751,6 +1744,8 @@ class MyTeamStatisticsReportController extends Controller
                 // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
             })
+            ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+            ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
             ->when( $request->legend == 'Yes', function($q) use($request) {
                 $q->whereRaw(" (select count(*) from shared_profiles A where A.shared_id = users.id) > 0 ");
             }) 
@@ -1816,16 +1811,17 @@ class MyTeamStatisticsReportController extends Controller
             //             ->whereIn('admin_org_users.access_type', [0])
             //             ->where('admin_org_users.granted_to_id', '=', Auth::id());
             // })
-            ->where( function($query)  {
-                $query->whereIn('id',function($q){
-                        $q->select('id')->from('users')
-                              ->where('reporting_to', Auth::id()); 
-                    })
-                    ->orWhereIn('id',function($q) {
-                        $q->select('shared_id')->from('shared_profiles')
-                          ->where('shared_with', Auth::id());
-                    });
-            })
+            ->whereIn('users.id', $members )
+            // ->where( function($query)  {
+            //     $query->whereIn('users.id',function($q){
+            //             $q->select('id')->from('users')
+            //                   ->where('reporting_to', Auth::id()); 
+            //         })
+            //         ->orWhereIn('users.id',function($q) {
+            //             $q->select('shared_id')->from('shared_profiles')
+            //               ->where('shared_with', Auth::id());
+            //         });
+            // })
             ->with('sharedWith');
 
 
@@ -1893,17 +1889,28 @@ class MyTeamStatisticsReportController extends Controller
         $request->session()->flash('level3', $level3);
         $request->session()->flash('level4', $level4);
 
+		// To Speed up performance
+        $first_sql = SharedProfile::where('shared_with', Auth::id())
+                                    ->where('shared_item', 'like', '%1%')
+                                    ->select('shared_id');
+        $members = User::where('reporting_to', Auth::id())->select('id')
+                                    ->union($first_sql)
+                                    ->pluck('id');
+
         $sql = User::selectRaw("users.employee_id, users.empl_record, 
                     employee_name, employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division,
                     employee_demo.level3_branch, employee_demo.level4,
                     case when date(SYSDATE()) not between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01') 
                             and employee_demo.employee_status = 'A'
+                            and j.due_date_paused = 'N'
                         then 'No' else 'Yes' end as excused")
                     ->join('employee_demo', function($join) {
                          $join->on('employee_demo.guid', '=', 'users.guid');
                         // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                         // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                     })
+                    ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+                    ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) ")
                     ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                         return $q->where('employee_demo.organization', $level0->name);
                     })
@@ -1959,16 +1966,17 @@ class MyTeamStatisticsReportController extends Controller
                     //             ->whereIn('admin_org_users.access_type', [0])
                     //             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                     // });
-                    ->where( function($query)  {
-                        $query->whereIn('id',function($q){
-                                $q->select('id')->from('users')
-                                      ->where('reporting_to', Auth::id()); 
-                            })
-                            ->orWhereIn('id',function($q) {
-                                $q->select('shared_id')->from('shared_profiles')
-                                  ->where('shared_with', Auth::id());
-                            });
-                    });
+                    ->whereIn('users.id', $members );
+                    // ->where( function($query)  {
+                    //     $query->whereIn('users.id',function($q){
+                    //             $q->select('id')->from('users')
+                    //                   ->where('reporting_to', Auth::id()); 
+                    //         })
+                    //         ->orWhereIn('users.id',function($q) {
+                    //             $q->select('shared_id')->from('shared_profiles')
+                    //               ->where('shared_with', Auth::id());
+                    //         });
+                    // });
                  
         $users = $sql->get();
 
@@ -2003,6 +2011,14 @@ class MyTeamStatisticsReportController extends Controller
         $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
         $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
 
+        // To Speed up performance
+        $first_sql = SharedProfile::where('shared_with', Auth::id())
+                ->where('shared_item', 'like', '%1%')
+                ->select('shared_id');
+        $members = User::where('reporting_to', Auth::id())->select('id')
+                ->union($first_sql)
+                ->pluck('id');
+
       $selected_ids = $request->ids ? explode(',', $request->ids) : [];
 
       $sql = User::selectRaw("users.employee_id, users.email, users.excused_start_date, users.excused_end_date,
@@ -2010,12 +2026,15 @@ class MyTeamStatisticsReportController extends Controller
                     employee_demo.employee_name, employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
                     case when date(SYSDATE()) not between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01') 
                             and employee_demo.employee_status = 'A'
+                            and j.due_date_paused = 'N'
                             then 'No' else 'Yes' end as excused")
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.guid', '=', 'users.guid');
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
+                ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+                ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) ")
                 ->when( $request->legend == 'Yes', function($q) use($request) {
                     $q->whereRaw(" ( date(SYSDATE()) between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01')) or employee_demo.employee_status <> 'A' ");
                 }) 
@@ -2077,16 +2096,17 @@ class MyTeamStatisticsReportController extends Controller
                 //             ->whereIn('admin_org_users.access_type', [0])
                 //             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 // })
-                ->where( function($query)  {
-                    $query->whereIn('id',function($q){
-                            $q->select('id')->from('users')
-                                  ->where('reporting_to', Auth::id()); 
-                        })
-                        ->orWhereIn('id',function($q) {
-                            $q->select('shared_id')->from('shared_profiles')
-                              ->where('shared_with', Auth::id());
-                        });
-                })
+                ->whereIn('users.id', $members )
+                // ->where( function($query)  {
+                //     $query->whereIn('users.id',function($q){
+                //             $q->select('id')->from('users')
+                //                   ->where('reporting_to', Auth::id()); 
+                //         })
+                //         ->orWhereIn('users.id',function($q) {
+                //             $q->select('shared_id')->from('shared_profiles')
+                //               ->where('shared_with', Auth::id());
+                //         });
+                // })
                 ->with('excuseReason') ;
 
         $users = $sql->get();
