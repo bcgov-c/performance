@@ -33,7 +33,7 @@ class SharedEmployeeDataTable extends DataTable
                 return view('my-team.partials.link-to-profile', compact(['row', 'text']));
             })->addColumn('nextConversationDue', function ($row) {
                 $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
-                if (isset($jr->excused_type) && $jr->excused_type == 'A') {
+                if ($jr->excused_type) {
                     if ($jr->excused_type == 'A') {
                         $text = 'Paused';
                         $landingPage = 'conversation.templates';
@@ -45,7 +45,7 @@ class SharedEmployeeDataTable extends DataTable
                     $landingPage = 'conversation.templates';
                     return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
                 }
-                if (isset($jr->next_conversation_date) && $jr->next_conversation_date) {
+                if ($jr->next_conversation_date) {
                     $text = Carbon::parse($jr->next_conversation_date)->format('M d, Y');
                     $landingPage = 'conversation.templates';
                     return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
@@ -65,7 +65,7 @@ class SharedEmployeeDataTable extends DataTable
                 ]);
                 if ($jr) {
                     $current_status = $jr->current_employee_status;
-                    if (isset($jr->next_conversation_date) && $jr->excused_type) {
+                    if ($jr->excused_type) {
                         $excused_type = $jr->excused_type;
                         if ($jr->excused_type == 'A') {
                             $yesOrNo = 'Auto';
