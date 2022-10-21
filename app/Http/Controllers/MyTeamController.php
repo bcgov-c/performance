@@ -107,7 +107,12 @@ class MyTeamController extends Controller
             [ "id" => 1, "name" => 'Yes' ],
         ];
 
-        return view('my-team/my-employees',compact('goals', 'tags', 'employees', 'employees_list', 'goaltypes', 'type_desc_str', 'conversationTopics', 'type', 'myEmpTable', 'sharedEmpTable', 'eReasons', 'eReasons2', 'showSignoff', 'yesOrNo', 'ClassificationArray'));
+        $yesOrNo2 = [
+            [ "id" => 0, "name" => 'No' ],
+            [ "id" => 1, "name" => 'Yes' ],
+        ];
+
+        return view('my-team/my-employees',compact('goals', 'tags', 'employees', 'employees_list', 'goaltypes', 'type_desc_str', 'conversationTopics', 'type', 'myEmpTable', 'sharedEmpTable', 'eReasons', 'eReasons2', 'showSignoff', 'yesOrNo', 'yesOrNo2', 'ClassificationArray'));
         // return $myEmployeesDataTable->render('my-team/my-employees',compact('goals', 'employees', 'goaltypes', 'conversationTopics', 'participants', 'type'));
     }
 
