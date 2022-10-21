@@ -33,10 +33,12 @@ class SharedEmployeeDataTable extends DataTable
                 return view('my-team.partials.link-to-profile', compact(['row', 'text']));
             })->addColumn('nextConversationDue', function ($row) {
                 $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
-                if ($jr->excused_type == 'A') {
-                    $text = 'Paused';
-                    $landingPage = 'conversation.templates';
-                    return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
+                if ($jr->excused_type) {
+                    if ($jr->excused_type == 'A') {
+                        $text = 'Paused';
+                        $landingPage = 'conversation.templates';
+                        return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
+                    }
                 }
                 if ($row->excused_flag) {
                     $text = 'Paused';
@@ -55,14 +57,16 @@ class SharedEmployeeDataTable extends DataTable
             })
             ->addColumn('excused_flag', function ($row) {
                 $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
-                $excused_type = $jr->excused_type;
-                $current_status = $jr->current_employee_status;
+                $excused_type = '';
+                $current_status = '';
                 $excused = json_encode([
                     'excused_flag' => $row->excused_flag,
                     'reason_id' => $row->excused_reason_id
                 ]);
                 if ($jr) {
+                    $current_status = $jr->current_employee_status;
                     if ($jr->excused_type) {
+                        $excused_type = $jr->excused_type;
                         if ($jr->excused_type == 'A') {
                             $yesOrNo = 'Auto';
                             return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo", "excused_type", "current_status"]));

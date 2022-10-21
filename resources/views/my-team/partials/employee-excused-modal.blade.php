@@ -19,17 +19,20 @@
                     @csrf
                     <input type="hidden" name="user_id" value="">
                     <div class="row">
-                        <div class="col-2 mt-1">
-                            <x-dropdown :list="$yesOrNo" label="Excused" name="excused_flag" value=""/>
+                        <div class="col-2 mt-1" id="divExcused1">
+                            <x-dropdown :list="$yesOrNo" label="Excused" name="excused_flag" id="excused_flag" value=""/>
+                        </div>
+                        <div class="col-2 mt-1" id="divExcused2">
+                            <x-dropdown :list="$yesOrNo2" label="Excused" name="excused_flag2" id="excused_flag2" value=""/>
                         </div>
                         <div class="col-10 mt-1" id="divReason1">
-                            <x-dropdown :list="$eReasons" label="Reason" name="excused_reason_id" value=""/>
+                            <x-dropdown :list="$eReasons" label="Reason" name="excused_reason_id" id="excused_reason_id" value=""/>
                         </div>
                         <div class="col-10 mt-1" id="divReason2">
-                            <x-dropdown :list="$eReasons2" label="Reason" name="excused_reason_id2" value=""/>
+                            <x-dropdown :list="$eReasons2" label="Reason" name="excused_reason_id2" id="excused_reason_id2" value=""/>
                         </div>
                         <div class="col-12 text-left pb-5 mt-3">
-                            <x-button type="button" class="btn-md btn-submit" name="excused_update_btn" >Update</x-button>
+                            <x-button type="button" class="btn-md btn-submit" name="excused_update_btn" id="excused_update_btn">Update</x-button>
                         </div>
                     </div>
                 </form>
