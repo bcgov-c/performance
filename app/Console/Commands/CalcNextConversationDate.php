@@ -124,7 +124,7 @@ class CalcNextConversationDate extends Command
                 $prevPause = null;
                 $prevDate = null;
                 $lastDateCalculated = false;
-                $excused_updated_by = $DefaultCreatorName;
+                $excused_updated_by = '';
                 $excused_updated_at = null;
                 if ($demo->guid) {
                     // YES GUID
