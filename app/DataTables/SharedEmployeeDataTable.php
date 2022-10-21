@@ -65,7 +65,7 @@ class SharedEmployeeDataTable extends DataTable
                 ]);
                 if ($jr) {
                     $current_status = $jr->current_employee_status;
-                    if (isset($jr->next_conversation_date) && $jr->excused_type) {
+                    if (isset($jr->excused_type) && $jr->excused_type) {
                         $excused_type = $jr->excused_type;
                         if ($jr->excused_type == 'A') {
                             $yesOrNo = 'Auto';
