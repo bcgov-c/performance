@@ -237,6 +237,7 @@ class ExcuseEmployeesController extends Controller
             ->whereRAW("j.id = (select min(n.id) from employee_demo_jr n where n.guid = k.guid and n.id < k.id and not n.excused_type is null)")
             ->whereRAW("not exists (select x.id from employee_demo_jr x where x.guid = j.guid and x.id > j.id and x.id < k.id and x.excused_type is null)")
             ->leftjoin('users as n', 'n.id', 'j.updated_by_id')
+            ->leftjoin('excused_reasons as r', 'r.id', 'u.excused_reason_id')            
             ->distinct()
             ->when($level0, function($q) use($level0) {$q->where('employee_demo.organization', $level0->name);})
             ->when($level1, function($q) use($level1) {$q->where('employee_demo.level1_program', $level1->name);})
@@ -268,8 +269,14 @@ class ExcuseEmployeesController extends Controller
                 , n.name as updated_name
                 , k.created_at as k_created_at
                 , k.excused_type as k_excused_type
-                , case when j.excused_type = 'A' then 'Auto' else case when j.excused_type = 'M' then 'Manual' else 'No' end end as excusedtype
-                , case when j.excused_type = 'A' then 'System' else n.name end as n_name
+                , case when j.excused_type = 'A' then case when j.current_employee_status = 'A' then 2 else 1 end else u.excused_reason_id end as reason_id
+                , case when j.excused_type = 'A' then case when j.current_employee_status = 'A' then 'Classification' else 'PeopleSoft Status' end else case when j.current_manual_excuse = 'Y' then r.name else '' end end as reason_name
+                , case when j.excused_type = 'A' then 'Auto' else case when u.excused_flag = 1 then 'Manual' else 'No' end end as excusedtype
+                , case when j.excused_type = 'A' then 'Auto' else case when u.excused_flag = 1 then 'Manual' else 'No' end end as excusedlink
+                , case when j.excused_type = 'A' then 'System' else case when n.name = '' then n.name else j.updated_by_id end end as n_name
+                , '' as created_at_string
+                , '' as startdate_string
+                , '' as enddate_string
                 ")
             ->orderBy('u.employee_id');
             // echo $query->toSQL();
@@ -278,28 +285,18 @@ class ExcuseEmployeesController extends Controller
             ->editColumn('employee_demo.employee_name', function($row) {
                 return $row->employee_name ? $row->employee_name : $row->name;
             })
-            ->editColumn('updated_name', function($row) {
-                return $row->j_excused_type == 'A' ? 'System' : ($row->updated_name ?? $row->id);
+            ->editColumn('startdate_string', function($row) {
+                return Carbon::parse($row->j_created_at)->format('M d, Y');
             })
-            ->editColumn('j_excused_type', function($row) {
-                if ($row->j_excused_type == 'A') {
-                    return 'Auto';
+            ->editColumn('enddate_string', function($row) {
+                $preStart = Carbon::parse($row->j_created_at)->format('M d, Y');
+                $preEnd = Carbon::parse($row->k_created_at)->format('M d, Y');
+                $preEnd = Carbon::parse($row->k_created_at)->subdays(1);
+                if ($preEnd < $preStart) {
+                    $preEnd = $preStart;
                 }
-                if ($row->j_excused_type == 'M' ) {
-                    return 'Manual';
-                }
-                return '';
+                return Carbon::parse($preEnd)->format('M d, Y');
             })
-            ->editColumn('k_excused_type', function($row) {
-                if ($row->k_excused_type == 'A') {
-                    return 'Auto';
-                }
-                if ($row->k_excused_type == 'M' ) {
-                    return 'Manual';
-                }
-                return '';
-            })
-            // ->rawColumns(['excused_status'])
             ->make(true);
         }
     }
@@ -479,7 +476,7 @@ class ExcuseEmployeesController extends Controller
             $sql = clone $demoWhere; 
 
             $employees = $sql->leftjoin('excused_reasons as r', 'r.id', 'users.excused_reason_id')
-            ->leftjoin('users as ub', 'ub.id', 'j.updated_by_id')
+            ->leftjoin('users as n', 'n.id', 'j.updated_by_id')
             ->selectRAW("
                 users.id
                 , users.guid
@@ -505,11 +502,14 @@ class ExcuseEmployeesController extends Controller
                 , j.created_by_id
                 , j.updated_by_id
                 , j.updated_at
-                , ub.name as excusedbyname
+                , j.created_at as j_created_at
+                , n.name as excusedbyname
                 , case when j.excused_type = 'A' then case when j.current_employee_status = 'A' then 2 else 1 end else users.excused_reason_id end as reason_id
                 , case when j.excused_type = 'A' then case when j.current_employee_status = 'A' then 'Classification' else 'PeopleSoft Status' end else case when j.current_manual_excuse = 'Y' then r.name else '' end end as reason_name
                 , case when j.excused_type = 'A' then 'Auto' else case when users.excused_flag = 1 then 'Manual' else 'No' end end as excusedtype
                 , case when j.excused_type = 'A' then 'Auto' else case when users.excused_flag = 1 then 'Manual' else 'No' end end as excusedlink
+                , case when j.excused_type = 'A' then 'System' else case when n.name = '' then n.name else j.updated_by_id end end as n_name
+                , '' as created_at_string
                 ");
 
             return Datatables::of($employees)
@@ -524,13 +524,8 @@ class ExcuseEmployeesController extends Controller
                         return '';
                     }
                 })
-                ->editColumn('j.created_by_id', function($row) {
-                    if($row->excused_type == 'A' || $row->current_manual_excuse == 'Y') {
-                        $datestr = Carbon::parse($row->updated_at)->format('M d, Y');
-                        return $datestr;
-                    } else {
-                        return '';
-                    }
+                ->editColumn('created_at_string', function($row) {
+                    return Carbon::parse($row->j_created_at)->format('M d, Y');
                 })
                 ->editColumn('excusedlink', function($row) {
                     $text = $row->excusedlink;

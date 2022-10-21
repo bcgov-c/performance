@@ -333,18 +333,22 @@
                 $("#employee-excused-modal").find(".user-name").html(userName);
                 $("#employee-excused-modal").find("input[name=user_id]").val($(this).data('user-id'));
                 $("#employee-excused-modal").find("select[name=excused_flag]").val($(this).data("user-row").excused_flag ?? 0);
+                $("#employee-excused-modal").find("select[name=excused_flag2]").val(1);
                 $("#employee-excused-modal").find("select[name=excused_reason_id]").val($(this).data("user-row").excused_reason_id ?? 3);
+                $("#employee-excused-modal").find("select[name=excused_flag2]").attr('disabled', true);
                 $("#employee-excused-modal").find("select[name=excused_reason_id2]").attr('disabled', true);
                 if ($(this).data("excused-type") == 'A') {
                     $("#employee-excused-modal").find("select[name=excused_reason_id2]").val($(this).data("current-status") == 'A' ? 2 : 1);
-                    $("#employee-excused-modal").find("select[name=excused_flag]").attr('disabled', true);
                     $("#employee-excused-modal").find("select[name=excused_reason_id]").attr('disabled', true);
+                    $("#divExcused1").hide();
+                    $("#divExcused2").show();
                     $("#divReason1").hide();
                     $("#divReason2").show();
                     $("#employee-excused-modal").find("button[name=excused_update_btn]").attr('disabled', true);
                 } else {
-                    $("#employee-excused-modal").find("select[name=excused_flag]").attr('disabled', false);
                     $("#employee-excused-modal").find("select[name=excused_reason_id]").attr('disabled', false);
+                    $("#divExcused1").show();
+                    $("#divExcused2").hide();
                     $("#divReason1").show();
                     $("#divReason2").hide();
                     $("#employee-excused-modal").find("button[name=excused_update_btn]").attr('disabled', false);

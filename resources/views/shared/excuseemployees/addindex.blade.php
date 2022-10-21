@@ -494,7 +494,6 @@
                 $("#editModal").find("select[name=excused_reason_id2]").attr('disabled', true);
                 if (excused_type == 'A') {
                     $("#editModal").find("select[name=excused_reason_id2]").val(current_status == 'A' ? 2 : 1);
-                    // $("#editModal").find("select[name=excused_flag]").attr('disabled', true);
                     $("#editModal").find("select[name=excused_reason_id]").attr('disabled', true);
                     $("#divReason1").hide();
                     $("#divReason2").show();
@@ -502,7 +501,6 @@
                     $("#divExcuse2").show();
                     $("#editModal").find("button[name=saveExcuseButton]").attr('disabled', true);
                 } else {
-                    // $("#editModal").find("select[name=excused_flag]").attr('disabled', false);
                     $("#editModal").find("select[name=excused_reason_id]").attr('disabled', false);
                     $("#divReason1").show();
                     $("#divReason2").hide();
