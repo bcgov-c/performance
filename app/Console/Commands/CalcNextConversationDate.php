@@ -353,6 +353,12 @@ class CalcNextConversationDate extends Command
                 echo 'Processed '.$counter.'.  Updated '.$updatecounter.'.'; echo "\r";
             }
         });
+
+        // Note: for speeding up performance, update 'Next conversation Due' and 'due_date_paused' in users table
+        $this->info( 'Update users table - start: '. now() );
+        $this->updateUsersTable();
+        $this->info( 'Update users table - end : '. now() );
+        
         echo 'Processed '.$counter.'.  Updated '.$updatecounter.'.'; echo "\r\n";
         DB::table('stored_dates')->updateOrInsert(
             [
@@ -380,5 +386,21 @@ class CalcNextConversationDate extends Command
         $this->info('CalcNextConversationDate, Completed: '.$end_time);
         // Log::info($end_time->format('c').' - '.$processname.' - Finished');
     } 
+ 
     
+    protected function updateUsersTable() {
+
+        User::where('guid', '<>', '')
+            ->update([
+                'next_conversation_date' => DB::raw(" (select next_conversation_date from employee_demo_jr j1 
+	                                        where id = (select max(id) from employee_demo_jr j2 where j1.guid = j2.guid)
+	                                                and users.guid = guid)" ),
+
+	            'due_date_paused' =>  DB::raw(" (select due_date_paused from employee_demo_jr j1 
+	                                    where id = (select max(id) from employee_demo_jr j2 where j1.guid = j2.guid)
+	                                        and users.guid = guid)" )
+            ]); 
+
+    }
+
 }
