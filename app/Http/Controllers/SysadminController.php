@@ -876,15 +876,6 @@ class SysadminController extends Controller
     } 
     
     public function switchIdentity(Request $request) {
-                $employee_info = DB::table('employee_demo')
-                    ->select('employee_first_name', 'employee_last_name')
-                    ->where('employee_email','=','RKing@oipc.bc.ca')
-                    ->whereNotNull('employee_id')
-                    ->get();
-        
-        print_r($employee_info);
-        
-        
             $user = auth()->user();
             $switched_userid = $user->id;
             
