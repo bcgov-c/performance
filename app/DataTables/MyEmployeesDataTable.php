@@ -105,7 +105,7 @@ class MyEmployeesDataTable extends DataTable
      */
     public function query(User $model)
     {
-        $reporting_users = User::find($this->id)->getReportingUserIds();
+        $reporting_users = User::find($this->id)->getAvailableReportingUserIds();
         return $model->newQuery()->whereIn('id', $reporting_users)
             ->withCount('activeGoals')
             ->with('upcomingConversation')
