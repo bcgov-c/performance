@@ -161,17 +161,9 @@ class User extends Authenticatable
     public function reportees() {
         return $this->hasMany('App\Models\User', 'reporting_to');
     }
-    
-    public function available_reportees() {
-        return $this->reportees()->whereNotNull('guid');
-    }
 
     public function reporteesCount() {
         return $this->reportees()->count();
-    }
-    
-    public function available_reporteesCount() {
-        return $this->available_reportees()->count();
     }
 
     public function hasSupervisorRole() {
@@ -197,10 +189,6 @@ class User extends Authenticatable
 
     public function getReportingUserIds() {
         return $this->reportees()->pluck('id');
-    }
-    
-    public function getAvailableReportingUserIds() {
-        return $this->available_reportees()->pluck('id');
     }
 
     public function reportingTos() {
