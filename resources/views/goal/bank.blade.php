@@ -165,8 +165,8 @@
                     const goalId = $(this).data('goal-id');
                     const selectDropdown = this;
                     $(this).multiselect({
-                        allSelectedText: 'All Direct Report',
-                        selectAllText: 'All Direct Report',
+                        allSelectedText: 'All',
+                        selectAllText: 'All',
                         includeSelectAllOption: true,
                         onDropdownHide: function () {
                             document.getElementById("syncGoalSharingData").innerHTML = "";
