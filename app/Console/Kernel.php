@@ -60,8 +60,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:NotifyConversationDue')    
         ->timezone('America/Vancouver')
         // ->dailyAt('02:30')
-        ->hourlyAt(30)
-        ->between('08:00', '22:00');
+        // ->hourlyAt(30)
+        ->everyTenMinutes()
+        ->between('08:00', '22:00')
+        ->onOneServer();
 
         $schedule->command('notify:daily')
         ->dailyAt('08:00');
