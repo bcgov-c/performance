@@ -179,6 +179,7 @@
             }
         });
         $("#add-goal-to-library-form").on('submit', function (e) {
+            $('#savebtn').prop('disabled', true);
             e.preventDefault();
             for (var i in CKEDITOR.instances){
                 CKEDITOR.instances[i].updateElement();
@@ -195,6 +196,7 @@
                     }
                 },
                 error: function (error){
+                    $('#savebtn').prop('disabled', false);
                     var errors = error.responseJSON.errors;
                     $('.alert-danger').show();
                     $('.modal-body').animate({scrollTop: 0},100);
