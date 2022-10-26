@@ -26,8 +26,8 @@ Create a goal for your employees to use in their own profile. Goals can be sugge
         $("#addGoalToLibraryModal").modal('show');
     });
     $(".items-to-share").multiselect({
-        allSelectedText: 'All Direct Report',
-        selectAllText: 'All Direct Report',
+        allSelectedText: 'All',
+        selectAllText: 'All',
         includeSelectAllOption: true
     });
     $(document).ready(function(){
