@@ -161,6 +161,7 @@ class NotifyConversationDue extends Command
                                         ->first();
 
                     if (!$log) {
+                        $this->logInfo( $now->format('Y-m-d') . ' - A - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
                         $sent_count += 1;
 
 
