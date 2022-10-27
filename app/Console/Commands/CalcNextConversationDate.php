@@ -101,6 +101,7 @@ class CalcNextConversationDate extends Command
         ->whereNotNull('employee_demo.guid')
         ->whereRaw("TRIM(employee_demo.guid) <> ''")
         // ->whereNull('employee_demo.date_deleted')
+        ->whereRAW("users.email like '%zehra%'")
         ->whereRaw("employee_demo.employee_status = (select min(a.employee_status) from employee_demo a where a.guid = employee_demo.guid)")
         ->whereRaw("employee_demo.empl_record = (select min(a.empl_record) from employee_demo a where a.guid = employee_demo.guid and a.employee_status = employee_demo.employee_status)")
         ->distinct()
@@ -126,6 +127,10 @@ class CalcNextConversationDate extends Command
                 $lastDateCalculated = false;
                 $excused_updated_by = '';
                 $excused_updated_at = null;
+                $usedate1 = '';
+                $usedate2 = '';
+                $newEndDate = '';
+                $currDate = Carbon::now()->toDateString();
                 if ($demo->guid) {
                     // YES GUID
                     // get last conversation details
@@ -140,13 +145,15 @@ class CalcNextConversationDate extends Command
                     ->first();
                     if ($lastConv) {
                         // use last conversation + 4 months as initial next conversation date
-                        $lastConversationDate = $lastConv->getLastSignOffDateAttribute()->format('M d, Y');
-                        $initNextConversationDate = $lastConv->getLastSignOffDateAttribute()->addMonth(4)->format('M d, Y');
+                        // $lastConversationDate = $lastConv->getLastSignOffDateAttribute()->format('M d, Y');
+                        // $initNextConversationDate = $lastConv->getLastSignOffDateAttribute()->addMonth(4)->format('M d, Y');
+                        $lastConversationDate = $lastConv->getLastSignOffDateAttribute()->toDateString();
+                        $initNextConversationDate = $lastConv->getLastSignOffDateAttribute()->addMonth(4)->toDateString();
                         // echo 'Last Conversation Date:'.$lastConversationDate; echo "\r\n";
                     } else {
                         // no last conversation, use randomizer to assign initial next conversation date
                         $lastConversationDate = null;
-                        $initNextConversationDate = $demo->users->joining_date->addMonth(4)->format('M d, Y');
+                        $initNextConversationDate = $demo->users->joining_date->addMonth(4)->toDateString();
                     }
                     // post go-live hard-coded initial next conversation due dates
                     // $virtualHardDate = Carbon::createFromDate(2022, 10, 14);
@@ -155,10 +162,10 @@ class CalcNextConversationDate extends Command
                     if ($virtualHardDate->gt($initNextConversationDate)) {
                         // distribute next conversation date, based on last digit of employee ID
                         $DDt = abs (($demo->employee_id % 10) - 1) * 5 + (($demo->employee_id % 5));
-                        $initNextConversationDate = $virtualHardDate->addDays($DDt)->format('M d, Y');
+                        $initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
                     }
                     // calcualte initial last conversation date; init next conversation minus 4 months
-                    $initLastConversationDate = Carbon::parse($initNextConversationDate)->subMonth(4);
+                    $initLastConversationDate = Carbon::parse($initNextConversationDate)->subMonth(4)->toDateString();
                     if ($lastConversationDate && Carbon::parse($lastConversationDate)->gt($initLastConversationDate)) {
                         $initLastConversationDate = $lastConversationDate;
                     }
@@ -230,51 +237,74 @@ class CalcNextConversationDate extends Command
                             ->where('created_at', '>', $initLastConversationDate)
                             ->orderBy('created_at')
                             ->get();
+                            $lastDateCalculated = false;
                             // calc excused days
                             foreach($allDates as $oneDay) {
-                                $lastDateCalculated = false;
                                 if ($prevDate == null) {
-                                    $prevDate = $oneDay->created_at->format('M d, Y');
+                                    $prevDate = $oneDay->created_at->toDateString();
                                     $prevPause = $oneDay->due_date_paused;
                                 } else {
-                                    if ($prevPause != $oneDay->due_date_paused) {
-                                        $currDate = Carbon::parse($oneDay->created_at->format('M d, Y'));
-                                        if ($currDate->gt($initLastConversationDate)) {
-                                            $usedate1 = $currDate;
+                                    if ($prevPause == 'Y' && $oneDay->due_date_paused == 'N') {
+                                        $calcDays = 0;
+                                        $currDate = Carbon::parse($oneDay->created_at->toDateString());
+                                        if ($prevDate > $initLastConversationDate) {
+                                                $usedate1 = $prevDate;
                                         } else {
                                             $usedate1 = $initLastConversationDate;
                                         }
-                                        if ($currDate->gt($initNextConversationDate)) {
-                                            $useDate2 = $initNextConversationDate;
+                                        if ($currDate > $initNextConversationDate) {
+                                            $usedate2 = $initNextConversationDate;
                                         } else {
-                                            $useDate2 = $currDate;
+                                            $usedate2 = $currDate;
                                         }
-                                        $diffInDays += abs(Carbon::parse($useDate2)->diffInDays($usedate1));
+                                        if ($usedate1 != $usedate2) {
+                                            $calcDays = abs(Carbon::parse($usedate2)->diffInDays($usedate1));
+                                        } else {
+                                            $calcDays = 0;
+                                        }
+                                        $diffInDays += $calcDays;
                                         $lastDateCalculated = true;
+                                        $prevPause = 'N';
+                                        echo 'End excused period for '.$usedate1.' to '.$usedate2.'.  '.$calcDays.' days.'; echo "\r\n";
+                                    } else {
+                                        if ($prevPause == 'N' && $oneDay->due_date_paused == 'Y') {
+                                            $prevDate = $oneDay->created_at->toDateString();
+                                            $prevPause = $oneDay->due_date_paused;
+                                            $lastDateCalculated = false;
+                                            echo 'Start new excused period for '.$prevDate.'.'; echo "\r\n";
+                                        }
                                     }
                                 }
                             }
                             if ($lastDateCalculated == false && $excused == false && $prevPause == 'Y') {
-                                $currDate = Carbon::parse(Carbon::now());
-                                if ($currDate ->gt($initLastConversationDate)) {
-                                    $usedate1 = $currDate ;
+                                $calcDays = 0;
+                                if ($prevDate > $initLastConversationDate) {
+                                    $usedate1 = $prevDate;
                                 } else {
                                     $usedate1 = $initLastConversationDate;
                                 }
-                                if ($currDate->gt($initNextConversationDate)) {
-                                    $useDate2 = $initNextConversationDate;
+                                $currDate = Carbon::now()->toDateString();
+                                if ($currDate > $initNextConversationDate) {
+                                    $usedate2 = $initNextConversationDate;
                                 } else {
-                                    $useDate2 = $currDate;
+                                    $usedate2 = $currDate;
                                 }
-                                $diffInDays += abs(Carbon::parse($useDate2)->diffInDays($usedate1));
+                                if ($usedate1 != $usedate2) {
+                                    $calcDays = abs(Carbon::parse($usedate2)->diffInDays($usedate1));
+                                } else {
+                                    $calcDays = 0;
+                                }
+                                $diffInDays += $calcDays;
                                 $lastDateCalculated = true;
+                                $prevPause = 'N';
+                                echo 'End excused period for '.$usedate1.' to '.$usedate2.'.  '.$calcDays.' days.'; echo "\r\n";
                             }
                             if ($diffInDays < 0) {
                                 $diffInDays = 0;
                             }
-                            $newEndDate = Carbon::parse($initNextConversationDate)->addDays($diffInDays);
-                            if ($newEndDate->gt($initNextConversationDate)) {
-                                $initNextConversationDate = $newEndDate->format('M d, Y');
+                            $newEndDate = Carbon::parse($initNextConversationDate)->addDays($diffInDays)->toDateString();
+                            if ($newEndDate > $initNextConversationDate) {
+                                $initNextConversationDate = $newEndDate;
                             }
                         }
                     } else {
@@ -355,9 +385,9 @@ class CalcNextConversationDate extends Command
         });
 
         // Note: for speeding up performance, update 'Next conversation Due' and 'due_date_paused' in users table
-        $this->info( 'Update users table - start: '. now() );
+        // $this->info( 'Update users table - start: '. now() );
         $this->updateUsersTable();
-        $this->info( 'Update users table - end : '. now() );
+        // $this->info( 'Update users table - end : '. now() );
         
         echo 'Processed '.$counter.'.  Updated '.$updatecounter.'.'; echo "\r\n";
         DB::table('stored_dates')->updateOrInsert(
