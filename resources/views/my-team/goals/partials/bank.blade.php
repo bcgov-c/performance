@@ -37,13 +37,5 @@ Create a goal for your employees to use in their own profile. Goals can be sugge
             toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent", "Link"] ] });
     });
     
-    $('#savebtn').click(function() {
-        $('#savebtn').prop('disabled', true);
-        $('#add-goal-to-library-form').submit();
-        setTimeout(function(){
-                $('#savebtn').prop('disabled', false);
-             }, 3000);
-    });
-    
 </script>
 @endpush
