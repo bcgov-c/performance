@@ -134,11 +134,11 @@ class EmployeeListController extends Controller
             ->when($level2, function($q) use($level2) {$q->where('d.level2_division', $level2->name);})
             ->when($level3, function($q) use($level3) {$q->where('d.level3_branch', $level3->name);})
             ->when($level4, function($q) use($level4) {$q->where('d.level4', $level4->name);})
-            ->when($request->criteria == 'name', function($q) use($request){$q->whereRAW("d.employee_name like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'emp', function($q) use($request){$q->whereRAW("d.employee_id like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'job', function($q) use($request){$q->whereRAW("d.jobcode_desc like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'dpt', function($q) use($request){$q->whereRAW("d.deptid like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRAW("(d.employee_id like '%".$request->search_text."%' or d.employee_name like '%".$request->search_text."%' or d.jobcode_desc like '%".$request->search_text."%' or d.deptid like '%".$request->search_text."%')");})
+            ->when($request->criteria == 'name', function($q) use($request){$q->whereRaw("d.employee_name like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'emp', function($q) use($request){$q->whereRaw("d.employee_id like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'job', function($q) use($request){$q->whereRaw("d.jobcode_desc like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'dpt', function($q) use($request){$q->whereRaw("d.deptid like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRaw("(d.employee_id like '%".$request->search_text."%' or d.employee_name like '%".$request->search_text."%' or d.jobcode_desc like '%".$request->search_text."%' or d.deptid like '%".$request->search_text."%')");})
             ->select
             (
                 'u.id',
@@ -228,11 +228,11 @@ class EmployeeListController extends Controller
             ->when($level2, function($q) use($level2) {$q->where('d.level2_division', $level2->name);})
             ->when($level3, function($q) use($level3) {$q->where('d.level3_branch', $level3->name);})
             ->when($level4, function($q) use($level4) {$q->where('d.level4', $level4->name);})
-            ->when($request->criteria == 'name', function($q) use($request){$q->whereRAW("d.employee_name like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'emp', function($q) use($request){$q->whereRAW("d.employee_id like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'job', function($q) use($request){$q->whereRAW("d.jobcode_desc like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'dpt', function($q) use($request){$q->whereRAW("d.deptid like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRAW("(d.employee_id like '%".$request->search_text."%' or d.employee_name like '%".$request->search_text."%' or d.jobcode_desc like '%".$request->search_text."%' or d.deptid like '%".$request->search_text."%')");})
+            ->when($request->criteria == 'name', function($q) use($request){$q->whereRaw("d.employee_name like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'emp', function($q) use($request){$q->whereRaw("d.employee_id like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'job', function($q) use($request){$q->whereRaw("d.jobcode_desc like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'dpt', function($q) use($request){$q->whereRaw("d.deptid like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRaw("(d.employee_id like '%".$request->search_text."%' or d.employee_name like '%".$request->search_text."%' or d.jobcode_desc like '%".$request->search_text."%' or d.deptid like '%".$request->search_text."%')");})
             ->select
             (
                 'u.id',

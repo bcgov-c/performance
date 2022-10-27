@@ -25,6 +25,7 @@ use App\Http\Requests\MyTeams\ShareProfileRequest;
 use App\Http\Requests\MyTeams\UpdateExcuseRequest;
 use App\Http\Requests\Goals\AddGoalToLibraryRequest;
 use App\Http\Requests\MyTeams\UpdateProfileSharedWithRequest;
+use Carbon\Carbon;
 
 class MyTeamController extends Controller
 {
@@ -179,6 +180,8 @@ class MyTeamController extends Controller
         $excused = User::find($request->user_id);
         $excused->excused_flag = $request->excused_flag;
         $excused->excused_reason_id = $request->excused_reason_id;
+        $excused->excused_updated_by =  Auth::id();
+        $excused->excused_updated_at = Carbon::now();
         $excused->save();
 
         return response()->json(['success' => true, 'message' => 'Participant Excused settings updated successfully']);
