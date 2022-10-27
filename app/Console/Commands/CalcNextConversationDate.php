@@ -100,8 +100,6 @@ class CalcNextConversationDate extends Command
         EmployeeDemo::leftjoin('users', 'users.guid', 'employee_demo.guid')
         ->whereNotNull('employee_demo.guid')
         ->whereRaw("TRIM(employee_demo.guid) <> ''")
-        // ->whereNull('employee_demo.date_deleted')
-        ->whereRAW("users.email like '%zehra%'")
         ->whereRaw("employee_demo.employee_status = (select min(a.employee_status) from employee_demo a where a.guid = employee_demo.guid)")
         ->whereRaw("employee_demo.empl_record = (select min(a.empl_record) from employee_demo a where a.guid = employee_demo.guid and a.employee_status = employee_demo.employee_status)")
         ->distinct()
