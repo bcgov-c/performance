@@ -315,6 +315,11 @@
 				$('#esearch_text_group').hide();
 
 				switchTree();
+                                
+                                
+                                $( "#btn_send" ).click(function() {
+                                    $('#saveGoalModal').modal('toggle');
+                                });
 
 				function switchTree(){
 					if($('#opt_audience2').prop('checked')) {
@@ -693,8 +698,6 @@
                 //     return;
                 // });
                 
-                 
-
 				$('#ebtn_search').click(function(e) {
 					e.preventDefault();
 					target = $('#enav-tree'); 
