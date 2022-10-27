@@ -89,13 +89,17 @@ class MyOrganizationController extends Controller
             ->from('users as u')
             ->leftjoin('employee_demo as d', 'u.guid', 'd.guid')
             ->leftjoin('employee_demo_jr as j', 'u.guid', 'j.guid')
-            ->whereRAW("trim(u.guid) <> ''")
+            ->whereRaw("trim(u.guid) <> ''")
             ->whereNotNull('u.guid')
-            ->whereRAW("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and d.date_deleted is null")
+            ->whereRaw("trim(d.guid) <> ''")
+            ->whereNotNull('d.guid')
+            ->whereRaw("trim(j.guid) <> ''")
+            ->whereNotNull('j.guid')
+            ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and d.date_deleted is null")
             ->whereExists(function ($orgs) use ($authId) {
                 $orgs->select('o.user_id')
                 ->from('admin_orgs as o')
-                ->whereRAW('o.user_id = '.$authId.' and (o.organization = d.organization or ((o.organization = "" or o.organization IS null) and (d.organization = "" or d.organization is null)))'
+                ->whereRaw('o.user_id = '.$authId.' and (o.organization = d.organization or ((o.organization = "" or o.organization IS null) and (d.organization = "" or d.organization is null)))'
                 .' and (o.level1_program = d.level1_program or ((o.level1_program = "" or o.level1_program IS null) and (d.level1_program = "" or d.level1_program is null)))'
                 .' and (o.level2_division = d.level2_division or ((o.level2_division = "" or o.level2_division IS null) and (d.level2_division = "" or d.level2_division is null)))'
                 .' and (o.level3_branch = d.level3_branch or ((o.level3_branch = "" or o.level3_branch IS null) and (d.level3_branch = "" or d.level3_branch is null)))'
@@ -106,11 +110,11 @@ class MyOrganizationController extends Controller
             ->when($level2, function($q) use($level2) {return $q->where('d.level2_division', $level2->name);})
             ->when($level3, function($q) use($level3) {return $q->where('d.level3_branch', $level3->name);})
             ->when($level4, function($q) use($level4) {return $q->where('d.level4', $level4->name);})
-            ->when($request->criteria == 'id' && $request->search_text, function($q) use($request){return $q->whereRAW("d.employee_id like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'name' && $request->search_text, function($q) use($request){return $q->whereRAW("d.employee_name like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'job' && $request->search_text, function($q) use($request){return $q->whereRAW("d.jobcode_desc like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'dpt' && $request->search_text, function($q) use($request){return $q->whereRAW("d.deptid like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRAW("(d.employee_id like '%".$request->search_text."%' or d.employee_name like '%".$request->search_text."%' or d.jobcode_desc like '%".$request->search_text."%' or d.deptid like '%".$request->search_text."%')");})
+            ->when($request->criteria == 'id' && $request->search_text, function($q) use($request){return $q->whereRaw("d.employee_id like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'name' && $request->search_text, function($q) use($request){return $q->whereRaw("d.employee_name like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'job' && $request->search_text, function($q) use($request){return $q->whereRaw("d.jobcode_desc like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'dpt' && $request->search_text, function($q) use($request){return $q->whereRaw("d.deptid like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRaw("(d.employee_id like '%".$request->search_text."%' or d.employee_name like '%".$request->search_text."%' or d.jobcode_desc like '%".$request->search_text."%' or d.deptid like '%".$request->search_text."%')");})
             ->select
             (
                 'u.id',
