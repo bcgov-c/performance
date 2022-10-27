@@ -25,8 +25,8 @@ class UpdateExcuseRequest extends FormRequest
     {
         return [
             'excused_flag' => 'nullable',
-            // 'excused_start_date' => 'nullable|date',
-            // 'excused_end_date' => 'nullable|date|after_or_equal:excused_start_date',
+            'excused_updated_by' => 'nullable',
+            'excused_updated_at' => 'nullable|date',
             'excused_reason_id' => 'exists:excused_reasons,id',
             'user_id' => 'exists:users,id'
         ];

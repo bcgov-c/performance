@@ -39,6 +39,8 @@ class User extends Authenticatable
         'acctlock',
         'last_signon_at',
         'last_sync_at',
+        'excused_updated_by',
+        'excused_updated_at',
     ];
 
     public $timestamps = true;

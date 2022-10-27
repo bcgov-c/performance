@@ -228,12 +228,21 @@ class ExcuseEmployeesController extends Controller
             ->join('employee_demo', 'employee_demo.guid', 'u.guid')
             ->join('employee_demo_jr as j', 'j.guid', 'u.guid')
             ->join('employee_demo_jr as k', 'k.guid', 'u.guid')
+            ->whereRaw("trim(u.guid) <> ''")
+            ->whereNotNull('u.guid')
+            ->whereRaw("trim(employee_demo.guid) <> ''")
+            ->whereNotNull('employee_demo.guid')
+            ->whereRaw("trim(j.guid) <> ''")
+            ->whereNotNull('j.guid')
+            ->whereRaw("trim(k.guid) <> ''")
+            ->whereNotNull('k.guid')
             ->whereNotNull('j.excused_type')
             ->whereNull('k.excused_type')
-            ->whereRAW('j.id < k.id')
-            ->whereRAW("k.id = (select min(m.id) from employee_demo_jr m where m.guid = k.guid and m.id > j.id and m.excused_type is null)")
-            ->whereRAW("j.id = (select min(n.id) from employee_demo_jr n where n.guid = k.guid and n.id < k.id and not n.excused_type is null)")
-            ->whereRAW("not exists (select x.id from employee_demo_jr x where x.guid = j.guid and x.id > j.id and x.id < k.id and x.excused_type is null)")
+            ->whereRaw('j.id < k.id')
+            ->whereRaw("k.id = (select min(m.id) from employee_demo_jr m where m.guid = k.guid and m.id > j.id and m.excused_type is null)")
+            ->whereRaw("j.id in (select x.id from employee_demo_jr x where x.guid = u.guid and not x.excused_type is null)")
+            ->whereRaw("not exists (select x.id from employee_demo_jr x where x.guid = j.guid and x.id > j.id and x.id < k.id and x.excused_type is null)")
+            ->whereRaw("not exists (select 1 from employee_demo_jr y where y.guid = u.guid and not y.excused_type is null and y.id = (select max(y1.id) from employee_demo_jr y1 where y1.guid = u.guid and y1.id < j.id))")
             ->leftjoin('users as n', 'n.id', 'j.updated_by_id')
             ->leftjoin('excused_reasons as r', 'r.id', 'u.excused_reason_id')            
             ->distinct()
@@ -242,11 +251,13 @@ class ExcuseEmployeesController extends Controller
             ->when($level2, function($q) use($level2) {$q->where('employee_demo.level2_division', $level2->name);})
             ->when($level3, function($q) use($level3) {$q->where('employee_demo.level3_branch', $level3->name);})
             ->when($level4, function($q) use($level4) {$q->where('employee_demo.level4', $level4->name);})
-            ->when($request->criteria == 'name', function($q) use($request){$q->whereRAW("employee_demo.employee_name like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'emp', function($q) use($request){$q->whereRAW("employee_demo.employee_id like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'ext', function($q) use($request){$q->whereRAW("j.excused_type like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'exb', function($q) use($request){$q->whereRAW("n.name like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRAW("(employee_demo.employee_id like '%".$request->search_text."%' or employee_demo.employee_name like '%".$request->search_text."%' or j.excused_type like '%".$request->search_text."%' or n.name like '%".$request->search_text."%')");})
+            ->when($request->criteria == 'name', function($q) use($request){$q->whereRaw("employee_demo.employee_name like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'emp', function($q) use($request){$q->whereRaw("employee_demo.employee_id like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'ext', function($q) use($request){$q->havingRaw("excusedtype like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'exb', function($q) use($request){$q->havingRaw("excused_by_name like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {
+                $q->havingRaw("employee_id_search like '%".$request->search_text."%' or employee_name_search like '%".$request->search_text."%' or excusedtype like '%".$request->search_text."%' or excused_by_name like '%".$request->search_text."%'");
+            })
             ->selectRAW ("
                 u.id
                 , u.guid
@@ -271,7 +282,9 @@ class ExcuseEmployeesController extends Controller
                 , case when j.excused_type = 'A' then case when j.current_employee_status = 'A' then 'Classification' else 'PeopleSoft Status' end else case when j.current_manual_excuse = 'Y' then r.name else '' end end as reason_name
                 , case when j.excused_type = 'A' then 'Auto' else case when u.excused_flag = 1 then 'Manual' else 'No' end end as excusedtype
                 , case when j.excused_type = 'A' then 'Auto' else case when u.excused_flag = 1 then 'Manual' else 'No' end end as excusedlink
-                , case when j.excused_type = 'A' then 'System' else case when n.name = '' then n.name else j.updated_by_id end end as n_name
+                , case when j.excused_type = 'A' then 'System' when j.excused_type = 'M' then case when n.name <> '' then n.name else j.updated_by_id end else '' end as excused_by_name
+                , case when 1 = 1 then u.employee_id else u.employee_id end as employee_id_search
+                , case when 1 = 1 then employee_demo.employee_name else employee_demo.employee_name end as employee_name_search
                 , '' as created_at_string
                 , '' as startdate_string
                 , '' as enddate_string
@@ -287,9 +300,8 @@ class ExcuseEmployeesController extends Controller
                 return Carbon::parse($row->j_created_at)->format('M d, Y');
             })
             ->editColumn('enddate_string', function($row) {
-                $preStart = Carbon::parse($row->j_created_at)->format('M d, Y');
-                $preEnd = Carbon::parse($row->k_created_at)->format('M d, Y');
-                $preEnd = Carbon::parse($row->k_created_at)->subdays(1);
+                $preStart = Carbon::parse($row->j_created_at)->toDateString();
+                $preEnd = Carbon::parse($row->k_created_at)->subdays(1)->toDateString();
                 if ($preEnd < $preStart) {
                     $preEnd = $preStart;
                 }
@@ -312,16 +324,18 @@ class ExcuseEmployeesController extends Controller
             ->leftjoin('employee_demo as d', 'u.guid', 'd.guid')
             ->leftjoin('employee_demo_jr as j', 'u.guid', 'j.guid')
             ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'Y' or u.excused_flag = 1) and d.date_deleted is null")
+            ->whereRaw("trim(u.guid) <> ''")
+            ->whereNotNull('u.guid')
             ->when($level0, function($q) use($level0) {$q->where('organization', $level0->name);})
             ->when($level1, function($q) use($level1) {$q->where('level1_program', $level1->name);})
             ->when($level2, function($q) use($level2) {$q->where('level2_division', $level2->name);})
             ->when($level3, function($q) use($level3) {$q->where('level3_branch', $level3->name);})
             ->when($level4, function($q) use($level4) {$q->where('level4', $level4->name);})
-            ->when($request->criteria == 'name', function($q) use($request){$q->whereRAW("d.employee_name like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'emp', function($q) use($request){$q->whereRAW("d.employee_id like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'job', function($q) use($request){$q->whereRAW("d.jobcode_desc like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'dpt', function($q) use($request){$q->whereRAW("d.deptid like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRAW("(d.employee_id like '%".$request->search_text."%' or d.employee_name like '%".$request->search_text."%' or d.jobcode_desc like '%".$request->search_text."%' or d.deptid like '%".$request->search_text."%')");})
+            ->when($request->criteria == 'name', function($q) use($request){$q->whereRaw("d.employee_name like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'emp', function($q) use($request){$q->whereRaw("d.employee_id like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'job', function($q) use($request){$q->whereRaw("d.jobcode_desc like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'dpt', function($q) use($request){$q->whereRaw("d.deptid like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRaw("(d.employee_id like '%".$request->search_text."%' or d.employee_name like '%".$request->search_text."%' or d.jobcode_desc like '%".$request->search_text."%' or d.deptid like '%".$request->search_text."%')");})
             ->select (
                 'u.id',
                 'u.guid',
@@ -506,8 +520,10 @@ class ExcuseEmployeesController extends Controller
                 , case when j.excused_type = 'A' then case when j.current_employee_status = 'A' then 'Classification' else 'PeopleSoft Status' end else case when j.current_manual_excuse = 'Y' then r.name else '' end end as reason_name
                 , case when j.excused_type = 'A' then 'Auto' else case when users.excused_flag = 1 then 'Manual' else 'No' end end as excusedtype
                 , case when j.excused_type = 'A' then 'Auto' else case when users.excused_flag = 1 then 'Manual' else 'No' end end as excusedlink
-                , case when j.excused_type = 'A' then 'System' else case when n.name = '' then n.name else j.updated_by_id end end as n_name
-                , '' as created_at_string
+                , case when j.excused_type = 'A' then 'System' when j.excused_type = 'M' then case when n.name <> '' then n.name else j.updated_by_id end else '' end as excused_by_name
+                , case when (j.excused_type = 'A' or j.current_manual_excuse = 'Y') then date(j.created_at) else '' end as created_at_string
+                , case when 1 = 1 then users.employee_id else users.employee_id end as employee_id_search
+                , case when 1 = 1 then employee_demo.employee_name else employee_demo.employee_name end as employee_name_search
                 ");
 
             return Datatables::of($employees)
@@ -523,7 +539,11 @@ class ExcuseEmployeesController extends Controller
                     }
                 })
                 ->editColumn('created_at_string', function($row) {
-                    return Carbon::parse($row->j_created_at)->format('M d, Y');
+                    if ($row->created_at_string) {
+                        return Carbon::parse($row->j_created_at)->format('M d, Y');
+                    } else {
+                        return '';
+                    }
                 })
                 ->editColumn('excusedlink', function($row) {
                     $text = $row->excusedlink;
@@ -898,16 +918,20 @@ class ExcuseEmployeesController extends Controller
         return User::leftjoin('employee_demo', 'employee_demo.guid', 'users.guid')
         ->leftjoin('employee_demo_jr as j', 'j.guid', 'users.guid')
         ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and employee_demo.date_deleted is null and not employee_demo.employee_id is null")
+        ->whereRaw("trim(users.guid) <> ''")
+        ->whereNotNull('users.guid')
         ->when( $level0, function ($q) use($level0) { $q->where('employee_demo.organization', $level0->name); }) 
         ->when( $level1, function ($q) use($level1) { $q->where('employee_demo.level1_program', $level1->name); })
         ->when( $level2, function ($q) use($level2) { $q->where('employee_demo.level2_division', $level2->name);  })
         ->when( $level3, function ($q) use($level3) { $q->where('employee_demo.level3_branch', $level3->name); })
         ->when( $level4, function ($q) use($level4) { $q->where('employee_demo.level4', $level4->name); })
-        ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) { $q->whereRaw("employee_demo.employee_id like '%".$request->search_text."%' or employee_demo.employee_name like '%".$request->search_text."%' or employee_demo.jobcode_desc like '%".$request->search_text."%' or employee_demo.deptid like '%".$request->search_text."%'"); })
+        ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) { 
+            $q->havingRaw("employee_id_search like '%".$request->search_text."%' or employee_name_search like '%".$request->search_text."%' or excusedtype like '%".$request->search_text."%' or excused_by_name like '%".$request->search_text."%'"); 
+        })
         ->when( $request->search_text && $request->criteria == 'emp', function ($q) use($request) { $q->whereRaw("employee_demo.employee_id like '%" . $request->search_text . "%'"); })
         ->when( $request->search_text && $request->criteria == 'name', function ($q) use($request) { $q->whereRaw("employee_demo.employee_name like '%" . $request->search_text . "%'"); })
-        ->when( $request->search_text && $request->criteria == 'ext', function ($q) use($request) { $q->whereRaw("excuse_type like '%" . $request->search_text . "%'"); })
-        ->when( $request->search_text && $request->criteria == 'exb', function ($q) use($request) { $q->whereRaw("n_name like '%" . $request->search_text . "%'"); })
+        ->when( $request->search_text && $request->criteria == 'ext', function ($q) use($request) { $q->havingRaw("excused_type like '%" . $request->search_text . "%'"); })
+        ->when( $request->search_text && $request->criteria == 'exb', function ($q) use($request) { $q->havingRaw("excused_by_name like '%" . $request->search_text . "%'"); })
         ;
     }
 
