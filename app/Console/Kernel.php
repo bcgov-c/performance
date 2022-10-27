@@ -43,7 +43,8 @@ class Kernel extends ConsoleKernel
   
         $schedule->command('command:SyncUserProfile')
         ->timezone('America/Vancouver')
-        ->dailyAt('00:25');
+        ->dailyAt('00:25')
+        ->appendOutputTo(storage_path('logs/SyncUserProfile.log'));
 
         $schedule->command('command:BuildAdminOrgUsers')
         ->timezone('America/Vancouver')
@@ -55,16 +56,9 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('command:NotifyConversationDue')
         ->timezone('America/Vancouver')    
-        ->dailyAt('02:30');
-        
-        $schedule->command('command:NotifyConversationDue')    
-        ->timezone('America/Vancouver')
-        // ->dailyAt('02:30')
-        // ->hourlyAt(30)
-        ->everyFifteenMinutes()
-        ->between('08:00', '22:00')
+        ->dailyAt('02:30')
         ->appendOutputTo(storage_path('logs/NotifyConversationDue.log'));
-
+        
         $schedule->command('notify:daily')
         ->dailyAt('08:00')
         ->appendOutputTo(storage_path('logs/daily.log'));
