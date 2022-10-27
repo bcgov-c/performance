@@ -98,20 +98,15 @@ class NotifyConversationDue extends Command
 
         // Eligible Users (check against Allow Access Oragnizations)
         $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+                        ->join('employee_demo_jr','employee_demo.guid','employee_demo_jr.guid')
                         ->join('access_organizations','employee_demo.organization','access_organizations.organization')
                         ->where('employee_demo.guid','<>','')
-                        ->where('users.due_date_paused', 'N')
+                        ->where('employee_demo_jr.due_date_paused', 'N')
                         ->where('access_organizations.allow_inapp_msg', 'Y')
                         ->whereNull('employee_demo.date_deleted')
 // ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                                                    
-<<<<<<< HEAD
                         ->select('users.*', 'employee_demo_jr.next_conversation_date' )
                         ->orderBy('users.guid');
-=======
-                        ->select('users.*')
-                        ->orderBy('users.guid')
-                        ->orderBy('users.id', 'desc');
->>>>>>> 17bda94 (#803 Conversation due email not received for team members and supervisor (fix bugs and add log file output))
 
         $prev_guid = '';
         $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
@@ -161,6 +156,7 @@ class NotifyConversationDue extends Command
                                         ->first();
 
                     if (!$log) {
+                        $this->logInfo( $due . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' ' . $dueIndays);
                         $sent_count += 1;
 
 
@@ -203,13 +199,8 @@ class NotifyConversationDue extends Command
                         // ]);
 
                     } else {
-                        // $this->logInfo( $now->format('Y-m-d') . ' - A - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . '  ** SKIPPED ** (ALREADY SENT, LOG RECORD FOUND)' );
                         $skip_count += 1;
                     }
-
-                } else {
-                    // $this->logInfo( $now->format('Y-m-d') . ' - A - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . '   ** SKIPPED ** (NOT DUE YET)' );
-                    $skip_count += 1;
                 }
 
                 $prev_guid = $user->guid;
@@ -218,9 +209,9 @@ class NotifyConversationDue extends Command
 
         });
 
-        $this->logInfo("Total eligible users            : " . $row_count );
-        $this->logInfo("Total notification skipped      : " . $skip_count );
-        $this->logInfo("Total notification created/Sent : " . $sent_count );
+        $this->logInfo("Total selected users              : " . $row_count );
+        $this->logInfo("Total notification skipped (sent) : " . $skip_count );
+        $this->logInfo("Total notification created        : " . $sent_count );
 
     }
 
@@ -233,20 +224,15 @@ class NotifyConversationDue extends Command
 
         // Eligible Users (check against Allow Access Oragnizations)
         $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+                    ->join('employee_demo_jr','employee_demo.guid','employee_demo_jr.guid')
                     ->join('access_organizations','employee_demo.organization','access_organizations.organization')
                     ->where('employee_demo.guid','<>','')
-                    ->where('users.due_date_paused', 'N')
+                    ->where('employee_demo_jr.due_date_paused', 'N')
                     ->where('access_organizations.allow_inapp_msg', 'Y')
                     ->whereNull('date_deleted')
 //->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                            
-<<<<<<< HEAD
                     ->select('users.*', 'employee_demo_jr.next_conversation_date' )
                     ->orderBy('users.guid');
-=======
-                    ->select('users.*')
-                    ->orderBy('users.guid')
-                    ->orderBy('users.id', 'desc');
->>>>>>> 17bda94 (#803 Conversation due email not received for team members and supervisor (fix bugs and add log file output))
 
         $prev_guid = '';    
         $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
@@ -258,7 +244,7 @@ class NotifyConversationDue extends Command
                     continue;
                 }
 
-                // $row_count += 1;
+                $row_count += 1;
 
                 // Look for direct report manager and Shared with
                 $manager_ids = SharedProfile::where('shared_id', $user->id)
@@ -277,8 +263,6 @@ class NotifyConversationDue extends Command
                 // process  each managers 
                 foreach ($manager_ids as $manager_id) {
 
-                    $row_count += 1;
-
                     // check whether the manager can recieve In-App Message
                     $mgr = User::join('employee_demo','employee_demo.guid','users.guid')
                                 ->join('access_organizations','employee_demo.organization','access_organizations.organization')
@@ -288,8 +272,6 @@ class NotifyConversationDue extends Command
                                 ->first();
 
                     if (!$mgr) {
-                        $this->logInfo( $now->format('Y-m-d') . ' - A - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . '  ** SKIPPED ** (MANAGER NOT FOUND OR PREFER NOT RECEVIED INAPP MSG)');
-                        $skip_count += 1;
                         continue;
                     }
 
@@ -329,7 +311,7 @@ class NotifyConversationDue extends Command
                                             ->first();
 
                         if (!$log) {
-                            $this->logInfo( $now->format('Y-m-d') . ' - A - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
+                            $this->logInfo( $due . ' - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' ' . $dueIndays);
                             $sent_count += 1;
         
                             // Use Class to create DashboardNotification
@@ -371,12 +353,8 @@ class NotifyConversationDue extends Command
                             // ]);
         
                         } else {
-                            // $this->logInfo( $now->format('Y-m-d') . ' - A - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . '  ** SKIPPED ** (ALREADY SENT, LOG RECORD FOUND)' );
                             $skip_count += 1;
                         }
-                    } else {
-                        // $this->logInfo( $now->format('Y-m-d') . ' - A - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . '  ** SKIPPED ** (NOT DUE YET)');
-                        $skip_count += 1;
                     }
 
                 }
@@ -387,9 +365,9 @@ class NotifyConversationDue extends Command
 
         });
 
-        $this->logInfo("Total eligible managers         : " . $row_count );
-        $this->logInfo("Total notification skipped      : " . $skip_count );
-        $this->logInfo("Total notification created/Sent : " . $sent_count );
+        $this->logInfo("Total selected users              : " . $row_count  );
+        $this->logInfo("Total notification skipped (sent) : " . $skip_count );
+        $this->logInfo("Total notification created        : " . $sent_count );
 
     }
 
@@ -402,20 +380,15 @@ class NotifyConversationDue extends Command
 
         // Eligible Users (check against Allow Access Oragnizations)
         $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+                        ->join('employee_demo_jr','employee_demo.guid','employee_demo_jr.guid')
                         ->join('access_organizations','employee_demo.organization','access_organizations.organization')
                         ->where('employee_demo.guid','<>','')
                         ->where('access_organizations.allow_email_msg', 'Y')
                         ->whereNull('employee_demo.date_deleted')
-                        ->where('users.due_date_paused', 'N')
-                        ->select('users.*')
+                        ->where('employee_demo_jr.due_date_paused', 'N')
+                        ->select('users.*', 'employee_demo_jr.next_conversation_date' )
 //  ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                                     
-<<<<<<< HEAD
                         ->orderBy('users.guid');
-=======
-// ->whereIn('users.id',['365129','367485','391595'])
-                        ->orderBy('users.guid')
-                        ->orderBy('users.id', 'desc');
->>>>>>> 17bda94 (#803 Conversation due email not received for team members and supervisor (fix bugs and add log file output))
 
         $prev_guid = '';
         $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
@@ -487,7 +460,7 @@ class NotifyConversationDue extends Command
 
                     // Send Email for team members
                     if (!$log) {
-                        $this->logInfo( $now->format('Y-m-d') . ' - E - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
+                        $this->logInfo( $due . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' ' . $dueIndays);
                         $sent_count += 1;
 
                         $sendMail = new \App\MicrosoftGraph\SendMail();
@@ -511,13 +484,9 @@ class NotifyConversationDue extends Command
                         $response = $sendMail->sendMailWithGenericTemplate();    
 
                     } else {
-                        // $this->logInfo( $now->format('Y-m-d') . ' - E - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . ' ** SKIPPED ** (ALREADY SENT, LOG RECORD FOUND)' );
                         $skip_count += 1;
                     }
-                } else {
-                    // $this->logInfo( $now->format('Y-m-d') . ' - E - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . ' ** SKIPPED ** (NOT DUE YET)' );
-                    $skip_count += 1;
-                }
+                } 
 
                 $prev_guid = $user->guid;
 
@@ -525,9 +494,9 @@ class NotifyConversationDue extends Command
 
         });
 
-        $this->logInfo("Total eligible users            : " . $row_count );
-        $this->logInfo("Total notification skipped      : " . $skip_count );
-        $this->logInfo("Total notification created/Sent : " . $sent_count );
+        $this->logInfo("Total selected users              : " . $row_count );
+        $this->logInfo("Total notification skipped (sent) : " . $skip_count );
+        $this->logInfo("Total notification created        : " . $sent_count );
 
     }
 
@@ -540,12 +509,13 @@ class NotifyConversationDue extends Command
 
         // Eligible Users (check against Allow Access Oragnizations)
         $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+                        ->join('employee_demo_jr','employee_demo.guid','employee_demo_jr.guid')
                         ->join('access_organizations','employee_demo.organization','access_organizations.organization')
                         ->where('employee_demo.guid','<>','')
                         ->where('access_organizations.allow_email_msg', 'Y')
                         ->whereNull('employee_demo.date_deleted')
-                        ->where('users.due_date_paused', 'N')
-                    ->select('users.*')
+                        ->where('employee_demo_jr.due_date_paused', 'N')
+                    ->select('users.*', 'employee_demo_jr.next_conversation_date' )
 // ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                                            
                     ->orderBy('users.guid');
 
@@ -559,7 +529,7 @@ class NotifyConversationDue extends Command
                     continue;
                 }
 
-                // $row_count += 1;
+                $row_count += 1;
 
                 // Look for direct report manager and Shared with
                 $manager_ids = SharedProfile::where('shared_id', $user->id)
@@ -575,10 +545,9 @@ class NotifyConversationDue extends Command
                         continue;
                 }
 
+
                 // process  each managers 
                 foreach ($manager_ids as $manager_id) {
-
-                    $row_count += 1;
 
                     // check whether the manager can recieve In-App Message
                     $mgr = User::join('employee_demo','employee_demo.guid','users.guid')
@@ -589,12 +558,8 @@ class NotifyConversationDue extends Command
                             ->first();
 
                     if (!$mgr) {
-                        $this->logInfo( $now->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . '  ** SKIPPED ** (MANAGER NOT FOUND OR PREFER TO NOT RECECIVED EMAIL)' );
-                        $skip_count += 1;
                         continue;
                     }
-
-
 
                     // User Prference 
                     $pref = UserPreference::where('user_id', $user->manager_id)->first();
@@ -658,7 +623,7 @@ class NotifyConversationDue extends Command
 
                         // Send Email for team members
                         if (!$log) {
-                            $this->logInfo( $now->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
+                            $this->logInfo( $due . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' ' . $dueIndays);
                             $sent_count += 1;
 
                             $sendMail = new \App\MicrosoftGraph\SendMail();
@@ -683,14 +648,10 @@ class NotifyConversationDue extends Command
                             $response = $sendMail->sendMailWithGenericTemplate();    
 
                         } else {
-                            // $this->logInfo( $now->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . '  ** SKIPPED ** (ALREADY SENT, LOG RECORD FOUND)' );
                             $skip_count += 1;
-                        } 
+                        }
+                    } 
 
-                    } else {
-                        // $this->logInfo( $now->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . '  ** SKIPPED ** (NOT DUE YET)' );
-                        $skip_count += 1; 
-                    }
                 }
 
                 $prev_guid = $user->guid;
@@ -699,9 +660,9 @@ class NotifyConversationDue extends Command
 
         });
 
-        $this->logInfo("Total eligible managers         : " . $row_count );
-        $this->logInfo("Total notification skipped      : " . $skip_count );
-        $this->logInfo("Total notification created/Sent : " . $sent_count );
+        $this->logInfo("Total selected users              : " . $row_count );
+        $this->logInfo("Total notification skipped (sent) : " . $skip_count );
+        $this->logInfo("Total notification created        : " . $sent_count );
 
     }
 
