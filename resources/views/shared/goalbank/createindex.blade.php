@@ -158,7 +158,7 @@
 			<br>
 			<div class="row">
 				<div class="col-md-3 mb-2">
-					<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveChangesModal()" name="btn_confirm" value="btn_confirm">Add Goal</button>
+					<button class="btn btn-primary mt-2" id="obtn_send" type="button" onclick="confirmSaveChangesModal()" name="btn_confirm" value="btn_confirm">Add Goal</button>
 					<button class="btn btn-secondary mt-2">Cancel</button>
 				</div>
 			</div>
@@ -287,6 +287,9 @@
 			let g_employees_by_org = [];
 
 			function confirmSaveChangesModal() {
+                            
+                                $('#obtn_send').prop('disabled',true);
+                            
 				let count = 0;
 				if($('#opt_audience1').prop('checked')) {
 					count = g_selected_employees.length;
@@ -299,6 +302,9 @@
 				} else {
 					$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal and assign to the selected audience?');
 				}
+                                
+                                
+                                
 				$('#saveGoalModal').modal();
 			}
 
@@ -686,6 +692,8 @@
                 //     location.reload();
                 //     return;
                 // });
+                
+                 
 
 				$('#ebtn_search').click(function(e) {
 					e.preventDefault();
@@ -774,6 +782,10 @@
                         @if(session()->has('title_miss'))                           
                             $('input[name=title]').addClass('is-invalid');
                         @endif
+                        
+                        
+                        
+                        
 
 		</script>
 	</x-slot>
