@@ -98,8 +98,10 @@ class CalcNextConversationDate extends Command
         $updatecounter = 0;
         $ClassificationArray = ExcusedClassification::select('jobcode')->get()->toArray();
         EmployeeDemo::leftjoin('users', 'users.guid', 'employee_demo.guid')
+        ->whereRaw("trim(employee_demo.guid) <> ''")
         ->whereNotNull('employee_demo.guid')
-        ->whereRaw("TRIM(employee_demo.guid) <> ''")
+        ->whereRaw("trim(users.guid) <> ''")
+        ->whereNotNull('users.guid')
         ->whereRaw("employee_demo.employee_status = (select min(a.employee_status) from employee_demo a where a.guid = employee_demo.guid)")
         ->whereRaw("employee_demo.empl_record = (select min(a.empl_record) from employee_demo a where a.guid = employee_demo.guid and a.employee_status = employee_demo.employee_status)")
         ->distinct()
@@ -134,6 +136,8 @@ class CalcNextConversationDate extends Command
                     // get last conversation details
                     $lastConv = Conversation::join('conversation_participants', 'conversations.id', 'conversation_participants.conversation_id')
                     ->join('users', 'users.id', 'conversation_participants.participant_id')
+                    ->whereRaw("trim(users.guid) <> ''")
+                    ->whereNotNull('users.guid')
                     ->whereNotNull('signoff_user_id')
                     ->whereNotNull('supervisor_signoff_id')
                     ->where('participant_id', $demo->users->id)
@@ -231,9 +235,12 @@ class CalcNextConversationDate extends Command
                         if (in_array($changeType, ['statusEndExcuse', 'classEndExcuse', 'manualEndExcuse'])) {
                             // re-calc next conversation date
                             // get historical dates
-                            $allDates = EmployeeDemoJunior::where('guid', $demo->guid)
-                            ->where('created_at', '>', $initLastConversationDate)
-                            ->orderBy('created_at')
+                            $allDates = EmployeeDemoJunior::from('employee_demo_jr as j')
+                            ->where('j.guid', $demo->guid)
+                            ->whereRaw("trim(j.guid) <> ''")
+                            ->whereNotNull('j.guid')
+                            ->where('j.created_at', '>', $initLastConversationDate)
+                            ->orderBy('j.created_at')
                             ->get();
                             $lastDateCalculated = false;
                             // calc excused days
@@ -417,18 +424,18 @@ class CalcNextConversationDate extends Command
  
     
     protected function updateUsersTable() {
+        User::from('users as u')
+        ->whereRaw("trim(u.guid) <> ''")
+        ->whereNotNull('u.guid')
+        ->update([
+            'u.next_conversation_date' => DB::raw(" (select next_conversation_date from employee_demo_jr j1 
+                                        where id = (select max(id) from employee_demo_jr j2 where j1.guid = j2.guid)
+                                                and users.guid = guid)" ),
 
-        User::where('guid', '<>', '')
-            ->update([
-                'next_conversation_date' => DB::raw(" (select next_conversation_date from employee_demo_jr j1 
-	                                        where id = (select max(id) from employee_demo_jr j2 where j1.guid = j2.guid)
-	                                                and users.guid = guid)" ),
-
-	            'due_date_paused' =>  DB::raw(" (select due_date_paused from employee_demo_jr j1 
-	                                    where id = (select max(id) from employee_demo_jr j2 where j1.guid = j2.guid)
-	                                        and users.guid = guid)" )
-            ]); 
-
+            'u.due_date_paused' =>  DB::raw(" (select due_date_paused from employee_demo_jr j1 
+                                    where id = (select max(id) from employee_demo_jr j2 where j1.guid = j2.guid)
+                                        and users.guid = guid)" )
+        ]); 
     }
 
 }
