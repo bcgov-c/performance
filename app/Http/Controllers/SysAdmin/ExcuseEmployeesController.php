@@ -491,6 +491,7 @@ class ExcuseEmployeesController extends Controller
 
             $employees = $sql->leftjoin('excused_reasons as r', 'r.id', 'users.excused_reason_id')
             ->leftjoin('users as n', 'n.id', 'j.updated_by_id')
+            ->orderBy('users.employee_id')
             ->selectRAW("
                 users.id
                 , users.guid

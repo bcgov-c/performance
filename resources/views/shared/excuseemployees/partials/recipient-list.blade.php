@@ -21,7 +21,7 @@
 
 @push('css')
 
-    <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 	<style>
 	#employee-list-table_filter label {
 		text-align: right !important;
@@ -31,8 +31,8 @@
 @endpush
 
 @push('js')
-    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script>
 
     <script>
     
@@ -40,13 +40,15 @@
             var user_selected = [];
 
             var oTable = $('#employee-list-table').DataTable({
-                "scrollX": true,
-                retrieve: true,
-                "searching": false,
-                processing: true,
                 serverSide: true,
-                select: true,
-                'order': [[1, 'asc']],
+                searching: false,
+                processing: true,
+                paging: true,
+                deferRender: true,
+                retrieve: true,
+                scrollCollapse: true,
+                scroller: true,
+                scrollX: true,
                 ajax: {
                     url: '{{ route(request()->segment(1).'.excuseemployees.employee.list') }}',
                     data: function (d) {
