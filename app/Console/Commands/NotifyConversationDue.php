@@ -106,7 +106,9 @@ class NotifyConversationDue extends Command
                         ->whereNull('employee_demo.date_deleted')
 // ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                                                    
                         ->select('users.*', 'employee_demo_jr.next_conversation_date' )
-                        ->orderBy('users.guid');
+                        ->orderBy('users.guid')
+                        ->orderBy('users.id', 'desc');
+
 
         $prev_guid = '';
         $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
@@ -232,7 +234,8 @@ class NotifyConversationDue extends Command
                     ->whereNull('date_deleted')
 //->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                            
                     ->select('users.*', 'employee_demo_jr.next_conversation_date' )
-                    ->orderBy('users.guid');
+                    ->orderBy('users.guid')
+                    ->orderBy('users.id', 'desc');
 
         $prev_guid = '';    
         $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
@@ -388,7 +391,8 @@ class NotifyConversationDue extends Command
                         ->where('employee_demo_jr.due_date_paused', 'N')
                         ->select('users.*', 'employee_demo_jr.next_conversation_date' )
 //  ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                                     
-                        ->orderBy('users.guid');
+                        ->orderBy('users.guid')
+                        ->orderBy('users.id', 'desc');
 
         $prev_guid = '';
         $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
@@ -517,7 +521,8 @@ class NotifyConversationDue extends Command
                         ->where('employee_demo_jr.due_date_paused', 'N')
                     ->select('users.*', 'employee_demo_jr.next_conversation_date' )
 // ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                                            
-                    ->orderBy('users.guid');
+                    ->orderBy('users.guid')
+                    ->orderBy('users.id', 'desc');
 
         $prev_guid = '';
         $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
