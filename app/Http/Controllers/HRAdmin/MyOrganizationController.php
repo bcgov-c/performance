@@ -91,10 +91,6 @@ class MyOrganizationController extends Controller
             ->leftjoin('employee_demo_jr as j', 'u.guid', 'j.guid')
             ->whereRaw("trim(u.guid) <> ''")
             ->whereNotNull('u.guid')
-            ->whereRaw("trim(d.guid) <> ''")
-            ->whereNotNull('d.guid')
-            ->whereRaw("trim(j.guid) <> ''")
-            ->whereNotNull('j.guid')
             ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and d.date_deleted is null")
             ->whereExists(function ($orgs) use ($authId) {
                 $orgs->select('o.user_id')
