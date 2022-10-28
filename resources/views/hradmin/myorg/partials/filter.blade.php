@@ -95,6 +95,15 @@
 
     <script>
         $('#dd_level0').select2({
+            serverSide: true,
+            searching: false,
+            processing: true,
+            paging: true,
+            deferRender: true,
+            retrieve: true,
+            scrollCollapse: true,
+            scroller: true,
+            scrollX: true,
             placeholder: 'Select Organization',
             allowClear: true,
             ajax: {
@@ -117,6 +126,15 @@
         });
 
         $('#dd_level1').select2({
+            serverSide: true,
+            searching: false,
+            processing: true,
+            paging: true,
+            deferRender: true,
+            retrieve: true,
+            scrollCollapse: true,
+            scroller: true,
+            scrollX: true,
             placeholder: 'Select Level 1',
             allowClear: true,
             ajax: {
@@ -140,6 +158,15 @@
         });
 
         $('#dd_level2').select2({
+            serverSide: true,
+            searching: false,
+            processing: true,
+            paging: true,
+            deferRender: true,
+            retrieve: true,
+            scrollCollapse: true,
+            scroller: true,
+            scrollX: true,
             placeholder: 'Select Level 2',
             allowClear: true,
             ajax: {
@@ -164,6 +191,15 @@
         });
 
         $('#dd_level3').select2({
+            serverSide: true,
+            searching: false,
+            processing: true,
+            paging: true,
+            deferRender: true,
+            retrieve: true,
+            scrollCollapse: true,
+            scroller: true,
+            scrollX: true,
             placeholder: 'Select Level 3',
             allowClear: true,
             ajax: {
@@ -189,6 +225,15 @@
         });
 
         $('#dd_level4').select2({
+            serverSide: true,
+            searching: false,
+            processing: true,
+            paging: true,
+            deferRender: true,
+            retrieve: true,
+            scrollCollapse: true,
+            scroller: true,
+            scrollX: true,
             placeholder: 'Select level 4',
             allowClear: true,
             ajax: {
