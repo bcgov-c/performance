@@ -98,7 +98,7 @@ class Conversation extends Model
         }
         
         foreach ($this->conversationParticipants->toArray() as $cp) {
-            if ($cp['participant_id'] == $reportingManager->id) {
+            if (isset($reportingManager->id) && $cp['participant_id'] == $reportingManager->id) {
                 return true;
             }
             if (in_array($cp['participant_id'], $sharing)) {
