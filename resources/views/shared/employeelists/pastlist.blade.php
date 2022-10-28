@@ -17,9 +17,9 @@
     </div>   
 
     @push('css')
-        <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" >
-        <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
         <x-slot name="css">
             <style>
                 .text-truncate-30 {
@@ -44,16 +44,20 @@
     @endpush
 
     @push('js')
-        <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
+        <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script>
         <script type="text/javascript">
             $(document).ready(function() {
                 $('#listtable').DataTable ( {
-                    processing: true,
                     serverSide: true,
-                    scrollX: true,
-                    stateSave: true,
+                    searching: false,
+                    processing: true,
+                    paging: true,
                     deferRender: true,
+                    retrieve: true,
+                    scrollCollapse: true,
+                    scroller: true,
+                    scrollX: true,
                     ajax: 
                     {
                         url: "{{ route(request()->segment(1).'.employeelists.getpastlist') }}",

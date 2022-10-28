@@ -115,6 +115,7 @@ class MyOrganizationController extends Controller
             ->when($request->criteria == 'job' && $request->search_text, function($q) use($request){return $q->whereRaw("d.jobcode_desc like '%".$request->search_text."%'");})
             ->when($request->criteria == 'dpt' && $request->search_text, function($q) use($request){return $q->whereRaw("d.deptid like '%".$request->search_text."%'");})
             ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRaw("(d.employee_id like '%".$request->search_text."%' or d.employee_name like '%".$request->search_text."%' or d.jobcode_desc like '%".$request->search_text."%' or d.deptid like '%".$request->search_text."%')");})
+            ->orderBy('u.employee_id')
             ->select
             (
                 'u.id',

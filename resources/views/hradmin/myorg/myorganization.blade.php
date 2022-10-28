@@ -15,9 +15,9 @@
 
 
     @push('css')
-        <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
         <x-slot name="css">
-            <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+            <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
             <style>
             .text-truncate-30 {
                 white-space: wrap; 
@@ -41,8 +41,8 @@
     @endpush
     @push('js')
         {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>   --}}
-        {{-- <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script> --}}
-        {{-- <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script> --}}
+        {{-- <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script> --}}
+        {{-- <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script> --}}
 
         <script type="text/javascript">
 
@@ -52,11 +52,15 @@
                     var table = $('#myorgtable').DataTable
                     (
                         {
-                            processing: true,
                             serverSide: true,
-                            scrollX: true,
-                            stateSave: true,
+                            searching: false,
+                            processing: true,
+                            paging: true,
                             deferRender: true,
+                            retrieve: true,
+                            scrollCollapse: true,
+                            scroller: true,
+                            scrollX: true,
                             ajax: 
                             {
                                 url: "{{ route('hradmin.myorg.myorganization') }}",
