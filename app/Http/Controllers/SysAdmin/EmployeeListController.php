@@ -129,7 +129,6 @@ class EmployeeListController extends Controller
             ->leftjoin('employee_demo as d', 'u.guid', 'd.guid')
             ->leftjoin('employee_demo_jr as j', 'u.guid', 'j.guid')
             ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and d.date_deleted is null")
-            ->whereNull('d.date_deleted')        
             ->when($level0, function($q) use($level0) {$q->where('d.organization', $level0->name);})
             ->when($level1, function($q) use($level1) {$q->where('d.level1_program', $level1->name);})
             ->when($level2, function($q) use($level2) {$q->where('d.level2_division', $level2->name);})
