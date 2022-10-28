@@ -30,6 +30,12 @@ class EmployeeListController extends Controller
     public function currentList(Request $request)
     {
         $errors = session('errors');
+        
+        $employees = DB::table('employee_demo')
+                    ->select('date_deleted')
+                    ->where('employee_id', '=', '124304')
+                    ->get();
+        print_r($employees);
 
         if ($errors) {
             $old = session()->getOldInput();
