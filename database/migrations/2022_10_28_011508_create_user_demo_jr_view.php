@@ -58,12 +58,21 @@ class CreateUserDemoJrView extends Migration
                 j.created_at,
                 j.updated_by_id,
                 j.updated_at,
-                jn.name as updated_by_name
+                jn.name as updated_by_name,
+                case when j.excused_type = 'A' then case when j.current_employee_status = 'A' then 2 else 1 end else u.excused_reason_id end as reason_id,
+                case when j.excused_type = 'A' then case when j.current_employee_status = 'A' then 'Classification' else 'PeopleSoft Status' end else case when j.current_manual_excuse = 'Y' then r.name else '' end end as reason_name,
+                case when j.excused_type = 'A' then 'Auto' else case when u.excused_flag = 1 then 'Manual' else 'No' end end as excusedtype,
+                case when j.excused_type = 'A' then 'Auto' else case when u.excused_flag = 1 then 'Manual' else 'No' end end as excusedlink,
+                case when j.excused_type = 'A' then 'System' when j.excused_type = 'M' then case when jn.name <> '' then jn.name else j.updated_by_id end else '' end as excused_by_name,
+                case when (j.excused_type = 'A' or j.current_manual_excuse = 'Y') then date(j.created_at) else '' end as created_at_string,
+                case when 1 = 1 then u.employee_id else u.employee_id end as employee_id_search,
+                case when 1 = 1 then d.employee_name else d.employee_name end as employee_name_search
             FROM
                 users as u
                 LEFT JOIN employee_demo as d ON d.guid = u.guid 
                 LEFT JOIN employee_demo_jr as j ON j.guid = u.guid
                 LEFT JOIN users as jn ON jn.id = j.updated_by_id
+                LEFT JOIN excused_reasons as r ON r.id = u.excused_reason_id
             WHERE 
                 NOT u.guid is null
                 AND TRIM(u.guid) <> ''
