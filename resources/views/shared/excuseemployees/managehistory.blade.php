@@ -64,6 +64,7 @@
                     scrollCollapse: true,
                     scroller: true,
                     scrollX: true,
+                    stateSave: true,
                     ajax: {
                         url: "{{ route(request()->segment(1).'.excuseemployees.managehistorylist') }}",
                         data: function(d) {
