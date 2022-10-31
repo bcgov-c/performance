@@ -105,29 +105,28 @@ class MyOrganizationController extends Controller
             ->when($request->criteria == 'dpt' && $request->search_text, function($q) use($request){return $q->whereRaw("u.deptid like '%".$request->search_text."%'");})
             ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRaw("(u.employee_id like '%".$request->search_text."%' or u.employee_name like '%".$request->search_text."%' or u.jobcode_desc like '%".$request->search_text."%' or u.deptid like '%".$request->search_text."%')");})
 
-            ->select
-            (
-                'u.user_id',
-                'u.guid',
-                'u.excused_flag',
-                'u.employee_id',
-                'u.employee_name', 
-                'u.jobcode_desc',
-                'u.organization',
-                'u.level1_program',
-                'u.level2_division',
-                'u.level3_branch',
-                'u.level4',
-                'u.deptid',
-                'u.employee_status',
-                'u.due_date_paused',
-                'u.next_conversation_date',
-                'u.excusedtype',
-                '"" AS nextConversationDue',
-                '"" AS shared',
-                '"" AS reportees',
-                '"" AS activeGoals'
-            );
+            ->selectRaw ("
+                u.user_id,
+                u.guid,
+                u.excused_flag,
+                u.employee_id,
+                u.employee_name, 
+                u.jobcode_desc,
+                u.organization,
+                u.level1_program,
+                u.level2_division,
+                u.level3_branch,
+                u.level4,
+                u.deptid,
+                u.employee_status,
+                u.due_date_paused,
+                u.next_conversation_date,
+                u.excusedtype,
+                '' AS nextConversationDue,
+                '' AS shared,
+                '' AS reportees,
+                '' AS activeGoals
+            ");
             return Datatables::of($query)->addIndexColumn()
             ->editColumn('activeGoals', function($row) {
                 $countActiveGoals = Goal::with('goals_shared_with')
@@ -155,9 +154,14 @@ class MyOrganizationController extends Controller
                 return $yesOrNo;
             })
             ->editColumn('reportees', function($row) {
-                // $countReportees = User::where('id', $row->user_id)->reporteesCount() ?? '0';
-                // return $countReportees;
-                return 0;
+                // $users = new User;
+                // $users->find('id', $row->user_id);
+                // $countReportees = User::whereRaw('id = '.$row->user_id)->hasMany('App\Models\User', 'reporting_to')->get()->count() ?? '0';
+                $tmp = $row->id;
+                Log::info(User::where('id', '=', $tmp)->reportees());
+                // $countReportees = User::with('users')->whereRaw('id = '.$row->user_id)->reporteesCount()->get() ?? '0';
+                return '$countReportees';
+                // return 0;
             })
             ->make(true);
         }
