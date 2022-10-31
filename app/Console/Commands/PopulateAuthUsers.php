@@ -14,7 +14,7 @@ class PopulateAuthUsers extends Command
      *
      * @var string
      */
-    protected $signature = 'command:PopulateAyuthUsers';
+    protected $signature = 'command:PopulateAuthUsers';
 
     /**
      * The console command description.
