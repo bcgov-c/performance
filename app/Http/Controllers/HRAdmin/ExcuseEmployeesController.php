@@ -1221,7 +1221,10 @@ class ExcuseEmployeesController extends Controller
      */
     public function manageindexupdate(Request $request) {
         $query = User::where('id', '=', $request->id)
-        ->update(['excused_flag' => $request->excused_flag, 'excused_reason_id' => $request->excused_reason_id]);
+        ->update(['excused_flag' => $request->excused_flag
+        , 'excused_reason_id' => $request->excused_reason_id
+        , 'excused_updated_by' => Auth::id()
+        , 'excused_updated_at' => Carbon::now()]);
         return redirect()->back();
     }
 
