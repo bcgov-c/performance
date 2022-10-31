@@ -523,7 +523,7 @@ class ExcuseEmployeesController extends Controller
                 })
                 ->editColumn('created_at_string', function($row) {
                     if ($row->created_at_string) {
-                        return Carbon::parse($row->j_created_at)->format('M d, Y');
+                        return Carbon::parse($row->created_at_string)->format('M d, Y');
                     } else {
                         return '';
                     }

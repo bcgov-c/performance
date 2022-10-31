@@ -506,16 +506,9 @@ class ExcuseEmployeesController extends Controller
                         return '<input pid="1335" type="checkbox" id="userCheck'. 
                             $employee->employee_id .'" name="userCheck[]" value="'. $employee->employee_id .'" class="dt-body-center">';
                 })
-                ->editColumn('excusedbyname', function($row) {
-                    if($row->excused_type == 'A' || $row->current_manual_excuse == 'Y') {
-                        return $row->excusedbyname ?? $row->updated_by_id;
-                    } else {
-                        return '';
-                    }
-                })
                 ->editColumn('created_at_string', function($row) {
                     if ($row->created_at_string) {
-                        return Carbon::parse($row->j_created_at)->format('M d, Y');
+                        return Carbon::parse($row->created_at_string)->format('M d, Y');
                     } else {
                         return '';
                     }
