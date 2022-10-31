@@ -5,19 +5,13 @@ namespace App\Http\Controllers\SysAdmin;
 use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Conversation;
-use App\Models\EmployeeDemo;
+use App\Models\Goal;
 use App\Models\EmployeeDemoJunior;
 use App\Models\OrganizationTree;
+use App\Models\SharedProfile;
+use App\Models\UserDemoJrView;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 
 
 class EmployeeListController extends Controller
@@ -119,93 +113,77 @@ class EmployeeListController extends Controller
     {
         if ($request->ajax()) 
         {
-            $level0 = $request->dd_level0 ? OrganizationTree::where('organization_trees.id', $request->dd_level0)->first() : null;
-            $level1 = $request->dd_level1 ? OrganizationTree::where('organization_trees.id', $request->dd_level1)->first() : null;
-            $level2 = $request->dd_level2 ? OrganizationTree::where('organization_trees.id', $request->dd_level2)->first() : null;
-            $level3 = $request->dd_level3 ? OrganizationTree::where('organization_trees.id', $request->dd_level3)->first() : null;
-            $level4 = $request->dd_level4 ? OrganizationTree::where('organization_trees.id', $request->dd_level4)->first() : null;
-            $query = User::withoutGlobalScopes()
-            ->from('users as u')
-            ->leftjoin('employee_demo as d', 'u.guid', 'd.guid')
-            ->leftjoin('employee_demo_jr as j', 'u.guid', 'j.guid')
-            ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and d.date_deleted is null")
-            ->whereNull('d.date_deleted')        
-            ->when($level0, function($q) use($level0) {$q->where('d.organization', $level0->name);})
-            ->when($level1, function($q) use($level1) {$q->where('d.level1_program', $level1->name);})
-            ->when($level2, function($q) use($level2) {$q->where('d.level2_division', $level2->name);})
-            ->when($level3, function($q) use($level3) {$q->where('d.level3_branch', $level3->name);})
-            ->when($level4, function($q) use($level4) {$q->where('d.level4', $level4->name);})
-            ->when($request->criteria == 'name', function($q) use($request){$q->whereRaw("d.employee_name like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'emp', function($q) use($request){$q->whereRaw("d.employee_id like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'job', function($q) use($request){$q->whereRaw("d.jobcode_desc like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'dpt', function($q) use($request){$q->whereRaw("d.deptid like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRaw("(d.employee_id like '%".$request->search_text."%' or d.employee_name like '%".$request->search_text."%' or d.jobcode_desc like '%".$request->search_text."%' or d.deptid like '%".$request->search_text."%')");})
-            ->orderBy('u.employee_id')
-            ->select
-            (
-                'u.id',
-                'u.guid',
-                'u.name',
-                'u.excused_flag',
-                'd.employee_id',
-                'd.employee_name', 
-                'd.jobcode_desc',
-                'd.organization',
-                'd.level1_program',
-                'd.level2_division',
-                'd.level3_branch',
-                'd.level4',
-                'd.deptid',
-                'd.date_deleted',
-                'd.employee_status',
-                'j.due_date_paused',
-                'j.next_conversation_date',
-                'j.excused_type',
-            );
+            $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
+            $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
+            $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
+            $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
+            $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+            $query = UserDemoJrView::from('user_demo_jr_view AS u')
+            ->whereNull('u.date_deleted')
+            ->when($level0, function($q) use($level0) {$q->where('u.organization', $level0->name);})
+            ->when($level1, function($q) use($level1) {$q->where('u.level1_program', $level1->name);})
+            ->when($level2, function($q) use($level2) {$q->where('u.level2_division', $level2->name);})
+            ->when($level3, function($q) use($level3) {$q->where('u.level3_branch', $level3->name);})
+            ->when($level4, function($q) use($level4) {$q->where('u.level4', $level4->name);})
+            ->when($request->criteria == 'name', function($q) use($request){$q->whereRaw("u.employee_name like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'emp', function($q) use($request){$q->whereRaw("u.employee_id like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'job', function($q) use($request){$q->whereRaw("u.jobcode_desc like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'dpt', function($q) use($request){$q->whereRaw("u.deptid like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRaw("(u.employee_id like '%".$request->search_text."%' OR u.employee_name like '%".$request->search_text."%' OR u.jobcode_desc like '%".$request->search_text."%' OR u.deptid like '%".$request->search_text."%')");})
+            ->selectRaw ("
+                u.user_id AS id,
+                u.guid,
+                u.user_name,
+                u.excused_flag,
+                u.employee_id,
+                u.employee_name, 
+                u.jobcode_desc,
+                u.organization,
+                u.level1_program,
+                u.level2_division,
+                u.level3_branch,
+                u.level4,
+                u.deptid,
+                u.date_deleted,
+                u.employee_status,
+                u.due_date_paused,
+                u.next_conversation_date,
+                u.excusedtype AS excused,
+                '' AS nextConversationDue,
+                '' AS shared,
+                '' AS reportees,
+                '' AS activeGoals
+            ");
             return Datatables::of($query)->addIndexColumn()
-            ->addColumn('activeGoals', function($row) {
-                $countActiveGoals = $row->activeGoals()->count() . ' Goals';
-                return $countActiveGoals;
+            ->editColumn('activeGoals', function($row) {
+                $countActiveGoals = Goal::with('goals_shared_with')
+                ->where('id', 'goal_id')
+                ->where('user_id', $row->id)
+                ->where('status', 'active')
+                ->get()
+                ->count();
+                return $countActiveGoals.' Goals';
             })
-            ->addColumn('nextConversationDue', function ($row) {
+            ->editColumn('nextConversationDue', function ($row) {
                 if ($row->excused_flag) {
                     return 'Paused';
                 } 
-                $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
-                if ($jr) {
-                    if  ($jr->due_date_paused != 'Y') {
-                        $text = Carbon::parse($jr->next_conversation_date)->format('M d, Y');
-                        return $text;
-                    } else {
-                        return 'Paused';
-                    }
+                if ($row->due_date_paused != 'Y') {
+                    $text = Carbon::parse($row->next_conversation_date)->format('M d, Y');
+                    return $text;
+                } else {
+                    return 'Paused';
                 }
                 return '';
             })
-            ->addColumn('excused', function ($row) {
-                $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
-                if ($jr) {
-                    if ($jr->excused_type) {
-                        if ($jr->excused_type == 'A') {
-                            return 'Auto';
-                        }
-                        if ($jr->excused_type == 'M' ) {
-                            return 'Manual';
-                        }
-                    }
-                }
-                if ($row->excused_flag) {
-                    return 'Manual';
-                }
-                return 'No';
-            })
-            ->addColumn('shared', function ($row) {
-                $yesOrNo = $row->is_shared ? "Yes" : "No";
+            ->editColumn('shared', function ($row) {
+                $yesOrNo = SharedProfile::where('shared_id', $row->id)->count() > 0 ? "Yes" : "No";
                 return $yesOrNo;
             })
-            ->addColumn('reportees', function($row) {
-                $countReportees = $row->reportees()->count() ?? '0';
-                return $countReportees;
+            ->editColumn('reportees', function($row) {
+                // $countReportees = $row->reportees()->count() ?? '0';
+                // return $countReportees;
+                return 0;
             })
             ->make(true);
         }
@@ -220,88 +198,74 @@ class EmployeeListController extends Controller
             $level2 = $request->dd_level2 ? OrganizationTree::where('organization_trees.id', $request->dd_level2)->first() : null;
             $level3 = $request->dd_level3 ? OrganizationTree::where('organization_trees.id', $request->dd_level3)->first() : null;
             $level4 = $request->dd_level4 ? OrganizationTree::where('organization_trees.id', $request->dd_level4)->first() : null;
-            $query = User::withoutGlobalScopes()
-            ->from('users as u')
-            ->leftjoin('employee_demo as d', 'u.guid', 'd.guid')
-            ->leftjoin('employee_demo_jr as j', 'u.guid', 'j.guid')
-            ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and d.date_deleted is not null")
-            ->when($level0, function($q) use($level0) {$q->where('d.organization', $level0->name);})
-            ->when($level1, function($q) use($level1) {$q->where('d.level1_program', $level1->name);})
-            ->when($level2, function($q) use($level2) {$q->where('d.level2_division', $level2->name);})
-            ->when($level3, function($q) use($level3) {$q->where('d.level3_branch', $level3->name);})
-            ->when($level4, function($q) use($level4) {$q->where('d.level4', $level4->name);})
-            ->when($request->criteria == 'name', function($q) use($request){$q->whereRaw("d.employee_name like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'emp', function($q) use($request){$q->whereRaw("d.employee_id like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'job', function($q) use($request){$q->whereRaw("d.jobcode_desc like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'dpt', function($q) use($request){$q->whereRaw("d.deptid like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRaw("(d.employee_id like '%".$request->search_text."%' or d.employee_name like '%".$request->search_text."%' or d.jobcode_desc like '%".$request->search_text."%' or d.deptid like '%".$request->search_text."%')");})
+            $query = UserDemoJrView::from('user_demo_jr_view AS u')
+            ->whereNotNull('u.date_deleted')
+            ->when($level0, function($q) use($level0) {$q->where('u.organization', $level0->name);})
+            ->when($level1, function($q) use($level1) {$q->where('u.level1_program', $level1->name);})
+            ->when($level2, function($q) use($level2) {$q->where('u.level2_division', $level2->name);})
+            ->when($level3, function($q) use($level3) {$q->where('u.level3_branch', $level3->name);})
+            ->when($level4, function($q) use($level4) {$q->where('u.level4', $level4->name);})
+            ->when($request->criteria == 'name', function($q) use($request){$q->whereRaw("u.employee_name like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'emp', function($q) use($request){$q->whereRaw("u.employee_id like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'job', function($q) use($request){$q->whereRaw("u.jobcode_desc like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'dpt', function($q) use($request){$q->whereRaw("u.deptid like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRaw("(u.employee_id like '%".$request->search_text."%' or u.employee_name like '%".$request->search_text."%' or u.jobcode_desc like '%".$request->search_text."%' or u.deptid like '%".$request->search_text."%')");})
             ->orderBy('u.employee_id')
-            ->select
-            (
-                'u.id',
-                'u.guid',
-                'u.name',
-                'u.excused_flag',
-                'd.employee_id',
-                'd.employee_name', 
-                'd.jobcode_desc',
-                'd.organization',
-                'd.level1_program',
-                'd.level2_division',
-                'd.level3_branch',
-                'd.level4',
-                'd.deptid',
-                'd.date_deleted',
-                'd.employee_status',
-                'j.due_date_paused',
-                'j.next_conversation_date',
-                'j.excused_type',
-            );
+            ->selectRaw ("
+                u.user_id AS id,
+                u.guid,
+                u.user_name,
+                u.excused_flag,
+                u.employee_id,
+                u.employee_name, 
+                u.jobcode_desc,
+                u.organization,
+                u.level1_program,
+                u.level2_division,
+                u.level3_branch,
+                u.level4,
+                u.deptid,
+                u.date_deleted,
+                u.employee_status,
+                u.due_date_paused,
+                u.next_conversation_date,
+                u.excusedtype AS excused,
+                '' AS nextConversationDue,
+                '' AS shared,
+                '' AS reportees,
+                '' AS activeGoals
+            ");
             return Datatables::of($query)
             ->addIndexColumn()
-            ->addColumn('activeGoals', function($row) {
-                $countActiveGoals = $row->activeGoals()->count() . ' Goals';
-                return $countActiveGoals;
+            ->editColumn('activeGoals', function($row) {
+                $countActiveGoals = Goal::with('goals_shared_with')
+                ->where('id', 'goal_id')
+                ->where('user_id', $row->id)
+                ->where('status', 'active')
+                ->get()
+                ->count();
+                return $countActiveGoals.' Goals';
             })
-            ->addColumn('nextConversationDue', function ($row) {
+            ->editColumn('nextConversationDue', function ($row) {
                 if ($row->excused_flag) {
                     return 'Paused';
                 } 
-                $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
-                if ($jr) {
-                    if  ($jr->due_date_paused != 'Y') {
-                        $text = Carbon::parse($jr->next_conversation_date)->format('M d, Y');
-                        return $text;
-                    } else {
-                        return 'Paused';
-                    }
+                if ($row->due_date_paused != 'Y') {
+                    $text = Carbon::parse($row->next_conversation_date)->format('M d, Y');
+                    return $text;
+                } else {
+                    return 'Paused';
                 }
                 return '';
             })
-            ->addColumn('excused', function ($row) {
-                $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
-                if ($jr) {
-                    if ($jr->excused_type) {
-                        if ($jr->excused_type == 'A') {
-                            return 'Auto';
-                        }
-                        if ($jr->excused_type == 'M' ) {
-                            return 'Manual';
-                        }
-                    }
-                }
-                if ($row->excused_flag) {
-                    return 'Manual';
-                }
-                return 'No';
-            })
-            ->addColumn('shared', function ($row) {
-                $yesOrNo = $row->is_shared ? "Yes" : "No";
+            ->editColumn('shared', function ($row) {
+                $yesOrNo = SharedProfile::where('shared_id', $row->id)->count() > 0 ? "Yes" : "No";
                 return $yesOrNo;
             })
-            ->addColumn('reportees', function($row) {
-                $countReportees = $row->reportees()->count() ?? '0';
-                return $countReportees;
+            ->editColumn('reportees', function($row) {
+                // $countReportees = $row->reportees()->count() ?? '0';
+                // return $countReportees;
+                return 0;
             })
             ->editColumn('date_deleted', function ($row) {
                 // return $row->date_deleted ? $row->date_deleted->format('M d, Y H:i:s') : null;
