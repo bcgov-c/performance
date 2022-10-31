@@ -123,9 +123,13 @@ class MyOrganizationController extends Controller
                 'u.due_date_paused',
                 'u.next_conversation_date',
                 'u.excusedtype',
+                '"" AS nextConversationDue',
+                '"" AS shared',
+                '"" AS reportees',
+                '"" AS activeGoals'
             );
             return Datatables::of($query)->addIndexColumn()
-            ->addColumn('activeGoals', function($row) {
+            ->editColumn('activeGoals', function($row) {
                 $countActiveGoals = Goal::with('goals_shared_with')
                 ->where('id', 'goal_id')
                 ->where('user_id', $row->user_id)
@@ -134,7 +138,7 @@ class MyOrganizationController extends Controller
                 ->count();
                 return $countActiveGoals.' Goals';
             })
-            ->addColumn('nextConversationDue', function ($row) {
+            ->editColumn('nextConversationDue', function ($row) {
                 if ($row->excused_flag) {
                     return 'Paused';
                 } 
@@ -146,11 +150,11 @@ class MyOrganizationController extends Controller
                 }
                 return '';
             })
-            ->addColumn('shared', function ($row) {
+            ->editColumn('shared', function ($row) {
                 $yesOrNo = SharedProfile::where('shared_id', $row->user_id)->count() > 0 ? "Yes" : "No";
                 return $yesOrNo;
             })
-            ->addColumn('reportees', function($row) {
+            ->editColumn('reportees', function($row) {
                 // $countReportees = User::where('id', $row->user_id)->reporteesCount() ?? '0';
                 // return $countReportees;
                 return 0;

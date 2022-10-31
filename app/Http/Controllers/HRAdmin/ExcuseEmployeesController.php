@@ -324,10 +324,10 @@ class ExcuseEmployeesController extends Controller
             ->when($level4, function($q) use($level4) {$q->where('u.level4', $level4->name);})
             ->when($request->criteria == 'name', function($q) use($request){$q->whereRaw("u.employee_name like '%".$request->search_text."%'");})
             ->when($request->criteria == 'emp', function($q) use($request){$q->whereRaw("u.employee_id like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'ext', function($q) use($request){$q->havingRaw("u.excusedtype like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'exb', function($q) use($request){$q->havingRaw("u.excused_by_name like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'ext', function($q) use($request){$q->havingRaw("u.j_excusedtype like '%".$request->search_text."%'");})
+            ->when($request->criteria == 'exb', function($q) use($request){$q->havingRaw("u.j_excused_updated_by_name like '%".$request->search_text."%'");})
             ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {
-                $q->havingRaw("u.employee_id_search like '%".$request->search_text."%' or u.employee_name_search like '%".$request->search_text."%' or u.excusedtype like '%".$request->search_text."%' or u.excused_by_name like '%".$request->search_text."%'");
+                $q->havingRaw("u.employee_id_search like '%".$request->search_text."%' or u.employee_name_search like '%".$request->search_text."%' or u.j_excusedtype like '%".$request->search_text."%' or u.j_excused_updated_by_name like '%".$request->search_text."%'");
             })
             ->selectRaw ("
             u.user_id AS id
@@ -1038,11 +1038,11 @@ class ExcuseEmployeesController extends Controller
         ->when( $level3, function ($q) use($level3) { $q->where('level3_branch', $level3->name); })
         ->when( $level4, function ($q) use($level4) { $q->where('level4', $level4->name); })
         ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) { 
-            $q->havingRaw("employee_id_search like '%".$request->search_text."%' or employee_name_search like '%".$request->search_text."%' or excused_type like '%".$request->search_text."%' or excused_by_name like '%".$request->search_text."%'"); 
+            $q->havingRaw("employee_id_search like '%".$request->search_text."%' or employee_name_search like '%".$request->search_text."%' or excusedtype like '%".$request->search_text."%' or excused_by_name like '%".$request->search_text."%'"); 
         })
         ->when( $request->search_text && $request->criteria == 'emp', function ($q) use($request) { $q->whereRaw("employee_id like '%" . $request->search_text . "%'"); })
         ->when( $request->search_text && $request->criteria == 'name', function ($q) use($request) { $q->whereRaw("employee_name like '%" . $request->search_text . "%'"); })
-        ->when( $request->search_text && $request->criteria == 'ext', function ($q) use($request) { $q->havingRaw("excused_type like '%" . $request->search_text . "%'"); })
+        ->when( $request->search_text && $request->criteria == 'ext', function ($q) use($request) { $q->havingRaw("excusedtype like '%" . $request->search_text . "%'"); })
         ->when( $request->search_text && $request->criteria == 'exb', function ($q) use($request) { $q->havingRaw("excused_by_name like '%" . $request->search_text . "%'"); })
         ;
     }
