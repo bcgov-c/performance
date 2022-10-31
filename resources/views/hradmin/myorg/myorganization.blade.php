@@ -6,10 +6,13 @@
     </div>
 
     <div class="card">
-        <div class="card-body">            
-            @include('hradmin.myorg.partials.filter')
-            <p></p>
-            <table class="table table-bordered myorgtable table-striped" id="myorgtable" style="width: 100%; overflow-x: auto; "></table>
+        <div class="card-body">    
+            <div class="m-n2 pb-n3">
+                @include('hradmin.myorg.partials.filter')
+            </div>
+            <div class="m-2 mt-n2">
+                <table class="table table-bordered myorgtable table-striped" id="myorgtable" style="width: 100%; overflow-x: auto; "></table>
+            </div>
         </div>    
     </div>   
 
@@ -59,6 +62,7 @@
                             scrollCollapse: true,
                             scroller: true,
                             scrollX: true,
+                            stateSave: true,
                             ajax: 
                             {
                                 url: "{{ route('hradmin.myorg.myorganization') }}",
@@ -78,36 +82,21 @@
                             },
                             columns: 
                             [
-                                {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id'
-                                    , name: 'u.employee_id', searchable: true, className: 'dt-nowrap'},
-                                {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name'
-                                    , name: 'u.employee_name', searchable: true, className: 'dt-nowrap'},
-                                {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc'
-                                    , name: 'u.jobcode_desc', searchable: true, className: 'dt-nowrap'},
-                                {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization'
-                                    , name: 'u.organization', searchable: true, className: 'dt-nowrap'},
-                                {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program'
-                                    , name: 'u.level1_program', searchable: true, className: 'dt-nowrap'},
-                                {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division'
-                                    , name: 'u.level2_division', searchable: true, className: 'dt-nowrap'},
-                                {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch'
-                                    , name: 'u.level3_branch', searchable: true, className: 'dt-nowrap'},
-                                {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4'
-                                    , name: 'u.level4', searchable: true, className: 'dt-nowrap'},
-                                {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid'
-                                    , name: 'u.deptid', searchable: true, className: 'dt-nowrap'},
-                                {title: 'Active Goals', ariaTitle: 'Active Goals', target: 0, type: 'string', data: 'activeGoals'
-                                    , name: 'activeGoals', searchable: false, className: 'dt-nowrap'},
-                                {title: 'Next Conversation', ariaTitle: 'Next Conversation', target: 0, type: 'date', data: 'nextConversationDue'
-                                    , name: 'nextConversationDue', searchable: false, className: 'dt-nowrap'},
-                                {title: 'Excused', ariaTitle: 'Excused', target: 0, type: 'string', data: 'excusedtype'
-                                    , name: 'excusedtype', searchable: false, className: 'dt-nowrap'},
-                                {title: 'Shared', ariaTitle: 'Shared', target: 0, type: 'string', data: 'shared'
-                                    , name: 'shared', searchable: false, className: 'dt-nowrap'},
-                                {title: 'Direct Reports', ariaTitle: 'Direct Reports', target: 0, type: 'string', data: 'reportees'
-                                    , name: 'reportees', searchable: false, className: 'dt-nowrap'},
-                                {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'num', data: 'user_id'
-                                    , name: 'u.user_id', searchable: true, visible: false, className: 'dt-nowrap'},
+                                {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'u.employee_id', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'u.employee_name', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'u.jobcode_desc', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'u.organization', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'u.level1_program', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'u.level2_division', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'u.level3_branch', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'u.level4', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', name: 'u.deptid', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Active Goals', ariaTitle: 'Active Goals', target: 0, type: 'string', data: 'activeGoals', name: 'activeGoals', searchable: false, className: 'dt-nowrap'},
+                                {title: 'Next Conversation', ariaTitle: 'Next Conversation', target: 0, type: 'date', data: 'nextConversationDue', name: 'nextConversationDue', searchable: false, className: 'dt-nowrap'},
+                                {title: 'Excused', ariaTitle: 'Excused', target: 0, type: 'string', data: 'excusedtype', name: 'excusedtype', searchable: true, className: 'dt-nowrap'},
+                                {title: 'Shared', ariaTitle: 'Shared', target: 0, type: 'string', data: 'shared', name: 'shared', searchable: false, className: 'dt-nowrap'},
+                                {title: 'Direct Reports', ariaTitle: 'Direct Reports', target: 0, type: 'string', data: 'reportees', name: 'reportees', searchable: false, className: 'dt-nowrap'},
+                                {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'num', data: 'user_id', name: 'u.user_id', searchable: true, visible: false, className: 'dt-nowrap'},
                             ]
                         }
                     );
