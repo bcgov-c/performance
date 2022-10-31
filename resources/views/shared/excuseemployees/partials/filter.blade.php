@@ -1,4 +1,4 @@
-<div class="card p-3">
+<div class="card pt-3 pl-3">
     <div class="form-row">
         <div class="form-group col-md-2">
             <label for="dd_level0">Organization</label>
@@ -55,7 +55,7 @@
             <input type="text" id="search_text" name="search_text" class="form-control" 
                     value="{{ old('search_text') }}" placeholder="Search Text">
         </div>
-        <div class="form-group col-md-2 p-3 float-left float-bottom" style="display: flex; flex-direction: column;">
+        <div class="form-group col-md-2 pt-3 pl-3 float-left float-bottom" style="display: flex; flex-direction: column;">
             <div class="form-group row"> </div>
                 <div class="form-group row">
                     <span class="float-left float-bottom">  
