@@ -129,13 +129,7 @@ class MyOrganizationController extends Controller
             ");
             return Datatables::of($query)->addIndexColumn()
             ->editColumn('activeGoals', function($row) {
-                $countActiveGoals = Goal::with('goals_shared_with')
-                ->where('id', 'goal_id')
-                ->where('user_id', $row->user_id)
-                ->where('status', 'active')
-                ->get()
-                ->count();
-                return $countActiveGoals.' Goals';
+                return (User::where('id', $row->user_id)->first()->activeGoals()->count() ?? '0').' Goals';
             })
             ->editColumn('nextConversationDue', function ($row) {
                 if ($row->excused_flag) {
@@ -150,18 +144,10 @@ class MyOrganizationController extends Controller
                 return '';
             })
             ->editColumn('shared', function ($row) {
-                $yesOrNo = SharedProfile::where('shared_id', $row->user_id)->count() > 0 ? "Yes" : "No";
-                return $yesOrNo;
+                return SharedProfile::where('shared_id', $row->user_id)->count() > 0 ? "Yes" : "No";
             })
             ->editColumn('reportees', function($row) {
-                // $users = new User;
-                // $users->find('id', $row->user_id);
-                // $countReportees = User::whereRaw('id = '.$row->user_id)->hasMany('App\Models\User', 'reporting_to')->get()->count() ?? '0';
-                $tmp = $row->id;
-                Log::info(User::where('id', '=', $tmp)->reportees());
-                // $countReportees = User::with('users')->whereRaw('id = '.$row->user_id)->reporteesCount()->get() ?? '0';
-                return '$countReportees';
-                // return 0;
+                return User::where('id', $row->user_id)->first()->reporteesCount() ?? '0';
             })
             ->make(true);
         }

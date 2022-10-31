@@ -156,13 +156,7 @@ class EmployeeListController extends Controller
             ");
             return Datatables::of($query)->addIndexColumn()
             ->editColumn('activeGoals', function($row) {
-                $countActiveGoals = Goal::with('goals_shared_with')
-                ->where('id', 'goal_id')
-                ->where('user_id', $row->id)
-                ->where('status', 'active')
-                ->get()
-                ->count();
-                return $countActiveGoals.' Goals';
+                return (User::where('id', $row->id)->first()->activeGoals()->count() ?? '0').' Goals';
             })
             ->editColumn('nextConversationDue', function ($row) {
                 if ($row->excused_flag) {
@@ -177,13 +171,10 @@ class EmployeeListController extends Controller
                 return '';
             })
             ->editColumn('shared', function ($row) {
-                $yesOrNo = SharedProfile::where('shared_id', $row->id)->count() > 0 ? "Yes" : "No";
-                return $yesOrNo;
+                return SharedProfile::where('shared_id', $row->id)->count() > 0 ? "Yes" : "No";
             })
             ->editColumn('reportees', function($row) {
-                // $countReportees = $row->reportees()->count() ?? '0';
-                // return $countReportees;
-                return 0;
+                return User::where('id', $row->id)->first()->reporteesCount() ?? '0';
             })
             ->make(true);
         }
@@ -238,13 +229,7 @@ class EmployeeListController extends Controller
             return Datatables::of($query)
             ->addIndexColumn()
             ->editColumn('activeGoals', function($row) {
-                $countActiveGoals = Goal::with('goals_shared_with')
-                ->where('id', 'goal_id')
-                ->where('user_id', $row->id)
-                ->where('status', 'active')
-                ->get()
-                ->count();
-                return $countActiveGoals.' Goals';
+                return (User::where('id', $row->id)->first()->activeGoals()->count() ?? '0').' Goals';
             })
             ->editColumn('nextConversationDue', function ($row) {
                 if ($row->excused_flag) {
@@ -259,17 +244,18 @@ class EmployeeListController extends Controller
                 return '';
             })
             ->editColumn('shared', function ($row) {
-                $yesOrNo = SharedProfile::where('shared_id', $row->id)->count() > 0 ? "Yes" : "No";
-                return $yesOrNo;
+                return SharedProfile::where('shared_id', $row->id)->count() > 0 ? "Yes" : "No";
             })
             ->editColumn('reportees', function($row) {
-                // $countReportees = $row->reportees()->count() ?? '0';
-                // return $countReportees;
-                return 0;
+                return User::where('id', $row->id)->first()->reporteesCount() ?? '0';
             })
             ->editColumn('date_deleted', function ($row) {
-                // return $row->date_deleted ? $row->date_deleted->format('M d, Y H:i:s') : null;
-                return $row->date_deleted;
+                if ($row->date_deleted) {
+                    $text = Carbon::parse($row->date_deleted)->format('M d, Y');
+                } else {
+                    $text = '';
+                }
+                return $row->date_deleted ? $text : null;
             })
             ->rawColumns(['date_deleted', 'nextConversation'])
             ->make(true);
