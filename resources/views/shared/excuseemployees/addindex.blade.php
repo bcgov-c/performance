@@ -49,9 +49,11 @@
 		</div>
 		<!--Modal ends here--->	
 	
-		@include('shared.excuseemployees.partials.filter')
+		<div class="m-n2 pb-n3 pl-2">
+			@include('shared.excuseemployees.partials.filter')
+		</div>
 
-        <div class="p-3">
+        <div class="m-2 mt-n2">
             <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                     <a class="nav-item nav-link active" id="nav-list-tab" data-toggle="tab" href="#nav-list" role="tab" aria-controls="nav-list" aria-selected="true">List</a>

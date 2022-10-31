@@ -49,6 +49,7 @@
                 scrollCollapse: true,
                 scroller: true,
                 scrollX: true,
+                stateSave: true,
                 ajax: {
                     url: '{{ route(request()->segment(1).'.excuseemployees.employee.list') }}',
                     data: function (d) {
@@ -110,9 +111,7 @@
                 ],
             });
 
-
             $('#employee-list-table tbody').on( 'click', 'input:checkbox', function () {
-
                 // if the input checkbox is selected 
                 var id = this.value;
                 var index = $.inArray(id, g_selected_employees);
@@ -121,7 +120,6 @@
                 } else {
                     g_selected_employees.splice( index, 1 );
                 }
-
                 // update the check all checkbox status 
                 if (g_selected_employees.length == 0) {
                     $('#employee-list-select-all').prop("checked", false);
@@ -134,7 +132,6 @@
                     $('#employee-list-select-all').prop("indeterminate", true);    
                 }
             });
-
             // Handle click on "Select all" control
             $('#employee-list-select-all').on('click', function() {
                 // Check/uncheck all checkboxes in the table
@@ -149,9 +146,7 @@
                     $('#employee-list-select-all').prop("indeterminate", false);    
                 }    
             });
-
         });
-
     </script>
 @endpush
 

@@ -78,18 +78,18 @@
                     },
                     columns: [
                         {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'u.employee_id', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_demo.employee_name', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'employee_demo.jobcode_desc', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Excused', ariaTitle: 'Excused', target: 0, type: 'string', data: 'excusedtype', name: 'excusedtype', searchable: false, visible: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Excused By', ariaTitle: 'Excused By', target: 0, type: 'string', data: 'excused_by_name', name: 'excused_by_name', searchable: false, visible: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'u.employee_name', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'u.jobcode_desc', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Excused', ariaTitle: 'Excused', target: 0, type: 'string', data: 'j_excusedtype', name: 'u.j_excusedtype', searchable: false, visible: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Excused By', ariaTitle: 'Excused By', target: 0, type: 'string', data: 'j_excused_updated_by_name', name: 'u.j_excused_updated_by_name', searchable: false, visible: true, className: 'dt-nowrap show-modal'},
                         {title: 'Start Date', ariaTitle: 'Start Date', target: 0, type: 'string', data: 'startdate_string', name: 'startdate_string', searchable: false, visible: true, className: 'dt-nowrap show-modal'},
                         {title: 'End Date', ariaTitle: 'End Date', target: 0, type: 'string', data: 'enddate_string', name: 'enddate_string', searchable: false, visible: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'employee_demo.organization', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'employee_demo.level1_program', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'employee_demo.level2_division', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'employee_demo.level3_branch', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'employee_demo.level4', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', name: 'employee_demo.deptid', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'u.organization', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'u.level1_program', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'u.level2_division', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'u.level3_branch', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'u.level4', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', name: 'u.deptid', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'num', data: 'id', name: 'id', searchable: false, visible: false},
                     ]
                 } );
@@ -153,15 +153,6 @@
                     $('#admintable').hide();
                 };
             });
-
-            // $(window).on('beforeunload', function(){
-            //     $('#pageLoader').show();
-            // });
-
-            // $(window).resize(function(){
-            //     location.reload();
-            //     return;
-            // });
 
         </script>
     @endpush
