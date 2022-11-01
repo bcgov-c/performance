@@ -704,10 +704,21 @@
                 $.ajax({
                     url: '/conversation/' + conversation_id
                     , success: function(result) {
-                         modal_open=true;
+                        modal_open=true;
                         isSupervisor = result.view_as_supervisor;
                         topic_id = result.topic.id;
                         disable_signoff = result.disable_signoff;
+                        
+                        type = 'current';
+                        @if($type == 'past')
+                            type = 'past';
+                        @endif
+                        
+                        if(type == 'past') {
+                            $('#sdq_card').hide();
+                            $('#pfc_card').hide();
+                        }
+                                
                         employee_signed = false;
                         supervisor_signed = false;
                         
