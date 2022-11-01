@@ -577,7 +577,7 @@ class NotifyConversationDue extends Command
                             ->first();
 
                     if (!$mgr) {
-                        $this->logInfo( $now->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . '  ** SKIPPED ** (MANAGER NOT FOUND OR PREFER TO NOT RECECIVED EMAIL)' );
+                        $this->logInfo( Carbon::now()->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . '  ** SKIPPED ** (MANAGER NOT FOUND OR PREFER TO NOT RECECIVED EMAIL)' );
                         $skip_count += 1;
                         continue;
                     }
@@ -671,12 +671,12 @@ class NotifyConversationDue extends Command
                             $response = $sendMail->sendMailWithGenericTemplate();    
 
                         } else {
-                            // $this->logInfo( $now->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . '  ** SKIPPED ** (ALREADY SENT, LOG RECORD FOUND)' );
+                            // $this->logInfo( Carbon::now()->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . '  ** SKIPPED ** (ALREADY SENT, LOG RECORD FOUND)' );
                             $skip_count += 1;
                         } 
 
                     } else {
-                        // $this->logInfo( $now->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . '  ** SKIPPED ** (NOT DUE YET)' );
+                        // $this->logInfo( Carbon::now()->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . '  ** SKIPPED ** (NOT DUE YET)' );
                         $skip_count += 1; 
                     }
                 }
