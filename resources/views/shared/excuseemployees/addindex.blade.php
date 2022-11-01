@@ -8,7 +8,7 @@
 
     @include('shared/excuseemployees/partials/excused-edit-modal')
 
-	<p class="px-3">Follow the steps below to select an employee and excuse them from the Performance Development process. This will remove the employee from any reporting and will pause the employee’s conversation deadlines during the date range selected.</p>
+	<p class="px-3">Follow the steps below to select an employee and excuse them from the Performance Development process. This will remove the employee from any reporting and will pause the employee’s conversation deadlines.</p>
 
         @if(Session::has('message'))
             <div class="col-12">                    
@@ -113,7 +113,7 @@
 					{{-- <h6 class="text-bold mt-1">Target Audience</h6> --}}
 					<div class="row">
 						<input class="" type="checkbox"  id="chkbox_declare" name="chkbox_declare" value="">
-						<p class="px-3">I wish to excuse the selected employees from the Performance Development process during the date range selected.</p>
+						<p class="px-3">I wish to excuse the selected employees from the Performance Development process.</p>
 					</div>
 					<div class="row">
 						<div class="alert alert-warning alert-dismissible no-border"  style="border-color:#d5e6f6; background-color:#d5e6f6" role="alert">
