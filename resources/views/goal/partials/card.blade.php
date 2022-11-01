@@ -1,7 +1,7 @@
     <div class="card card-primary shadow">
         <div class="card-header p-1">
             <div class="d-flex">
-                @if(isset($from) && $from == 'bank') 
+                @if(isset($from) && $from == 'bank' || session()->has('view-profile-as')) 
                     <a href="{{route("goal.edit", $goal->id)}}" class="p-2">
                 @else
                     <a href="{{route("goal.show", $goal->id)}}" class="p-2">
