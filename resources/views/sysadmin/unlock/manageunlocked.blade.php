@@ -215,7 +215,116 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
+<script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
+        
+<script>            
+	CKEDITOR.replace('info_comment1', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment2', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment3', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment4', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment5', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment6', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment7', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment8', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment9', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment10', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	
+	 modal_open=false;
+</script>    
+
 <script>
+	
+
 
 $.ajaxSetup({
 	headers: {

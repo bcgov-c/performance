@@ -81,6 +81,9 @@
                     <div class="flex-fill btn-view-conversation"  style="cursor: pointer;" data-id="{{ $c->id }}" data-toggle="modal" data-target="#viewConversationModal">
                         <h6>
                             {{ $c->topic->name }}
+                            {{-- @if ( $c->unlock_until > now() ) 
+                                <span class="pl-4 text-danger font-wieght-bold">[Notes: reopened until: {{ $c->unlock_until->format('Y-m-d') }} ]</span>
+                            @endif --}}
                         </h6>
                         <span class="mr-2">
                             With
