@@ -58,7 +58,7 @@
                 
                 
                 
-                <div class="card">
+                <div class="card" id="sdq_card">
                         <div class="card-header panel-heading bg-primary" id="heading_1">
                         <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_1" aria-expanded="false" aria-controls="collapse_1">
                                 <button class="btn btn-link" style="color:white">
@@ -75,7 +75,7 @@
                         </div>
                 </div>
                 
-                <div class="card">
+                <div class="card"  id="pfc_card">
                         <div class="card-header panel-heading bg-primary" id="heading_2">
                         <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_2" aria-expanded="false" aria-controls="collapse_2">
                                 <button class="btn btn-link" style="color:white">
