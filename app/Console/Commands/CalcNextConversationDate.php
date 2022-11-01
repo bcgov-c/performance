@@ -436,21 +436,32 @@ class CalcNextConversationDate extends Command
         $this->info('CalcNextConversationDate, Completed: '.$end_time);
         // Log::info($end_time->format('c').' - '.$processname.' - Finished');
     } 
- 
-    
+     
     protected function updateUsersTable() {
-        User::from('users as u')
-        ->whereRaw("trim(u.guid) <> ''")
-        ->whereNotNull('u.guid')
-        ->update([
-            'u.next_conversation_date' => DB::raw(" (select next_conversation_date from employee_demo_jr j1 
-                                        where id = (select max(id) from employee_demo_jr j2 where j1.guid = j2.guid)
-                                                and u.guid = guid)" ),
 
-            'u.due_date_paused' =>  DB::raw(" (select due_date_paused from employee_demo_jr j1 
+        $users = User::from('users')
+        ->whereRaw("trim(users.guid) <> ''")
+        ->whereNotNull('users.guid')
+        ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('employee_demo_jr')
+                ->whereRaw("employee_demo_jr.id = (select max(id) from employee_demo_jr j2 where employee_demo_jr.guid = j2.guid)")
+                ->whereColumn('employee_demo_jr.guid', 'users.guid')
+                ->where(function($query) {
+                    $query->whereRaw( 'employee_demo_jr.next_conversation_date <> users.next_conversation_date')
+                            ->orWhereRaw( 'employee_demo_jr.due_date_paused <> users.due_date_paused');
+                });
+        })
+        ->update([
+            'users.next_conversation_date' => DB::raw(" (select next_conversation_date from employee_demo_jr j1 
+                                        where id = (select max(id) from employee_demo_jr j2 where j1.guid = j2.guid)
+                                                and users.guid = guid)" ),
+
+            'users.due_date_paused' =>  DB::raw(" (select due_date_paused from employee_demo_jr j1 
                                     where id = (select max(id) from employee_demo_jr j2 where j1.guid = j2.guid)
-                                        and u.guid = guid)" )
+                                        and users.guid = guid)" )
         ]); 
+
     }
 
 }
