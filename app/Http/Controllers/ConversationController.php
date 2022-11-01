@@ -52,8 +52,19 @@ class ConversationController extends Controller
                         } 
                         return $query;
                     });
-            })->whereNotNull('signoff_user_id')->whereNotNull('supervisor_signoff_id');
-            //->whereDate('unlock_until', '<', Carbon::today());
+            })->whereNotNull('signoff_user_id')->whereNotNull('supervisor_signoff_id')
+            ->where(function($query) {
+                $query->where(function($query) {
+                    $query->whereNotNull('signoff_user_id')
+                          ->whereNotNull('supervisor_signoff_id')                          
+                          ->whereNull('unlock_until');
+                })
+                ->orWhere(function($query) {
+                    $query->whereNotNull('signoff_user_id')
+                          ->whereNotNull('supervisor_signoff_id')
+                          ->whereDate('unlock_until', '<', Carbon::today() );
+                });
+            });       
 
             if ($request->has('user_id') && $request->user_id) {
                 $user_id = $request->user_id;
