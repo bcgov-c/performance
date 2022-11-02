@@ -137,10 +137,10 @@ class StatisticsReportController extends Controller
                         ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                             return $q->where('employee_demo.level4', $level4->name);
                         })
-                        ->where( function($query) {
-                            $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01")')
-                                  ->where('employee_demo.employee_status', 'A');
-                        })
+                        // ->where( function($query) {
+                        //     $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01")')
+                        //           ->where('employee_demo.employee_status', 'A');
+                        // })
                         // ->whereIn('A.id', $matched_user_ids);
                         ->whereExists(function ($query) {
                             $query->select(DB::raw(1))
@@ -193,10 +193,10 @@ class StatisticsReportController extends Controller
                     // ->where('acctlock', 0)
                     // ->whereBetween('goals_count', $range)
                     // ->whereIn('A.id', $matched_user_ids);
-                    ->where( function($query) {
-                        $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01")')
-                              ->where('employee_demo.employee_status', 'A');
-                    })
+                    // ->where( function($query) {
+                    //     $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01")')
+                    //           ->where('employee_demo.employee_status', 'A');
+                    // })
                     ->whereExists(function ($query) {
                         $query->select(DB::raw(1))
                                 ->from('admin_org_users')
@@ -251,8 +251,9 @@ class StatisticsReportController extends Controller
         $count_raw .= $level3 ? "     and employee_demo.level3_branch = '". addslashes($level3->name) ."'" : '';
         $count_raw .= $level4 ? "     and employee_demo.level4 = '". addslashes($level4->name) ."'" : '';
         $count_raw .= "     and ( ";
-        $count_raw .= "           date(SYSDATE()) not between IFNULL(users.excused_start_date,'1900-01-01')  and IFNULL(users.excused_end_date,'1900-01-01')  "; 
-        $count_raw .= "       and employee_demo.employee_status = 'A' ";
+        $count_raw .= "           users.due_date_paused = 'N' ";
+        // $count_raw .= "           date(SYSDATE()) not between IFNULL(users.excused_start_date,'1900-01-01')  and IFNULL(users.excused_end_date,'1900-01-01')  "; 
+        // $count_raw .= "       and employee_demo.employee_status = 'A' ";
         $count_raw .= "         )";
         $count_raw .= "     and exists (select 1 from admin_org_users ";
         $count_raw .= "                  where admin_org_users.allowed_user_id = users.id ";
@@ -300,10 +301,10 @@ class StatisticsReportController extends Controller
                           ->whereColumn('goals.id', 'goal_tags.goal_id');
                 })
                 ->where('employee_demo.guid', '<>', '')
-                ->where( function($query) {
-                    $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01")')
-                          ->where('employee_demo.employee_status', 'A');
-                })
+                // ->where( function($query) {
+                //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01")')
+                //           ->where('employee_demo.employee_status', 'A');
+                // })
                 // ->whereIn('users.id', $matched_user_ids);
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
@@ -377,10 +378,10 @@ class StatisticsReportController extends Controller
                 ->when( (array_key_exists($request->range, $this->groups)) , function($q) use($request) {
                     return $q->whereBetween('goals_count', $this->groups[$request->range]);
                 })
-                ->where( function($query) {
-                    $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01") ')
-                          ->where('employee_demo.employee_status', 'A');
-                })
+                // ->where( function($query) {
+                //     $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01") ')
+                //           ->where('employee_demo.employee_status', 'A');
+                // })
                 // ->whereExists(function ($query) {
                 //     $query->select(DB::raw(1))
                 //             ->from('admin_orgs')
@@ -496,8 +497,9 @@ class StatisticsReportController extends Controller
             $count_raw .= "      and employee_demo.guid <> '' ";
             
             $count_raw .= "     and ( ";
-            $count_raw .= "            date(SYSDATE()) not between IFNULL(users.excused_start_date, '1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01') "; 
-            $count_raw .= "        and employee_demo.employee_status = 'A' ";
+            $count_raw .= "            users.due_date_paused = 'N' ";
+            // $count_raw .= "            date(SYSDATE()) not between IFNULL(users.excused_start_date, '1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01') "; 
+            // $count_raw .= "        and employee_demo.employee_status = 'A' ";
             $count_raw .= "         )";
             
             $count_raw .= " ) as 'tag_0' ";
@@ -509,8 +511,9 @@ class StatisticsReportController extends Controller
             $count_raw .= "      and users.id = goals.user_id ";
             
             $count_raw .= "     and ( ";
-            $count_raw .= "            date(SYSDATE()) not between IFNULL(users.excused_start_date,'1900-01-01')  and IFNULL(users.excused_end_date,'1900-01-01') "; 
-            $count_raw .= "        and employee_demo.employee_status = 'A' ";
+            $count_raw .= "            users.due_date_paused = 'N' ";
+            // $count_raw .= "            date(SYSDATE()) not between IFNULL(users.excused_start_date,'1900-01-01')  and IFNULL(users.excused_end_date,'1900-01-01') "; 
+            // $count_raw .= "        and employee_demo.employee_status = 'A' ";
             $count_raw .= "         )";
             
             $count_raw .= ") as 'tag_". $tag->id ."'";
@@ -565,10 +568,10 @@ class StatisticsReportController extends Controller
                                         ->whereColumn('goals.user_id',  'users.id');
                                 });
                     })
-                    ->where( function($query) {
-                        $query->whereRaw('date(SYSDATE()) between users.excused_start_date and users.excused_end_date')
-                              ->orWhere('employee_demo.employee_status', 'A');
-                    })  
+                    // ->where( function($query) {
+                    //     $query->whereRaw('date(SYSDATE()) between users.excused_start_date and users.excused_end_date')
+                    //           ->orWhere('employee_demo.employee_status', 'A');
+                    // })  
                     // ->whereExists(function ($query) {
                     //     $query->select(DB::raw(1))
                     //             ->from('admin_orgs')
@@ -722,10 +725,10 @@ class StatisticsReportController extends Controller
                 ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.level4', $level4->name);
                 })
-                ->where( function($query) {
-                    $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
-                          ->where('employee_demo.employee_status', 'A');
-                })
+                // ->where( function($query) {
+                //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
+                //           ->where('employee_demo.employee_status', 'A');
+                // })
                 // ->whereExists(function ($query) {
                 //     $query->select(DB::raw(1))
                 //             ->from('admin_orgs')
@@ -857,10 +860,10 @@ class StatisticsReportController extends Controller
         //     } );
         // })
         // ->where('admin_orgs.user_id', '=', Auth::id());
-        ->where( function($query) {
-            $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
-                  ->where('employee_demo.employee_status', 'A');
-        })
+        // ->where( function($query) {
+        //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
+        //           ->where('employee_demo.employee_status', 'A');
+        // })
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
                     ->from('admin_org_users')
@@ -963,10 +966,10 @@ class StatisticsReportController extends Controller
                     ->whereIn('admin_org_users.access_type', [0,2])
                     ->where('admin_org_users.granted_to_id', '=', Auth::id());
         })
-        ->where( function($query) {
-            $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
-                  ->where('employee_demo.employee_status', 'A');
-        })
+        // ->where( function($query) {
+        //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
+        //           ->where('employee_demo.employee_status', 'A');
+        // })
         ->get();
 
         foreach($topics as $topic)
@@ -1019,10 +1022,10 @@ class StatisticsReportController extends Controller
                 ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.level4', $level4->name);
                 })
-                ->where( function($query) {
-                    $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
-                          ->where('employee_demo.employee_status', 'A');
-                })
+                // ->where( function($query) {
+                //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
+                //           ->where('employee_demo.employee_status', 'A');
+                // })
                 // ->whereExists(function ($query) {
                 //     $query->select(DB::raw(1))
                 //             ->from('admin_orgs')
@@ -1112,10 +1115,10 @@ class StatisticsReportController extends Controller
                 ->when( $request->topic_id, function($q) use($request) {
                     $q->where('conversations.conversation_topic_id', $request->topic_id);
                 })
-                ->where( function($query) {
-                    $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
-                          ->where('employee_demo.employee_status', 'A');
-                })
+                // ->where( function($query) {
+                //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
+                //           ->where('employee_demo.employee_status', 'A');
+                // })
                 // ->whereExists(function ($query) {
                 //     $query->select(DB::raw(1))
                 //             ->from('admin_orgs')
@@ -1228,10 +1231,10 @@ class StatisticsReportController extends Controller
             //     } );
             // })
             // ->where('admin_orgs.user_id', '=', Auth::id())
-            ->where( function($query) {
-                $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
-                      ->where('employee_demo.employee_status', 'A');
-            })
+            // ->where( function($query) {
+            //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
+            //           ->where('employee_demo.employee_status', 'A');
+            // })
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
                         ->from('admin_org_users')
@@ -1497,10 +1500,10 @@ class StatisticsReportController extends Controller
                 //     } );
                 // })
                 // ->where('admin_orgs.user_id', '=', Auth::id())
-                ->where( function($query) {
-                    $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
-                          ->where('employee_demo.employee_status', 'A');
-                })
+                // ->where( function($query) {
+                //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
+                //           ->where('employee_demo.employee_status', 'A');
+                // })
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('admin_org_users')
@@ -1581,10 +1584,10 @@ class StatisticsReportController extends Controller
             ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                 return $q->where('employee_demo.level4', $level4->name);
             })
-            ->where( function($query) {
-                $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
-                      ->where('employee_demo.employee_status', 'A');
-            })
+            // ->where( function($query) {
+            //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
+            //           ->where('employee_demo.employee_status', 'A');
+            // })
             // ->whereExists(function ($query) {
             //     $query->select(DB::raw(1))
             //             ->from('admin_orgs')
@@ -1695,9 +1698,7 @@ class StatisticsReportController extends Controller
         $sql = User::selectRaw("users.employee_id, users.empl_record, 
                     employee_name, employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division,
                     employee_demo.level3_branch, employee_demo.level4,
-                    case when date(SYSDATE()) not between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01') 
-                          and employee_demo.employee_status = 'A'
-                          and users.due_date_paused = 'N'
+                    case when users.due_date_paused = 'N'
                         then 'No' else 'Yes' end as excused")
                     ->join('employee_demo', function($join) {
                          $join->on('employee_demo.guid', '=', 'users.guid');
@@ -1706,10 +1707,10 @@ class StatisticsReportController extends Controller
                     })
                     // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                     // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) ")
-                    ->where( function($q) {
-                        $q->whereRaw(" ( date(SYSDATE()) between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01')) or employee_demo.employee_status <> 'A' or users.due_date_paused <> 'N' ")
-                          ->orWhereRaw(" ( date(SYSDATE()) not between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01')) and employee_demo.employee_status ='A' and users.due_date_paused = 'N' ");
-                    })
+                    // ->where( function($q) {
+                    //     $q->whereRaw(" (( date(SYSDATE()) between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01')) or employee_demo.employee_status <> 'A' or users.due_date_paused <> 'N') ")
+                    //       ->orWhereRaw(" ( date(SYSDATE()) not between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01')) and employee_demo.employee_status ='A' and users.due_date_paused = 'N' ");
+                    // })
                     ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                         return $q->where('employee_demo.organization', $level0->name);
                     })
@@ -1804,9 +1805,7 @@ class StatisticsReportController extends Controller
       $sql = User::selectRaw("users.employee_id, users.email, users.excused_start_date, users.excused_end_date,
                             users.excused_reason_id, users.reporting_to,
                     employee_demo.employee_name, employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
-                    case when date(SYSDATE()) not between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01') 
-                            and employee_demo.employee_status = 'A'
-                            and users.due_date_paused = 'N'
+                    case when users.due_date_paused = 'N'
                         then 'No' else 'Yes' end as excused")
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.guid', '=', 'users.guid');
@@ -1816,17 +1815,17 @@ class StatisticsReportController extends Controller
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) ")
                 ->when( $request->legend == 'Yes', function($q) use($request) {
-                    $q->whereRaw(" ( date(SYSDATE()) between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01')) or employee_demo.employee_status <> 'A' or users.due_date_paused <> 'N' ");
+                    $q->whereRaw(" users.due_date_paused = 'Y' ");
                 }) 
                 ->when( $request->legend == 'No', function($q) use($request) {
-                    $q->whereRaw(" ( date(SYSDATE()) not between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01')) and employee_demo.employee_status ='A' and users.due_date_paused = 'N' ");
+                    $q->whereRaw(" users.due_date_paused = 'N' ");
                 })
-                ->when( $request->missing('legend'), function($query) {
-                    $query->where( function($q) {
-                        $q->whereRaw(" ( date(SYSDATE()) between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01')) or employee_demo.employee_status <> 'A' or users.due_date_paused <> 'N' ")
-                          ->orWhereRaw(" ( date(SYSDATE()) not between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01')) and employee_demo.employee_status ='A' and users.due_date_paused = 'N' ");
-                    });
-                })
+                // ->when( $request->missing('legend'), function($query) {
+                //     $query->where( function($q) {
+                //         $q->whereRaw(" (( date(SYSDATE()) between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01')) or employee_demo.employee_status <> 'A' or users.due_date_paused <> 'N') ")
+                //           ->orWhereRaw(" ( date(SYSDATE()) not between IFNULL(users.excused_start_date,'1900-01-01') and IFNULL(users.excused_end_date,'1900-01-01')) and employee_demo.employee_status ='A' and users.due_date_paused = 'N' ");
+                //     });
+                // })
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
                 })
