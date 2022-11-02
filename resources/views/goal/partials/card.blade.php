@@ -26,7 +26,12 @@
             </div>
         </div>
         <div class="card-body" style="min-height:135px">
-            <a href="{{route("goal.show", $goal->id)}}">
+            @if(isset($from) && $from == 'bank' || session()->has('view-profile-as')) 
+                    <a href="{{route("goal.edit", $goal->id)}}" class="p-2">
+            @else
+                    <a href="{{route("goal.show", $goal->id)}}" class="p-2">
+            @endif
+                
                 <p class="h5">
                     {{ $goal->title }}
                 </p>
