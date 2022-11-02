@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\Conversation;
 use App\Models\User;
 use App\Models\EmployeeDemo;
+use App\Models\ExcusedReason;
 use App\Models\EmployeeDemoJunior;
 use App\Models\ExcusedClassification;
 use App\Models\JobSchedAudit;
@@ -129,6 +130,8 @@ class CalcNextConversationDate extends Command
                 $usedate2 = '';
                 $newEndDate = '';
                 $currDate = Carbon::now()->toDateString();
+                $excused_reason_id = null;
+                $excused_reason_desc = null;
                 if ($demo->guid) {
                     // YES GUID
                     // get last conversation details
@@ -182,6 +185,8 @@ class CalcNextConversationDate extends Command
                             // STATUS CHANGE
                             $changeType = 'statusStartExcuse';
                             $excuseType = 'A';
+                            $excused_reason_id = 1;
+                            $excused_reason_desc = 'PeopleSoft Status';
                         }
                         if ($jr->current_employee_status != 'A' 
                             && $demo->employee_status == 'A') {
@@ -198,6 +203,8 @@ class CalcNextConversationDate extends Command
                             // CLASSIFICATION CHANGE
                             $changeType = 'classStartExcuse';
                             $excuseType = 'A';
+                            $excused_reason_id = 2;
+                            $excused_reason_desc = 'Classification';
                         }
                         if ($jr->current_employee_status == 'A' 
                             && $demo->employee_status == 'A'
@@ -217,6 +224,8 @@ class CalcNextConversationDate extends Command
                             $excuseType = 'M';
                             $excused_updated_by = $demo->excused_updated_by;
                             $excused_updated_at = $demo->excused_updated_at;
+                            $excused_reason_id = $demo->users->excused_reason_id;
+                            $excused_reason_desc = ExcusedReason::whereRaw('id ='.$demo->users->excused_reason_id)->first()->name;
                         }
                         if ($jr->current_employee_status == 'A' 
                             && $demo->employee_status == 'A'
@@ -315,16 +324,22 @@ class CalcNextConversationDate extends Command
                         if ($demo->employee_status != 'A') {
                             $changeType = 'statusNewExcuse';
                             $excuseType = 'A';
+                            $excused_reason_id = 1;
+                            $excused_reason_desc = 'PeopleSoft Status';
                         } else {
                             if ($demo_inarray) {
                                 $changeType = 'classNewExcuse';
                                 $excuseType = 'A';
-                            } else {
+                                $excused_reason_id = 2;
+                                $excused_reason_desc = 'Classification';
+                                } else {
                                 if ($demo->excused_flag) {
                                     $changeType = 'manualNewExcuse';
                                     $excuseType = 'M';
                                     $excused_updated_by = $demo->excused_updated_by;
                                     $excused_updated_at = $demo->excused_updated_at;
+                                    $excused_reason_id = $demo->users->excused_reason_id;
+                                    $excused_reason_desc = ExcusedReason::whereRaw('id ='.$demo->users->excused_reason_id)->first()->name;
                                 } else {
                                     $changeType = 'noExcuse';
                                     $excuseType = null;
@@ -350,6 +365,8 @@ class CalcNextConversationDate extends Command
                         $newJr->next_conversation_date = $initNextConversationDate ? Carbon::parse($initNextConversationDate) : null;
                         $newJr->created_by_id = $DefaultCreatorName;
                         $newJr->updated_by_id = $excused_updated_by ?? $DefaultCreatorName;
+                        $newJr->excused_reason_id = $excused_reason_id;
+                        $newJr->excused_reason_desc = $excused_reason_desc;
                         if($excused_updated_at) {
                             $newJr->updated_at = $excused_updated_at;
                         }
