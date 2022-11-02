@@ -188,9 +188,9 @@
 			function confirmSaveExcuseModal(){
 				count = g_selected_employees.length;
 				if (count == 0) {
-					$('#saveExcuseModal .modal-body p').html('Are you sure you want to excuse employee?');
+					$('#saveExcuseModal .modal-body p').html('<p>Are you sure you want to excuse employee?</p><p>Note: The change may not reflect until the next day.</p>');
 				} else {
-					$('#saveExcuseModal .modal-body p').html('Are you sure you want to excuse ' + count + ' selected users?');
+					$('#saveExcuseModal .modal-body p').html('<p>Are you sure you want to excuse ' + count + ' selected users?</p><p>Note: The change may not reflect until the next day.</p>');
 				}
 				$('#saveExcuseModal').modal();
 			}
@@ -511,18 +511,6 @@
                     $("#editModal").find("button[name=saveExcuseButton]").attr('disabled', false);
                 }
             });
-
-			@if(session()->has('start_date_missing'))                           
-				$('#start_date').addClass('is-invalid');
-			@endif
-			@if(session()->has('target_date_missing'))                           
-				$('#target_date').addClass('is-invalid');
-			@endif
-			@if(session()->has('date_error'))      
-				$('#start_date').addClass('is-invalid');
-				$('#target_date').addClass('is-invalid');
-			@endif
-
 		</script>
 	</x-slot>
 
