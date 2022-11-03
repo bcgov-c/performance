@@ -82,6 +82,7 @@
                         {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'u.employee_name', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'u.jobcode_desc', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Excused', ariaTitle: 'Excused', target: 0, type: 'string', data: 'j_excusedtype', name: 'u.j_excusedtype', searchable: false, visible: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Excused Reason', ariaTitle: 'Excused Reason', target: 0, type: 'string', data: 'j_excused_reason_desc', name: 'u.j_excused_reason_desc', searchable: false, visible: true, className: 'dt-nowrap show-modal'},
                         {title: 'Excused By', ariaTitle: 'Excused By', target: 0, type: 'string', data: 'j_excused_updated_by_name', name: 'u.j_excused_updated_by_name', searchable: false, visible: true, className: 'dt-nowrap show-modal'},
                         {title: 'Start Date', ariaTitle: 'Start Date', target: 0, type: 'string', data: 'startdate_string', name: 'startdate_string', searchable: false, visible: true, className: 'dt-nowrap show-modal'},
                         {title: 'End Date', ariaTitle: 'End Date', target: 0, type: 'string', data: 'enddate_string', name: 'enddate_string', searchable: false, visible: true, className: 'dt-nowrap show-modal'},
