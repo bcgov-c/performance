@@ -385,7 +385,7 @@ return [
                     'active' => ['sysadmin/system-security/*']
                 ],
                 [
-                    'text' => 'Schedule Job Aduit',
+                    'text' => 'Schedule Job Audit',
                     'url'  => 'sysadmin/job-schedule-audit',
                     'active' => ['sysadmin/system-security/*']
                 ],
