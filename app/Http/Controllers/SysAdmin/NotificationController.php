@@ -54,10 +54,26 @@ class NotificationController extends Controller
                 ->when($alert_format, function ($query) use($alert_format) {
                         $query->where('alert_format', $alert_format);
                 })
-                ->select(['id', 'subject', 'recipients', 'alert_type', 'alert_format', 'notify_user_id', 'description','date_sent','created_at'])
+                ->when($request->notify_user, function ($query) use($request) {
+                    $query->whereHas('notify_user', function ($query) use($request) { 
+                        $query->whereRaw("lower(name) like  '%". strtolower($request->notify_user) . "%'"); 
+                    });   
+                })
+                ->when($request->overdue_user, function ($query) use($request) {
+                    $query->whereHas('overdue_user', function ($query) use($request) { 
+                        $query->whereRaw("lower(name) like  '%". strtolower($request->overdue_user) . "%'"); 
+                    });   
+                })
+                ->when($request->notify_due_date, function ($query) use($request) {
+                    $query->where('notify_due_date', $request->notify_due_date );
+                })
+                ->when($request->notify_for_days || $request->notify_for_days == 0, function ($query) use($request) {
+                    $query->where('notify_for_days', $request->notify_for_days);
+                })
+                ->select(['id', 'subject', 'recipients', 'alert_type', 'alert_format', 'notify_user_id', 'overdue_user_id', 
+                            'notify_due_date', 'notify_for_days', 'description','date_sent','created_at'])
                 ->with(['recipients'])
-                ->with(['notify_user']);
-
+                ->with(['notify_user', 'overdue_user']);
 
             return Datatables::of($notifications)
                 ->addColumn('alert_type_name', function ($notification) {

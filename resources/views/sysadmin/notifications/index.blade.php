@@ -44,7 +44,7 @@
 				<label for="date_sent_to">Date Sent (To)</label>
 				<input type="date" class="form-control" id="date_sent_to" name="date_sent_to" placeholder="" value="">
 				</div>
-				<div class="col-md-2 mb-2">
+				<div class="col-md-3 mb-2">
 				<label for="recipients">Recipients</label>
 					<input type="text" class="form-control" id="recipients" name="recipients" placeholder="name">
 				</div>
@@ -60,6 +60,43 @@
 				<input type="text" class="form-control" id="alert_format" placeholder="" value="">
  --}}				  
 				</div>
+				{{-- <div class="col-md-1 mb-1">
+					<label></label>
+					<button class="btn btn-primary mt-2" type="submit">Search</button>
+				</div> --}}
+				
+			</div>
+
+
+            <div class="form-row">
+				<div class="col-md-3 mb-2">
+				<label for="notify_user">Notify User</label>
+				<input type="text" class="form-control" id="notify_user" name="notify_user" placeholder="notify user name" value="">
+				</div>
+				<div class="col-md-3 mb-2">
+				<label for="overdue_user">Overdue User</label>
+				<input type="text" class="form-control" id="overdue_user" name="overdue_user" placeholder="Overdue user name" value="">
+				</div>
+				<div class="col-md-2 mb-2">
+				<label for="notify_due_date">Notify Due Date</label>
+					<input type="date" class="form-control" id="notify_due_date" name="notify_due_date" placeholder="">
+				</div>
+                <div class="col-md-2 mb-2">
+                    <label for="alert_format">Alert Format</label>
+                <select  class="form-control id="notify_for_days" name="notify_for_days">
+					<option value="">All </option>
+					@foreach ( [ '30' => 'Due in Month', '7' => 'Due in Week', '0' => 'Overdue'] as $key => $value)
+					  <option value="{{ $key }}">{{ $value }}</option>
+					@endforeach
+				  </select>
+                </div>
+
+                {{-- <div class="col-md-2 mb-2">
+                    <label for="notify_for_days">Notify for days</label>
+                        <input type="text" class="form-control" id="notify_for_days" name="notify_for_days" placeholder="">
+                </div> --}}
+  
+
 				<div class="col-md-1 mb-1">
 					<label></label>
 					<button class="btn btn-primary mt-2" type="submit">Search</button>
@@ -80,6 +117,10 @@
 					<th>Alert Type</th>
 					<th>Alert Format</th>
 					<th>Action</th>
+                    <th>Notify User</th>
+                    <th>Overdue User</th>
+                    <th>Overdue Date</th>
+                    <th>Notify For days</th>
 				</tr>
 			</thead>
 		</table>
@@ -108,6 +149,10 @@
 	#notificationlog-table_filter label {
 		text-align: right !important;
 	}
+    #notificationlog-table_filter {
+        display: none;
+    }
+    
 </style>
 </x-slot>
 
@@ -118,6 +163,7 @@
     <script>
 
     var oTable = $('#notificationlog-table').DataTable({
+        "scrollX": true,
         retrieve: true,
         processing: true,
         serverSide: true,
@@ -129,6 +175,10 @@
                 d.date_sent_to = $('input[name=date_sent_to]').val();
 				d.recipients = $('input[name=recipients]').val();
 				d.alert_format = $('select[name=alert_format]').val();
+                d.notify_user = $('input[name=notify_user]').val();
+                d.overdue_user = $('input[name=overdue_user]').val();
+                d.notify_due_date = $('input[name=notify_due_date]').val();
+                d.notify_for_days = $('select[name=notify_for_days]').val();
 			}
         },
         columns: [
@@ -138,7 +188,11 @@
             {data: 'recipients', name: 'recipients'},
             {data: 'alert_type_name', name: 'alert_type_name'},
             {data: 'alert_format_name', name: 'alert_format_name'},
-            {data: 'action', name: 'action', orderable: false, searchable: false}
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+            {data: 'notify_user.name', name: 'notify_user_id', defaultContent: '',  orderable: false  },
+            {data: 'overdue_user.name', name: 'overdue_user_id', defaultContent: '', orderable: false},
+            {data: 'notify_due_date', name: 'notify_due_date', defaultContent: '', },
+            {data: 'notify_for_days', name: 'notify_for_days', defaultContent: '', },
         ],
 		columnDefs: [
                 // {
