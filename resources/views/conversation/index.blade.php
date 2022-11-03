@@ -200,7 +200,7 @@
             
             document.getElementById("closemodal").onclick = function(e) {myFunction(e)};
             function myFunction(e) {
-                if (modal_edit ==  true){       
+                if (modal_edit ==  true || !checkIfItIsLocked()){       
                         if (confirm('Click "OK" to save content and exit. Click "Cancel" to exit without saving.')) {
                             modal_open=false;
                             saveComments();                                
