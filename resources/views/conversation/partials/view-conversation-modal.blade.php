@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header bg-primary">
                 <h5 id="template-header"></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:white">
+                <button type="button" class="close" id="closemodal" aria-label="Close" style="color:white">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <input type="hidden" name="viewmode" id="viewmode" value="0">
