@@ -191,7 +191,25 @@
     <x-slot name="js">
         <script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
         
-        <script>            
+        <script>        
+            var toReloadPage = false;
+            
+            document.getElementById("closemodal").onclick = function(e) {myFunction(e)};
+            function myFunction(e) {
+                        if (confirm('Click "OK" to save content and exit. Click "Cancel" to exit without saving.')) {
+                            modal_open=false;
+                            saveComments();                                
+                            $('.modal-body').find('#employee_id').val('');
+                            $('.modal-body').find('.error').html('');
+                            $('.modal-body').find('input[type=radio]').prop('checked', false);
+                            $('#viewConversationModal').modal('toggle');
+                        }else {
+                            e.preventDefault();                            
+                        }    
+                        window.location.reload();
+            } 
+        
+        
             CKEDITOR.replace('info_comment1', {
                 toolbar: "Custom",
                 toolbar_Custom: [
@@ -595,6 +613,7 @@
             <?php if ($type == 'upcoming'){ ?>
                 var modal_edit = true;
             <?php } ?>
+            /*    
             $(document).on('hide.bs.modal', '#viewConversationModal', function(e) {
                 if (toReloadPage) {
                     window.location.reload();
@@ -608,6 +627,7 @@
                     }
                 }
             });
+            */
             
             function saveComments() {
                 var isSupervisor = $('#viewmode').val();
@@ -652,13 +672,14 @@
                             });
                        
             }
-
+            
+            /*
             $(document).on('show.bs.modal', '#viewConversationModal', function(e) {
                 $("#viewConversationModal").find("textarea").val('');
                 $("#viewConversationModal").find("input, textarea").prop("readonly", false);
                 $('#viewConversationModal').data('is-frozen', 0);
             });
-            
+            */
 
             $(document).on('change', '.team_member_agreement', function () {
                 if ($(this).prop('checked')) {
