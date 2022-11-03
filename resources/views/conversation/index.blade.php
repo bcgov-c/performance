@@ -191,23 +191,7 @@
     <x-slot name="js">
         <script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
         
-        <script>                 
-            var toReloadPage = false;
-            
-            document.getElementById("closemodal").onclick = function(e) {myFunction(e)};
-            function myFunction(e) {
-                        if (confirm('Click "OK" to save content and exit. Click "Cancel" to exit without saving.')) {
-                            modal_open=false;
-                            saveComments();                                
-                            $('.modal-body').find('#employee_id').val('');
-                            $('.modal-body').find('.error').html('');
-                            $('.modal-body').find('input[type=radio]').prop('checked', false);
-                            $('#viewConversationModal').modal('toggle');
-                        }else {
-                            e.preventDefault();                            
-                        }    
-                        window.location.reload();
-            }  
+        <script>            
             CKEDITOR.replace('info_comment1', {
                 toolbar: "Custom",
                 toolbar_Custom: [
@@ -323,6 +307,7 @@
             var isSupervisor = {{$user->hasRole('Supervisor') ? 'true' : 'false'}};
             var currentUser = {{$authId}};
             var conversation_id = 0;
+            var toReloadPage = false;
             $('#conv_participant_edit').select2({
                 maximumSelectionLength: 2,
                 ajax: {
@@ -610,7 +595,19 @@
             <?php if ($type == 'upcoming'){ ?>
                 var modal_edit = true;
             <?php } ?>
-            
+            $(document).on('hide.bs.modal', '#viewConversationModal', function(e) {
+                if (toReloadPage) {
+                    window.location.reload();
+                } else {
+                    window.location.reload();
+                    if (modal_edit ==  true){                        
+                        if (isContentModified() && confirm('Click "OK" to save content and exit. Click "Cancel" to exit without saving.')) {
+                            modal_open=false;
+                            saveComments();
+                        }
+                    }
+                }
+            });
             
             function saveComments() {
                 var isSupervisor = $('#viewmode').val();
@@ -1298,30 +1295,7 @@
             const minutes = 15;
             const SessionTime = 1000 * 60 * minutes;
             $(document).ready(function () {                
-                const myTimeout = setTimeout(sessionWarning, SessionTime);      
-                
-                /*
-                $(".modal-close").click(function(){
-                    if (toReloadPage) {
-                        window.location.reload();
-                    } else {
-                        window.location.reload();
-                        if (modal_edit ==  true){                        
-                            if (isContentModified()){
-                                var ask = confirm('Click "OK" to save content and exit. Click "Cancel" to exit without saving.');
-                                if (ask) {
-                                    modal_open=false;
-                                    saveComments();                                
-                                    $('.modal-body').find('#employee_id').val('');
-                                    $('.modal-body').find('.error').html('');
-                                    $('.modal-body').find('input[type=radio]').prop('checked', false);
-                                    $('#viewConversationModal').modal('toggle');
-                                }
-                            }
-                        }
-                    }
-                });
-                 */  
+                const myTimeout = setTimeout(sessionWarning, SessionTime);                
             });
             
             function sessionWarningStop() {
