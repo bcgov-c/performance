@@ -12,7 +12,7 @@ use App\Models\ExcusedClassification;
 use App\Models\JobSchedAudit;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-// use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
@@ -97,7 +97,7 @@ class CalcNextConversationDate extends Command
         //Process all employees;
         $counter = 0;
         $updatecounter = 0;
-        $ClassificationArray = ExcusedClassification::select('jobcode')->get()->toArray();
+        $ClassificationArray = ExcusedClassification::select('jobcode')->pluck('jobcode')->toArray();
         EmployeeDemo::leftjoin('users', 'users.guid', 'employee_demo.guid')
         ->whereRaw("trim(employee_demo.guid) <> ''")
         ->whereNotNull('employee_demo.guid')
@@ -172,6 +172,7 @@ class CalcNextConversationDate extends Command
                     if ($lastConversationDate && Carbon::parse($lastConversationDate)->gt($initLastConversationDate)) {
                         $initLastConversationDate = $lastConversationDate;
                     }
+                    $demo_inarray = in_array($demo->jobcode, $ClassificationArray);
                     // get last stored detail in junior table
                     $jr = EmployeeDemoJunior::where('guid', '=', $demo->guid)->orderBy('id', 'desc')->first();
                     if ($jr) {
@@ -194,7 +195,6 @@ class CalcNextConversationDate extends Command
                             $changeType = 'statusEndExcuse';
                         }
                         $jr_inarray = in_array($jr->current_classification, $ClassificationArray);
-                        $demo_inarray = in_array($demo->jobcode, $ClassificationArray);
                         $excused = ($demo->employee_status != 'A' || $demo_inarray || $demo->excused_flag);
                         if ($jr->current_employee_status == 'A' 
                             && $demo->employee_status == 'A'
@@ -332,7 +332,7 @@ class CalcNextConversationDate extends Command
                                 $excuseType = 'A';
                                 $excused_reason_id = 2;
                                 $excused_reason_desc = 'Classification';
-                                } else {
+                            } else {
                                 if ($demo->excused_flag) {
                                     $changeType = 'manualNewExcuse';
                                     $excuseType = 'M';
