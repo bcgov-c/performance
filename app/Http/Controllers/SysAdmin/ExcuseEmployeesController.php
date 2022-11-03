@@ -261,6 +261,7 @@ class ExcuseEmployeesController extends Controller
                 , u.reason_name
                 , u.j_excusedtype
                 , u.j_excusedlink
+                , u.j_excused_by_name
                 , u.excused_updated_by
                 , u.employee_id_search
                 , u.employee_name_search
