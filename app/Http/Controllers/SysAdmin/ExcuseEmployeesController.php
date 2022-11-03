@@ -233,9 +233,9 @@ class ExcuseEmployeesController extends Controller
             ->when($request->search_text && $request->criteria == 'emp', function($q) use($request) {$q->whereRaw("u.employee_id like '%".$request->search_text."%'");})
             ->when($request->search_text && $request->criteria == 'ext', function($q) use($request) {$q->havingRaw("u.j_excusedtype like '%".$request->search_text."%'");})
             ->when($request->search_text && $request->criteria == 'rsn', function($q) use($request) {$q->whereRaw("u.j_excused_reason_desc like '%".$request->search_text."%'"); })
-            ->when($request->search_text && $request->criteria == 'exb', function($q) use($request) {$q->havingRaw("u.j_excused_updated_by_name like '%".$request->search_text."%'");})
+            ->when($request->search_text && $request->criteria == 'exb', function($q) use($request) {$q->havingRaw("u.excused_by_name like '%".$request->search_text."%'");})
             ->when($request->search_text && $request->criteria == 'all', function($q) use ($request) {
-                $q->havingRaw("u.employee_id_search like '%".$request->search_text."%' or u.employee_name_search like '%".$request->search_text."%' or u.j_excusedtype like '%".$request->search_text."%' or u.j_excused_reason_desc like '%".$request->search_text."%' or u.j_excused_updated_by_name like '%".$request->search_text."%'");
+                $q->havingRaw("u.employee_id_search like '%".$request->search_text."%' or u.employee_name_search like '%".$request->search_text."%' or u.j_excusedtype like '%".$request->search_text."%' or u.j_excused_reason_desc like '%".$request->search_text."%' or u.excused_by_name like '%".$request->search_text."%'");
             })
             ->selectRaw ("
                 u.user_id AS id
@@ -261,7 +261,7 @@ class ExcuseEmployeesController extends Controller
                 , u.reason_name
                 , u.j_excusedtype
                 , u.j_excusedlink
-                , u.j_excused_by_name
+                , u.excused_by_name
                 , u.excused_updated_by
                 , u.employee_id_search
                 , u.employee_name_search
