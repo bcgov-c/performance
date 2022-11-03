@@ -63,7 +63,7 @@
             </div>
         </div>
 
-        <div class="form-row">
+        {{-- <div class="form-row">
             <div class="form-group col-md-3">
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" value="1" id="include_trashed" name="include_trashed">
@@ -72,7 +72,7 @@
                     </label>
                 </div>
             </div>
-        </div>
+        </div> --}}
 
     </div>    
     
