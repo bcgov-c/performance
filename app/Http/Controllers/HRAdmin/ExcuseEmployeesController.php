@@ -300,7 +300,7 @@ class ExcuseEmployeesController extends Controller
         $request->session()->flash('level3', $level3);
         $request->session()->flash('level4', $level4);
 
-        $criteriaList = $this->search_criteria_list_history();
+        $criteriaList = $this->search_criteria_list();
         return view('shared.excuseemployees.managehistory', compact ('request', 'criteriaList'));
     }
 
@@ -324,12 +324,13 @@ class ExcuseEmployeesController extends Controller
             ->when($level2, function($q) use($level2) {$q->where('u.level2_division', $level2->name);})
             ->when($level3, function($q) use($level3) {$q->where('u.level3_branch', $level3->name);})
             ->when($level4, function($q) use($level4) {$q->where('u.level4', $level4->name);})
-            ->when($request->criteria == 'name', function($q) use($request){$q->whereRaw("u.employee_name like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'emp', function($q) use($request){$q->whereRaw("u.employee_id like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'ext', function($q) use($request){$q->havingRaw("u.j_excusedtype like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'exb', function($q) use($request){$q->havingRaw("u.j_excused_updated_by_name like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {
-                $q->havingRaw("u.employee_id_search like '%".$request->search_text."%' or u.employee_name_search like '%".$request->search_text."%' or u.j_excusedtype like '%".$request->search_text."%' or u.j_excused_updated_by_name like '%".$request->search_text."%'");
+            ->when($request->search_text && $request->criteria == 'name', function($q) use($request){$q->whereRaw("u.employee_name like '%".$request->search_text."%'");})
+            ->when($request->search_text && $request->criteria == 'emp', function($q) use($request){$q->whereRaw("u.employee_id like '%".$request->search_text."%'");})
+            ->when($request->search_text && $request->criteria == 'ext', function($q) use($request){$q->havingRaw("u.j_excusedtype like '%".$request->search_text."%'");})
+            ->when($request->search_text && $request->criteria == 'rsn', function($q) use($request){$q->whereRaw("u.j_excused_reason_desc like '%".$request->search_text."%'"); })
+            ->when($request->search_text && $request->criteria == 'exb', function($q) use($request){$q->havingRaw("u.j_excused_updated_by_name like '%".$request->search_text."%'");})
+            ->when($request->search_text && $request->criteria == 'all', function($q) use ($request){
+                $q->havingRaw("u.employee_id_search like '%".$request->search_text."%' or u.employee_name_search like '%".$request->search_text."%' or u.j_excusedtype like '%".$request->search_text."%' or u.j_excused_reason_desc like '%".$request->search_text."%' or u.j_excused_updated_by_name like '%".$request->search_text."%'");
             })
             ->selectRaw ("
             u.user_id AS id
@@ -360,6 +361,8 @@ class ExcuseEmployeesController extends Controller
             , u.employee_id_search
             , u.employee_name_search
             , u.j_excused_updated_by_name
+            , u.j_excused_reason_id
+            , u.j_excused_reason_desc
             , '' as created_at_string
             , '' as startdate_string
             , '' as enddate_string
