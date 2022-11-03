@@ -193,9 +193,14 @@
         
         <script>        
             var toReloadPage = false;
+            var modal_edit = false;
+            <?php if ($type == 'upcoming'){ ?>
+                var modal_edit = true;
+            <?php } ?>
             
             document.getElementById("closemodal").onclick = function(e) {myFunction(e)};
             function myFunction(e) {
+                if (modal_edit ==  true){       
                         if (confirm('Click "OK" to save content and exit. Click "Cancel" to exit without saving.')) {
                             modal_open=false;
                             saveComments();                                
@@ -205,8 +210,9 @@
                             $('#viewConversationModal').modal('toggle');
                         }else {
                             e.preventDefault();                            
-                        }    
-                        window.location.reload();
+                        }  
+                }
+                window.location.reload();
             } 
         
         
@@ -609,10 +615,7 @@
                 ).submit();
             });
             
-            var modal_edit = false;
-            <?php if ($type == 'upcoming'){ ?>
-                var modal_edit = true;
-            <?php } ?>
+            
             /*    
             $(document).on('hide.bs.modal', '#viewConversationModal', function(e) {
                 if (toReloadPage) {
