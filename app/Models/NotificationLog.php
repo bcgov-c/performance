@@ -59,6 +59,12 @@ class NotificationLog extends Model
 
     }
 
+    public function overdue_user() {
+
+        return $this->belongsTo('App\Models\User','overdue_user_id','id')->select('name', 'id', 'email');        
+
+    }
+
 
     public function sender() {
 

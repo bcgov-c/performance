@@ -132,11 +132,11 @@ class NotifyConversationDue extends Command
                 $dueIndays = 0;
                 $msg = '';
                 if ($dayDiff >= 7 and $dayDiff <= 30) {
-                    $msg = 'REMINDER - your next performance conversation is due in 1 month' . ' (' . $due . ')';
+                    $msg = 'REMINDER - your next performance conversation is ' . $due ;
                     $dueIndays = 30;
                 }
                 if ($dayDiff >= 0 and $dayDiff < 7) {
-                    $msg = 'REMINDER - your next performance conversation is due in 1 week' . ' (' . $due . ')';
+                    $msg = 'REMINDER - your next performance conversation is ' . $due ;
                     $dueIndays = 7;
                 }
                 if ($dayDiff < 0) {  
@@ -279,7 +279,7 @@ class NotifyConversationDue extends Command
                                 ->first();
 
                     if (!$mgr) {
-                        $this->logInfo( $now->format('Y-m-d') . ' - A - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . '  ** SKIPPED ** (MANAGER NOT FOUND OR PREFER NOT RECEVIED INAPP MSG)');
+                        $this->logInfo( Carbon::now()->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . '  ** SKIPPED ** (MANAGER PREFER NOT TO RECECIVED EMAIL OR ORG IS NOT ALLOW EMAIL)' );
                         $skip_count += 1;
                         continue;
                     }
@@ -296,15 +296,15 @@ class NotifyConversationDue extends Command
                     $dueIndays = 0;
                     $msg = '';
                     if ($dayDiff >= 7 and $dayDiff <= 30) {
-                        $msg = 'REMINDER - ' . $user->name . '\'s next performance conversation is due in 1 month' . ' (' . $due . ')';
+                        $msg = 'REMINDER - ' . $user->name . '\'s next performance conversation is ' . $due . ')';
                         $dueIndays = 30;
                     }
                     if ($dayDiff >= 0 and $dayDiff < 7) {
-                        $msg = 'REMINDER - ' . $user->name . '\'s performance conversation due date is one week away' . ' (' . $due . ')';
+                        $msg = 'REMINDER - ' . $user->name . '\'s performance conversation due date is  ' . $due ;
                         $dueIndays = 7;
                     }
                     if ($dayDiff < 0) {  
-                        $msg = 'OVERDUE - ' . $user->name . '\'s next performance conversation is past due' . ' (' . $due . ')';
+                        $msg = 'OVERDUE - ' . $user->name . '\'s next performance conversation is past due' . $due ;
                         $dueIndays = 0;
                     }
 
@@ -577,7 +577,7 @@ class NotifyConversationDue extends Command
                             ->first();
 
                     if (!$mgr) {
-                        $this->logInfo( Carbon::now()->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . '  ** SKIPPED ** (MANAGER PREFER TO NOT RECECIVED EMAIL)' );
+                        $this->logInfo( Carbon::now()->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . '  ** SKIPPED ** (MANAGER PREFER NOT TO RECECIVED EMAIL OR ORG IS NOT ALLOW EMAIL)' );
                         $skip_count += 1;
                         continue;
                     }

@@ -361,7 +361,7 @@ return [
                 ],
                 [
                     'text' => 'Notifications',
-                    'url'  => 'sysadmin/notifications/generic-template',
+                    'url'  => 'sysadmin/notifications',
                     'active' => ['sysadmin/notifications/*']
                 ],
                 [
