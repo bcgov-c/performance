@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Tag;
 use App\Models\Goal;
 use App\Models\User;
@@ -782,9 +783,14 @@ class MyTeamStatisticsReportController extends Controller
 
         // To Speed up performance
         $first_sql = SharedProfile::where('shared_with', Auth::id())
-                ->where('shared_item', 'like', '%1%')
-                ->select('shared_id');
+                        ->join('users', function($join) {
+                            $join->on('users.id', '=', 'shared_profiles.shared_id');
+                        })
+                        ->where('users.due_date_paused', 'N')                        
+                        ->where('shared_item', 'like', '%2%')
+                       ->select('shared_profiles.shared_id');
         $members = User::where('reporting_to', Auth::id())->select('id')
+                        ->where('users.due_date_paused', 'N')                        
                 ->union($first_sql)
                 ->pluck('id');
 
@@ -916,10 +922,18 @@ class MyTeamStatisticsReportController extends Controller
         ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.level4', $level4->name);
         })
-        ->where(function ($query)  {
-            return $query->whereNull('signoff_user_id')
-                        ->orWhereNull('supervisor_signoff_id');
+        ->where(function($query) {
+            $query->where(function($query) {
+                $query->whereNull('signoff_user_id')
+                    ->orWhereNull('supervisor_signoff_id');
+            })
+            ->orWhere(function($query) {
+                $query->whereNotNull('signoff_user_id')
+                    ->whereNotNull('supervisor_signoff_id')
+                    ->whereDate('unlock_until', '>=', Carbon::today() );
+            });
         })
+        ->whereNull('deleted_at')
         // ->whereRaw("DATEDIFF (
         //             COALESCE (
         //                     (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )  
@@ -930,8 +944,8 @@ class MyTeamStatisticsReportController extends Controller
         //                     (select joining_date from users where id = conversations.user_id)
         //                 ) 
         //         , DATE_ADD( DATE_FORMAT(sysdate(), '%Y-%m-%d'), INTERVAL -122 day) ) < 0 ")
-        ->whereRaw("DATEDIFF ( users.next_conversation_date
-                    , curdate() ) > 0 ")
+        // ->whereRaw("DATEDIFF ( users.next_conversation_date
+        //             , curdate() ) > 0 ")
         // ->whereExists(function ($query) {
         //     $query->select(DB::raw(1))
         //                 ->from('admin_orgs')
@@ -976,7 +990,27 @@ class MyTeamStatisticsReportController extends Controller
         //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
         //           ->where('employee_demo.employee_status', 'A');
         // })
-        ->whereIn('users.id', $members );
+        ->where(function ($query) use($members) {
+            $query->where(function ($q) use($members) {  
+                $q->where('users.id', Auth::id() )
+                   ->whereExists(function ($query) use ($members) {
+                    $query->select("conversation_participants.conversation_id")
+                          ->from('conversation_participants')
+                          ->whereColumn('conversations.id','conversation_id')
+                          ->whereIn('participant_id', $members->toArray() );
+                })
+                ->orWhere(function ($q) use($members) {  
+                    $q->whereIn('users.id', $members->toArray() )
+                      ->whereExists(function ($query) use ($members) {
+                        $query->select("conversation_participants.conversation_id")
+                              ->from('conversation_participants')
+                              ->whereColumn('conversations.id','conversation_id')
+                              ->where('participant_id', Auth::id() );
+                    });
+                });
+            });  
+        });
+        // ->whereIn('users.id', $members );
         // ->where( function($query)  {
         //     $query->whereIn('users.id',function($q){
         //             $q->select('id')->from('users')
@@ -1015,11 +1049,7 @@ class MyTeamStatisticsReportController extends Controller
         $data['chart3']['groups'] = array();
 
         // SQL for Chart 3
-        $completed_conversations = Conversation::where(function ($query)  {
-                return $query->whereNotNull('signoff_user_id')
-                             ->whereNotNull('supervisor_signoff_id');
-        })
-        ->join('users', 'users.id', 'conversations.user_id') 
+        $completed_conversations = Conversation::join('users', 'users.id', 'conversations.user_id') 
         ->join('employee_demo', function($join) {
             $join->on('employee_demo.guid', '=', 'users.guid');
             // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
@@ -1027,6 +1057,19 @@ class MyTeamStatisticsReportController extends Controller
         })
         // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
         // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
+        ->where(function($query) {
+            $query->where(function($query) {
+                $query->whereNotNull('signoff_user_id')
+                      ->whereNotNull('supervisor_signoff_id')                          
+                      ->whereNull('unlock_until');
+            })
+            ->orWhere(function($query) {
+                $query->whereNotNull('signoff_user_id')
+                      ->whereNotNull('supervisor_signoff_id')
+                      ->whereDate('unlock_until', '<', Carbon::today() );
+            });
+        })
+        ->whereNull('deleted_at')   
         ->where('users.due_date_paused', 'N')                        
         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.organization', $level0->name);
@@ -1087,7 +1130,27 @@ class MyTeamStatisticsReportController extends Controller
         //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
         //           ->where('employee_demo.employee_status', 'A');
         // })
-        ->whereIn('users.id', $members )
+        ->where(function ($query) use($members) {
+            $query->where(function ($q) use($members) {  
+                $q->where('users.id', Auth::id() )
+                   ->whereExists(function ($query) use ($members) {
+                    $query->select("conversation_participants.conversation_id")
+                          ->from('conversation_participants')
+                          ->whereColumn('conversations.id','conversation_id')
+                          ->whereIn('participant_id', $members->toArray() );
+                })
+                ->orWhere(function ($q) use($members) {  
+                    $q->whereIn('users.id', $members->toArray() )
+                      ->whereExists(function ($query) use ($members) {
+                        $query->select("conversation_participants.conversation_id")
+                              ->from('conversation_participants')
+                              ->whereColumn('conversations.id','conversation_id')
+                              ->where('participant_id', Auth::id() );
+                    });
+                });
+            });  
+        })
+        // ->whereIn('users.id', $members )
         // ->where( function($query)  {
         //     $query->whereIn('users.id',function($q){
         //             $q->select('id')->from('users')
@@ -1125,9 +1188,14 @@ class MyTeamStatisticsReportController extends Controller
 
         // To Speed up performance
         $first_sql = SharedProfile::where('shared_with', Auth::id())
-                            ->where('shared_item', 'like', '%1%')
-                            ->select('shared_id');
+                        ->join('users', function($join) {
+                            $join->on('users.id', '=', 'shared_profiles.shared_id');
+                        })
+                        ->where('users.due_date_paused', 'N')                        
+                        ->where('shared_item', 'like', '%2%')
+                        ->select('shared_profiles.shared_id');
         $members = User::where('reporting_to', Auth::id())->select('id')
+                            ->where('users.due_date_paused', 'N')      
                             ->union($first_sql)
                             ->pluck('id');
 
@@ -1233,12 +1301,24 @@ class MyTeamStatisticsReportController extends Controller
                 //             (select joining_date from users where id = conversations.user_id)
                 //         ) 
                 // , DATE_ADD( DATE_FORMAT(sysdate(), '%Y-%m-%d'), INTERVAL -122 day) ) < 0 ")
-                ->whereRaw("DATEDIFF ( users.next_conversation_date
-                            , curdate() ) > 0 ")
-                ->where(function ($query)  {
-                    return $query->whereNull('signoff_user_id')
-                                 ->orwhereNull('supervisor_signoff_id');
+                // ->whereRaw("DATEDIFF ( users.next_conversation_date
+                //             , curdate() ) > 0 ")
+                // ->where(function ($query)  {
+                //     return $query->whereNull('signoff_user_id')
+                //                  ->orwhereNull('supervisor_signoff_id');
+                // })
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereNull('signoff_user_id')
+                            ->orWhereNull('supervisor_signoff_id');
+                    })
+                    ->orWhere(function($query) {
+                        $query->whereNotNull('signoff_user_id')
+                            ->whereNotNull('supervisor_signoff_id')
+                            ->whereDate('unlock_until', '>=', Carbon::today() );
+                    });
                 })
+                ->whereNull('deleted_at')
                 ->join('users', 'users.id', 'conversations.user_id') 
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.guid', '=', 'users.guid');
@@ -1310,7 +1390,27 @@ class MyTeamStatisticsReportController extends Controller
                 //             ->whereIn('admin_org_users.access_type', [0,2])
                 //             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 // })
-                ->whereIn('users.id', $members )
+                ->where(function ($query) use($members) {
+                    $query->where(function ($q) use($members) {  
+                        $q->where('users.id', Auth::id() )
+                           ->whereExists(function ($query) use ($members) {
+                            $query->select("conversation_participants.conversation_id")
+                                  ->from('conversation_participants')
+                                  ->whereColumn('conversations.id','conversation_id')
+                                  ->whereIn('participant_id', $members->toArray() );
+                        })
+                        ->orWhere(function ($q) use($members) {  
+                            $q->whereIn('users.id', $members->toArray() )
+                              ->whereExists(function ($query) use ($members) {
+                                $query->select("conversation_participants.conversation_id")
+                                      ->from('conversation_participants')
+                                      ->whereColumn('conversations.id','conversation_id')
+                                      ->where('participant_id', Auth::id() );
+                            });
+                        });
+                    });  
+                })
+                // ->whereIn('users.id', $members )
                 // ->where( function($query)  {
                 //     $query->whereIn('users.id',function($q){
                 //             $q->select('id')->from('users')
@@ -1354,10 +1454,23 @@ class MyTeamStatisticsReportController extends Controller
             ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                 return $q->where('employee_demo.level4', $level4->name);
             })
-            ->where(function ($query)  {
-                return $query->whereNotNull('signoff_user_id')
-                             ->whereNotNull('supervisor_signoff_id');
+            // ->where(function ($query)  {
+            //     return $query->whereNotNull('signoff_user_id')
+            //                  ->whereNotNull('supervisor_signoff_id');
+            // })
+            ->where(function($query) {
+                $query->where(function($query) {
+                    $query->whereNotNull('signoff_user_id')
+                          ->whereNotNull('supervisor_signoff_id')                          
+                          ->whereNull('unlock_until');
+                })
+                ->orWhere(function($query) {
+                    $query->whereNotNull('signoff_user_id')
+                          ->whereNotNull('supervisor_signoff_id')
+                          ->whereDate('unlock_until', '<', Carbon::today() );
+                });
             })
+            ->whereNull('deleted_at')  
             ->when( $request->topic_id, function($q) use($request) {
                 $q->where('conversations.conversation_topic_id', $request->topic_id);
             })
@@ -1405,7 +1518,27 @@ class MyTeamStatisticsReportController extends Controller
             //             ->whereIn('admin_org_users.access_type', [0,2])
             //             ->where('admin_org_users.granted_to_id', '=', Auth::id());
             // })
-            ->whereIn('users.id', $members )
+            ->where(function ($query) use($members) {
+                $query->where(function ($q) use($members) {  
+                    $q->where('users.id', Auth::id() )
+                       ->whereExists(function ($query) use ($members) {
+                        $query->select("conversation_participants.conversation_id")
+                              ->from('conversation_participants')
+                              ->whereColumn('conversations.id','conversation_id')
+                              ->whereIn('participant_id', $members->toArray() );
+                    })
+                    ->orWhere(function ($q) use($members) {  
+                        $q->whereIn('users.id', $members->toArray() )
+                          ->whereExists(function ($query) use ($members) {
+                            $query->select("conversation_participants.conversation_id")
+                                  ->from('conversation_participants')
+                                  ->whereColumn('conversations.id','conversation_id')
+                                  ->where('participant_id', Auth::id() );
+                        });
+                    });
+                });  
+            })
+            // ->whereIn('users.id', $members )
             // ->where( function($query)  {
             //     $query->whereIn('users.id',function($q){
             //             $q->select('id')->from('users')

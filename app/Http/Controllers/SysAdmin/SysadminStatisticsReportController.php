@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\SysAdmin;
 
 use stdClass;
+use Carbon\Carbon;
 use App\Models\Tag;
 use App\Models\Goal;
 use App\Models\User;
@@ -606,10 +607,22 @@ class SysadminStatisticsReportController extends Controller
         ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.level4', $level4->name);
         })
-        ->where(function ($query)  {
-            return $query->whereNull('signoff_user_id')
-                        ->orWhereNull('supervisor_signoff_id');
+        // ->where(function ($query)  {
+        //     return $query->whereNull('signoff_user_id')
+        //                 ->orWhereNull('supervisor_signoff_id');
+        // })
+        ->where(function($query) {
+            $query->where(function($query) {
+                $query->whereNull('signoff_user_id')
+                    ->orWhereNull('supervisor_signoff_id');
+            })
+            ->orWhere(function($query) {
+                $query->whereNotNull('signoff_user_id')
+                    ->whereNotNull('supervisor_signoff_id')
+                    ->whereDate('unlock_until', '>=', Carbon::today() );
+            });
         })
+        ->whereNull('deleted_at')
         // ->whereRaw("DATEDIFF (
         //             COALESCE (
         //                     (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )  
@@ -653,15 +666,28 @@ class SysadminStatisticsReportController extends Controller
         $data['chart3']['groups'] = array();
 
         // SQL for Chart 3
-        $completed_conversations = Conversation::where(function ($query)  {
-                return $query->whereNotNull('signoff_user_id')
-                             ->whereNotNull('supervisor_signoff_id');
-        })
-        ->join('users', 'users.id', 'conversations.user_id') 
+        $completed_conversations = Conversation::join('users', 'users.id', 'conversations.user_id') 
         ->join('employee_demo', function($join) {
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
             // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
         })
+        // ->where(function ($query)  {
+        //         return $query->whereNotNull('signoff_user_id')
+        //                      ->whereNotNull('supervisor_signoff_id');
+        // })
+        ->where(function($query) {
+            $query->where(function($query) {
+                $query->whereNotNull('signoff_user_id')
+                      ->whereNotNull('supervisor_signoff_id')                          
+                      ->whereNull('unlock_until');
+            })
+            ->orWhere(function($query) {
+                $query->whereNotNull('signoff_user_id')
+                      ->whereNotNull('supervisor_signoff_id')
+                      ->whereDate('unlock_until', '<', Carbon::today() );
+            });
+        })        
+        ->whereNull('deleted_at')
         // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
         // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
         ->where('users.due_date_paused', 'N')        
@@ -746,10 +772,22 @@ class SysadminStatisticsReportController extends Controller
                         users.next_conversation_date as next_due_date")               
                 ->whereRaw("DATEDIFF ( users.next_conversation_date
                      , curdate() ) > 0 ")
-                ->where(function ($query)  {
-                    return $query->whereNull('signoff_user_id')
-                                 ->orwhereNull('supervisor_signoff_id');
+                // ->where(function ($query)  {
+                //     return $query->whereNull('signoff_user_id')
+                //                  ->orwhereNull('supervisor_signoff_id');
+                // })
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereNull('signoff_user_id')
+                            ->orWhereNull('supervisor_signoff_id');
+                    })
+                    ->orWhere(function($query) {
+                        $query->whereNotNull('signoff_user_id')
+                            ->whereNotNull('supervisor_signoff_id')
+                            ->whereDate('unlock_until', '>=', Carbon::today() );
+                    });
                 })
+                ->whereNull('deleted_at')                
                 ->join('users', 'users.id', 'conversations.user_id') 
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
@@ -811,10 +849,23 @@ class SysadminStatisticsReportController extends Controller
             ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                 return $q->where('employee_demo.level4', $level4->name);
             })
-            ->where(function ($query)  {
-                return $query->whereNotNull('signoff_user_id')
-                             ->whereNotNull('supervisor_signoff_id');
+            // ->where(function ($query)  {
+            //     return $query->whereNotNull('signoff_user_id')
+            //                  ->whereNotNull('supervisor_signoff_id');
+            // })
+            ->where(function($query) {
+                $query->where(function($query) {
+                    $query->whereNotNull('signoff_user_id')
+                          ->whereNotNull('supervisor_signoff_id')                          
+                          ->whereNull('unlock_until');
+                })
+                ->orWhere(function($query) {
+                    $query->whereNotNull('signoff_user_id')
+                          ->whereNotNull('supervisor_signoff_id')
+                          ->whereDate('unlock_until', '<', Carbon::today() );
+                });
             })
+            ->whereNull('deleted_at')  
             ->when( $request->topic_id, function($q) use($request) {
                 $q->where('conversations.conversation_topic_id', $request->topic_id);
             })
