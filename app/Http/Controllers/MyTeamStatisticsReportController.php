@@ -906,7 +906,7 @@ class MyTeamStatisticsReportController extends Controller
         })
         // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
         // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N')")
-        ->where('users.due_date_paused', 'N')                                
+        // ->where('users.due_date_paused', 'N')                                
         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.organization', $level0->name);
         })
@@ -933,7 +933,7 @@ class MyTeamStatisticsReportController extends Controller
                     ->whereDate('unlock_until', '>=', Carbon::today() );
             });
         })
-        ->whereNull('deleted_at')
+        ->whereNull('deleted_at')        
         // ->whereRaw("DATEDIFF (
         //             COALESCE (
         //                     (select GREATEST( max(sign_off_time) , max(supervisor_signoff_time) )  
@@ -992,7 +992,7 @@ class MyTeamStatisticsReportController extends Controller
         // })
         ->where(function ($query) use($members) {
             $query->where(function ($q) use($members) {  
-                $q->where('users.id', Auth::id() )
+                $q->where('conversations.user_id', Auth::id() )
                    ->whereExists(function ($query) use ($members) {
                     $query->select("conversation_participants.conversation_id")
                           ->from('conversation_participants')
@@ -1000,7 +1000,7 @@ class MyTeamStatisticsReportController extends Controller
                           ->whereIn('participant_id', $members->toArray() );
                 })
                 ->orWhere(function ($q) use($members) {  
-                    $q->whereIn('users.id', $members->toArray() )
+                    $q->whereIn('conversations.user_id', $members->toArray() )
                       ->whereExists(function ($query) use ($members) {
                         $query->select("conversation_participants.conversation_id")
                               ->from('conversation_participants')
@@ -1069,8 +1069,7 @@ class MyTeamStatisticsReportController extends Controller
                       ->whereDate('unlock_until', '<', Carbon::today() );
             });
         })
-        ->whereNull('deleted_at')   
-        ->where('users.due_date_paused', 'N')                        
+        // ->where('users.due_date_paused', 'N')                        
         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.organization', $level0->name);
         })
@@ -1132,7 +1131,7 @@ class MyTeamStatisticsReportController extends Controller
         // })
         ->where(function ($query) use($members) {
             $query->where(function ($q) use($members) {  
-                $q->where('users.id', Auth::id() )
+                $q->where('conversations.user_id', Auth::id() )
                    ->whereExists(function ($query) use ($members) {
                     $query->select("conversation_participants.conversation_id")
                           ->from('conversation_participants')
@@ -1140,7 +1139,7 @@ class MyTeamStatisticsReportController extends Controller
                           ->whereIn('participant_id', $members->toArray() );
                 })
                 ->orWhere(function ($q) use($members) {  
-                    $q->whereIn('users.id', $members->toArray() )
+                    $q->whereIn('conversations.user_id', $members->toArray() )
                       ->whereExists(function ($query) use ($members) {
                         $query->select("conversation_participants.conversation_id")
                               ->from('conversation_participants')
@@ -1327,7 +1326,7 @@ class MyTeamStatisticsReportController extends Controller
                 })
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
-                ->where('users.due_date_paused', 'N')                        
+                // ->where('users.due_date_paused', 'N')                        
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
                 })
@@ -1392,7 +1391,7 @@ class MyTeamStatisticsReportController extends Controller
                 // })
                 ->where(function ($query) use($members) {
                     $query->where(function ($q) use($members) {  
-                        $q->where('users.id', Auth::id() )
+                        $q->where('conversations.user_id', Auth::id() )
                            ->whereExists(function ($query) use ($members) {
                             $query->select("conversation_participants.conversation_id")
                                   ->from('conversation_participants')
@@ -1400,7 +1399,7 @@ class MyTeamStatisticsReportController extends Controller
                                   ->whereIn('participant_id', $members->toArray() );
                         })
                         ->orWhere(function ($q) use($members) {  
-                            $q->whereIn('users.id', $members->toArray() )
+                            $q->whereIn('conversations.user_id', $members->toArray() )
                               ->whereExists(function ($query) use ($members) {
                                 $query->select("conversation_participants.conversation_id")
                                       ->from('conversation_participants')
@@ -1438,7 +1437,7 @@ class MyTeamStatisticsReportController extends Controller
             })
             // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
             // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
-            ->where('users.due_date_paused', 'N')                                    
+            // ->where('users.due_date_paused', 'N')                                    
             ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                 return $q->where('employee_demo.organization', $level0->name);
             })
@@ -1520,7 +1519,7 @@ class MyTeamStatisticsReportController extends Controller
             // })
             ->where(function ($query) use($members) {
                 $query->where(function ($q) use($members) {  
-                    $q->where('users.id', Auth::id() )
+                    $q->where('conversations.user_id', Auth::id() )
                        ->whereExists(function ($query) use ($members) {
                         $query->select("conversation_participants.conversation_id")
                               ->from('conversation_participants')
@@ -1528,7 +1527,7 @@ class MyTeamStatisticsReportController extends Controller
                               ->whereIn('participant_id', $members->toArray() );
                     })
                     ->orWhere(function ($q) use($members) {  
-                        $q->whereIn('users.id', $members->toArray() )
+                        $q->whereIn('conversations.user_id', $members->toArray() )
                           ->whereExists(function ($query) use ($members) {
                             $query->select("conversation_participants.conversation_id")
                                   ->from('conversation_participants')
@@ -1633,7 +1632,7 @@ class MyTeamStatisticsReportController extends Controller
                 );
         
                 $columns = ["Employee ID", "Employee Name", "Email",
-                        "Conversation Due Date",
+                            "Conversation Topic", "Conversation Due Date", 
                             "Conversation Participant", "Employee Sign-Off", "Supervisor Sign-off", 
                                 "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
                            ];
@@ -1646,6 +1645,7 @@ class MyTeamStatisticsReportController extends Controller
                         $row['Employee ID'] = $conversation->employee_id;
                         $row['Name'] = $conversation->employee_name;
                         $row['Email'] = $conversation->user->email;
+                        $row['Conversation Topic'] = $conversation->topic->name;
                         $row['Conversation Due Date'] = $conversation->next_due_date;
                         $row['Conversation Participant'] = implode(', ', $conversation->conversationParticipants->pluck('participant.name')->toArray() );
                         $row['Employee Sign-Off'] = $conversation->signoff_user  ? $conversation->signoff_user->name : '';
@@ -1657,7 +1657,7 @@ class MyTeamStatisticsReportController extends Controller
                         $row['Level 4'] = $conversation->level4;
         
                         fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], // $row['Next Conversation Due'],
-                        $row['Conversation Due Date'], $row["Conversation Participant"],
+                        $row['Conversation Topic'], $row['Conversation Due Date'], $row["Conversation Participant"],
                         $row["Employee Sign-Off"], $row["Supervisor Sign-off"],
                                  $row['Organization'],
                                   $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
@@ -1690,7 +1690,7 @@ class MyTeamStatisticsReportController extends Controller
                 );
         
                 $columns = ["Employee ID", "Employee Name", "Email",
-                        "Conversation Due Date",
+                            "Conversation Topic", "Conversation Due Date",
                             "Conversation Participant", "Employee Sign-Off", "Supervisor Sign-off", 
                                 "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
                            ];
@@ -1703,6 +1703,7 @@ class MyTeamStatisticsReportController extends Controller
                         $row['Employee ID'] = $conversation->employee_id;
                         $row['Name'] = $conversation->employee_name;
                         $row['Email'] = $conversation->user->email;
+                        $row['Conversation Topic'] = $conversation->topic->name;
                         $row['Conversation Due Date'] = $conversation->next_due_date;
                         $row['Conversation Participant'] = implode(', ', $conversation->conversationParticipants->pluck('participant.name')->toArray() );
                         $row['Employee Sign-Off'] = $conversation->signoff_user  ? $conversation->signoff_user->name : '';
@@ -1714,7 +1715,7 @@ class MyTeamStatisticsReportController extends Controller
                         $row['Level 4'] = $conversation->level4;
         
                         fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], // $row['Next Conversation Due'],
-                        $row['Conversation Due Date'], $row["Conversation Participant"],
+                        $row['Conversation Topic'], $row['Conversation Due Date'], $row["Conversation Participant"],
                         $row["Employee Sign-Off"], $row["Supervisor Sign-off"],
                                  $row['Organization'],
                                   $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
