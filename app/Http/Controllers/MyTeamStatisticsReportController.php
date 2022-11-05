@@ -1069,6 +1069,7 @@ class MyTeamStatisticsReportController extends Controller
                       ->whereDate('unlock_until', '<', Carbon::today() );
             });
         })
+        ->whereNull('deleted_at')  
         // ->where('users.due_date_paused', 'N')                        
         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.organization', $level0->name);
