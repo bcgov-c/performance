@@ -95,10 +95,12 @@ class DashboardController extends Controller
                         //     $link = "open_shared_profile_modal()";  
                         // }
 
-                        $text .= '<button onclick="'. $link . '"' .
-                                // 'data-toggle="tooltip" data-placement="bottom" title="Click to view the details." '.
-                                'data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Now hover out." '.
-                                'class="notification-modal btn btn-sm btn-primary mt-2" value="'. $notification->id .'">View</button>';
+                        if  ( !(in_array($notification->notification_type, ['CA', 'CS'])) ) {
+                            $text .= '<button onclick="'. $link . '"' .
+                                    // 'data-toggle="tooltip" data-placement="bottom" title="Click to view the details." '.
+                                    'data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Now hover out." '.
+                                    'class="notification-modal btn btn-sm btn-primary mt-2" value="'. $notification->id .'">View</button>';
+                        }
                     }
                     $text .= '<button class="btn btn-danger btn-sm ml-2 delete-dn mt-2"  data-id="'. $notification->id .
                                 '" data-comment="'. $notification->comment . '"><i class="fas fa-trash-alt fa-lg" ></i></button>';

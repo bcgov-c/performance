@@ -82,7 +82,7 @@
 					<input type="date" class="form-control" id="notify_due_date" name="notify_due_date" placeholder="">
 				</div>
                 <div class="col-md-2 mb-2">
-                    <label for="alert_format">Alert Format</label>
+                    <label for="alert_format">Notify For Days</label>
                 <select  class="form-control id="notify_for_days" name="notify_for_days">
 					<option value="">All </option>
 					@foreach ( [ '30' => 'Due in Month', '7' => 'Due in Week', '0' => 'Overdue'] as $key => $value)
