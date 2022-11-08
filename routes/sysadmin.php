@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SysadminController;
+use App\Http\Controllers\SysAdmin\AuditingController;
 use App\Http\Controllers\GenericTemplateController;
 use App\Http\Controllers\SysAdmin\GoalBankController;
 use App\Http\Controllers\SysAdmin\AccessLogController;
@@ -175,6 +176,12 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/notifications/employees/{id}', [NotificationController::class,'getEmployees']);
         Route::get('/sysadmin/notifications/employee-list', [NotificationController::class, 'getDatatableEmployees'])->name('sysadmin.notifications.employee.list');
     });
+
+    //  Job Schedule Audit 
+    Route::middleware(['auth'])->prefix('sysadmin')->name('sysadmin.')->group(function() {    
+        Route::resource('/auditing', AuditingController::class)->only(['index']);
+    });
+
 
     //  Job Schedule Audit 
     Route::middleware(['auth'])->prefix('sysadmin')->name('sysadmin.')->group(function() {    

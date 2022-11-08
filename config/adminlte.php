@@ -390,6 +390,11 @@ return [
                     'active' => ['sysadmin/system-security/*']
                 ],
                 [
+                    'text' => 'Auditing',
+                    'url'  => 'sysadmin/auditing',
+                    'active' => ['sysadmin/auditing/*']
+                ],
+                [
                     'text' => 'Welcome Message',
                     'url'  => 'sysadmin/messageeditor',
                     'active' => ['sysadmin/messageeditor/*']

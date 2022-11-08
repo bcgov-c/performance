@@ -11,10 +11,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\SharedProfile;
+use OwenIt\Auditing\Contracts\Auditable;
+use OwenIt\Auditing\Auditable as AuditableTrait;
 
-class Conversation extends Model
+class Conversation extends Model implements Auditable
+
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, AuditableTrait;
 
     protected $with = ['topic', 'conversationParticipants', 'conversationParticipants.participant'];
     protected $appends = ['c_date', 'c_time', 'questions', 'date_time', 'is_current_user_participant', 'is_with_supervisor', 'last_sign_off_date', 'is_locked'];
