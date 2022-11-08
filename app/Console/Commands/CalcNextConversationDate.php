@@ -357,7 +357,7 @@ class CalcNextConversationDate extends Command
                         $newJr->current_classification = $demo->jobcode;
                         $newJr->current_classification_descr = $demo->jobcode_desc;
                         $newJr->current_manual_excuse = $demo->excused_flag ? 'Y' : 'N';
-                        $newJr->due_date_paused = in_array($changeType, $excusedArrayTypes) ? 'Y' : 'N';
+                        $newJr->due_Date_paused = in_array($changeType, $excusedArrayTypes) ? 'Y' : 'N';
                         $newJr->last_employee_status = $new_last_employee_status;
                         $newJr->last_classification = $new_last_classification;
                         $newJr->last_classification_descr = $new_last_classification_descr;
@@ -375,35 +375,8 @@ class CalcNextConversationDate extends Command
                         $newJr->save();
                         $updatecounter += 1;
                         echo 'GUID '.$newJr->guid.'.  $changeType '.$changeType.'.  EMPLID '.$demo->employee_id.'.'; echo "\r\n";
-                    } else {
-                        if ($jr && $jr->next_conversation_date && $initNextConversationDate && $jr->next_conversation_date <> $initNextConversationDate) {
-                            // save new next conversation due date;
-                            $newJr = new EmployeeDemoJunior;
-                            $newJr->guid = $jr->guid;
-                            $newJr->current_employee_status = $jr->current_employee_status;
-                            $newJr->current_classification = $jr->current_classification;
-                            $newJr->current_classification_descr = $jr->current_classification_descr;
-                            $newJr->current_manual_excuse = $jr->current_manual_excuse;
-                            $newJr->due_date_paused = $jr->due_date_paused;
-                            $newJr->last_employee_status = $jr->last_employee_status;
-                            $newJr->last_classification = $jr->last_classification;
-                            $newJr->last_classification_descr = $jr->last_classification_descr;
-                            $newJr->last_manual_excuse = $jr->last_manual_excuse;
-                            $newJr->excused_type = $jr->excused_type;
-                            $newJr->last_conversation_date = $jr->last_conversation_date;
-                            $newJr->next_conversation_date = $initNextConversationDate ? Carbon::parse($initNextConversationDate) : null;
-                            $newJr->created_by_id = $jr->created_by_id;
-                            $newJr->updated_by_id = $jr->updated_by_id;
-                            $newJr->excused_reason_id = $jr->excused_reason_id;
-                            $newJr->excused_reason_desc = $jr->excused_reason_desc;
-                            $newJr->created_at = $jr->created_at;
-                            $newJr->updated_at = $jr->updated_at;
-                            $newJr->save();
-                            $updatecounter += 1;
-                            echo 'GUID '.$newJr->guid.'.  $changeType updateDueDate.  EMPLID '.$demo->employee_id.'.  oldDueDate '.$jr->next_conversation_date.'.  newDueDate '.$initNextConversationDate.'.  '; echo "\r\n";
-                        } else {
-                            // SKIP if no change
-                        }
+                } else {
+                        // SKIP if no change
                     }
                 } else {
                     // NO GUID
