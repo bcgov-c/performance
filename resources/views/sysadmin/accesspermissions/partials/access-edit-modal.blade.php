@@ -12,18 +12,10 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                @if(Session::has('error'))
-                    <div class="alert alert-warning alert-dismissible" role="alert">
-                        <button type="button" class="close" data-dismiss="alert">
-                            <i class="fa fa-times"></i>
-                        </button>
-                        <strong>Error !</strong> System Administrator already assigned to selected user.
-                    </div>
-                @endif
                 <div class="mt-4 p-3">
                     <div class="row">
                         <div class="col-12">
-                            <p>Change/Update user access details below.</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
                         </div>
                     </div>
                 </div>
