@@ -21,9 +21,9 @@
 
 
     @push('css')
-        <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
         <x-slot name="css">
-            <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+            <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
             <style>
                 .text-truncate-30 {
                     white-space: wrap; 
@@ -48,19 +48,23 @@
     @endpush
 
     @push('js')
-        {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>   --}}
-        <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+        <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script>
         <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
         <script type="text/javascript">
 			$(document).ready(function(){
 
                 $('#filtertable').DataTable ( {
-                    processing: true,
                     serverSide: true,
+                    searching: false,
+                    processing: true,
+                    paging: true,
+                    deferRender: true,
+                    retrieve: true,
+                    scrollCollapse: true,
+                    scroller: true,
                     scrollX: true,
                     stateSave: true,
-                    deferRender: true,
                     ajax: {
                         url: "{{ route('sysadmin.accesspermissions.manageexistingaccesslist') }}",
                         data: function(d) {
@@ -74,21 +78,22 @@
                         }
                     },
                     columns: [
-                        {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_demo.employee_id', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_demo.employee_name', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'eMail', ariaTitle: 'eMail', target: 0, type: 'string', data: 'email', name: 'users.email', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'employee_demo.jobcode_desc', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'employee_demo.organization', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'employee_demo.level1_program', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'employee_demo.level2_division', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'employee_demo.level3_branch', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'employee_demo.level4', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', name: 'employee_demo.deptid', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Access Level', ariaTitle: 'Access Level', target: 0, type: 'string', data: 'longname', name: 'roles.longname', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'display_name', name: 'display_name', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'eMail', ariaTitle: 'eMail', target: 0, type: 'string', data: 'user_email', name: 'user_email', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', name: 'deptid', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Access Level', ariaTitle: 'Access Level', target: 0, type: 'string', data: 'role_longname', name: 'role_longname', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},
-                        {title: 'Model ID', ariaTitle: 'Model ID', target: 0, type: 'num', data: 'model_id', name: 'model_has_roles.model_id', searchable: false, visible: false},
-                        {title: 'Role ID', ariaTitle: 'Role ID', target: 0, type: 'num', data: 'role_id', name: 'model_has_roles.role_id', searchable: false, visible: false},
-                        {title: 'Reason', ariaTitle: 'Reason', target: 0, type: 'num', data: 'reason', name: 'model_has_roles.reason', searchable: false, visible: false},
+                        {title: 'Model ID', ariaTitle: 'Model ID', target: 0, type: 'num', data: 'model_id', name: 'model_id', searchable: false, visible: false},
+                        {title: 'Role ID', ariaTitle: 'Role ID', target: 0, type: 'num', data: 'role_id', name: 'role_id', searchable: false, visible: false},
+                        {title: 'Reason', ariaTitle: 'Reason', target: 0, type: 'num', data: 'reason', name: 'reason', searchable: false, visible: false},
+                        {title: 'SysAdmin', ariaTitle: 'SysAdmin', target: 0, type: 'num', data: 'sysadmin', name: 'sysadmin', searchable: false, visible: false},
                     ]
                 } );
 
@@ -104,6 +109,7 @@
                     var reason = button.data('reason');
                     var role_id = parseInt(button.data('roleid'));
                     var email = button.data('email');
+                    var sysadmin = button.data('sysadmin');
                     var model_id = button.data('modelid');
                     var current = {{ auth()->user()->id }};
                     $('#reason').val(reason);
@@ -119,15 +125,21 @@
                         $('#accessselect').prop('disabled', true);
                     }
                     if($('#accessselect').val() == 3) {
+                        $('#accessselect').prop('disabled', sysadmin);
                         $('#admintable').show();
                         var table = $('#admintable').DataTable
                         (
                             {
+                                serverSide: true,
+                                searching: false,
                                 processing: true,
-                                serverSide: false,
+                                paging: true,
+                                deferRender: true,
+                                retrieve: true,
+                                scrollCollapse: true,
+                                scroller: true,
                                 scrollX: true,
-                                stateSave: false,
-                                deferRender: false,
+                                stateSave: true,
                                 ajax: {
                                     type: 'GET',
                                     url: "/sysadmin/accesspermissions/manageexistingaccessadmin/"+model_id,

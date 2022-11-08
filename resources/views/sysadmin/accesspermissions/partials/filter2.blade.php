@@ -84,52 +84,19 @@
     <script>
 		$(document).ready(function(){
 
-			$('#ebtn_search').click(function(e) {
-                target = $('#enav-tree'); 
-                ddnotempty = $('#edd_level0').val() + $('#edd_level1').val() + $('#edd_level2').val() + $('#edd_level3').val() + $('#edd_level4').val();
-                if(ddnotempty) {
-                    // To do -- ajax called to load the tree
-                    $.when( 
-                        $.ajax({
-                            url: '/sysadmin/accesspermissions/eorg-tree',
-                            // url: $url,
-                            type: 'GET',
-                            data: $("#notify-form").serialize(),
-                            dataType: 'html',
-
-                            beforeSend: function() {
-                                $("#etree-loading-spinner").show();                    
-                            },
-
-                            success: function (result) {
-                                $('#enav-tree').html(''); 
-                                $('#enav-tree').html(result);
-                                $('#enav-tree').attr('loaded','loaded');
-                            },
-
-                            complete: function() {
-                                $("#etree-loading-spinner").hide();
-                            },
-
-                            error: function () {
-                                alert("error");
-                                $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
-                            }
-                        })
-                        
-                    ).then(function( data, textStatus, jqXHR ) {
-                        //alert( jqXHR.status ); // Alerts 200
-                        enodes = $('#eaccordion-level0 input:checkbox');
-                        eredrawTreeCheckboxes();	
-                    }); 
-                } else {
-                    $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
-                };
-            });
-
             $('#edd_level0').select2({
                 placeholder: 'Select Organization',
                 allowClear: true,
+                serverSide: true,
+                searching: false,
+                processing: true,
+                paging: true,
+                deferRender: true,
+                retrieve: true,
+                scrollCollapse: true,
+                scroller: true,
+                scrollX: true,
+                stateSave: true,
                 ajax: {
                     url: '/sysadmin/eorg-organizations'
                     , dataType: 'json'
@@ -152,6 +119,15 @@
             $('#edd_level1').select2({
                 placeholder: 'Select Level 1',
                 allowClear: true,
+                searching: false,
+                processing: true,
+                paging: true,
+                deferRender: true,
+                retrieve: true,
+                scrollCollapse: true,
+                scroller: true,
+                scrollX: true,
+                stateSave: true,
                 ajax: {
                     url: '/sysadmin/eorg-programs' 
                     , dataType: 'json'
@@ -175,6 +151,15 @@
             $('#edd_level2').select2({
                 placeholder: 'Select Level 2',
                 allowClear: true,
+                searching: false,
+                processing: true,
+                paging: true,
+                deferRender: true,
+                retrieve: true,
+                scrollCollapse: true,
+                scroller: true,
+                scrollX: true,
+                stateSave: true,
                 ajax: {
                     url: '/sysadmin/eorg-divisions' 
                     , dataType: 'json'
@@ -199,6 +184,15 @@
             $('#edd_level3').select2({
                 placeholder: 'Select Level 3',
                 allowClear: true,
+                searching: false,
+                processing: true,
+                paging: true,
+                deferRender: true,
+                retrieve: true,
+                scrollCollapse: true,
+                scroller: true,
+                scrollX: true,
+                stateSave: true,
                 ajax: {
                     url: '/sysadmin/eorg-branches' 
                     , dataType: 'json'
@@ -224,6 +218,15 @@
             $('#edd_level4').select2({
                 placeholder: 'Select Level 4',
                 allowClear: true,
+                searching: false,
+                processing: true,
+                paging: true,
+                deferRender: true,
+                retrieve: true,
+                scrollCollapse: true,
+                scroller: true,
+                scrollX: true,
+                stateSave: true,
                 ajax: {
                     url: '/sysadmin/eorg-level4' 
                     , dataType: 'json'
@@ -328,6 +331,7 @@
                 $('#edd_level2').val(null).trigger('change');
                 $('#edd_level3').val(null).trigger('change');
                 $('#edd_level4').val(null).trigger('change');
+                $('#ebtn_search').click();
             });
         });
 
