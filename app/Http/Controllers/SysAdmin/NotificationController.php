@@ -67,7 +67,7 @@ class NotificationController extends Controller
                 ->when($request->notify_due_date, function ($query) use($request) {
                     $query->where('notify_due_date', $request->notify_due_date );
                 })
-                ->when($request->notify_for_days || $request->notify_for_days == 0, function ($query) use($request) {
+                ->when($request->notify_for_days || $request->notify_for_days == '0', function ($query) use($request) {
                     $query->where('notify_for_days', $request->notify_for_days);
                 })
                 ->select(['id', 'subject', 'recipients', 'alert_type', 'alert_format', 'notify_user_id', 'overdue_user_id', 
