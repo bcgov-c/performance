@@ -220,7 +220,8 @@
             serverSide: true,
             // select: true,
             'order': [[ 0, 'desc']],
-            fixedHeader: true,            
+            fixedHeader: true,   
+            fixedColumn: true,         
             ajax: {
                 url: '{!! route('sysadmin.auditing.index') !!}',
                 data: function (data) {
@@ -241,19 +242,25 @@
                 {data: 'event', name: 'event', className: "dt-nowrap" },
                 {data: 'auditable_type_name',  name: 'auditable_type_name',  className: "dt-nowrap" },
                 {data: 'auditable_id',  name: 'auditable_id'},
-                {data: 'old_values', name: 'old_values', width: '10em', orderable: false, },
-                {data: 'new_values', name: 'new_values', width: '10em', orderable: false, },
+                {data: 'old_values', name: 'old_values', orderable: false, searchable: false},
+                {data: 'new_values', name: 'new_values', orderable: false, searchable: false},
                 {data: 'url', name: 'url',},
                 {data: 'ip_address', name: 'ip_address', className: "dt-nowrap"},
-                {data: 'user_agent', name: 'user_agent', className: "dt-nowrap"},
+                {data: 'user_agent', name: 'user_agent', render: function (data, type, row) {
+                                return "<div style='width: 20em;'>" + data  + '</div>';
+                    }
+                },
                 // {data: 'deleted_by', name: 'delete_by', orderable: false, searchable: false, className: "dt-nowrap"},
                 // {data: 'deleted_at', name: 'delete_at', orderable: false, searchable: false, className: "dt-nowrap"},
             ],
             columnDefs: [
                     {
-                        // width: '5em',
-                        // targets: [0]
+                            render: function (data, type, row) {
+                                return "<div style='max-width: 40em;'>" + data  + '</div>';
+                            },
+                            targets: [6,7]
                     },
+                 
             ],
 
         });
