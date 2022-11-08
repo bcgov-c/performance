@@ -21,7 +21,7 @@
 
 @push('css')
 
-    <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 	<style>
 	#employee-list-table_filter label {
 		text-align: right !important;
@@ -31,8 +31,8 @@
 @endpush
 
 @push('js')
-    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script>
 
     <script>
     
@@ -40,15 +40,19 @@
             var user_selected = [];
 
             var oTable = $('#employee-list-table').DataTable({
-                "scrollX": true,
-                retrieve: true,
-                "searching": false,
-                processing: true,
                 serverSide: true,
+                searching: false,
+                processing: true,
+                paging: true,
+                deferRender: true,
+                retrieve: true,
+                scrollCollapse: true,
+                scroller: true,
+                scrollX: true,
+                stateSave: true,
                 select: true,
-                'order': [[1, 'asc']],
                 ajax: {
-                    url: '{!! route('sysadmin.accesspermissions.employee.list') !!}',
+                    url: "{{ route('sysadmin.accesspermissions.employee.list') }}",
                     data: function (d) {
                         d.dd_level0 = $('#dd_level0').val();
                         d.dd_level1 = $('#dd_level1').val();
@@ -90,53 +94,15 @@
                 columns: [
                     {title: '<input name="select_all" value="1" id="employee-list-select-all" type="checkbox" />', ariaTitle: 'employee-list-select-all', target: 0, type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
                     {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', className: 'dt-nowrap show-modal'},
-                    {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', className: 'dt-nowrap show-modal'},
+                    {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'display_name', name: 'display_name', className: 'dt-nowrap show-modal'},
                     {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', className: 'dt-nowrap show-modal'},
-                    {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'employee_email', className: 'dt-nowrap show-modal'},
+                    {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'user_email', name: 'user_email', className: 'dt-nowrap show-modal'},
                     {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', className: 'dt-nowrap show-modal'},
                     {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', className: 'dt-nowrap show-modal'},
                     {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', className: 'dt-nowrap show-modal'},
                     {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', className: 'dt-nowrap show-modal'},
                     {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', className: 'dt-nowrap show-modal'},
                     {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', data: 'deptid', name: 'deptid', className: 'dt-nowrap show-modal'},
-                ],
-                columnDefs: [
-                    {
-                    },
-                    {
-                    },
-                    {
-                        className: "dt-nowrap",
-                        targets: 2
-                    },
-                    {
-                        className: "dt-nowrap",
-                        targets: 3
-                    },
-                    {
-                        className: "dt-nowrap",
-                        targets: 4
-                    },
-                    {
-                        className: "dt-nowrap",
-                        targets: 5
-                    },        
-                    {
-                        className: "dt-nowrap",
-                        targets: 6
-                    },
-                    {
-                        className: "dt-nowrap",
-                        targets: 7
-                    },        
-                    {
-                        className: "dt-nowrap",
-                        targets: 8
-                    },        
-                    {
-                        className: "dt-nowrap",
-                        targets: 9
-                    }        
                 ]
             });
 
