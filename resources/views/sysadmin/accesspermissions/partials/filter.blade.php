@@ -59,8 +59,6 @@
             <div class="form-group row"> </div>
                 <div class="form-group row">
                     <span class="float-left float-bottom">  
-                        {{-- <button type="submit" class="btn btn-primary" name="btn_search" 
-                            value="btn_search" formaction="{{ route('sysadmin.accesspermissions.search') }}">Filter</button> --}}
                         <button type="button" class="btn btn-primary" id="btn_search" name="btn_search" value="btn_search">Filter</button>
                         <button type="button" class="btn btn-secondary" id="btn_search_reset" name="btn_reset" value="btn_reset">Reset</button>
                     </span>
@@ -95,9 +93,20 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
+
         $('#dd_level0').select2({
             placeholder: 'Select Organization',
             allowClear: true,
+            serverSide: true,
+            searching: false,
+            processing: true,
+            paging: true,
+            deferRender: true,
+            retrieve: true,
+            scrollCollapse: true,
+            scroller: true,
+            scrollX: true,
+            stateSave: true,
             ajax: {
                 url: '/sysadmin/org-organizations'
                 , dataType: 'json'
@@ -120,6 +129,16 @@
         $('#dd_level1').select2({
             placeholder: 'Select Level 1',
             allowClear: true,
+            serverSide: true,
+            searching: false,
+            processing: true,
+            paging: true,
+            deferRender: true,
+            retrieve: true,
+            scrollCollapse: true,
+            scroller: true,
+            scrollX: true,
+            stateSave: true,
             ajax: {
                 url: '/sysadmin/org-programs' 
                 , dataType: 'json'
@@ -143,6 +162,16 @@
         $('#dd_level2').select2({
             placeholder: 'Select Level 2',
             allowClear: true,
+            serverSide: true,
+            searching: false,
+            processing: true,
+            paging: true,
+            deferRender: true,
+            retrieve: true,
+            scrollCollapse: true,
+            scroller: true,
+            scrollX: true,
+            stateSave: true,
             ajax: {
                 url: '/sysadmin/org-divisions' 
                 , dataType: 'json'
@@ -167,6 +196,16 @@
         $('#dd_level3').select2({
             placeholder: 'Select Level 3',
             allowClear: true,
+            serverSide: true,
+            searching: false,
+            processing: true,
+            paging: true,
+            deferRender: true,
+            retrieve: true,
+            scrollCollapse: true,
+            scroller: true,
+            scrollX: true,
+            stateSave: true,
             ajax: {
                 url: '/sysadmin/org-branches' 
                 , dataType: 'json'
@@ -192,6 +231,16 @@
         $('#dd_level4').select2({
             placeholder: 'Select level 4',
             allowClear: true,
+            serverSide: true,
+            searching: false,
+            processing: true,
+            paging: true,
+            deferRender: true,
+            retrieve: true,
+            scrollCollapse: true,
+            scroller: true,
+            scrollX: true,
+            stateSave: true,
             ajax: {
                 url: '/sysadmin/org-level4' 
                 , dataType: 'json'
@@ -277,64 +326,55 @@
             $('#btn_search').click();
         });
 
-        $('#dd_level0').change(function (){
-            // e.preventDefault();
+        $('#dd_level0').change(function (e){
+            e.preventDefault();
         });
 
-        $('#dd_level1').change(function (){
-            // e.preventDefault();
+        $('#dd_level1').change(function (e){
+            e.preventDefault();
         });
 
-        $('#dd_level2').change(function (){
-            // e.preventDefault();
+        $('#dd_level2').change(function (e){
+            e.preventDefault();
         });
 
-        $('#dd_level3').change(function (){
-            // e.preventDefault();
+        $('#dd_level3').change(function (e){
+            e.preventDefault();
         });
 
-        $('#dd_level4').change(function (){
-            // e.preventDefault();
+        $('#dd_level4').change(function (e){
+            e.preventDefault();
             $('#btn_search').click();
         });
 
-        $('#criteria').change(function (){
-            // e.preventDefault();
+        $('#criteria').change(function (e){
+            e.preventDefault();
             $('#btn_search').click();
         });
 
-        $('#search_text').change(function (){
-            // e.preventDefault();
+        $('#search_text').change(function (e){
+            e.preventDefault();
             $('#btn_search').click();
         });
 
         $('#search_text').keydown(function (e){
             if (e.keyCode == 13) {
-                // e.preventDefault();
+                e.preventDefault();
                 $('#btn_search').click();
             }
         });
 
-        $('#btn_search_reset').click(function() {
-            // e.preventDefault();
+        $('#btn_search_reset').click(function(e) {
+            e.preventDefault();
+            $('#criteria').val('all');
+            $('#search_text').val(null);
             $('#dd_level0').val(null).trigger('change');
             $('#dd_level1').val(null).trigger('change');
             $('#dd_level2').val(null).trigger('change');
             $('#dd_level3').val(null).trigger('change');
             $('#dd_level4').val(null).trigger('change');
-            $('#criteria').val('all');
-            $('#search_text').val(null);
-            $('#btn_search').click();
+            // $('#btn_search').click();
         });
-
-        $('#btn_search').click(function() {
-            // e.preventDefault();
-            $('#employee-list-table').DataTable().ajax.reload();
-        });
-
-
-
-
 
     </script>
 
