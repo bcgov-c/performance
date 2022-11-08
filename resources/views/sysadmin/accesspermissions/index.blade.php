@@ -151,10 +151,10 @@
 	<x-slot name="js">
 
 		<script>
-			let g_matched_employees = {!!json_encode($matched_emp_ids)!!};
-			let g_selected_employees = {!!json_encode($old_selected_emp_ids)!!};
-			let g_selected_orgnodes = {!!json_encode($old_selected_org_nodes)!!};
-			let g_employees_by_org = [];
+			g_matched_employees = {!! json_encode($matched_emp_ids) !!};
+			g_selected_employees = {!! json_encode($old_selected_emp_ids) !!};
+			g_selected_orgnodes = {!! json_encode($old_selected_org_nodes) !!};
+			g_employees_by_org = [];
 
 			function confirmSaveAccessModal(){
 				count = g_selected_employees.length;
@@ -388,34 +388,81 @@
 					}
 				}
 
+				$('#ebtn_search').click(function(e) {
+					target = $('#enav-tree'); 
+					ddnotempty = $('#edd_level0').val() + $('#edd_level1').val() + $('#edd_level2').val() + $('#edd_level3').val() + $('#edd_level4').val();
+					if(ddnotempty) {
+						// To do -- ajax called to load the tree
+						$.when( 
+							$.ajax({
+								url: '/sysadmin/accesspermissions/eorg-tree',
+								// url: $url,
+								type: 'GET',
+								data: $("#notify-form").serialize(),
+								dataType: 'html',
+
+								beforeSend: function() {
+									$("#etree-loading-spinner").show();                    
+								},
+
+								success: function (result) {
+									$('#enav-tree').html(''); 
+									$('#enav-tree').html(result);
+									$('#enav-tree').attr('loaded','loaded');
+								},
+
+								complete: function() {
+									$("#etree-loading-spinner").hide();
+								},
+
+								error: function () {
+									alert("error");
+									$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
+								}
+							})
+							
+						).then(function( data, textStatus, jqXHR ) {
+							//alert( jqXHR.status ); // Alerts 200
+							enodes = $('#eaccordion-level0 input:checkbox');
+							eredrawTreeCheckboxes();	
+						}); 
+					} else {
+						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
+					};
+				});
+
+				$('#btn_search').click(function(e) {
+					e.preventDefault();
+					$('#employee-list-table').DataTable().rows().invalidate().draw();
+				}); 
+
+				$(window).on('beforeunload', function(){
+					$('#pageLoader').show();
+				});
+
+				$(window).resize(function(){
+					location.reload();
+					return;
+				});
+
+				// Model -- Confirmation Box
+
+				// var modalConfirm = function(callback) {
+				// 	$("#btn-confirm").on("click", function(){
+				// 		$("#mi-modal").modal('show');
+				// 	});
+				// 	$("#modal-btn-si").on("click", function(){
+				// 		callback(true);
+				// 		$("#mi-modal").modal('hide');
+				// 	});
+					
+				// 	$("#modal-btn-no").on("click", function(){
+				// 		callback(false);
+				// 		$("#mi-modal").modal('hide');
+				// 	});
+				// };
 
 			});
-
-			$(window).on('beforeunload', function(){
-				$('#pageLoader').show();
-			});
-
-			$(window).resize(function(){
-				location.reload();
-				return;
-			});
-
-			// Model -- Confirmation Box
-
-			// var modalConfirm = function(callback) {
-			// 	$("#btn-confirm").on("click", function(){
-			// 		$("#mi-modal").modal('show');
-			// 	});
-			// 	$("#modal-btn-si").on("click", function(){
-			// 		callback(true);
-			// 		$("#mi-modal").modal('hide');
-			// 	});
-				
-			// 	$("#modal-btn-no").on("click", function(){
-			// 		callback(false);
-			// 		$("#mi-modal").modal('hide');
-			// 	});
-			// };
 
 		</script>
 	</x-slot>
