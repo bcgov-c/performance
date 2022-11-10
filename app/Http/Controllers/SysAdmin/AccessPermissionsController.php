@@ -782,20 +782,14 @@ class AccessPermissionsController extends Controller
                     ->where('model_id', $request->model_id)
                     ->whereIn('role_id', [3, 4])
                     ->update(['role_id' => $request->accessselect, 'reason' => $request->reason]);
-                    }
-                catch (Exception $e) {
-                    // dd($e->getMessage());
-                    // $exception = new Exception;
-                    // return parent::report($request, $exception);
-                    // return with('error', 'System Administrator already assigned to selected user.');
-                    // echo "<script>alert('error');</script>";
-                    // \Session::flash('error', 'ABC');
-                    // return response()->with('error', 'System Administrator already assigned to selected user.');
-                    return '';
+                    $orgs = DB::table('admin_orgs')
+                    ->where('user_id', '=', $request->input('model_id'))
+                    ->delete();
+                return redirect()->back();
                 }
-                // $orgs = DB::table('admin_orgs')
-                // ->where('user_id', '=', $request->input('model_id'))
-                // ->delete();
+                catch (Exception $e) {
+                    return response()->with('error', 'System Administrator already assigned to selected user.');
+                }
             }
             if($request->accessselect == 3) {
                 $query = DB::table('model_has_roles')
