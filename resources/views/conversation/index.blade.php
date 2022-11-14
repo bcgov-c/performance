@@ -633,7 +633,6 @@
             */
             
             function saveComments() {
-                var isSupervisor = $('#viewmode').val();
                 if(isSupervisor == 1) {
                         var info_comment1_data = CKEDITOR.instances['info_comment1'].getData();
                         var info_comment2_data = CKEDITOR.instances['info_comment2'].getData();
