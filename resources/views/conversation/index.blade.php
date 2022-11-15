@@ -318,6 +318,7 @@
             });
             
              modal_open=false;
+             
         </script>    
         
         <script>
@@ -674,6 +675,9 @@
                             });
                        
             }
+            
+            
+            
             
             /*
             $(document).on('show.bs.modal', '#viewConversationModal', function(e) {
@@ -1048,7 +1052,8 @@
                             CKEDITOR.instances['info_comment9'].setReadOnly( true );  
                             CKEDITOR.instances['info_comment10'].setReadOnly( true );  
                             $('#info_comment11').prop( 'disabled', true );
-                        }
+                        }                        
+                        
                         if (isNotThirdPerson) {
                             const currentEmpSignoffDone = isSupervisor ? !!result.supervisor_signoff_id : !!result.signoff_user_id
                             if (currentEmpSignoffDone) {
@@ -1324,6 +1329,250 @@
             function sessionWarningStop() {
                 clearTimeout(SessionTime);
             }
+            
+            
+            var info_save1 = 0;
+            var info_save2 = 0;
+            var info_save3 = 0;
+            var info_save4 = 0;
+            var info_save5 = 0;
+            var info_save6 = 0;
+            var info_save7 = 0;
+            var info_save8 = 0;
+            var info_save9 = 0;
+            var info_save10 = 0;
+            var info_save11 = 0;           
+            
+                        
+            CKEDITOR.instances['info_comment1'].on('focus', function(e) {
+                   $('#info_area1').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment1').show();
+                   info_save1 = 0;
+            });
+            CKEDITOR.instances['info_comment1'].on('blur', function(e) {
+                if(info_save1 == 0){
+                   $('#control-info-comment1').hide();
+                }   
+            });
+            
+            $('#control-info-comment1').click(function() {
+                saveCkComment('info_comment1');
+                info_save1 = 1;
+                $('#info_area1').html('<span style="color:red">Comment saved</span>');
+            }); 
+            
+            
+            CKEDITOR.instances['info_comment2'].on('focus', function(e) {
+                   $('#info_area2').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment2').show();
+                   info_save2 = 0;
+            });
+            CKEDITOR.instances['info_comment2'].on('blur', function(e) {
+                if(info_save2 == 0){
+                   $('#control-info-comment2').hide();
+                }   
+            });
+            
+            $('#control-info-comment2').click(function() {
+                saveCkComment('info_comment2');
+                info_save2 = 1;
+                $('#info_area2').html('<span style="color:red">Comment saved</span>');
+            }); 
+            
+            
+            CKEDITOR.instances['info_comment3'].on('focus', function(e) {
+                   $('#info_area3').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment3').show();
+                   info_save3 = 0;
+            });
+            CKEDITOR.instances['info_comment3'].on('blur', function(e) {
+                if(info_save3 == 0){
+                   $('#control-info-comment3').hide();
+                }   
+            });
+            
+            $('#control-info-comment3').click(function() {
+                saveCkComment('info_comment3');
+                info_save3 = 1;
+                $('#info_area3').html('<span style="color:red">Comment saved</span>');
+            }); 
+            
+            CKEDITOR.instances['info_comment4'].on('focus', function(e) {
+                   $('#info_area4').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment4').show();
+                   info_save4 = 0;
+            });
+            CKEDITOR.instances['info_comment4'].on('blur', function(e) {
+                if(info_save4 == 0){
+                   $('#control-info-comment4').hide();
+                }   
+            });
+            
+            $('#control-info-comment4').click(function() {
+                saveCkComment('info_comment4');
+                info_save4 = 1;
+                $('#info_area4').html('<span style="color:red">Comment saved</span>');
+            });  
+            
+            
+            
+            CKEDITOR.instances['info_comment5'].on('focus', function(e) {
+                   $('#info_area5').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment5').show();
+                   info_save5 = 0;
+            });
+            CKEDITOR.instances['info_comment5'].on('blur', function(e) {
+                if(info_save5 == 0){
+                   $('#control-info-comment5').hide();
+                }   
+            });
+            
+            $('#control-info-comment5').click(function() {
+                saveCkComment('info_comment5');
+                info_save5 = 1;
+                $('#info_area5').html('<span style="color:red">Comment saved</span>');
+            });  
+            
+            
+            
+            
+            CKEDITOR.instances['info_comment6'].on('focus', function(e) {
+                   $('#info_area6').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment6').show();
+                   info_save6 = 0;
+            });
+            CKEDITOR.instances['info_comment6'].on('blur', function(e) {
+                if(info_save6 == 0){
+                   $('#control-info-comment6').hide();
+                }   
+            });
+            
+            $('#control-info-comment6').click(function() {
+                saveCkComment('info_comment6');
+                info_save6 = 1;
+                $('#info_area6').html('<span style="color:red">Comment saved</span>');
+            });
+            
+            CKEDITOR.instances['info_comment7'].on('focus', function(e) {
+                   $('#info_area7').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment7').show();
+                   info_save7 = 0;
+            });
+            CKEDITOR.instances['info_comment7'].on('blur', function(e) {
+                if(info_save7 == 0){
+                   $('#control-info-comment7').hide();
+                }   
+            });
+            
+            $('#control-info-comment7').click(function() {
+                saveCkComment('info_comment7');
+                info_save7 = 1;
+                $('#info_area7').html('<span style="color:red">Comment saved</span>');
+            });
+            
+            CKEDITOR.instances['info_comment8'].on('focus', function(e) {
+                   $('#info_area8').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment8').show();
+                   info_save8 = 0;
+            });
+            CKEDITOR.instances['info_comment8'].on('blur', function(e) {
+                if(info_save8 == 0){
+                   $('#control-info-comment8').hide();
+                }   
+            });
+            
+            $('#control-info-comment8').click(function() {
+                saveCkComment('info_comment8');
+                info_save8 = 1;
+                $('#info_area8').html('<span style="color:red">Comment saved</span>');
+            });
+            
+            CKEDITOR.instances['info_comment9'].on('focus', function(e) {
+                   $('#info_area9').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment9').show();
+                   info_save9 = 0;
+            });
+            CKEDITOR.instances['info_comment9'].on('blur', function(e) {
+                if(info_save9 == 0){
+                   $('#control-info-comment9').hide();
+                }   
+            });
+            
+            $('#control-info-comment9').click(function() {
+                saveCkComment('info_comment9');
+                info_save9 = 1;
+                $('#info_area9').html('<span style="color:red">Comment saved</span>');
+            });
+            
+            
+            CKEDITOR.instances['info_comment10'].on('focus', function(e) {
+                   $('#info_area10').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment10').show();
+                   info_save10 = 0;
+            });
+            CKEDITOR.instances['info_comment10'].on('blur', function(e) {
+                if(info_save10 == 0){
+                   $('#control-info-comment10').hide();
+                }   
+            });
+            
+            $('#control-info-comment10').click(function() {
+                saveCkComment('info_comment10');
+                info_save10 = 1;
+                $('#info_area10').html('<span style="color:red">Comment saved</span>');
+            });
+            
+                        
+            $('#info_comment11').focus(function() {
+                 $('#info_area11').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment11').show();
+                   info_save11 = 0;
+            });
+            $('#info_comment11').blur(function() {
+                 $('#control-info-comment11').hide();
+            });
+            
+            $('#control-info-comment11').click(function() {
+                saveComment('info_comment11');
+                $('#info_area11').html('<span style="color:red">Comment saved</span>');
+            });
+            
+            function saveCkComment(comment) {
+                var info_comment_data = CKEDITOR.instances[comment].getData();
+                var comments = {};
+                comments[comment] = info_comment_data;
+                
+                $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comments', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:comments
+                                }
+                            });
+
+            }
+            
+            function saveComment(comment) {
+                var info_comment_data = $('#'+comment).val();
+                var comments = {};
+                comments[comment] = info_comment_data;
+                
+                $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comments', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:comments
+                                }
+                            });
+
+            }
+            
         </script>
 
 @isset($open_modal_id)
