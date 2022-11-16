@@ -491,7 +491,7 @@
                 $("#editModal").find("input[name=user_id]").val(user_id);
                 $("#editModal").find("select[name=excused_flag]").val(excused_flag ?? 0);
                 $("#editModal").find("select[name=excused_flag2]").val(1);
-                $("#editModal").find("select[name=excused_reason_id]").val(excused_reason_id ?? 3);
+                $("#editModal").find("select[name=excused_reason_id]").val(excused_reason_id ? (excused_reason_id < 3 ? 3 : excused_reason_id) : 3);
                 $("#editModal").find("select[name=excused_flag2]").attr('disabled', true);
                 $("#editModal").find("select[name=excused_reason_id2]").attr('disabled', true);
                 if (excused_type == 'A') {
