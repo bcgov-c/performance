@@ -33,8 +33,8 @@ class GoalController extends Controller
     {
         $authId = Auth::id();
         $goaltypes = GoalType::all()->toArray();
-        $tags = Tag::all()->sortBy("name")->toArray();
         $user = User::find($authId);
+        $tags = Tag::all()->sortBy("name")->toArray();
         
         $request->session()->forget('is_bank');
               
@@ -316,10 +316,9 @@ class GoalController extends Controller
         ->with('goalType')
         ->with('tags')        
         ->firstOrFail();
-
-        $goaltypes = GoalType::all()->toArray();
-        $tags = Tag::all(["id","name", "description"])->sortBy("name")->toArray();
         
+        
+        $goaltypes = GoalType::all()->toArray();
         $type_desc_arr = array();
         foreach($goaltypes as $goalType) {
             if(isset($goalType['description']) && isset($goalType['name'])) {                
@@ -328,6 +327,9 @@ class GoalController extends Controller
             }
         }
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
+        
+        
+        $tags = Tag::all(["id","name", "description"])->sortBy("name")->toArray();
 
         return view('goal.edit', compact("goal", "goaltypes", "type_desc_str", "tags"));
         // return redirect()->route('goal.edit', $id);
@@ -418,12 +420,12 @@ class GoalController extends Controller
         return redirect()->back();
     }
 
-    public function goalBank(Request $request) {
-        $tags = Tag::all()->sortBy("name")->toArray();
-        $tags_input = $request->tag_ids;   
+    public function goalBank(Request $request) {         
         
         $authId = Auth::id();
         $user = User::find($authId);
+        $tags = Tag::all()->sortBy("name")->toArray();
+        $tags_input = $request->tag_ids;  
 
         $adminGoals = Goal::withoutGlobalScopes()
         ->join('goal_bank_orgs', 'goals.id', '=', 'goal_bank_orgs.goal_id')
