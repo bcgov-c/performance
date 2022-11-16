@@ -34,10 +34,11 @@ class ResourceController extends Controller
     }
     public function goalsetting(Request $request)
     {
-        //get goal tags
-        $tags = Tag::all()->sortBy("name")->toArray();
+        
         $t = $request->t;
         
+        //get goal tags
+        $tags = Tag::all()->sortBy("name")->toArray();
         $data = [
             [
                 'question' => 'What is goal setting?',
