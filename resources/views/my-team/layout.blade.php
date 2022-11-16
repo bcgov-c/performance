@@ -325,7 +325,7 @@
                 $("#employee-excused-modal").find("input[name=user_id]").val($(this).data('user-id'));
                 $("#employee-excused-modal").find("select[name=excused_flag]").val($(this).data("user-row").excused_flag ?? 0);
                 $("#employee-excused-modal").find("select[name=excused_flag2]").val(1);
-                $("#employee-excused-modal").find("select[name=excused_reason_id]").val($(this).data("user-row").excused_reason_id ?? 3);
+                $("#employee-excused-modal").find("select[name=excused_reason_id]").val($(this).data("user-row").excused_reason_id ? ($(this).data("user-row").excused_reason_id < 3 ? 3 : $(this).data("user-row").excused_reason_id) : 3);
                 $("#employee-excused-modal").find("select[name=excused_flag2]").attr('disabled', true);
                 $("#employee-excused-modal").find("select[name=excused_reason_id2]").attr('disabled', true);
                 if ($(this).data("excused-type") == 'A') {
