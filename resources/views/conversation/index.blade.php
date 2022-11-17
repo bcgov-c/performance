@@ -398,8 +398,8 @@
                     const supervisorSignOffDone = $modal.data('supervisor-signoff') == 1;
                     const employeeSignOffDone = $modal.data('employee-signoff') == 1;
                     let message = "must un-sign before changes can be made to this record of conversation";
-                    const supervisor = $("#supervisor-signoff-message").find('.name').html();
-                    const emp = $("#employee-signoff-message").find('.name').html();
+                    const supervisor = $("#supervisor-unsignoff-message").find('.name').html();
+                    const emp = $("#employee-unsignoff-message").find('.name').html();
                     if (supervisorSignOffDone && employeeSignOffDone) {
                         message = `${supervisor} and ${emp} ${message}`;
                     } else if (supervisorSignOffDone) {
@@ -734,7 +734,8 @@
                         modal_open=true;
                         isSupervisor = result.view_as_supervisor;
                         topic_id = result.topic.id;
-                        disable_signoff = result.disable_signoff;
+                        disable_signoff = result.disable_signoff;                        
+                        is_locked = result.is_locked;
                         
                         type = 'current';
                         @if($type == 'past')
@@ -1052,7 +1053,20 @@
                             CKEDITOR.instances['info_comment9'].setReadOnly( true );  
                             CKEDITOR.instances['info_comment10'].setReadOnly( true );  
                             $('#info_comment11').prop( 'disabled', true );
-                        }                        
+                        }       
+                        
+                        if(is_locked) {
+                            $('#emp-signoff-row').hide();
+                            $('#employee-signoff-message').hide();
+                            $('#sup-signoff-row').hide();
+                            $('#supervisor-signoff-message').hide();
+                            $('#emp-unsignoff-row').hide();
+                            $('#employee-unsignoff-message').hide();
+                            $('#sup-unsignoff-row').hide();
+                            $('#supervisor-unsignoff-message').hide();
+                        }
+                        
+                        
                         
                         if (isNotThirdPerson) {
                             const currentEmpSignoffDone = isSupervisor ? !!result.supervisor_signoff_id : !!result.signoff_user_id

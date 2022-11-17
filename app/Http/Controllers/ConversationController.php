@@ -334,6 +334,8 @@ class ConversationController extends Controller
         
         $conversation_id = $conversation->id;
         $conversation->disable_signoff = false;
+        
+        $conversation->is_locked = $conversation->getIsLockedAttribute();
              
         $conversation_topic_details = DB::table('conversation_topics')   
                             ->select('conversation_topics.*')
