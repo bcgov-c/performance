@@ -56,14 +56,14 @@ class ConversationController extends Controller
             ->where(function($query) {
                 $query->where(function($query) {
                     $query->whereNotNull('signoff_user_id')
-                          ->whereNotNull('supervisor_signoff_id')                          
-                          ->whereNull('unlock_until');
-                })
-                ->orWhere(function($query) {
-                    $query->whereNotNull('signoff_user_id')
-                          ->whereNotNull('supervisor_signoff_id')
-                          ->whereDate('unlock_until', '<', Carbon::today() );
+                          ->whereNotNull('supervisor_signoff_id');                          
+                        //   ->whereNull('unlock_until');
                 });
+                // ->orWhere(function($query) {
+                //     $query->whereNotNull('signoff_user_id')
+                //           ->whereNotNull('supervisor_signoff_id')
+                //           ->whereDate('unlock_until', '<', Carbon::today() );
+                // });
             });       
 
             if ($request->has('user_id') && $request->user_id) {
@@ -136,12 +136,12 @@ class ConversationController extends Controller
                 $query->where(function($query) {
                     $query->whereNull('signoff_user_id')
                         ->orWhereNull('supervisor_signoff_id');
-                })
-                ->orWhere(function($query) {
-                    $query->whereNotNull('signoff_user_id')
-                          ->whereNotNull('supervisor_signoff_id')
-                          ->whereDate('unlock_until', '>=', Carbon::today() );
                 });
+                // ->orWhere(function($query) {
+                //     $query->whereNotNull('signoff_user_id')
+                //           ->whereNotNull('supervisor_signoff_id')
+                //           ->whereDate('unlock_until', '>=', Carbon::today() );
+                // });
             });
             if ($request->has('user_id') && $request->user_id) {
                 $user_id = $request->user_id;
