@@ -20,7 +20,8 @@
 
 
 {{-- Search Criteria Section --}}
-<form id="manage-unlocked-conversation-form" action="{{ route('sysadmin.unlock.manageunlocked.search') }}" method="post">
+<form id="manage-unlocked-conversation-form" action="{{ route('sysadmin.unlock.manageunlocked.search') }}" 
+		method="post" class="search-filter" >
 	@csrf
 
 	<div class="card p-3">
@@ -35,7 +36,7 @@
 			</select>
 		</div>
 		<div class="form-group col-md-3">
-			<label for="dd_level1">Program</label>
+			<label for="dd_level1">Level 1</label>
 			<select id="dd_level1" name="dd_level1" class="form-control select2">
 				@if ( old('dd_level1') && session()->get('level1') )
 					<option value="{{ session()->get('level1')->id }}">{{ session()->get('level1')->name }}</option>
@@ -43,7 +44,7 @@
 			</select>
 		</div>
 		<div class="form-group col-md-3">
-			<label for="dd_level2">Division</label>
+			<label for="dd_level2">Level 2</label>
 			<select id="dd_level2" name="dd_level2" class="form-control select2">
 				@if ( old('dd_level2') && session()->get('level2') )
 					<option value="{{ session()->get('level2')->id }}">{{ session()->get('level2')->name }}</option>
@@ -51,7 +52,7 @@
 			</select>
 		</div>
 		<div class="form-group col-md-3">
-			<label for="dd_level3">Branch</label>
+			<label for="dd_level3">Level 3</label>
 			<select id="dd_level3" name="dd_level3" class="form-control select2">
 				@if ( old('dd_level3') && session()->get('level3') )
 					<option value="{{ session()->get('level3')->id }}">{{ session()->get('level3')->name }}</option>
@@ -101,7 +102,7 @@
 			<div class="form-group col-md-2">
 				<label for="search_text">search</label>
 				<input type="text" id="search_text" name="search_text" class="form-control" 
-						value="{{ old('search_text') }}" placeholder="Employee">
+						value="" placeholder="Employee">
 			</div>
 
 		</div>
@@ -109,9 +110,11 @@
 		<div class="form-row">
 			<div class="form-group col-md-12">
 			<span class="float-right">  
-			<button type="submit" class="btn btn-primary" name="btn_search" 
-					value="btn_search" formaction="{{ route('sysadmin.unlock.manageunlocked.search') }}">Search</button>
-			<button type="button" class="btn btn-secondary  " id="btn_search_reset" name="btn_reset" value="btn_reset">reset</button>
+			<button type="button" class="btn btn-primary" name="btn_search"  id ="btn_search" 
+					value="btn_search" 
+					{{-- formaction="{{ route('sysadmin.unlock.manageunlocked.search') }}" --}}
+					>Search</button>
+			<button type="button" class="btn btn-secondary  " id="btn_search_reset" name="btn_reset" value="btn_reset">Reset</button>
 			</span>
 			</div>
 		</div>
@@ -527,17 +530,28 @@ $(function() {
 		$('#dd_level4').val(null).trigger('change');
 	});
 
+	$('#btn_search').on('click', function() {
+            // oTable.ajax.reload(null, true);
+            oTable.draw();
+    });
 
 	$('#btn_search_reset').click(function() {
-		$('#dd_level0').val(null).trigger('change');
-		$('#dd_level1').val(null).trigger('change');
-		$('#dd_level2').val(null).trigger('change');
-		$('#dd_level3').val(null).trigger('change');
-		$('#dd_level4').val(null).trigger('change');
-		$('#topic_id').val(null).trigger('change');
-		$('#due_date_from').val(null);
-		$('#due_date_to').val(null);
-		$('#search_text').val(null);
+		// Reset filter fields value
+		$('.search-filter input').map( function() {$(this).val(''); });
+        $('.search-filter select').map( function() { return $(this).val(''); })
+
+		oTable.search( '' ).columns().search( '' ).draw();
+
+        // oTable.search( '' ).columns().search( '' ).draw();
+		// $('#dd_level0').val(null).trigger('change');
+		// $('#dd_level1').val(null).trigger('change');
+		// $('#dd_level2').val(null).trigger('change');
+		// $('#dd_level3').val(null).trigger('change');
+		// $('#dd_level4').val(null).trigger('change');
+		// $('#topic_id').val(null).trigger('change');
+		// $('#due_date_from').val(null);
+		// $('#due_date_to').val(null);
+		// $('#search_text').val(null);
 	});
 
 
