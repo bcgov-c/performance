@@ -44,7 +44,12 @@ class Conversation extends Model implements Auditable
         if (!$this->initial_signoff) {
             return false;
         }
-        return $this->initial_signoff->addDays(14)->isPast();
+        $locked = $this->initial_signoff->addDays(14)->isPast();
+        if ($this->isUnlock) {
+            $locked = false;
+        }
+
+        return $locked;
     }
 
     public function getInfoComment1Attribute() {
