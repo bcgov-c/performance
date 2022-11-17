@@ -15,13 +15,21 @@ $(function() {
 
 
     $(document).on('click', '.btn-view-conversation', function(e) {
-        console.log('testing');
                 conversation_id = e.currentTarget.getAttribute('data-id');
-                updateConversation(conversation_id);
-            });
+                updateConversation(conversation_id);             
+    });
+
+    $('#viewConversationModal').on('shown.bs.modal', function (e) {
+        // do something...
+        $('#unsign-off-form input').prop('disabled', true);
+        $('#unsign-off-form').attr('readonly', 'readonly');
+        $('#unsignoff-sup-id-input').css('visibility','hidden');
+      })
 
 
-
+    $(document).on('click', '#closemodal', function(e) {
+        $('#viewConversationModal').modal('hide');
+    });
 
 
     function updateConversation(conversation_id) {
