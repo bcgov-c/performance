@@ -1055,7 +1055,7 @@
                             $('#info_comment11').prop( 'disabled', true );
                         }       
                         
-                        if(is_locked) {
+                        if(is_locked && type == 'past') {
                             $('#emp-signoff-row').hide();
                             $('#employee-signoff-message').hide();
                             $('#sup-signoff-row').hide();
