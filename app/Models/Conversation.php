@@ -123,7 +123,8 @@ class Conversation extends Model implements Auditable
 
     public function getLastSignOffDateAttribute()
     {
-        return $this->supervisor_signoff_time > $this->sign_off_time ? $this->sign_off_time : $this->supervisor_signoff_time;
+        // return $this->supervisor_signoff_time > $this->sign_off_time ? $this->sign_off_time : $this->supervisor_signoff_time;
+        return max($this->supervisor_signoff_time, $this->sign_off_time);
     }
 
     public function getCTimeAttribute()
