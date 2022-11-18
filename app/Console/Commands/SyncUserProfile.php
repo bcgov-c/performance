@@ -146,7 +146,8 @@ class SyncUserProfile extends Command
                     $this->info('Warning: Same GUID but difference email | ' . $user->guid . ' -> ' . $user->email . ' - demo ' .
                     $employee->employee_email );
                 }
-                       
+
+                $user->name = $employee->employee_first_name . ' ' . $employee->employee_last_name;
                 //$user->email = $employee->employee_email;
                 // $user->guid = $employee->guid;
                 $user->employee_id = $employee->employee_id;
