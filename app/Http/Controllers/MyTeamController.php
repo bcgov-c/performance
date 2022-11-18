@@ -36,7 +36,7 @@ class MyTeamController extends Controller
      */
     public function myEmployees(MyEmployeesDataTable $myEmployeesDataTable, SharedEmployeeDataTable $sharedEmployeeDataTable)
     {
-        $tags = Tag::all()->toArray();
+        $tags = Tag::all()->sortBy("name")->toArray();
         $goaltypes = GoalType::all();
         // $eReasons = ExcusedReason::all();
         $eReasons = ExcusedReason::where('id', '>', 2)->get();
@@ -497,7 +497,7 @@ class MyTeamController extends Controller
         // $participants = Participant::all();
         // $participants = Participant::select('id', 'name')->get();
         $participants = [];
-        $tags = Tag::all()->toArray();
+        $tags = Tag::all()->sortBy("name")->toArray();
         $goals = Goal::where('user_id', Auth::id())
             ->where('status', 'active')
             ->with('user')
