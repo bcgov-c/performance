@@ -926,11 +926,11 @@ class MyTeamStatisticsReportController extends Controller
             $query->where(function($query) {
                 $query->whereNull('signoff_user_id')
                     ->orWhereNull('supervisor_signoff_id');
-            })
-            ->orWhere(function($query) {
-                $query->whereNotNull('signoff_user_id')
-                    ->whereNotNull('supervisor_signoff_id')
-                    ->whereDate('unlock_until', '>=', Carbon::today() );
+            // })
+            // ->orWhere(function($query) {
+            //     $query->whereNotNull('signoff_user_id')
+            //         ->whereNotNull('supervisor_signoff_id')
+            //         ->whereDate('unlock_until', '>=', Carbon::today() );
             });
         })
         ->whereNull('deleted_at')        
@@ -1060,13 +1060,12 @@ class MyTeamStatisticsReportController extends Controller
         ->where(function($query) {
             $query->where(function($query) {
                 $query->whereNotNull('signoff_user_id')
-                      ->whereNotNull('supervisor_signoff_id')                          
-                      ->whereNull('unlock_until');
-            })
-            ->orWhere(function($query) {
-                $query->whereNotNull('signoff_user_id')
-                      ->whereNotNull('supervisor_signoff_id')
-                      ->whereDate('unlock_until', '<', Carbon::today() );
+                      ->whereNotNull('supervisor_signoff_id');
+            // })
+            // ->orWhere(function($query) {
+            //     $query->whereNotNull('signoff_user_id')
+            //           ->whereNotNull('supervisor_signoff_id')
+            //           ->whereDate('unlock_until', '<', Carbon::today() );
             });
         })
         ->whereNull('deleted_at')  
@@ -1311,11 +1310,11 @@ class MyTeamStatisticsReportController extends Controller
                     $query->where(function($query) {
                         $query->whereNull('signoff_user_id')
                             ->orWhereNull('supervisor_signoff_id');
-                    })
-                    ->orWhere(function($query) {
-                        $query->whereNotNull('signoff_user_id')
-                            ->whereNotNull('supervisor_signoff_id')
-                            ->whereDate('unlock_until', '>=', Carbon::today() );
+                    // })
+                    // ->orWhere(function($query) {
+                    //     $query->whereNotNull('signoff_user_id')
+                    //         ->whereNotNull('supervisor_signoff_id')
+                    //         ->whereDate('unlock_until', '>=', Carbon::today() );
                     });
                 })
                 ->whereNull('deleted_at')
@@ -1461,13 +1460,12 @@ class MyTeamStatisticsReportController extends Controller
             ->where(function($query) {
                 $query->where(function($query) {
                     $query->whereNotNull('signoff_user_id')
-                          ->whereNotNull('supervisor_signoff_id')                          
-                          ->whereNull('unlock_until');
-                })
-                ->orWhere(function($query) {
-                    $query->whereNotNull('signoff_user_id')
-                          ->whereNotNull('supervisor_signoff_id')
-                          ->whereDate('unlock_until', '<', Carbon::today() );
+                          ->whereNotNull('supervisor_signoff_id');
+                // })
+                // ->orWhere(function($query) {
+                //     $query->whereNotNull('signoff_user_id')
+                //           ->whereNotNull('supervisor_signoff_id')
+                //           ->whereDate('unlock_until', '<', Carbon::today() );
                 });
             })
             ->whereNull('deleted_at')  
