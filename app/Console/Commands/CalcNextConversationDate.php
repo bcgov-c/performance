@@ -261,9 +261,9 @@ class CalcNextConversationDate extends Command
                                 if ($prevDate == null) {
                                     $prevDate = $oneDay->created_at->toDateString();
                                     $prevPause = $oneDay->due_date_paused;
-                                    if ($prevPause == 'Y') {
-                                        echo $demo->employee_id.': First row found excused date '.$prevDate.'. Status:'.$prevPause.'.'; echo "\r\n";
-                                    }
+                                    // if ($prevPause == 'Y') {
+                                    //     echo $demo->employee_id.': First row found excused date '.$prevDate.'. Status:'.$prevPause.'.'; echo "\r\n";
+                                    // }
                                 } else {
                                     if ($prevPause == 'Y' && $oneDay->due_date_paused == 'N') {
                                         $calcDays = 0;
