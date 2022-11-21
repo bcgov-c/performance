@@ -249,7 +249,11 @@ class CalcNextConversationDate extends Command
                             ->whereRaw("trim(j.guid) <> ''")
                             ->whereNotNull('j.guid')
                             ->where('j.created_at', '>', $initLastConversationDate)
-                            ->orderBy('j.created_at')
+                            ->where(function ($where) use ($initLastConversationDate) {
+                                $where->where('j.created_at', '>', $initLastConversationDate)
+                                ->orWhereRaw("j.id = (SELECT MAX(cd.id) from employee_demo_jr cd where cd.guid = j.guid AND cd.created_at <= '".$initLastConversationDate."')");
+                            })
+                            ->orderBy('j.id')
                             ->get();
                             $lastDateCalculated = false;
                             // calc excused days
@@ -257,6 +261,9 @@ class CalcNextConversationDate extends Command
                                 if ($prevDate == null) {
                                     $prevDate = $oneDay->created_at->toDateString();
                                     $prevPause = $oneDay->due_date_paused;
+                                    if ($prevPause == 'Y') {
+                                        echo $demo->employee_id.': First row found excused date '.$prevDate.'. Status:'.$prevPause.'.'; echo "\r\n";
+                                    }
                                 } else {
                                     if ($prevPause == 'Y' && $oneDay->due_date_paused == 'N') {
                                         $calcDays = 0;
@@ -271,7 +278,7 @@ class CalcNextConversationDate extends Command
                                         } else {
                                             $usedate2 = $currDate;
                                         }
-                                        if ($usedate1 != $usedate2) {
+                                        if ($usedate1 != $usedate2 && $usedate2 > $initLastConversationDate) {
                                             $calcDays = abs(Carbon::parse($usedate2)->diffInDays($usedate1));
                                         } else {
                                             $calcDays = 0;
@@ -279,13 +286,13 @@ class CalcNextConversationDate extends Command
                                         $diffInDays += $calcDays;
                                         $lastDateCalculated = true;
                                         $prevPause = 'N';
-                                        echo 'End excused period for '.$usedate1.' to '.$usedate2.'.  '.$calcDays.' days.'; echo "\r\n";
+                                        echo $demo->employee_id.': End excused period for '.$usedate1.' to '.$usedate2.'. '.$calcDays.' days.'; echo "\r\n";
                                     } else {
                                         if ($prevPause == 'N' && $oneDay->due_date_paused == 'Y') {
                                             $prevDate = $oneDay->created_at->toDateString();
                                             $prevPause = $oneDay->due_date_paused;
                                             $lastDateCalculated = false;
-                                            echo 'Start new excused period for '.$prevDate.'.'; echo "\r\n";
+                                            echo $demo->employee_id.': Start new excused period for '.$prevDate.'.'; echo "\r\n";
                                         }
                                     }
                                 }
@@ -303,7 +310,7 @@ class CalcNextConversationDate extends Command
                                 } else {
                                     $usedate2 = $currDate;
                                 }
-                                if ($usedate1 != $usedate2) {
+                                if ($usedate1 != $usedate2 && $usedate2 > $initLastConversationDate) {
                                     $calcDays = abs(Carbon::parse($usedate2)->diffInDays($usedate1));
                                 } else {
                                     $calcDays = 0;
@@ -311,7 +318,7 @@ class CalcNextConversationDate extends Command
                                 $diffInDays += $calcDays;
                                 $lastDateCalculated = true;
                                 $prevPause = 'N';
-                                echo 'End excused period for '.$usedate1.' to '.$usedate2.'.  '.$calcDays.' days.'; echo "\r\n";
+                                echo $demo->employee_id.': End excused period for '.$usedate1.' to '.$usedate2.'. '.$calcDays.' days.'; echo "\r\n";
                             }
                             if ($diffInDays < 0) {
                                 $diffInDays = 0;
