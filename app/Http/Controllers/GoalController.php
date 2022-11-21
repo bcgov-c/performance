@@ -485,8 +485,8 @@ class GoalController extends Controller
             $dateRange[1] = trim($dateRange[1]);
             $startDate = Carbon::createFromFormat('M d, Y', $dateRange[0]);
             $endDate = Carbon::createFromFormat('M d, Y', $dateRange[1]);
-            $adminGoals = $adminGoals->whereDate('created_at', '>=', $startDate);
-            $adminGoals = $adminGoals->whereDate('created_at', '<=', $endDate);
+            $adminGoals = $adminGoals->whereDate('goals.created_at', '>=', $startDate);
+            $adminGoals = $adminGoals->whereDate('goals.created_at', '<=', $endDate);
         }
         if ($request->has('created_by') && $request->created_by) {
             // $query = $query->where('user_id', $request->created_by);
@@ -534,8 +534,8 @@ class GoalController extends Controller
             $startDate = Carbon::createFromFormat('M d, Y', $dateRange[0]);
             $endDate = Carbon::createFromFormat('M d, Y', $dateRange[1]);
 
-            $query = $query->whereDate('created_at', '>=', $startDate);
-            $query = $query->whereDate('created_at', '<=', $endDate);
+            $query = $query->whereDate('goals.created_at', '>=', $startDate);
+            $query = $query->whereDate('goals.created_at', '<=', $endDate);
         }
 
         if ($request->has('created_by') && $request->created_by) {
