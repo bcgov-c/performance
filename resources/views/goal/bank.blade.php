@@ -61,6 +61,12 @@
                                     <tr class="border-bottom">
                                         <th>
                                             <input type="checkbox" id="select_all">
+                                            @if ($bankGoals->isEmpty()) 
+                                            @php    $no_box = 'disabled' @endphp
+                                            @else 
+                                            @php    $no_box = ''  @endphp
+                                            @endif
+                                            <input type="checkbox" id="select_all"  {{$no_box}}>
                                         </th>
                                         <th style="width:35%"> <a href='javascript:sort("title")'>Goal Title <i class="sorttitle fas fa-sort" style="display:none"></i></a> </th>
                                         <th style="width:20%"> <a href='javascript:sort("typename")'>Goal Type <i class="sorttype fas fa-sort"  style="display:none"></i></a></th>
