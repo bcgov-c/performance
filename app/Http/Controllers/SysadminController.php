@@ -14,6 +14,7 @@ use App\Models\Organization;
 use App\Models\User;
 use App\Models\Goal;
 use App\Models\GoalType;
+use App\Models\Tag;
 use App\Models\OrgNode;
 use App\Models\ExcusedReason;
 use App\Models\EmployeeDemo;
@@ -1146,6 +1147,44 @@ class SysadminController extends Controller
                         ->make(true); 
         }
     }
+    
+    public function tags(Request $request) {
+        $tags = Tag::all()->sortBy("name")->toArray();    
+ 
+        return view('sysadmin.tags.index', compact ('request', 'tags'));
+    } 
 
+    public function tagDetail(Request $request, $id) {
+        $tag = Tag::findOrFail($id);        
+        return view('sysadmin.tags.detail', compact ('request', 'tag'));
+    } 
+    
+    public function tagUpdate(Request $request, $id) {
+        $tag = Tag::findOrFail($id);
+        $tag->name = $request->name;
+        $tag->description = $request->description;
+        $tag->save();
+        //return $this->respondeWith($tag);
+        return redirect('/sysadmin/tags');
+    } 
+    
+    public function tagDelete(Request $request, $id) {
+        $tag = Tag::findOrFail($id);
+        DB::table('goal_tags')->where('tag_id', $id)->delete();
+        $tag->delete();
+        //return $this->respondeWith($tag);
+        return redirect('/sysadmin/tags');
+    }
 
+    public function tagNew(Request $request) {
+        
+        return view('sysadmin.tags.new', compact ('request'));
+    }
+    
+    public function tagInsert(Request $request) {
+        DB::table('tags')->insert(
+            ['name' => $request->name, 'description' => $request->description]
+        );
+        return redirect('/sysadmin/tags');
+    }
 }
