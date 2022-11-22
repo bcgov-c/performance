@@ -279,7 +279,14 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
     Route::get('/sysadmin/level2/{id0}/{id1}', 'App\Http\Controllers\SysadminController@getOrgLevel2')->name('sysadmin.level2');
     Route::get('/sysadmin/level3/{id0}/{id1}/{id2}', 'App\Http\Controllers\SysadminController@getOrgLevel3')->name('sysadmin.level3');
     Route::get('/sysadmin/level4/{id0}/{id1}/{id2}/{id3}', 'App\Http\Controllers\SysadminController@getOrgLevel4')->name('sysadmin.level4');
-        
+    
+
+    Route::get('/sysadmin/tags', [SysadminController::class, 'tags'])->name('sysadmin.tags');
+    Route::get('/sysadmin/tag-detail/{id}', [SysadminController::class, 'tagDetail'])->name('sysadmin.tag-detail');
+    Route::put('/sysadmin/tag-update/{id}', [SysadminController::class, 'tagUpdate'])->name('sysadmin.tag-update');
+    Route::get('/sysadmin/tag-delete/{id}', [SysadminController::class, 'tagDelete'])->name('sysadmin.tag-delete');
+    Route::get('/sysadmin/tag-new', [SysadminController::class, 'tagNew'])->name('sysadmin.tag-new');
+    Route::put('/sysadmin/tag-insert', [SysadminController::class, 'tagInsert'])->name('sysadmin.tag-insert');
 });
 
     Route::get('/sysadmin/switch-identity', [SysadminController::class, 'switchIdentity'])->name('sysadmin.switch-identity');
