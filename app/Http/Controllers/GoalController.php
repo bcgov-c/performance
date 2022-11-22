@@ -1021,6 +1021,26 @@ class GoalController extends Controller
         $newGoal->referenced_from = $goal->id;
         $newGoal->save();
 
+        //add tags to copied goal
+        $orggoal_id = $goal->id;
+        $newgoal_id = $newGoal->id;
+        $tags = DB::table('goal_tags')                        
+                ->where('goal_id', $orggoal_id)
+                ->get();    
+        if(count($tags) > 0) {
+            foreach($tags as $tag){
+                $tag_id = $tag->tag_id;
+                DB::table('goal_tags')->insert(
+                    array(
+                           'goal_id'     =>   $newgoal_id, 
+                           'tag_id'   =>   $tag_id,
+                           'created_at'   =>   date('Y-m-d h:i:s a', time()),
+                           'updated_at'   =>   date('Y-m-d h:i:s a', time())
+                    )
+                );
+            }
+        }        
+
         return redirect()->route('goal.current');
     }
 }
