@@ -60,7 +60,6 @@
                                 <thead>
                                     <tr class="border-bottom">
                                         <th>
-                                            <input type="checkbox" id="select_all">
                                             @if ($bankGoals->isEmpty()) 
                                             @php    $no_box = 'disabled' @endphp
                                             @else 
