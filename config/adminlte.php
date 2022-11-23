@@ -356,6 +356,11 @@ return [
                     'active' => ['sysadmin/goalbank/*']
                 ],
                 [
+                    'text' => 'Tags Management',
+                    'url'  => 'sysadmin/tags',
+                    'active' => ['sysadmin/tags/*']
+                ],
+                [
                     'text' => 'Unlock Conversations',
                     'url'  => 'sysadmin/unlock/unlockconversation',
                     'active' => ['sysadmin/unlock/*']
