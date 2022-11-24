@@ -211,17 +211,21 @@ class Conversation extends Model implements Auditable
     }
 
     public static function nextConversationDue($user = null) {
-        if ($user === null)
+        // if ($user === null)
+        //     $user = Auth::user();
+        // $lastConv = self::getLastConv([], $user);
+        // $nextConvDate =  ($lastConv) ? $lastConv->sign_off_time->addMonths(4)->format('M d, Y') : (
+        //     $user->joining_date ? $user->joining_date->addMonths(4)->format('M d, Y') : ''
+        // );
+        // if ((!$nextConvDate) || (Carbon::createFromDate(2022, 10, 14)->gt($nextConvDate))) {
+        //     $DDt = abs (($user->id % 10) - 1) * 5 + (($user->id % 5));
+        //     $nextConvDate = Carbon::createFromDate(2022, 10, 14)->addDays($DDt)->format('M d, Y');
+        // }
+        // return $nextConvDate;
+        if ($user === null) {
             $user = Auth::user();
-        $lastConv = self::getLastConv([], $user);
-        $nextConvDate =  ($lastConv) ? $lastConv->sign_off_time->addMonths(4)->format('M d, Y') : (
-            $user->joining_date ? $user->joining_date->addMonths(4)->format('M d, Y') : ''
-        );
-        if ((!$nextConvDate) || (Carbon::createFromDate(2022, 10, 14)->gt($nextConvDate))) {
-            $DDt = abs (($user->id % 10) - 1) * 5 + (($user->id % 5));
-            $nextConvDate = Carbon::createFromDate(2022, 10, 14)->addDays($DDt)->format('M d, Y');
-        }
-        return $nextConvDate;
+        } 
+        return $user->next_conversation_date;
     }
 
     public static function latestPastConversation()
