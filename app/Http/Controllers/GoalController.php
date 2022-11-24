@@ -38,7 +38,7 @@ class GoalController extends Controller
         
         $request->session()->forget('is_bank');
               
-        $tagsList = Tag::all()->toArray();
+        $tagsList = Tag::all()->sortBy("name")->toArray();
         array_unshift($tagsList, [
             "id" => "0",
             "name" => "Any"
@@ -653,7 +653,7 @@ class GoalController extends Controller
             "name" => "Any"
         ]);
         
-        $tagsList = Tag::all()->toArray();
+        $tagsList = Tag::all()->sortBy("name")->toArray();
         array_unshift($tagsList, [
             "id" => "0",
             "name" => "Any"
