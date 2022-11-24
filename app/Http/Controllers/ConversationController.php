@@ -278,7 +278,6 @@ class ConversationController extends Controller
             // Send Out email when the conversation added
             $user = User::where('id', $value)
                             ->with('userPreference')
-                            ->select('id','name','guid')
                             ->first();
 
             if ($user && $user->allow_email_notification && $user->userPreference->conversation_setup_flag == 'Y') {                            
