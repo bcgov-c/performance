@@ -201,18 +201,18 @@
             document.getElementById("closemodal").onclick = function(e) {myFunction(e)};
             function myFunction(e) {
                 if (modal_edit ==  true || !checkIfItIsLocked()){       
-                        if (confirm('Click "OK" to save content and exit. Click "Cancel" to exit without saving.')) {
+                        if (confirm('If you continue you will lose any unsaved information.')) {
                             modal_open=false;
-                            saveComments();                                
+                            //saveComments();                                
                             $('.modal-body').find('#employee_id').val('');
                             $('.modal-body').find('.error').html('');
                             $('.modal-body').find('input[type=radio]').prop('checked', false);
                             $('#viewConversationModal').modal('toggle');
+                            window.location.reload();
                         }else {
                             e.preventDefault();                            
                         }  
                 }
-                window.location.reload();
             } 
         
         
@@ -649,6 +649,7 @@
                         comments['info_comment5'] = info_comment5_data;
                         comments['info_comment6'] = info_comment6_data;
                         comments['info_comment11'] = info_comment11_data;
+                        
                 } else {                       
                         var info_comment4_data = CKEDITOR.instances['info_comment4'].getData();                       
                         var info_comment7_data = CKEDITOR.instances['info_comment7'].getData();
@@ -662,6 +663,7 @@
                         comments['info_comment8'] = info_comment8_data;
                         comments['info_comment9'] = info_comment9_data;
                         comments['info_comment10'] = info_comment10_data;
+                        
                 }
                         $.ajax({
                                 url: '/conversation/' + conversation_id
@@ -1321,7 +1323,36 @@
             function sessionWarning() {
                 if (modal_open == true) {
                     saveComments();
-                    alert('Your comments have been autosaved.');
+                    
+                    if(isSupervisor == 1) {                        
+                        $('#info_area1').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area2').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area3').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area5').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area6').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area11').html('<span style="color:red">Comment saved</span>');                
+                        
+                        $('#control-info-comment1').show();
+                        $('#control-info-comment2').show();
+                        $('#control-info-comment3').show();
+                        $('#control-info-comment5').show();
+                        $('#control-info-comment6').show();
+                        $('#control-info-comment11').show();
+                        
+                    } else {
+                        $('#info_area4').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area7').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area8').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area9').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area10').html('<span style="color:red">Comment saved</span>');
+                        
+                        $('#control-info-comment4').show();
+                        $('#control-info-comment7').show();
+                        $('#control-info-comment8').show();
+                        $('#control-info-comment9').show();
+                        $('#control-info-comment10').show();
+                    }                    
+                    alert('You have been inactive for more than 15 minutes. Your comments have been automatically saved.');
                 }
                 
             }            
