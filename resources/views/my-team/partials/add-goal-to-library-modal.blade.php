@@ -100,7 +100,7 @@
 
             <div class="row">
                 <div class="col-12 text-right">
-                <button id="savebtn" type="submit" class="btn btn-primary mt-3">Save</button>
+                <button id="savebtn" type="submit" class="btn btn-submit btn-primary mt-3">Save</button>
                 <button id="cancelbtn" type="button" class="btn btn-secondary mt-3" data-dismiss="modal">Cancel</button>
                 </div>
             </div>

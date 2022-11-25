@@ -23,6 +23,7 @@ Create a goal for your employees to use in their own profile. Goals can be sugge
 <script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
 <script>
     $(document).on('click', '#add-goal-to-library-btn', function () {
+        modal_open = true;
         $("#addGoalToLibraryModal").modal('show');
     });
     $(".items-to-share").multiselect({
