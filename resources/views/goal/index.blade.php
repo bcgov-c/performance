@@ -230,6 +230,7 @@
     
     <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
     <script>
+        var modal_open = false;
         $('body').popover({
             selector: '[data-toggle]',
             trigger: 'click',
@@ -275,6 +276,7 @@
         $('.goal_type_text').text(desc);
     }); */
     $(document).on('show.bs.modal', '#addGoalModal', function(e) {
+        modal_open = true;
         $('#what').val('');
         $('#measure_of_success').val('');
         $("#goal_title").val('');
@@ -288,6 +290,7 @@
                  
     });
     $(document).on('hide.bs.modal', '#addGoalModal', function(e) {
+        modal_open = false;
         const isContentModified = () => {
             if ($('#what').val() !== '' || $('#measure_of_success').val() !== ''
                  || $("#goal_title").val() !== '' || $('input[name=goal_type_id]').val() != 1 
@@ -497,7 +500,20 @@
                 $('#sortby').val(obj);
                 $("#filter-menu").submit();
             }
-              
+            
+        const minutes = 15;
+        const SessionTime = 1000 * 60 * minutes;
+        $(document).ready(function () {                
+            const myTimeout = setTimeout(sessionWarning, SessionTime);                
+        });    
+            
+        function sessionWarning() {
+                if (modal_open == true) {
+                    $(".btn-submit").trigger("click");                  
+                    alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');
+                }
+                
+        }          
 </script>    
 
 <style>
