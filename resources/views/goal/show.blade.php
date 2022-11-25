@@ -199,7 +199,8 @@
             toolbar_Custom: [
                 ["Bold", "Italic", "Underline"],
                 ["NumberedList", "BulletedList"],
-                ["Outdent", "Indent"]
+                ["Outdent", "Indent"],
+                ["Link"],
             ],
         });
     });
@@ -209,7 +210,8 @@
             toolbar_Custom: [
                 ["Bold", "Italic", "Underline"],
                 ["NumberedList", "BulletedList"],
-                ["Outdent", "Indent"]
+                ["Outdent", "Indent"],
+                ["Link"],
             ],
         });
     });
