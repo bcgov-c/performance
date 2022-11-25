@@ -7,7 +7,7 @@
     </x-slot>
 
     <div class="container-fluid">
-        <form action="{{ route ('goal.update', $goal->id)}}" method="POST" onsubmit="confirm('Are you sure you want to update Goal ?')">
+        <form action="{{ route ('goal.update', $goal->id)}}" method="POST">
             @csrf
             @method('PUT')
             <div class="row">
@@ -131,6 +131,7 @@
 
 
     <script>
+        var no_msg = false;
         $(document).ready(() => {
             $('.tags').multiselect({
                 enableFiltering: true,
@@ -160,6 +161,9 @@
         window.isDirty = true;
         $('form').on('submit', () => {
             window.isDirty = false;
+            if (no_msg == false) {
+                confirm('Are you sure you want to update Goal ?');
+            }
         });
         let originalData = $('form').serialize();
         $(document).ready(function () {
@@ -182,6 +186,18 @@
             selector: '[data-toggle-select]',
             trigger: 'click',
         });
+        
+        const minutes = 15;
+        const SessionTime = 1000 * 60 * minutes;
+        $(document).ready(function () {                
+            const myTimeout = setTimeout(sessionWarning, SessionTime);                
+        });    
+            
+        function sessionWarning() {
+            no_msg = true;
+            $(".btn-primary").trigger("click");                  
+            alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');                
+        } 
 
     </script>
     @endpush

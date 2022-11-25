@@ -233,6 +233,7 @@
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
         <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
         <script>
+            var modal_open = false;
             $('#filter-menu select, #filter-menu input').change(function () {
                 $("#filter-menu").submit();
             });
@@ -424,6 +425,19 @@
             selector: '[data-toggle-select]',
             trigger: 'click',
         });
+        
+        const minutes = 15;
+        const SessionTime = 1000 * 60 * minutes;
+        $(document).ready(function () {                
+            const myTimeout = setTimeout(sessionWarning, SessionTime);                
+        });    
+            
+        function sessionWarning() {
+            if (modal_open == true) {
+                $(".btn-submit").trigger("click");                  
+                alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');    
+            }
+        } 
 </script>    
 <style>
     .multiselect-container{
