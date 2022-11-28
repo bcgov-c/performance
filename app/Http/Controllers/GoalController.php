@@ -579,7 +579,7 @@ class GoalController extends Controller
         
         
         // $query = $query->groupBy('goals.id');
-        $bankGoals = $query->paginate(10);
+        $bankGoals = $query->paginate($perPage=10, $columns = ['*'], $pageName = 'Goal');
         $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goalTypes, $tagsList);
 
 
