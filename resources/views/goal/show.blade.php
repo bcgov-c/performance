@@ -257,7 +257,8 @@
             toolbar_Custom: [
                 ["Bold", "Italic", "Underline"],
                 ["NumberedList", "BulletedList"],
-                ["Outdent", "Indent"]
+                ["Outdent", "Indent"],
+                ["Link"],
             ],
         });
         $(this).parent().parent().find(".edit-save").data("editor", instance.name);
