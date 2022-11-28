@@ -194,6 +194,20 @@
         <script>        
             var toReloadPage = false;
             var modal_edit = false;
+            
+            var db_info_comment1 = '';
+            var db_info_comment2 = '';
+            var db_info_comment3 = '';
+            var db_info_comment4 = '';
+            var db_info_comment5 = '';
+            var db_info_comment6 = '';
+            var db_info_comment7 = '';
+            var db_info_comment8 = '';
+            var db_info_comment9 = '';
+            var db_info_comment10 = '';
+            var db_info_comment11 = '';
+            
+            
             <?php if ($type == 'upcoming'){ ?>
                 var modal_edit = true;
             <?php } ?>
@@ -784,6 +798,18 @@
                         var comment10 = result.info_comment10;
                         var comment11 = result.info_comment11;
                         
+                        db_info_comment1 = comment1;
+                        db_info_comment2 = comment2;
+                        db_info_comment3 = comment3;
+                        db_info_comment4 = comment4;
+                        db_info_comment5 = comment5;
+                        db_info_comment6 = comment6;
+                        db_info_comment7 = comment7;
+                        db_info_comment8 = comment8;
+                        db_info_comment9 = comment9;
+                        db_info_comment10 = comment10;
+                        db_info_comment11 = comment11;                        
+                        
                         if (topic_id == 2 || topic_id == 4  || topic_id == 5) {
                             if (comment1 == '') {
                                 comment1 = result.info_comment5;
@@ -1322,23 +1348,41 @@
             
             function sessionWarning() {
                 if (modal_open == true) {
-                    saveComments();
-                    
-                    if(isSupervisor == 1) {                        
+                    saveComments();                                
+                    alert('You have been inactive for more than 15 minutes. Your comments have been automatically saved.');
+                    if(isSupervisor == 1) {   
                         $('#info_area1').html('<span style="color:red">Comment saved</span>');
                         $('#info_area2').html('<span style="color:red">Comment saved</span>');
                         $('#info_area3').html('<span style="color:red">Comment saved</span>');
                         $('#info_area5').html('<span style="color:red">Comment saved</span>');
                         $('#info_area6').html('<span style="color:red">Comment saved</span>');
-                        $('#info_area11').html('<span style="color:red">Comment saved</span>');                
+                        $('#info_area11').html('<span style="color:red">Comment saved</span>');
                         
-                        $('#control-info-comment1').show();
-                        $('#control-info-comment2').show();
-                        $('#control-info-comment3').show();
-                        $('#control-info-comment5').show();
-                        $('#control-info-comment6').show();
-                        $('#control-info-comment11').show();
+                        var info_comment1_data = CKEDITOR.instances['info_comment1'].getData();
+                        var info_comment2_data = CKEDITOR.instances['info_comment2'].getData();
+                        var info_comment3_data = CKEDITOR.instances['info_comment3'].getData();
+                        var info_comment5_data = CKEDITOR.instances['info_comment5'].getData();
+                        var info_comment6_data = CKEDITOR.instances['info_comment6'].getData();
+                        var info_comment11_data = $('#info_comment11').val();
                         
+                        if (db_info_comment1 != info_comment1_data) {
+                            $('#control-info-comment1').show();
+                        }
+                        if (db_info_comment2 != info_comment2_data) {
+                            $('#control-info-comment2').show();
+                        }
+                        if (db_info_comment3 != info_comment3_data) {
+                            $('#control-info-comment3').show();
+                        }
+                        if (db_info_comment5 != info_comment5_data) {
+                            $('#control-info-comment5').show();
+                        }
+                        if (db_info_comment6 != info_comment6_data) {
+                            $('#control-info-comment6').show();
+                        }
+                        if (db_info_comment11 != info_comment11_data) {
+                            $('#control-info-comment11').show();
+                        }                                                
                     } else {
                         $('#info_area4').html('<span style="color:red">Comment saved</span>');
                         $('#info_area7').html('<span style="color:red">Comment saved</span>');
@@ -1346,13 +1390,22 @@
                         $('#info_area9').html('<span style="color:red">Comment saved</span>');
                         $('#info_area10').html('<span style="color:red">Comment saved</span>');
                         
-                        $('#control-info-comment4').show();
-                        $('#control-info-comment7').show();
-                        $('#control-info-comment8').show();
-                        $('#control-info-comment9').show();
-                        $('#control-info-comment10').show();
-                    }                    
-                    alert('You have been inactive for more than 15 minutes. Your comments have been automatically saved.');
+                        if (db_info_comment4 != info_comment4_data) {
+                            $('#control-info-comment4').show();
+                        }
+                        if (db_info_comment7 != info_comment7_data) {
+                            $('#control-info-comment7').show();
+                        }
+                        if (db_info_comment8 != info_comment8_data) {
+                            $('#control-info-comment8').show();
+                        }
+                        if (db_info_comment9 != info_comment9_data) {
+                            $('#control-info-comment9').show();
+                        }
+                        if (db_info_comment10 != info_comment10_data) {
+                            $('#control-info-comment10').show();
+                        }
+                    }       
                 }
                 
             }            
@@ -1363,17 +1416,6 @@
                 $('.modal-body').find('.error').html('');
                 $('.modal-body').find('input[type=radio]').prop('checked', false);
             });
-            
-            
-            const minutes = 15;
-            const SessionTime = 1000 * 60 * minutes;
-            $(document).ready(function () {                
-                const myTimeout = setTimeout(sessionWarning, SessionTime);                
-            });
-            
-            function sessionWarningStop() {
-                clearTimeout(SessionTime);
-            }
             
             
             var info_save1 = 0;
@@ -1616,6 +1658,19 @@
                                 }
                             });
 
+            }
+            
+            
+            
+            
+            const minutes = 1;
+            const SessionTime = 1000 * 60 * minutes;
+            $(document).ready(function () {                
+                const myTimeout = setTimeout(sessionWarning, SessionTime);                
+            });
+            
+            function sessionWarningStop() {
+                clearTimeout(SessionTime);
             }
             
         </script>
