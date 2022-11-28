@@ -72,7 +72,7 @@
                                         <th style="width:15%"> <a href='javascript:sort("tagnames")'>Tags <i class="sorttag fas fa-sort"  style="display:none"></i></a></th>
                                         <th style="width:15%"> <a href='javascript:sort("created_at")'>Date Added <i class="sortdate fas fa-sort"  style="display:none"></i></a></th>
                                         <th style="width:15%"> <a href='javascript:sort("username")'>Created By <i class="sortuser fas fa-sort"  style="display:none"></i></a></th>
-                                        <th style="width:15%"> <a href='javascript:sort("is_mandatory")'>Mandatory/Suggested <i class="sortmandatory fas fa-sort"  style="display:none"></i></a></th>
+                                        <th style="width:15%"> <a href='javascript:sort("is_mandatory")'>Mandatory/ Suggested <i class="sortmandatory fas fa-sort"  style="display:none"></i></a></th>
                                     </tr>
                                 </thead>
                                 <tbody>
