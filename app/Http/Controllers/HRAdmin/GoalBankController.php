@@ -304,46 +304,49 @@ class GoalBankController extends Controller
         $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
         $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
         if ($request->ajax()) {
-            $query = GoalBankOrg::where('goal_id', '=', $goal_id)
+            $query = GoalBankOrg::join('ods_departments', 'goal_bank_orgs.deptid', 'ods_departments.deptid')
+            ->whereRaw("ods_departments.jobsched_id = (SELECT MAX(od.jobsched_id) FROM ods_departments AS od)")
+            ->where('goal_id', '=', $goal_id)
             ->join('admin_orgs', function ($j1) {
                 $j1->on(function ($j1a) {
-                    $j1a->whereRAW('admin_orgs.organization = goal_bank_orgs.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (goal_bank_orgs.organization = "" OR goal_bank_orgs.organization IS NULL))');
+                    $j1a->whereRAW('admin_orgs.organization = ods_departments.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (ods_departments.organization = "" OR ods_departments.organization IS NULL))');
                 } )
                 ->on(function ($j2a) {
-                    $j2a->whereRAW('admin_orgs.level1_program = goal_bank_orgs.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (goal_bank_orgs.level1_program = "" OR goal_bank_orgs.level1_program IS NULL))');
+                    $j2a->whereRAW('admin_orgs.level1_program = ods_departments.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (ods_departments.level1_program = "" OR ods_departments.level1_program IS NULL))');
                 } )
                 ->on(function ($j3a) {
-                    $j3a->whereRAW('admin_orgs.level2_division = goal_bank_orgs.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (goal_bank_orgs.level2_division = "" OR goal_bank_orgs.level2_division IS NULL))');
+                    $j3a->whereRAW('admin_orgs.level2_division = ods_departments.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (ods_departments.level2_division = "" OR ods_departments.level2_division IS NULL))');
                 } )
                 ->on(function ($j4a) {
-                    $j4a->whereRAW('admin_orgs.level3_branch = goal_bank_orgs.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (goal_bank_orgs.level3_branch = "" OR goal_bank_orgs.level3_branch IS NULL))');
+                    $j4a->whereRAW('admin_orgs.level3_branch = ods_departments.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (ods_departments.level3_branch = "" OR ods_departments.level3_branch IS NULL))');
                 } )
                 ->on(function ($j5a) {
-                    $j5a->whereRAW('admin_orgs.level4 = goal_bank_orgs.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (goal_bank_orgs.level4 = "" OR goal_bank_orgs.level4 IS NULL))');
+                    $j5a->whereRAW('admin_orgs.level4 = ods_departments.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (ods_departments.level4 = "" OR ods_departments.level4 IS NULL))');
                 } );
             } )
             ->where('admin_orgs.user_id', '=', Auth::id())
             ->when( $level0, function ($q) use($level0) {
-                return $q->where('goal_bank_orgs.organization', '=', $level0->name);
+                return $q->where('ods_departments.organization', '=', $level0->name);
             })
             ->when( $level1, function ($q) use($level1) {
-                return $q->where('goal_bank_orgs.level1_program', $level1->name);
+                return $q->where('ods_departments.level1_program', $level1->name);
             })
             ->when( $level2, function ($q) use($level2) {
-                return $q->where('goal_bank_orgs.level2_division', $level2->name);
+                return $q->where('ods_departments.level2_division', $level2->name);
             })
             ->when( $level3, function ($q) use($level3) {
-                return $q->where('goal_bank_orgs.level3_branch', $level3->name);
+                return $q->where('ods_departments.level3_branch', $level3->name);
             })
             ->when( $level4, function ($q) use($level4) {
-                return $q->where('goal_bank_orgs.level4', $level4->name);
+                return $q->where('ods_departments.level4', $level4->name);
             })
             ->select (
-                'goal_bank_orgs.organization',
-                'goal_bank_orgs.level1_program',
-                'goal_bank_orgs.level2_division',
-                'goal_bank_orgs.level3_branch',
-                'goal_bank_orgs.level4',
+                'ods_departments.deptid',
+                'ods_departments.organization',
+                'ods_departments.level1_program',
+                'ods_departments.level2_division',
+                'ods_departments.level3_branch',
+                'ods_departments.level4',
                 'goal_bank_orgs.goal_id',
                 'goal_bank_orgs.id'
             );
@@ -757,7 +760,7 @@ class GoalBankController extends Controller
 
         if($request->opt_audience == "byOrg") {
             $selected_org_nodes = $request->eorgCheck ? $request->eorgCheck : [];
-            $organizationList = OrganizationTree::select('id', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
+            $organizationList = OrganizationTree::select('id', 'deptid', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
             ->whereIn('id', $selected_org_nodes)
             ->distinct()
             ->orderBy('id')
@@ -770,6 +773,7 @@ class GoalBankController extends Controller
                     ['goal_id' => $resultrec->id
                     // , 'version' => '5'
                     , 'version' => '1'
+                    , 'deptid' => ($org1->deptid ? $org1->deptid : null)
                     , 'organization' => ($org1->organization ? $org1->organization : null)
                     , 'level1_program' => ($org1->level1_program ? $org1->level1_program : null)
                     , 'level2_division' => ($org1->level2_division ? $org1->level2_division : null)
@@ -1059,7 +1063,7 @@ class GoalBankController extends Controller
         $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
         $current_user = User::find(Auth::id());
 
-            $organizationList = OrganizationTree::select('id', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
+            $organizationList = OrganizationTree::select('id', 'deptid', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
             ->whereIn('id', $selected_org_nodes)
             ->distinct()
             ->orderBy('id')
@@ -1111,7 +1115,7 @@ class GoalBankController extends Controller
         $selected_org_nodes = $request->eorgCheck ? $request->eorgCheck : [];
         $current_user = Auth::id();
 
-            $organizationList = OrganizationTree::select('id', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
+            $organizationList = OrganizationTree::select('id', 'deptid', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
             ->whereIn('id', $selected_org_nodes)
             ->distinct()
             ->orderBy('id')
@@ -1139,11 +1143,12 @@ class GoalBankController extends Controller
                 
                 $goal_bank_org = \App\Models\GoalBankOrg::updateOrCreate([
                     'goal_id' => $resultrec->id
-                  , 'organization' => $org1->organization
-                  , 'level1_program' => $org1->level1_program
-                  , 'level2_division' => $org1->level2_division
-                  , 'level3_branch' => $org1->level3_branch
-                  , 'level4' => $org1->level4
+                    , 'deptid' => $org1->deptid
+                    , 'organization' => $org1->organization
+                    , 'level1_program' => $org1->level1_program
+                    , 'level2_division' => $org1->level2_division
+                    , 'level3_branch' => $org1->level3_branch
+                    , 'level4' => $org1->level4
                 ],[
 
                 ]); 

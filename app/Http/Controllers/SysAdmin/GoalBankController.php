@@ -305,28 +305,31 @@ class GoalBankController extends Controller
         $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
         $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
         if ($request->ajax()) {
-            $query = GoalBankOrg::where('goal_id', '=', $goal_id)
+            $query = GoalBankOrg::join('ods_departments', 'goal_bank_orgs.deptid', 'ods_departments.deptid')
+            ->whereRaw("ods_departments.jobsched_id = (SELECT MAX(od.jobsched_id) FROM ods_departments AS od)")
+            ->where('goal_id', '=', $goal_id)
             ->when( $level0, function ($q) use($level0) {
-                return $q->where('goal_bank_orgs.organization', '=', $level0->name);
+                return $q->where('ods_departments.organization', '=', $level0->name);
             })
             ->when( $level1, function ($q) use($level1) {
-                return $q->where('goal_bank_orgs.level1_program', $level1->name);
+                return $q->where('ods_departments.level1_program', $level1->name);
             })
             ->when( $level2, function ($q) use($level2) {
-                return $q->where('goal_bank_orgs.level2_division', $level2->name);
+                return $q->where('ods_departments.level2_division', $level2->name);
             })
             ->when( $level3, function ($q) use($level3) {
-                return $q->where('goal_bank_orgs.level3_branch', $level3->name);
+                return $q->where('ods_departments.level3_branch', $level3->name);
             })
             ->when( $level4, function ($q) use($level4) {
-                return $q->where('goal_bank_orgs.level4', $level4->name);
+                return $q->where('ods_departments.level4', $level4->name);
             })
             ->select (
-                'organization',
-                'level1_program',
-                'level2_division',
-                'level3_branch',
-                'level4',
+                'ods_departments.deptid',
+                'ods_departments.organization',
+                'ods_departments.level1_program',
+                'ods_departments.level2_division',
+                'ods_departments.level3_branch',
+                'ods_departments.level4',
                 'goal_id',
                 'id'
             );
@@ -743,7 +746,7 @@ class GoalBankController extends Controller
 
         if($request->opt_audience == "byOrg") {
             $selected_org_nodes = $request->eorgCheck ? $request->eorgCheck : [];
-            $organizationList = OrganizationTree::select('id', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
+            $organizationList = OrganizationTree::select('id', 'deptid', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
             ->whereIn('id', $selected_org_nodes)
             ->distinct()
             ->orderBy('id')
@@ -756,6 +759,7 @@ class GoalBankController extends Controller
                     ['goal_id' => $resultrec->id
                     // , 'version' => '5'
                     , 'version' => '1'
+                    , 'deptid' => ($org1->deptid ? $org1->deptid : null)
                     , 'organization' => ($org1->organization ? $org1->organization : null)
                     , 'level1_program' => ($org1->level1_program ? $org1->level1_program : null)
                     , 'level2_division' => ($org1->level2_division ? $org1->level2_division : null)
@@ -1051,7 +1055,7 @@ class GoalBankController extends Controller
         $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
         $current_user = User::find(Auth::id());
 
-            $organizationList = OrganizationTree::select('id', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
+            $organizationList = OrganizationTree::select('id', 'deptid', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
             ->whereIn('id', $selected_org_nodes)
             ->distinct()
             ->orderBy('id')
@@ -1081,6 +1085,7 @@ class GoalBankController extends Controller
                     ['goal_id' => $resultrec->id
                     // , 'version' => '5'
                     , 'version' => '1'
+                    , 'deptid' => $org1->deptid
                     , 'organization' => $org1->organization
                     , 'level1_program' => $org1->level1_program
                     , 'level2_division' => $org1->level2_division
@@ -1103,7 +1108,7 @@ class GoalBankController extends Controller
         $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
         $current_user = Auth::id();
 
-            $organizationList = OrganizationTree::select('id', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
+            $organizationList = OrganizationTree::select('id', 'deptid', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
             ->whereIn('id', $selected_org_nodes)
             ->distinct()
             ->orderBy('id')
@@ -1129,7 +1134,8 @@ class GoalBankController extends Controller
                 // }
 
                 $goal_bank_org = \App\Models\GoalBankOrg::updateOrCreate([
-                      'goal_id' => $resultrec->id
+                    'goal_id' => $resultrec->id
+                    , 'deptid' => $org1->deptid
                     , 'organization' => $org1->organization
                     , 'level1_program' => $org1->level1_program
                     , 'level2_division' => $org1->level2_division
