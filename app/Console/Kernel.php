@@ -46,6 +46,10 @@ class Kernel extends ConsoleKernel
         ->dailyAt('00:25')
         ->appendOutputTo(storage_path('logs/SyncUserProfile.log'));
 
+        $schedule->command('command:PopulateOdsDepartments')
+        ->timezone('America/Vancouver')
+        ->dailyAt('00:55');
+  
         $schedule->command('command:PopulateAuthUsers')
         ->timezone('America/Vancouver')
         ->dailyAt('01:00');
