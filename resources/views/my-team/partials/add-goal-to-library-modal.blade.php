@@ -148,7 +148,15 @@
              	});
 		}); 
 
-        $(document).on('show.bs.modal', '#addGoalModal', function(e) {
+        $(document).on('show.bs.modal', '#addGoalToLibraryModal', function(e) {
+            $('.alert-danger').hide();
+            $('.text-danger').html('');
+            $('.form-control').removeClass('is-invalid');
+            
+            const minutes = 15;
+            const SessionTime = 1000 * 60 * minutes;
+            const myTimeout = setTimeout(sessionWarning, SessionTime);    
+            
             $('#what').val('');
             $('#measure_of_success').val('');
             $("#goal_title").val('');
@@ -161,7 +169,7 @@
             };
                     
         });
-        $(document).on('hide.bs.modal', '#addGoalModal', function(e) {
+        $(document).on('hide.bs.modal', '#addGoalToLibraryModal', function(e) {
             const isContentModified = () => {
                 if ($('#what').val() !== '' || $('#measure_of_success').val() !== ''
                     || $("#goal_title").val() !== '' || $('input[name=goal_type_id]').val() != 1 
