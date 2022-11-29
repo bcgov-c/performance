@@ -382,7 +382,11 @@ class GoalController extends Controller
             DB::table('goal_tags')->where('goal_id', $id)->delete();
         }
 
-        return redirect()->route($goal->is_library ? 'goal.library' : 'goal.index');
+        if ($request->datatype != "auto") {
+            return redirect()->route($goal->is_library ? 'goal.library' : 'goal.index');
+        } else {
+            return \Redirect::route('goal.edit', [$id]);
+        }
     }
 
     public function getSuggestedGoal($id) {
