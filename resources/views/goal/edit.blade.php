@@ -8,6 +8,7 @@
 
     <div class="container-fluid">
         <form action="{{ route ('goal.update', $goal->id)}}" method="POST">
+            <input type ="hidden" id="datatype" name="datatype" value"manual">
             @csrf
             @method('PUT')
             <div class="row">
@@ -195,6 +196,7 @@
             
         function sessionWarning() {
             no_msg = true;
+            $('#datatype').val('auto');
             $(".btn-primary").trigger("click");                  
             alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');                
         } 
