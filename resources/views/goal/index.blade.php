@@ -277,6 +277,15 @@
     }); */
     $(document).on('show.bs.modal', '#addGoalModal', function(e) {
         modal_open = true;
+        
+        $('.alert-danger').hide();
+        $('.text-danger').html('');
+        $('.form-control').removeClass('is-invalid');
+        
+        const minutes = 15;
+        const SessionTime = 1000 * 60 * minutes;
+        const myTimeout = setTimeout(sessionWarning, SessionTime); 
+        
         $('#what').val('');
         $('#measure_of_success').val('');
         $("#goal_title").val('');
@@ -501,12 +510,6 @@
                 $("#filter-menu").submit();
             }
             
-        const minutes = 15;
-        const SessionTime = 1000 * 60 * minutes;
-        $(document).ready(function () {                
-            const myTimeout = setTimeout(sessionWarning, SessionTime);                
-        });    
-            
         function sessionWarning() {
                 if (modal_open == true) {
                     //$(".btn-submit").trigger("click");  
@@ -520,7 +523,8 @@
                         success: function (result) {
                             console.log(result);
                             if(result.success){
-                                //window.location.href= '/goal';
+                                alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');
+                                window.location.href= '/goal';
                             }
                         },
                         error: function (error){
@@ -537,11 +541,9 @@
                                 $('input[name='+value[0]+']').addClass('is-invalid');
                                 $(className).text(value[1]);
                             });
+                            alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');
                         }
                     });
-                    
-                    alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');
-                    window.location.href= '/goal';
                 }
                 
         }          

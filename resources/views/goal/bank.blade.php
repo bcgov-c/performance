@@ -425,12 +425,7 @@
             selector: '[data-toggle-select]',
             trigger: 'click',
         });
-        
-        const minutes = 15;
-        const SessionTime = 1000 * 60 * minutes;
-        $(document).ready(function () {                
-            const myTimeout = setTimeout(sessionWarning, SessionTime);                
-        });    
+           
             
         function sessionWarning() {
             if (modal_open == true) {
@@ -444,7 +439,8 @@
                     data: $('#add-goal-to-library-form').serialize(),
                     success: function (result) {
                         if(result.success){
-                            //window.location.href= '/goal';
+                            alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');  
+                            window.location.href= '/goal/goalbank'; 
                         }
                     },
                     error: function (error){
@@ -461,11 +457,11 @@
                             $('input[name='+value[0]+']').addClass('is-invalid');
                             $(className).text(value[1]);
                         });
+                        alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');  
                     }
                 });
                 
-                alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');  
-                window.location.href= '/goal/goalbank';    
+                   
             }
         } 
 </script>    

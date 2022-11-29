@@ -477,7 +477,7 @@
                         // Update View
                         if ($("#" + $(that).data('id') + '_edit').is('textarea')) {
                             $("#" + $(that).data('id')).val($("#" + $(that).data('id')).val());
-                        } else {
+                        } else { 
                             updateConversation(conversation_id)
                         }
                     }
@@ -614,6 +614,10 @@
             $(document).on('click', '.btn-view-conversation', function(e) {
                 conversation_id = e.currentTarget.getAttribute('data-id');
                 updateConversation(conversation_id);
+                console.log('modal open');
+                const minutes = 15;
+                const SessionTime = 1000 * 60 * minutes;
+                const myTimeout = setTimeout(sessionWarning, SessionTime);
             });
 
             $(document).on('click', '.delete-btn', function() {
@@ -1661,14 +1665,6 @@
             }
             
             
-            
-            
-            const minutes = 1;
-            const SessionTime = 1000 * 60 * minutes;
-            $(document).ready(function () {                
-                const myTimeout = setTimeout(sessionWarning, SessionTime);                
-            });
-            
             function sessionWarningStop() {
                 clearTimeout(SessionTime);
             }
@@ -1681,7 +1677,7 @@
             $(function() {
                 conversation_id = {{ $open_modal_id }};
                 updateConversation(conversation_id);
-                $('#viewConversationModal').modal('show');
+                $('#viewConversationModal').modal('show');                
             });
 
             
