@@ -77,6 +77,12 @@
                     [
                         {title: 'Employee ID', ariaTitle: 'Employee ID', target: 0, type: 'string', data: 'employee_id', name: 'u.employee_id', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'u.employee_name', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'u.employee_email', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Position #', ariaTitle: 'Position #', target: 0, type: 'string', data: 'position_number', name: 'u.position_number', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Reports To Name', ariaTitle: 'Reports To Name', target: 0, type: 'string', data: 'supervisor_name', name: 'u.supervisor_name', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Reports To Position #', ariaTitle: 'Reports To Position #', target: 0, type: 'string', data: 'supervisor_position_number', name: 'u.supervisor_position_number', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Status', ariaTitle: 'Status', target: 0, type: 'string', data: 'employee_status', name: 'u.employee_status', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Record #', ariaTitle: 'Record #', target: 0, type: 'string', data: 'empl_record', name: 'u.empl_record', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'u.jobcode_desc', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'u.organization', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'u.level1_program', searchable: true, className: 'dt-nowrap show-modal'},
