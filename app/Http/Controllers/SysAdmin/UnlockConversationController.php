@@ -342,7 +342,7 @@ class UnlockConversationController extends Controller
              ->when( $level0 or $level1 or $level2 or $level3 or $level4 or $request->search_text, function ($q) 
                         use($request, $level0, $level1, $level2, $level3, $level4) {
 
-                return $q->whereIn('id', function($q) use ($request, $level0, $level1, $level2, $level3, $level4) {
+                return $q->whereIn('conversations.id', function($q) use ($request, $level0, $level1, $level2, $level3, $level4) {
                     $q->select('conversation_id')->from('conversation_participants')
                     ->join('users', 'users.id', 'conversation_participants.participant_id')
                     ->whereIn('users.guid', function($q) use ($request, $level0, $level1, $level2, $level3, $level4) {
