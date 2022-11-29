@@ -509,8 +509,39 @@
             
         function sessionWarning() {
                 if (modal_open == true) {
-                    $(".btn-submit").trigger("click");                  
+                    //$(".btn-submit").trigger("click");  
+                    for (var i in CKEDITOR.instances){
+                        CKEDITOR.instances[i].updateElement();
+                    };
+                    $.ajax({
+                        url:'/goal',
+                        type : 'POST',
+                        data: $('#goal_form').serialize(),
+                        success: function (result) {
+                            console.log(result);
+                            if(result.success){
+                                //window.location.href= '/goal';
+                            }
+                        },
+                        error: function (error){
+                            $('.btn-submit').prop('disabled',false);
+                            $('.btn-submit').html('Save Changes');
+                            $('.alert-danger').show();
+                            $('.modal-body').animate({scrollTop: 0},100);
+                            var errors = error.responseJSON.errors;
+                            $('.text-danger').each(function(i, obj) {
+                                $('.text-danger').text('');
+                            });
+                            Object.entries(errors).forEach(function callback(value, index) {
+                                var className = '.error-' + value[0];
+                                $('input[name='+value[0]+']').addClass('is-invalid');
+                                $(className).text(value[1]);
+                            });
+                        }
+                    });
+                    
                     alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');
+                    window.location.href= '/goal';
                 }
                 
         }          
