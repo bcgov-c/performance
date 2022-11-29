@@ -36,10 +36,21 @@ $(function() {
         $.ajax({
             url: '/conversation/' + conversation_id
             , success: function(result) {
-                 modal_open=true;
+                modal_open=true;
                 isSupervisor = result.view_as_supervisor;
                 topic_id = result.topic.id;
-                disable_signoff = result.disable_signoff;
+                disable_signoff = result.disable_signoff;                        
+                is_locked = result.is_locked;
+                
+                type = 'current';
+                @if($type == 'past')
+                    type = 'past';
+                @endif
+                
+                if(type == 'past') {
+                    $('#sdq_card').hide();
+                    $('#pfc_card').hide();
+                }
                         
                 employee_signed = false;
                 supervisor_signed = false;
@@ -347,7 +358,21 @@ $(function() {
                     CKEDITOR.instances['info_comment9'].setReadOnly( true );  
                     CKEDITOR.instances['info_comment10'].setReadOnly( true );  
                     $('#info_comment11').prop( 'disabled', true );
+                }       
+                
+                if(is_locked && type == 'past') {
+                    $('#emp-signoff-row').hide();
+                    $('#employee-signoff-message').hide();
+                    $('#sup-signoff-row').hide();
+                    $('#supervisor-signoff-message').hide();
+                    $('#emp-unsignoff-row').hide();
+                    $('#employee-unsignoff-message').hide();
+                    $('#sup-unsignoff-row').hide();
+                    $('#supervisor-unsignoff-message').hide();
                 }
+                
+                
+                
                 if (isNotThirdPerson) {
                     const currentEmpSignoffDone = isSupervisor ? !!result.supervisor_signoff_id : !!result.signoff_user_id
                     if (currentEmpSignoffDone) {

@@ -45,7 +45,7 @@ class Conversation extends Model implements Auditable
             return false;
         }
         $locked = $this->initial_signoff->addDays(14)->isPast();
-        if ($this->isUnlock) {
+        if ($locked && $this->isUnlock) {
             $locked = false;
         }
 

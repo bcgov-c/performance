@@ -539,6 +539,7 @@ $(function() {
 		// Reset filter fields value
 		$('.search-filter input').map( function() {$(this).val(''); });
         $('.search-filter select').map( function() { return $(this).val(''); })
+		$(".search-filter .select2").map(function() { $(this).val('').trigger('change'); })
 
 		oTable.search( '' ).columns().search( '' ).draw();
 
@@ -553,6 +554,14 @@ $(function() {
 		// $('#due_date_to').val(null);
 		// $('#search_text').val(null);
 	});
+
+	$('#manage-unlocked-conversation-form').on('keyup keypress', function(e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode === 13) { 
+            e.preventDefault();
+            return false;
+        }
+    });
 
 
 	// dispaly Detail in Modal
