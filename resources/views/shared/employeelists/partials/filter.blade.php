@@ -304,7 +304,6 @@
 
             $('#btn_search_reset').click(function (e){
                 e.preventDefault();
-                $('#criteria').val('all');
                 $('#search_text').val(null);
                 $('#dd_level0').val(null).trigger('change');
                 $('#dd_level1').val(null).trigger('change');
