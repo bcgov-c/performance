@@ -615,9 +615,92 @@
                 conversation_id = e.currentTarget.getAttribute('data-id');
                 updateConversation(conversation_id);
                 console.log('modal open');
+                
                 const minutes = 15;
                 const SessionTime = 1000 * 60 * minutes;
-                const myTimeout = setTimeout(sessionWarning, SessionTime);
+                //const myTimeout = setTimeout(sessionWarning, SessionTime);
+                const myTimeout = setInterval(function() { 
+                    if (modal_open == true) {
+                        $('#info_area1').html('');
+                        $('#info_area2').html('');
+                        $('#info_area3').html('');
+                        $('#info_area4').html('');
+                        $('#info_area5').html('');
+                        $('#info_area6').html('');
+                        $('#info_area7').html('');
+                        $('#info_area8').html('');
+                        $('#info_area9').html('');
+                        $('#info_area10').html('');
+                        $('#info_area11').html('');
+                        saveComments();                                
+                        alert('You have been inactive for more than 15 minutes. Your comments have been automatically saved.');
+                        if(isSupervisor == 1) {                               
+                            var info_comment1_data = CKEDITOR.instances['info_comment1'].getData();
+                            var info_comment2_data = CKEDITOR.instances['info_comment2'].getData();
+                            var info_comment3_data = CKEDITOR.instances['info_comment3'].getData();
+                            var info_comment5_data = CKEDITOR.instances['info_comment5'].getData();
+                            var info_comment6_data = CKEDITOR.instances['info_comment6'].getData();
+                            var info_comment11_data = $('#info_comment11').val();
+
+                            if (db_info_comment1 != info_comment1_data) {
+                                $('#info_area1').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment1').show();
+                                db_info_comment1 = info_comment1_data;
+                            }
+                            if (db_info_comment2 != info_comment2_data) {
+                                $('#info_area2').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment2').show();
+                                db_info_comment2 = info_comment2_data;
+                            }
+                            if (db_info_comment3 != info_comment3_data) {
+                                $('#info_area3').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment3').show();
+                                db_info_comment3 = info_comment3_data;
+                            }
+                            if (db_info_comment5 != info_comment5_data) {
+                                $('#info_area5').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment5').show();
+                                db_info_comment5 = info_comment5_data;
+                            }
+                            if (db_info_comment6 != info_comment6_data) {
+                                $('#info_area6').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment6').show();
+                                db_info_comment6 = info_comment6_data;
+                            }
+                            if (db_info_comment11 != info_comment11_data) {
+                                $('#info_area11').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment11').show();
+                                db_info_comment11 = info_comment11_data;
+                            }                                                
+                        } else {
+                            if (db_info_comment4 != info_comment4_data) {
+                                $('#info_area4').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment4').show();
+                                db_info_comment4 = info_comment4_data;
+                            }
+                            if (db_info_comment7 != info_comment7_data) {
+                                $('#info_area7').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment7').show();
+                                db_info_comment7 = info_comment7_data;
+                            }
+                            if (db_info_comment8 != info_comment8_data) {
+                                $('#info_area8').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment8').show();
+                                db_info_comment8 = info_comment8_data;
+                            }
+                            if (db_info_comment9 != info_comment9_data) {
+                                $('#info_area9').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment9').show();
+                                db_info_comment9 = info_comment9_data;
+                            }
+                            if (db_info_comment10 != info_comment10_data) {
+                                $('#info_area10').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment10').show();
+                                db_info_comment10 = info_comment10_data;
+                            }
+                        }       
+                    }    
+                }, SessionTime);
             });
 
             $(document).on('click', '.delete-btn', function() {

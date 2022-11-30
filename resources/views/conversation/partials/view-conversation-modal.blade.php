@@ -199,7 +199,7 @@
                                             <br/>
                                             <h6 id="tip-info-comment3"></h6>
                                             <span id="desc-info-comment3"></span>
-                                            <span id="control-info-comment3" style="display:none"><span id="info_area3"></span></span>
+                                            <span id="control-info-comment3" style="display:none"><br/><span id="info_area3"></span></span>
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <textarea class="form-control supervisor-comment info_comment3 mb-4 btn-conv-edit" name="info_comment3" id="info_comment3" data-id="info_comment3" data-name="info_comment3"></textarea>
