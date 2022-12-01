@@ -673,6 +673,12 @@
                                 db_info_comment11 = info_comment11_data;
                             }                                                
                         } else {
+                            var info_comment4_data = CKEDITOR.instances['info_comment4'].getData();
+                            var info_comment7_data = CKEDITOR.instances['info_comment7'].getData();
+                            var info_comment8_data = CKEDITOR.instances['info_comment8'].getData();
+                            var info_comment9_data = CKEDITOR.instances['info_comment9'].getData();
+                            var info_comment10_data = CKEDITOR.instances['info_comment10'].getData();                        
+                        
                             if (db_info_comment4 != info_comment4_data) {
                                 $('#info_area4').html('<span style="color:red">Comment saved</span>');
                                 $('#control-info-comment4').show();
