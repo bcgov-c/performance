@@ -194,6 +194,7 @@
         <script>        
             var toReloadPage = false;
             var modal_edit = false;
+            var after_init = 0;
             
             var db_info_comment1 = '';
             var db_info_comment2 = '';
@@ -1431,7 +1432,6 @@
                             });
                         });
                         $('#conv_participant').text(participants);
-                        //originalData = result.info_comment1+result.info_comment2+result.info_comment3+result.info_comment4+result.info_comment5+'';
                     }
                     , error: function(error) {
                         var errors = error.responseJSON.errors;
@@ -1443,6 +1443,7 @@
                 if (modal_open == true) {
                     saveComments();                                
                     alert('You have been inactive for more than 15 minutes. Your comments have been automatically saved.');
+                    after_init = 1;
                     if(isSupervisor == 1) {   
                         $('#info_area1').html('<span style="color:red">Comment saved</span>');
                         $('#info_area2').html('<span style="color:red">Comment saved</span>');
@@ -1529,6 +1530,12 @@
                    $('#control-info-comment1').show();
                    info_save1 = 0;
             });
+            CKEDITOR.instances['info_comment1'].on('key', function(e) { 
+                $('#info_area1').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                $('#control-info-comment1').show();
+                info_save1 = 0;       
+            });           
+        
             CKEDITOR.instances['info_comment1'].on('blur', function(e) {
                 if(info_save1 == 0){
                    $('#control-info-comment1').hide();
@@ -1544,6 +1551,11 @@
             
             CKEDITOR.instances['info_comment2'].on('focus', function(e) {
                    $('#info_area2').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment2').show();
+                   info_save2 = 0;
+            });
+            CKEDITOR.instances['info_comment2'].on('key', function(e) { 
+                $('#info_area2').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
                    $('#control-info-comment2').show();
                    info_save2 = 0;
             });
@@ -1565,6 +1577,11 @@
                    $('#control-info-comment3').show();
                    info_save3 = 0;
             });
+            CKEDITOR.instances['info_comment3'].on('key', function(e) { 
+                $('#info_area3').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment3').show();
+                   info_save3 = 0;
+            });
             CKEDITOR.instances['info_comment3'].on('blur', function(e) {
                 if(info_save3 == 0){
                    $('#control-info-comment3').hide();
@@ -1579,6 +1596,11 @@
             
             CKEDITOR.instances['info_comment4'].on('focus', function(e) {
                    $('#info_area4').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment4').show();
+                   info_save4 = 0;
+            });
+            CKEDITOR.instances['info_comment4'].on('key', function(e) { 
+                $('#info_area4').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
                    $('#control-info-comment4').show();
                    info_save4 = 0;
             });
@@ -1601,6 +1623,11 @@
                    $('#control-info-comment5').show();
                    info_save5 = 0;
             });
+            CKEDITOR.instances['info_comment5'].on('key', function(e) { 
+                $('#info_area5').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment5').show();
+                   info_save5 = 0;
+            });
             CKEDITOR.instances['info_comment5'].on('blur', function(e) {
                 if(info_save5 == 0){
                    $('#control-info-comment5').hide();
@@ -1614,10 +1641,13 @@
             });  
             
             
-            
-            
             CKEDITOR.instances['info_comment6'].on('focus', function(e) {
                    $('#info_area6').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment6').show();
+                   info_save6 = 0;
+            });
+            CKEDITOR.instances['info_comment6'].on('key', function(e) { 
+                $('#info_area6').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
                    $('#control-info-comment6').show();
                    info_save6 = 0;
             });
@@ -1638,6 +1668,11 @@
                    $('#control-info-comment7').show();
                    info_save7 = 0;
             });
+            CKEDITOR.instances['info_comment7'].on('key', function(e) { 
+                $('#info_area7').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment7').show();
+                   info_save7 = 0;
+            });
             CKEDITOR.instances['info_comment7'].on('blur', function(e) {
                 if(info_save7 == 0){
                    $('#control-info-comment7').hide();
@@ -1652,6 +1687,11 @@
             
             CKEDITOR.instances['info_comment8'].on('focus', function(e) {
                    $('#info_area8').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment8').show();
+                   info_save8 = 0;
+            });
+            CKEDITOR.instances['info_comment8'].on('key', function(e) { 
+                $('#info_area8').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
                    $('#control-info-comment8').show();
                    info_save8 = 0;
             });
@@ -1672,6 +1712,11 @@
                    $('#control-info-comment9').show();
                    info_save9 = 0;
             });
+            CKEDITOR.instances['info_comment9'].on('key', function(e) { 
+                $('#info_area9').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment9').show();
+                   info_save9 = 0;
+            });
             CKEDITOR.instances['info_comment9'].on('blur', function(e) {
                 if(info_save9 == 0){
                    $('#control-info-comment9').hide();
@@ -1687,6 +1732,11 @@
             
             CKEDITOR.instances['info_comment10'].on('focus', function(e) {
                    $('#info_area10').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment10').show();
+                   info_save10 = 0;
+            });
+            CKEDITOR.instances['info_comment10'].on('key', function(e) { 
+                $('#info_area10').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
                    $('#control-info-comment10').show();
                    info_save10 = 0;
             });
