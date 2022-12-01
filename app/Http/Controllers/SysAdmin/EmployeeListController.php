@@ -182,19 +182,20 @@ class EmployeeListController extends Controller
     }
 
     public function exportCurrent(Request $request) {
-        $level0 = $request->dd_level0 ? OrganizationTree::where('organization_trees.id', $request->dd_level0)->first() : null;
-        $level1 = $request->dd_level1 ? OrganizationTree::where('organization_trees.id', $request->dd_level1)->first() : null;
-        $level2 = $request->dd_level2 ? OrganizationTree::where('organization_trees.id', $request->dd_level2)->first() : null;
-        $level3 = $request->dd_level3 ? OrganizationTree::where('organization_trees.id', $request->dd_level3)->first() : null;
-        $level4 = $request->dd_level4 ? OrganizationTree::where('organization_trees.id', $request->dd_level4)->first() : null;
+        // $level0 = $request->dd_level0 ? OrganizationTree::where('organization_trees.id', $request->dd_level0)->first() : null;
+        // $level1 = $request->dd_level1 ? OrganizationTree::where('organization_trees.id', $request->dd_level1)->first() : null;
+        // $level2 = $request->dd_level2 ? OrganizationTree::where('organization_trees.id', $request->dd_level2)->first() : null;
+        // $level3 = $request->dd_level3 ? OrganizationTree::where('organization_trees.id', $request->dd_level3)->first() : null;
+        // $level4 = $request->dd_level4 ? OrganizationTree::where('organization_trees.id', $request->dd_level4)->first() : null;
+        // dd($request->all());
         $query = UserDemoJrView::from('user_demo_jr_view AS u')
-        ->whereNotNull('u.date_deleted')
-        ->when($level0, function($q) use($level0) {$q->where('u.organization', $level0->name);})
-        ->when($level1, function($q) use($level1) {$q->where('u.level1_program', $level1->name);})
-        ->when($level2, function($q) use($level2) {$q->where('u.level2_division', $level2->name);})
-        ->when($level3, function($q) use($level3) {$q->where('u.level3_branch', $level3->name);})
-        ->when($level4, function($q) use($level4) {$q->where('u.level4', $level4->name);})
-        ->when($request->search_text, function($q) use ($request) { $q->whereRaw($request->criteria." like '%".$request->search_text."%'"); })
+        ->whereNull('u.date_deleted')
+        // ->when($level0, function($q) use($level0) {$q->where('u.organization', $level0->name);})
+        // ->when($level1, function($q) use($level1) {$q->where('u.level1_program', $level1->name);})
+        // ->when($level2, function($q) use($level2) {$q->where('u.level2_division', $level2->name);})
+        // ->when($level3, function($q) use($level3) {$q->where('u.level3_branch', $level3->name);})
+        // ->when($level4, function($q) use($level4) {$q->where('u.level4', $level4->name);})
+        // ->when($request->search_text, function($q) use ($request) { $q->whereRaw($request->criteria." like '%".$request->search_text."%'"); })
         ->orderBy('u.employee_id')
         ->selectRaw ("
             u.user_id AS id,
@@ -390,6 +391,126 @@ class EmployeeListController extends Controller
             ->rawColumns(['date_deleted', 'nextConversation'])
             ->make(true);
         }
+    }
+
+    public function exportPast(Request $request) {
+        $query = UserDemoJrView::from('user_demo_jr_view AS u')
+        ->whereNotNull('u.date_deleted')
+        ->orderBy('u.employee_id')
+        ->selectRaw ("
+            u.user_id AS id,
+            u.guid,
+            u.user_name,
+            u.excused_flag,
+            u.employee_id,
+            u.employee_name, 
+            u.employee_email, 
+            u.position_number,
+            u.empl_record,
+            u.jobcode_desc,
+            u.organization,
+            u.level1_program,
+            u.level2_division,
+            u.level3_branch,
+            u.level4,
+            u.deptid,
+            u.date_deleted,
+            u.employee_status,
+            u.supervisor_name,
+            u.supervisor_position_number,
+            u.due_date_paused,
+            u.next_conversation_date,
+            u.excusedtype AS excused,
+            CASE WHEN (u.due_date_paused != 'Y' AND u.excused_flag <> 1) THEN u.next_conversation_date ELSE 'Paused' END AS nextConversationDue,
+            CASE WHEN (SELECT COUNT(sp.id) FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id) > 0 THEN 'Yes' ELSE 'No' END AS shared,
+            (SELECT COUNT(DISTINCT rep.id) FROM users AS rep WHERE rep.reporting_to = u.employee_id) AS reportees,
+            (SELECT COUNT(DISTINCT g.id) FROM goals as g WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals
+        ");
+        $records = $query->get();
+        // Generating Output file
+        $filename = 'Past_Employees_'. Carbon::now()->format('YmdHis') . '.csv';
+        $headers = array(
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+        $columns = [
+            'Employee ID',  
+            'Name', 
+            'Email', 
+            'Position #',  
+            'Reports To Name', 
+            'Reports To Position #',  
+            'Status', 
+            'Record #', 
+            'Classification', 
+            'Organization', 
+            'Level 1',
+            'Level 2',
+            'Level 3',
+            'Level 4',
+            'Dept ID',
+            'Active Goals',
+            'Next Conversation',
+            'Excused',
+            'Shared',
+            'Direct Reports',
+            'Date Deleted',
+        ];
+        $callback = function() use($records, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            foreach ($records as $rec) {
+                $row['Employee ID'] = $rec->id;
+                $row['Name'] = $rec->employee_name;
+                $row['Email'] = $rec->employee_email;
+                $row['Position #'] = $rec->position_number;
+                $row['Reports To Name'] = $rec->supervisor_name;
+                $row['Reports To Position #'] = $rec->supervisor_position_number;
+                $row['Status'] = $rec->employee_status;
+                $row['Record #'] = $rec->empl_record;
+                $row['Classification'] = $rec->jobcode_desc;
+                $row['Organization'] = $rec->organization;
+                $row['Level 1'] = $rec->level1_program;
+                $row['Level 2'] = $rec->level2_division;
+                $row['Level 3'] = $rec->level3_branch;
+                $row['Level 4'] = $rec->level4;
+                $row['Dept ID'] = $rec->deptid;
+                $row['Active Goals'] = $rec->activeGoals;
+                $row['Next Conversation'] = $rec->nextConversationDue;
+                $row['Excused'] = $rec->excused;
+                $row['Shared'] = $rec->shared;
+                $row['Direct Reports'] = $rec->reportees;
+                $row['Date Deleted'] = $rec->date_deleted;
+                fputcsv($file, array(
+                    $row['Employee ID'], 
+                    $row['Name'], 
+                    $row['Email'], 
+                    $row['Position #'],  
+                    $row['Reports To Name'], 
+                    $row['Reports To Position #'],
+                    $row['Status'], 
+                    $row['Record #'], 
+                    $row['Classification'], 
+                    $row['Organization'], 
+                    $row['Level 1'], 
+                    $row['Level 2'], 
+                    $row['Level 3'], 
+                    $row['Level 4'], 
+                    $row['Dept ID'], 
+                    $row['Active Goals'], 
+                    $row['Next Conversation'], 
+                    $row['Excused'], 
+                    $row['Shared'], 
+                    $row['Direct Reports'], 
+                    $row['Date Deleted'] 
+                ));
+            }
+            fclose($file);
+        };
+        return response()->stream($callback, 200, $headers);
     }
 
     protected function search_criteria_list() {

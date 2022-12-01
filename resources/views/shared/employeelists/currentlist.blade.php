@@ -17,9 +17,10 @@
     </div>   
 
     @push('css')
-        <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" >
-        <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/buttons/2.3.2/css/buttons.dataTables.min.css" rel="stylesheet">
         <x-slot name="css">
             <style>
                 .text-truncate-30 {
@@ -39,17 +40,53 @@
                 #listtable_filter label {
                     display: none;
                 }
+
+                #listtable_wrapper .dt-buttons {
+                    float: none;
+                    text-align:right;
+                }
             </style>
         </x-slot>
     @endpush
 
     @push('js')
-        <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script>
+        <!-- <script src="https://code.jquery.com/jquery-3.5.1.js"></script> -->
+        <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap4.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.3.2/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.html5.min.js"></script>
         <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
         <script type="text/javascript">
             $(document).ready(function() {
                 $('#listtable').DataTable ( {
+                    dom: 'lfBrtip',
+                    buttons: {
+                        buttons: [
+                            // {
+                            //     extend: "copy",
+                            //     text: "Copy to Clipboard",
+                            //     exportOptions:  {
+                            //         columns: ':visible',
+                            //         modifier: {
+                            //             page: 'all',
+                            //             search: 'none',
+                            //         },
+                            //     },
+                            // },
+                            {
+                                extend: "csv",
+                                text: "Export Displayed",
+                                exportOptions:  {
+                                    columns: ':visible',
+                                    modifier: {
+                                        page: 'all',
+                                        search: 'none',
+                                    },
+                                },
+                            },
+                            'colvis'
+                        ],
+                    },
                     serverSide: true,
                     searching: true,
                     processing: true,
@@ -101,7 +138,7 @@
                 } );
 
                 // add export button on right
-                $("#listtable_filter").append('<button id="export-btn" value="export" class="btn-sm btn-primary">Export</button> ');
+                $("#listtable_filter").append('<button id="export-btn" value="export" class="dt-button buttons-csv buttons-html5">Export All Rows</button> ');
 
                 $('#export-btn').on('click', function() {
                     export_url = '{{ route("sysadmin.employeelists.export-current") }}';
