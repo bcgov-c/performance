@@ -17,6 +17,7 @@ use App\Http\Controllers\SysAdmin\AccessPermissionsController;
 use App\Http\Controllers\SysAdmin\UnlockConversationController;
 use App\Http\Controllers\SysAdmin\AccessOrganizationsController;
 use App\Http\Controllers\SysAdmin\SysadminStatisticsReportController;
+use Illuminate\Http\Request;
 
 
 Route::group(['middleware' => ['role:Sys Admin']], function () 
@@ -53,6 +54,7 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/employeelists/org-branches', [EmployeeListController::class,'getBranches']);
         Route::get('/sysadmin/employeelists/org-level4', [EmployeeListController::class,'getLevel4']);
         Route::get('/sysadmin/employeelists/export-current', [EmployeeListController::class, 'exportCurrent'])->name('sysadmin.employeelists.export-current');
+        Route::get('/sysadmin/employeelists/export-past', [EmployeeListController::class, 'exportPast'])->name('sysadmin.employeelists.export-past');
     });
   
     Route::get('sysadmin/get-identities', [SysadminController::class, 'getIdentities'])->name('sysadmin.get-identities');
