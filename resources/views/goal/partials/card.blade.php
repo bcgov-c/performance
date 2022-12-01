@@ -1,7 +1,7 @@
     <div class="card card-primary shadow">
         <div class="card-header p-1">
             <div class="d-flex">
-                @if(isset($from) && $from == 'bank' || session()->has('view-profile-as')) 
+                @if(isset($from) && $from == 'bank') 
                     <a href="{{route("goal.edit", $goal->id)}}" class="p-2">
                 @else
                     <a href="{{route("goal.show", $goal->id)}}" class="p-2">
@@ -26,7 +26,7 @@
             </div>
         </div>
         <div class="card-body" style="min-height:135px">
-            @if(isset($from) && $from == 'bank' || session()->has('view-profile-as')) 
+            @if(isset($from) && $from == 'bank') 
                     <a href="{{route("goal.edit", $goal->id)}}" class="p-2">
             @else
                     <a href="{{route("goal.show", $goal->id)}}" class="p-2">
