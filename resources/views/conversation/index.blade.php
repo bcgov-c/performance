@@ -616,7 +616,7 @@
                 updateConversation(conversation_id);
                 console.log('modal open');
                 
-                const minutes = 15;
+                const minutes = 1;
                 const SessionTime = 1000 * 60 * minutes;
                 //const myTimeout = setTimeout(sessionWarning, SessionTime);
                 const myTimeout = setInterval(function() { 
