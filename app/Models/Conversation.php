@@ -41,10 +41,12 @@ class Conversation extends Model implements Auditable
     }
 
     public function getIsLockedAttribute() {
-        if (!$this->initial_signoff) {
+        $signoff_time = max($this->supervisor_signoff_time, $this->sign_off_time);
+
+        if (!$signoff_time) {
             return false;
         }
-        $locked = $this->initial_signoff->addDays(14)->isPast();
+        $locked = $signoff_time->addDays(14)->isPast();
         if ($locked && $this->isUnlock) {
             $locked = false;
         }
