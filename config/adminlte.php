@@ -274,11 +274,11 @@ return [
                     'url'  => 'my-team/my-employees',
                     'active' => ['my-team/my-employees/*'],
                 ],
-                [
-                    'text' => 'Statistic and Reports',
-                    'url'  => 'my-team/statistics/sharedsummary',
-                    'active' => ['my-team/statistics/*']
-                ],                
+                // [
+                //     'text' => 'Statistic and Reports',
+                //     'url'  => 'my-team/statistics/sharedsummary',
+                //     'active' => ['my-team/statistics/*']
+                // ],                
                 // [
                 //     'text' => 'Notify Team Members',
                 //     'url'  => 'my-team/notify-team-members',
