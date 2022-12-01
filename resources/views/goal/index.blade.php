@@ -287,6 +287,11 @@
         for (var i in CKEDITOR.instances){
             CKEDITOR.instances[i].setData('');
         };
+        
+        CKEDITOR.instances['what'].setReadOnly(true);
+        CKEDITOR.instances['measure_of_success'].setReadOnly(true);
+        $('#start_date').prop("readonly",true);
+        $('#target_date').prop("readonly",true);
                  
     });
     $(document).on('hide.bs.modal', '#addGoalModal', function(e) {
@@ -437,6 +442,39 @@
                     }
                 });
             });
+            
+            $("#goal_title").change(function(){
+                var goal_title = $("#goal_title").val();
+                var tags = $('.tags').val(); 
+                if (goal_title != '' && tags != ''){
+                   CKEDITOR.instances['what'].setReadOnly(false);
+                   CKEDITOR.instances['measure_of_success'].setReadOnly(false);
+                   $('#start_date').prop("readonly",false);
+                   $('#target_date').prop("readonly",false);
+                } else {
+                   CKEDITOR.instances['what'].setReadOnly(true);
+                   CKEDITOR.instances['measure_of_success'].setReadOnly(true);
+                   $('#start_date').prop("readonly",true);
+                   $('#target_date').prop("readonly",true);
+                }
+            });
+            
+            $(".tags").change(function(){
+                var goal_title = $("#goal_title").val();
+                var tags = $('.tags').val(); 
+                if (goal_title != '' && tags != ''){
+                    CKEDITOR.instances['what'].setReadOnly(false);
+                    CKEDITOR.instances['measure_of_success'].setReadOnly(false);
+                    $('#start_date').prop("readonly",false);
+                    $('#target_date').prop("readonly",false);
+                } else {
+                   CKEDITOR.instances['what'].setReadOnly(true);
+                   CKEDITOR.instances['measure_of_success'].setReadOnly(true);
+                   $('#start_date').prop("readonly",true);
+                   $('#target_date').prop("readonly",true);
+                }
+            });
+            
         });        
     </script>
     </x-slot>
