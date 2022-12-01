@@ -617,7 +617,7 @@
                 updateConversation(conversation_id);
                 console.log('modal open');
                 
-                const minutes = 1;
+                const minutes = 20;
                 const SessionTime = 1000 * 60 * minutes;
                 //const myTimeout = setTimeout(sessionWarning, SessionTime);
                 const myTimeout = setInterval(function() { 
@@ -634,7 +634,7 @@
                         $('#info_area10').html('');
                         $('#info_area11').html('');
                         saveComments();                                
-                        alert('You have been inactive for more than 15 minutes. Your comments have been automatically saved.');
+                        alert('You have been inactive for more than 20 minutes. Your comments have been automatically saved.');
                         if(isSupervisor == 1) {                               
                             var info_comment1_data = CKEDITOR.instances['info_comment1'].getData();
                             var info_comment2_data = CKEDITOR.instances['info_comment2'].getData();
@@ -1442,7 +1442,7 @@
             function sessionWarning() {
                 if (modal_open == true) {
                     saveComments();                                
-                    alert('You have been inactive for more than 15 minutes. Your comments have been automatically saved.');
+                    alert('You have been inactive for more than 20 minutes. Your comments have been automatically saved.');
                     after_init = 1;
                     if(isSupervisor == 1) {   
                         $('#info_area1').html('<span style="color:red">Comment saved</span>');
