@@ -206,7 +206,7 @@
     });
     
     $(document).ready(function(){
-        CKEDITOR.replaceAll('addreply', {
+        CKEDITOR.replace('addreply', {
             toolbar: "Custom",
             toolbar_Custom: [
                 ["Bold", "Italic", "Underline"],
@@ -215,6 +215,9 @@
                 ["Link"],
             ],
         });
+        
+        
+        
     });
     
     </script>
