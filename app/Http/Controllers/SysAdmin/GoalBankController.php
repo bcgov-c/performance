@@ -1717,16 +1717,33 @@ class GoalBankController extends Controller
             ->leftjoin('goals_shared_with', 'goals.id', '=', 'goals_shared_with.goal_id')
             ->join('users', 'users.id', '=', 'goals_shared_with.user_id')
             ->leftjoin('employee_demo', 'employee_demo.guid', '=', 'users.guid')
+            ->leftjoin('admin_orgs', function ($j1) {
+                $j1->on(function ($j1a) {
+                    $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+                } )
+                ->on(function ($j2a) {
+                    $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+                } )
+                ->on(function ($j3a) {
+                    $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+                } )
+                ->on(function ($j4a) {
+                    $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+                } )
+                ->on(function ($j5a) {
+                    $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+                } );
+            } )   
             ->when($level0, function($q) use($level0) {return $q->where('employee_demo.organization', $level0->name);})
             ->when($level1, function($q) use($level1) {return $q->where('employee_demo.level1_program', $level1->name);})
             ->when($level2, function($q) use($level2) {return $q->where('employee_demo.level2_division', $level2->name);})
             ->when($level3, function($q) use($level3) {return $q->where('employee_demo.level3_branch', $level3->name);})
             ->when($level4, function($q) use($level4) {return $q->where('employee_demo.level4', $level4->name);})
-            ->when($request->search_text && $request->criteria == 'name', function($q) use($request){return $q->where('employee_demo.employee_name', 'like', "%" . $request->search_text . "%");})
-            ->when($request->search_text && $request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
-            ->when($request->search_text && $request->criteria == 'job', function($q) use($request){return $q->where('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%");})
-            ->when($request->search_text && $request->criteria == 'dpt', function($q) use($request){return $q->where('employee_demo.deptid', 'like', "%" . $request->search_text . "%");})
-            ->when($request->search_text && $request->criteria == 'all', function($q) use ($request) {
+            ->when($request->criteria == 'name', function($q) use($request){return $q->where('employee_demo.employee_name', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'job', function($q) use($request){return $q->where('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'dpt', function($q) use($request){return $q->where('employee_demo.deptid', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'all', function($q) use ($request) {
                 return $q->where(function ($query2) use ($request) {
                     if($request->search_text) {
                         $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
