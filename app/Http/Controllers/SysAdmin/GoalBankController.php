@@ -548,20 +548,6 @@ class GoalBankController extends Controller
             ]);
         }
 
-        if ($request->ebtn_search) {
-            session()->put('_old_input', [
-                'add_level0' => $request->add_level0,
-                'add_level1' => $request->add_level1,
-                'add_level2' => $request->add_level2,
-                'add_level3' => $request->add_level3,
-                'add_level4' => $request->add_level4,
-                'acriteria' => $request->acriteria,
-                'asearch_text' => $request->asearch_text,
-                'aorgCheck' => $request->aorgCheck,
-                'auserCheck' => $request->auserCheck,
-            ]);
-        }
-
         $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
         $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
         $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
