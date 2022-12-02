@@ -10,7 +10,7 @@ class GoalBankOrg extends Model
     use HasFactory;
 
     protected $fillable = [
-        'goal_id','version','deptid','organization','level1_program','level2_division','level3_branch','level4'
+        'goal_id','version','organization','level1_program','level2_division','level3_branch','level4'
     ];
 
     public function goal() {

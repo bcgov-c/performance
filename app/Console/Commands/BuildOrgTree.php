@@ -50,11 +50,11 @@ class BuildOrgTree extends Command
             $this->info('Level 0 - Oragnization Level');
 
             $Organizations =  EmployeeDemo::whereNotIn('organization',['',' '])
-            ->select('organization', 'deptid')->distinct()->get();
+                ->select('organization')->groupBy('organization')->pluck('organization');
 
-            foreach ($Organizations as $organization ) {
+            foreach ($Organizations as $organization_name ) {
 
-                $node = OrganizationTree::where('name', $organization->organization )
+                $node = OrganizationTree::where('name', $organization_name )
                     ->where('level', 0)->first();
 
                 // check no of employee 
@@ -62,17 +62,15 @@ class BuildOrgTree extends Command
 
                 if (!$node) {
                     $node = new OrganizationTree([
-                            'name' => $organization->organization,
+                            'name' => $organization_name,
                             'status' => 1,
                             'level' => 0,
-                            'organization' =>  $organization->organization,
+                            'organization' =>  $organization_name,
                             // 'no_of_employee' => $count,
                     ]);
-                    $node->deptid = $organization->deptid;
                     $node->saveAsRoot(); // Saved as root
                 } else {
                     $node->status = 1;
-                    $node->deptid = $organization->deptid;
                     // $node->no_of_employee = $count;
                     $node->save();
                 }
@@ -88,17 +86,18 @@ class BuildOrgTree extends Command
 
             foreach ($organizations as $parent ) {
 
-                $programs =  EmployeeDemo::where('organization', $parent->organization )
+                $programs =  EmployeeDemo::where('organization', $parent->name )
                     ->whereNotIn('level1_program',['',' '])
-                    ->select('level1_program', 'deptid')
-                    ->distinct()
+                    ->select('level1_program')
+                    ->groupBy('level1_program')
                     ->orderBy('level1_program')
-                    ->get();
+                    ->pluck('level1_program');
 
-                foreach ($programs as $program ) {
-                    $node = OrganizationTree::where('name', $program->level1_program )
-                        ->where('organization', $parent->organization )
+                foreach ($programs as $program_name ) {
+                    $node = OrganizationTree::where('name', $program_name )
+                        ->where('organization', $parent->name )
                         ->where('level', 1)->first();
+
 
                     // check no of employee 
                     // $count = EmployeeDemo::where('organization',$parent->name)
@@ -107,45 +106,47 @@ class BuildOrgTree extends Command
 
                     if (!$node) {
                         $node = new OrganizationTree([
-                            'name' => $program->level1_program,
+                            'name' => trim($program_name),
                             'status' => 1,
                             'level' => 1,
-                            'organization' =>  $parent->organization,
-                            'level1_program' =>  $program->level1_program,
+                            'organization' =>  trim($parent->organization),
+                            'level1_program' =>  trim($program_name),
                             // 'no_of_employee' => $count,
                         ]);
-                        $node->deptid = $program->deptid;
                         $node->save(); // Saved as root
                         $parent->appendNode($node);
                     } else {
                         $node->status = 1;
-                        $node->deptid = $program->deptid;
                         // $node->no_of_employee = $count;
                         $node->save();
                     }
+
+
                 }
             }
 
+
             // Level 2 - Division  
             $this->info( now() );
-            $this->info('Level 2 - Division');
+            $this->info('Level 2 -Division');
 
             $programs = OrganizationTree::withDepth()->having('depth', '=', 1)->get();
 
             foreach ($programs as $parent ) {
-                $divisions =  EmployeeDemo::where('organization', $parent->organization)
-                    ->where('level1_program', $parent->level1_program)
-                    ->whereNotIn('level2_division',['',' '])
-                    ->select('level2_division', 'deptid')
-                    ->distinct()
-                    ->orderBy('level2_division')
-                    ->get();
 
-                foreach ($divisions as $division ) {
+                $divisions =  EmployeeDemo::where('organization', $parent->organization)
+                    ->where('level1_program', $parent->name)
+                    ->whereNotIn('level2_division',['',' '])
+                    ->select('level2_division')
+                    ->groupBy('level2_division')
+                    ->orderBy('level2_division')
+                    ->pluck('level2_division');
+
+                foreach ($divisions as $division_name ) {
                     
-                    $node = OrganizationTree::where('name', $division->level2_division )
+                    $node = OrganizationTree::where('name', $division_name )
                     ->where('organization', $parent->organization )
-                    ->where('level1_program', $parent->level1_program )
+                    ->where('level1_program', $parent->name )
                     ->where('level', 2)->first();
 
                     // // check no of employee 
@@ -156,24 +157,25 @@ class BuildOrgTree extends Command
 
                     if (!$node) {
                         $node = new OrganizationTree([
-                            'name' => $division->level2_division,
+                            'name' => trim($division_name),
                             'status' => 1,
                             'level' => 2,
-                            'organization' =>  $parent->organization,
-                            'level1_program' =>  $parent->level1_program,
-                            'level2_division' =>  $division->level2_division,
+                            'organization' =>  trim($parent->organization),
+                            'level1_program' =>  trim($parent->name),
+                            'level2_division' =>  trim($division_name),
                             // 'no_of_employee' => $count,
                         ]);
-                        $node->deptid = $division->deptid;
                         $node->save(); // Saved as root
                         $parent->appendNode($node);
                     } else {
                         $node->status = 1;
-                        $node->deptid = $division->deptid;
                         // $node->no_of_employee = $count;
                         $node->save();
                     }
+
                 }
+
+                
             }
 
             // Level 3 - Branch  
@@ -184,21 +186,21 @@ class BuildOrgTree extends Command
 
             foreach ($divisions as $parent) {
 
-                $branches =  EmployeeDemo::where('organization', $parent->organization)
+                $branches =  EmployeeDemo::where('organization',$parent->organization)
                     ->where('level1_program', $parent->level1_program)
-                    ->where('level2_division', $parent->level2_division)
+                    ->where('level2_division', $parent->name)
                     ->whereNotIn('level3_branch',['',' '])
-                    ->select('level3_branch', 'deptid')
-                    ->distinct()
+                    ->select('level3_branch')
+                    ->groupBy('level3_branch')
                     ->orderBy('level3_branch')
-                    ->get();
+                    ->pluck('level3_branch');
 
-                foreach ($branches as $branch ) {
+                foreach ($branches as $branch_name ) {
 
-                    $node = OrganizationTree::where('name', $branch->level3_branch )
+                    $node = OrganizationTree::where('name', $branch_name )
                     ->where('organization', $parent->organization )
                     ->where('level1_program', $parent->level1_program )
-                    ->where('level2_division', $parent->level2_division )
+                    ->where('level2_division', $parent->name )
                     ->where('level', 3)->first();
 
                     // // check no of employee 
@@ -211,25 +213,25 @@ class BuildOrgTree extends Command
                                     
                     if (!$node) {
                         $node = new OrganizationTree([
-                            'name' => $branch->level3_branch,
+                            'name' => trim($branch_name),
                             'status' => 1,
                             'level' => 3,
-                            'organization' =>  $parent->organization,
-                            'level1_program' =>  $parent->level1_program,
-                            'level2_division' =>  $parent->level2_division,
-                            'level3_branch' =>  $branch->level3_branch,
+                            'organization' =>  trim($parent->organization),
+                            'level1_program' =>  trim($parent->level1_program),
+                            'level2_division' =>  trim($parent->name),
+                            'level3_branch' =>  trim($branch_name),
                             // 'no_of_employee' => $count,
                         ]);
-                        $node->deptid = $branch->deptid;
                         $node->save(); // Saved as root
                         $parent->appendNode($node);
                     } else {
                         $node->status = 1;
-                        $node->deptid = $branch->deptid;
                         // $node->no_of_employee = $count;
                         $node->save();
                     }
+
                 }
+
             }
 
 
@@ -244,20 +246,20 @@ class BuildOrgTree extends Command
                 $level4_list =  EmployeeDemo::where('organization',$parent->organization)
                         ->where('level1_program', $parent->level1_program)
                         ->where('level2_division', $parent->level2_division)
-                        ->where('level3_branch', $parent->level3_branch)
+                        ->where('level3_branch', $parent->name)
                         ->whereNotIn('level4',['',' '])
-                        ->select('level4', 'deptid')
-                        ->distinct()
+                        ->select('level4')
+                        ->groupBy('level4')
                         ->orderBy('level4')
-                        ->get();
+                        ->pluck('level4');
 
-                foreach ($level4_list as $level4 ) {
+                foreach ($level4_list as $level4_name ) {
 
-                    $node = OrganizationTree::where('name', $level4->level4 )
+                    $node = OrganizationTree::where('name', $level4_name )
                     ->where('organization', $parent->organization )
                     ->where('level1_program', $parent->level1_program )
                     ->where('level2_division', $parent->level2_division )
-                    ->where('level3_branch', $parent->level3_branch )
+                    ->where('level3_branch', $parent->name )
                     ->where('level', 4)->first();
 
                     // check no of employee 
@@ -270,26 +272,26 @@ class BuildOrgTree extends Command
 
                     if (!$node) {
                         $node = new OrganizationTree([
-                            'name' => $level4->level4,
+                            'name' => trim($level4_name),
                             'status' => 1,
                             'level' => 4,
-                            'organization' =>  $parent->organization,
-                            'level1_program' =>  $parent->level1_program,
-                            'level2_division' =>  $parent->level2_division,
-                            'level3_branch' => $parent->level3_branch,
-                            'level4' => $level4->level4,
+                            'organization' =>  trim($parent->organization),
+                            'level1_program' =>  trim($parent->level1_program),
+                            'level2_division' =>  trim($parent->level2_division),
+                            'level3_branch' => trim($parent->name),
+                            'level4' => trim($level4_name),
                             // 'no_of_employee' => $count,
                         ]);
-                        $node->deptid = $level4->deptid;
                         $node->save(); // Saved as root
                         $parent->appendNode($node);
                     } else {
                         $node->status = 1;
-                        $node->deptid = $level4->deptid;
                         // $node->no_of_employee = $count;
                         $node->save();
                     }
+
                 }
+                
             }
             
             $this->info( now() );
