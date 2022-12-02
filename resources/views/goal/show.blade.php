@@ -119,7 +119,7 @@
                                                     {{-- <x-profile-pic></x-profile-pic> --}}
                                                     <div class="border flex-fill p-2 rounded">
                                                         <!-- <x-textarea class="ckeditor" name="comment" id="addreply"/> -->
-                                                        <textarea class="addreply" name="comment"></textarea>
+                                                        <textarea class="addreply" id="addreply" name="comment"></textarea>
                                                         <div class="d-flex flex-row my-2">
                                                             <x-button class="btn" action="submit" :data-comment-id="$comment->id" size="sm">Add Comment</x-button>
                                                         </div>
@@ -204,8 +204,9 @@
             ],
         });
     });
+    
     $(document).ready(function(){
-        CKEDITOR.replaceAll('addreply', {
+        CKEDITOR.replace('addreply', {
             toolbar: "Custom",
             toolbar_Custom: [
                 ["Bold", "Italic", "Underline"],
@@ -214,7 +215,11 @@
                 ["Link"],
             ],
         });
+        
+        
+        
     });
+    
     </script>
 
     <script>
