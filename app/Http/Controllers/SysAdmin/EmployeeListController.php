@@ -147,6 +147,9 @@ class EmployeeListController extends Controller
                 u.employee_status,
                 u.supervisor_name,
                 u.supervisor_position_number,
+                u.reporting_to_employee_id,
+                u.reporting_to_name,
+                u.reporting_to_email,
                 u.due_date_paused,
                 u.next_conversation_date,
                 u.excusedtype AS excused,
@@ -218,6 +221,9 @@ class EmployeeListController extends Controller
             u.employee_status,
             u.supervisor_name,
             u.supervisor_position_number,
+            u.reporting_to_employee_id,
+            u.reporting_to_name,
+            u.reporting_to_email,
             u.due_date_paused,
             u.next_conversation_date,
             u.excusedtype AS excused,
@@ -266,7 +272,7 @@ class EmployeeListController extends Controller
                 $row['Name'] = $rec->employee_name;
                 $row['Email'] = $rec->employee_email;
                 $row['Position #'] = $rec->position_number;
-                $row['Reports To Name'] = $rec->supervisor_name;
+                $row['Reports To Name'] = $rec->reporting_to_name;
                 $row['Reports To Position #'] = $rec->supervisor_position_number;
                 $row['Status'] = $rec->employee_status;
                 $row['Record #'] = $rec->empl_record;
@@ -349,6 +355,9 @@ class EmployeeListController extends Controller
                 u.employee_status,
                 u.supervisor_name,
                 u.supervisor_position_number,
+                u.reporting_to_employee_id,
+                u.reporting_to_name,
+                u.reporting_to_email,
                 u.due_date_paused,
                 u.next_conversation_date,
                 u.excusedtype AS excused,
@@ -418,6 +427,9 @@ class EmployeeListController extends Controller
             u.employee_status,
             u.supervisor_name,
             u.supervisor_position_number,
+            u.reporting_to_employee_id,
+            u.reporting_to_name,
+            u.reporting_to_email,
             u.due_date_paused,
             u.next_conversation_date,
             u.excusedtype AS excused,
@@ -467,7 +479,7 @@ class EmployeeListController extends Controller
                 $row['Name'] = $rec->employee_name;
                 $row['Email'] = $rec->employee_email;
                 $row['Position #'] = $rec->position_number;
-                $row['Reports To Name'] = $rec->supervisor_name;
+                $row['Reports To Name'] = $rec->reporting_to_name;
                 $row['Reports To Position #'] = $rec->supervisor_position_number;
                 $row['Status'] = $rec->employee_status;
                 $row['Record #'] = $rec->empl_record;
@@ -519,7 +531,7 @@ class EmployeeListController extends Controller
             'u.employee_name'=> 'Name',
             'u.employee_email' => 'Email', 
             'u.position_number' => 'Position #',
-            'u.supervisor_name' => 'Reports To Name',
+            'u.reporting_to_name' => 'Reports To Name',
             'u.supervisor_position_number' => 'Reports to Position #',
             'u.jobcode_desc' => 'Classification',
             'u.deptid' => 'Dept ID'
