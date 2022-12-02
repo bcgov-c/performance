@@ -534,22 +534,18 @@
 
 				$('#edd_level0').change(function (e){
 					e.preventDefault();
-					$('#ebtn_search').click();
 				});
 
 				$('#edd_level1').change(function (e){
 					e.preventDefault();
-					$('#ebtn_search').click();
 				});
 
 				$('#edd_level2').change(function (e){
 					e.preventDefault();
-					$('#ebtn_search').click();
 				});
 
 				$('#edd_level3').change(function (e){
 					e.preventDefault();
-					$('#ebtn_search').click();
 				});
 				$('#edd_level4').change(function (e){
 					e.preventDefault();
@@ -565,7 +561,6 @@
 					$('#edd_level2').val(null);
 					$('#edd_level3').val(null);
 					$('#edd_level4').val(null);
-					$('#ebtn_search').click();
        			});
 
 				$('#ebtn_search').click(function(e) {
