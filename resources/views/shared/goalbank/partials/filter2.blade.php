@@ -212,37 +212,34 @@
         });
         
         $('#edd_level0').on('select2:select', function (e) {
-            // Do something
-            $('#edd_level1').val(null).trigger('change');
-            $('#edd_level2').val(null).trigger('change');
-            $('#edd_level3').val(null).trigger('change');
-            $('#edd_level4').val(null).trigger('change');
+            if ($('#edd_level1').val()) { $('#edd_level1').val(null).trigger('change'); };
+            if ($('#edd_level2').val()) { $('#edd_level2').val(null).trigger('change'); };
+            if ($('#edd_level3').val()) { $('#edd_level3').val(null).trigger('change'); };
+            if ($('#edd_level4').val()) { $('#edd_level4').val(null).trigger('change'); };
         });
 
         $('#edd_level1').on('select2:select', function (e) {
-            // Do something
-            $('#edd_level2').val(null).trigger('change');
-            $('#edd_level3').val(null).trigger('change');
+            if ($('#edd_level2').val()) { $('#edd_level2').val(null).trigger('change'); };
+            if ($('#edd_level3').val()) { $('#edd_level3').val(null).trigger('change'); };
+            if ($('#edd_level4').val()) { $('#edd_level4').val(null).trigger('change'); };
             $('#edd_level4').val(null).trigger('change');
         });
 
         $('#edd_level2').on('select2:select', function (e) {
-            // Do something
-            $('#edd_level3').val(null).trigger('change');
-            $('#edd_level4').val(null).trigger('change');
+            if ($('#edd_level3').val()) { $('#edd_level3').val(null).trigger('change'); };
+            if ($('#edd_level4').val()) { $('#edd_level4').val(null).trigger('change'); };
         });
 
         $('#edd_level3').on('select2:select', function (e) {
-            // Do something
-            $('#edd_level4').val(null).trigger('change');
+            if ($('#edd_level4').val()) { $('#edd_level4').val(null).trigger('change'); };
         });
 
-        $('#ebtn_search_reset').click(function() {
-            $('#edd_level0').val(null).trigger('change');
-            $('#edd_level1').val(null).trigger('change');
-            $('#edd_level2').val(null).trigger('change');
-            $('#edd_level3').val(null).trigger('change');
-            $('#edd_level4').val(null).trigger('change');
+        $('#ebtn_search_reset').click(function(e) {
+            if ($('#edd_level0').val()) { $('#edd_level0').val(null).trigger('change'); };
+            if ($('#edd_level1').val()) { $('#edd_level1').val(null).trigger('change'); };
+            if ($('#edd_level2').val()) { $('#edd_level2').val(null).trigger('change'); };
+            if ($('#edd_level3').val()) { $('#edd_level3').val(null).trigger('change'); };
+            if ($('#edd_level4').val()) { $('#edd_level4').val(null).trigger('change'); };
         });
 
     </script>
