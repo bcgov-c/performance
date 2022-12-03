@@ -306,6 +306,7 @@ class GoalBankController extends Controller
         $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
         if ($request->ajax()) {
             $query = GoalBankOrg::where('goal_id', '=', $goal_id)
+            ->where('version', 1)
             ->when( $level0, function ($q) use($level0) {
                 return $q->where('goal_bank_orgs.organization', '=', $level0->name);
             })
@@ -344,6 +345,7 @@ class GoalBankController extends Controller
     public function deleteorg(Request $request, $id)
     {
         $query = GoalBankOrg::where('id', '=', $id)
+        ->where('version', 1)
         ->delete();
 
         return redirect()->back();
@@ -1601,6 +1603,7 @@ class GoalBankController extends Controller
             )
             ->addSelect(['org_audience' => 
                 GoalBankOrg::whereColumn('goal_id', 'goals.id')
+                ->where('version', 1)
                 ->selectRAW('count(distinct goal_bank_orgs.id)')
             ] )
             ->addSelect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)])
