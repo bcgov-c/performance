@@ -1105,6 +1105,7 @@ class GoalBankController extends Controller
                 $result = DB::table('goal_bank_orgs')
                 ->updateorinsert(
                     ['goal_id' => $resultrec->id
+                    , 'version' => '1'
                     , 'organization' => $org1->organization
                     , 'level1_program' => $org1->level1_program
                     , 'level2_division' => $org1->level2_division
