@@ -74,7 +74,7 @@ class PopulateOdsDepartments extends Command
                 WHERE 
                     TRIM(ed.organization) <> ''
                     AND NOT ed.organization IS NULL
-                    AND ed.date_updated = (SELECT MAX(ed1.date_updated) FROM employee_demo AS ed1 WHERE ed1.guid = ed.guid AND ed1.deptid = ed.deptid)
+                    AND ed.date_updated = (SELECT MAX(ed1.date_updated) FROM employee_demo AS ed1 WHERE ed1.deptid = ed.deptid)
                 ORDER BY 
                     ed.organization, 
                     ed.level1_program, 
