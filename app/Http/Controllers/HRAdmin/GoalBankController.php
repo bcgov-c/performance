@@ -307,6 +307,7 @@ class GoalBankController extends Controller
             $query = GoalBankOrg::join('ods_departments', 'goal_bank_orgs.deptid', 'ods_departments.deptid')
             ->whereRaw("ods_departments.jobsched_id = (SELECT MAX(od.jobsched_id) FROM ods_departments AS od)")
             ->where('goal_id', '=', $goal_id)
+            ->where('goal_bank_orgs.version', 1)
             ->join('admin_orgs', function ($j1) {
                 $j1->on(function ($j1a) {
                     $j1a->whereRAW('admin_orgs.organization = ods_departments.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (ods_departments.organization = "" OR ods_departments.organization IS NULL))');
@@ -340,6 +341,12 @@ class GoalBankController extends Controller
             ->when( $level4, function ($q) use($level4) {
                 return $q->where('ods_departments.level4', $level4->name);
             })
+            ->orderBy('ods_departments.organization')
+            ->orderBy('ods_departments.level1_program')
+            ->orderBy('ods_departments.level2_division')
+            ->orderBy('ods_departments.level3_branch')
+            ->orderBy('ods_departments.level4')
+            ->distinct()
             ->select (
                 'ods_departments.deptid',
                 'ods_departments.organization',
@@ -1739,6 +1746,7 @@ class GoalBankController extends Controller
             )
             ->addSelect(['org_audience' => 
                 GoalBankOrg::whereColumn('goal_id', 'goals.id')
+                ->where('version', 1)
                 ->selectRAW('count(distinct goal_bank_orgs.id)')
             ] )
             ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
