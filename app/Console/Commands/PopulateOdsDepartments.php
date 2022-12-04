@@ -63,11 +63,11 @@ class PopulateOdsDepartments extends Command
             INSERT INTO ods_departments (
                 SELECT DISTINCT ".$audit_id.",
                     ed.deptid,
-                    ed.organization,
-                    ed.level1_program,
-                    ed.level2_division,
-                    ed.level3_branch,
-                    ed.level4,
+                    CASE WHEN TRIM(ed.organization) = '' THEN NULL ELSE ed.organization END,
+                    CASE WHEN TRIM(ed.level1_program) = '' THEN NULL ELSE ed.level1_program END,
+                    CASE WHEN TRIM(ed.level2_division) = '' THEN NULL ELSE ed.level2_division END,
+                    CASE WHEN TRIM(ed.level3_branch) = '' THEN NULL ELSE ed.level3_branch END,
+                    CASE WHEN TRIM(ed.level4) = '' THEN NULL ELSE ed.level4 END,
                     now()
                 FROM 
                     employee_demo AS ed
