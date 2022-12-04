@@ -304,10 +304,8 @@ class GoalBankController extends Controller
         $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
         $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
         if ($request->ajax()) {
-            $query = GoalBankOrg::join('ods_departments', function ($bank) {
-                $bank->where('goal_bank_orgs.deptid', 'ods_departments.deptid')
-                ->whereRaw("ods_departments.jobsched_id = (SELECT MAX(od.jobsched_id) FROM ods_departments AS od)");
-            })
+            $query = GoalBankOrg::join('ods_departments', 'goal_bank_orgs.deptid', 'ods_departments.deptid')
+            ->whereRaw("ods_departments.jobsched_id = (SELECT MAX(od.jobsched_id) FROM ods_departments AS od)")
             ->where('goal_id', '=', $goal_id)
             ->where('goal_bank_orgs.version', 1)
             ->join('admin_orgs', function ($j1) {
