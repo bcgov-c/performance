@@ -305,7 +305,7 @@ class GoalBankController extends Controller
         $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
         if ($request->ajax()) {
             $query = GoalBankOrg::where('goal_id', '=', $goal_id)
-            ->join('admin_orgs', function ($j1) {
+            ->join('goal_bank_orgs.admin_orgs', function ($j1) {
                 $j1->on(function ($j1a) {
                     $j1a->whereRAW('admin_orgs.organization = goal_bank_orgs.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (goal_bank_orgs.organization = "" OR goal_bank_orgs.organization IS NULL))');
                 } )
