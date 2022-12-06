@@ -114,21 +114,23 @@ class GoalController extends Controller
         }
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
         
+        /*
         if ($request->is("goal/current")) {
             $goals = $query->where('status', 'active')
             ->paginate(8);
             $type = 'current';
-            return view('goal.index', compact('goals', 'type', 'goaltypes', 'user','employees', 'tags', 'type_desc_str'));
+            return view('goal.index', compact('goals', 'type', 'goaltypes', 'user','employees', 'tags', 'tagsList', 'statusList', 'type_desc_str'));
         } else if ($request->is("goal/supervisor")) {
             //$user = Auth::user();
             // TO remove already copied goals.
             // $referencedGoals = Goal::where('user_id', $authId)->whereNotNull('referenced_from')->pluck('referenced_from');
             $goals = $user->sharedGoals()
-            /* ->whereNotIn('goals.id', $referencedGoals ) */
+            // ->whereNotIn('goals.id', $referencedGoals ) 
             ->paginate(8);
             $type = 'supervisor';
             return view('goal.index', compact('goals', 'type', 'goaltypes', 'user', 'tags', 'type_desc_str'));
-        }       
+        } 
+        */
         array_unshift($goaltypes, [
             "id" => "0",
             "description" => '',
@@ -138,7 +140,17 @@ class GoalController extends Controller
         $query = $query->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
         ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id');
-        $query = $query->where('status', '<>', 'active')->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'), 'goal_types.name as typename');
+        if ($request->is("goal/current")) {
+            $type = 'current';
+            $query = $query->where('status', '=', 'active')->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'), 'goal_types.name as typename');            
+        } else if($request->is("goal/supervisor")){
+            $type = 'supervisor';
+            $goals = $user->sharedGoals()->paginate(8);
+            return view('goal.index', compact('goals', 'type', 'goaltypes', 'user', 'tags', 'type_desc_str'));
+        } else {
+            $query = $query->where('status', '<>', 'active')->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'), 'goal_types.name as typename');
+        }
+        
         
         if(isset($request->title) && $request->title != ''){
             $query = $query->where('goals.title', 'LIKE', "%$request->title%");

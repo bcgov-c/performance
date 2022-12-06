@@ -9,7 +9,12 @@
       <th scope="col"><a href="javascript:sort('tagnames');">Tags</a></th>
       <th scope="col"><a href="javascript:sort('start_date');">Start Date</a></th>
       <th scope="col"><a href="javascript:sort('target_date');">End Date</a></th>
+      @if ($type == 'current')
+      <th scope="col">Shared With</th>
+      @endif
+      @if ($type == 'past')
       <th scope="col"><a href="javascript:sort('status');">Status</a></th>
+      @endif
       <th> </th>
     </tr>
   </thead>
@@ -42,9 +47,23 @@
       <td onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">{{ $goal->start_date_human }}
       </td>
       <td onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">{{ $goal->target_date_human }}</td>
+      @if ($type == 'current')
+      <td>
+          @if(!session()->has('view-profile-as')) 
+            @if(session()->has('has_employees') > 0 && (request()->is('goal/current') || request()->is('goal/goalbank')))
+                <div>
+                @include('goal.partials.goal-share-with-dropdown')
+                <br><br>
+                </div>
+            @endif
+            @endif
+      </td>
+      @endif
+      @if ($type == 'past')
       <td>
         @include('goal.partials.status-change')
       </td>
+      @endif
       <td>
         <div class="d-flex">
           <x-button :href="route('goal.show', $goal->id)" size='sm' class="mr-2">View</x-button>
