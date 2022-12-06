@@ -219,7 +219,7 @@ class GoalController extends Controller
         }
       
         $goals = $query->groupBy('title');
-        $goals = $query->paginate(4);
+        $goals = $query->paginate(10);
         
         $from = 'goal';        
         
