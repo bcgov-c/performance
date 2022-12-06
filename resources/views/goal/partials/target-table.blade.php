@@ -52,8 +52,8 @@
           @if(!session()->has('view-profile-as')) 
             @if(session()->has('has_employees') > 0 && (request()->is('goal/current') || request()->is('goal/goalbank')))
                 <div>
+                @php $noLabel = true @endphp    
                 @include('goal.partials.goal-share-with-dropdown')
-                <br><br>
                 </div>
             @endif
             @endif
