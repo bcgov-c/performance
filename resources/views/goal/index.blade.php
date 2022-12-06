@@ -27,7 +27,44 @@
         {{-- {{$dataTable->table()}} --}}
 
         <div class="row">
-         @if ($type == 'current' || $type == 'supervisor')
+         @if ($type != 'supervisor')   
+         <form action="" method="get" id="filter-menu">
+            <div class="row">
+                <div class="col">
+                    <label>
+                        Title
+                        <input type="text" name="title" class="form-control" value="{{request()->title}}">
+                    </label>
+                </div>
+                <div class="col">
+                    <x-dropdown :list="$goaltypes" label="Goal Type" name="goal_type" :selected="request()->goal_type"></x-dropdown>
+                </div>
+                @if ($type == 'past')
+                <div class="col">
+                    <x-dropdown :list="$statusList" label="Status" name="status" :selected="request()->status"></x-dropdown>                      
+                </div>
+                @endif
+                <div class="col">
+                    <x-dropdown :list="$tagsList" label="Tags" name="tag_id" :selected="request()->tag_id"></x-dropdown>
+                </div>
+                <div class="col">
+                    <label>
+                        Start Date
+                        <input type="text" class="form-control" name="filter_start_date" value="{{request()->filter_start_date ?? 'Any'}}">
+                    </label>
+                </div>
+                <div class="col">
+                    <label>
+                        End Date
+                        <input type="text" class="form-control" name="filter_target_date" value="{{request()->filter_target_date ?? 'Any'}}">
+                    </label>
+                </div>
+            </div>
+            <input name="sortby" id="sortby" value="{{$sortby}}" type="hidden">
+            <input name="sortorder" id="sortorder" value="{{$sortorder}}" type="hidden">
+        </form>    
+        @endif    
+        @if ($type == 'current' || $type == 'supervisor')
             @if($type == 'supervisor')
                 <div class="col-12 mb-4">
                     @if($goals->count() != 0)
@@ -39,54 +76,21 @@
                         </div>
                     @endif
                 </div>
-            @endif
-            @foreach ($goals as $goal)
-
-                <div class="col-12 col-lg-6 col-xl-4">
-                    @include('goal.partials.card')
-                </div>
-
-            @endforeach
-            @else
-             <div class="col-12 col-sm-12">
-                 
-                <form action="" method="get" id="filter-menu">
-                    <div class="row">
-                        <div class="col">
-                            <label>
-                                Title
-                                <input type="text" name="title" class="form-control" value="{{request()->title}}">
-                            </label>
-                        </div>
-                        <div class="col">
-                            <x-dropdown :list="$goaltypes" label="Goal Type" name="goal_type" :selected="request()->goal_type"></x-dropdown>
-                        </div>
-                        <div class="col">
-                            <x-dropdown :list="$statusList" label="Status" name="status" :selected="request()->status"></x-dropdown>                      
-                        </div>
-                        <div class="col">
-                            <x-dropdown :list="$tagsList" label="Tags" name="tag_id" :selected="request()->tag_id"></x-dropdown>
-                        </div>
-                        <div class="col">
-                            <label>
-                                Start Date
-                                <input type="text" class="form-control" name="filter_start_date" value="{{request()->filter_start_date ?? 'Any'}}">
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label>
-                                End Date
-                                <input type="text" class="form-control" name="filter_target_date" value="{{request()->filter_target_date ?? 'Any'}}">
-                            </label>
-                        </div>
+                @foreach ($goals as $goal)
+                    <div class="col-12 col-lg-6 col-xl-4">
+                        @include('goal.partials.card')
                     </div>
-                    <input name="sortby" id="sortby" value="{{$sortby}}" type="hidden">
-                    <input name="sortorder" id="sortorder" value="{{$sortorder}}" type="hidden">
-                </form> 
-                 
+                @endforeach
+            @else
+                <div class="col-12 col-sm-12">
+                    @include('goal.partials.target-table',['goals'=>$goals])
+                </div>
+            @endif            
+        @else
+             <div class="col-12 col-sm-12">                 
                 @include('goal.partials.target-table',['goals'=>$goals])
             </div>
-            @endif
+        @endif
         </div>
         {{ $goals->links() }}
     </div>
