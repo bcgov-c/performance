@@ -12,9 +12,7 @@
       @if ($type == 'current')
       <th scope="col">Shared With</th>
       @endif
-      @if ($type == 'past')
       <th scope="col"><a href="javascript:sort('status');">Status</a></th>
-      @endif
       <th> </th>
     </tr>
   </thead>
@@ -59,11 +57,9 @@
             @endif
       </td>
       @endif
-      @if ($type == 'past')
       <td>
         @include('goal.partials.status-change')
       </td>
-      @endif
       <td>
         <div class="d-flex">
           <x-button :href="route('goal.show', $goal->id)" size='sm' class="mr-2">View</x-button>
