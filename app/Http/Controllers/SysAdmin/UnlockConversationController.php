@@ -271,7 +271,7 @@ class UnlockConversationController extends Controller
                     return '<button class="btn btn-primary btn-sm  ml-2 btn-view-conversation" '.
                     'data-id="'. $conversation->id . '" data-toggle="modal" data-target="#viewConversationModal">View</button>' .
                     '<button class="btn btn-primary btn-sm ml-2 unlock-modal" data-id="'. $conversation->id . '" unlock-until="' .
-                     $conversation->unlock_until . '">Modify</button>';
+                     $conversation->unlock_until->format('Y-m-d') . '">Modify</button>';
                 })
                 ->addColumn('unlock', function ($conversation) {
                     $icon = $conversation->unlock_until ? 'fa-unlock-alt' : 'fa-lock';
