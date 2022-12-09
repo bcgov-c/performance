@@ -105,9 +105,9 @@
 			</div>
 
 			<div class="form-group col-md-2">
-				<label for="search_text">search</label>
+				<label for="search_text">Search</label>
 				<input type="text" id="search_text" name="search_text" class="form-control" 
-						value="" placeholder="Employee">
+						value="" placeholder="Keyword">
 			</div>
 
 		</div>
@@ -410,7 +410,7 @@ $(function() {
 	});
 
 	$('#dd_level1').select2({
-		placeholder: 'select program',
+		placeholder: 'select level 1',
 		allowClear: true,
 		ajax: {
 			url: '/hradmin/notifications/org-programs' 
@@ -433,7 +433,7 @@ $(function() {
 	});
 
 	$('#dd_level2').select2({
-		placeholder: 'select division',
+		placeholder: 'select level 2',
 		allowClear: true,
 		ajax: {
 			url: '/hradmin/notifications/org-divisions' 
@@ -457,7 +457,7 @@ $(function() {
 	});
 
 	$('#dd_level3').select2({
-		placeholder: 'select branch',
+		placeholder: 'select level 3',
 		allowClear: true,
 		ajax: {
 			url: '/hradmin/notifications/org-branches' 

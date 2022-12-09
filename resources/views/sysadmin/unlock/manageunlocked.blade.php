@@ -100,9 +100,9 @@
 			</div>
 
 			<div class="form-group col-md-2">
-				<label for="search_text">search</label>
+				<label for="search_text">Search</label>
 				<input type="text" id="search_text" name="search_text" class="form-control" 
-						value="" placeholder="Employee">
+						value="" placeholder="Keyword">
 			</div>
 
 		</div>
@@ -159,7 +159,7 @@
 					<p>
                         <i class="icon fas fa-exclamation-circle"></i>
 						This record of conversation has been unlocked by System Administrator or Ministry HR Administrator
-                        due to a special request on behalf of one or nore of the conversation participants.
+                        due to a special request on behalf of one or more of the conversation participants.
                         This record of conversation will be locked on ''. Unlocking this record of coversation will allow participants to un-sign and 
 						edit the content. The conversation will remain unlocked until the date entered below.
 					</p>
@@ -407,7 +407,7 @@ $(function() {
 	});
 
 	$('#dd_level1').select2({
-		placeholder: 'select program',
+		placeholder: 'select level 1',
 		allowClear: true,
 		ajax: {
 			url: '/hradmin/notifications/org-programs' 
@@ -430,7 +430,7 @@ $(function() {
 	});
 
 	$('#dd_level2').select2({
-		placeholder: 'select division',
+		placeholder: 'select level 2',
 		allowClear: true,
 		ajax: {
 			url: '/hradmin/notifications/org-divisions' 
@@ -454,7 +454,7 @@ $(function() {
 	});
 
 	$('#dd_level3').select2({
-		placeholder: 'select branch',
+		placeholder: 'select level 3',
 		allowClear: true,
 		ajax: {
 			url: '/hradmin/notifications/org-branches' 
@@ -569,9 +569,12 @@ $(function() {
 			e.preventDefault();
 
             inst = 'This record of conversation has been unlocked by System Administrator or Ministry HR Administrator ' +  
-                    'due to a special request on behalf of one or nore of the conversation participants. ' + 
-                    'This record of conversation will be locked on <b>' +  $(this).attr('unlock-until')  + '</b>. If you need to edit the conversation lock ' + 
-                    'date, you can use the calendar selection tool below to do so.'; 
+                    'due to a special request on behalf of one or more of the conversation participants. ' + 
+					// 'This record of conversation will be locked on <b>' +  $(this).attr('unlock-until')  + '</b>.
+					'This record will remain unlocked until <b>' +  $(this).attr('unlock-until')  + '</b>.' +
+					' If you need to edit the conversation lock ' + 
+                    'date, you can use the calendar selection tool below to do so. ' + 
+					'The conversation will remain unlocked until the date entered below.'; 
 
 			// Clear all those error message if exists
 			$('#unlock_until').val( $(this).attr('unlock-until') );
