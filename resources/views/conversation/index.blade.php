@@ -230,6 +230,7 @@
                         }  
                 } else if(checkIfItIsLocked()) {
                     $('#viewConversationModal').modal('toggle');
+                    window.location.reload();
                 }
             } 
         
