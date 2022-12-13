@@ -11,8 +11,11 @@ var toReloadPage = false;
 
 
 
+
+
 $(function() {
 
+    @include('conversation.partials.detail-conversation-modal')
 
     $(document).on('click', '.btn-view-conversation', function(e) {
                 conversation_id = e.currentTarget.getAttribute('data-id');
@@ -31,8 +34,7 @@ $(function() {
         $('#viewConversationModal').modal('hide');
     });
 
-
-    function updateConversation(conversation_id) {
+    {{-- function updateConversation(conversation_id) {
         $.ajax({
             url: '/conversation/' + conversation_id
             , success: function(result) {
@@ -621,7 +623,7 @@ $(function() {
                 var errors = error.responseJSON.errors;
             }
         });
-    }
+    } --}}
 
 });
 
