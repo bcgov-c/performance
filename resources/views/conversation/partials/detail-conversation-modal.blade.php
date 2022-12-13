@@ -358,7 +358,7 @@ function updateConversation(conversation_id) {
                             $('#info_comment11').prop( 'disabled', true );
                         }       
                         
-                        if(is_locked && type == 'past') {
+                        if(is_locked) {
                             $('#emp-signoff-row').hide();
                             $('#employee-signoff-message').hide();
                             $('#sup-signoff-row').hide();
@@ -367,9 +367,7 @@ function updateConversation(conversation_id) {
                             $('#employee-unsignoff-message').hide();
                             $('#sup-unsignoff-row').hide();
                             $('#supervisor-unsignoff-message').hide();
-                        }
-                        
-                        
+                        }                         
                         
                         if (isNotThirdPerson) {
                             const currentEmpSignoffDone = isSupervisor ? !!result.supervisor_signoff_id : !!result.signoff_user_id
