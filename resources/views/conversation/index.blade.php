@@ -194,6 +194,7 @@
         <script>        
             var toReloadPage = false;
             var modal_edit = false;
+            var is_viewer = false;
             var after_init = 0;
             var myTimeout;
             
@@ -754,7 +755,7 @@
             @include('conversation.partials.detail-conversation-modal');
             
             function sessionWarning() {
-                if (modal_open == true) {
+                if (modal_open == true && !is_viewer) {
                     saveComments();                                
                     alert('You have not saved your work in 20 minutes so the PDP has auto-saved to make sure you don\'t lose any information.');
                     after_init = 1;
