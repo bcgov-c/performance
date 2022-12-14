@@ -505,6 +505,7 @@ class ConversationController extends Controller
         $conversation->disable_signoff = $disable_signoff;
         $conversation->mgr = $mgr;
         $conversation->emp = $emp;
+        $request->session()->put('view_as_supervisor', $view_as_supervisor);
         
         
         /*
