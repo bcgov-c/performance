@@ -272,6 +272,8 @@ function updateConversation(conversation_id) {
                                 CKEDITOR.instances['info_comment10'].setReadOnly(true);
                                 $('.employee-sign-off').prop('disabled', true);
                                 $('.team_member_agreement').prop('disabled', true);
+                                
+                                $('#unsign-off-block').html('');
                         }
                         
 
