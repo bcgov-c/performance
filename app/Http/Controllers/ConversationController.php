@@ -167,7 +167,6 @@ class ConversationController extends Controller
                 $myTeamQuery->whereNotIn('user_id', $sharedSupervisorIds);
             }
             $myTeamQuery->where('signoff_user_id','<>', $authId); 
-            
             $type = 'past';
 
             $conversations = $query->orderBy('id', 'DESC')->paginate(10);                       
@@ -350,9 +349,9 @@ class ConversationController extends Controller
                $shareinfo_0 = DB::table('shared_profiles')                        
                                     ->select('shared_with')
                                     ->where('shared_id', '=', $value)
-                                    ->get();                
-                if (count($shareinfo_0) > 0) {
-                    if($shareinfo_0[0]->shared_with == $actualOwner) {
+                                    ->get();   
+                foreach($shareinfo_0 as $shareitem){
+                   if($shareitem->shared_with == $actualOwner) {
                         ConversationParticipant::updateOrCreate([
                             'conversation_id' => $conversation->id,
                             'participant_id' => $actualOwner,
@@ -366,12 +365,13 @@ class ConversationController extends Controller
                         ]);
                     }
                 }
+                              
                 $shareinfo_1 = DB::table('shared_profiles')                        
                                     ->select('shared_with')
                                     ->where('shared_id', '=', $actualOwner)
-                                    ->get();                
-                if (count($shareinfo_1) > 0) {
-                    if($shareinfo_1[0]->shared_with == $value) {
+                                    ->get(); 
+                foreach($shareinfo_1 as $shareitem){
+                    if($shareitem->shared_with == $value) {
                         ConversationParticipant::updateOrCreate([
                             'conversation_id' => $conversation->id,
                             'participant_id' => $value,
@@ -384,6 +384,7 @@ class ConversationController extends Controller
                             'role' => 'emp',
                         ]);
                     }
+                    
                 } 
             }
         }
