@@ -846,7 +846,7 @@
             });
             CKEDITOR.instances['info_comment1'].on('key', function(e) { 
                 $('#info_area1').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                $('#control-info-comment1').show();
+                //$('#control-info-comment1').show();
                 info_save1 = 0;       
             });           
         
@@ -871,7 +871,7 @@
             });
             CKEDITOR.instances['info_comment2'].on('key', function(e) { 
                 $('#info_area2').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                   $('#control-info-comment2').show();
+                   //$('#control-info-comment2').show();
                    info_save2 = 0;
             });
             CKEDITOR.instances['info_comment2'].on('blur', function(e) {
@@ -895,7 +895,7 @@
             });
             CKEDITOR.instances['info_comment3'].on('key', function(e) { 
                 $('#info_area3').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                   $('#control-info-comment3').show();
+                   //$('#control-info-comment3').show();
                    info_save3 = 0;
             });
             CKEDITOR.instances['info_comment3'].on('blur', function(e) {
@@ -918,7 +918,7 @@
             });
             CKEDITOR.instances['info_comment4'].on('key', function(e) { 
                 $('#info_area4').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                   $('#control-info-comment4').show();
+                   //$('#control-info-comment4').show();
                    info_save4 = 0;
             });
             CKEDITOR.instances['info_comment4'].on('blur', function(e) {
@@ -943,7 +943,7 @@
             });
             CKEDITOR.instances['info_comment5'].on('key', function(e) { 
                 $('#info_area5').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                   $('#control-info-comment5').show();
+                   //$('#control-info-comment5').show();
                    info_save5 = 0;
             });
             CKEDITOR.instances['info_comment5'].on('blur', function(e) {
@@ -967,7 +967,7 @@
             });
             CKEDITOR.instances['info_comment6'].on('key', function(e) { 
                 $('#info_area6').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                   $('#control-info-comment6').show();
+                   //$('#control-info-comment6').show();
                    info_save6 = 0;
             });
             CKEDITOR.instances['info_comment6'].on('blur', function(e) {
@@ -990,7 +990,7 @@
             });
             CKEDITOR.instances['info_comment7'].on('key', function(e) { 
                 $('#info_area7').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                   $('#control-info-comment7').show();
+                   //$('#control-info-comment7').show();
                    info_save7 = 0;
             });
             CKEDITOR.instances['info_comment7'].on('blur', function(e) {
@@ -1013,7 +1013,7 @@
             });
             CKEDITOR.instances['info_comment8'].on('key', function(e) { 
                 $('#info_area8').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                   $('#control-info-comment8').show();
+                   //$('#control-info-comment8').show();
                    info_save8 = 0;
             });
             CKEDITOR.instances['info_comment8'].on('blur', function(e) {
@@ -1036,7 +1036,7 @@
             });
             CKEDITOR.instances['info_comment9'].on('key', function(e) { 
                 $('#info_area9').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                   $('#control-info-comment9').show();
+                   //$('#control-info-comment9').show();
                    info_save9 = 0;
             });
             CKEDITOR.instances['info_comment9'].on('blur', function(e) {
@@ -1060,7 +1060,7 @@
             });
             CKEDITOR.instances['info_comment10'].on('key', function(e) { 
                 $('#info_area10').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                   $('#control-info-comment10').show();
+                   //$('#control-info-comment10').show();
                    info_save10 = 0;
             });
             CKEDITOR.instances['info_comment10'].on('blur', function(e) {
