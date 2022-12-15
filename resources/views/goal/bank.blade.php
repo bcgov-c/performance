@@ -439,7 +439,7 @@
                     data: $('#add-goal-to-library-form').serialize(),
                     success: function (result) {
                         if(result.success){
-                            alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');  
+                            alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');  
                             window.location.href= '/goal/goalbank'; 
                         }
                     },
