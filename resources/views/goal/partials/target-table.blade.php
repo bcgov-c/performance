@@ -10,7 +10,11 @@
       <th scope="col"><a href="javascript:sort('start_date');">Start Date</a></th>
       <th scope="col"><a href="javascript:sort('target_date');">End Date</a></th>
       @if ($type == 'current')
+      @if(!session()->has('view-profile-as')) 
+      @if(session()->has('has_employees') > 0 && (request()->is('goal/current') || request()->is('goal/goalbank')))
       <th scope="col">Shared With</th>
+      @endif
+      @endif
       @endif
       <th scope="col"><a href="javascript:sort('status');">Status</a></th>
       <th> </th>
@@ -54,7 +58,7 @@
                 @include('goal.partials.goal-share-with-dropdown')
                 </div>
             @endif
-            @endif
+          @endif
       </td>
       @endif
       <td>
