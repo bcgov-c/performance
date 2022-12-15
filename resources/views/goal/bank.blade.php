@@ -444,7 +444,8 @@
                     data: $('#add-goal-to-library-form').serialize(),
                     success: function (result) {
                         if(result.success){
-                            //window.location.href= '/goal';
+                            alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');  
+                            window.location.href= '/goal/goalbank'; 
                         }
                     },
                     error: function (error){

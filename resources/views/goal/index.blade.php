@@ -281,6 +281,16 @@
     }); */
     $(document).on('show.bs.modal', '#addGoalModal', function(e) {
         modal_open = true;
+        
+        $('.alert-danger').hide();
+        $('.alert-danger').html('<i class="fa fa-info-circle"></i> There are one or more errors on the page. Please review and try again.');
+        $('.text-danger').html('');
+        $('.form-control').removeClass('is-invalid');
+        
+        const minutes = 1;
+        const SessionTime = 1000 * 60 * minutes;
+        const myTimeout = setTimeout(sessionWarning, SessionTime); 
+        
         $('#what').val('');
         $('#measure_of_success').val('');
         $("#goal_title").val('');
@@ -562,12 +572,16 @@
                         success: function (result) {
                             console.log(result);
                             if(result.success){
+                                alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');
                                 //window.location.href= '/goal';
+                                $('.alert-danger').show();
+                                $('.alert-danger').html('Your goal has been saved.');
                             }
                         },
                         error: function (error){
                             $('.btn-submit').prop('disabled',false);
                             $('.btn-submit').html('Save Changes');
+                            $('.alert-danger').html('<i class="fa fa-info-circle"></i> There are one or more errors on the page. Please review and try again.');
                             $('.alert-danger').show();
                             $('.modal-body').animate({scrollTop: 0},100);
                             var errors = error.responseJSON.errors;
