@@ -149,11 +149,12 @@
 		}); 
 
         $(document).on('show.bs.modal', '#addGoalToLibraryModal', function(e) {
+            modal_open = true;
             $('.alert-danger').hide();
             $('.text-danger').html('');
             $('.form-control').removeClass('is-invalid');
             
-            const minutes = 15;
+            const minutes = 1;
             const SessionTime = 1000 * 60 * minutes;
             const myTimeout = setTimeout(sessionWarning, SessionTime);    
             
