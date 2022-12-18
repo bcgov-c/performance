@@ -360,6 +360,7 @@ function updateConversation(conversation_id) {
                             $('#info_comment11').prop( 'disabled', true );
                         }       
                         
+                        <?php if ($type == 'past'){ ?>
                         if(is_locked) {
                             $('#emp-signoff-row').hide();
                             $('#employee-signoff-message').hide();
@@ -369,7 +370,8 @@ function updateConversation(conversation_id) {
                             $('#employee-unsignoff-message').hide();
                             $('#sup-unsignoff-row').hide();
                             $('#supervisor-unsignoff-message').hide();
-                        }                         
+                        }
+                        <?php } ?>
                         
                         if (isNotThirdPerson) {
                             const currentEmpSignoffDone = isSupervisor ? !!result.supervisor_signoff_id : !!result.signoff_user_id
