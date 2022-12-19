@@ -41,17 +41,10 @@ class Conversation extends Model implements Auditable
     }
 
     public function getIsLockedAttribute() {
-        $signoff_time = max($this->supervisor_signoff_time, $this->sign_off_time);
-
-        if (!$signoff_time) {
+        if (!$this->initial_signoff) {
             return false;
         }
-        $locked = $signoff_time->addDays(14)->isPast();
-        if ($locked && $this->isUnlock) {
-            $locked = false;
-        }
-
-        return $locked;
+        return $this->initial_signoff->addDays(14)->isPast();
     }
 
     public function getInfoComment1Attribute() {
@@ -125,8 +118,7 @@ class Conversation extends Model implements Auditable
 
     public function getLastSignOffDateAttribute()
     {
-        // return $this->supervisor_signoff_time > $this->sign_off_time ? $this->sign_off_time : $this->supervisor_signoff_time;
-        return max($this->supervisor_signoff_time, $this->sign_off_time);
+        return $this->supervisor_signoff_time > $this->sign_off_time ? $this->sign_off_time : $this->supervisor_signoff_time;
     }
 
     public function getCTimeAttribute()

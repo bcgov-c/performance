@@ -424,45 +424,6 @@
             selector: '[data-toggle-select]',
             trigger: 'click',
         });
-           
-            
-        function sessionWarning() {
-            if (modal_open == true) {
-                //$(".btn-submit").trigger("click");
-                for (var i in CKEDITOR.instances){
-                    CKEDITOR.instances[i].updateElement();
-                };
-                $.ajax({
-                    url:'/my-team/add-goal-to-library',
-                    type : 'POST',
-                    data: $('#add-goal-to-library-form').serialize(),
-                    success: function (result) {
-                        if(result.success){
-                            alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');  
-                            window.location.href= '/goal/goalbank'; 
-                        }
-                    },
-                    error: function (error){
-                        $('.btn-submit').prop('disabled',false);
-                        $('.btn-submit').html('Save Changes');
-                        $('.alert-danger').show();
-                        $('.modal-body').animate({scrollTop: 0},100);
-                        var errors = error.responseJSON.errors;
-                        $('.text-danger').each(function(i, obj) {
-                            $('.text-danger').text('');
-                        });
-                        Object.entries(errors).forEach(function callback(value, index) {
-                            var className = '.error-' + value[0];
-                            $('input[name='+value[0]+']').addClass('is-invalid');
-                            $(className).text(value[1]);
-                        });
-                        alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');  
-                    }
-                });
-                
-                   
-            }
-        } 
 </script>    
 <style>
     .multiselect-container{
