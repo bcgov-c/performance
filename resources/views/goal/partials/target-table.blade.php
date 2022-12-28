@@ -51,14 +51,14 @@
       <td onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">{{ $goal->target_date_human }}</td>
       @if ($type == 'current')
       @if(!session()->has('view-profile-as')) 
-      <td>          
-            @if(session()->has('has_employees') > 0 && (request()->is('goal/current') || request()->is('goal/goalbank')))
+      @if(session()->has('has_employees') > 0 && (request()->is('goal/current') || request()->is('goal/goalbank')))
+      <td>       
                 <div>
                 @php $noLabel = true @endphp    
                 @include('goal.partials.goal-share-with-dropdown')
-                </div>
-            @endif          
+                </div>    
       </td>
+      @endif      
       @endif
       @endif
       <td>
