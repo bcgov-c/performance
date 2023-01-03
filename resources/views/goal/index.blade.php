@@ -235,6 +235,7 @@
     <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
     <script>
         var modal_open = false;
+        var need_fresh = false;
         $('body').popover({
             selector: '[data-toggle]',
             trigger: 'click',
@@ -324,7 +325,11 @@
         };
         if (isContentModified() && !confirm("If you continue you will lose any unsaved information.")) {
             e.preventDefault();
-        }
+        } else {
+            if(need_fresh){
+                location.reload();
+            }
+        } 
     });
 
     $(document).on('click', '.btn-submit', function(e){
@@ -571,14 +576,18 @@
                         data: $('#goal_form').serialize(),
                         success: function (result) {
                             console.log(result);
+                            need_fresh = true;
                             if(result.success){
                                 alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');
                                 //window.location.href= '/goal';
                                 $('.alert-danger').show();
                                 $('.alert-danger').html('Your goal has been saved.');
+                                $('.btn-submit').hide();
                             }
                         },
                         error: function (error){
+                            need_fresh = false;
+                            $('.btn-submit').show();
                             $('.btn-submit').prop('disabled',false);
                             $('.btn-submit').html('Save Changes');
                             $('.alert-danger').html('<i class="fa fa-info-circle"></i> There are one or more errors on the page. Please review and try again.');
@@ -593,6 +602,7 @@
                                 $('input[name='+value[0]+']').addClass('is-invalid');
                                 $(className).text(value[1]);
                             });
+                            //alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');
                         }
                     });
                     
