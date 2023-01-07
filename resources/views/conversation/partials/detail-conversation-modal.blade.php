@@ -1,4 +1,3 @@
-
 function updateConversation(conversation_id) {
                 $.ajax({
                     url: '/conversation/' + conversation_id

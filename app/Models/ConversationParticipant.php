@@ -19,6 +19,7 @@ class ConversationParticipant extends Model implements Auditable
     protected $fillable = [
         'conversation_id',
         'participant_id',
+        'role',
     ];
 
     public $timestamps = false;
