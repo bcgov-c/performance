@@ -38,57 +38,11 @@ class ConversationController extends Controller
         $conversationTopics = ConversationTopic::all();
         // $participants = Participant::all();
         $query = Conversation::with('conversationParticipants');
-        
-        //get historic conversations
-        $history_conversations = DB::table('conversation_participants')  
-                                    ->select('conversation_id')
-                                    ->join('conversations', 'conversation_participants.conversation_id', '=', 'conversations.id')
-                                    ->where('conversation_participants.participant_id', '=', $authId)
-                                    ->whereNull('conversations.deleted_at')
-                                    ->whereNull('conversations.sign_off_time')
-                                    ->whereNull('conversations.supervisor_signoff_time')
-                                    ->distinct()
-                                    ->get();
-        $consersation_ids = array();
-        foreach($history_conversations as $history_conversation) {
-            $consersation_ids[] = $history_conversation->conversation_id;
-        }
-        //get historic supervisors
-        $history_supervisors = DB::table('conversation_participants')
-                                    ->select('participant_id')
-                                    ->whereIn('conversation_id', $consersation_ids)
-                                    ->where('role', '=', 'mgr')
-                                    ->where('participant_id', '<>', $authId)
-                                    ->distinct()
-                                    ->get();
-        $supervisor_ids = array();
-        foreach($history_supervisors as $history_supervisor){
-            $supervisor_ids[] = $history_supervisor->participant_id;
-        }
-        
-        //get historic team members
-        $history_teams = DB::table('conversation_participants')
-                                    ->select('participant_id')
-                                    ->whereIn('conversation_id', $consersation_ids)
-                                    ->where('role', '=', 'emp')
-                                    ->where('participant_id', '<>', $authId)
-                                    ->distinct()
-                                    ->get();
-        $team_ids = array();
-        foreach($history_teams as $history_team){
-            $team_ids[] = $history_team->participant_id;
-        }
                 
         $type = 'upcoming';
         if ($request->is('conversation/past') || $request->is('my-team/conversations/past')) {
             $sharedSupervisorIds = SharedProfile::where('shared_id', Auth::id())->with('sharedWithUser')->get()->pluck('shared_with')->toArray();
             array_push($sharedSupervisorIds, $supervisorId);
-            foreach ($supervisor_ids as $supervisor_id) {
-                if (!in_array($supervisor_id, $sharedSupervisorIds)) {
-                    array_push($sharedSupervisorIds, $supervisor_id);
-                }
-            }
-            
             $query->where(function($query) use ($authId, $supervisorId, $sharedSupervisorIds, $viewType) {
                 $query->where('user_id', $authId)->
                     orWhereHas('conversationParticipants', function($query) use ($authId, $supervisorId, $sharedSupervisorIds, $viewType) {
@@ -98,19 +52,8 @@ class ConversationController extends Controller
                         } 
                         return $query;
                     });
-            })->whereNotNull('signoff_user_id')->whereNotNull('supervisor_signoff_id')
-            ->where(function($query) {
-                $query->where(function($query) {
-                    $query->whereNotNull('signoff_user_id')
-                          ->whereNotNull('supervisor_signoff_id');                          
-                        //   ->whereNull('unlock_until');
-                });
-                // ->orWhere(function($query) {
-                //     $query->whereNotNull('signoff_user_id')
-                //           ->whereNotNull('supervisor_signoff_id')
-                //           ->whereDate('unlock_until', '<', Carbon::today() );
-                // });
-            });       
+            })->whereNotNull('signoff_user_id')->whereNotNull('supervisor_signoff_id');
+            //->whereDate('unlock_until', '<', Carbon::today());
 
             if ($request->has('user_id') && $request->user_id) {
                 $user_id = $request->user_id;
@@ -167,6 +110,7 @@ class ConversationController extends Controller
                 $myTeamQuery->whereNotIn('user_id', $sharedSupervisorIds);
             }
             $myTeamQuery->where('signoff_user_id','<>', $authId); 
+            
             $type = 'past';
 
             $conversations = $query->orderBy('id', 'DESC')->paginate(10);                       
@@ -181,12 +125,12 @@ class ConversationController extends Controller
                 $query->where(function($query) {
                     $query->whereNull('signoff_user_id')
                         ->orWhereNull('supervisor_signoff_id');
+                })
+                ->orWhere(function($query) {
+                    $query->whereNotNull('signoff_user_id')
+                          ->whereNotNull('supervisor_signoff_id')
+                          ->whereDate('unlock_until', '>=', Carbon::today() );
                 });
-                // ->orWhere(function($query) {
-                //     $query->whereNotNull('signoff_user_id')
-                //           ->whereNotNull('supervisor_signoff_id')
-                //           ->whereDate('unlock_until', '>=', Carbon::today() );
-                // });
             });
             if ($request->has('user_id') && $request->user_id) {
                 $user_id = $request->user_id;
@@ -229,12 +173,6 @@ class ConversationController extends Controller
             // get Conversations with my supervisor
             $sharedSupervisorIds = SharedProfile::where('shared_id', Auth::id())->with('sharedWithUser')->get()->pluck('shared_with')->toArray();
             array_push($sharedSupervisorIds, $supervisorId);
-            foreach ($supervisor_ids as $supervisor_id) {
-                if (!in_array($supervisor_id, $sharedSupervisorIds)) {
-                    array_push($sharedSupervisorIds, $supervisor_id);
-                }
-            }
-            
             $query->where(function($query) use ($sharedSupervisorIds) {
                 $query->whereIn('user_id', $sharedSupervisorIds)->
                 orWhereHas('conversationParticipants', function ($query) use ($sharedSupervisorIds) {
@@ -288,7 +226,7 @@ class ConversationController extends Controller
     public function store(ConversationRequest $request)
     {
 
-        //DB::beginTransaction();
+        DB::beginTransaction();
         $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
         $isDirectRequest = true;
         if(route('my-team.my-employee') == url()->previous()) {
@@ -306,89 +244,19 @@ class ConversationController extends Controller
         $conversation->save();
 
         foreach ($request->participant_id as $key => $value) {
-            $is_direct = false;
-            $mgrinfo_0 = DB::table('users')                        
-                                    ->select('reporting_to')
-                                    ->where('id', '=', $value)
-                                    ->get();
-            if($mgrinfo_0[0]->reporting_to == $actualOwner){
-                ConversationParticipant::updateOrCreate([
-                    'conversation_id' => $conversation->id,
-                    'participant_id' => $value,
-                    'role' => 'emp',
-                ]);
-                
-                ConversationParticipant::updateOrCreate([
-                    'conversation_id' => $conversation->id,
-                    'participant_id' => $actualOwner,
-                    'role' => 'mgr',
-                ]);
-                $is_direct = true;
-            } 
-            
-            $mgrinfo_1 = DB::table('users')                        
-                                    ->select('reporting_to')
-                                    ->where('id', '=', $actualOwner)
-                                    ->get();
-            if($mgrinfo_1[0]->reporting_to == $value){
-                ConversationParticipant::updateOrCreate([
-                    'conversation_id' => $conversation->id,
-                    'participant_id' => $actualOwner,
-                    'role' => 'emp',
-                ]);
-                
-                ConversationParticipant::updateOrCreate([
-                    'conversation_id' => $conversation->id,
-                    'participant_id' => $value,
-                    'role' => 'mgr',
-                ]);
-                $is_direct = true;
-            }
-            
-            if (!$is_direct) {
-               $shareinfo_0 = DB::table('shared_profiles')                        
-                                    ->select('shared_with')
-                                    ->where('shared_id', '=', $value)
-                                    ->get();   
-                foreach($shareinfo_0 as $shareitem){
-                   if($shareitem->shared_with == $actualOwner) {
-                        ConversationParticipant::updateOrCreate([
-                            'conversation_id' => $conversation->id,
-                            'participant_id' => $actualOwner,
-                            'role' => 'mgr',
-                        ]);
-                        
-                        ConversationParticipant::updateOrCreate([
-                            'conversation_id' => $conversation->id,
-                            'participant_id' => $value,
-                            'role' => 'emp',
-                        ]);
-                    }
-                }
-                              
-                $shareinfo_1 = DB::table('shared_profiles')                        
-                                    ->select('shared_with')
-                                    ->where('shared_id', '=', $actualOwner)
-                                    ->get(); 
-                foreach($shareinfo_1 as $shareitem){
-                    if($shareitem->shared_with == $value) {
-                        ConversationParticipant::updateOrCreate([
-                            'conversation_id' => $conversation->id,
-                            'participant_id' => $value,
-                            'role' => 'mgr',
-                        ]);
-                        
-                        ConversationParticipant::updateOrCreate([
-                            'conversation_id' => $conversation->id,
-                            'participant_id' => $actualOwner,
-                            'role' => 'emp',
-                        ]);
-                    }
-                    
-                } 
-            }
+            ConversationParticipant::updateOrCreate([
+                'conversation_id' => $conversation->id,
+                'participant_id' => $value,
+            ]);
         }
-        //DB::commit();
+
+        if(!in_array($actualOwner, $request->participant_id)) {
+            ConversationParticipant::updateOrCreate([
+                'conversation_id' => $conversation->id,
+                'participant_id' => $actualOwner,
+            ]);
+        }
+        DB::commit();
 
         // create a message on the participant's dasboard under home page
         foreach ($request->participant_id as $key => $value) {
@@ -455,8 +323,6 @@ class ConversationController extends Controller
         
         $conversation_id = $conversation->id;
         $conversation->disable_signoff = false;
-        
-        $conversation->is_locked = $conversation->getIsLockedAttribute();
              
         $conversation_topic_details = DB::table('conversation_topics')   
                             ->select('conversation_topics.*')
@@ -465,51 +331,6 @@ class ConversationController extends Controller
                             ->get(); 
         $conversation->preparing_for_conversation = $conversation_topic_details[0]->preparing_for_conversation;
         
-        $conversation_participants = DB::table('conversation_participants')                        
-                            ->where('conversation_id', $conversation_id)
-                            ->get();    
-        $conversation->participants = $conversation_participants;
-        $is_viewer = false;
-        $view_as_supervisor = false;
-        $disable_signoff = false;
-        $mgr = '';
-        $emp = '';
-        
-        if(session()->has('view-profile-as')) {
-            $original_user = $request->session()->get('original-auth-id');
-            foreach($conversation_participants as $participant) {
-                if($participant->role == 'mgr' && $participant->participant_id == $original_user) {
-                    $mgr = $participant->participant_id;
-                    $view_as_supervisor = true;
-                }elseif($participant->role == 'emp'  && $participant->participant_id == $original_user) {
-                    $emp = $participant->participant_id;
-                }
-            } 
-            if ($mgr == '' && $emp == ''){
-                $is_viewer = true;
-                $disable_signoff = true;
-            }
-        }else {
-            foreach($conversation_participants as $participant) {
-                $current_user = auth()->user()->id;
-                if($participant->role == 'mgr' && $participant->participant_id == $current_user) {
-                    $mgr = $participant->participant_id;
-                    $view_as_supervisor = true;
-                }
-                if($participant->role == 'emp'  && $participant->participant_id == $current_user) {
-                    $emp = $participant->participant_id;
-                }
-            }        
-        }
-        $conversation->is_viewer = $is_viewer;
-        $conversation->view_as_supervisor = $view_as_supervisor;
-        $conversation->disable_signoff = $disable_signoff;
-        $conversation->mgr = $mgr;
-        $conversation->emp = $emp;
-        $request->session()->put('view_as_supervisor', $view_as_supervisor);
-        
-        
-        /*
         if(!session()->has('view-profile-as')) {
             $current_user = auth()->user()->id;
             $conversation_participants = DB::table('conversation_participants')                        
@@ -572,7 +393,6 @@ class ConversationController extends Controller
         }
         $request->session()->put('view_as_supervisor', $view_as_supervisor);
         $conversation->view_as_supervisor = $view_as_supervisor;
-         */
         //error_log(print_r($conversation,true));
         return $conversation;
     }

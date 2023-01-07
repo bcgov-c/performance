@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header bg-primary">
                 <h5 id="template-header"></h5>
-                <button type="button" class="close" id="closemodal" aria-label="Close" style="color:white">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:white">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <input type="hidden" name="viewmode" id="viewmode" value="0">
@@ -58,7 +58,7 @@
                 
                 
                 
-                <div class="card" id="sdq_card">
+                <div class="card">
                         <div class="card-header panel-heading bg-primary" id="heading_1">
                         <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_1" aria-expanded="false" aria-controls="collapse_1">
                                 <button class="btn btn-link" style="color:white">
@@ -75,7 +75,7 @@
                         </div>
                 </div>
                 
-                <div class="card"  id="pfc_card">
+                <div class="card">
                         <div class="card-header panel-heading bg-primary" id="heading_2">
                         <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_2" aria-expanded="false" aria-controls="collapse_2">
                                 <button class="btn btn-link" style="color:white">
@@ -106,7 +106,6 @@
                                     <div id="div-info-comment4">
                                         <h6 id="tip-info-comment4"></h6>
                                         <span id="desc-info-comment4"></span>
-                                        <span id="control-info-comment4" style="display:none"><br/><span id="info_area4"></span></span>
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <textarea class="form-control info_comment4 mb-4 employee-comment btn-conv-edit" data-name="info_comment4" data-id="info_comment4" name="info_comment4" id="info_comment4"></textarea>
@@ -117,7 +116,6 @@
                                         <br/>
                                         <h6 id="tip-info-comment7"></h6>
                                         <span id="desc-info-comment7"></span>
-                                        <span id="control-info-comment7" style="display:none"><br/><span id="info_area7"></span></span>
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <textarea class="form-control info_comment7 mb-4 employee-comment btn-conv-edit" data-name="info_comment7" data-id="info_comment7" name="info_comment7" id="info_comment7"></textarea>
@@ -128,7 +126,6 @@
                                         <br/>
                                         <h6 id="tip-info-comment8"></h6>
                                         <span id="desc-info-comment8"></span>
-                                        <span id="control-info-comment8" style="display:none"><br/><span id="info_area8"></span></span>
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <textarea class="form-control info_comment8 mb-4 employee-comment btn-conv-edit" data-name="info_comment8" data-id="info_comment8" name="info_comment8" id="info_comment8"></textarea>
@@ -139,7 +136,6 @@
                                         <br/>
                                         <h6 id="tip-info-comment9"></h6>
                                         <span id="desc-info-comment9"></span>
-                                        <span id="control-info-comment9" style="display:none"><br/><span id="info_area9"></span></span>
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <textarea class="form-control info_comment9 mb-4 employee-comment btn-conv-edit" data-name="info_comment9" data-id="info_comment9" name="info_comment9" id="info_comment9"></textarea>
@@ -150,7 +146,6 @@
                                         <br/>
                                         <h6 id="tip-info-comment10"></h6>
                                         <span id="desc-info-comment10"></span>
-                                        <span id="control-info-comment10" style="display:none"><br/><span id="info_area10"></span></span>
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <textarea class="form-control info_comment10 mb-4 employee-comment btn-conv-edit" data-name="info_comment10" data-id="info_comment10" name="info_comment10" id="info_comment10"></textarea>
@@ -173,7 +168,6 @@
                                         <div class="col-12">
                                             <h6 id="tip-info-comment1"></h6>                                    
                                             <span id="desc-info-comment1"></span>
-                                            <span id="control-info-comment1" style="display:none"><br/><span id="info_area1"></span></span>
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <textarea class="form-control supervisor-comment info_comment1 mb-4 btn-conv-edit" name="info_comment1" id="info_comment1" data-id="info_comment1" data-name="info_comment1"></textarea>
@@ -186,7 +180,6 @@
                                             <br/>
                                             <h6 id="tip-info-comment2"></h6>
                                             <span id="desc-info-comment2"></span>
-                                            <span id="control-info-comment2" style="display:none"><br/><span id="info_area2"></span></span>
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <textarea class="form-control supervisor-comment info_comment2 mb-4 btn-conv-edit" name="info_comment2" id="info_comment2" data-id="info_comment2" data-name="info_comment2"></textarea>
@@ -199,7 +192,6 @@
                                             <br/>
                                             <h6 id="tip-info-comment3"></h6>
                                             <span id="desc-info-comment3"></span>
-                                            <span id="control-info-comment3" style="display:none"><br/><span id="info_area3"></span></span>
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <textarea class="form-control supervisor-comment info_comment3 mb-4 btn-conv-edit" name="info_comment3" id="info_comment3" data-id="info_comment3" data-name="info_comment3"></textarea>
@@ -212,7 +204,6 @@
                                             <br/>   
                                             <h6 id="tip-info-comment5"></h6>
                                             <span id="desc-info-comment5"></span>
-                                            <span id="control-info-comment5" style="display:none"><br/><span id="info_area5"></span></span>
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <textarea class="form-control supervisor-comment info_comment5 mb-4 btn-conv-edit" name="info_comment5" id="info_comment5" data-id="info_comment5" data-name="info_comment5"></textarea>
@@ -225,7 +216,6 @@
                                             <br/>
                                             <h6 id="tip-info-comment6"></h6>
                                             <span id="desc-info-comment6"></span>
-                                            <span id="control-info-comment6" style="display:none"><br/><span id="info_area6"></span></span>
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <textarea class="form-control supervisor-comment info_comment6 mb-4 btn-conv-edit" name="info_comment6" id="info_comment6" data-id="info_comment6" data-name="info_comment6"></textarea>
@@ -238,7 +228,6 @@
                                             <br/>   
                                             <h6 id="tip-info-comment11"></h6>
                                             <span id="desc-info-comment11"></span>
-                                            <span id="control-info-comment11" style="display:none"><br/><span id="info_area11"></span></span>
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <input class="form-control form-control-md supervisor-comment info_comment11 mb-4 " type="date" name="info_comment11" id="info_comment11" data-id="info_comment11" data-name="info_comment11">                                                 
