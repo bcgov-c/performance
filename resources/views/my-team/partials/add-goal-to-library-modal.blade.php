@@ -100,7 +100,7 @@
 
             <div class="row">
                 <div class="col-12 text-right">
-                <button id="savebtn" type="submit" class="btn btn-primary mt-3">Save</button>
+                <button id="savebtn" type="submit" class="btn btn-submit btn-primary mt-3">Save</button>
                 <button id="cancelbtn" type="button" class="btn btn-secondary mt-3" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -148,7 +148,16 @@
              	});
 		}); 
 
-        $(document).on('show.bs.modal', '#addGoalModal', function(e) {
+        $(document).on('show.bs.modal', '#addGoalToLibraryModal', function(e) {
+            modal_open = true;
+            $('.alert-danger').hide();
+            $('.text-danger').html('');
+            $('.form-control').removeClass('is-invalid');
+            
+            const minutes = 1;
+            const SessionTime = 1000 * 60 * minutes;
+            const myTimeout = setTimeout(sessionWarning, SessionTime);    
+            
             $('#what').val('');
             $('#measure_of_success').val('');
             $("#goal_title").val('');
@@ -161,7 +170,7 @@
             };
                     
         });
-        $(document).on('hide.bs.modal', '#addGoalModal', function(e) {
+        $(document).on('hide.bs.modal', '#addGoalToLibraryModal', function(e) {
             const isContentModified = () => {
                 if ($('#what').val() !== '' || $('#measure_of_success').val() !== ''
                     || $("#goal_title").val() !== '' || $('input[name=goal_type_id]').val() != 1 
