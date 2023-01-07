@@ -41,10 +41,17 @@ class Conversation extends Model implements Auditable
     }
 
     public function getIsLockedAttribute() {
-        if (!$this->initial_signoff) {
+        $signoff_time = max($this->supervisor_signoff_time, $this->sign_off_time);
+
+        if (!$signoff_time) {
             return false;
         }
-        return $this->initial_signoff->addDays(14)->isPast();
+        $locked = $signoff_time->addDays(14)->isPast();
+        if ($locked && $this->isUnlock) {
+            $locked = false;
+        }
+
+        return $locked;
     }
 
     public function getInfoComment1Attribute() {
@@ -118,7 +125,8 @@ class Conversation extends Model implements Auditable
 
     public function getLastSignOffDateAttribute()
     {
-        return $this->supervisor_signoff_time > $this->sign_off_time ? $this->sign_off_time : $this->supervisor_signoff_time;
+        // return $this->supervisor_signoff_time > $this->sign_off_time ? $this->sign_off_time : $this->supervisor_signoff_time;
+        return max($this->supervisor_signoff_time, $this->sign_off_time);
     }
 
     public function getCTimeAttribute()
@@ -181,44 +189,27 @@ class Conversation extends Model implements Auditable
         $user = User::find($authId);
 
         $jr = EmployeeDemoJunior::where('guid', $user->guid)->getQuery()->orderBy('id', 'desc')->first();
-        if ($jr->excused_type == 'A' || $user->excused_flag) {
+        if ((isset($jr->excused_type) && $jr->excused_type == 'A') || $user->excused_flag) {
             $msg = "Employee is currently excused and their conversation deadline is paused";
             return [
                 $msg, "success"
             ];
         } else {
-            $msg = "Next performance conversation is due by ";            
-            if (Carbon::now()->gte($jr->next_conversation_date)) {
+            $msg = "Next performance conversation is due by ";
+            if(isset($jr->next_conversation_date)){
+                if (Carbon::now()->gte($jr->next_conversation_date)) {
+                    return [
+                        $msg.Carbon::parse($jr->next_conversation_date)->format('M d, Y'),
+                        "danger"
+                    ];
+                }
+                $diff = Carbon::now()->diffInMonths(Carbon::parse($jr->next_conversation_date), false);
                 return [
                     $msg.Carbon::parse($jr->next_conversation_date)->format('M d, Y'),
-                    "danger"
+                    $diff < 0 ? "danger" : ($diff < 1 ? "warning" : "success")
                 ];
             }
-            $diff = Carbon::now()->diffInMonths(Carbon::parse($jr->next_conversation_date), false);
-            return [
-                $msg.Carbon::parse($jr->next_conversation_date)->format('M d, Y'),
-                $diff < 0 ? "danger" : ($diff < 1 ? "warning" : "success")
-            ];
         }
-        $user = Auth::user();
-        $nextDueDate = $user->joining_date ?  : '';
-        $diff = Carbon::now()->diffInMonths($nextDueDate, false);
-
-        if ((!$nextDueDate) || (Carbon::createFromDate(2022, 10, 14)->gt($nextDueDate))) {
-            $DDt = abs (($user->id % 10) - 1) * 5 + (($user->id % 5));
-            $nextDueDate = Carbon::createFromDate(2022, 10, 14)->addDays($DDt);
-        }
-
-        /* dd([
-            Carbon::now()->format('d-M-y'),
-            $nextDueDate->format('d-M-y'),
-            $diff
-        ]); */
-        return [
-            // $msg3 . $nextDueDate->format('d-M-y'),
-            $msg. $nextDueDate->format('d-M-y'),
-            $diff < 0 ? "danger" : ($diff < 1 ? "warning" : "success")
-        ];
     }
 
     public static function nextConversationDue($user = null) {

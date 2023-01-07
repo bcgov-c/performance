@@ -81,6 +81,9 @@
                     <div class="flex-fill btn-view-conversation"  style="cursor: pointer;" data-id="{{ $c->id }}" data-toggle="modal" data-target="#viewConversationModal">
                         <h6>
                             {{ $c->topic->name }}
+                            {{-- @if ( $c->unlock_until > now() ) 
+                                <span class="pl-4 text-danger font-wieght-bold">[Notes: reopened until: {{ $c->unlock_until->format('Y-m-d') }} ]</span>
+                            @endif --}}
                         </h6>
                         <span class="mr-2">
                             With
@@ -188,7 +191,51 @@
     <x-slot name="js">
         <script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
         
-        <script>            
+        <script>        
+            var toReloadPage = false;
+            var modal_edit = false;
+            var is_viewer = false;
+            var after_init = 0;
+            var myTimeout;
+            
+            var db_info_comment1 = '';
+            var db_info_comment2 = '';
+            var db_info_comment3 = '';
+            var db_info_comment4 = '';
+            var db_info_comment5 = '';
+            var db_info_comment6 = '';
+            var db_info_comment7 = '';
+            var db_info_comment8 = '';
+            var db_info_comment9 = '';
+            var db_info_comment10 = '';
+            var db_info_comment11 = '';
+            
+            
+            <?php if ($type == 'upcoming'){ ?>
+                var modal_edit = true;
+            <?php } ?>
+            
+            document.getElementById("closemodal").onclick = function(e) {myFunction(e)};
+            function myFunction(e) {
+                if (modal_edit ==  true || !checkIfItIsLocked()){       
+                        if (confirm('If you continue you will lose any unsaved information.')) {
+                            modal_open=false;
+                            //saveComments();                                
+                            $('.modal-body').find('#employee_id').val('');
+                            $('.modal-body').find('.error').html('');
+                            $('.modal-body').find('input[type=radio]').prop('checked', false);
+                            $('#viewConversationModal').modal('toggle');
+                            window.location.reload();
+                        }else {
+                            e.preventDefault();                            
+                        }  
+                } else if(checkIfItIsLocked()) {
+                    $('#viewConversationModal').modal('toggle');
+                    window.location.reload();
+                }
+            } 
+        
+        
             CKEDITOR.replace('info_comment1', {
                 toolbar: "Custom",
                 toolbar_Custom: [
@@ -291,6 +338,7 @@
             });
             
              modal_open=false;
+             
         </script>    
         
         <script>
@@ -370,8 +418,8 @@
                     const supervisorSignOffDone = $modal.data('supervisor-signoff') == 1;
                     const employeeSignOffDone = $modal.data('employee-signoff') == 1;
                     let message = "must un-sign before changes can be made to this record of conversation";
-                    const supervisor = $("#supervisor-signoff-message").find('.name').html();
-                    const emp = $("#employee-signoff-message").find('.name').html();
+                    const supervisor = $("#supervisor-unsignoff-message").find('.name').html();
+                    const emp = $("#employee-unsignoff-message").find('.name').html();
                     if (supervisorSignOffDone && employeeSignOffDone) {
                         message = `${supervisor} and ${emp} ${message}`;
                     } else if (supervisorSignOffDone) {
@@ -379,7 +427,7 @@
                     } else {
                         message = `${emp} ` + message;
                     }
-                    alert(message);
+                    //alert(message);
                     return true;
                 }
                 return false;
@@ -435,7 +483,7 @@
                         // Update View
                         if ($("#" + $(that).data('id') + '_edit').is('textarea')) {
                             $("#" + $(that).data('id')).val($("#" + $(that).data('id')).val());
-                        } else {
+                        } else { 
                             updateConversation(conversation_id)
                         }
                     }
@@ -572,6 +620,8 @@
             $(document).on('click', '.btn-view-conversation', function(e) {
                 conversation_id = e.currentTarget.getAttribute('data-id');
                 updateConversation(conversation_id);
+                console.log('modal open');                
+                setTimeRoll();
             });
 
             $(document).on('click', '.delete-btn', function() {
@@ -588,10 +638,8 @@
                 ).submit();
             });
             
-            var modal_edit = false;
-            <?php if ($type == 'upcoming'){ ?>
-                var modal_edit = true;
-            <?php } ?>
+            
+            /*    
             $(document).on('hide.bs.modal', '#viewConversationModal', function(e) {
                 if (toReloadPage) {
                     window.location.reload();
@@ -605,9 +653,9 @@
                     }
                 }
             });
+            */
             
             function saveComments() {
-                var isSupervisor = $('#viewmode').val();
                 if(isSupervisor == 1) {
                         var info_comment1_data = CKEDITOR.instances['info_comment1'].getData();
                         var info_comment2_data = CKEDITOR.instances['info_comment2'].getData();
@@ -623,6 +671,7 @@
                         comments['info_comment5'] = info_comment5_data;
                         comments['info_comment6'] = info_comment6_data;
                         comments['info_comment11'] = info_comment11_data;
+                        
                 } else {                       
                         var info_comment4_data = CKEDITOR.instances['info_comment4'].getData();                       
                         var info_comment7_data = CKEDITOR.instances['info_comment7'].getData();
@@ -636,6 +685,7 @@
                         comments['info_comment8'] = info_comment8_data;
                         comments['info_comment9'] = info_comment9_data;
                         comments['info_comment10'] = info_comment10_data;
+                        
                 }
                         $.ajax({
                                 url: '/conversation/' + conversation_id
@@ -649,13 +699,17 @@
                             });
                        
             }
-
+            
+            
+            
+            
+            /*
             $(document).on('show.bs.modal', '#viewConversationModal', function(e) {
                 $("#viewConversationModal").find("textarea").val('');
                 $("#viewConversationModal").find("input, textarea").prop("readonly", false);
                 $('#viewConversationModal').data('is-frozen', 0);
             });
-            
+            */
 
             $(document).on('change', '.team_member_agreement', function () {
                 if ($(this).prop('checked')) {
@@ -696,576 +750,71 @@
                 }
                 return false;
             }
-
-            function updateConversation(conversation_id) {
-                $.ajax({
-                    url: '/conversation/' + conversation_id
-                    , success: function(result) {
-                         modal_open=true;
-                        isSupervisor = result.view_as_supervisor;
-                        topic_id = result.topic.id;
-                        disable_signoff = result.disable_signoff;
-                        employee_signed = false;
-                        supervisor_signed = false;
-                        
-                        if (typeof result.signoff_user_id === 'number') {
-                            employee_signed = true;                            
-                        }
-                        if (typeof result.supervisor_signoff_id === 'number') {
-                            supervisor_signed = true;                            
-                        }    
-                                                
-                        $('#conv_participant_edit').val('');
-                        $('#conv_participant').val('');
-                        $('#conv_title').text(result.topic.name);
-                        $('#conv_title_edit').val(result.topic.name);
-                        $('#conv_date').text(result.c_date);
-                        $('#conv_date_edit').val(result.date);
-                        $('#conv_time').text(result.c_time);
-                        $('#conv_time_edit').val(result.time);
-                        $('#conv_comment').text(result.comment);
-                        $('#conv_comment_edit').text(result.comment);
-                        //$('#info_comment1').val(result.info_comment1);
-                        
-                        //set comments based on topic id. for swtich old template to new version
-                        var comment1 = result.info_comment1;
-                        var comment2 = result.info_comment2;
-                        var comment3 = result.info_comment3;
-                        var comment4 = result.info_comment4;
-                        var comment5 = result.info_comment5;
-                        var comment6 = result.info_comment6;
-                        var comment7 = result.info_comment7;
-                        var comment8 = result.info_comment8;
-                        var comment9 = result.info_comment9;
-                        var comment10 = result.info_comment10;
-                        var comment11 = result.info_comment11;
-                        
-                        if (topic_id == 2 || topic_id == 4  || topic_id == 5) {
-                            if (comment1 == '') {
-                                comment1 = result.info_comment5;
-                            }
-                        }
-                        if (topic_id == 3) {
-                            if (comment7 == '') {
-                                comment7 = result.info_comment1;
-                            }
-                            if (comment8 == '') {
-                                comment8 = result.info_comment3;
-                            }
-                            if (comment9 == '') {
-                                comment9 = result.info_comment4;
-                            }
-                            if (comment1 == '') {
-                                comment1 = result.info_comment2;
-                            }
-                            if (comment2 == '') {
-                                comment2 = result.info_comment6;
-                            }
-                            if (comment3 == '') {
-                                comment3 = result.info_comment5;
-                            }
-                        }
-                                                
-                        CKEDITOR.instances['info_comment1'].setData(comment1);
-                        CKEDITOR.instances['info_comment2'].setData(comment2);
-                        CKEDITOR.instances['info_comment3'].setData(comment3);
-                        CKEDITOR.instances['info_comment4'].setData(comment4);
-                        CKEDITOR.instances['info_comment5'].setData(comment5);
-                        CKEDITOR.instances['info_comment6'].setData(comment6);
-                        CKEDITOR.instances['info_comment7'].setData(comment7);
-                        CKEDITOR.instances['info_comment8'].setData(comment8);
-                        CKEDITOR.instances['info_comment9'].setData(comment9);
-                        CKEDITOR.instances['info_comment10'].setData(comment10);
-                        $('#info_comment11').val(comment11);
-                        
-                        
-                        $('[name="check_one"]').removeAttr('checked');
-                        $('[name="check_two"]').removeAttr('checked');
-                        $('[name="check_one_"]').removeAttr('checked');
-                        $('[name="check_two_"]').removeAttr('checked');
-                        
-                        if (result.empl_agree1 == 1) {
-                            $("input[name=check_one][value=1]").prop('checked', true);
-                        } 
-                        if (result.empl_agree1 == 0) {
-                            $("input[name=check_one][value=0]").prop('checked', true);
-                        }
-                        if (result.empl_agree2 == 1) {
-                            $("input[name=check_two][value=1]").prop('checked', true);
-                        } 
-                        if (result.empl_agree2 == 0) {
-                            $("input[name=check_two][value=0]").prop('checked', true);
-                        }
-                        
-                        if (result.supv_agree1 == 1) {
-                            $("input[name=check_one_][value=1]").prop('checked', true);
-                        } 
-                        if (result.supv_agree1 == 0) {
-                            $("input[name=check_one_][value=0]").prop('checked', true);
-                        }
-                        if (result.supv_agree2 == 1) {
-                            $("input[name=check_two_][value=1]").prop('checked', true);
-                        } 
-                        if (result.supv_agree2 == 0) {
-                            $("input[name=check_two_][value=0]").prop('checked', true);
-                        }
-                        
-
-                        $("#locked-message").addClass("d-none");
-                        
-                        user1 = result.conversation_participants.find((p) => p.participant_id === currentUser);
-                        user2 = result.conversation_participants.find((p) => p.participant_id !== currentUser);
-                        let isNotThirdPerson = true;
-                        if (!user1 || !user2) {
-                            user1 = result.conversation_participants[0];
-                            user2 = result.conversation_participants[1];
-
-                            // Disable everything.
-                            $("button.btn-conv-edit").hide();
-                            $("button.btn-conv-save").hide();
-                            $("button.btn-conv-cancel").hide();
-                            $("#viewConversationModal").find('textarea').each((index, e) => $(e).prop('readonly', true));
-                            $('#viewConversationModal').data('is-frozen', 1);
-                            $('#viewConversationModal').data('is-not-allowed', 1);
-
-                            isNotThirdPerson = false;
-                        }
-                        $('#employee-signoff-questions').removeClass('d-none');
-                        if (isSupervisor) {
-                            $('#employee-signoff-message').find('.name').html(user2.participant.name);
-                            $('#supervisor-signoff-message').find('.name').html(user1.participant.name);
-                            
-                            $('#employee-unsignoff-message').find('.name').html(user2.participant.name);
-                            $('#supervisor-unsignoff-message').find('.name').html(user1.participant.name);
-                        } else {
-                            $('#employee-signoff-message').find('.name').html(user1.participant.name);
-                            $('#supervisor-signoff-message').find('.name').html(user2.participant.name);
-                            
-                            $('#employee-unsignoff-message').find('.name').html(user1.participant.name);
-                            $('#supervisor-unsignoff-message').find('.name').html(user2.participant.name);
-                        }
- 
-                        if (!isSupervisor) {
-                            $('#viewmode').val(0);
-                            
-                            CKEDITOR.instances['info_comment1'].setReadOnly(true);
-                            CKEDITOR.instances['info_comment2'].setReadOnly(true);
-                            CKEDITOR.instances['info_comment3'].setReadOnly(true);
-                            CKEDITOR.instances['info_comment5'].setReadOnly(true);
-                            CKEDITOR.instances['info_comment6'].setReadOnly(true);                            
-                            $('#info_comment11').prop('disabled', true);
-                            $('.supervisor-sign-off').prop('disabled', true);
-                            
-                            CKEDITOR.instances['info_comment4'].setReadOnly(false);
-                            CKEDITOR.instances['info_comment7'].setReadOnly(false);
-                            CKEDITOR.instances['info_comment8'].setReadOnly(false);
-                            CKEDITOR.instances['info_comment9'].setReadOnly(false);
-                            CKEDITOR.instances['info_comment10'].setReadOnly(false);
-                            $('.employee-sign-off').prop('disabled', false);
-                            $('.team_member_agreement').prop('disabled', false);
-                            
-                            if(employee_signed == false) {                                
-                                $('#signoff-emp-id-input').html('<div id="emp-signoff-row"><div class="my-2">Enter your 6 digit employee ID to indicate you have read and accept the performance review:</div><input type="text" id="employee_id" class="form-control d-inline w-50"><button class="btn btn-primary btn-sign-off ml-2" type="button">Sign with my employee ID</button><br><span class="text-danger error" data-error-for="employee_id"></span></div>');                                
-                                $('#unsign-off-block').html('');
-                            } else {
-                                CKEDITOR.instances['info_comment4'].setReadOnly( true );
-                                CKEDITOR.instances['info_comment7'].setReadOnly( true );
-                                CKEDITOR.instances['info_comment8'].setReadOnly( true );
-                                CKEDITOR.instances['info_comment9'].setReadOnly( true );
-                                CKEDITOR.instances['info_comment10'].setReadOnly( true );
-                                $('.employee-sign-off').prop( 'disabled', true );
-                                $('.team_member_agreement').prop( 'disabled', true )
-                                modal_open=false;
-                                $("input[name=check_one]").prop( 'disabled', true );
-                                $("input[name=check_two]").prop( 'disabled', true );
-                                
-                                $('#unsignoff-emp-id-input').html('<input type="text" id="employee_id" class="form-control d-inline w-50"><button data-action="unsignoff" class="btn btn-primary btn-sign-off ml-2" type="button">Un-Sign</button><br><span class="text-danger error" data-error-for="employee_id"></span>');
-                                $('#sign-off-block').html('');
-                            }
-                            
-                            $("input[name=check_one_]").prop('disabled', true);
-                            $("input[name=check_two_]").prop('disabled', true);
-                            
-                        } else {
-                            $('#viewmode').val(1);
-                        
-                            CKEDITOR.instances['info_comment1'].setReadOnly(false);
-                            CKEDITOR.instances['info_comment2'].setReadOnly(false);
-                            CKEDITOR.instances['info_comment3'].setReadOnly(false);
-                            CKEDITOR.instances['info_comment5'].setReadOnly(false);
-                            CKEDITOR.instances['info_comment6'].setReadOnly(false);
-                            $('#info_comment11').prop('disabled', false);
-                            $('.supervisor-sign-off').prop('disabled', false);
-                            
-                            CKEDITOR.instances['info_comment4'].setReadOnly(true);
-                            CKEDITOR.instances['info_comment7'].setReadOnly(true);
-                            CKEDITOR.instances['info_comment8'].setReadOnly(true);
-                            CKEDITOR.instances['info_comment9'].setReadOnly(true);
-                            CKEDITOR.instances['info_comment10'].setReadOnly(true);
-                            $('.employee-sign-off').prop('disabled', true);
-                            $('.team_member_agreement').prop('disabled', true);
-      
-                            if(supervisor_signed == false) {
-                                $('#signoff-sup-id-input').html('<div id="emp-signoff-row"><div class="my-2">Enter your 6 digit employee ID to indicate you have read and accept the performance review:</div><input type="text" id="employee_id" class="form-control d-inline w-50"><button class="btn btn-primary btn-sign-off ml-2" type="button">Sign with my employee ID</button><br><span class="text-danger error" data-error-for="employee_id"></span></div>');                                
-                                $('#unsign-off-block').html('');
-                            } else {
-                                CKEDITOR.instances['info_comment1'].setReadOnly( true );
-                                CKEDITOR.instances['info_comment2'].setReadOnly( true );
-                                CKEDITOR.instances['info_comment3'].setReadOnly( true );
-                                CKEDITOR.instances['info_comment5'].setReadOnly( true );
-                                CKEDITOR.instances['info_comment6'].setReadOnly( true );
-                                $('#info_comment11').prop( 'disabled', true );
-                                $('.supervisor-sign-off').prop( 'disabled', true );   
-                                modal_open=false;
-                                $("input[name=check_one_]").prop( 'disabled', true );
-                                $("input[name=check_two_]").prop( 'disabled', true );
-                                
-                                $('#unsignoff-sup-id-input').html('<input type="text" id="employee_id" class="form-control d-inline w-50"><button data-action="unsignoff" class="btn btn-primary btn-sign-off ml-2" type="button">Un-Sign</button><br><span class="text-danger error" data-error-for="employee_id"></span>');
-                                $('#sign-off-block').html('');
-                            }
-                            
-                            $("input[name=check_one]").prop('disabled', true);
-                            $("input[name=check_two]").prop('disabled', true);
-                            
-                        }
-                        
-
-                        $('.team_member_agreement').prop('checked', result.team_member_agreement ? true : false);
-                        //$('#team_member_agreement_2').prop('checked', result.team_member_agreement ? true : false);
-
-                        $("#employee-sign_off_form").find('input:radio[name="check_one"][value="'+result.empl_agree1+'"]').prop('checked', true);
-                        $("#employee-sign_off_form").find('input:radio[name="check_two"][value="'+result.empl_agree2+'"]').prop('checked', true);
-                        $("#employee-sign_off_form").find('input:radio[name="check_three"][value="'+result.empl_agree3+'"]').prop('checked', true);
-
-                        $("#employee-signoff-questions").find('input:radio[name="check_one_"][value="'+result.supv_agree1+'"]').prop('checked', true);
-                        $("#employee-signoff-questions").find('input:radio[name="check_two_"][value="'+result.supv_agree2+'"]').prop('checked', true);
-                        $("#employee-signoff-questions").find('input:radio[name="check_three_"][value="'+result.supv_agree3+'"]').prop('checked', true);
-
-                        if (disable_signoff) {
-                            $("#employee-sign_off_form").find('input:radio[name="check_one"]').prop('disabled', true);
-                            $("#employee-sign_off_form").find('input:radio[name="check_two"]').prop('disabled', true);
-                            $("#employee-sign_off_form").find('input:radio[name="check_three"]').prop('disabled', true);
-
-                            $("#employee-signoff-questions").find('input:radio[name="check_one_"]').prop('disabled', true);
-                            $("#employee-signoff-questions").find('input:radio[name="check_two_"]').prop('disabled', true);
-                            $("#employee-signoff-questions").find('input:radio[name="check_three_"]').prop('disabled', true);
-                        }
-
-                        if (!!result.supervisor_signoff_id) {
-                            $('#supervisor-signoff-message').find('.not').addClass('d-none');
-                            $('#supervisor-signoff-message').find('.time').removeClass('d-none');
-                            $('#viewConversationModal').data('supervisor-signoff', 1);
-
-                        }
-                        else {
-                            $('#supervisor-signoff-message').find('.not').removeClass('d-none');
-                            $('#supervisor-signoff-message').find('.time').addClass('d-none');
-                            $('#viewConversationModal').data('supervisor-signoff', 0);
-                            
-                            $('#supervisor-unsignoff-message').find('.not').removeClass('d-none');
-                        }
-                        if (!!result.signoff_user_id) {
-                            $('#employee-signoff-message').find('.not').addClass('d-none');
-                            $('#employee-signoff-message').find('.time').removeClass('d-none');
-                            $('#viewConversationModal').data('employee-signoff', 1);
-                        } else {
-                            $('#employee-signoff-message').find('.not').removeClass('d-none');
-                            $('#employee-signoff-message').find('.time').addClass('d-none');
-                            $('#viewConversationModal').data('employee-signoff', 0);
-                            
-                            
-                            $('#employee-unsignoff-message').find('.not').removeClass('d-none');
-                        }
-                        
-                        if (result.signoff_user_id) {                            
-                            $(".team_member_agreement").prop('disabled', true);
-                        }
-                        
-                        if (employee_signed || supervisor_signed) {
-                            // Freeze content.
-                            $("button.btn-conv-edit").hide();
-                            $("button.btn-conv-save").hide();
-                            $("button.btn-conv-cancel").hide();
-                            $("#viewConversationModal").find('textarea').each((index, e) => $(e).prop('readonly', true));
-                            $('#viewConversationModal').data('is-frozen', 1);
-                            if (result.supervisor_signoff_id && isSupervisor) {
-                                $("#viewConversationModal .sup-inputs").find('input:radio').each((index, e) => $(e).prop('disabled', true));
-                            } 
-                            if (result.signoff_user_id && !isSupervisor) {
-                                $("#viewConversationModal .emp-inputs").find('input:radio').each((index, e) => $(e).prop('disabled', true));
-                            }
-                            if (result.signoff_user_id && result.supervisor_signoff_id) {
-                                $("#questions-to-consider").hide();
-                                $("#questions-to-consider").prev().hide();
-                            }
-                            
-                            //either employee or supervisor signed off, both of them cannot edit/add comment anymore
-                            CKEDITOR.instances['info_comment1'].setReadOnly( true );
-                            CKEDITOR.instances['info_comment2'].setReadOnly( true );
-                            CKEDITOR.instances['info_comment3'].setReadOnly( true );
-                            CKEDITOR.instances['info_comment4'].setReadOnly( true );
-                            CKEDITOR.instances['info_comment5'].setReadOnly( true );
-                            CKEDITOR.instances['info_comment6'].setReadOnly( true );  
-                            CKEDITOR.instances['info_comment7'].setReadOnly( true );  
-                            CKEDITOR.instances['info_comment8'].setReadOnly( true );  
-                            CKEDITOR.instances['info_comment9'].setReadOnly( true );  
-                            CKEDITOR.instances['info_comment10'].setReadOnly( true );  
-                            $('#info_comment11').prop( 'disabled', true );
-                        }
-                        if (isNotThirdPerson) {
-                            const currentEmpSignoffDone = isSupervisor ? !!result.supervisor_signoff_id : !!result.signoff_user_id
-                            if (currentEmpSignoffDone) {
-                                $("#signoff-form-block").find("#signoff-emp-id-input").hide();
-                                $("#unsignoff-form-block").show();
-                            } else {
-                                $("#unsignoff-form-block").hide();
-                                $("#signoff-form-block").find("#signoff-emp-id-input").show();
-                            }
-                        }
-
-                        if(!!$('#unsign-off-form').length) {
-                            $('#unsign-off-form').attr('action', $('#unsign-off-form').data('action-url').replace('xxx', conversation_id));
-                        }
-                        $('#questions-to-consider').html('');
-                        /*
-                        if(result.topic.id == 4){
-                            $('#comment_area6').hide();   
-                            $('#info_to_capture').removeClass('d-none');
-                        }else if(result.topic.id == 3){
-                            $('#comment_area6').show();    
-                            $('#info_to_capture').removeClass('d-none');                            
-                        }else if(result.topic.id == 1){
-                            $('#comment_area6').hide(); 
-                            $('#info_to_capture').removeClass('d-none');
-                        }else {
-                            $('#comment_area6').hide(); 
-                            $('#info_to_capture').addClass('d-none');
-                        }
-                        */
-                       $('#div-info-comment1').show();
-                       $('#div-info-comment2').show();
-                       $('#div-info-comment3').show();
-                       $('#div-info-comment4').show();
-                       $('#div-info-comment5').show();
-                       $('#div-info-comment6').show();
-                       $('#div-info-comment7').show();
-                       $('#div-info-comment8').show();
-                       $('#div-info-comment9').show();
-                       $('#div-info-comment10').show();
-                       $('#div-info-comment11').show();
-                       if(result.topic.id == 1){
-                           $('#div-info-comment9').hide();
-                           $('#div-info-comment10').hide();
-                           
-                           $('#div-info-comment11').hide();
-                           
-                           $('#tip-info-comment4').html('<b>Self Summary (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Consider accomplishments, areas for growth, changes to your goals, learning opportunities, etc."> </i>');
-                           $('#desc-info-comment4').html('Describe your performance since your last check-in and identify areas to focus on moving forward.');
-                           $('#tip-info-comment7').html('<b>Additional Comments (optional)</b>');
-                           $('#tip-info-comment8').html('<b>Action Items (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
-                           
-                           $('#tip-info-comment1').html('<b>Appreciation (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Provide an overview of the actions or results being celebrated. Be as specific as possible about timing, activities, and outcomes achieved. Highlight behaviours, competencies, and corporate values that you feel contributed to the success."> </i>');
-                           $('#desc-info-comment1').html('Highlight what has gone well.');
-                           $('#tip-info-comment2').html('<b>Coaching (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Provide specific examples of actions, outcomes or behaviours where there is opportunity for growth. Capture information on any additional assistance or training offered to support improvement."> </i>');
-                           $('#desc-info-comment2').html('Identify areas where things could be (even) better.');
-                           $('#tip-info-comment3').html('<b>Evaluation (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Be as specific as possible, use examples, and focus on observable behaviours and business results."> </i>');
-                           $('#desc-info-comment3').html('Provide an overall summary of performance.');
-                           $('#tip-info-comment5').html('<b>Additional Comments (optional)</b>');
-                           $('#tip-info-comment6').html('<b>Action Items (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
-                           $('#desc-info-comment6').html('Capture actions to take as a result of this conversation.');
-                           
-                           
-                       }else if(result.topic.id == 2){
-                           $('#div-info-comment8').hide();
-                           $('#div-info-comment9').hide();
-                           $('#div-info-comment10').hide();
-                           
-                           $('#div-info-comment3').hide();
-                           $('#div-info-comment5').hide();
-                           $('#div-info-comment6').hide();
-                           $('#div-info-comment11').hide();                           
-                           
-                           $('#tip-info-comment4').html('<b>Comments (optional)</b>');
-                           $('#tip-info-comment7').html('<b>Action Items (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
-                           $('#desc-info-comment7').html('Capture actions to take a result of this conversation.');
-                           
-                           $('#tip-info-comment1').html('<b>Comments (optional)</b>');
-                           $('#tip-info-comment2').html('<b>Action Items (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
-                           $('#desc-info-comment2').html('Capture actions to take a result of this conversation.');
-                            
-                       }else if(result.topic.id == 3){
-                           
-                           
-                           $('#div-info-comment6').hide();
-                           $('#div-info-comment11').hide();
-                           
-                           $('#tip-info-comment4').html('<b>Career Goal Statement (Optional)</b>');
-                           $('#desc-info-comment4').html('Your personal vision for the future of your career.');
-                           $('#tip-info-comment7').html('<b>Strengths (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate areas of strength to build on for career advancement."> </i>');
-                           $('#desc-info-comment7').html('Identity your top 1 to 3 strengths.');
-                           $('#tip-info-comment8').html('<b>Areas for Growth (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate areas for growth in the short to medium term to assist with career advancement."> </i>');
-                           $('#desc-info-comment8').html('Identity 1 to 3 areas you\'d most like to grow.');
-                           $('#tip-info-comment9').html('<b>Additional Comments (optional)</b>');
-                           $('#tip-info-comment10').html('<b>Action Items (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
-                           $('#desc-info-comment10').html('Caputre actions to take as a result of this conversation.');
-                           
-                           $('#tip-info-comment1').html('<b>Employee Strengths (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Comment on strengths identified by employee, note additonal areas of strength as required, and provide examples where appropriate."> </i>');
-                           $('#desc-info-comment1').html('Provide feedback on strength(s) identified by employee.');
-                           $('#tip-info-comment2').html('<b>Employee Growth (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Comment on areas for growth identified by employee, note additional areas of growth as required, and provide examples where appropriate."> </i>');
-                           $('#desc-info-comment2').html('Provide feedback on area(s) for growth identified by employee.');
-                           $('#tip-info-comment3').html('<b>Additional Comments (optional)</b>');
-                           $('#tip-info-comment5').html('<b>Aciton Items (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activites and areas for further discussion. Consider creating a goal in My Goals for yourself or the Goal Bank for your employee to track progress."> </i>');
-                           $('#desc-info-comment5').html('Capture actions to take as a result of this conversation.');
-                           
-                           
-                       }else if(result.topic.id == 4){
-                           $('#div-info-comment9').hide();
-                           $('#div-info-comment10').hide();
-                           
-                           $('#div-info-comment5').hide();
-                           $('#div-info-comment6').hide();
-                           
-                           $('#tip-info-comment4').html('<b>Self Summary (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Consider accomplishments, areas for improvement, support required to succeed, etc."> </i>');
-                           $('#desc-info-comment4').html('Describe your performance since your last check-in and areas to focus on moving forward.');
-                           $('#tip-info-comment7').html('<b>Additional Comments (optional)</b>');
-                           $('#tip-info-comment8').html('<b>Action Items (optional) </b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
-                           $('#desc-info-comment8').html('Capture actions to take as a result of this conversation.');
-                           
-                           $('#tip-info-comment1').html('<b>Evaluation</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Be as specific as possible, use examples, and focus on observable behaviours and business results."> </i>');
-                           $('#desc-info-comment1').html('Provide an overall summary of performance.');
-                           $('#tip-info-comment2').html('<b>What must the employee accomplish? By when?</b>');
-                           $('#tip-info-comment3').html('<b>What support will the supervisor (and others) provide? By When?</b>');
-                           $('#tip-info-comment11').html('<b>When will a follow up meeting occur?</b>');
-                           
-                            
-                       }else if(result.topic.id == 5){
-                           $('#div-info-comment8').hide();
-                           $('#div-info-comment9').hide();
-                           $('#div-info-comment10').hide();
-                           
-                           $('#div-info-comment3').hide();
-                           $('#div-info-comment5').hide();
-                           $('#div-info-comment6').hide();
-                           $('#div-info-comment11').hide();
-                           
-                           $('#tip-info-comment4').html('<b>Comments (optional)</b>');
-                           $('#tip-info-comment7').html('<b>Action Items (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
-                           $('#desc-info-comment7').html('Capture actions to take a result of this conversation.');
-                           
-                           $('#tip-info-comment1').html('<b>Comments (optional)</b>');
-                           $('#tip-info-comment2').html('<b>Action Items (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
-                           $('#desc-info-comment2').html('Capture actions to take a result of this conversation.');
-                       }else{
-                            $('#div-info-comment1').hide();
-                            $('#div-info-comment2').hide();
-                            $('#div-info-comment3').hide();
-                            $('#div-info-comment4').hide();
-                            $('#div-info-comment5').hide();
-                            $('#div-info-comment6').hide();
-                            $('#div-info-comment7').hide();
-                            $('#div-info-comment8').hide();
-                            $('#div-info-comment9').hide();
-                            $('#div-info-comment10').hide();
-                            $('#div-info-comment11').hide();
-                       }
-                       
-
-                        //Is Locked
-                        /*
-                        if (result.is_locked) {
-                            $("#locked-message").removeClass("d-none");
-                            $("#unsignoff-form-block").hide();
-                            $("#signoff-form-block").hide();
-                        }
-                        */
-
-                        //Additional Info to Capture
-                        if (result.conversation_topic_id == 1) {
-                          $("#info_capture1").html('<span>Appreciation (optional) - supervisor to highlight what has gone well </span><i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Provide an overview of the actions or results being celebrated. Be as specific as possible about timing, activities, and outcomes achieved. Highlight behaviours, competencies, and corporate values that you feel contributed to the success." ></i>');
-                          $("#info_capture2").html('<span>Coaching (optional) - supervisor to identify areas where things could be (even) better </span><i class="fas fa-info-circle" data-toggle="popover" data-placement="right" data-trigger="click" data-content="Provide specific examples of actions, outcomes or behaviours where there is opportunity for growth. Capture information on any additional assistance or training offered to support improvement."></i>');
-                          $("#info_capture3").html('<span>Evaluation (optional) - supervisor to provide an overall summary of performance</span> <i class="fas fa-info-circle" data-toggle="popover" data-placement="right" data-trigger="click" data-content="Be as specific as possible, use examples, and focus on observable behaviours and business results"></i>');
-                        }
-                        if (result.conversation_topic_id == 3) {
-                          $('#info_capture1').html('<span>Strengths (optional) identify your top 1 to 3 strengths</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Employee to indicate areas of strength to build on for career advancement." ></i>');
-                          $('#info_capture2').html('<span>Supervisor Comments (optional) provide feedback on strength(s) identified by employee above</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Supervisor to comment on strengths identified by employee, note additional areas of strength as required, and provide examples where appropriate." ></i>');
-                          $('#info_capture3').html('<span>Areas for Growth (optional) identify 1 to 3 areas you most like to grow over the next two years</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Employee to indicate areas for growth in the short to medium term to assist with career advancement." ></i>');
-                          $('#info_capture4').html('<span>Supervisor Comments (optional) provide feedback on area(s) for growth identified by employee above</span> <i class="fas fa-info-circle"  data-toggle="popover" data-placement="right" data-trigger="click" data-content="Supervisor to comment on areas for growth identified by employee, note additional areas of growth as required, and provide examples where appropriate." ></i>');
-                        }
-                        if (result.conversation_topic_id == 4) {
-                          $("#info_capture1").html("What date will a follow up meeting occur?");
-                          $("#info_capture2").html("What must the employee accomplish? By when?");
-                          $("#info_capture3").html("What support will the supervisor (and others) provide? By when?");
-                          
-                          
-                          $('#info_comment1').prop('required',true);
-                          $('#info_comment1_edit').prop('required',true);
-                          $('#info_comment2').prop('required',true);
-                          $('#info_comment2_edit').prop('required',true);
-                          $('#info_comment3').prop('required',true);
-                          $('#info_comment3_edit').prop('required',true);
-                        }
-                        $('[data-toggle="popover"]').popover();
-                        /* result.questions?.forEach((question) => {
-                          // $('#questions-to-consider').append('<li>' + question + '</li>');
-                          $('#questions-to-consider').append(question);
-                        }); */
-                        $('#questions-to-consider').html(result.questions);
-                        $('#preparing-for-conversation').html(result.preparing_for_conversation);
-                      
-                        // result.questions
-                        $('#template-title').text(result.topic.name + ' Template');
-                        $('#template-header').text(result.topic.name);
-                        // $('#conv_participant_edit').next(".select2-container").hide();
-
-                        $('body').on('click', function (e) {
-                            $('[data-toggle=popover]').each(function () {
-                            // hide any open popovers when the anywhere else in the body is clicked
-                            if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
-                                $(this).popover('hide');
-                                }
-                            });
-                        });
-
-                        var participants = '';
-                        $.each(result.topics, function(key, value) {
-                            var selected = '';
-                            if (value.id == result.conversation_topic_id) {
-                                selected = 'selected';
-                            }
-                            $('#conv_title_edit').append('<option value="' + value.id + '" ' + selected + '>' + value.name + '</option>');
-                        });
-                        $.each(result.conversation_participants, function(key, value) {
-                            var data = {
-                                id: value.participant_id
-                                , text: value.participant.name
-                            , };
-                            var comma = ', ';
-                            if (result.conversation_participants.length == (key + 1)) {
-                                comma = '';
-                            }
-                            participants = participants + value.participant.name + comma;
-                            var newOption = new Option(value.participant.name, value.participant_id, true, true);
-                            $('#conv_participant_edit').append(newOption).trigger('change');
-                            $('#conv_participant_edit').trigger({
-                                type: 'select2:select'
-                                , params: {
-                                    data: data
-                                }
-                            });
-                        });
-                        $('#conv_participant').text(participants);
-                        //originalData = result.info_comment1+result.info_comment2+result.info_comment3+result.info_comment4+result.info_comment5+'';
-                    }
-                    , error: function(error) {
-                        var errors = error.responseJSON.errors;
-                    }
-                });
-            }
+            
+            //include detail conversation modal fill
+            @include('conversation.partials.detail-conversation-modal');
             
             function sessionWarning() {
-                if (modal_open == true) {
-                    saveComments();
-                    alert('Your comments have been autosaved.');
+                if (modal_open == true && !is_viewer) {
+                    saveComments();                                
+                    alert('You have not saved your work in 20 minutes so the PDP has auto-saved to make sure you don\'t lose any information.');
+                    after_init = 1;
+                    if(isSupervisor == 1) {   
+                        $('#info_area1').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area2').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area3').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area5').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area6').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area11').html('<span style="color:red">Comment saved</span>');
+                        
+                        var info_comment1_data = CKEDITOR.instances['info_comment1'].getData();
+                        var info_comment2_data = CKEDITOR.instances['info_comment2'].getData();
+                        var info_comment3_data = CKEDITOR.instances['info_comment3'].getData();
+                        var info_comment5_data = CKEDITOR.instances['info_comment5'].getData();
+                        var info_comment6_data = CKEDITOR.instances['info_comment6'].getData();
+                        var info_comment11_data = $('#info_comment11').val();
+                        
+                        if (db_info_comment1 != info_comment1_data) {
+                            $('#control-info-comment1').show();
+                        }
+                        if (db_info_comment2 != info_comment2_data) {
+                            $('#control-info-comment2').show();
+                        }
+                        if (db_info_comment3 != info_comment3_data) {
+                            $('#control-info-comment3').show();
+                        }
+                        if (db_info_comment5 != info_comment5_data) {
+                            $('#control-info-comment5').show();
+                        }
+                        if (db_info_comment6 != info_comment6_data) {
+                            $('#control-info-comment6').show();
+                        }
+                        if (db_info_comment11 != info_comment11_data) {
+                            $('#control-info-comment11').show();
+                        }                                                
+                    } else {
+                        $('#info_area4').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area7').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area8').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area9').html('<span style="color:red">Comment saved</span>');
+                        $('#info_area10').html('<span style="color:red">Comment saved</span>');
+                        
+                        if (db_info_comment4 != info_comment4_data) {
+                            $('#control-info-comment4').show();
+                        }
+                        if (db_info_comment7 != info_comment7_data) {
+                            $('#control-info-comment7').show();
+                        }
+                        if (db_info_comment8 != info_comment8_data) {
+                            $('#control-info-comment8').show();
+                        }
+                        if (db_info_comment9 != info_comment9_data) {
+                            $('#control-info-comment9').show();
+                        }
+                        if (db_info_comment10 != info_comment10_data) {
+                            $('#control-info-comment10').show();
+                        }
+                    }       
                 }
                 
             }            
@@ -1278,15 +827,409 @@
             });
             
             
-            const minutes = 15;
-            const SessionTime = 1000 * 60 * minutes;
-            $(document).ready(function () {                
-                const myTimeout = setTimeout(sessionWarning, SessionTime);                
+            var info_save1 = 0;
+            var info_save2 = 0;
+            var info_save3 = 0;
+            var info_save4 = 0;
+            var info_save5 = 0;
+            var info_save6 = 0;
+            var info_save7 = 0;
+            var info_save8 = 0;
+            var info_save9 = 0;
+            var info_save10 = 0;
+            var info_save11 = 0;           
+            
+                        
+            CKEDITOR.instances['info_comment1'].on('focus', function(e) {
+                   $('#info_area1').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment1').show();
+                   info_save1 = 0;
             });
+            CKEDITOR.instances['info_comment1'].on('key', function(e) { 
+                $('#info_area1').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                //$('#control-info-comment1').show();
+                info_save1 = 0;       
+            });           
+        
+            CKEDITOR.instances['info_comment1'].on('blur', function(e) {
+                if(info_save1 == 0){
+                   $('#control-info-comment1').hide();
+                }   
+            });
+            
+            $('#control-info-comment1').click(function() {
+                saveCkComment('info_comment1');
+                info_save1 = 1;
+                $('#info_area1').html('<span style="color:red">Comment saved</span>');
+                setTimeRoll();
+            }); 
+            
+            
+            CKEDITOR.instances['info_comment2'].on('focus', function(e) {
+                   $('#info_area2').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment2').show();
+                   info_save2 = 0;
+            });
+            CKEDITOR.instances['info_comment2'].on('key', function(e) { 
+                $('#info_area2').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   //$('#control-info-comment2').show();
+                   info_save2 = 0;
+            });
+            CKEDITOR.instances['info_comment2'].on('blur', function(e) {
+                if(info_save2 == 0){
+                   $('#control-info-comment2').hide();
+                }   
+            });
+            
+            $('#control-info-comment2').click(function() {
+                saveCkComment('info_comment2');
+                info_save2 = 1;
+                $('#info_area2').html('<span style="color:red">Comment saved</span>');
+                setTimeRoll();
+            }); 
+            
+            
+            CKEDITOR.instances['info_comment3'].on('focus', function(e) {
+                   $('#info_area3').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment3').show();
+                   info_save3 = 0;
+            });
+            CKEDITOR.instances['info_comment3'].on('key', function(e) { 
+                $('#info_area3').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   //$('#control-info-comment3').show();
+                   info_save3 = 0;
+            });
+            CKEDITOR.instances['info_comment3'].on('blur', function(e) {
+                if(info_save3 == 0){
+                   $('#control-info-comment3').hide();
+                }   
+            });
+            
+            $('#control-info-comment3').click(function() {
+                saveCkComment('info_comment3');
+                info_save3 = 1;
+                $('#info_area3').html('<span style="color:red">Comment saved</span>');
+                setTimeRoll();
+            }); 
+            
+            CKEDITOR.instances['info_comment4'].on('focus', function(e) {
+                   $('#info_area4').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment4').show();
+                   info_save4 = 0;
+            });
+            CKEDITOR.instances['info_comment4'].on('key', function(e) { 
+                $('#info_area4').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   //$('#control-info-comment4').show();
+                   info_save4 = 0;
+            });
+            CKEDITOR.instances['info_comment4'].on('blur', function(e) {
+                if(info_save4 == 0){
+                   $('#control-info-comment4').hide();
+                }   
+            });
+            
+            $('#control-info-comment4').click(function() {
+                saveCkComment('info_comment4');
+                info_save4 = 1;
+                $('#info_area4').html('<span style="color:red">Comment saved</span>');
+                setTimeRoll();
+            });  
+            
+            
+            
+            CKEDITOR.instances['info_comment5'].on('focus', function(e) {
+                   $('#info_area5').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment5').show();
+                   info_save5 = 0;
+            });
+            CKEDITOR.instances['info_comment5'].on('key', function(e) { 
+                $('#info_area5').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   //$('#control-info-comment5').show();
+                   info_save5 = 0;
+            });
+            CKEDITOR.instances['info_comment5'].on('blur', function(e) {
+                if(info_save5 == 0){
+                   $('#control-info-comment5').hide();
+                }   
+            });
+            
+            $('#control-info-comment5').click(function() {
+                saveCkComment('info_comment5');
+                info_save5 = 1;
+                $('#info_area5').html('<span style="color:red">Comment saved</span>');
+                setTimeRoll();
+            });  
+            
+            
+            CKEDITOR.instances['info_comment6'].on('focus', function(e) {
+                   $('#info_area6').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment6').show();
+                   info_save6 = 0;
+            });
+            CKEDITOR.instances['info_comment6'].on('key', function(e) { 
+                $('#info_area6').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   //$('#control-info-comment6').show();
+                   info_save6 = 0;
+            });
+            CKEDITOR.instances['info_comment6'].on('blur', function(e) {
+                if(info_save6 == 0){
+                   $('#control-info-comment6').hide();
+                }   
+            });
+            
+            $('#control-info-comment6').click(function() {
+                saveCkComment('info_comment6');
+                info_save6 = 1;
+                $('#info_area6').html('<span style="color:red">Comment saved</span>');
+                setTimeRoll();
+            });
+            
+            CKEDITOR.instances['info_comment7'].on('focus', function(e) {
+                   $('#info_area7').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment7').show();
+                   info_save7 = 0;
+            });
+            CKEDITOR.instances['info_comment7'].on('key', function(e) { 
+                $('#info_area7').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   //$('#control-info-comment7').show();
+                   info_save7 = 0;
+            });
+            CKEDITOR.instances['info_comment7'].on('blur', function(e) {
+                if(info_save7 == 0){
+                   $('#control-info-comment7').hide();
+                }   
+            });
+            
+            $('#control-info-comment7').click(function() {
+                saveCkComment('info_comment7');
+                info_save7 = 1;
+                $('#info_area7').html('<span style="color:red">Comment saved</span>');
+                setTimeRoll();
+            });
+            
+            CKEDITOR.instances['info_comment8'].on('focus', function(e) {
+                   $('#info_area8').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment8').show();
+                   info_save8 = 0;
+            });
+            CKEDITOR.instances['info_comment8'].on('key', function(e) { 
+                $('#info_area8').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   //$('#control-info-comment8').show();
+                   info_save8 = 0;
+            });
+            CKEDITOR.instances['info_comment8'].on('blur', function(e) {
+                if(info_save8 == 0){
+                   $('#control-info-comment8').hide();
+                }   
+            });
+            
+            $('#control-info-comment8').click(function() {
+                saveCkComment('info_comment8');
+                info_save8 = 1;
+                $('#info_area8').html('<span style="color:red">Comment saved</span>');
+                setTimeRoll();
+            });
+            
+            CKEDITOR.instances['info_comment9'].on('focus', function(e) {
+                   $('#info_area9').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment9').show();
+                   info_save9 = 0;
+            });
+            CKEDITOR.instances['info_comment9'].on('key', function(e) { 
+                $('#info_area9').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   //$('#control-info-comment9').show();
+                   info_save9 = 0;
+            });
+            CKEDITOR.instances['info_comment9'].on('blur', function(e) {
+                if(info_save9 == 0){
+                   $('#control-info-comment9').hide();
+                }   
+            });
+            
+            $('#control-info-comment9').click(function() {
+                saveCkComment('info_comment9');
+                info_save9 = 1;
+                $('#info_area9').html('<span style="color:red">Comment saved</span>');
+                setTimeRoll();
+            });
+            
+            
+            CKEDITOR.instances['info_comment10'].on('focus', function(e) {
+                   $('#info_area10').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment10').show();
+                   info_save10 = 0;
+            });
+            CKEDITOR.instances['info_comment10'].on('key', function(e) { 
+                $('#info_area10').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   //$('#control-info-comment10').show();
+                   info_save10 = 0;
+            });
+            CKEDITOR.instances['info_comment10'].on('blur', function(e) {
+                if(info_save10 == 0){
+                   $('#control-info-comment10').hide();
+                }   
+            });
+            
+            $('#control-info-comment10').click(function() {
+                saveCkComment('info_comment10');
+                info_save10 = 1;
+                $('#info_area10').html('<span style="color:red">Comment saved</span>');
+                setTimeRoll();
+            });
+            
+                        
+            $('#info_comment11').focus(function() {
+                 $('#info_area11').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                   $('#control-info-comment11').show();
+                   info_save11 = 0;
+            });
+            $('#info_comment11').blur(function() {
+                 $('#control-info-comment11').hide();
+            });
+            
+            $('#control-info-comment11').click(function() {
+                saveComment('info_comment11');
+                $('#info_area11').html('<span style="color:red">Comment saved</span>');
+                setTimeRoll();
+            });
+            
+            function saveCkComment(comment) {
+                var info_comment_data = CKEDITOR.instances[comment].getData();
+                var comments = {};
+                comments[comment] = info_comment_data;
+                
+                $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comments', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:comments
+                                }
+                            });
+
+            }
+            
+            function saveComment(comment) {
+                var info_comment_data = $('#'+comment).val();
+                var comments = {};
+                comments[comment] = info_comment_data;
+                
+                $.ajax({
+                                url: '/conversation/' + conversation_id
+                                , type: 'PUT'
+                                , data: {
+                                    _token: '{{ csrf_token() }}'
+                                    , field: 'info_comments', // e.target.getAttribute('data-name'),
+                                    //value: $("#" + $(that).data('id') + '_edit').val()
+                                    value:comments
+                                }
+                            });
+
+            }
+            
             
             function sessionWarningStop() {
                 clearTimeout(SessionTime);
             }
+            
+            
+            function setTimeRoll(){
+                const minutes = 20;
+                const SessionTime = 1000 * 60 * minutes;
+                if (myTimeout) { clearInterval(myTimeout) };
+                //const myTimeout = setTimeout(sessionWarning, SessionTime);
+                myTimeout = setInterval(function() { 
+                    if (modal_open == true) {
+                        $('#info_area1').html('');
+                        $('#info_area2').html('');
+                        $('#info_area3').html('');
+                        $('#info_area4').html('');
+                        $('#info_area5').html('');
+                        $('#info_area6').html('');
+                        $('#info_area7').html('');
+                        $('#info_area8').html('');
+                        $('#info_area9').html('');
+                        $('#info_area10').html('');
+                        $('#info_area11').html('');
+                        saveComments();                                
+                        alert('You have not saved your work in 20 minutes so the PDP has auto-saved to make sure you don\'t lose any information.');
+                        if(isSupervisor == 1) {                               
+                            var info_comment1_data = CKEDITOR.instances['info_comment1'].getData();
+                            var info_comment2_data = CKEDITOR.instances['info_comment2'].getData();
+                            var info_comment3_data = CKEDITOR.instances['info_comment3'].getData();
+                            var info_comment5_data = CKEDITOR.instances['info_comment5'].getData();
+                            var info_comment6_data = CKEDITOR.instances['info_comment6'].getData();
+                            var info_comment11_data = $('#info_comment11').val();
+
+                            if (db_info_comment1 != info_comment1_data) {
+                                $('#info_area1').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment1').show();
+                                db_info_comment1 = info_comment1_data;
+                            }
+                            if (db_info_comment2 != info_comment2_data) {
+                                $('#info_area2').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment2').show();
+                                db_info_comment2 = info_comment2_data;
+                            }
+                            if (db_info_comment3 != info_comment3_data) {
+                                $('#info_area3').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment3').show();
+                                db_info_comment3 = info_comment3_data;
+                            }
+                            if (db_info_comment5 != info_comment5_data) {
+                                $('#info_area5').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment5').show();
+                                db_info_comment5 = info_comment5_data;
+                            }
+                            if (db_info_comment6 != info_comment6_data) {
+                                $('#info_area6').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment6').show();
+                                db_info_comment6 = info_comment6_data;
+                            }
+                            if (db_info_comment11 != info_comment11_data) {
+                                $('#info_area11').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment11').show();
+                                db_info_comment11 = info_comment11_data;
+                            }                                                
+                        } else {
+                            var info_comment4_data = CKEDITOR.instances['info_comment4'].getData();
+                            var info_comment7_data = CKEDITOR.instances['info_comment7'].getData();
+                            var info_comment8_data = CKEDITOR.instances['info_comment8'].getData();
+                            var info_comment9_data = CKEDITOR.instances['info_comment9'].getData();
+                            var info_comment10_data = CKEDITOR.instances['info_comment10'].getData();                        
+                        
+                            if (db_info_comment4 != info_comment4_data) {
+                                $('#info_area4').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment4').show();
+                                db_info_comment4 = info_comment4_data;
+                            }
+                            if (db_info_comment7 != info_comment7_data) {
+                                $('#info_area7').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment7').show();
+                                db_info_comment7 = info_comment7_data;
+                            }
+                            if (db_info_comment8 != info_comment8_data) {
+                                $('#info_area8').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment8').show();
+                                db_info_comment8 = info_comment8_data;
+                            }
+                            if (db_info_comment9 != info_comment9_data) {
+                                $('#info_area9').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment9').show();
+                                db_info_comment9 = info_comment9_data;
+                            }
+                            if (db_info_comment10 != info_comment10_data) {
+                                $('#info_area10').html('<span style="color:red">Comment saved</span>');
+                                $('#control-info-comment10').show();
+                                db_info_comment10 = info_comment10_data;
+                            }
+                        }       
+                    }    
+                }, SessionTime);                
+            }
+            
         </script>
 
 @isset($open_modal_id)
@@ -1295,7 +1238,7 @@
             $(function() {
                 conversation_id = {{ $open_modal_id }};
                 updateConversation(conversation_id);
-                $('#viewConversationModal').modal('show');
+                $('#viewConversationModal').modal('show');                
             });
 
             
