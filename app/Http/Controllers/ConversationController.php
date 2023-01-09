@@ -172,82 +172,8 @@ class ConversationController extends Controller
                         
             
         } else { // Upcoming
-            $conversations = $query->where(function($query) use ($authId, $supervisorId, $viewType) {
-                $query->where('user_id', $authId)->
-                    orWhereHas('conversationParticipants', function($query) use ($authId, $supervisorId, $viewType) {
-                        $query->where('participant_id', $authId);
-                    });
-            })->where(function($query) {
-                $query->where(function($query) {
-                    $query->whereNull('signoff_user_id')
-                        ->orWhereNull('supervisor_signoff_id');
-                });
-                // ->orWhere(function($query) {
-                //     $query->whereNotNull('signoff_user_id')
-                //           ->whereNotNull('supervisor_signoff_id')
-                //           ->whereDate('unlock_until', '>=', Carbon::today() );
-                // });
-            });
-            if ($request->has('user_id') && $request->user_id) {
-                $user_id = $request->user_id;
-                $query->where(function($query) use($user_id) {
-                    $query->where('user_id', $user_id)->
-                        orWhereHas('conversationParticipants', function($query) use ($user_id) {
-                            $query->where('participant_id', $user_id);
-                            return $query;
-                        });
-                });
-            }
-
-            if ($request->has('user_name') && $request->user_name) {
-                $user_name = $request->user_name;
-                $query->where(function ($query) use ($user_name) {
-                    $query->whereHas('user', function ($query) use ($user_name) {
-                        $query->where('name', 'like', "%$user_name%");
-                    })
-                    ->orWhereHas('conversationParticipants', function($query) use ($user_name) {
-                        $query->whereHas('participant', function($query) use ($user_name) {
-                            $query->where('name', 'like', "%$user_name%");
-                        });
-                    });
-                });
-            }
-            
-            if ($request->has('conversation_topic_id') && $request->conversation_topic_id) {
-                $query->where('conversation_topic_id', $request->conversation_topic_id);
-            }
-            $myTeamQuery = clone $query;
-
-            // get Conversations with My Team 
-            $myTeamQuery->where(function ($query) use($supervisorId) {
-                $query->whereDoesntHave('conversationParticipants', function ($query) use ($supervisorId) {
-                    $query->where('participant_id', $supervisorId);
-                });
-                $query->where('user_id', '<>', $supervisorId);
-            });
-            
-            // get Conversations with my supervisor
-            $sharedSupervisorIds = SharedProfile::where('shared_id', Auth::id())->with('sharedWithUser')->get()->pluck('shared_with')->toArray();
-            array_push($sharedSupervisorIds, $supervisorId);
-            foreach ($supervisor_ids as $supervisor_id) {
-                if (!in_array($supervisor_id, $sharedSupervisorIds)) {
-                    array_push($sharedSupervisorIds, $supervisor_id);
-                }
-            }
-            
-            $query->where(function($query) use ($sharedSupervisorIds) {
-                $query->whereIn('user_id', $sharedSupervisorIds)->
-                orWhereHas('conversationParticipants', function ($query) use ($sharedSupervisorIds) {
-                    $query->whereIn('participant_id', $sharedSupervisorIds);
-                });
-            });
-            
-
-            $conversations = $query->orderBy('id', 'DESC')->paginate(10);            
-            $myTeamConversations = $myTeamQuery->orderBy('id', 'DESC')->paginate(10);
-            
             //conversations with my supervisor
-            $conversations = DB::select("SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as last_sign_off_date, conversations.unlock_until, conversation_topics.name, empusers.name as empname, mgrusers.name as mgrname 
+            $sup_query = "SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as last_sign_off_date, conversations.unlock_until, conversation_topics.name, empusers.name as empname, mgrusers.name as mgrname 
                                     FROM conversations 
                                     INNER JOIN conversation_topics  ON conversations.conversation_topic_id = conversation_topics.id
                                     LEFT JOIN conversation_participants emp_participants ON conversations.id = emp_participants.conversation_id AND emp_participants.role = 'emp'
@@ -256,13 +182,21 @@ class ConversationController extends Controller
                                     INNER JOIN users mgrusers ON mgrusers.id = mgr_participants.participant_id
                                     WHERE (emp_participants.participant_id = $authId)
                                     AND `conversations`.`deleted_at` is null
-                                    and 
-                                    ((`signoff_user_id` is null or `supervisor_signoff_id` is null))
-                                    order by conversations.id desc");
+                                    AND 
+                                    ((`signoff_user_id` is null or `supervisor_signoff_id` is null))";
+            
+            if ($request->has('conversation_topic_id') && $request->conversation_topic_id) {
+                $sup_query .= " AND conversations.conversation_topic_id = '.$request->conversation_topic_id.'"; 
+            }
+            if ($request->has('user_name') && $request->user_name) {
+                $sup_query .= " AND (empusers.name LIKE '%.$request->user_name.%' OR mgrusers.name LIKE '%.$request->user_name.%')"; 
+            }
+            $sup_query .= " ORDER BY conversations.id DESC";
+            $conversations = DB::select($sup_query);
             
             
             //conversations with my team
-            $myTeamConversations = DB::select("SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as last_sign_off_date,conversations.unlock_until, conversation_topics.name, empusers.name as empname, mgrusers.name as mgrname 
+            $emp_query = "SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as last_sign_off_date,conversations.unlock_until, conversation_topics.name, empusers.name as empname, mgrusers.name as mgrname 
                                     FROM conversations 
                                     INNER JOIN conversation_topics  ON conversations.conversation_topic_id = conversation_topics.id
                                     LEFT JOIN conversation_participants emp_participants ON conversations.id = emp_participants.conversation_id AND emp_participants.role = 'emp'
@@ -272,8 +206,15 @@ class ConversationController extends Controller
                                     WHERE (mgr_participants.participant_id = $authId)
                                     AND `conversations`.`deleted_at` is null
                                     and 
-                                    ((`signoff_user_id` is null or `supervisor_signoff_id` is null))
-                                    order by conversations.id desc");
+                                    ((`signoff_user_id` is null or `supervisor_signoff_id` is null))";
+            if ($request->has('conversation_topic_id') && $request->conversation_topic_id) {
+                $emp_query .= " AND conversations.conversation_topic_id = '.$request->conversation_topic_id.'"; 
+            }
+            if ($request->has('user_name') && $request->user_name) {
+                $emp_query .= " AND (empusers.name LIKE '%.$request->user_name.%' OR mgrusers.name LIKE '%.$request->user_name.%')"; 
+            }
+            $sup_query .= " ORDER BY conversations.id DESC";
+            $myTeamConversations = DB::select($emp_query);
             
         }
         
