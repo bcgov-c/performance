@@ -527,8 +527,8 @@ class EmployeeListController extends Controller
 
     protected function search_criteria_list() {
         return [
-            'u.employee_id' => 'Employee ID', 
             'u.employee_name'=> 'Name',
+            'u.employee_id' => 'Employee ID', 
             'u.employee_email' => 'Email', 
             'u.position_number' => 'Position #',
             'u.reporting_to_name' => 'Reports To Name',
