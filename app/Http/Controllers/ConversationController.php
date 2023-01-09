@@ -45,8 +45,6 @@ class ConversationController extends Controller
                                     ->join('conversations', 'conversation_participants.conversation_id', '=', 'conversations.id')
                                     ->where('conversation_participants.participant_id', '=', $authId)
                                     ->whereNull('conversations.deleted_at')
-                                    ->whereNull('conversations.sign_off_time')
-                                    ->whereNull('conversations.supervisor_signoff_time')
                                     ->distinct()
                                     ->get();
         $consersation_ids = array();
@@ -171,6 +169,8 @@ class ConversationController extends Controller
 
             $conversations = $query->orderBy('id', 'DESC')->paginate(10);                       
             $myTeamConversations = $myTeamQuery->orderBy('id', 'DESC')->paginate(10);
+                        
+            
         } else { // Upcoming
             $conversations = $query->where(function($query) use ($authId, $supervisorId, $viewType) {
                 $query->where('user_id', $authId)->
@@ -243,8 +243,37 @@ class ConversationController extends Controller
             });
             
 
-            $conversations = $query->orderBy('id', 'DESC')->paginate(10);
+            $conversations = $query->orderBy('id', 'DESC')->paginate(10);            
             $myTeamConversations = $myTeamQuery->orderBy('id', 'DESC')->paginate(10);
+            
+            //conversations with my supervisor
+            $conversations = DB::select("SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as last_sign_off_date, conversations.unlock_until, conversation_topics.name, empusers.name as empname, mgrusers.name as mgrname 
+                                    FROM conversations 
+                                    INNER JOIN conversation_topics  ON conversations.conversation_topic_id = conversation_topics.id
+                                    LEFT JOIN conversation_participants emp_participants ON conversations.id = emp_participants.conversation_id AND emp_participants.role = 'emp'
+                                    LEFT JOIN conversation_participants mgr_participants ON conversations.id = mgr_participants.conversation_id AND mgr_participants.role = 'mgr'
+                                    INNER JOIN users empusers ON empusers.id = emp_participants.participant_id
+                                    INNER JOIN users mgrusers ON mgrusers.id = mgr_participants.participant_id
+                                    WHERE (emp_participants.participant_id = $authId)
+                                    AND `conversations`.`deleted_at` is null
+                                    and 
+                                    ((`signoff_user_id` is null or `supervisor_signoff_id` is null))
+                                    order by conversations.id desc");
+            
+            
+            //conversations with my team
+            $myTeamConversations = DB::select("SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as last_sign_off_date,conversations.unlock_until, conversation_topics.name, empusers.name as empname, mgrusers.name as mgrname 
+                                    FROM conversations 
+                                    INNER JOIN conversation_topics  ON conversations.conversation_topic_id = conversation_topics.id
+                                    LEFT JOIN conversation_participants emp_participants ON conversations.id = emp_participants.conversation_id AND emp_participants.role = 'emp'
+                                    LEFT JOIN conversation_participants mgr_participants ON conversations.id = mgr_participants.conversation_id AND mgr_participants.role = 'mgr'
+                                    INNER JOIN users empusers ON empusers.id = emp_participants.participant_id
+                                    INNER JOIN users mgrusers ON mgrusers.id = mgr_participants.participant_id
+                                    WHERE (mgr_participants.participant_id = $authId)
+                                    AND `conversations`.`deleted_at` is null
+                                    and 
+                                    ((`signoff_user_id` is null or `supervisor_signoff_id` is null))
+                                    order by conversations.id desc");
             
         }
         
