@@ -86,11 +86,11 @@ class SetNextLevelManager extends Command
                         if ($reporting_to) {
                             $user->reportingTos()->updateOrCreate([ 'reporting_to_id' => $reporting_to, ]);
                         }
-                        $this->info('User '.$demo->employee_id.' - '.$demo->employee_name.' updated Manager to '.$reporting_to.'.');
+                        $this->info('EID '.$demo->employee_id.' - '.$demo->employee_name.' updated Manager to UID '.$reporting_to.'.');
                         $updatecounter += 1;
                     }
                 } else {
-                    $this->info('User '.$demo->employee_id.' - '.$demo->employee_name.' not found by guid.');
+                    $this->info('EID '.$demo->employee_id.' - '.$demo->employee_name.' not found by guid.');
                 }
                 $counter += 1;
                 echo 'Processed '.$counter.'.  Updated '.$updatecounter.'.'; echo "\r";
