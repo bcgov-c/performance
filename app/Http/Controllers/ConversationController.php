@@ -186,14 +186,14 @@ class ConversationController extends Controller
                                     ((`signoff_user_id` is null or `supervisor_signoff_id` is null))";
             
             if ($request->has('conversation_topic_id') && $request->conversation_topic_id) {
-                $sup_query .= " AND conversations.conversation_topic_id = '.$request->conversation_topic_id.'"; 
+                $sup_query .= " AND conversations.conversation_topic_id = $request->conversation_topic_id"; 
             }
             if ($request->has('user_name') && $request->user_name) {
-                $sup_query .= " AND (empusers.name LIKE '%.$request->user_name.%' OR mgrusers.name LIKE '%.$request->user_name.%')"; 
+                $sup_query .= " AND (empusers.name LIKE '%$request->user_name%' OR mgrusers.name LIKE '%$request->user_name%')"; 
             }
             $sup_query .= " ORDER BY conversations.id DESC";
             $conversations = DB::select($sup_query);
-            
+            error_log($sup_query);
             
             //conversations with my team
             $emp_query = "SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as last_sign_off_date,conversations.unlock_until, conversation_topics.name, empusers.name as empname, mgrusers.name as mgrname 
@@ -208,12 +208,12 @@ class ConversationController extends Controller
                                     and 
                                     ((`signoff_user_id` is null or `supervisor_signoff_id` is null))";
             if ($request->has('conversation_topic_id') && $request->conversation_topic_id) {
-                $emp_query .= " AND conversations.conversation_topic_id = '.$request->conversation_topic_id.'"; 
+                $emp_query .= " AND conversations.conversation_topic_id = $request->conversation_topic_id"; 
             }
             if ($request->has('user_name') && $request->user_name) {
-                $emp_query .= " AND (empusers.name LIKE '%.$request->user_name.%' OR mgrusers.name LIKE '%.$request->user_name.%')"; 
+                $emp_query .= " AND (empusers.name LIKE '%$request->user_name%' OR mgrusers.name LIKE '%$request->user_name%')"; 
             }
-            $sup_query .= " ORDER BY conversations.id DESC";
+            $emp_query .= " ORDER BY conversations.id DESC";
             $myTeamConversations = DB::select($emp_query);
             
         }
