@@ -175,9 +175,7 @@
             @endif
             @endif
         </div>
-        <div class="float-right text-right">
-            {{ $conversations->links() }}
-        </div>
+        <div class="float-right text-right">       </div>
     </div>
 
     @include('conversation.partials.view-conversation-modal')
