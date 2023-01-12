@@ -48,11 +48,9 @@ class UpdateGUIDByEmployeeId extends Command
     {
         $processname = 'UpdateGUIDByEmployeeId';
         $DefaultCreatorName = 'System';
-
         $start_time = Carbon::now()->format('c');
         $this->info( $processname.', Started: '. $start_time);
         Log::info($start_time.' - '.$processname.' - Started.');
-
         $job_name = 'command:UpdateGUIDByEmployeeId';
         $status = 'Initiated';
         $audit_id = JobSchedAudit::insertGetId(
@@ -62,48 +60,43 @@ class UpdateGUIDByEmployeeId extends Command
             'status' => $status
           ]
         );
-
         //Process users with new GUID in employee_demo table;
         $counter = 0;
         $updatecounter = 0;
-
-        User::select('id')
+        $userList = User::select('id')
         ->whereRaw("EXISTS (SELECT 1 FROM employee_demo WHERE employee_demo.employee_id = users.employee_id and employee_demo.guid <> users.guid AND NOT employee_demo.guid IS NULL AND TRIM(employee_demo.guid) <> '' AND employee_demo.date_updated = (SELECT MAX(ed.date_updated) FROM employee_demo ed WHERE ed.employee_id = employee_demo.employee_id))")
         ->distinct()
         ->orderBy('users.employee_id')
-        ->orderBy('users.empl_record')
-        ->chunk(100, function($userList) use (&$counter, &$updatecounter, $audit_id) {
-            foreach ($userList as $item) {
-                DB::beginTransaction();
-                try {
-                    $update = User::select('id', 'employee_id', 'guid')
-                    ->find($item->id);
-                    $demo = EmployeeDemo::select('guid')
-                    ->whereRaw("employee_id = '".$update->employee_id."' AND NOT guid IS NULL AND TRIM(guid) <> ''")
-                    ->orderBy('date_updated', 'desc')
-                    ->first();
-                    $old_guid = $update->guid;
-                    $new_guid = $demo->guid;
-                    $update->guid = $new_guid;
-                    $update->save(); 
-                    $old_values = [ 'guid' => $old_guid ];
-                    $new_values = [ 'guid' => $new_guid ];
-                    $audit = new JobDataAudit;
-                    $audit->job_sched_id = $audit_id;
-                    $audit->old_values = json_encode($old_values);
-                    $audit->new_values = json_encode($new_values);
-                    $audit->save();
-                    DB::commit();
-                    $updatecounter += 1;
-                    echo 'Processed UID '.$item->id.'. Updated GUID '.$old_guid.' to '.$new_guid.'.'; echo "\r\n";
-                } catch (Exception $e) {
-                    echo 'Unable to update UID '.$item->id.' from '.$old_guid.' to '.$new_guid.'.'; echo "\r\n";
-                    DB::rollback();
-                }
-                $counter += 1;
+        ->orderBy('users.empl_record');
+        foreach ($userList as $item) {
+            DB::beginTransaction();
+            try {
+                $update = User::select('id', 'employee_id', 'guid')
+                ->find($item->id);
+                $demo = EmployeeDemo::select('guid')
+                ->whereRaw("employee_id = '".$update->employee_id."' AND NOT guid IS NULL AND TRIM(guid) <> ''")
+                ->orderBy('date_updated', 'desc')
+                ->first();
+                $old_guid = $update->guid;
+                $new_guid = $demo->guid;
+                $update->guid = $new_guid;
+                $update->save(); 
+                $old_values = [ 'guid' => $old_guid ];
+                $new_values = [ 'guid' => $new_guid ];
+                $audit = new JobDataAudit;
+                $audit->job_sched_id = $audit_id;
+                $audit->old_values = json_encode($old_values);
+                $audit->new_values = json_encode($new_values);
+                $audit->save();
+                DB::commit();
+                $updatecounter += 1;
+                echo 'Processed UID '.$item->id.'. Updated GUID '.$old_guid.' to '.$new_guid.'.'; echo "\r\n";
+            } catch (Exception $e) {
+                echo 'Unable to update UID '.$item->id.' from '.$old_guid.' to '.$new_guid.'.'; echo "\r\n";
+                DB::rollback();
             }
-        });
-
+            $counter += 1;
+        }
         echo 'Processed '.$counter.'.  Updated '.$updatecounter.'.'; echo "\r\n";
         $end_time = Carbon::now();
         DB::table('job_sched_audit')->updateOrInsert(
@@ -121,5 +114,4 @@ class UpdateGUIDByEmployeeId extends Command
         $this->info('CalcNextConversationDate, Completed: '.$end_time);
         Log::info($end_time->format('c').' - '.$processname.' - Finished');
     } 
-
 }
