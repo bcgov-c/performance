@@ -46,7 +46,7 @@ class Kernel extends ConsoleKernel
         ->dailyAt('00:25')
         ->appendOutputTo(storage_path('logs/SyncUserProfile.log'));
 
-        $schedule->command('command:SetNextLevelManager')
+        $schedule->command('command:UpdateGUIDByEmployeeId')
         ->timezone('America/Vancouver')
         ->dailyAt('00:45');
 
