@@ -63,12 +63,12 @@ class UpdateGUIDByEmployeeId extends Command
         //Process users with new GUID in employee_demo table;
         $counter = 0;
         $updatecounter = 0;
-        $userList = User::withoutGlobalScopes()
-        ->select('id')
+        $userList = User::select('id')
         ->whereRaw("EXISTS (SELECT 1 FROM employee_demo WHERE employee_demo.employee_id = users.employee_id and employee_demo.guid <> users.guid AND NOT employee_demo.guid IS NULL AND TRIM(employee_demo.guid) <> '' AND employee_demo.date_updated = (SELECT MAX(ed.date_updated) FROM employee_demo ed WHERE ed.employee_id = employee_demo.employee_id))")
         ->distinct()
         ->orderBy('users.employee_id')
-        ->orderBy('users.empl_record');
+        ->orderBy('users.empl_record')
+        ->get();
         foreach ($userList as $item) {
             DB::beginTransaction();
             try {
