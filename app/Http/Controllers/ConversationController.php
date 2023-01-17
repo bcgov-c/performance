@@ -76,6 +76,20 @@ class ConversationController extends Controller
         foreach($history_teams as $history_team){
             $team_ids[] = $history_team->participant_id;
         }
+        
+        
+        //get current team members
+        $team_query = "SELECT users.id as id FROM performance.users 
+                        where users.reporting_to = $authId
+                        UNION
+                        select shared_profiles.shared_id as id FROM shared_profiles
+                        WHERE shared_with = $authId";
+        $myCurrentTeam = DB::select($team_query);
+        $myCurrentTeam_array = array();
+        foreach($myCurrentTeam as $item){
+            $myCurrentTeam_array[] = $item->id;
+        }
+        $myCurrentTeam_list = implode( ',', $myCurrentTeam_array );
                 
         $type = 'upcoming';
         if ($request->is('conversation/past') || $request->is('my-team/conversations/past')) {
@@ -155,22 +169,20 @@ class ConversationController extends Controller
             
              // With My Team
              if ($sharedSupervisorIds && $sharedSupervisorIds[0]) {
-                $myTeamQuery->where(function($query) use ($sharedSupervisorIds) {
+                $myTeamQuery->where(function($query) use ($sharedSupervisorIds,$myCurrentTeam_array) {
                     $query->whereNotIn('user_id', $sharedSupervisorIds)->
-                    orWhereHas('conversationParticipants', function ($query) use ($sharedSupervisorIds) {
-                        $query->whereNotIn('participant_id', $sharedSupervisorIds);
+                    orWhereHas('conversationParticipants', function ($query) use ($myCurrentTeam_array ) {
+                        $query->whereIn('participant_id', $myCurrentTeam_array);
                     });
                 });
             
-                $myTeamQuery->whereNotIn('user_id', $sharedSupervisorIds);
+                
             }
-            $myTeamQuery->where('signoff_user_id','<>', $authId); 
+            $myTeamQuery->where('signoff_user_id','<>', $authId);
             $type = 'past';
 
             $conversations = $query->orderBy('id', 'DESC')->paginate(10);                       
             $myTeamConversations = $myTeamQuery->orderBy('id', 'DESC')->paginate(10);
-                        
-            
         } else { // Upcoming
             //conversations with my supervisor
             $sup_query = "SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as last_sign_off_date, conversations.unlock_until, conversation_topics.name, empusers.name as empname, mgrusers.name as mgrname 
@@ -193,15 +205,14 @@ class ConversationController extends Controller
             }
             $sup_query .= " ORDER BY conversations.id DESC";
             $conversations = DB::select($sup_query);
-            error_log($sup_query);
-            
-            //conversations with my team
+                        
+            //conversations with my team            
             $emp_query = "SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as last_sign_off_date,conversations.unlock_until, conversation_topics.name, empusers.name as empname, mgrusers.name as mgrname 
                                     FROM conversations 
                                     INNER JOIN conversation_topics  ON conversations.conversation_topic_id = conversation_topics.id
                                     LEFT JOIN conversation_participants emp_participants ON conversations.id = emp_participants.conversation_id AND emp_participants.role = 'emp'
                                     LEFT JOIN conversation_participants mgr_participants ON conversations.id = mgr_participants.conversation_id AND mgr_participants.role = 'mgr'
-                                    INNER JOIN users empusers ON empusers.id = emp_participants.participant_id
+                                    INNER JOIN users empusers ON empusers.id = emp_participants.participant_id AND emp_participants.participant_id IN ($myCurrentTeam_list)
                                     INNER JOIN users mgrusers ON mgrusers.id = mgr_participants.participant_id
                                     WHERE (mgr_participants.participant_id = $authId)
                                     AND `conversations`.`deleted_at` is null
