@@ -309,11 +309,7 @@ class CalcNextConversationDate extends Command
                                     $usedate1 = $initLastConversationDate;
                                 }
                                 $currDate = Carbon::now()->toDateString();
-                                if ($currDate > $initNextConversationDate) {
-                                    $usedate2 = $currDate;
-                                } else {
-                                    $usedate2 = $initNextConversationDate;
-                                }
+                                $usedate2 = $currDate;
                                 if ($usedate1 != $usedate2 && $usedate2 > $initLastConversationDate) {
                                     $calcDays = abs(Carbon::parse($usedate2)->diffInDays($usedate1));
                                 } else {
@@ -331,6 +327,7 @@ class CalcNextConversationDate extends Command
                             if ($newEndDate > $initNextConversationDate) {
                                 $initNextConversationDate = $newEndDate;
                             }
+                            echo $demo->employee_id.': Next Conversation Date = '.$initNextConversationDate; echo "\r\n";
                         }
                     } else {
                         // NO Previous JR record exist, store details to junior table
