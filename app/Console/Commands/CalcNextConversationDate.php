@@ -391,7 +391,7 @@ class CalcNextConversationDate extends Command
                             'current_employee_status' => $demo->employee_status, 
                             'current_classification' => $demo->jobcode, 
                             'current_classification_descr' => $demo->jobcode_desc, 
-                            'current_manual_excuse' => $demo->$demo->excused_flag ? 'Y' : 'N', 
+                            'current_manual_excuse' => $demo->excused_flag ? 'Y' : 'N', 
                             'due_date_paused' => in_array($changeType, $excusedArrayTypes) ? 'Y' : 'N', 
                             'last_employee_status' => $new_last_employee_status, 
                             'last_classification' => $new_last_classification, 
