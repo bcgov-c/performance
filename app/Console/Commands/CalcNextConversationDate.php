@@ -268,14 +268,18 @@ class CalcNextConversationDate extends Command
                                 } else {
                                     if ($prevPause == 'Y' && $oneDay->due_date_paused == 'N') {
                                         $calcDays = 0;
-                                        $currDate = Carbon::parse($oneDay->created_at->toDateString());
+                                        $calcDate = Carbon::parse($oneDay->created_at->toDateString());
+                                        $currDate = Carbon::now()->toDateString();
                                         if ($prevDate > $initLastConversationDate) {
                                                 $usedate1 = $prevDate;
                                         } else {
                                             $usedate1 = $initLastConversationDate;
                                         }
-                                        if ($currDate > $initNextConversationDate) {
-                                            $usedate2 = $currDate;
+                                        if ($calcDate > $currDate) {
+                                            $calcDate = $currDate
+                                        }
+                                        if ($calcDate > $initNextConversationDate) {
+                                            $usedate2 = $calcDate;
                                         } else {
                                             $usedate2 = $initNextConversationDate;
                                         }
