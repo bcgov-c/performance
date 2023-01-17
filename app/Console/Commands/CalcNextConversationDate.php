@@ -274,8 +274,11 @@ class CalcNextConversationDate extends Command
                                         } else {
                                             $usedate1 = $initLastConversationDate;
                                         }
-                                        if ($currDate > $initNextConversationDate) {
-                                            $usedate2 = $currDate;
+                                        if ($calcDate > $currDate) {
+                                            $calcDate = $currDate;
+                                        }
+                                        if ($calcDate > $initNextConversationDate) {
+                                            $usedate2 = $calcDate;
                                         } else {
                                             $usedate2 = $initNextConversationDate;
                                         }
