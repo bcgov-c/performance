@@ -82,8 +82,14 @@ class UpdateGUIDByEmployeeId extends Command
                 $new_guid = $demo->guid;
                 $update->guid = $new_guid;
                 $update->save(); 
-                $old_values = [ 'guid' => $old_guid ];
-                $new_values = [ 'guid' => $new_guid ];
+                $old_values = [ 
+                    'table' => 'users', 
+                    'guid' => $old_guid 
+                ];
+                $new_values = [ 
+                    'table' => 'users', 
+                    'guid' => $new_guid 
+                ];
                 $audit = new JobDataAudit;
                 $audit->job_sched_id = $audit_id;
                 $audit->old_values = json_encode($old_values);
