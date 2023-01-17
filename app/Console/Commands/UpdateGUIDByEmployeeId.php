@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\EmployeeDemo;
+use App\Models\EmployeeDemoJunior;
 use App\Models\JobSchedAudit;
 use App\Models\JobDataAudit;
 use Illuminate\Console\Command;
@@ -80,6 +81,8 @@ class UpdateGUIDByEmployeeId extends Command
                 ->first();
                 $old_guid = $update->guid;
                 $new_guid = $demo->guid;
+                $jr = EmployeeDemoJunior::whereRaw("guid = '".$old_guid."' AND NOT guid IS NULL AND TRIM(guid) <> ''")
+                ->update(['guid' => $new_guid]);
                 $update->guid = $new_guid;
                 $update->save(); 
                 $old_values = [ 
