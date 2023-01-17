@@ -10,6 +10,7 @@ use App\Models\ExcusedReason;
 use App\Models\EmployeeDemoJunior;
 use App\Models\ExcusedClassification;
 use App\Models\JobSchedAudit;
+use App\Models\JobDataAudit;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -106,7 +107,7 @@ class CalcNextConversationDate extends Command
         ->distinct()
         ->orderBy('employee_demo.employee_id')
         ->orderBy('employee_demo.empl_record')
-        ->chunk(1000, function($employeeDemo) use (&$counter, &$updatecounter, $ClassificationArray, $DefaultCreatorName) {
+        ->chunk(1000, function($employeeDemo) use (&$counter, &$updatecounter, $ClassificationArray, $DefaultCreatorName, $audit_id) {
             foreach ($employeeDemo as $demo) {
                 $changeType = 'noChange';
                 $new_last_employee_status = null;
@@ -381,6 +382,35 @@ class CalcNextConversationDate extends Command
                         }
                         $newJr->save();
                         $updatecounter += 1;
+                        $old_values = [ 
+                            'table' => 'employee_demo_jr'
+                        ];
+                        $new_values = [ 
+                            'table' => 'employee_demo_jr', 
+                            'guid' => $demo->guid, 
+                            'current_employee_status' => $demo->employee_status, 
+                            'current_classification' => $demo->jobcode, 
+                            'current_classification_descr' => $demo->jobcode_desc, 
+                            'current_manual_excuse' => $demo->$demo->excused_flag ? 'Y' : 'N', 
+                            'due_date_paused' => in_array($changeType, $excusedArrayTypes) ? 'Y' : 'N', 
+                            'last_employee_status' => $new_last_employee_status, 
+                            'last_classification' => $new_last_classification, 
+                            'last_classification_descr' => $new_last_classification_descr, 
+                            'last_manual_excuse' => $new_last_manual_excuse, 
+                            'excused_type' => $excuseType, 
+                            'last_conversation_date' => $lastConversationDate ? Carbon::parse($lastConversationDate) : null, 
+                            'next_conversation_date' => $initNextConversationDate ? Carbon::parse($initNextConversationDate) : null, 
+                            'created_by_id' => $DefaultCreatorName, 
+                            'updated_by_id' => $excused_updated_by ?? $DefaultCreatorName, 
+                            'excused_reason_id' => $excused_reason_id, 
+                            'excused_reason_desc' => $excused_reason_desc, 
+                            'updated_at' => $excused_updated_at ? $excused_updated_at : null
+                        ];
+                        $audit = new JobDataAudit;
+                        $audit->job_sched_id = $audit_id;
+                        $audit->old_values = json_encode($old_values);
+                        $audit->new_values = json_encode($new_values);
+                        $audit->save();
                         echo 'GUID '.$newJr->guid.'.  $changeType '.$changeType.'.  EMPLID '.$demo->employee_id.'.'; echo "\r\n";
                     } else {
                         if ($jr && $jr->next_conversation_date && $initNextConversationDate && $jr->next_conversation_date <> $initNextConversationDate) {
@@ -407,7 +437,37 @@ class CalcNextConversationDate extends Command
                             $newJr->updated_at = $jr->updated_at;
                             $newJr->save();
                             $updatecounter += 1;
-                            echo 'GUID '.$newJr->guid.'.  $changeType updateDueDate.  EMPLID '.$demo->employee_id.'.  oldDueDate '.$jr->next_conversation_date.'.  newDueDate '.$initNextConversationDate.'.  '; echo "\r\n";
+                            $old_values = [ 
+                                'table' => 'employee_demo_jr'
+                            ];
+                            $new_values = [ 
+                                'table' => 'employee_demo_jr', 
+                                'guid' => $jr->guid, 
+                                'current_employee_status' => $jr->current_employee_status, 
+                                'current_classification' => $jr->current_classification, 
+                                'current_classification_descr' => $jr->current_classification_descr, 
+                                'current_manual_excuse' => $jr->current_manual_excuse, 
+                                'due_date_paused' => $jr->due_date_paused, 
+                                'last_employee_status' => $jr->last_employee_status, 
+                                'last_classification' => $jr->last_classification, 
+                                'last_classification_descr' => $jr->last_classification_descr, 
+                                'last_manual_excuse' => $jr->last_manual_excuse, 
+                                'excused_type' => $jr->excused_type, 
+                                'last_conversation_date' => $jr->last_conversation_date, 
+                                'next_conversation_date' => $initNextConversationDate ? Carbon::parse($initNextConversationDate) : null, 
+                                'created_by_id' => $jr->created_by_id, 
+                                'updated_by_id' => $jr->updated_by_id, 
+                                'excused_reason_id' => $jr->excused_reason_id, 
+                                'excused_reason_desc' => $jr->excused_reason_desc, 
+                                'created_at' => $jr->created_at,
+                                'updated_at' => $jr->updated_at
+                            ];
+                            $audit = new JobDataAudit;
+                            $audit->job_sched_id = $audit_id;
+                            $audit->old_values = json_encode($old_values);
+                            $audit->new_values = json_encode($new_values);
+                            $audit->save();
+                                echo 'GUID '.$newJr->guid.'.  $changeType updateDueDate.  EMPLID '.$demo->employee_id.'.  oldDueDate '.$jr->next_conversation_date.'.  newDueDate '.$initNextConversationDate.'.  '; echo "\r\n";
                         } else {
                             // SKIP if no change
                         }
