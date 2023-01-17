@@ -328,7 +328,6 @@ class CalcNextConversationDate extends Command
                             if ($newEndDate > $initNextConversationDate) {
                                 $initNextConversationDate = $newEndDate;
                             }
-                            echo $demo->employee_id.': Next Conversation Date = '.$initNextConversationDate; echo "\r\n";
                         }
                     } else {
                         // NO Previous JR record exist, store details to junior table
