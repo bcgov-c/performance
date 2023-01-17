@@ -275,9 +275,9 @@ class CalcNextConversationDate extends Command
                                             $usedate1 = $initLastConversationDate;
                                         }
                                         if ($currDate > $initNextConversationDate) {
-                                            $usedate2 = $initNextConversationDate;
-                                        } else {
                                             $usedate2 = $currDate;
+                                        } else {
+                                            $usedate2 = $initNextConversationDate;
                                         }
                                         if ($usedate1 != $usedate2 && $usedate2 > $initLastConversationDate) {
                                             $calcDays = abs(Carbon::parse($usedate2)->diffInDays($usedate1));
@@ -307,9 +307,9 @@ class CalcNextConversationDate extends Command
                                 }
                                 $currDate = Carbon::now()->toDateString();
                                 if ($currDate > $initNextConversationDate) {
-                                    $usedate2 = $initNextConversationDate;
-                                } else {
                                     $usedate2 = $currDate;
+                                } else {
+                                    $usedate2 = $initNextConversationDate;
                                 }
                                 if ($usedate1 != $usedate2 && $usedate2 > $initLastConversationDate) {
                                     $calcDays = abs(Carbon::parse($usedate2)->diffInDays($usedate1));
