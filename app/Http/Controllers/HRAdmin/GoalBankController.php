@@ -1092,7 +1092,7 @@ class GoalBankController extends Controller
 
     public function updategoal(Request $request) 
     {
-        $selected_org_nodes = $request->orgCheck ? $request->orgCheck : [];
+        $selected_org_nodes = $request->eorgCheck ? $request->eorgCheck : [];
         $current_user = Auth::id();
 
             $organizationList = OrganizationTree::select('id', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
