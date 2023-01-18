@@ -28,8 +28,8 @@
           {{ $goal->title }}
         </a>
       </th>
-      <td onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">{{ $goal->typename }}</td>
-      <td onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">
+      <td >{{ $goal->typename }}</td>
+      <td >
           <?php
           $tags_arr = explode(",", $goal->tagnames);
           $total_tags = count($tags_arr);
@@ -46,9 +46,9 @@
           }          
           ?>
           </td>
-      <td onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">{{ $goal->start_date_human }}
+      <td  >{{ $goal->start_date_human }}
       </td>
-      <td onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">{{ $goal->target_date_human }}</td>
+      <td >{{ $goal->target_date_human }}</td>
       @if ($type == 'current')
       @if(!session()->has('view-profile-as')) 
       @if(session()->has('has_employees') > 0 && (request()->is('goal/current') || request()->is('goal/goalbank')))
