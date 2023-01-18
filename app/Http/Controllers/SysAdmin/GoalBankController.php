@@ -1091,8 +1091,10 @@ class GoalBankController extends Controller
                     , 'level2_division' => $org1->level2_division
                     , 'level3_branch' => $org1->level3_branch
                     , 'level4' => $org1->level4
-                    , 'created_at' => date('Y-m-d H:i:s')
-                    , 'updated_at' => date('Y-m-d H:i:s') ],
+                    ],
+                    [
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]
                 );
                 if(!$result){
                     break;
