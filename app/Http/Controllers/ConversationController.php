@@ -79,7 +79,7 @@ class ConversationController extends Controller
         
         
         //get current team members
-        $team_query = "SELECT users.id as id FROM performance.users 
+        $team_query = "SELECT users.id as id FROM users 
                         where users.reporting_to = $authId
                         UNION
                         select shared_profiles.shared_id as id FROM shared_profiles
