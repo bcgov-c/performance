@@ -462,7 +462,7 @@ class GoalController extends Controller
                 $j5a->whereRAW('employee_demo.level4 = goal_bank_orgs.level4 OR ((employee_demo.level4 = "" OR employee_demo.level4 IS NULL) AND (goal_bank_orgs.level4 = "" OR goal_bank_orgs.level4 IS NULL))');
             } );
         } )
-        ->join('users', 'users.guid', '=', 'employee_demo.guid')
+        ->join('users', 'users.employee_id', '=', 'employee_demo.employee_id')
         ->leftjoin('users as u2', 'u2.id', '=', 'goals.created_by')
         ->where('users.id', '=', Auth::id())
         ->whereIn('goals.by_admin', [1, 2])
