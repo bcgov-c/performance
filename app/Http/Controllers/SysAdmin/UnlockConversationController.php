@@ -345,8 +345,8 @@ class UnlockConversationController extends Controller
                 return $q->whereIn('conversations.id', function($q) use ($request, $level0, $level1, $level2, $level3, $level4) {
                     $q->select('conversation_id')->from('conversation_participants')
                     ->join('users', 'users.id', 'conversation_participants.participant_id')
-                    ->whereIn('users.guid', function($q) use ($request, $level0, $level1, $level2, $level3, $level4) {
-                        $q->select('guid')->from('employee_demo')
+                    ->whereIn('users.employee_id', function($q) use ($request, $level0, $level1, $level2, $level3, $level4) {
+                        $q->select('employee_id')->from('employee_demo')
                             ->when( $level0, function ($q) use($level0) {
                                 return $q->where('employee_demo.organization', $level0->name);
                             })

@@ -178,7 +178,7 @@ class EmployeeSharesController extends Controller
         $employee_ids = ($request->userCheck) ? $request->userCheck : [];
 
         $eeToShare = EmployeeDemo::select('users.id')
-            ->join('users', 'employee_demo.guid', 'users.guid')
+            ->join('users', 'employee_demo.employee_id', 'users.employee_id')
             ->whereIn('employee_demo.employee_id', $selected_emp_ids )
             ->distinct()
             ->select ('users.id')
@@ -186,7 +186,7 @@ class EmployeeSharesController extends Controller
             ->get() ;
 
         $shareTo = EmployeeDemo::select('users.id')
-            ->join('users', 'employee_demo.guid', 'users.guid')
+            ->join('users', 'employee_demo.employee_id', 'users.employee_id')
             ->whereIn('employee_demo.employee_id', $eselected_emp_ids )
             ->distinct()
             ->select ('users.id')
@@ -888,11 +888,11 @@ class EmployeeSharesController extends Controller
 
             $query = User::withoutGlobalScopes()
             ->join('shared_profiles', 'shared_profiles.shared_id', '=', 'users.id')
-            ->leftjoin('employee_demo', 'users.guid', '=', 'employee_demo.guid')
+            ->leftjoin('employee_demo', 'users.employee_id', '=', 'employee_demo.employee_id')
             ->leftjoin('users as u2', 'u2.id', '=', 'shared_profiles.shared_with')
-            ->leftjoin('employee_demo as e2', 'u2.guid', '=', 'e2.guid')
+            ->leftjoin('employee_demo as e2', 'u2.employee_id', '=', 'e2.employee_id')
             ->leftjoin('users as cc', 'cc.id', '=', 'shared_profiles.shared_by')
-            ->leftjoin('employee_demo as ec', 'cc.guid', '=', 'ec.guid')
+            ->leftjoin('employee_demo as ec', 'cc.employee_id', '=', 'ec.employee_id')
             ->when($level0, function($q) use($level0) {return $q->where('employee_demo.organization', $level0->name);})
             ->when($level1, function($q) use($level1) {return $q->where('employee_demo.level1_program', $level1->name);})
             ->when($level2, function($q) use($level2) {return $q->where('employee_demo.level2_division', $level2->name);})
@@ -973,8 +973,8 @@ class EmployeeSharesController extends Controller
             $query = User::withoutGlobalScopes()
             ->join('employee_shares', 'employee_shares.user_id', '=', 'users.id')
             ->leftjoin('users as u2', 'employee_shares.shared_with_id', '=', 'u2.id')
-            ->leftjoin('employee_demo', 'users.guid', '=', 'employee_demo.guid')
-            ->leftjoin('employee_demo as ed2', 'u2.guid', '=', 'ed2.guid')
+            ->leftjoin('employee_demo', 'users.employee_id', '=', 'employee_demo.employee_id')
+            ->leftjoin('employee_demo as ed2', 'u2.employee_id', '=', 'ed2.employee_id')
             ->leftjoin('shared_elements', 'shared_elements.id', '=', 'employee_shares.shared_element_id')
             ->where('users.id', '=', $id)
             ->select (

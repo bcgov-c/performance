@@ -99,11 +99,11 @@ class CalcNextConversationDate extends Command
         $counter = 0;
         $updatecounter = 0;
         $ClassificationArray = ExcusedClassification::select('jobcode')->pluck('jobcode')->toArray();
-        EmployeeDemo::leftjoin('users', 'users.guid', 'employee_demo.guid')
+        EmployeeDemo::leftjoin('users', 'users.employee_id', 'employee_demo.employee_id')
         ->whereRaw("trim(employee_demo.guid) <> ''")
         ->whereNotNull('employee_demo.guid')
-        ->whereRaw("employee_demo.employee_status = (select min(a.employee_status) from employee_demo a where a.guid = employee_demo.guid)")
-        ->whereRaw("employee_demo.empl_record = (select min(a.empl_record) from employee_demo a where a.guid = employee_demo.guid and a.employee_status = employee_demo.employee_status)")
+        ->whereRaw("employee_demo.employee_status = (select min(a.employee_status) from employee_demo a where a.employee_id = employee_demo.employee_id)")
+        ->whereRaw("employee_demo.empl_record = (select min(a.empl_record) from employee_demo a where a.employee_id = employee_demo.employee_id and a.employee_status = employee_demo.employee_status)")
         ->distinct()
         ->orderBy('employee_demo.employee_id')
         ->orderBy('employee_demo.empl_record')
@@ -177,7 +177,7 @@ class CalcNextConversationDate extends Command
                     }
                     $demo_inarray = in_array($demo->jobcode, $ClassificationArray);
                     // get last stored detail in junior table
-                    $jr = EmployeeDemoJunior::where('guid', '=', $demo->guid)->orderBy('id', 'desc')->first();
+                    $jr = EmployeeDemoJunior::where('employee_id', '=', $demo->employee_id)->orderBy('id', 'desc')->first();
                     if ($jr) {
                         // Previous JR record exist
                         $new_last_employee_status = $jr->current_employee_status;
@@ -246,13 +246,13 @@ class CalcNextConversationDate extends Command
                             // re-calc next conversation date
                             // get historical dates
                             $allDates = EmployeeDemoJunior::from('employee_demo_jr as j')
-                            ->where('j.guid', $demo->guid)
+                            ->where('j.employee_id', $demo->employee_id)
                             ->whereRaw("trim(j.guid) <> ''")
                             ->whereNotNull('j.guid')
                             ->where('j.created_at', '>', $initLastConversationDate)
                             ->where(function ($where) use ($initLastConversationDate) {
                                 $where->where('j.created_at', '>', $initLastConversationDate)
-                                ->orWhereRaw("j.id = (SELECT MAX(cd.id) from employee_demo_jr cd where cd.guid = j.guid AND cd.created_at <= '".$initLastConversationDate."')");
+                                ->orWhereRaw("j.id = (SELECT MAX(cd.id) from employee_demo_jr cd where cd.employee_id = j.employee_id AND cd.created_at <= '".$initLastConversationDate."')");
                             })
                             ->orderBy('j.id')
                             ->get();
@@ -360,6 +360,7 @@ class CalcNextConversationDate extends Command
                     if ($changeType != 'noChange') {
                         $newJr = new EmployeeDemoJunior;
                         $newJr->guid = $demo->guid;
+                        $newJr->employee_id = $demo->employee_id;
                         $newJr->current_employee_status = $demo->employee_status;
                         $newJr->current_classification = $demo->jobcode;
                         $newJr->current_classification_descr = $demo->jobcode_desc;
@@ -387,6 +388,7 @@ class CalcNextConversationDate extends Command
                         $new_values = [ 
                             'table' => 'employee_demo_jr', 
                             'guid' => $demo->guid, 
+                            'employee_id' => $demo->employee_id, 
                             'current_employee_status' => $demo->employee_status, 
                             'current_classification' => $demo->jobcode, 
                             'current_classification_descr' => $demo->jobcode_desc, 
@@ -416,6 +418,7 @@ class CalcNextConversationDate extends Command
                             // save new next conversation due date;
                             $newJr = new EmployeeDemoJunior;
                             $newJr->guid = $jr->guid;
+                            $newJr->employee_id = $jr->employee_id;
                             $newJr->current_employee_status = $jr->current_employee_status;
                             $newJr->current_classification = $jr->current_classification;
                             $newJr->current_classification_descr = $jr->current_classification_descr;
@@ -442,6 +445,7 @@ class CalcNextConversationDate extends Command
                             $new_values = [ 
                                 'table' => 'employee_demo_jr', 
                                 'guid' => $jr->guid, 
+                                'employee_id' => $jr->employee_id, 
                                 'current_employee_status' => $jr->current_employee_status, 
                                 'current_classification' => $jr->current_classification, 
                                 'current_classification_descr' => $jr->current_classification_descr, 
@@ -534,17 +538,28 @@ class CalcNextConversationDate extends Command
  
     
     protected function updateUsersTable() {
-        User::from('users as u')
-        ->whereRaw("trim(u.guid) <> ''")
-        ->whereNotNull('u.guid')
-        ->update([
-            'u.next_conversation_date' => DB::raw(" (select next_conversation_date from employee_demo_jr j1 
-                                        where id = (select max(id) from employee_demo_jr j2 where j1.guid = j2.guid)
-                                                and u.guid = guid)" ),
 
-            'u.due_date_paused' =>  DB::raw(" (select due_date_paused from employee_demo_jr j1 
-                                    where id = (select max(id) from employee_demo_jr j2 where j1.guid = j2.guid)
-                                        and u.guid = guid)" )
+        $users = User::from('users')
+        ->whereRaw("trim(users.guid) <> ''")
+        ->whereNotNull('users.guid')
+        ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('employee_demo_jr')
+                ->whereRaw("employee_demo_jr.id = (select max(id) from employee_demo_jr j2 where employee_demo_jr.employee_id = j2.employee_id)")
+                ->whereColumn('employee_demo_jr.employee_id', 'users.employee_id')
+                ->where(function($query) {
+                    $query->whereRaw( 'employee_demo_jr.next_conversation_date <> users.next_conversation_date')
+                            ->orWhereRaw( 'employee_demo_jr.due_date_paused <> users.due_date_paused');
+                });
+        })
+        ->update([
+            'users.next_conversation_date' => DB::raw(" (select next_conversation_date from employee_demo_jr j1 
+                                        where id = (select max(id) from employee_demo_jr j2 where j1.employee_id = j2.employee_id)
+                                                and users.employee_id = employee_id)" ),
+
+            'users.due_date_paused' =>  DB::raw(" (select due_date_paused from employee_demo_jr j1 
+                                    where id = (select max(id) from employee_demo_jr j2 where j1.employee_id = j2.employee_id)
+                                        and users.employee_id = employee_id)" )
         ]); 
     }
 

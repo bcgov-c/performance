@@ -332,7 +332,7 @@ class HRadminController extends Controller
 
         $this->getSearchCriterias($crit);
 
-        $query = User::join('employee_demo', 'users.guid', 'employee_demo.guid')
+        $query = User::join('employee_demo', 'users.employee_id', 'employee_demo.employee_id')
         ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
         ->whereNotNull('excused_start_date');
         // ->get();
@@ -434,7 +434,7 @@ class HRadminController extends Controller
         if ($request->ajax()) {
             $data = User::select('*');
 
-            $query = User::join('employee_demo', 'users.guid', 'employee_demo.guid')
+            $query = User::join('employee_demo', 'users.employee_id', 'employee_demo.employee_id')
             ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
             ->whereNotNull('excused_start_date');
     
