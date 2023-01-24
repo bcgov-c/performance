@@ -302,7 +302,7 @@ class NotificationController extends Controller
         $employee_ids = ($request->userCheck) ? $request->userCheck : [];
 
         $toRecipients = EmployeeDemo::select('users.id')
-                ->join('users', 'employee_demo.guid', 'users.guid')
+                ->join('users', 'employee_demo.employee_id', 'users.employee_id')
                 ->whereIn('employee_demo.employee_id', $selected_emp_ids )
                 ->distinct()
                 ->orderBy('employee_demo.employee_name')

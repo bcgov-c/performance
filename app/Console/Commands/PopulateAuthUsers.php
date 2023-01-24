@@ -70,7 +70,7 @@ class PopulateAuthUsers extends Command
                     employee_demo d,
                     admin_orgs o
                 WHERE 
-                    u.guid = d.guid
+                    u.employee_id = d.employee_id
                     AND (o.organization = d.organization OR ((TRIM(o.organization) = '' OR o.organization IS NULL) AND (d.organization = '' OR d.organization IS NULL))) 
                     AND (o.level1_program = d.level1_program OR ((TRIM(o.level1_program) = '' OR o.level1_program IS NULL) AND (d.level1_program = '' OR d.level1_program IS NULL))) 
                     AND (o.level2_division = d.level2_division OR ((TRIM(o.level2_division) = '' OR o.level2_division IS NULL) AND (d.level2_division = '' OR d.level2_division IS NULL))) 

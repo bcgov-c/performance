@@ -1097,7 +1097,7 @@ class SysadminController extends Controller
 
 
             $query = User::withoutGlobalScopes()
-            ->leftjoin('employee_demo', 'users.guid', '=', 'employee_demo.guid')
+            ->leftjoin('employee_demo', 'users.employee_id', '=', 'employee_demo.employee_id')
             // ->wherein('employee_demo.employee_status', ['A', 'L', 'P', 'S'])
             ->whereNull('employee_demo.date_deleted')
             ->when($level0, function($q) use($level0) {return $q->where('employee_demo.organization', $level0->name);})

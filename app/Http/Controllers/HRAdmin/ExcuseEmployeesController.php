@@ -186,9 +186,9 @@ class ExcuseEmployeesController extends Controller
             $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
             $query = User::withoutGlobalScopes()
             ->from('users as u')
-            ->leftjoin('employee_demo as d', 'u.guid', 'd.guid')
-            ->leftjoin('employee_demo_jr as j', 'u.guid', 'j.guid')
-            ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'Y' or u.excused_flag = 1) and d.date_deleted is null")
+            ->leftjoin('employee_demo as d', 'u.employee_id', 'd.employee_id')
+            ->leftjoin('employee_demo_jr as j', 'u.employee_id', 'j.employee_id')
+            ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.employee_id = j.employee_id) and (j.due_date_paused = 'Y' or u.excused_flag = 1) and d.date_deleted is null")
             ->whereRaw("trim(u.guid) <> ''")
             ->whereNotNull('u.guid')
             ->whereExists(function ($orgs) use ($authId) {
@@ -233,7 +233,7 @@ class ExcuseEmployeesController extends Controller
             ->addIndexColumn()
             ->addColumn('excused_status', function($row) {
                 $text = 'No';
-                $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
+                $jr = EmployeeDemoJunior::where('employee_id', $row->employee_id)->getQuery()->orderBy('id', 'desc')->first();
                 if ($jr) {
                     if ($jr->excused_type) {
                         if ($jr->excused_type == 'A') {
@@ -592,7 +592,7 @@ class ExcuseEmployeesController extends Controller
         $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
 
         $selection = EmployeeDemo::select('users.id')
-            ->join('users', 'employee_demo.guid', 'users.guid')
+            ->join('users', 'employee_demo.employee_id', 'users.employee_id')
             ->whereIn('employee_demo.employee_id', $selected_emp_ids )
             ->distinct()
             ->select ('users.id')
@@ -1201,7 +1201,7 @@ class ExcuseEmployeesController extends Controller
     public function manageindexedit(Request $request, $id) {
         $users = User::where('id', '=', $id)
         ->select('id', 'excused_flag', 'excused_reason_id')
-        ->leftjoin('employee_demo', 'users.guid', '=', 'employee_demo.guid')
+        ->leftjoin('employee_demo', 'users.employee_id', '=', 'employee_demo.employee_id')
         ->get();
         $excused_flag = $users->excused_flag;
         $excused_reason_id = $users->excused_reason_id;

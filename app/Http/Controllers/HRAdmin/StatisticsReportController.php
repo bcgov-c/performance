@@ -116,7 +116,7 @@ class StatisticsReportController extends Controller
             $sql = User::selectRaw('AVG(goals_count) as goals_average')
                         ->from(DB::raw( $from_stmt ))
                         ->join('employee_demo', function($join) {
-                            $join->on('employee_demo.guid', '=', 'A.guid');
+                            $join->on('employee_demo.employee_id', '=', 'A.employee_id');
                             // $join->on('employee_demo.employee_id', '=', 'A.employee_id');
                             // $join->on('employee_demo.empl_record', '=', 'A.empl_record');
                         })
@@ -169,7 +169,7 @@ class StatisticsReportController extends Controller
                 ->groupBy('group_key')
                     ->from(DB::raw( $from_stmt ))
                     ->join('employee_demo', function($join) {
-                        $join->on('employee_demo.guid', '=', 'A.guid');
+                        $join->on('employee_demo.employee_id', '=', 'A.employee_id');
                         //$join->on('employee_demo.employee_id', '=', 'A.employee_id');
                         //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
                     })
@@ -245,7 +245,7 @@ class StatisticsReportController extends Controller
 	    $count_raw .= "     and tag_id = tags.id ";  
         $count_raw .= "     and users.id = goals.user_id ";
         // $count_raw .= "     and users.employee_id = employee_demo.employee_id ";
-        $count_raw .= "     and users.guid = employee_demo.guid ";
+        $count_raw .= "     and users.employee_id = employee_demo.employee_id ";
         $count_raw .= $level0 ? "     and employee_demo.organization = '". addslashes($level0->name) ."'" : '';
         $count_raw .= $level1 ? "     and employee_demo.level1_program = '". addslashes($level1->name) ."'" : '';
         $count_raw .= $level2 ? "     and employee_demo.level2_division = '". addslashes($level2->name) ."'" : '';
@@ -274,7 +274,7 @@ class StatisticsReportController extends Controller
                     $join->on('goals.user_id', '=', 'users.id');
                 })
                 ->join('employee_demo', function($join) {
-                    $join->on('employee_demo.guid', '=', 'users.guid');
+                    $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'A.empl_record');
                 })
@@ -352,7 +352,7 @@ class StatisticsReportController extends Controller
                                 employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4')
                 ->from(DB::raw( $from_stmt ))                                
                 ->join('employee_demo', function($join) {
-                    $join->on('employee_demo.guid', '=', 'A.guid');
+                    $join->on('employee_demo.employee_id', '=', 'A.employee_id');
                     // $join->on('employee_demo.employee_id', '=', 'A.employee_id');
                     //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
                 })
@@ -522,7 +522,7 @@ class StatisticsReportController extends Controller
 
         $sql = User::selectRaw($count_raw)
                     ->join('employee_demo', function($join) {
-                        $join->on('employee_demo.guid', '=', 'users.guid');
+                        $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                         // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                         // $join->on('employee_demo.empl_record', '=', 'A.empl_record');
                     })
@@ -704,7 +704,7 @@ class StatisticsReportController extends Controller
                             , curdate() )
                     as overdue_in_days")
                 ->join('employee_demo', function($join) {
-                    $join->on('employee_demo.guid', '=', 'users.guid');
+                    $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
@@ -790,7 +790,7 @@ class StatisticsReportController extends Controller
         // SQL for Chart 2
         $sql = Conversation::join('users', 'users.id', 'conversations.user_id') 
         ->join('employee_demo', function($join) {
-            $join->on('employee_demo.guid', '=', 'users.guid');
+            $join->on('employee_demo.employee_id', '=', 'users.employee_id');
             // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
             // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
         })
@@ -913,7 +913,7 @@ class StatisticsReportController extends Controller
         // SQL for Chart 3
         $completed_conversations = Conversation::join('users', 'users.id', 'conversations.user_id') 
         ->join('employee_demo', function($join) {
-            $join->on('employee_demo.guid', '=', 'users.guid');
+            $join->on('employee_demo.employee_id', '=', 'users.employee_id');
             // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
             // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
         })
@@ -1025,7 +1025,7 @@ class StatisticsReportController extends Controller
                     DATEDIFF ( users.next_conversation_date, curdate() )  as overdue_in_days,
                     users.next_conversation_date as next_due_date")
                 ->join('employee_demo', function($join) {
-                    $join->on('employee_demo.guid', '=', 'users.guid');
+                    $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
@@ -1127,7 +1127,7 @@ class StatisticsReportController extends Controller
                 ->whereNull('deleted_at')                
                 ->join('users', 'users.id', 'conversations.user_id') 
                 ->join('employee_demo', function($join) {
-                    $join->on('employee_demo.guid', '=', 'users.guid');
+                    $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
@@ -1206,7 +1206,7 @@ class StatisticsReportController extends Controller
                     users.next_conversation_date as next_due_date")
             ->join('users', 'users.id', 'conversations.user_id') 
             ->join('employee_demo', function($join) {
-                $join->on('employee_demo.guid', '=', 'users.guid');
+                $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
             })
@@ -1494,7 +1494,7 @@ class StatisticsReportController extends Controller
         $sql = User::selectRaw("users.employee_id, users.empl_record,
                 case when (select count(*) from shared_profiles A where A.shared_id = users.id) > 0 then 'Yes' else 'No' end as shared")
                 ->join('employee_demo', function($join) {
-                    $join->on('employee_demo.guid', '=', 'users.guid');
+                    $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
@@ -1605,7 +1605,7 @@ class StatisticsReportController extends Controller
                  employee_demo.level3_branch, employee_demo.level4,
             case when (select count(*) from shared_profiles A where A.shared_id = users.id) > 0 then 'Yes' else 'No' end as shared")
             ->join('employee_demo', function($join) {
-                $join->on('employee_demo.guid', '=', 'users.guid');
+                $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
             })
@@ -1750,7 +1750,7 @@ class StatisticsReportController extends Controller
                     case when users.due_date_paused = 'N'
                         then 'No' else 'Yes' end as excused")
                     ->join('employee_demo', function($join) {
-                         $join->on('employee_demo.guid', '=', 'users.guid');
+                         $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                         // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                         // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                     })
@@ -1857,7 +1857,7 @@ class StatisticsReportController extends Controller
                     case when users.due_date_paused = 'N'
                         then 'No' else 'Yes' end as excused")
                 ->join('employee_demo', function($join) {
-                    $join->on('employee_demo.guid', '=', 'users.guid');
+                    $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
