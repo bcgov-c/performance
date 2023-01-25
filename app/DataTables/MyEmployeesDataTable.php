@@ -44,8 +44,8 @@ class MyEmployeesDataTable extends DataTable
                 $landingPage = 'goal.current';
                 return view('my-team.partials.link-to-profile', compact(['row', 'text', 'landingPage']));
             })->addColumn('nextConversationDue', function ($row) {
-                $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
-                if ($jr->excused_type) {
+                $jr = EmployeeDemoJunior::where('employee_id', $row->employee_id)->getQuery()->orderBy('id', 'desc')->first();
+                if (isset($jr->excused_type) && $jr->excused_type) {
                     if ($jr->excused_type == 'A') {
                         $text = 'Paused';
                         $landingPage = 'conversation.templates';
@@ -71,7 +71,7 @@ class MyEmployeesDataTable extends DataTable
                 return view('my-team.partials.view-btn', compact(["row", "yesOrNo"])); // $row['id'];
             })
             ->addColumn('excused_flag', function ($row) {
-                $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
+                $jr = EmployeeDemoJunior::where('employee_id', $row->employee_id)->getQuery()->orderBy('id', 'desc')->first();
                 $excused_type = '';
                 $current_status = '';
                 $excused = json_encode([

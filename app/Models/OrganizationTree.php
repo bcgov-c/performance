@@ -74,7 +74,7 @@ class OrganizationTree extends Model
 
     public function users() {
 
-        $demoWhere = EmployeeDemo::join('users','employee_demo.guid', 'users.guid')
+        $demoWhere = EmployeeDemo::join('users','employee_demo.employee_id', 'users.employee_id')
             ->where('organization_trees.id', $this->id );
   
         $sql_level0 = clone $demoWhere; 

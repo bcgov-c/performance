@@ -150,6 +150,7 @@ class GoalBankController extends Controller
             , 'employee_demo.level4'
             , 'employee_demo.deptid'
         ])
+        ->whereNull('employee_demo.date_deleted')
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
@@ -168,6 +169,7 @@ class GoalBankController extends Controller
             , 'employee_demo.level4'
             , 'employee_demo.deptid'
         ])
+        ->whereNull('employee_demo.date_deleted')
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
@@ -283,11 +285,21 @@ class GoalBankController extends Controller
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql->select([ 'employee_demo.employee_id', 'employee_demo.employee_name', 'employee_demo.jobcode_desc', 'employee_demo.employee_email', 
-                'employee_demo.organization', 'employee_demo.level1_program', 'employee_demo.level2_division',
-                'employee_demo.level3_branch','employee_demo.level4', 'employee_demo.deptid'])
-            ->orderBy('employee_id')
-                ->pluck('employee_demo.employee_id');        
+        $matched_emp_ids = $sql->select([ 
+            'employee_demo.employee_id', 
+            'employee_demo.employee_name', 
+            'employee_demo.jobcode_desc', 
+            'employee_demo.employee_email', 
+            'employee_demo.organization', 
+            'employee_demo.level1_program', 
+            'employee_demo.level2_division',
+            'employee_demo.level3_branch',
+            'employee_demo.level4', 
+            'employee_demo.deptid'
+        ])
+        ->whereNull('employee_demo.date_deleted')
+        ->orderBy('employee_demo.employee_id')
+        ->pluck('employee_demo.employee_id');        
         
         $criteriaList = $this->search_criteria_list();
         $roles = DB::table('roles')
@@ -456,11 +468,21 @@ class GoalBankController extends Controller
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql->select([ 'employee_demo.employee_id', 'employee_demo.employee_name', 'employee_demo.jobcode_desc', 'employee_demo.employee_email', 
-                'employee_demo.organization', 'employee_demo.level1_program', 'employee_demo.level2_division',
-                'employee_demo.level3_branch','employee_demo.level4', 'employee_demo.deptid'])
-            ->orderBy('employee_id')
-                ->pluck('employee_demo.employee_id');        
+        $matched_emp_ids = $sql->select([ 
+            'employee_demo.employee_id', 
+            'employee_demo.employee_name', 
+            'employee_demo.jobcode_desc', 
+            'employee_demo.employee_email', 
+            'employee_demo.organization', 
+            'employee_demo.level1_program', 
+            'employee_demo.level2_division',
+            'employee_demo.level3_branch',
+            'employee_demo.level4', 
+            'employee_demo.deptid'
+        ])
+        ->whereNull('employee_demo.date_deleted')
+        ->orderBy('employee_demo.employee_id')
+        ->pluck('employee_demo.employee_id');        
         
         $criteriaList = $this->search_criteria_list();
         $ecriteriaList = $this->search_criteria_list();
@@ -599,8 +621,10 @@ class GoalBankController extends Controller
             , 'employee_demo.level2_division'
             , 'employee_demo.level3_branch'
             , 'employee_demo.level4'
-            , 'employee_demo.deptid'])
-        ->orderBy('employee_id')
+            , 'employee_demo.deptid'
+        ])
+        ->whereNull('employee_demo.date_deleted')
+        ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
         $ademoWhere = $this->abaseFilteredWhere($request, $alevel0, $alevel1, $alevel2, $alevel3, $alevel4);
@@ -615,8 +639,10 @@ class GoalBankController extends Controller
             , 'employee_demo.level2_division'
             , 'employee_demo.level3_branch'
             , 'employee_demo.level4'
-            , 'employee_demo.deptid'])
-        ->orderBy('employee_id')
+            , 'employee_demo.deptid'
+        ])
+        ->whereNull('employee_demo.date_deleted')
+        ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
         $criteriaList = $this->search_criteria_list();
@@ -711,7 +737,7 @@ class GoalBankController extends Controller
             // $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
             $selected_emp_ids = $request->userCheck ? $request->userCheck : [];
             $toRecipients = EmployeeDemo::select('users.id')
-            ->join('users', 'employee_demo.guid', 'users.guid')
+            ->join('users', 'employee_demo.employee_id', 'users.employee_id')
             ->whereIn('employee_demo.employee_id', $selected_emp_ids )
             ->distinct()
             ->select ('users.id')
@@ -802,16 +828,17 @@ class GoalBankController extends Controller
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
         $rows = $sql->join('organization_trees', function($join) use($request) {
-                $join->on('employee_demo.organization', '=', 'organization_trees.organization')
-                    ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
-                    ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
-                    ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
-                    ->on('employee_demo.level4', '=', 'organization_trees.level4');
-                })
-                ->select('organization_trees.id','employee_demo.employee_id')
-                ->groupBy('organization_trees.id', 'employee_demo.employee_id')
-                ->orderBy('organization_trees.id')->orderBy('employee_demo.employee_id')
-                ->get();
+            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
+            ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
+            ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
+            ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
+            ->on('employee_demo.level4', '=', 'organization_trees.level4');
+        })
+        ->whereNull('employee_demo.date_deleted')
+        ->select('organization_trees.id','employee_demo.employee_id')
+        ->groupBy('organization_trees.id', 'employee_demo.employee_id')
+        ->orderBy('organization_trees.id')->orderBy('employee_demo.employee_id')
+        ->get();
 
         $empIdsByOrgId = $rows->groupBy('id')->all();
 
@@ -853,16 +880,17 @@ class GoalBankController extends Controller
         $edemoWhere = $this->ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4);
         $esql = clone $edemoWhere; 
         $rows = $esql->join('organization_trees', function($join) use($request) {
-                $join->on('employee_demo.organization', '=', 'organization_trees.organization')
-                    ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
-                    ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
-                    ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
-                    ->on('employee_demo.level4', '=', 'organization_trees.level4');
-                })
-                ->select('organization_trees.id','employee_demo.employee_id')
-                ->groupBy('organization_trees.id', 'employee_demo.employee_id')
-                ->orderBy('organization_trees.id')->orderBy('employee_demo.employee_id')
-                ->get();
+            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
+            ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
+            ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
+            ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
+            ->on('employee_demo.level4', '=', 'organization_trees.level4');
+        })
+        ->whereNull('employee_demo.date_deleted')
+        ->select('organization_trees.id','employee_demo.employee_id')
+        ->groupBy('organization_trees.id', 'employee_demo.employee_id')
+        ->orderBy('organization_trees.id')->orderBy('employee_demo.employee_id')
+        ->get();
 
         $eempIdsByOrgId = $rows->groupBy('id')->all();
 
@@ -903,16 +931,17 @@ class GoalBankController extends Controller
         $ademoWhere = $this->abaseFilteredWhere($request, $alevel0, $alevel1, $alevel2, $alevel3, $alevel4);
         $asql = clone $ademoWhere; 
         $rows = $asql->join('organization_trees', function($join) use($request) {
-                $join->on('employee_demo.organization', '=', 'organization_trees.organization')
-                    ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
-                    ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
-                    ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
-                    ->on('employee_demo.level4', '=', 'organization_trees.level4');
-                })
-                ->select('organization_trees.id','employee_demo.employee_id')
-                ->groupBy('organization_trees.id', 'employee_demo.employee_id')
-                ->orderBy('organization_trees.id')->orderBy('employee_demo.employee_id')
-                ->get();
+            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
+            ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
+            ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
+            ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
+            ->on('employee_demo.level4', '=', 'organization_trees.level4');
+        })
+        ->whereNull('employee_demo.date_deleted')
+        ->select('organization_trees.id','employee_demo.employee_id')
+        ->groupBy('organization_trees.id', 'employee_demo.employee_id')
+        ->orderBy('organization_trees.id')->orderBy('employee_demo.employee_id')
+        ->get();
 
         $aempIdsByOrgId = $rows->groupBy('id')->all();
 
@@ -953,13 +982,14 @@ class GoalBankController extends Controller
                 , 'employee_demo.level3_branch'
                 , 'employee_demo.level4'
                 , 'employee_demo.deptid'
-            ]);
+            ])
+            ->whereNull('employee_demo.date_deleted');
             return Datatables::of($employees)
-                ->addColumn('select_users', static function ($employee) {
-                        return '<input pid="1335" type="checkbox" id="userCheck'. 
-                            $employee->employee_id .'" name="userCheck[]" value="'. $employee->employee_id .'" class="dt-body-center">';
-                })->rawColumns(['select_users','action'])
-                ->make(true);
+            ->addColumn('select_users', static function ($employee) {
+                return '<input pid="1335" type="checkbox" id="userCheck'. 
+                    $employee->employee_id .'" name="userCheck[]" value="'. $employee->employee_id .'" class="dt-body-center">';
+            })->rawColumns(['select_users','action'])
+            ->make(true);
         }
     }
 
@@ -986,13 +1016,15 @@ class GoalBankController extends Controller
                 , 'employee_demo.level2_division'
                 , 'employee_demo.level3_branch'
                 , 'employee_demo.level4'
-                , 'employee_demo.deptid']);
+                , 'employee_demo.deptid'
+            ])
+            ->whereNull('employee_demo.date_deleted');
             return Datatables::of($eemployees)
-                ->addColumn('eselect_users', static function ($eemployee) {
-                        return '<input pid="1335" type="checkbox" id="euserCheck'. 
-                            $eemployee->employee_id .'" name="euserCheck[]" value="'. $eemployee->employee_id .'" class="dt-body-center">';
-                })->rawColumns(['eselect_users','eaction'])
-                ->make(true);
+            ->addColumn('eselect_users', static function ($eemployee) {
+                return '<input pid="1335" type="checkbox" id="euserCheck'. 
+                    $eemployee->employee_id .'" name="euserCheck[]" value="'. $eemployee->employee_id .'" class="dt-body-center">';
+            })->rawColumns(['eselect_users','eaction'])
+            ->make(true);
         }
     }
 
@@ -1019,12 +1051,14 @@ class GoalBankController extends Controller
                 , 'employee_demo.level2_division'
                 , 'employee_demo.level3_branch'
                 , 'employee_demo.level4'
-                , 'employee_demo.deptid']);
+                , 'employee_demo.deptid'
+            ])
+            ->whereNull('employee_demo.date_deleted');
             return Datatables::of($aemployees)
-                ->addColumn('aselect_users', static function ($aemployee) {
-                        return '<input pid="1335" type="checkbox" id="auserCheck'. 
-                            $aemployee->employee_id .'" name="auserCheck[]" value="'. $aemployee->employee_id .'" class="dt-body-center">';
-                })->rawColumns(['aselect_users','aaction'])
+            ->addColumn('aselect_users', static function ($aemployee) {
+                    return '<input pid="1335" type="checkbox" id="auserCheck'. 
+                        $aemployee->employee_id .'" name="auserCheck[]" value="'. $aemployee->employee_id .'" class="dt-body-center">';
+            })->rawColumns(['aselect_users','aaction'])
                 ->make(true);
         }
     }
@@ -1133,7 +1167,7 @@ class GoalBankController extends Controller
 
         $aemployee_ids = ($request->auserCheck) ? $request->auserCheck : [];
         $toRecipients = EmployeeDemo::select('users.id')
-        ->join('users', 'employee_demo.guid', 'users.guid')
+        ->join('users', 'employee_demo.employee_id', 'users.employee_id')
         ->whereIn('employee_demo.employee_id', $aselected_emp_ids)
         ->distinct()
         ->select ('users.id')
@@ -1187,7 +1221,7 @@ class GoalBankController extends Controller
     public function getUsers(Request $request)
     {
         $search = $request->search;
-        $users =  User::whereRaw("lower(name) like '%". strtolower($search)."%'")
+        $users =  User::whereRaw("name like '%".$search."%'")
                     ->whereNotNull('email')->paginate();
         return ['data'=> $users];
     }
@@ -1296,23 +1330,23 @@ class GoalBankController extends Controller
         })
         ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
             $q->where(function($query) use ($request) {
-                return $query->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->search_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->search_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->search_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
+                return $query->whereRaw("employee_demo.employee_id LIKE '%".$request->search_text."%'")
+                    ->orWhereRaw("employee_demo.employee_name LIKE '%".$request->search_text."%'")
+                    ->orWhereRaw("employee_demo.jobcode_desc LIKE '%".$request->search_text."%'")
+                    ->orWhereRaw("employee_demo.deptid LIKE '%".$request->search_text."%'");
             });
         })
         ->when( $request->search_text && $request->criteria == 'emp', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->search_text) . "%'");
+            return $q->whereRaw("employee_demo.employee_id LIKE '%".$request->search_text."%'");
         })
         ->when( $request->search_text && $request->criteria == 'name', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->search_text) . "%'");
+            return $q->whereRaw("employee_demo.employee_name LIKE '%".$request->search_text."%'");
         })
         ->when( $request->search_text && $request->criteria == 'job', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->search_text) . "%'");
+            return $q->whereRaw("employee_demo.jobcode_desc LIKE '%".$request->search_text."%'");
         })
         ->when( $request->search_text && $request->criteria == 'dpt', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
+            return $q->whereRaw("employee_demo.deptid LIKE '%".$request->search_text."%'");
         });
         return $demoWhere;
     }
@@ -1359,23 +1393,23 @@ class GoalBankController extends Controller
         ->when( $request->asearch_text && $request->acriteria == 'all', function ($q) use($request) {
             $q->where(function($query) use ($request) {
                 
-                return $query->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->asearch_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->asearch_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->asearch_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->asearch_text) . "%'");
+                return $query->whereRaw("employee_demo.employee_id LIKE '%".$request->asearch_text."%'")
+                    ->orWhereRaw("employee_demo.employee_name LIKE '%".$request->asearch_text."%'")
+                    ->orWhereRaw("employee_demo.jobcode_desc LIKE '%".$request->asearch_text."%'")
+                    ->orWhereRaw("employee_demo.deptid LIKE '%".$request->asearch_text."%'");
             });
         })
         ->when( $request->asearch_text && $request->acriteria == 'emp', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->asearch_text) . "%'");
+            return $q->whereRaw("employee_demo.employee_id LIKE '%".$request->asearch_text."%'");
         })
         ->when( $request->esearch_text && $request->acriteria == 'name', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->asearch_text) . "%'");
+            return $q->whereRaw("employee_demo.employee_name LIKE '%".$request->asearch_text."%'");
         })
         ->when( $request->esearch_text && $request->acriteria == 'job', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->asearch_text) . "%'");
+            return $q->whereRaw("employee_demo.jobcode_desc LIKE '%".$request->asearch_text."%'");
         })
         ->when( $request->esearch_text && $request->acriteria == 'dpt', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->asearch_text) . "%'");
+            return $q->whereRaw("employee_demo.deptid LIKE '%".$request->asearch_text."%'");
         });
         return $ademoWhere;
     }
@@ -1578,20 +1612,20 @@ class GoalBankController extends Controller
 
             $query = Goal::withoutGlobalScopes()
             ->join('users as cu', 'cu.id', '=', 'goals.created_by')
-            ->leftjoin('employee_demo as ced', 'ced.guid', '=', 'cu.guid')
+            ->leftjoin('employee_demo as ced', 'ced.employee_id', '=', 'cu.employee_id')
             ->where('is_library', true)
             ->whereIn('by_admin', [1, 2])
             ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
                 $q->where(function($query) use ($request) {
-                    return $query->whereRaw("LOWER(goals.title) LIKE '%" . strtolower($request->search_text) . "%'")
-                        ->orWhereRaw("LOWER(ced.employee_name) LIKE '%" . strtolower($request->search_text) . "%'");
+                    return $query->whereRaw("goals.title LIKE '%".$request->search_text."%'")
+                        ->orWhereRaw("ced.employee_name LIKE '%".$request->search_text."%'");
                 });
             })
             ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
-                return $q->whereRaw("LOWER(goals.title) LIKE '%" . strtolower($request->search_text) . "%'");
+                return $q->whereRaw("goals.title LIKE '%".$request->search_text."%'");
             })
             ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
-                return $q->whereRaw("LOWER(ced.employee_name) LIKE '%" . strtolower($request->search_text) . "%'");
+                return $q->whereRaw("ced.employee_name LIKE '%".$request->search_text."%'");
             })
             ->distinct()
             ->select
@@ -1652,17 +1686,34 @@ class GoalBankController extends Controller
             ->where('goals.id', '=', $goal_id)
             ->leftjoin('goals_shared_with', 'goals.id', '=', 'goals_shared_with.goal_id')
             ->join('users', 'users.id', '=', 'goals_shared_with.user_id')
-            ->leftjoin('employee_demo', 'employee_demo.guid', '=', 'users.guid')
+            ->leftjoin('employee_demo', 'employee_demo.employee_id', '=', 'users.employee_id')
+            ->leftjoin('admin_orgs', function ($j1) {
+                $j1->on(function ($j1a) {
+                    $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
+                } )
+                ->on(function ($j2a) {
+                    $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
+                } )
+                ->on(function ($j3a) {
+                    $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
+                } )
+                ->on(function ($j4a) {
+                    $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
+                } )
+                ->on(function ($j5a) {
+                    $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
+                } );
+            } )   
             ->when($level0, function($q) use($level0) {return $q->where('employee_demo.organization', $level0->name);})
             ->when($level1, function($q) use($level1) {return $q->where('employee_demo.level1_program', $level1->name);})
             ->when($level2, function($q) use($level2) {return $q->where('employee_demo.level2_division', $level2->name);})
             ->when($level3, function($q) use($level3) {return $q->where('employee_demo.level3_branch', $level3->name);})
             ->when($level4, function($q) use($level4) {return $q->where('employee_demo.level4', $level4->name);})
-            ->when($request->search_text && $request->criteria == 'name', function($q) use($request){return $q->where('employee_demo.employee_name', 'like', "%" . $request->search_text . "%");})
-            ->when($request->search_text && $request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
-            ->when($request->search_text && $request->criteria == 'job', function($q) use($request){return $q->where('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%");})
-            ->when($request->search_text && $request->criteria == 'dpt', function($q) use($request){return $q->where('employee_demo.deptid', 'like', "%" . $request->search_text . "%");})
-            ->when($request->search_text && $request->criteria == 'all', function($q) use ($request) {
+            ->when($request->criteria == 'name', function($q) use($request){return $q->where('employee_demo.employee_name', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'job', function($q) use($request){return $q->where('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'dpt', function($q) use($request){return $q->where('employee_demo.deptid', 'like', "%" . $request->search_text . "%");})
+            ->when($request->criteria == 'all', function($q) use ($request) {
                 return $q->where(function ($query2) use ($request) {
                     if($request->search_text) {
                         $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
