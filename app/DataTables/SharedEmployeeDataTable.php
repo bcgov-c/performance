@@ -32,7 +32,7 @@ class SharedEmployeeDataTable extends DataTable
                 $text = $row['active_goals_count'] . " Goals";
                 return view('my-team.partials.link-to-profile', compact(['row', 'text']));
             })->addColumn('nextConversationDue', function ($row) {
-                $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
+                $jr = EmployeeDemoJunior::where('employee_id', $row->employee_id)->getQuery()->orderBy('id', 'desc')->first();
                 if (isset($jr->excused_type) && $jr->excused_type) {
                     if ($jr->excused_type == 'A') {
                         $text = 'Paused';
@@ -56,7 +56,7 @@ class SharedEmployeeDataTable extends DataTable
                 return view('my-team.partials.view-btn', compact(["row", "yesOrNo"])); // $row['id'];
             })
             ->addColumn('excused_flag', function ($row) {
-                $jr = EmployeeDemoJunior::where('guid', $row->guid)->getQuery()->orderBy('id', 'desc')->first();
+                $jr = EmployeeDemoJunior::where('employee_id', $row->employee_id)->getQuery()->orderBy('id', 'desc')->first();
                 $excused_type = '';
                 $current_status = '';
                 $excused = json_encode([

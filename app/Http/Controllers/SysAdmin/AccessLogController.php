@@ -38,11 +38,11 @@ class AccessLogController extends Controller
                             })
                             ->select('access_logs.*', 'users.name', 'users.employee_id',
                                         DB::raw("(Select idir FROM employee_demo
-                                            where users.guid = employee_demo.guid
+                                            where users.employee_id = employee_demo.employee_id
                                                 and employee_demo.date_deleted is null
                                             limit 1 ) as idir"),
                                         DB::raw("(Select organization FROM employee_demo
-                                                   where users.guid = employee_demo.guid
+                                                   where users.employee_id = employee_demo.employee_id
                                                      and employee_demo.date_deleted is null
                                                 limit 1 ) as organization")
                             );
@@ -77,11 +77,11 @@ class AccessLogController extends Controller
                             })
                             ->select('access_logs.*', 'users.name', 'users.employee_id',
                                         DB::raw("(Select idir FROM employee_demo
-                                        where users.guid = employee_demo.guid
+                                        where users.employee_id = employee_demo.employee_id
                                             and employee_demo.date_deleted is null
                                         limit 1 ) as idir"),
                                         DB::raw("(Select organization FROM employee_demo
-                                                where users.guid = employee_demo.guid
+                                                where users.employee_id = employee_demo.employee_id
                                                     and employee_demo.date_deleted is null
                                                 limit 1 ) as organization")
                             );

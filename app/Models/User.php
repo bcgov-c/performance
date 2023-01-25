@@ -166,7 +166,7 @@ class User extends Authenticatable
     
     public function avaliableReportees() {
         return $this->reportees()
-                ->join('employee_demo', 'employee_demo.guid', '=', 'users.guid');
+                ->join('employee_demo', 'employee_demo.employee_id', '=', 'users.employee_id');
     }
 
     public function reporteesCount() {
@@ -215,11 +215,11 @@ class User extends Authenticatable
     }
     
     public function employee_demo() {
-        return $this->hasOne('App\Models\EmployeeDemo', 'guid', 'guid');
+        return $this->hasOne('App\Models\EmployeeDemo', 'employee_id', 'employee_id');
     }
     
     public function employee_demo_jr() {
-        $instance = $this->hasOne('App\Models\EmployeeDemoJunior', 'guid', 'guid');
+        $instance = $this->hasOne('App\Models\EmployeeDemoJunior', 'employee_id', 'employee_id');
         $instance->getQuery()->orderBy('id', 'desc')->first();
         return $instance;
     }
@@ -262,7 +262,7 @@ class User extends Authenticatable
 
         $organization = EmployeeDemo::join('access_organizations', 'employee_demo.organization', 'access_organizations.organization')
                             ->where('access_organizations.allow_inapp_msg', 'Y')
-                            ->where('employee_demo.guid', $this->guid)
+                            ->where('employee_demo.employee_id', $this->employee_id)
                             ->first(); 
 
         return ($organization ? true : false);                            
@@ -277,7 +277,7 @@ class User extends Authenticatable
 
         $organization = EmployeeDemo::join('access_organizations', 'employee_demo.organization', 'access_organizations.organization')
                             ->where('access_organizations.allow_email_msg', 'Y')
-                            ->where('employee_demo.guid', $this->guid)
+                            ->where('employee_demo.employee_id', $this->employee_id)
                             ->select('employee_demo.guid', 'employee_demo.organization')
                             ->first(); 
 

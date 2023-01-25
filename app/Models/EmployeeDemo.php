@@ -44,7 +44,7 @@ class EmployeeDemo extends Model
     ];
 
     public function users() {
-        return $this->hasOne(User::class, 'guid', 'guid');
+        return $this->hasOne(User::class, 'employee_id', 'employee_id');
     }
 
     // public function dr_count() {

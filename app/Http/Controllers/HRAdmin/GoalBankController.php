@@ -149,6 +149,7 @@ class GoalBankController extends Controller
             , 'employee_demo.level4'
             , 'employee_demo.deptid'
         ])
+        ->whereNull('employee_demo.date_deleted')
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
@@ -167,6 +168,7 @@ class GoalBankController extends Controller
             , 'employee_demo.level4'
             , 'employee_demo.deptid'
         ])
+        ->whereNull('employee_demo.date_deleted')
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
 
@@ -282,11 +284,21 @@ class GoalBankController extends Controller
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql->select([ 'employee_demo.employee_id', 'employee_demo.employee_name', 'employee_demo.jobcode_desc', 'employee_demo.employee_email', 
-                'employee_demo.organization', 'employee_demo.level1_program', 'employee_demo.level2_division',
-                'employee_demo.level3_branch','employee_demo.level4', 'employee_demo.deptid'])
-            ->orderBy('employee_id')
-                ->pluck('employee_demo.employee_id');        
+        $matched_emp_ids = $sql->select([ 
+            'employee_demo.employee_id', 
+            'employee_demo.employee_name', 
+            'employee_demo.jobcode_desc', 
+            'employee_demo.employee_email', 
+            'employee_demo.organization', 
+            'employee_demo.level1_program', 
+            'employee_demo.level2_division',
+            'employee_demo.level3_branch',
+            'employee_demo.level4', 
+            'employee_demo.deptid'
+        ])
+        ->whereNull('employee_demo.date_deleted')
+        ->orderBy('employee_demo.employee_id')
+        ->pluck('employee_demo.employee_id');        
         
         $criteriaList = $this->search_criteria_list();
         $roles = DB::table('roles')
@@ -304,56 +316,47 @@ class GoalBankController extends Controller
         $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
         $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
         if ($request->ajax()) {
-            $query = GoalBankOrg::join('ods_departments', 'goal_bank_orgs.deptid', 'ods_departments.deptid')
-            ->whereRaw("ods_departments.jobsched_id = (SELECT MAX(od.jobsched_id) FROM ods_departments AS od)")
-            ->where('goal_id', '=', $goal_id)
-            ->where('goal_bank_orgs.version', 1)
+            $query = GoalBankOrg::where('goal_id', '=', $goal_id)
             ->join('admin_orgs', function ($j1) {
                 $j1->on(function ($j1a) {
-                    $j1a->whereRAW('admin_orgs.organization = ods_departments.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (ods_departments.organization = "" OR ods_departments.organization IS NULL))');
+                    $j1a->whereRAW('admin_orgs.organization = goal_bank_orgs.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (goal_bank_orgs.organization = "" OR goal_bank_orgs.organization IS NULL))');
                 } )
                 ->on(function ($j2a) {
-                    $j2a->whereRAW('admin_orgs.level1_program = ods_departments.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (ods_departments.level1_program = "" OR ods_departments.level1_program IS NULL))');
+                    $j2a->whereRAW('admin_orgs.level1_program = goal_bank_orgs.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (goal_bank_orgs.level1_program = "" OR goal_bank_orgs.level1_program IS NULL))');
                 } )
                 ->on(function ($j3a) {
-                    $j3a->whereRAW('admin_orgs.level2_division = ods_departments.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (ods_departments.level2_division = "" OR ods_departments.level2_division IS NULL))');
+                    $j3a->whereRAW('admin_orgs.level2_division = goal_bank_orgs.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (goal_bank_orgs.level2_division = "" OR goal_bank_orgs.level2_division IS NULL))');
                 } )
                 ->on(function ($j4a) {
-                    $j4a->whereRAW('admin_orgs.level3_branch = ods_departments.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (ods_departments.level3_branch = "" OR ods_departments.level3_branch IS NULL))');
+                    $j4a->whereRAW('admin_orgs.level3_branch = goal_bank_orgs.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (goal_bank_orgs.level3_branch = "" OR goal_bank_orgs.level3_branch IS NULL))');
                 } )
                 ->on(function ($j5a) {
-                    $j5a->whereRAW('admin_orgs.level4 = ods_departments.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (ods_departments.level4 = "" OR ods_departments.level4 IS NULL))');
+                    $j5a->whereRAW('admin_orgs.level4 = goal_bank_orgs.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (goal_bank_orgs.level4 = "" OR goal_bank_orgs.level4 IS NULL))');
                 } );
             } )
+            ->where('goal_bank_orgs.version', 1)
             ->where('admin_orgs.user_id', '=', Auth::id())
             ->when( $level0, function ($q) use($level0) {
-                return $q->where('ods_departments.organization', '=', $level0->name);
+                return $q->where('goal_bank_orgs.organization', '=', $level0->name);
             })
             ->when( $level1, function ($q) use($level1) {
-                return $q->where('ods_departments.level1_program', $level1->name);
+                return $q->where('goal_bank_orgs.level1_program', $level1->name);
             })
             ->when( $level2, function ($q) use($level2) {
-                return $q->where('ods_departments.level2_division', $level2->name);
+                return $q->where('goal_bank_orgs.level2_division', $level2->name);
             })
             ->when( $level3, function ($q) use($level3) {
-                return $q->where('ods_departments.level3_branch', $level3->name);
+                return $q->where('goal_bank_orgs.level3_branch', $level3->name);
             })
             ->when( $level4, function ($q) use($level4) {
-                return $q->where('ods_departments.level4', $level4->name);
+                return $q->where('goal_bank_orgs.level4', $level4->name);
             })
-            ->orderBy('ods_departments.organization')
-            ->orderBy('ods_departments.level1_program')
-            ->orderBy('ods_departments.level2_division')
-            ->orderBy('ods_departments.level3_branch')
-            ->orderBy('ods_departments.level4')
-            ->distinct()
             ->select (
-                'ods_departments.deptid',
-                'ods_departments.organization',
-                'ods_departments.level1_program',
-                'ods_departments.level2_division',
-                'ods_departments.level3_branch',
-                'ods_departments.level4',
+                'goal_bank_orgs.organization',
+                'goal_bank_orgs.level1_program',
+                'goal_bank_orgs.level2_division',
+                'goal_bank_orgs.level3_branch',
+                'goal_bank_orgs.level4',
                 'goal_bank_orgs.goal_id',
                 'goal_bank_orgs.id'
             );
@@ -371,6 +374,7 @@ class GoalBankController extends Controller
     public function deleteorg(Request $request, $id)
     {
         $query = GoalBankOrg::where('id', '=', $id)
+        ->where('version', 1)
         ->delete();
 
         return redirect()->back();
@@ -481,11 +485,21 @@ class GoalBankController extends Controller
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql->select([ 'employee_demo.employee_id', 'employee_demo.employee_name', 'employee_demo.jobcode_desc', 'employee_demo.employee_email', 
-                'employee_demo.organization', 'employee_demo.level1_program', 'employee_demo.level2_division',
-                'employee_demo.level3_branch','employee_demo.level4', 'employee_demo.deptid'])
-            ->orderBy('employee_id')
-                ->pluck('employee_demo.employee_id');        
+        $matched_emp_ids = $sql->select([ 
+            'employee_demo.employee_id', 
+            'employee_demo.employee_name', 
+            'employee_demo.jobcode_desc', 
+            'employee_demo.employee_email', 
+            'employee_demo.organization', 
+            'employee_demo.level1_program', 
+            'employee_demo.level2_division',
+            'employee_demo.level3_branch',
+            'employee_demo.level4', 
+            'employee_demo.deptid'
+        ])
+        ->whereNull('employee_demo.date_deleted')
+        ->orderBy('employee_demo.employee_id')
+        ->pluck('employee_demo.employee_id');        
         
         $criteriaList = $this->search_criteria_list();
         $ecriteriaList = $this->search_criteria_list();
@@ -624,8 +638,10 @@ class GoalBankController extends Controller
             , 'employee_demo.level2_division'
             , 'employee_demo.level3_branch'
             , 'employee_demo.level4'
-            , 'employee_demo.deptid'])
-        ->orderBy('employee_id')
+            , 'employee_demo.deptid'
+        ])
+        ->whereNull('employee_demo.date_deleted')
+        ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
         $ademoWhere = $this->abaseFilteredWhere($request, $alevel0, $alevel1, $alevel2, $alevel3, $alevel4);
@@ -640,8 +656,10 @@ class GoalBankController extends Controller
             , 'employee_demo.level2_division'
             , 'employee_demo.level3_branch'
             , 'employee_demo.level4'
-            , 'employee_demo.deptid'])
-        ->orderBy('employee_id')
+            , 'employee_demo.deptid'
+        ])
+        ->whereNull('employee_demo.date_deleted')
+        ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
         $criteriaList = $this->search_criteria_list();
@@ -735,52 +753,38 @@ class GoalBankController extends Controller
             // $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
             $selected_emp_ids = $request->userCheck ? $request->userCheck : [];
             $toRecipients = EmployeeDemo::select('users.id')
-            ->join('users', 'employee_demo.guid', 'users.guid')
+            ->join('users', 'employee_demo.employee_id', 'users.employee_id')
             ->whereIn('employee_demo.employee_id', $selected_emp_ids )
             ->distinct()
-            ->select ('users.id', 'users.employee_id')
+            ->select ('users.id')
             ->orderBy('employee_demo.employee_name')
             ->get() ;
-
-            $newly_added_emp_ids = [];
             foreach ($toRecipients as $newId) {
-                // $result = DB::table('goals_shared_with')
-                // ->updateOrInsert(
-                //     ['goal_id' => $resultrec->id
-                //     , 'user_id' => $newId->id
-                //     ],
-                //     []
-                // );
-                $sharedWith = \App\Models\GoalSharedWith::updateOrCreate([
-                    'goal_id' => $resultrec->id,
-                    'user_id' => $newId->id,
-                ],[
-                ]); 
-
-                if ($sharedWith->wasRecentlyCreated) {
-                    array_push($newly_added_emp_ids, $newId->employee_id);
-                }
+                $result = DB::table('goals_shared_with')
+                ->updateOrInsert(
+                    ['goal_id' => $resultrec->id
+                    , 'user_id' => $newId->id
+                    ],
+                    []
+                );
             }
             
-            $notify_audiences = $newly_added_emp_ids;
+            $notify_audiences = $selected_emp_ids;
         }
 
         if($request->opt_audience == "byOrg") {
             $selected_org_nodes = $request->eorgCheck ? $request->eorgCheck : [];
-            $organizationList = OrganizationTree::select('id', 'deptid', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
+            $organizationList = OrganizationTree::select('id', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
             ->whereIn('id', $selected_org_nodes)
             ->distinct()
             ->orderBy('id')
             ->get();
-
-            $newly_added_emp_ids = [];
             foreach($organizationList as $org1) {
                 $result = DB::table('goal_bank_orgs')
                 ->insert(
                     ['goal_id' => $resultrec->id
                     // , 'version' => '5'
                     , 'version' => '1'
-                    , 'deptid' => ($org1->deptid ? $org1->deptid : null)
                     , 'organization' => ($org1->organization ? $org1->organization : null)
                     , 'level1_program' => ($org1->level1_program ? $org1->level1_program : null)
                     , 'level2_division' => ($org1->level2_division ? $org1->level2_division : null)
@@ -792,14 +796,9 @@ class GoalBankController extends Controller
                 if(!$result){
                     break;
                 }
-
-                // new organization tree id
-                $org1_emplid_ids = $this->get_employees_by_selected_org_nodes($org1->id);
-                $newly_added_emp_ids = array_merge($newly_added_emp_ids, $org1_emplid_ids);
-
             }
 
-            $notify_audiences = $newly_added_emp_ids;
+            $notify_audiences = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
             
         }
 
@@ -807,7 +806,7 @@ class GoalBankController extends Controller
         $this->notify_on_dashboard($resultrec, $notify_audiences);
 
         // // Send Out Email notification when new goal added
-        $this->notify_employees($resultrec, $notify_audiences);
+        // $this->notify_employees($resultrec, $notify_audiences);
 
         return redirect()->route(request()->segment(1).'.goalbank')
             ->with('success', 'Create new goal bank successful.');
@@ -851,6 +850,7 @@ class GoalBankController extends Controller
                     ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
                     ->on('employee_demo.level4', '=', 'organization_trees.level4');
                 })
+                ->whereNull('employee_demo.date_deleted')
                 ->select('organization_trees.id','employee_demo.employee_id')
                 ->groupBy('organization_trees.id', 'employee_demo.employee_id')
                 ->orderBy('organization_trees.id')->orderBy('employee_demo.employee_id')
@@ -902,6 +902,7 @@ class GoalBankController extends Controller
                             ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
                             ->on('employee_demo.level4', '=', 'organization_trees.level4');
                         })
+                        ->whereNull('employee_demo.date_deleted')
                         ->select('organization_trees.id','employee_demo.employee_id')
                         ->groupBy('organization_trees.id', 'employee_demo.employee_id')
                         ->orderBy('organization_trees.id')->orderBy('employee_demo.employee_id')
@@ -952,6 +953,7 @@ class GoalBankController extends Controller
                     ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
                     ->on('employee_demo.level4', '=', 'organization_trees.level4');
                 })
+                ->whereNull('employee_demo.date_deleted')
                 ->select('organization_trees.id','employee_demo.employee_id')
                 ->groupBy('organization_trees.id', 'employee_demo.employee_id')
                 ->orderBy('organization_trees.id')->orderBy('employee_demo.employee_id')
@@ -1022,13 +1024,15 @@ class GoalBankController extends Controller
                 , 'employee_demo.level2_division'
                 , 'employee_demo.level3_branch'
                 , 'employee_demo.level4'
-                , 'employee_demo.deptid']);
+                , 'employee_demo.deptid'
+            ])
+            ->whereNull('employee_demo.date_deleted');
             return Datatables::of($eemployees)
-                ->addColumn('eselect_users', static function ($eemployee) {
-                        return '<input pid="1335" type="checkbox" id="euserCheck'. 
-                            $eemployee->employee_id .'" name="euserCheck[]" value="'. $eemployee->employee_id .'" class="dt-body-center">';
-                })->rawColumns(['eselect_users','eaction'])
-                ->make(true);
+            ->addColumn('eselect_users', static function ($eemployee) {
+                return '<input pid="1335" type="checkbox" id="euserCheck'. 
+                    $eemployee->employee_id .'" name="euserCheck[]" value="'. $eemployee->employee_id .'" class="dt-body-center">';
+            })->rawColumns(['eselect_users','eaction'])
+            ->make(true);
         }
     }
 
@@ -1055,13 +1059,15 @@ class GoalBankController extends Controller
                 , 'employee_demo.level2_division'
                 , 'employee_demo.level3_branch'
                 , 'employee_demo.level4'
-                , 'employee_demo.deptid']);
+                , 'employee_demo.deptid'
+            ])
+            ->whereNull('employee_demo.date_deleted');
             return Datatables::of($aemployees)
-                ->addColumn('aselect_users', static function ($aemployee) {
-                        return '<input pid="1335" type="checkbox" id="auserCheck'. 
-                            $aemployee->employee_id .'" name="auserCheck[]" value="'. $aemployee->employee_id .'" class="dt-body-center">';
-                })->rawColumns(['aselect_users','aaction'])
-                ->make(true);
+            ->addColumn('aselect_users', static function ($aemployee) {
+                return '<input pid="1335" type="checkbox" id="auserCheck'. 
+                    $aemployee->employee_id .'" name="auserCheck[]" value="'. $aemployee->employee_id .'" class="dt-body-center">';
+            })->rawColumns(['aselect_users','aaction'])
+            ->make(true);
         }
     }
 
@@ -1070,7 +1076,7 @@ class GoalBankController extends Controller
         $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
         $current_user = User::find(Auth::id());
 
-            $organizationList = OrganizationTree::select('id', 'deptid', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
+            $organizationList = OrganizationTree::select('id', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
             ->whereIn('id', $selected_org_nodes)
             ->distinct()
             ->orderBy('id')
@@ -1105,10 +1111,8 @@ class GoalBankController extends Controller
                     , 'level2_division' => $org1->level2_division
                     , 'level3_branch' => $org1->level3_branch
                     , 'level4' => $org1->level4
-                    ],
-                    [
-                        'updated_at' => date('Y-m-d H:i:s')
-                    ]
+                    , 'created_at' => date('Y-m-d H:i:s')
+                    , 'updated_at' => date('Y-m-d H:i:s') ],
                 );
                 if(!$result){
                     break;
@@ -1124,63 +1128,34 @@ class GoalBankController extends Controller
         $selected_org_nodes = $request->eorgCheck ? $request->eorgCheck : [];
         $current_user = Auth::id();
 
-            $organizationList = OrganizationTree::select('id', 'deptid', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
+            $organizationList = OrganizationTree::select('id', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
             ->whereIn('id', $selected_org_nodes)
             ->distinct()
             ->orderBy('id')
             ->get();
 
             $resultrec = Goal::withoutGlobalScopes()->findorfail( $request->goal_id );
-
-            $notify_audiences = [];
-            $newly_added_emp_ids = [];
+    
             foreach($organizationList as $org1) {
-                // $result = DB::table('goal_bank_orgs')
-                // ->updateorinsert(
-                //     ['goal_id' => $resultrec->id
-                //     , 'organization' => $org1->organization
-                //     , 'level1_program' => $org1->level1_program
-                //     , 'level2_division' => $org1->level2_division
-                //     , 'level3_branch' => $org1->level3_branch
-                //     , 'level4' => $org1->level4
-                //     ],
-                // );
-                // if(!$result){
-                //     break;
-                // }
-
-                
-                $goal_bank_org = \App\Models\GoalBankOrg::updateOrCreate([
-                    'goal_id' => $resultrec->id
-                    , 'version' => 1
-                    , 'deptid' => $org1->deptid
-                    , 'organization' => $org1->organization
-                    , 'level1_program' => $org1->level1_program
-                    , 'level2_division' => $org1->level2_division
-                    , 'level3_branch' => $org1->level3_branch
-                    , 'level4' => $org1->level4
-                    , 'created_at' => date('Y-m-d H:i:s')
-                    , 'updated_at' => date('Y-m-d H:i:s')
-                ],[
-
-                ]); 
-
-
-                // new organization tree id
-                if ($goal_bank_org->wasRecentlyCreated) {
-                    $org1_emplid_ids = $this->get_employees_by_selected_org_nodes($org1->id);
-                    $newly_added_emp_ids = array_merge($newly_added_emp_ids, $org1_emplid_ids);
+                $result = DB::table('goal_bank_orgs')
+                ->updateorinsert(
+                    [
+                        'goal_id' => $resultrec->id
+                        , 'version' => '1'
+                        , 'organization' => $org1->organization
+                        , 'level1_program' => $org1->level1_program
+                        , 'level2_division' => $org1->level2_division
+                        , 'level3_branch' => $org1->level3_branch
+                        , 'level4' => $org1->level4
+                    ],
+                    [
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]
+                );
+                if(!$result){
+                    break;
                 }
-
             }
-
-        $notify_audiences = $newly_added_emp_ids;
-
-        // notify_on_dashboard when new goal added
-        $this->notify_on_dashboard($resultrec, $notify_audiences);
-
-         // // Send Out Email notification when new goal added
-        $this->notify_employees($resultrec, $notify_audiences);
 
         return redirect()->route(request()->segment(1).'.goalbank.manageindex')
             ->with('success', 'Goal update successful.');
@@ -1200,44 +1175,22 @@ class GoalBankController extends Controller
 
         $aemployee_ids = ($request->auserCheck) ? $request->auserCheck : [];
         $toRecipients = EmployeeDemo::select('users.id')
-        ->join('users', 'employee_demo.guid', 'users.guid')
+        ->join('users', 'employee_demo.employee_id', 'users.employee_id')
         ->whereIn('employee_demo.employee_id', $aselected_emp_ids)
         ->distinct()
-        ->select ('users.id','users.employee_id')
+        ->select ('users.id')
         ->orderBy('employee_demo.employee_name')
         ->get() ;
 
-        
-        $notify_audiences = [];
-        $newly_added_emp_ids = [];
         foreach ($toRecipients as $newId) {
-            // $result = DB::table('goals_shared_with')
-            // ->updateOrInsert(
-            //     ['goal_id' => $resultrec->id
-            //     , 'user_id' => $newId->id
-            //     ],
-            //     []
-            // );
-            
-            $sharedWith = \App\Models\GoalSharedWith::updateOrCreate([
-                'goal_id' => $resultrec->id,
-                'user_id' => $newId->id,
-            ],[
-            ]); 
-
-            if ($sharedWith->wasRecentlyCreated) {
-                array_push($newly_added_emp_ids, $newId->employee_id);
-            }
-         
+            $result = DB::table('goals_shared_with')
+            ->updateOrInsert(
+                ['goal_id' => $resultrec->id
+                , 'user_id' => $newId->id
+                ],
+                []
+            );
         }
-
-        $notify_audiences = $newly_added_emp_ids;
-
-        // notify_on_dashboard when new goal added
-        $this->notify_on_dashboard($resultrec, $notify_audiences);
-
-        // // Send Out Email notification when new goal added
-        $this->notify_employees($resultrec, $notify_audiences);		
 
         return redirect()->route(request()->segment(1).'.goalbank.manageindex')
             ->with('success', 'Goal update successful.');
@@ -1276,7 +1229,7 @@ class GoalBankController extends Controller
     public function getUsers(Request $request)
     {
         $search = $request->search;
-        $users =  User::whereRaw("lower(name) like '%". strtolower($search)."%'")
+        $users =  User::whereRaw("name like '%".$search."%'")
                     ->whereNotNull('email')->paginate();
         return ['data'=> $users];
     }
@@ -1403,23 +1356,23 @@ class GoalBankController extends Controller
         })
         ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
             $q->where(function($query) use ($request) {
-                return $query->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->search_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->search_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->search_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
+                return $query->whereRaw("employee_demo.employee_id LIKE '%".$request->search_text."%'")
+                    ->orWhereRaw("employee_demo.employee_name LIKE '%".$request->search_text."%'")
+                    ->orWhereRaw("employee_demo.jobcode_desc LIKE '%".$request->search_text."%'")
+                    ->orWhereRaw("employee_demo.deptid LIKE '%".$request->search_text."%'");
             });
         })
         ->when( $request->search_text && $request->criteria == 'emp', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->search_text) . "%'");
+            return $q->whereRaw("employee_demo.employee_id LIKE '%".$request->search_text."%'");
         })
         ->when( $request->search_text && $request->criteria == 'name', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->search_text) . "%'");
+            return $q->whereRaw("employee_demo.employee_name LIKE '%".$request->search_text."%'");
         })
         ->when( $request->search_text && $request->criteria == 'job', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->search_text) . "%'");
+            return $q->whereRaw("employee_demo.jobcode_desc LIKE '%".$request->search_text."%'");
         })
         ->when( $request->search_text && $request->criteria == 'dpt', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
+            return $q->whereRaw("employee_demo.deptid LIKE '%".$request->search_text."%'");
         });
         return $demoWhere;
     }
@@ -1502,23 +1455,23 @@ class GoalBankController extends Controller
         ->when( $request->asearch_text && $request->acriteria == 'all', function ($q) use($request) {
             $q->where(function($query) use ($request) {
                 
-                return $query->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->asearch_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->asearch_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->asearch_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->asearch_text) . "%'");
+                return $query->whereRaw("employee_demo.employee_id LIKE '%".$request->asearch_text."%'")
+                    ->orWhereRaw("employee_demo.employee_name LIKE '%".$request->asearch_text."%'")
+                    ->orWhereRaw("employee_demo.jobcode_desc LIKE '%".$request->asearch_text."%'")
+                    ->orWhereRaw("employee_demo.deptid LIKE '%".$request->asearch_text."%'");
             });
         })
         ->when( $request->asearch_text && $request->acriteria == 'emp', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->asearch_text) . "%'");
+            return $q->whereRaw("employee_demo.employee_id LIKE '%".$request->asearch_text."%'");
         })
         ->when( $request->esearch_text && $request->acriteria == 'name', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->asearch_text) . "%'");
+            return $q->whereRaw("employee_demo.employee_name LIKE '%".$request->asearch_text."%'");
         })
         ->when( $request->esearch_text && $request->acriteria == 'job', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->asearch_text) . "%'");
+            return $q->whereRaw("employee_demo.jobcode_desc LIKE '%".$request->asearch_text."%'");
         })
         ->when( $request->esearch_text && $request->acriteria == 'dpt', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->asearch_text) . "%'");
+            return $q->whereRaw("employee_demo.deptid LIKE '%".$request->asearch_text."%'");
         });
         return $ademoWhere;
     }
@@ -1721,21 +1674,21 @@ class GoalBankController extends Controller
 
             $ownedgoals = Goal::withoutGlobalScopes()
             ->join('users as cu', 'cu.id', '=', 'goals.created_by')
-            ->leftjoin('employee_demo as ced', 'ced.guid', '=', 'cu.guid')
+            ->leftjoin('employee_demo as ced', 'ced.employee_id', '=', 'cu.employee_id')
             ->where('is_library', true)
             ->where('goals.created_by', '=', Auth::id())
             ->where('by_admin', '=', 2)
             ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
                 $q->where(function($query) use ($request) {
-                    return $query->whereRaw("LOWER(goals.title) LIKE '%" . strtolower($request->search_text) . "%'")
-                        ->orWhereRaw("LOWER(ced.employee_name) LIKE '%" . strtolower($request->search_text) . "%'");
+                    return $query->whereRaw("goals.title LIKE '%".$request->search_text."%'")
+                        ->orWhereRaw("ced.employee_name LIKE '%".$request->search_text."%'");
                 });
             })
             ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
-                return $q->whereRaw("LOWER(goals.title) LIKE '%" . strtolower($request->search_text) . "%'");
+                return $q->whereRaw("goals.title LIKE '%".$request->search_text."%'");
             })
             ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
-                return $q->whereRaw("LOWER(ced.employee_name) LIKE '%" . strtolower($request->search_text) . "%'");
+                return $q->whereRaw("ced.employee_name LIKE '%".$request->search_text."%'");
             })
             ->distinct()
             ->select
@@ -1796,7 +1749,7 @@ class GoalBankController extends Controller
             ->where('goals.id', '=', $goal_id)
             ->join('goals_shared_with', 'goals.id', '=', 'goals_shared_with.goal_id')
             ->join('users', 'users.id', '=', 'goals_shared_with.user_id')
-            ->join('employee_demo', 'employee_demo.guid', '=', 'users.guid')
+            ->join('employee_demo', 'employee_demo.employee_id', '=', 'users.employee_id')
             ->join('admin_orgs', function ($j1) {
                 $j1->on(function ($j1a) {
                     $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
@@ -1879,6 +1832,12 @@ class GoalBankController extends Controller
         ->where('model_id', '=', $modelId);
     }
 
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function deletegoal(Request $request, $goal_id) {
         $query1 = DB::table('goal_tags') 
         ->where('goal_id', '=', $goal_id) 
@@ -1895,6 +1854,7 @@ class GoalBankController extends Controller
         ->delete(); 
         return redirect()->back(); 
     }
+
     
     protected function get_employees_by_selected_org_nodes($selected_org_nodes) {
         $employees = EmployeeDemo::join('organization_trees', function ($j1) {
@@ -1914,7 +1874,7 @@ class GoalBankController extends Controller
                     $j5a->whereRAW('organization_trees.level4 = employee_demo.level4 OR ((organization_trees.level4 = "" OR organization_trees.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
                 } );
             } )
-            ->where('organization_trees.id', $selected_org_nodes)
+            ->whereIn('organization_trees.id', $selected_org_nodes)
             ->pluck('employee_id'); 
         return ($employees ? $employees->toArray() : []); 
     }
@@ -1947,34 +1907,19 @@ class GoalBankController extends Controller
     protected function notify_employees($goalBank, $employee_ids)
     {
         // find user id based on the employee_id
-        // $bcc_user_ids = User::whereIn('employee_id', $employee_ids)->pluck('id');
-        $notify_users = User::whereIn('employee_id', $employee_ids)
-                                ->with('userPreference')
-                                ->select('id','name', 'guid')
-                                ->get();
-
-        // Add dasboard message to each participant_id
-        foreach ($notify_users as $user) {
-
-            if ($user && $user->allow_email_notification && $user->userPreference->goal_bank_flag == 'Y') {
-
-                // Send Out Email Notification to Employee
-                $sendMail = new \App\MicrosoftGraph\SendMail();
-                $sendMail->toRecipients = [ $user->id ];  
-                $sendMail->sender_id = null; 
-                $sendMail->useQueue = false;
-                $sendMail->saveToLog = true;
-                $sendMail->alert_type = 'N';
-                $sendMail->alert_format = 'E';
-
-                $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
-                array_push($sendMail->bindvariables, $user->name);
-                array_push($sendMail->bindvariables, $goalBank->user ? $goalBank->user->name : '');   // Person who added goal to goal bank
-                array_push($sendMail->bindvariables, $goalBank->title);       // goal title
-                array_push($sendMail->bindvariables, $goalBank->mandatory_status_descr);           // Mandatory or suggested status
-                $response = $sendMail->sendMailWithGenericTemplate();
-            }
-        }
+        $bcc_user_ids = User::whereIn('employee_id', $employee_ids)->pluck('id');
+        
+        // Send Out Email Notification to Employee
+        $sendMail = new SendMail();
+        $sendMail->bccRecipients = $bcc_user_ids;  
+        $sendMail->sender_id = null;
+        $sendMail->useQueue = false;
+        $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
+        array_push($sendMail->bindvariables, "");
+        array_push($sendMail->bindvariables, $goalBank->user ? $goalBank->user->name : '');   // Person who added goal to goal bank
+        array_push($sendMail->bindvariables, $goalBank->title);       // goal title
+        array_push($sendMail->bindvariables, $goalBank->mandatory_status_descr);           // Mandatory or suggested status
+        // $response = $sendMail->sendMailWithGenericTemplate();
     }
 
 }
