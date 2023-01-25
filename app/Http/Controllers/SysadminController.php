@@ -192,7 +192,7 @@ class SysadminController extends Controller
 
         $query = DB::table('employee_demo')
         ->join('users', function($join){
-            $join->on('employee_Demo.employee_id', '=', 'users.id');
+            $join->on('employee_demo.employee_id', '=', 'users.employee_id');
         })
         ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
         // ->wherenotnull('excused_start_date')
@@ -274,7 +274,7 @@ class SysadminController extends Controller
 
         $query = DB::table('employee_demo')
         ->join('users', function($join){
-            $join->on('employee_Demo.employee_id', '=', 'users.id');
+            $join->on('employee_demo.employee_id', '=', 'users.employee_id');
         })
         ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
         ->wherenotnull('excused_start_date')
@@ -353,7 +353,7 @@ class SysadminController extends Controller
 
         $query = DB::table('employee_demo')
         ->join('users', function($join){
-            $join->on('employee_Demo.employee_id', '=', 'users.id');
+            $join->on('employee_Demo.employee_id', '=', 'users.employee_id');
         })
         ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4')
         // ->wherenotnull('excused_start_date')
@@ -441,7 +441,7 @@ class SysadminController extends Controller
 
         $query = DB::table('employee_demo')
         ->leftjoin('users', function($join){
-            $join->on('employee_Demo.employee_id', '=', 'users.id');
+            $join->on('employee_demo.employee_id', '=', 'users.employee_id');
         })
         ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
         // ->wherenotnull('excused_start_date')

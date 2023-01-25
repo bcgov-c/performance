@@ -188,7 +188,7 @@ class Conversation extends Model implements Auditable
         $authId = Auth::id();
         $user = User::find($authId);
 
-        $jr = EmployeeDemoJunior::where('guid', $user->guid)->getQuery()->orderBy('id', 'desc')->first();
+        $jr = EmployeeDemoJunior::where('employee_id', $user->employee_id)->getQuery()->orderBy('id', 'desc')->first();
         if ((isset($jr->excused_type) && $jr->excused_type == 'A') || $user->excused_flag) {
             $msg = "Employee is currently excused and their conversation deadline is paused";
             return [
