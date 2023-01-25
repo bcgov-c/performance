@@ -570,7 +570,11 @@
                         if (result.success) {
                             location.reload();
                         } else {
-                            $('.error').html(result.Message);
+                            if(isSupervisor){
+                                $('#signoff-sup-id-input .error').html(result.Message);
+                            } else {
+                                $('#signoff-emp-id-input .error').html(result.Message);
+                            }
                         }
                     }
                     , error: function(error) {
