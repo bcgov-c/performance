@@ -89,7 +89,11 @@ class ConversationController extends Controller
         foreach($myCurrentTeam as $item){
             $myCurrentTeam_array[] = $item->id;
         }
-        $myCurrentTeam_list = implode( ',', $myCurrentTeam_array );
+        if(count($myCurrentTeam_array) > 0) {
+            $myCurrentTeam_list = implode( ',', $myCurrentTeam_array );
+        } else {
+            $myCurrentTeam_list = "''";
+        }
                 
         $type = 'upcoming';
         if ($request->is('conversation/past') || $request->is('my-team/conversations/past')) {
