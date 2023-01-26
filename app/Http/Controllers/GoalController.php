@@ -397,7 +397,8 @@ class GoalController extends Controller
         if ($request->datatype != "auto") {
             return redirect()->route($goal->is_library ? 'goal.library' : 'goal.index');
         } else {
-            return \Redirect::route('goal.edit', [$id]);
+            //return \Redirect::route('goal.edit', [$id]);
+            return \Redirect::route('goal.edit', [$id])->with('autosave', " Goal updated.");
         }
     }
 
