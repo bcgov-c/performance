@@ -190,15 +190,18 @@
         
         const minutes = 1;
         const SessionTime = 1000 * 60 * minutes;
-        $(document).ready(function () {                
-            const myTimeout = setTimeout(sessionWarning, SessionTime);                
+        
+        $(document).ready(function () { 
+            @if (!\Session::has('autosave')) 
+                const myTimeout = setTimeout(sessionWarning, SessionTime);  
+            @endif
         });    
             
         function sessionWarning() {
-            no_msg = true;
+            no_msg = true;    
             $('#datatype').val('auto');
-            $(".btn-primary").trigger("click");                  
-            alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');                
+            $(".btn-primary").trigger("click");
+            alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');    
         } 
 
     </script>
