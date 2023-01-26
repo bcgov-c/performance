@@ -183,7 +183,7 @@
             for (var i in CKEDITOR.instances){
                 CKEDITOR.instances[i].updateElement();
             };
-            if (isContentModified() && !confirm("If you continue you will lose any unsaved information.")) {
+            if (isContentModified() && !confirm("If you continue you will lose any unsaved changes.")) {
                 e.preventDefault();
             }
         });
