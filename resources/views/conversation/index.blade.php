@@ -212,7 +212,7 @@
             document.getElementById("closemodal").onclick = function(e) {myFunction(e)};
             function myFunction(e) {
                 if (modal_edit ==  true || !checkIfItIsLocked()){       
-                        if (confirm('If you continue you will lose any unsaved information.')) {
+                        if (confirm('If you continue you will lose any unsaved changes.')) {
                             modal_open=false;
                             //saveComments();                                
                             $('.modal-body').find('#employee_id').val('');
