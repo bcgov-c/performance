@@ -150,7 +150,6 @@ class GoalBankController extends Controller
             , 'employee_demo.level4'
             , 'employee_demo.deptid'
         ])
-        ->whereNull('employee_demo.date_deleted')
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
@@ -169,7 +168,6 @@ class GoalBankController extends Controller
             , 'employee_demo.level4'
             , 'employee_demo.deptid'
         ])
-        ->whereNull('employee_demo.date_deleted')
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
@@ -297,7 +295,6 @@ class GoalBankController extends Controller
             'employee_demo.level4', 
             'employee_demo.deptid'
         ])
-        ->whereNull('employee_demo.date_deleted')
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
@@ -480,7 +477,6 @@ class GoalBankController extends Controller
             'employee_demo.level4', 
             'employee_demo.deptid'
         ])
-        ->whereNull('employee_demo.date_deleted')
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
@@ -623,7 +619,6 @@ class GoalBankController extends Controller
             , 'employee_demo.level4'
             , 'employee_demo.deptid'
         ])
-        ->whereNull('employee_demo.date_deleted')
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
@@ -641,7 +636,6 @@ class GoalBankController extends Controller
             , 'employee_demo.level4'
             , 'employee_demo.deptid'
         ])
-        ->whereNull('employee_demo.date_deleted')
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
@@ -834,7 +828,6 @@ class GoalBankController extends Controller
             ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
             ->on('employee_demo.level4', '=', 'organization_trees.level4');
         })
-        ->whereNull('employee_demo.date_deleted')
         ->select('organization_trees.id','employee_demo.employee_id')
         ->groupBy('organization_trees.id', 'employee_demo.employee_id')
         ->orderBy('organization_trees.id')->orderBy('employee_demo.employee_id')
@@ -886,7 +879,6 @@ class GoalBankController extends Controller
             ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
             ->on('employee_demo.level4', '=', 'organization_trees.level4');
         })
-        ->whereNull('employee_demo.date_deleted')
         ->select('organization_trees.id','employee_demo.employee_id')
         ->groupBy('organization_trees.id', 'employee_demo.employee_id')
         ->orderBy('organization_trees.id')->orderBy('employee_demo.employee_id')
@@ -937,7 +929,6 @@ class GoalBankController extends Controller
             ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
             ->on('employee_demo.level4', '=', 'organization_trees.level4');
         })
-        ->whereNull('employee_demo.date_deleted')
         ->select('organization_trees.id','employee_demo.employee_id')
         ->groupBy('organization_trees.id', 'employee_demo.employee_id')
         ->orderBy('organization_trees.id')->orderBy('employee_demo.employee_id')
@@ -982,8 +973,7 @@ class GoalBankController extends Controller
                 , 'employee_demo.level3_branch'
                 , 'employee_demo.level4'
                 , 'employee_demo.deptid'
-            ])
-            ->whereNull('employee_demo.date_deleted');
+            ]);
             return Datatables::of($employees)
             ->addColumn('select_users', static function ($employee) {
                 return '<input pid="1335" type="checkbox" id="userCheck'. 
@@ -1017,8 +1007,7 @@ class GoalBankController extends Controller
                 , 'employee_demo.level3_branch'
                 , 'employee_demo.level4'
                 , 'employee_demo.deptid'
-            ])
-            ->whereNull('employee_demo.date_deleted');
+            ]);
             return Datatables::of($eemployees)
             ->addColumn('eselect_users', static function ($eemployee) {
                 return '<input pid="1335" type="checkbox" id="euserCheck'. 
@@ -1052,8 +1041,7 @@ class GoalBankController extends Controller
                 , 'employee_demo.level3_branch'
                 , 'employee_demo.level4'
                 , 'employee_demo.deptid'
-            ])
-            ->whereNull('employee_demo.date_deleted');
+            ]);
             return Datatables::of($aemployees)
             ->addColumn('aselect_users', static function ($aemployee) {
                     return '<input pid="1335" type="checkbox" id="auserCheck'. 
@@ -1312,8 +1300,8 @@ class GoalBankController extends Controller
 
     protected function baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4) {
         // Base Where Clause
-        $demoWhere = EmployeeDemo::
-        when( $level0, function ($q) use($level0) {
+        $demoWhere = EmployeeDemo::whereNull('employee_demo.date_deleted')
+        ->when( $level0, function ($q) use($level0) {
             return $q->where('employee_demo.organization', $level0->name);
         })
         ->when( $level1, function ($q) use($level1) {
@@ -1353,8 +1341,8 @@ class GoalBankController extends Controller
 
     protected function ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4) {
         // Base Where Clause
-        $edemoWhere = EmployeeDemo::
-        when( $elevel0, function ($q) use($elevel0) {
+        $edemoWhere = EmployeeDemo::whereNull('employee_demo.date_deleted')
+        ->when( $elevel0, function ($q) use($elevel0) {
             return $q->where('employee_demo.organization', $elevel0->name);
         })
         ->when( $elevel1, function ($q) use($elevel1) {
@@ -1374,8 +1362,8 @@ class GoalBankController extends Controller
 
     protected function abaseFilteredWhere($request, $alevel0, $alevel1, $alevel2, $alevel3, $alevel4) {
         // Base Where Clause
-        $ademoWhere = EmployeeDemo::
-        when( $alevel0, function ($q) use($alevel0) {
+        $ademoWhere = EmployeeDemo::whereNull('employee_demo.date_deleted')
+        ->when( $alevel0, function ($q) use($alevel0) {
             return $q->where('employee_demo.organization', $alevel0->name);
         })
         ->when( $alevel1, function ($q) use($alevel1) {

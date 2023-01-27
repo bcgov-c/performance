@@ -104,7 +104,7 @@ class MyOrganizationController extends Controller
             ->when($request->criteria == 'job' && $request->search_text, function($q) use($request){return $q->whereRaw("u.jobcode_desc like '%".$request->search_text."%'");})
             ->when($request->criteria == 'dpt' && $request->search_text, function($q) use($request){return $q->whereRaw("u.deptid like '%".$request->search_text."%'");})
             ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRaw("(u.employee_id like '%".$request->search_text."%' or u.employee_name like '%".$request->search_text."%' or u.jobcode_desc like '%".$request->search_text."%' or u.deptid like '%".$request->search_text."%')");})
-
+            ->whereNull('u.date_deleted')
             ->selectRaw ("
                 u.user_id,
                 u.guid,

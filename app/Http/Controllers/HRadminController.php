@@ -34,6 +34,7 @@ class HRadminController extends Controller
         $this->getSearchCriterias($crit);
 
         $query = DB::table('employee_demo as emp')
+        ->whereNull('emp.date_deleted')
         ->select('emp.employee_id', 'emp.guid', 'emp.employee_name', 'emp.jobcode_desc', 'emp.organization','emp.level1_program', 'emp.level2_division', 'emp.level3_branch', 'emp.level4', 'emp.deptid');
         // ->addselect(function ($aa){});
         // ->addselect(DB::raw("(select count(id) as goal_count from goals where user_id = emp.employee_id and status = 'active' group by user_id) as goal_count"));

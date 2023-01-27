@@ -823,7 +823,7 @@ class ConversationController extends Controller
         $user = User::find($authId);
         $template = ConversationTopic::findOrFail($id);
         $allTemplates = ConversationTopic::all();
-        $participants = session()->has('original-auth-id') ? User::where('id', Auth::id())->get() : $user->reportees()->get();
+        $participants = session()->has('original-auth-id') ? User::where('id', Auth::id())->get() : $user->avaliableReportees()->get();
         $reportingManager = $user->reportingManager()->get();
         $sharedProfile = SharedProfile::where('shared_with', Auth::id())->with('sharedUser')->get()->pluck('sharedUser');
         $participants = $participants->toBase()->merge($reportingManager)->merge($sharedProfile);

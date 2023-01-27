@@ -137,12 +137,21 @@ class EmployeeSharesController extends Controller
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $edemoWhere = $this->ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4);
         $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql->select([ 'employee_id', 'employee_name', 'jobcode_desc', 'employee_email', 
-                'employee_demo.organization', 'employee_demo.level1_program', 'employee_demo.level2_division',
-                'employee_demo.level3_branch','employee_demo.level4', 'employee_demo.deptid'])
-                ->orderBy('employee_id')
-                ->pluck('employee_demo.employee_id');        
-                $ematched_emp_ids = clone $matched_emp_ids;
+        $matched_emp_ids = $sql->select([ 
+            'employee_id', 
+            'employee_name', 
+            'jobcode_desc', 
+            'employee_email', 
+            'employee_demo.organization', 
+            'employee_demo.level1_program', 
+            'employee_demo.level2_division',
+            'employee_demo.level3_branch',
+            'employee_demo.level4', 
+            'employee_demo.deptid'
+        ])
+        ->orderBy('employee_demo.employee_id')
+        ->pluck('employee_demo.employee_id');        
+        $ematched_emp_ids = clone $matched_emp_ids;
         // $alert_format_list = NotificationLog::ALERT_FORMAT;
         $criteriaList = $this->search_criteria_list();
         $ecriteriaList = $this->search_criteria_list();
@@ -395,10 +404,10 @@ class EmployeeSharesController extends Controller
             $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
             $sql = clone $demoWhere; 
             $employees = $sql->select([ 
-                'employee_id'
-                , 'employee_name'
-                , 'jobcode_desc'
-                , 'employee_email'
+                'employee_demo.employee_id'
+                , 'employee_demo.employee_name'
+                , 'employee_demo.jobcode_desc'
+                , 'employee_demo.employee_email'
                 , 'employee_demo.organization'
                 , 'employee_demo.level1_program'
                 , 'employee_demo.level2_division'
@@ -448,8 +457,7 @@ class EmployeeSharesController extends Controller
     public function getUsers(Request $request)
     {
         $search = $request->search;
-        $users =  User::whereRaw("lower(name) like '%". strtolower($search)."%'")
-                    ->whereNotNull('email')->paginate();
+        $users =  User::whereRaw("name like '%".$search."%'")->whereNotNull('email')->paginate();
         return ['data'=> $users];
     }
 
@@ -458,7 +466,7 @@ class EmployeeSharesController extends Controller
         orderby('organization_trees.name','asc')->select('organization_trees.id','organization_trees.name')
             ->where('organization_trees.level',0)
             ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(name) LIKE '%" . strtolower($request->q) . "%'");
+                return $q->whereRaw("name LIKE '%".$request->q."%'");
             })
             ->get();
         $eformatted_orgs = [];
@@ -475,7 +483,7 @@ class EmployeeSharesController extends Controller
         orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
             ->where('organization_trees.level',1)
             ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
+                return $q->whereRaw("organization_trees.name LIKE '%".$request->q."%'");
                 })
             ->when( $elevel0 , function ($q) use($elevel0) {
                 return $q->where('organization_trees.organization', $elevel0->name );
@@ -500,7 +508,7 @@ class EmployeeSharesController extends Controller
         orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
             ->where('organization_trees.level',2)
             ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
+                return $q->whereRaw("organization_trees.name LIKE '%".$request->q."%'");
                 })
             ->when( $elevel0 , function ($q) use($elevel0) {
                 return $q->where('organization_trees.organization', $elevel0->name) ;
@@ -532,7 +540,7 @@ class EmployeeSharesController extends Controller
             orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
             ->where('organization_trees.level',3)
             ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
+                return $q->whereRaw("organization_trees.name LIKE '%".$request->q."%'");
                 })
             ->when( $elevel0 , function ($q) use($elevel0) {
                 return $q->where('organization_trees.organization', $elevel0->name) ;
@@ -569,7 +577,7 @@ class EmployeeSharesController extends Controller
             orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
             ->where('organization_trees.level',4)
             ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
+                return $q->whereRaw("organization_trees.name LIKE '%".$request->q."%'");
                 })
             ->when( $elevel0 , function ($q) use($elevel0) {
                 return $q->where('organization_trees.organization', $elevel0->name) ;
@@ -653,8 +661,8 @@ class EmployeeSharesController extends Controller
 
     protected function baseFilteredWhere(Request $request, $level0, $level1, $level2, $level3, $level4) {
         // Base Where Clause
-        $demoWhere = EmployeeDemo::
-            when( $level0, function ($q) use($level0) {
+        $demoWhere = EmployeeDemo::whereNull('employee_demo.date_deleted')
+        ->when( $level0, function ($q) use($level0) {
             return $q->where('employee_demo.organization', $level0->name);
         })
         ->when( $level1, function ($q) use($level1) {
@@ -672,31 +680,31 @@ class EmployeeSharesController extends Controller
         ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
             $q->where(function($query) use ($request) {
                 
-                return $query->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->search_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->search_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->search_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
+                return $query->whereRaw("employee_demo.employee_id LIKE '%".$request->search_text."%'")
+                    ->orWhereRaw("employee_demo.employee_name LIKE '%".$request->search_text."%'")
+                    ->orWhereRaw("employee_demo.jobcode_desc LIKE '%".$request->search_text."%'")
+                    ->orWhereRaw("employee_demo.deptid LIKE '%".$request->search_text."%'");
             });
         })
         ->when( $request->search_text && $request->criteria == 'emp', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->search_text) . "%'");
+            return $q->whereRaw("employee_demo.employee_id LIKE '%".$request->search_text."%'");
         })
         ->when( $request->search_text && $request->criteria == 'name', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->search_text) . "%'");
+            return $q->whereRaw("employee_demo.employee_name LIKE '%".$request->search_text."%'");
         })
         ->when( $request->search_text && $request->criteria == 'job', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->search_text) . "%'");
+            return $q->whereRaw("employee_demo.jobcode_desc LIKE '%".$request->search_text."%'");
         })
         ->when( $request->search_text && $request->criteria == 'dpt', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
+            return $q->whereRaw("employee_demo.deptid LIKE '%".$request->search_text."%'");
         });
         return $demoWhere;
     }
 
     protected function ebaseFilteredWhere(Request $request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4) {
         // Base Where Clause
-        $edemoWhere = EmployeeDemo::
-            when( $elevel0, function ($q) use($elevel0) {
+        $edemoWhere = EmployeeDemo::whereNull('employee_demo.date_deleted')
+        ->when( $elevel0, function ($q) use($elevel0) {
             return $q->where('employee_demo.organization', $elevel0->name);
         })
         ->when( $elevel1, function ($q) use($elevel1) {
@@ -714,23 +722,23 @@ class EmployeeSharesController extends Controller
         ->when( $request->esearch_text && $request->ecriteria == 'all', function ($q) use($request) {
             $q->where(function($query) use ($request) {
                 
-                return $query->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->esearch_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->esearch_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->esearch_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->esearch_text) . "%'");
+                return $query->whereRaw("employee_demo.employee_id LIKE '%".$request->esearch_text."%'")
+                    ->orWhereRaw("employee_demo.employee_name LIKE '%".$request->esearch_text."%'")
+                    ->orWhereRaw("employee_demo.jobcode_desc LIKE '%".$request->esearch_text."%'")
+                    ->orWhereRaw("employee_demo.deptid LIKE '%".$request->esearch_text."%'");
             });
         })
         ->when( $request->esearch_text && $request->ecriteria == 'emp', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->esearch_text) . "%'");
+            return $q->whereRaw("employee_demo.employee_id LIKE '%".$request->esearch_text."%'");
         })
         ->when( $request->esearch_text && $request->ecriteria == 'name', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->esearch_text) . "%'");
+            return $q->whereRaw("employee_demo.employee_name LIKE '%".$request->esearch_text."%'");
         })
         ->when( $request->esearch_text && $request->ecriteria == 'job', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.jobcode_desc) LIKE '%" . strtolower($request->esearch_text) . "%'");
+            return $q->whereRaw("employee_demo.jobcode_desc LIKE '%".$request->esearch_text."%'");
         })
         ->when( $request->esearch_text && $request->ecriteria == 'dpt', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->esearch_text) . "%'");
+            return $q->whereRaw("employee_demo.deptid LIKE '%".$request->esearch_text."%'");
         });
         return $edemoWhere;
     }
