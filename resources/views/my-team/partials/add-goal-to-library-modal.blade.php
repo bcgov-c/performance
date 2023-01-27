@@ -87,14 +87,15 @@
                 </div>
                 <div class="col-6">
                     <!-- <label> -->
-                        <b>Audience</b><br>
+                        <b>Audience</b><br>                        
                         <select multiple class="form-control items-to-share" name="itemsToShare[]">
                             @foreach ($employees_list as $employee)
                                 <option value="{{ $employee['id'] }}" selected> {{$employee["name"]}}</option>                                
                             @endforeach
                         </select>
                     <!-- </label> -->
-                    <small class="text-danger error-share_with"></small>
+                    <br/>
+                    <small class="text-danger error-itemsToShare"></small>
                 </div>
             </div>
 
@@ -213,6 +214,7 @@
                         $('.text-danger').text('');
                     });
                     Object.entries(errors).forEach(function callback(value, index) {
+                         console.log(value[0]);
                         var className = '.error-' + value[0];
                         $('#addGoalToLibraryModal input[name='+value[0]+']').addClass('is-invalid');
                         $(className).text(value[1]);
