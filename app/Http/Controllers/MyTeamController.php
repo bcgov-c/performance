@@ -126,7 +126,7 @@ class MyTeamController extends Controller
     }
 
     public function myEmployeesAjax() {
-        return User::find(Auth::id())->reportees()->get();
+        return User::find(Auth::id())->avaliableReportees()->get();
     }
     
     public function mySharedEmployeesAjax() {
