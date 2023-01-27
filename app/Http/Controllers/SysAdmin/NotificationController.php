@@ -580,11 +580,9 @@ class NotificationController extends Controller
     }
 
     protected function baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4, $job_titles) {
-
-
-
         // Base Where Clause
-        $demoWhere = EmployeeDemo::when( $level0, function ($q) use($level0) {
+        $demoWhere = EmployeeDemo::whereNull('employee_demo.date_deleted')
+        ->when( $level0, function ($q) use($level0) {
             return $q->where('employee_demo.organization', $level0->name);
         })
         ->when( $level1, function ($q) use($level1) {
@@ -626,9 +624,6 @@ class NotificationController extends Controller
         ->when( $request->search_text && $request->criteria == 'dpt', function ($q) use($request) {
             return $q->whereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
         });
-     
-        // dd ([ $request, $request->criteria,  $demoWhere->toSql() ]);
-
         return $demoWhere;
     }
 
