@@ -253,7 +253,7 @@ class AccessPermissionsController extends Controller
             ->get() ;
 
         if($request->input('accessselect') == 3) {
-            $organizationList = OrganizationTree::select('id', 'deptid', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
+            $organizationList = OrganizationTree::select('id', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4')
             ->whereIn('id', $selected_org_nodes)
             ->distinct()
             ->orderBy('id')
@@ -276,7 +276,6 @@ class AccessPermissionsController extends Controller
                         ['user_id' => $newId->id
                         // , 'version' => '5'
                         , 'version' => '1'
-                        , 'deptid' => $org1->deptid
                         , 'organization' => $org1->organization
                         , 'level1_program' => $org1->level1_program
                         , 'level2_division' => $org1->level2_division
@@ -725,7 +724,6 @@ class AccessPermissionsController extends Controller
             $query = AdminOrg::where('user_id', $model_id)
             ->where('version', '1')
             ->select (
-                'deptid',
                 'organization',
                 'level1_program',
                 'level2_division',

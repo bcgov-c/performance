@@ -100,9 +100,9 @@ class ExcuseEmployeesController extends Controller
             , 'level4'
             , 'deptid'
             , 'jobcode_desc'
-            ])
-            ->orderBy('employee_id')
-            ->pluck('employee_id');        
+        ])
+        ->orderBy('employee_id')
+        ->pluck('employee_id');        
         
         $criteriaList = $this->search_criteria_list();
         $reasons = ExcusedReason::where('id', '>', 2)->get();
@@ -423,16 +423,16 @@ class ExcuseEmployeesController extends Controller
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
         $rows = $sql->join('organization_trees as o', function($join) {
-                $join->on('user_demo_jr_view.organization', 'o.organization')
-                    ->on('user_demo_jr_view.level1_program', 'o.level1_program')
-                    ->on('user_demo_jr_view.level2_division', 'o.level2_division')
-                    ->on('user_demo_jr_view.level3_branch', 'o.level3_branch')
-                    ->on('user_demo_jr_view.level4', 'o.level4');
-                })
-                ->select('o.id', 'employee_id')
-                ->groupBy('o.id', 'employee_id')
-                ->orderBy('o.id')->orderBy('employee_id')
-                ->get();
+            $join->on('user_demo_jr_view.organization', 'o.organization')
+            ->on('user_demo_jr_view.level1_program', 'o.level1_program')
+            ->on('user_demo_jr_view.level2_division', 'o.level2_division')
+            ->on('user_demo_jr_view.level3_branch', 'o.level3_branch')
+            ->on('user_demo_jr_view.level4', 'o.level4');
+        })
+        ->select('o.id', 'employee_id')
+        ->groupBy('o.id', 'employee_id')
+        ->orderBy('o.id')->orderBy('employee_id')
+        ->get();
 
         $empIdsByOrgId = $rows->groupBy('id')->all();
 

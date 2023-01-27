@@ -99,7 +99,8 @@ class CalcNextConversationDate extends Command
         $counter = 0;
         $updatecounter = 0;
         $ClassificationArray = ExcusedClassification::select('jobcode')->pluck('jobcode')->toArray();
-        EmployeeDemo::leftjoin('users', 'users.employee_id', 'employee_demo.employee_id')
+        EmployeeDemo::whereNull('employee_demo.date_deleted')
+        ->leftjoin('users', 'users.employee_id', 'employee_demo.employee_id')
         ->whereRaw("trim(employee_demo.guid) <> ''")
         ->whereNotNull('employee_demo.guid')
         ->whereRaw("employee_demo.employee_status = (select min(a.employee_status) from employee_demo a where a.employee_id = employee_demo.employee_id)")

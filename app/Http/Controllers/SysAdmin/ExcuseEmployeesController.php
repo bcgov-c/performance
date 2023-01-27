@@ -912,7 +912,8 @@ class ExcuseEmployeesController extends Controller
 
     protected function ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4) {
         // Base Where Clause
-        $demoWhere = EmployeeDemo::when( $elevel0, function ($q) use($elevel0) { $q->whereRaw("user_demo_jr_view.organization = '".$elevel0->name."'"); }) 
+        $demoWhere = EmployeeDemo::whereNull('date_deleted')
+        ->when( $elevel0, function ($q) use($elevel0) { $q->whereRaw("user_demo_jr_view.organization = '".$elevel0->name."'"); }) 
         ->when( $elevel1, function ($q) use($elevel1) { $q->whereRaw("user_demo_jr_view.level1_program = '".$elevel1->name."'"); })
         ->when( $elevel2, function ($q) use($elevel2) { $q->whereRaw("user_demo_jr_view.level2_division = '".$elevel2->name."'");  })
         ->when( $elevel3, function ($q) use($elevel3) { $q->whereRaw("user_demo_jr_view.level3_branch = '".$elevel3->name."'"); })

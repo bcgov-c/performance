@@ -166,7 +166,8 @@ class User extends Authenticatable
     
     public function avaliableReportees() {
         return $this->reportees()
-                ->join('employee_demo', 'employee_demo.employee_id', '=', 'users.employee_id');
+                ->join('employee_demo', 'employee_demo.employee_id', '=', 'users.employee_id')
+                ->whereNull('employee_demo.date_deleted');
     }
 
     public function reporteesCount() {
