@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Models\OrganizationTree;
 use App\Models\ConversationTopic;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Exports\ConversationExport;
 use App\Exports\UserGoalCountExport;
 use App\Http\Controllers\Controller;
@@ -705,12 +706,17 @@ class StatisticsReportController extends Controller
                     as overdue_in_days")
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                })
+                ->join('conversation_participants', function($join) {
+                    $join->on('users.id', '=', 'conversation_participants.participant_id');
+                })
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
-                })
+                
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid' )
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N')")
                 ->where('users.due_date_paused', 'N')
+                ->where('conversation_participants.role', 'emp')
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
                 })
@@ -767,7 +773,7 @@ class StatisticsReportController extends Controller
                     $query->select(DB::raw(1))
                             ->from('admin_org_users')
                             ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
-                            ->whereIn('admin_org_users.access_type', [0,2])
+                            ->whereIn('admin_org_users.access_type', [0,2,3])
                             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 });
 
@@ -791,12 +797,16 @@ class StatisticsReportController extends Controller
         $sql = Conversation::join('users', 'users.id', 'conversations.user_id') 
         ->join('employee_demo', function($join) {
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+        })
+        ->join('conversation_participants', function($join) {
+            $join->on('users.id', '=', 'conversation_participants.participant_id');   
             // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
             // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
         })
         // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
         // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N')")
         ->where('users.due_date_paused', 'N')
+        ->where('conversation_participants.role', 'emp')
         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.organization', $level0->name);
         })
@@ -914,6 +924,9 @@ class StatisticsReportController extends Controller
         $completed_conversations = Conversation::join('users', 'users.id', 'conversations.user_id') 
         ->join('employee_demo', function($join) {
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+        })
+        ->join('conversation_participants', function($join) {
+            $join->on('users.id', '=', 'conversation_participants.participant_id');
             // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
             // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
         })
@@ -935,7 +948,8 @@ class StatisticsReportController extends Controller
         ->whereNull('deleted_at')   
         // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
         // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
-        ->where('users.due_date_paused', 'N')        
+        ->where('users.due_date_paused', 'N')   
+        ->where('conversation_participants.role', 'emp')     
         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.organization', $level0->name);
         })
@@ -1026,12 +1040,17 @@ class StatisticsReportController extends Controller
                     users.next_conversation_date as next_due_date")
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                })
+                ->join('conversation_participants', function($join) {
+                    $join->on('users.id', '=', 'conversation_participants.participant_id');
+                })
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
-                })
+                
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N')")
                 ->where('users.due_date_paused', 'N')
+                ->where('conversation_participants.role', 'emp')
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
                 })
@@ -1091,6 +1110,7 @@ class StatisticsReportController extends Controller
                             ->whereIn('admin_org_users.access_type', [0,2])
                             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 });
+               // Log::info($sql_chart1->tosql());
                 
         // SQL - Chart 2
         $sql_chart2 = Conversation::selectRaw("conversations.*, users.employee_id, employee_demo.employee_name, users.email,
@@ -1126,6 +1146,7 @@ class StatisticsReportController extends Controller
                 })
                 ->whereNull('deleted_at')                
                 ->join('users', 'users.id', 'conversations.user_id') 
+                ->join('conversation_participants','users.id','conversation_participants.participant_id')
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
@@ -1134,6 +1155,7 @@ class StatisticsReportController extends Controller
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N')")
                 ->where('users.due_date_paused', 'N')
+                ->where('conversation_participants.role','emp')
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
                 })
@@ -1205,6 +1227,7 @@ class StatisticsReportController extends Controller
                     employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
                     users.next_conversation_date as next_due_date")
             ->join('users', 'users.id', 'conversations.user_id') 
+            ->join('conversation_participants','users.id','conversation_participants.participant_id')
             ->join('employee_demo', function($join) {
                 $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
@@ -1212,7 +1235,8 @@ class StatisticsReportController extends Controller
             })
             // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
             // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N')")
-            ->where('users.due_date_paused', 'N')            
+            ->where('users.due_date_paused', 'N')     
+            ->where('conversation_participants.role','emp')       
             ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                 return $q->where('employee_demo.organization', $level0->name);
             })
