@@ -104,6 +104,13 @@
                     :href='route("goal.show", $goal->id)' class="ml-2">{{__('View')}}</x-button>
                     </span>
                 </form>  
+                @else    
+                <span style="float: right">
+                <form id="delete-goal-{{$goal->id}}" action="{{ route('goal.destroy', $goal->id)}}" method="POST" onsubmit="return confirm('{{ $goalDeleteConfirmationText ?? 'Are you sure you want to permanently delete this goal?' }}')">                    
+                    <x-button
+                    :href='route("goal.show", $goal->id)' class="ml-2">{{__('View')}}</x-button>
+                    </span>
+                </form>      
                 @endif 
             </div>
             @endif
