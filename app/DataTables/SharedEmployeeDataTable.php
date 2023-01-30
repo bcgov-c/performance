@@ -89,7 +89,9 @@ class SharedEmployeeDataTable extends DataTable
      */
     public function query(User $model)
     {
-        return $model->newQuery()->whereIn('id', SharedProfile::where('shared_with', Auth::id())->pluck('shared_id') )
+        return $model->newQuery()
+            ->whereIn('id', SharedProfile::where('shared_with', Auth::id())->pluck('shared_id') )
+            ->where('reporting_to', '<>', Auth::id())     
             ->withCount('activeGoals')
             ->with('upcomingConversation')
             ->with('employee_demo')
