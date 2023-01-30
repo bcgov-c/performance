@@ -14,7 +14,7 @@
                 </a>
                 <div class="flex-fill"></div>
                 
-                @if (($type ?? '') !== 'supervisor' && !$disableEdit && 1 == 0)
+                @if ($type !== 'supervisor' && !$disableEdit && 1 == 0)
                 @if(!session()->has('view-profile-as'))
                 <form id="delete-goal-{{$goal->id}}" action="{{ route('goal.destroy', $goal->id)}}" method="POST" onsubmit="return confirm('{{ $goalDeleteConfirmationText ?? 'Are you sure you want to permanently delete this goal?' }}')">
                     @csrf
@@ -86,7 +86,8 @@
                     @include('goal.partials.status-change')                                     
                 @else
                     <x-goal-status :status="$goal->status"></x-goal-status>
-                @endif                
+                @endif  
+                @if(($type ?? '') !== 'supervisor' && !$disableEdit)
                 <span style="float: right">
                 <form id="delete-goal-{{$goal->id}}" action="{{ route('goal.destroy', $goal->id)}}" method="POST" onsubmit="return confirm('{{ $goalDeleteConfirmationText ?? 'Are you sure you want to permanently delete this goal?' }}')">
                     @csrf
@@ -103,7 +104,7 @@
                     :href='route("goal.show", $goal->id)' class="ml-2">{{__('View')}}</x-button>
                     </span>
                 </form>  
-                
+                @endif 
             </div>
             @endif
             
