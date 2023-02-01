@@ -46,6 +46,10 @@ class Kernel extends ConsoleKernel
         ->dailyAt('00:25')
         ->appendOutputTo(storage_path('logs/SyncUserProfile.log'));
 
+        $schedule->command('command:GetODSPositions')
+        ->timezone('America/Vancouver')
+        ->dailyAt('00:30');
+
         $schedule->command('command:UpdateGUIDByEmployeeId')
         ->timezone('America/Vancouver')
         ->dailyAt('00:45');
@@ -58,6 +62,10 @@ class Kernel extends ConsoleKernel
         ->timezone('America/Vancouver')
         ->dailyAt('01:00');
   
+        $schedule->command('command:SetNextLevelManager')
+        ->timezone('America/Vancouver')
+        ->dailyAt('01:15');
+
         $schedule->command('command:BuildAdminOrgUsers')
         ->timezone('America/Vancouver')
         ->dailyAt('01:30');
