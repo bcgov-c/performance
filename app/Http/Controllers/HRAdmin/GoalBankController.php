@@ -181,6 +181,9 @@ class GoalBankController extends Controller
             }
         }
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
+        
+        //no need private in goalbank module
+        unset($goalTypes[3]);
 
         return view('shared.goalbank.createindex', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'type_desc_str') );
     }
