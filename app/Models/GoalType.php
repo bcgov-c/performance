@@ -9,6 +9,12 @@ use Illuminate\Database\Eloquent\Builder;
 class GoalType extends Model
 {
     use SoftDeletes;
+    
+    protected $fillable = [
+    'name',
+    'order',
+    'description'
+    ];
 
     protected static function boot()
     {
@@ -19,4 +25,5 @@ class GoalType extends Model
             $builder->orderBy('order', 'asc');
         });
     }
+    
 }

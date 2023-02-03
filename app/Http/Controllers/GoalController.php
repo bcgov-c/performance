@@ -164,6 +164,13 @@ class GoalController extends Controller
         if(isset($request->status) && $request->status != 0){
             $query = $query->where('goals.status', 'LIKE', "$request->status");
         }
+        
+        if (session()->get('original-auth-id') && session()->get('original-auth-id') != Auth::id()){
+            $query = $query->where('goal_types.name', '<>', 'Private');
+        }
+        
+        
+        
         if(isset($request->filter_start_date) && $request->filter_start_date != ''){
             $start_date_array = explode('-', $request->filter_start_date);
             if(count($start_date_array) == 2) {
@@ -592,13 +599,12 @@ class GoalController extends Controller
             $query = $query->orderby($sortby, $sortorder);    
         }
         
-        
-        
-        
         // $query = $query->groupBy('goals.id');
         $bankGoals = $query->paginate($perPage=10, $columns = ['*'], $pageName = 'Goal');
         $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goalTypes, $tagsList);
-
+        
+        //no need private in goalbank module
+        unset($goalTypes[4]);
 
         $myTeamController = new MyTeamController();
         $suggestedGoalsData = $myTeamController->showSugggestedGoals('my-team.goals.bank', false);
@@ -614,6 +620,7 @@ class GoalController extends Controller
                 array_push($type_desc_arr, $item);
             }
         }
+        
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
         $goals_count = count($bankGoals);
         
@@ -664,7 +671,7 @@ class GoalController extends Controller
             "name" => "Any"
         ]);
 
-        $goalTypes = GoalType::all()->toArray();
+        $goalTypes = GoalType::all()->toArray();        
         array_unshift($goalTypes, [
             "id" => "0",
             "name" => "Any"
