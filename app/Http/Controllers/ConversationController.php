@@ -175,12 +175,10 @@ class ConversationController extends Controller
              if ($sharedSupervisorIds && $sharedSupervisorIds[0]) {
                 $myTeamQuery->where(function($query) use ($sharedSupervisorIds,$myCurrentTeam_array) {
                     $query->whereNotIn('user_id', $sharedSupervisorIds)->
-                    orWhereHas('conversationParticipants', function ($query) use ($myCurrentTeam_array ) {
+                    WhereHas('conversationParticipants', function ($query) use ($myCurrentTeam_array ) {
                         $query->whereIn('participant_id', $myCurrentTeam_array);
                     });
                 });
-            
-                
             }
             $myTeamQuery->where('signoff_user_id','<>', $authId);
             $type = 'past';
