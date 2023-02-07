@@ -159,8 +159,19 @@ class MyTeamController extends Controller
             /// $sharedProfile->save();
             return $this->respondeWith($sharedProfile);
         }
-
-        $sharedProfile->delete();
+        
+        //also clean up shared goals
+        $shared_id = $sharedProfile->shared_id;
+        $shared_with = $sharedProfile->shared_with;
+        
+        DB::table('goals_shared_with')
+                    ->where('user_id', $shared_id)
+                    ->whereIn('goal_id', function ($query) use ($shared_with) {
+                        $query->select('id')->from('goals')->where('user_id', $shared_with);
+                    })
+                    ->delete();
+        $sharedProfile->delete();        
+        
         return $this->respondeWith('');
     }
 
@@ -521,10 +532,11 @@ class MyTeamController extends Controller
                     ->select('id', 'name')
                     ->where('id', Auth::id())
                     ->first();
-        $employees_list[0]["id"] = $myself->id;
-        $employees_list[0]["name"] = $myself->name;
+        //$employees_list[0]["id"] = $myself->id;
+        //$employees_list[0]["name"] = $myself->name;
+        //$i = 1;
         
-        $i = 1;
+        $i = 0;
         if(count($employees)>0) {
             foreach ($employees as $employee) {
                 $employees_list[$i]["id"] = $employee->id;

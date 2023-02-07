@@ -37,6 +37,8 @@ Create a goal for your employees to use in their own profile. Goals can be sugge
         CKEDITOR.replace('measure_of_success', {
             toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent", "Link"] ] });
     });
-    
+    $('#addGoalToLibraryModal').on('hidden.bs.modal', function (e) {
+        modal_open = false;
+    })
 </script>
 @endpush

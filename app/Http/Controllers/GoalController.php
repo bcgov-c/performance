@@ -76,6 +76,7 @@ class GoalController extends Controller
 
         $myTeamController = new MyTeamController(); 
         $employees = $myTeamController->myEmployeesAjax();
+        
 
         $query = Goal::where('user_id', $authId)
         ->with('user')
@@ -444,7 +445,7 @@ class GoalController extends Controller
         return redirect()->back();
     }
 
-    public function goalBank(Request $request) {         
+    public function goalBank(Request $request) {      
         
         $authId = Auth::id();
         $user = User::find($authId);
