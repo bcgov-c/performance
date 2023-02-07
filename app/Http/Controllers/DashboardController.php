@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\UserReportingTo;
 use App\Models\SharedProfile;
 use App\Models\DashboardMessage;
+use App\Models\PreferredSupervisor;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DashboardNotification;
 use Illuminate\Support\Facades\Route;
@@ -210,9 +214,13 @@ class DashboardController extends Controller
 
         $open_modal = (session('open')) ? true : false;
 
+        $supervisorList = Auth::user()->supervisorList();
+        $supervisorListCount = Auth::user()->supervisorListCount();
+        $preferredSupervisor = Auth::user()->preferredSupervisor();
+
         return view('dashboard.index', compact('greetings', 'tab', 'supervisorTooltip', 'sharedList', 'profilesharedTooltip', 
                     // 'notifications', 'notifications_unread', 
-                    'message', 'matched_dn_ids','old_selected_dn_ids', 'open_modal'));
+                    'message', 'matched_dn_ids','old_selected_dn_ids', 'open_modal', 'supervisorList', 'supervisorListCount', 'preferredSupervisor'));
     }
 
     public function show(Request $request, $id) {
@@ -344,8 +352,37 @@ class DashboardController extends Controller
          $request->session()->forget('existing_user_id');
          $request->session()->forget('user_is_switched');
          //return redirect()->back();
-         return redirect()->to('/');
+         return redirect()->to('/dashboard');
 
+    }
+
+    public function updateSupervisor(Request $request) {
+        PreferredSupervisor::updateOrCreate([
+            'employee_id' => Auth::user()->employee_id,
+            'position_nbr' => Auth::user()->employee_demo->position_number
+        ], [
+            'supv_empl_id' => $request->id
+        ]);
+        $supvUser = User::join('employee_demo AS d', 'users.employee_id', 'd.employee_id')
+        ->select('users.id')
+        ->whereRaw("users.employee_id = '".$request->id."'")
+        ->whereNull('d.date_deleted')
+        ->orderBy('users.id')
+        ->first();
+        if($supvUser) {
+            User::where('id', '=', Auth::user()->id)
+            ->update([
+                'reporting_to' => $supvUser->id
+            ]);
+            UserReportingTo::updateOrCreate([
+                'user_id' => Auth::user()->id
+            ], [ 
+                'reporting_to_id' => $supvUser->id 
+            ]);
+        }
+        $test = User::where('id',  '=', (Auth::user()->id));
+        // Log::info($test);
+        return redirect()->back();
     }
 
 }

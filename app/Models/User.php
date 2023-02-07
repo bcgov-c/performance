@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\EmployeeDemo;
 use App\Models\EmployeeDemoJunior;
+use App\Models\PreferredSupervisor;
 
 class User extends Authenticatable
 {
@@ -284,6 +285,42 @@ class User extends Authenticatable
 
         return ($organization ? true : false);                            
 
+    }
+
+    public function supervisorList() {
+        return EmployeeDemo::join('positions AS p', 'employee_demo.position_number', 'p.position_nbr')
+        ->join('employee_demo AS e', 'p.reports_to', 'e.position_number')
+        ->join('users AS v', 'e.employee_id', 'v.employee_id')
+        ->distinct()
+        ->select('e.position_number', 'v.employee_id', 'v.name')
+        ->whereNull('e.date_deleted')
+        ->where('employee_demo.employee_id', $this->employee_id)
+        ->orderBy('e.position_number')
+        ->orderBy('v.name')
+        ->get();
+    }
+
+    public function preferredSupervisor() {
+        return PreferredSupervisor::join('users AS u', 'u.employee_id', 'preferred_supervisor.supv_empl_id')
+        ->select('preferred_supervisor.supv_empl_id', 'u.name')
+        ->where('preferred_supervisor.employee_id', '=', $this->employee_id)
+        ->where('preferred_supervisor.position_nbr', '=', $this->employee_demo->position_number)
+        ->first();
+    }
+
+    public function supervisorListCount() {
+        return $this->supervisorList()->count();
+    }
+
+    public function validPreferredSupervisor() {
+        // return EmployeeDemo::join('positions AS p', 'employee_demo.position_number', 'p.position_nbr')
+        // ->join('employee_demo AS e', 'p.reports_to', 'e.position_number')
+        // ->select('e.employee_id')
+        // ->whereNull('e.date_deleted')
+        // ->where('employee_demo.employee_id', $this->employee_id)
+        // ->whereRaw("EXISTS (SELECT 1 FROM preferred_supervisor AS ps WHERE ps.employee_id = employee_demo.employee_id AND ps.position_nbr = employee_demo.position_number AND ps.supv_empl_id = e.employee_id)")
+        // ->first();
+        return null;
     }
 
 }
