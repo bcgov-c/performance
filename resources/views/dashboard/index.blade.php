@@ -6,14 +6,35 @@
     </x-slot>
     <div class="container-fluid">
         <div class="row mb-4">
-        <div class="col-12 col-sm-4 col-md-4">
+            <div class="col-12 col-sm-4 col-md-4">
                 <strong>
                     My Current Supervisor
                     <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="{{ $supervisorTooltip }}"></i>
                 </strong>
                 <div class="bg-white border-b rounded p-2 mt-2 shadow-sm">
                     {{-- <x-profile-pic></x-profile-pic> --}}
-                    {{ Auth::user()->reportingManager ? Auth::user()->reportingManager->name : 'No supervisor' }}
+                    @if($supervisorListCount <= 1)
+                        {{ Auth::user()->reportingManager ? Auth::user()->reportingManager->name : 'No supervisor' }}
+                    @else
+                        <label for="supervisor_btn">
+                            <button type="button" icon="fas fa-xs fa-ellipsis-v" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {{ $preferredSupervisor ? $preferredSupervisor->name : (Auth::user()->reportingManager ? Auth::user()->reportingManager->name : 'No supervisor') }}
+                            </button>
+                            <div class="dropdown-menu"  size="xs">
+                                @foreach($supervisorList as $supv)
+                                    @if(!$preferredSupervisor || $supv->employee_id != $preferredSupervisor->supv_empl_id)
+                                        <x-button icon="fas fa-xs fa-fw" value="{{ $supv->employee_id }}" data-id="{{ $supv->employee_id }}" data-name="{{ $supv->name }}" class="dropdown-item change_supervisor" name="change_supervisor" id="change_supervisor">
+                                            {{ $supv->name }}
+                                        </x-button>
+                                    @else
+                                        <x-button icon="fas fa-xs fa-fw fa-solid fa-user-check" value="{{ $supv->employee_id }}" data-id="{{ $supv->employee_id }}" data-name="{{ $supv->name }}" class="dropdown-item no_change_supervisor" name="no_change_supervisor" id='no_change_supervisor'>
+                                            {{ $supv->name }}
+                                        </x-button>
+                                    @endif
+                                @endforeach
+                            </div>
+                        </label>
+                    @endif
                 </div>
             </div>
             <div class="col-12 col-sm-4 col-md-4">
@@ -81,6 +102,28 @@
                         $(this).popover('hide');
                     }
                 });
+            });
+
+            $('.change_supervisor').on('click', function(e) {
+                e.preventDefault();
+                var check = confirm("Are you sure you want to change supervisor?");
+                if(check == true){
+                    // alert($(this).data('id'));
+                    $.ajax({
+                        url: "{{ route('dashboard.updateSupervisor') }}",
+                        type: 'POST',
+                        dataType: 'json',
+                        data: { id : $(this).data('id'), 
+                        },
+                        success: function (data) {
+                            window.location.reload();
+                        }
+                    });
+                }
+            });
+
+            $('.no_change_supervisor').on('click', function(e) {
+                e.preventDefault();
             });
 
         </script>
