@@ -313,14 +313,14 @@ class User extends Authenticatable
     }
 
     public function validPreferredSupervisor() {
-        // return EmployeeDemo::join('positions AS p', 'employee_demo.position_number', 'p.position_nbr')
-        // ->join('employee_demo AS e', 'p.reports_to', 'e.position_number')
-        // ->select('e.employee_id')
-        // ->whereNull('e.date_deleted')
-        // ->where('employee_demo.employee_id', $this->employee_id)
-        // ->whereRaw("EXISTS (SELECT 1 FROM preferred_supervisor AS ps WHERE ps.employee_id = employee_demo.employee_id AND ps.position_nbr = employee_demo.position_number AND ps.supv_empl_id = e.employee_id)")
-        // ->first();
-        return null;
+        $row = EmployeeDemo::join('positions AS p', 'employee_demo.position_number', 'p.position_nbr')
+        ->join('employee_demo AS e', 'p.reports_to', 'e.position_number')
+        ->select('e.employee_id')
+        ->whereNull('e.date_deleted')
+        ->where('employee_demo.employee_id', $this->employee_id)
+        ->whereRaw("EXISTS (SELECT 1 FROM preferred_supervisor AS ps WHERE ps.employee_id = employee_demo.employee_id AND ps.position_nbr = employee_demo.position_number AND ps.supv_empl_id = e.employee_id)")
+        ->first();
+        return $row ? $row->employee_id : '';
     }
 
 }
