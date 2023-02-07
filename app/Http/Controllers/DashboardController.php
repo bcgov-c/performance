@@ -380,8 +380,6 @@ class DashboardController extends Controller
                 'reporting_to_id' => $supvUser->id 
             ]);
         }
-        $test = User::where('id',  '=', (Auth::user()->id));
-        // Log::info($test);
         return redirect()->back();
     }
 

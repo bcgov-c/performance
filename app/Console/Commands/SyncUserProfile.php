@@ -218,17 +218,21 @@ class SyncUserProfile extends Command
 
             if ($user) {
 
-                if ($user->reporting_to != $reporting_to) {
-                    $user->reporting_to = $reporting_to;
-                    $user->last_sync_at = $new_sync_at;
-                    $user->save();             
+                if(!$user->validPreferredSupervisor()) {
 
-                    // Update Reporting Tos
-                    if ($reporting_to) {
-                        $user->reportingTos()->updateOrCreate([
-                            'reporting_to_id' => $reporting_to,
-                        ]);
+                    if ($user->reporting_to != $reporting_to) {
+                        $user->reporting_to = $reporting_to;
+                        $user->last_sync_at = $new_sync_at;
+                        $user->save();             
+
+                        // Update Reporting Tos
+                        if ($reporting_to) {
+                            $user->reportingTos()->updateOrCreate([
+                                'reporting_to_id' => $reporting_to,
+                            ]);
+                        }
                     }
+
                 }
             } else {
                 $this->info('Step 2: User ' . $employee->employee_email . ' - ' . 
@@ -274,7 +278,7 @@ class SyncUserProfile extends Command
             if ($user) {
                 return $user->id;
             } else {
-                $text = 'Supervisor Not found - ' . $employee->supervisor_emplid . ' | employee -' .
+                $text = 'Supervisor Not found - ' . $employee->supervisor_emplid . ' | employee - ' .
                     $employee->employee_id;
                 $this->info( 'exception ' . $text );
                 
