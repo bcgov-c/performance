@@ -30,6 +30,9 @@
          @if ($type != 'supervisor')   
          <form action="" method="get" id="filter-menu">
             <div class="row">
+                
+                <div class="col-12"  id="msgdiv"></div>
+                
                 <div class="col">
                     <label>
                         Title
@@ -237,6 +240,7 @@
         var modal_open = false;
         var need_fresh = false;
         var autosave = true;
+        var no_warning = false;
         var myTimeout;
         $('body').popover({
             selector: '[data-toggle]',
@@ -323,13 +327,18 @@
         for (var i in CKEDITOR.instances){
             CKEDITOR.instances[i].updateElement();
         };
-        if (isContentModified() && !confirm("If you continue you will lose any unsaved changes.")) {
-            e.preventDefault();
+        if(no_warning == false) {
+            if (isContentModified() && !confirm("If you continue you will lose any unsaved changes.")) {
+                e.preventDefault();
+            } else {
+                if(need_fresh){
+                    location.reload();
+                }
+            } 
         } else {
-            if(need_fresh){
-                location.reload();
-            }
-        } 
+            localStorage.setItem('savemsg', 'Your goal is saved');
+            location.reload();            
+        }
     });
 
     $(document).on('click', '.btn-submit', function(e){
@@ -518,7 +527,15 @@
         
         $(document).ready(function(){
             $(":button").removeClass('text-center');
-            $(":button").addClass('text-left');            
+            $(":button").addClass('text-left');     
+            
+            
+            var savemsg = localStorage.getItem('savemsg');
+            if (savemsg == 'Your goal is saved') {
+                $('#msgdiv').html('<div class="alert alert-info"><p><i class="fa fa-info-circle"></i> '+savemsg+'</p></div>');
+                localStorage.setItem('savemsg', '');
+            }
+            
         });
         
         $('input[name="filter_start_date"]').daterangepicker({
@@ -578,13 +595,15 @@
                                 need_fresh = true;
                                 if(result.success){
                                     autosave = false;
+                                    no_warning = true;
                                     alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');
                                     //window.location.href= '/goal';
                                     $('.alert-danger').show();
                                     $('.alert-danger').html('Your goal has been saved.');
                                     $('.btn-submit').hide();
                                     $('.text-danger').hide();
-                                    $('.form-control').removeClass('is-invalid');
+                                    $('.form-control').removeClass('is-invalid');                                    
+                                    $('#addGoalModal').modal('toggle');
                                 }
                             },
                             error: function (error){
@@ -602,7 +621,7 @@
                                 });
                                 Object.entries(errors).forEach(function callback(value, index) {
                                     var className = '.error-' + value[0];
-                                    $('input[name='+value[0]+']').addClass('is-invalid');
+                                    $('#addGoalModal input[name='+value[0]+']').addClass('is-invalid');
                                     $(className).text(value[1]);
                                 });
                                 //alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');
