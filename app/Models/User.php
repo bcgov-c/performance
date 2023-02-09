@@ -301,11 +301,15 @@ class User extends Authenticatable
     }
 
     public function preferredSupervisor() {
-        return PreferredSupervisor::join('users AS u', 'u.employee_id', 'preferred_supervisor.supv_empl_id')
-        ->select('preferred_supervisor.supv_empl_id', 'u.name')
-        ->where('preferred_supervisor.employee_id', '=', $this->employee_id)
-        ->where('preferred_supervisor.position_nbr', '=', $this->employee_demo->position_number)
-        ->first();
+        if ($this->employee_demo && $this->employee_demo->position_number) {
+            return PreferredSupervisor::join('users AS u', 'u.employee_id', 'preferred_supervisor.supv_empl_id')
+            ->select('preferred_supervisor.supv_empl_id', 'u.name')
+            ->where('preferred_supervisor.employee_id', '=', $this->employee_id)
+            ->where('preferred_supervisor.position_nbr', '=', $this->employee_demo->position_number)
+            ->first();
+        } else {
+            return null;
+        }
     }
 
     public function supervisorListCount() {
