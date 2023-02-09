@@ -152,7 +152,7 @@
                         <!-- <textarea id="what" label="Goal Descriptionxxx" name="what" ></textarea> -->
                         <!-- <textarea id="what" name="what" ></textarea>                             -->
                         <small class="text-danger error-what"></small>
-                        <x-textarea-modal id="what" name="what" />
+                        <x-textarea-modal id="what" name="what"/>
                         <!-- </label> -->
                   </div>
                        <div class="col-12">
@@ -304,14 +304,17 @@
         $("input[name=start_date]").val('');
         $("input[name=target_date]").val('');
         for (var i in CKEDITOR.instances){
-            CKEDITOR.instances[i].setData('');
+            if(i != 'what'){
+                CKEDITOR.instances[i].setData('');
+            } else {
+                CKEDITOR.instances[i].setData('Please complete goal type, title, and tags before entering this content.');
+            }
         };
         
         CKEDITOR.instances['what'].setReadOnly(true);
         CKEDITOR.instances['measure_of_success'].setReadOnly(true);
         $('#start_date').prop("readonly",true);
         $('#target_date').prop("readonly",true);
-                 
     });
     $(document).on('hide.bs.modal', '#addGoalModal', function(e) {
         modal_open = false;
@@ -475,6 +478,7 @@
                 var goal_title = $("#goal_title").val();
                 var tags = $('.tags').val(); 
                 if (goal_title != '' && tags != ''){
+                   CKEDITOR.instances['what'].setData(''); 
                    CKEDITOR.instances['what'].setReadOnly(false);
                    CKEDITOR.instances['measure_of_success'].setReadOnly(false);
                    $('#start_date').prop("readonly",false);
@@ -491,6 +495,7 @@
                 var goal_title = $("#goal_title").val();
                 var tags = $('.tags').val(); 
                 if (goal_title != '' && tags != ''){
+                    CKEDITOR.instances['what'].setData(''); 
                     CKEDITOR.instances['what'].setReadOnly(false);
                     CKEDITOR.instances['measure_of_success'].setReadOnly(false);
                     $('#start_date').prop("readonly",false);
