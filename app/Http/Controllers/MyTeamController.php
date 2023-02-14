@@ -489,14 +489,12 @@ class MyTeamController extends Controller
 
     public function updateItemsToShare(Request $request) {
         $request->validate([
-            'itemsToShare' => 'required|array',
-            'itemsToShare.*' => 'exists:users,id',
             'goal_id' => 'required|exists:goals,id'
         ]);
 
         $share_with = $request->itemsToShare;
-        $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->find($request->goal_id);
-
+        $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->find($request->goal_id); 
+        
         $goal->sharedWith()->sync($share_with);
         return response()->json(['success' => true, 'message' => 'Goal synced successfully']);
     }
