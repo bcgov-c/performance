@@ -1,3 +1,4 @@
+<script src="https://cdn.ckeditor.com/4.20.1/standard-all/ckeditor.js"></script>
 <x-side-layout title="{{ __('My Goals - Performance Development Platform') }}">
     <x-slot name="header">
         <h3>
@@ -220,6 +221,8 @@
                     ["Outdent", "Indent"],
                     ["Link"],
                 ],
+                extraPlugins: 'editorplaceholder',
+                editorplaceholder: 'Please complete goal type, title, and tags before entering this content.',
                 disableNativeSpellChecker: false
             });
             CKEDITOR.replace('measure_of_success', {
@@ -303,12 +306,10 @@
         $('.tooltip-dropdown').find('.dropdown-item[data-value="1"]').click();
         $("input[name=start_date]").val('');
         $("input[name=target_date]").val('');
+        
+        
         for (var i in CKEDITOR.instances){
-            if(i != 'what'){
-                CKEDITOR.instances[i].setData('');
-            } else {
-                CKEDITOR.instances[i].setData('Please complete goal type, title, and tags before entering this content.');
-            }
+            CKEDITOR.instances[i].setData('');
         };
         
         CKEDITOR.instances['what'].setReadOnly(true);
@@ -637,7 +638,6 @@
                     }    
                 }, SessionTime);                
             }
-        
 </script>    
 
 <style>
