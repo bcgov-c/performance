@@ -25,7 +25,7 @@ class AddGoalToLibraryRequest extends FormRequest
     {
         return [
             'title' => 'required',
-            'what' => 'required',
+            'what' => 'nullable',
             'why' => 'nullable',
             'how' => 'nullable',
             'measure_of_success' => 'nullable',
@@ -43,7 +43,7 @@ class AddGoalToLibraryRequest extends FormRequest
     public function messages() {
         return [
             'itemsToShare.required' => 'please select at least one employee',
-            'what.required' => 'The description field is required'
+            //'what.required' => 'The description field is required'
         ];
     }
 }

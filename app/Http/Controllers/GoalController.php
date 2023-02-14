@@ -364,11 +364,9 @@ class GoalController extends Controller
     public function update(Request $request, $id)
     {        
         $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->findOrFail($id); 
-        if ($request->title == '' || $request->what== ''  || $request->tag_ids== '') {
+        if ($request->title == '' || $request->tag_ids== '') {
             if($request->title == '') {
                 $request->session()->flash('title_miss', 'The title field is required');
-            } elseif($request->what == '') {
-                $request->session()->flash('what_miss', 'The description field is required');
             } elseif($request->tag_ids == '') {
                 $request->session()->flash('tags_miss', 'The tags field is required');
             }                 
