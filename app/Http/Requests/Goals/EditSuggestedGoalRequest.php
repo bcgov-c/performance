@@ -27,7 +27,7 @@ class EditSuggestedGoalRequest extends FormRequest
             'title' => 'required',
             'start_date' => 'nullable',
             'target_date' => 'nullable',
-            'what' => 'required',
+            'what' => 'nullable',
             'why' => 'nullable',
             'how' => 'nullable',
             'measure_of_success' => 'nullable',
@@ -39,7 +39,7 @@ class EditSuggestedGoalRequest extends FormRequest
     
     public function messages() {
         return [
-            'what.required' => 'The description field is required'
+            //'what.required' => 'The description field is required'
         ];
     }
 }

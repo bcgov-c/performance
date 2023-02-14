@@ -340,6 +340,7 @@
             } 
         } else {
             localStorage.setItem('savemsg', 'Your goal is saved');
+            alert('Your goal is saved');
             location.reload();            
         }
     });
@@ -612,6 +613,7 @@
                                 }
                             },
                             error: function (error){
+                                console.log(error);
                                 need_fresh = false;
                                 autosave =  true;
                                 $('.btn-submit').show();
