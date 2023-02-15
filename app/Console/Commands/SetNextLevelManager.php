@@ -9,6 +9,7 @@ use App\Models\EmployeeDemo;
 use App\Models\ExcusedReason;
 use App\Models\JobSchedAudit;
 use App\Models\JobDataAudit;
+use App\Models\UserReportingTo;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -105,7 +106,15 @@ class SetNextLevelManager extends Command
                             $audit->save();
                             // Update Reporting Tos
                             if ($reporting_to) {
-                                $user->reportingTos()->updateOrCreate([ 'reporting_to_id' => $reporting_to ]);
+                                // $user->reportingTos()->updateOrCreate([ 'reporting_to_id' => $reporting_to ]);
+                                UserReportingTo::updateOrCreate(
+                                    [
+                                        'user_id' => $user->id
+                                    ],
+                                    [
+                                        'reporting_to_id' => $reporting_to
+                                    ]
+                                );
                             }
                             $old_values = [ 
                                 'table' => 'user_reporting_tos'                        
@@ -127,7 +136,7 @@ class SetNextLevelManager extends Command
                             echo 'Unable to reporting_to for EID # '.$demo->employee_id.'.'; echo "\r\n";
                             DB::rollback();
                         }
-                        }
+                    }
                 } else {
                     $this->info('EID '.$demo->employee_id.' - '.$demo->employee_name.' not found.');
                 }
