@@ -187,6 +187,8 @@
             };
             if (isContentModified() && !confirm("If you continue you will lose any unsaved changes.")) {
                 e.preventDefault();
+            } else {
+                location.reload();
             }
         });
         $("#add-goal-to-library-form").on('submit', function (e) {
