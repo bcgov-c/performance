@@ -462,6 +462,7 @@
                             $('input[name='+value[0]+']').addClass('is-invalid');
                             $(className).text(value[1]);
                         });
+                        alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');  
                     }
                 });
                 
