@@ -302,6 +302,7 @@ $(function() {
 		myData['groups'].forEach((element) => {
 			  array_ids = array_ids.concat( element['ids'] );
 		});
+                console.log(myData['groups']);
 		
 		option = {
 			ids : array_ids,					// parameter for exporting
@@ -385,7 +386,7 @@ $(function() {
 				},
 				label: {
 					alignTo: 'edge',
-					formatter: '{name|{b}} \n\n  {value|{c}} {per|{d}%} \n {emp|{@unique_emp} : {@total_unique_emp}} {per|{@per_emp}%} ',
+					formatter: '{name|{b}} \n\n  {value|{c}} {per|{d}%} \n {emp|{@unique_emp}} ',
 					minMargin: 1,
 					fontWeight: 'bold',
 					edgeDistance: 3,
