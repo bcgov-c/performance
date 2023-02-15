@@ -530,11 +530,11 @@ class MyTeamController extends Controller
                     ->select('id', 'name')
                     ->where('id', Auth::id())
                     ->first();
-        //$employees_list[0]["id"] = $myself->id;
-        //$employees_list[0]["name"] = $myself->name;
-        //$i = 1;
+        $employees_list[0]["id"] = $myself->id;
+        $employees_list[0]["name"] = $myself->name;
+        $i = 1;
         
-        $i = 0;
+        //$i = 0;
         if(count($employees)>0) {
             foreach ($employees as $employee) {
                 $employees_list[$i]["id"] = $employee->id;
@@ -556,7 +556,7 @@ class MyTeamController extends Controller
                 $i++;
             }
         }
-        usort($employees_list, fn($a, $b) => $a['name'] <=> $b['name']);
+        usort($employees_list, function($a, $b){ return strcmp($a["name"], $b["name"]); });
         
         $type = 'upcoming';
         $disableEdit = false;
