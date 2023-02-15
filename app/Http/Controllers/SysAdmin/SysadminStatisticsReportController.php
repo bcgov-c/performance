@@ -782,7 +782,7 @@ class SysadminStatisticsReportController extends Controller
         
         // Chart 5 -- Completed Conversation by employees
         $data['chart5']['chart_id'] = 5;
-        $data['chart5']['title'] = 'Employee: Completed Conversations';
+        $data['chart5']['title'] = 'Employees: Completed Conversations';
         $data['chart5']['legend'] = $topics->pluck('name')->toArray();
         $data['chart5']['groups'] = array();
 

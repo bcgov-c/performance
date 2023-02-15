@@ -1049,6 +1049,128 @@ class StatisticsReportController extends Controller
                     // 'ids' => $subset ? $subset->pluck('id')->toArray() : []
                 ]);
         }    
+        
+        
+        // Chart4 -- Open Conversation for employees
+        $topics = ConversationTopic::select('id','name')->get();
+        $data['chart4']['chart_id'] = 2;
+        $data['chart4']['title'] = 'Employees: Open Conversations';
+        $data['chart4']['legend'] = $topics->pluck('name')->toArray();
+        $data['chart4']['groups'] = array();
+
+        $open_conversations = $conversations;        
+        
+        $total_unique_emp = 0;
+        foreach($topics as $topic)
+        {
+            $subset = $open_conversations->where('conversation_topic_id', $topic->id );
+            $unique_emp = $subset->unique('id')->count();            
+            $total_unique_emp = $total_unique_emp + $unique_emp;
+        } 
+        
+        
+        foreach($topics as $topic)
+        {
+            $subset = $open_conversations->where('conversation_topic_id', $topic->id );
+            $unique_emp = $subset->unique('id')->count();
+            $per_emp = 0;
+            if($total_unique_emp > 0) {
+                $per_emp = ($unique_emp / $total_unique_emp) * 100;
+            }
+            array_push( $data['chart4']['groups'],  [ 'name' => $topic->name, 'value' => $unique_emp,
+                        'topic_id' => $topic->id,
+                            // 'ids' => $subset ? $subset->pluck('id')->toArray() : []
+                        ]);
+        } 
+        
+        // Chart 5 -- Completed Conversation by Employees
+        $data['chart5']['chart_id'] = 3;
+        $data['chart5']['title'] = 'Employees: Completed Conversations';
+        $data['chart5']['legend'] = $topics->pluck('name')->toArray();
+        $data['chart5']['groups'] = array();
+
+        // SQL for Chart 5
+        $completed_conversations = Conversation::join('users', 'users.id', 'conversations.user_id') 
+        ->join('employee_demo', function($join) {
+            $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+        })
+        ->join('conversation_participants', function($join) {
+            $join->on('users.id', '=', 'conversation_participants.participant_id');
+            // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+            // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+        })
+        // ->where(function ($query)  {
+        //     return $query->whereNotNull('signoff_user_id')
+        //                  ->whereNotNull('supervisor_signoff_id');
+        // })
+        ->where(function($query) {
+            $query->where(function($query) {
+                $query->whereNotNull('signoff_user_id')
+                      ->whereNotNull('supervisor_signoff_id');                          
+            // })
+            // ->orWhere(function($query) {
+            //     $query->whereNotNull('signoff_user_id')
+            //           ->whereNotNull('supervisor_signoff_id')
+            //           ->whereDate('unlock_until', '<', Carbon::today() );
+            });
+        })
+        ->whereNull('deleted_at')   
+        // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+        // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
+        ->where('users.due_date_paused', 'N')   
+        ->where('conversation_participants.role', 'emp')     
+        ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.organization', $level0->name);
+        })
+        ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.level1_program', $level1->name);
+        })
+        ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.level2_division', $level2->name);
+        })
+        ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.level3_branch', $level3->name);
+        })
+        ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.level4', $level4->name);
+        })
+        ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                    ->from('admin_org_users')
+                    ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                    ->whereIn('admin_org_users.access_type', [0,2])
+                    ->where('admin_org_users.granted_to_id', '=', Auth::id());
+        })
+        // ->where( function($query) {
+        //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
+        //           ->where('employee_demo.employee_status', 'A');
+        // })
+        ->get();
+        
+        $total_unique_emp = 0;
+        foreach($topics as $topic)
+        {
+            $subset = $completed_conversations->where('conversation_topic_id', $topic->id );
+            $unique_emp = $subset->unique('id')->count();            
+            $total_unique_emp = $total_unique_emp + $unique_emp;
+        } 
+        
+
+        foreach($topics as $topic)
+        {
+            $subset = $completed_conversations->where('conversation_topic_id', $topic->id );
+            $unique_emp = $subset->unique('id')->count();
+            $per_emp = 0;
+            if($total_unique_emp > 0) {
+                $per_emp = ($unique_emp / $total_unique_emp) * 100;
+            }
+            
+            array_push( $data['chart5']['groups'],  [ 'name' => $topic->name, 'value' => $unique_emp, 
+                    'topic_id' => $topic->id, 
+                    // 'ids' => $subset ? $subset->pluck('id')->toArray() : []
+                ]);
+        }
+        
 
         return view('hradmin.statistics.conversationsummary',compact('data'));
 
