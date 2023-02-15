@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\EmployeeDemo;
 use App\Models\JobSchedAudit;
 use App\Models\SharedProfile;
+use App\Models\UserReportingTo;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 
@@ -227,9 +228,17 @@ class SyncUserProfile extends Command
 
                         // Update Reporting Tos
                         if ($reporting_to) {
-                            $user->reportingTos()->updateOrCreate([
-                                'reporting_to_id' => $reporting_to,
-                            ]);
+                            // $user->reportingTos()->updateOrCreate([
+                            //     'reporting_to_id' => $reporting_to,
+                            // ]);
+                            UserReportingTo::updateOrCreate(
+                                [
+                                    'user_id' => $user->id
+                                ],
+                                [
+                                    'reporting_to_id' => $reporting_to
+                                ]
+                            );
                         }
                     }
 
