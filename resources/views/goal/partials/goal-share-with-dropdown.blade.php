@@ -46,8 +46,10 @@
                 $employee_list[$i]['id'] = auth()->user()->id;
                 $employee_list[$i]['name'] = auth()->user()->name;
             }
-            asort($employee_list);
-            error_log(print_r($employee_list,true));
+            
+            //asort($employee_list);
+            //error_log(print_r($employee_list,true));
+            usort($employee_list, function($a, $b){ return strcmp($a["name"], $b["name"]); });
         }
         
         ?>
