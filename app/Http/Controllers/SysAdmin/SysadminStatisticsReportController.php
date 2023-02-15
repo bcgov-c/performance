@@ -650,11 +650,25 @@ class SysadminStatisticsReportController extends Controller
         $data['chart2']['groups'] = array();
 
         $open_conversations = $conversations;
+        
+        $total_unique_emp = 0;
         foreach($topics as $topic)
         {
             $subset = $open_conversations->where('conversation_topic_id', $topic->id );
+            $unique_emp = $subset->unique('id')->count();            
+            $total_unique_emp = $total_unique_emp + $unique_emp;
+        } 
+        
+        foreach($topics as $topic)
+        {
+            $subset = $open_conversations->where('conversation_topic_id', $topic->id );
+            $unique_emp = $subset->unique('id')->count();
+            $per_emp = 0;
+            if($total_unique_emp > 0) {
+                $per_emp = ($unique_emp / $total_unique_emp) * 100;
+            }
             array_push( $data['chart2']['groups'],  [ 'name' => $topic->name, 'value' => $subset->count(),
-                        'topic_id' => $topic->id,
+                        'topic_id' => $topic->id, 'unique_emp'=>$unique_emp, 'total_unique_emp'=>$total_unique_emp, 'per_emp'=>$per_emp,
                             // 'ids' => $subset ? $subset->pluck('id')->toArray() : []
                         ]);
         }    
@@ -710,15 +724,29 @@ class SysadminStatisticsReportController extends Controller
         //           ->where('employee_demo.employee_status', 'A');
         // })
         ->get();
+        
+        $total_unique_emp = 0;
+        foreach($topics as $topic)
+        {
+            $subset = $completed_conversations->where('conversation_topic_id', $topic->id );
+            $unique_emp = $subset->unique('id')->count();            
+            $total_unique_emp = $total_unique_emp + $unique_emp;
+        }
 
         foreach($topics as $topic)
         {
             $subset = $completed_conversations->where('conversation_topic_id', $topic->id );
+            $unique_emp = $subset->unique('id')->count();
+            $per_emp = 0;
+            if($total_unique_emp > 0) {
+                $per_emp = ($unique_emp / $total_unique_emp) * 100;
+            }
+            
             array_push( $data['chart3']['groups'],  [ 'name' => $topic->name, 'value' => $subset->count(), 
-                    'topic_id' => $topic->id,
+                    'topic_id' => $topic->id, 'unique_emp'=>$unique_emp, 'total_unique_emp'=>$total_unique_emp, 'per_emp'=>$per_emp,
                     // 'ids' => $subset ? $subset->pluck('id')->toArray() : []
                 ]);
-        }    
+        }      
 
         return view('sysadmin.statistics.conversationsummary',compact('data'));
 
