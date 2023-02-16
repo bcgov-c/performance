@@ -8,6 +8,7 @@ use App\Models\Goal;
 use App\Models\User;
 use App\Models\GoalType;
 use App\Models\Conversation;
+use App\Models\ConversationParticipant;
 use Illuminate\Http\Request;
 use App\Models\OrganizationTree;
 use App\Models\ConversationTopic;
@@ -896,6 +897,7 @@ class StatisticsReportController extends Controller
         });
         
         $conversations = $sql->get();
+        
 
         // Chart2 -- Open Conversation
         $topics = ConversationTopic::select('id','name')->get();
@@ -1051,19 +1053,61 @@ class StatisticsReportController extends Controller
         }    
         
         
+        // SQL for Chart 4
+        $sql = ConversationParticipant::join('users', 'users.id', 'conversation_participants.participant_id') 
+        ->join('employee_demo', function($join) {
+            $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+        })
+        ->join('conversations', function($join) {
+            $join->on('conversations.id', '=', 'conversation_participants.conversation_id');  
+        })
+        ->where('users.due_date_paused', 'N')
+        ->where('conversation_participants.role', 'emp')
+        ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.organization', $level0->name);
+        })
+        ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.level1_program', $level1->name);
+        })
+        ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.level2_division', $level2->name);
+        })
+        ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.level3_branch', $level3->name);
+        })
+        ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+            return $q->where('employee_demo.level4', $level4->name);
+        })
+        ->where(function($query) {
+            $query->where(function($query) {
+                $query->whereNull('signoff_user_id')
+                    ->orWhereNull('supervisor_signoff_id');
+            });
+        })
+        ->whereNull('deleted_at')
+        ->whereRaw("DATEDIFF ( users.next_conversation_date
+                        , curdate() ) > 0 ")
+        ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                    ->from('admin_org_users')
+                    ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                    ->whereIn('admin_org_users.access_type', [0,2])
+                    ->where('admin_org_users.granted_to_id', '=', Auth::id());
+        });
+        
+        $emp_conversations = $sql->get();
+                
         // Chart4 -- Open Conversation for employees
         $topics = ConversationTopic::select('id','name')->get();
         $data['chart4']['chart_id'] = 2;
         $data['chart4']['title'] = 'Employees: Open Conversations';
         $data['chart4']['legend'] = $topics->pluck('name')->toArray();
-        $data['chart4']['groups'] = array();
-
-        $open_conversations = $conversations;        
+        $data['chart4']['groups'] = array();        
         
         $total_unique_emp = 0;
         foreach($topics as $topic)
         {
-            $subset = $open_conversations->where('conversation_topic_id', $topic->id );
+            $subset = $emp_conversations->where('conversation_topic_id', $topic->id );
             $unique_emp = $subset->unique('id')->count();            
             $total_unique_emp = $total_unique_emp + $unique_emp;
         } 
@@ -1071,7 +1115,7 @@ class StatisticsReportController extends Controller
         
         foreach($topics as $topic)
         {
-            $subset = $open_conversations->where('conversation_topic_id', $topic->id );
+            $subset = $emp_conversations->where('conversation_topic_id', $topic->id );
             $unique_emp = $subset->unique('id')->count();
             $per_emp = 0;
             if($total_unique_emp > 0) {
@@ -1090,12 +1134,12 @@ class StatisticsReportController extends Controller
         $data['chart5']['groups'] = array();
 
         // SQL for Chart 5
-        $completed_conversations = Conversation::join('users', 'users.id', 'conversations.user_id') 
+        $completed_conversations = ConversationParticipant::join('users', 'users.id', 'conversation_participants.participant_id') 
         ->join('employee_demo', function($join) {
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
         })
-        ->join('conversation_participants', function($join) {
-            $join->on('users.id', '=', 'conversation_participants.participant_id');
+        ->join('conversations', function($join) {
+            $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
             // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
             // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
         })
@@ -1471,7 +1515,107 @@ class StatisticsReportController extends Controller
             ->with('signoff_user:id,name')
             ->with('signoff_supervisor:id,name')
             ;
-
+            
+            
+        // SQL - Chart 4
+        $sql_chart4 = ConversationParticipant::selectRaw("conversations.*, users.employee_id, employee_demo.employee_name, users.email,
+                        employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
+                        users.next_conversation_date as next_due_date")
+                ->whereRaw("DATEDIFF ( users.next_conversation_date
+                        , curdate() ) > 0 ")
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereNull('signoff_user_id')
+                            ->orWhereNull('supervisor_signoff_id');
+                    });
+                })
+                ->whereNull('deleted_at')                
+                ->join('users', 'users.id', 'conversation_participants.participant_id') 
+                ->join('conversations','conversations.id','conversation_participants.participant_id')
+                ->join('employee_demo', function($join) {
+                    $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                })
+                ->where('users.due_date_paused', 'N')
+                ->where('conversation_participants.role','emp')
+                ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.organization', $level0->name);
+                })
+                ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level1_program', $level1->name);
+                })
+                ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level2_division', $level2->name);
+                })
+                ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level3_branch', $level3->name);
+                })
+                ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level4', $level4->name);
+                })
+                ->when( $request->topic_id, function($q) use($request) {
+                    $q->where('conversations.conversation_topic_id', $request->topic_id);
+                })
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('admin_org_users')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                            ->whereIn('admin_org_users.access_type', [0,2])
+                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                })
+                ->with('topic:id,name')
+                ->with('signoff_user:id,name')
+                ->with('signoff_supervisor:id,name');    
+            
+        // SQL for Chart 5
+         $sql_chart5 = ConversationParticipant::selectRaw("conversations.*, users.employee_id, employee_demo.employee_name, users.email,
+                    employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
+                    users.next_conversation_date as next_due_date")
+            ->join('users', 'users.id', 'conversation_participants.participant_id') 
+            ->join('conversations','conversations.id','conversation_participants.participant_id')
+            ->join('employee_demo', function($join) {
+                $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+            })
+            ->where('users.due_date_paused', 'N')     
+            ->where('conversation_participants.role','emp')       
+            ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                return $q->where('employee_demo.organization', $level0->name);
+            })
+            ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                return $q->where('employee_demo.level1_program', $level1->name);
+            })
+            ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                return $q->where('employee_demo.level2_division', $level2->name);
+            })
+            ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                return $q->where('employee_demo.level3_branch', $level3->name);
+            })
+            ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                return $q->where('employee_demo.level4', $level4->name);
+            })
+            ->where(function($query) {
+                $query->where(function($query) {
+                    $query->whereNotNull('signoff_user_id')
+                          ->whereNotNull('supervisor_signoff_id');
+                });
+            })
+            ->whereNull('deleted_at')              
+            ->when( $request->topic_id, function($q) use($request) {
+                $q->where('conversations.conversation_topic_id', $request->topic_id);
+            })
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                        ->from('admin_org_users')
+                        ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                        ->whereIn('admin_org_users.access_type', [0,2])
+                        ->where('admin_org_users.granted_to_id', '=', Auth::id());
+            })
+            ->with('topic:id,name')
+            ->with('signoff_user:id,name')
+            ->with('signoff_supervisor:id,name')
+            ;
+                   
+                
+                
 
         // Generating Output file 
         $filename = 'Conversations.xlsx';
@@ -1648,7 +1792,7 @@ class StatisticsReportController extends Controller
             case 4:
 
                 $filename = 'Employees of Open Conversation By Topic.csv';
-                $conversations =  $sql_chart2->get();
+                $conversations =  $sql_chart4->get();
         
                 $headers = array(
                     "Content-type"        => "text/csv",
@@ -1705,7 +1849,7 @@ class StatisticsReportController extends Controller
             case 5:
 
                 $filename = 'Employees of Completed Conversation By Topic.csv';
-                $conversations =  $sql_chart3->get();
+                $conversations =  $sql_chart5->get();
 
                 if (array_key_exists($request->range, $this->overdue_groups) ) {
                     $users = $users->whereBetween('overdue_in_days', $this->overdue_groups[$request->range]);  
