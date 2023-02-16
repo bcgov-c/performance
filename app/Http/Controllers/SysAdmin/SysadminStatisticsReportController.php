@@ -544,9 +544,13 @@ class SysadminStatisticsReportController extends Controller
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
+                ->join('conversation_participants', function($join) {
+                    $join->on('users.id', '=', 'conversation_participants.participant_id');
+                })
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                 ->where('users.due_date_paused', 'N')
+                ->where('conversation_participants.role', 'emp')        
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
                 })
@@ -589,9 +593,15 @@ class SysadminStatisticsReportController extends Controller
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
             // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
         })
+        ->join('conversation_participants', function($join) {
+            $join->on('users.id', '=', 'conversation_participants.participant_id');   
+            // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+            // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+        })
         // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
         // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
         ->where('users.due_date_paused', 'N')
+        ->where('conversation_participants.role', 'emp')        
         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.organization', $level0->name);
         })
@@ -685,6 +695,11 @@ class SysadminStatisticsReportController extends Controller
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
             // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
         })
+        ->join('conversation_participants', function($join) {
+            $join->on('users.id', '=', 'conversation_participants.participant_id');
+            // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+            // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+        })
         // ->where(function ($query)  {
         //         return $query->whereNotNull('signoff_user_id')
         //                      ->whereNotNull('supervisor_signoff_id');
@@ -703,7 +718,8 @@ class SysadminStatisticsReportController extends Controller
         ->whereNull('deleted_at')
         // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
         // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
-        ->where('users.due_date_paused', 'N')        
+        ->where('users.due_date_paused', 'N')
+        ->where('conversation_participants.role', 'emp')        
         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.organization', $level0->name);
         })
@@ -792,6 +808,11 @@ class SysadminStatisticsReportController extends Controller
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
             // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
         })
+        ->join('conversation_participants', function($join) {
+            $join->on('users.id', '=', 'conversation_participants.participant_id');
+            // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+            // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
+        })
         // ->where(function ($query)  {
         //         return $query->whereNotNull('signoff_user_id')
         //                      ->whereNotNull('supervisor_signoff_id');
@@ -810,7 +831,8 @@ class SysadminStatisticsReportController extends Controller
         ->whereNull('deleted_at')
         // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
         // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
-        ->where('users.due_date_paused', 'N')        
+        ->where('users.due_date_paused', 'N')  
+        ->where('conversation_participants.role', 'emp')             
         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.organization', $level0->name);
         })
@@ -877,9 +899,13 @@ class SysadminStatisticsReportController extends Controller
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
+                ->join('conversation_participants', function($join) {
+                    $join->on('users.id', '=', 'conversation_participants.participant_id');
+                })
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                 ->where('users.due_date_paused', 'N')
+                ->where('conversation_participants.role', 'emp')        
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
                 })
@@ -923,13 +949,15 @@ class SysadminStatisticsReportController extends Controller
                 })
                 ->whereNull('deleted_at')                
                 ->join('users', 'users.id', 'conversations.user_id') 
+                ->join('conversation_participants','users.id','conversation_participants.participant_id')        
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
-                ->where('users.due_date_paused', 'N')                                
+                ->where('users.due_date_paused', 'N')  
+                ->where('conversation_participants.role','emp')        
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
                 })
@@ -961,13 +989,15 @@ class SysadminStatisticsReportController extends Controller
                     organization, level1_program, level2_division, level3_branch, level4,
                     users.next_conversation_date as next_due_date")
             ->join('users', 'users.id', 'conversations.user_id') 
+            ->join('conversation_participants','users.id','conversation_participants.participant_id')     
             ->join('employee_demo', function($join) {
                 $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
             })
             // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
             // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
-            ->where('users.due_date_paused', 'N')            
+            ->where('users.due_date_paused', 'N')  
+            ->where('conversation_participants.role','emp')           
             ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                 return $q->where('employee_demo.organization', $level0->name);
             })
@@ -1097,7 +1127,7 @@ class SysadminStatisticsReportController extends Controller
                 $callback = function() use($conversations, $columns) {
                     $file = fopen('php://output', 'w');
                     fputcsv($file, $columns);
-        
+                    
                     foreach ($conversations as $conversation) {
                         $row['Employee ID'] = $conversation->employee_id;
                         $row['Name'] = $conversation->employee_name;
@@ -1182,7 +1212,126 @@ class SysadminStatisticsReportController extends Controller
         
                 return response()->stream($callback, 200, $headers);
 
+                break;   
+               
+            case 4:
+
+                $filename = 'Employees of Open Conversation By Topic.csv';
+                $conversations =  $sql_chart2->get();
+        
+                $headers = array(
+                    "Content-type"        => "text/csv",
+                    "Content-Disposition" => "attachment; filename=$filename",
+                    "Pragma"              => "no-cache",
+                    "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                    "Expires"             => "0"
+                );
+        
+                $columns = ["Employee ID", "Employee Name", "Email",
+                        "Conversation Due Date",
+                            "Conversation Participant", "Employee Sign-Off", "Supervisor Sign-off", 
+                                "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
+                           ];
+        
+                $callback = function() use($conversations, $columns) {
+                    $file = fopen('php://output', 'w');
+                    fputcsv($file, $columns);
+                    $topics = ConversationTopic::select('id','name')->get();
+                    foreach($topics as $topic){
+                        $subset = $conversations->where('conversation_topic_id', $topic->id );
+                        $unique_emp_topic_conversations = $subset->unique('id');
+                        foreach ($unique_emp_topic_conversations as $conversation) {
+                            $row['Employee ID'] = $conversation->employee_id;
+                            $row['Name'] = $conversation->employee_name;
+                            $row['Email'] = $conversation->email;
+                            $row['Conversation Due Date'] = $conversation->next_due_date;
+                            $row['Conversation Participant'] = implode(', ', $conversation->conversationParticipants->pluck('participant.name')->toArray() );
+                            $row['Employee Sign-Off'] = $conversation->signoff_user  ? $conversation->signoff_user->name : '';
+                            $row['Supervisor Sign-off'] = $conversation->signoff_supervisor ? $conversation->signoff_supervisor->name : '';
+                            $row['Organization'] = $conversation->organization;
+                            $row['Level 1'] = $conversation->level1_program;
+                            $row['Level 2'] = $conversation->level2_division;
+                            $row['Level 3'] = $conversation->level3_branch;
+                            $row['Level 4'] = $conversation->level4;
+
+                            fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], // $row['Next Conversation Due'],
+                            $row['Conversation Due Date'], $row["Conversation Participant"],
+                            $row["Employee Sign-Off"], $row["Supervisor Sign-off"],
+                                     $row['Organization'],
+                                      $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
+                                    ));
+                        }
+                    } 
+        
+                    fclose($file);
+                };
+        
+                return response()->stream($callback, 200, $headers);
+
+
                 break;    
+            
+            case 5:
+
+                $filename = 'Employees of Completed Conversation By Topic.csv';
+                $conversations =  $sql_chart3->get();
+
+                if (array_key_exists($request->range, $this->overdue_groups) ) {
+                    $users = $users->whereBetween('overdue_in_days', $this->overdue_groups[$request->range]);  
+                }
+        
+                $headers = array(
+                    "Content-type"        => "text/csv",
+                    "Content-Disposition" => "attachment; filename=$filename",
+                    "Pragma"              => "no-cache",
+                    "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                    "Expires"             => "0"
+                );
+        
+                $columns = ["Employee ID", "Employee Name", "Email",
+                        "Conversation Due Date",
+                            "Conversation Participant", "Employee Sign-Off", "Supervisor Sign-off", 
+                                "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
+                           ];
+        
+                $callback = function() use($conversations, $columns) {
+                    $file = fopen('php://output', 'w');
+                    fputcsv($file, $columns);
+                    $topics = ConversationTopic::select('id','name')->get();
+                    
+                    foreach($topics as $topic){
+                        $subset = $conversations->where('conversation_topic_id', $topic->id );
+                        $unique_emp_topic_conversations = $subset->unique('id');
+                        foreach ($unique_emp_topic_conversations as $conversation) {
+                            $row['Employee ID'] = $conversation->employee_id;
+                            $row['Name'] = $conversation->employee_name;
+                            $row['Email'] = $conversation->email;
+                            $row['Conversation Due Date'] = $conversation->next_due_date;
+                            $row['Conversation Participant'] = implode(', ', $conversation->conversationParticipants->pluck('participant.name')->toArray() );
+                            $row['Employee Sign-Off'] = $conversation->signoff_user  ? $conversation->signoff_user->name : '';
+                            $row['Supervisor Sign-off'] = $conversation->signoff_supervisor ? $conversation->signoff_supervisor->name : '';
+                            $row['Organization'] = $conversation->organization;
+                            $row['Level 1'] = $conversation->level1_program;
+                            $row['Level 2'] = $conversation->level2_division;
+                            $row['Level 3'] = $conversation->level3_branch;
+                            $row['Level 4'] = $conversation->level4;
+
+                            fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], // $row['Next Conversation Due'],
+                            $row['Conversation Due Date'], $row["Conversation Participant"],
+                            $row["Employee Sign-Off"], $row["Supervisor Sign-off"],
+                                     $row['Organization'],
+                                      $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
+                                    ));
+                        }
+                    } 
+        
+                    fclose($file);
+                };
+        
+                return response()->stream($callback, 200, $headers);
+
+                break;
+                
         }
         
     }
