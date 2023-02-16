@@ -1619,6 +1619,124 @@ class StatisticsReportController extends Controller
         
                 return response()->stream($callback, 200, $headers);
 
+                break;  
+                
+            case 4:
+
+                $filename = 'Employees of Open Conversation By Topic.csv';
+                $conversations =  $sql_chart2->get();
+        
+                $headers = array(
+                    "Content-type"        => "text/csv",
+                    "Content-Disposition" => "attachment; filename=$filename",
+                    "Pragma"              => "no-cache",
+                    "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                    "Expires"             => "0"
+                );
+        
+                $columns = ["Employee ID", "Employee Name", "Email",
+                        "Conversation Due Date",
+                            "Conversation Participant", "Employee Sign-Off", "Supervisor Sign-off", 
+                                "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
+                           ];
+        
+                $callback = function() use($conversations, $columns) {
+                    $file = fopen('php://output', 'w');
+                    fputcsv($file, $columns);
+                    $topics = ConversationTopic::select('id','name')->get();
+                    foreach($topics as $topic){
+                        $subset = $conversations->where('conversation_topic_id', $topic->id );
+                        $unique_emp_topic_conversations = $subset->unique('id');
+                        foreach ($unique_emp_topic_conversations as $conversation) {
+                            $row['Employee ID'] = $conversation->employee_id;
+                            $row['Name'] = $conversation->employee_name;
+                            $row['Email'] = $conversation->email;
+                            $row['Conversation Due Date'] = $conversation->next_due_date;
+                            $row['Conversation Participant'] = implode(', ', $conversation->conversationParticipants->pluck('participant.name')->toArray() );
+                            $row['Employee Sign-Off'] = $conversation->signoff_user  ? $conversation->signoff_user->name : '';
+                            $row['Supervisor Sign-off'] = $conversation->signoff_supervisor ? $conversation->signoff_supervisor->name : '';
+                            $row['Organization'] = $conversation->organization;
+                            $row['Level 1'] = $conversation->level1_program;
+                            $row['Level 2'] = $conversation->level2_division;
+                            $row['Level 3'] = $conversation->level3_branch;
+                            $row['Level 4'] = $conversation->level4;
+
+                            fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], // $row['Next Conversation Due'],
+                            $row['Conversation Due Date'], $row["Conversation Participant"],
+                            $row["Employee Sign-Off"], $row["Supervisor Sign-off"],
+                                     $row['Organization'],
+                                      $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
+                                    ));
+                        }
+                    } 
+        
+                    fclose($file);
+                };
+        
+                return response()->stream($callback, 200, $headers);
+
+
+                break;    
+            
+            case 5:
+
+                $filename = 'Employees of Completed Conversation By Topic.csv';
+                $conversations =  $sql_chart3->get();
+
+                if (array_key_exists($request->range, $this->overdue_groups) ) {
+                    $users = $users->whereBetween('overdue_in_days', $this->overdue_groups[$request->range]);  
+                }
+        
+                $headers = array(
+                    "Content-type"        => "text/csv",
+                    "Content-Disposition" => "attachment; filename=$filename",
+                    "Pragma"              => "no-cache",
+                    "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                    "Expires"             => "0"
+                );
+        
+                $columns = ["Employee ID", "Employee Name", "Email",
+                        "Conversation Due Date",
+                            "Conversation Participant", "Employee Sign-Off", "Supervisor Sign-off", 
+                                "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
+                           ];
+        
+                $callback = function() use($conversations, $columns) {
+                    $file = fopen('php://output', 'w');
+                    fputcsv($file, $columns);
+                    $topics = ConversationTopic::select('id','name')->get();
+                    
+                    foreach($topics as $topic){
+                        $subset = $conversations->where('conversation_topic_id', $topic->id );
+                        $unique_emp_topic_conversations = $subset->unique('id');
+                        foreach ($unique_emp_topic_conversations as $conversation) {
+                            $row['Employee ID'] = $conversation->employee_id;
+                            $row['Name'] = $conversation->employee_name;
+                            $row['Email'] = $conversation->email;
+                            $row['Conversation Due Date'] = $conversation->next_due_date;
+                            $row['Conversation Participant'] = implode(', ', $conversation->conversationParticipants->pluck('participant.name')->toArray() );
+                            $row['Employee Sign-Off'] = $conversation->signoff_user  ? $conversation->signoff_user->name : '';
+                            $row['Supervisor Sign-off'] = $conversation->signoff_supervisor ? $conversation->signoff_supervisor->name : '';
+                            $row['Organization'] = $conversation->organization;
+                            $row['Level 1'] = $conversation->level1_program;
+                            $row['Level 2'] = $conversation->level2_division;
+                            $row['Level 3'] = $conversation->level3_branch;
+                            $row['Level 4'] = $conversation->level4;
+
+                            fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], // $row['Next Conversation Due'],
+                            $row['Conversation Due Date'], $row["Conversation Participant"],
+                            $row["Employee Sign-Off"], $row["Supervisor Sign-off"],
+                                     $row['Organization'],
+                                      $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
+                                    ));
+                        }
+                    } 
+        
+                    fclose($file);
+                };
+        
+                return response()->stream($callback, 200, $headers);
+
                 break;    
         }
         
