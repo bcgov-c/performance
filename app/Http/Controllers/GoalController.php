@@ -149,7 +149,7 @@ class GoalController extends Controller
         } else if($request->is("goal/supervisor")){
             $type = 'supervisor';
             $goals = $user->sharedGoals()->paginate(8);
-            return view('goal.index', compact('goals', 'type', 'goaltypes', 'user', 'tags', 'type_desc_str'));
+            return view('goal.index', compact('goals', 'type', 'goaltypes','goal_types_modal','user', 'tags', 'type_desc_str'));
         } else {
             $query = $query->where('status', '<>', 'active')->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'), 'goal_types.name as typename');
         }
