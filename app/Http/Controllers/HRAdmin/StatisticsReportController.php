@@ -715,8 +715,13 @@ class StatisticsReportController extends Controller
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid' )
-                // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N')")
-                ->where('users.due_date_paused', 'N')
+                // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N')")                
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('users.due_date_paused', 'N')
+                            ->orWhereNull('users.due_date_paused');
+                    });
+                })        
                 ->where('conversation_participants.role', 'emp')
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
@@ -806,7 +811,12 @@ class StatisticsReportController extends Controller
         })
         // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
         // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N')")
-        ->where('users.due_date_paused', 'N')
+        ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('users.due_date_paused', 'N')
+                            ->orWhereNull('users.due_date_paused');
+                    });
+                })
         //->where('conversation_participants.role', 'emp')
         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.organization', $level0->name);
@@ -849,8 +859,14 @@ class StatisticsReportController extends Controller
         //                     (select joining_date from users where id = conversations.user_id)
         //                 ) 
         //         , DATE_ADD( DATE_FORMAT(sysdate(), '%Y-%m-%d'), INTERVAL -122 day) ) < 0 ")
-        ->whereRaw("DATEDIFF ( users.next_conversation_date
-                        , curdate() ) > 0 ")
+        
+        ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereRaw("DATEDIFF ( users.next_conversation_date, curdate() ) > 0 ")
+                            ->orWhereNull('users.next_conversation_date');
+                    });
+                })        
+                
         // ->whereExists(function ($query) {
         //     $query->select(DB::raw(1))
         //                 ->from('admin_orgs')
@@ -912,7 +928,7 @@ class StatisticsReportController extends Controller
         foreach($topics as $topic)
         {
             $subset = $open_conversations->where('conversation_topic_id', $topic->id );
-            $unique_emp = $subset->unique('id')->count();            
+            $unique_emp = $subset->unique('participant_id')->count();            
             $total_unique_emp = $total_unique_emp + $unique_emp;
         } 
         
@@ -920,7 +936,7 @@ class StatisticsReportController extends Controller
         foreach($topics as $topic)
         {
             $subset = $open_conversations->where('conversation_topic_id', $topic->id );
-            $unique_emp = $subset->unique('id')->count();
+            $unique_emp = $subset->unique('participant_id')->count();
             $per_emp = 0;
             if($total_unique_emp > 0) {
                 $per_emp = ($unique_emp / $total_unique_emp) * 100;
@@ -965,7 +981,12 @@ class StatisticsReportController extends Controller
         ->whereNull('deleted_at')   
         // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
         // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
-        ->where('users.due_date_paused', 'N')   
+        ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('users.due_date_paused', 'N')
+                            ->orWhereNull('users.due_date_paused');
+                    });
+                })
         //->where('conversation_participants.role', 'emp')     
         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.organization', $level0->name);
@@ -1032,7 +1053,7 @@ class StatisticsReportController extends Controller
         foreach($topics as $topic)
         {
             $subset = $completed_conversations->where('conversation_topic_id', $topic->id );
-            $unique_emp = $subset->unique('id')->count();            
+            $unique_emp = $subset->unique('participant_id')->count();            
             $total_unique_emp = $total_unique_emp + $unique_emp;
         } 
         
@@ -1040,7 +1061,7 @@ class StatisticsReportController extends Controller
         foreach($topics as $topic)
         {
             $subset = $completed_conversations->where('conversation_topic_id', $topic->id );
-            $unique_emp = $subset->unique('id')->count();
+            $unique_emp = $subset->unique('participant_id')->count();
             $per_emp = 0;
             if($total_unique_emp > 0) {
                 $per_emp = ($unique_emp / $total_unique_emp) * 100;
@@ -1061,7 +1082,12 @@ class StatisticsReportController extends Controller
         ->join('conversations', function($join) {
             $join->on('conversations.id', '=', 'conversation_participants.conversation_id');  
         })
-        ->where('users.due_date_paused', 'N')
+        ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('users.due_date_paused', 'N')
+                            ->orWhereNull('users.due_date_paused');
+                    });
+                })
         ->where('conversation_participants.role', 'emp')
         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.organization', $level0->name);
@@ -1085,8 +1111,12 @@ class StatisticsReportController extends Controller
             });
         })
         ->whereNull('deleted_at')
-        ->whereRaw("DATEDIFF ( users.next_conversation_date
-                        , curdate() ) > 0 ")
+        ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereRaw("DATEDIFF ( users.next_conversation_date, curdate() ) > 0 ")
+                            ->orWhereNull('users.next_conversation_date');
+                    });
+                })   
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
                     ->from('admin_org_users')
@@ -1108,7 +1138,7 @@ class StatisticsReportController extends Controller
         foreach($topics as $topic)
         {
             $subset = $emp_conversations->where('conversation_topic_id', $topic->id );
-            $unique_emp = $subset->unique('id')->count();            
+            $unique_emp = $subset->unique('participant_id')->count();            
             $total_unique_emp = $total_unique_emp + $unique_emp;
         } 
         
@@ -1116,7 +1146,7 @@ class StatisticsReportController extends Controller
         foreach($topics as $topic)
         {
             $subset = $emp_conversations->where('conversation_topic_id', $topic->id );
-            $unique_emp = $subset->unique('id')->count();
+            $unique_emp = $subset->unique('participant_id')->count();
             $per_emp = 0;
             if($total_unique_emp > 0) {
                 $per_emp = ($unique_emp / $total_unique_emp) * 100;
@@ -1161,7 +1191,12 @@ class StatisticsReportController extends Controller
         ->whereNull('deleted_at')   
         // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
         // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
-        ->where('users.due_date_paused', 'N')   
+        ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('users.due_date_paused', 'N')
+                            ->orWhereNull('users.due_date_paused');
+                    });
+                })
         ->where('conversation_participants.role', 'emp')     
         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.organization', $level0->name);
@@ -1195,7 +1230,7 @@ class StatisticsReportController extends Controller
         foreach($topics as $topic)
         {
             $subset = $completed_conversations->where('conversation_topic_id', $topic->id );
-            $unique_emp = $subset->unique('id')->count();            
+            $unique_emp = $subset->unique('participant_id')->count();            
             $total_unique_emp = $total_unique_emp + $unique_emp;
         } 
         
@@ -1203,7 +1238,7 @@ class StatisticsReportController extends Controller
         foreach($topics as $topic)
         {
             $subset = $completed_conversations->where('conversation_topic_id', $topic->id );
-            $unique_emp = $subset->unique('id')->count();
+            $unique_emp = $subset->unique('participant_id')->count();
             $per_emp = 0;
             if($total_unique_emp > 0) {
                 $per_emp = ($unique_emp / $total_unique_emp) * 100;
@@ -1245,7 +1280,12 @@ class StatisticsReportController extends Controller
                 
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N')")
-                ->where('users.due_date_paused', 'N')
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('users.due_date_paused', 'N')
+                            ->orWhereNull('users.due_date_paused');
+                    });
+                })
                 ->where('conversation_participants.role', 'emp')
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
@@ -1323,8 +1363,12 @@ class StatisticsReportController extends Controller
                 //             (select joining_date from users where id = conversations.user_id)
                 //         ) 
                 // , DATE_ADD( DATE_FORMAT(sysdate(), '%Y-%m-%d'), INTERVAL -122 day) ) < 0 ")
-                ->whereRaw("DATEDIFF ( users.next_conversation_date
-                        , curdate() ) > 0 ")
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereRaw("DATEDIFF ( users.next_conversation_date, curdate() ) > 0 ")
+                            ->orWhereNull('users.next_conversation_date');
+                    });
+                })   
                 // ->where(function ($query)  {
                 //     return $query->whereNull('signoff_user_id')
                 //                  ->orwhereNull('supervisor_signoff_id');
@@ -1350,7 +1394,12 @@ class StatisticsReportController extends Controller
                 })
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N')")
-                ->where('users.due_date_paused', 'N')
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('users.due_date_paused', 'N')
+                            ->orWhereNull('users.due_date_paused');
+                    });
+                })
                 //->where('conversation_participants.role','emp')
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
@@ -1431,7 +1480,13 @@ class StatisticsReportController extends Controller
             })
             // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
             // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N')")
-            ->where('users.due_date_paused', 'N')     
+            ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('users.due_date_paused', 'N')
+                            ->orWhereNull('users.due_date_paused');
+                    });
+                })
+
             //->where('conversation_participants.role','emp')       
             ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                 return $q->where('employee_demo.organization', $level0->name);
@@ -1521,8 +1576,12 @@ class StatisticsReportController extends Controller
         $sql_chart4 = ConversationParticipant::selectRaw("conversations.*, users.employee_id, employee_demo.employee_name, users.email,
                         employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
                         users.next_conversation_date as next_due_date")
-                ->whereRaw("DATEDIFF ( users.next_conversation_date
-                        , curdate() ) > 0 ")
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereRaw("DATEDIFF ( users.next_conversation_date, curdate() ) > 0 ")
+                            ->orWhereNull('users.next_conversation_date');
+                    });
+                })   
                 ->where(function($query) {
                     $query->where(function($query) {
                         $query->whereNull('signoff_user_id')
@@ -1535,7 +1594,13 @@ class StatisticsReportController extends Controller
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 })
-                ->where('users.due_date_paused', 'N')
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('users.due_date_paused', 'N')
+                            ->orWhereNull('users.due_date_paused');
+                    });
+                })
+
                 ->where('conversation_participants.role','emp')
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
@@ -1575,7 +1640,12 @@ class StatisticsReportController extends Controller
             ->join('employee_demo', function($join) {
                 $join->on('employee_demo.employee_id', '=', 'users.employee_id');
             })
-            ->where('users.due_date_paused', 'N')     
+            ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('users.due_date_paused', 'N')
+                            ->orWhereNull('users.due_date_paused');
+                    });
+                }) 
             ->where('conversation_participants.role','emp')       
             ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                 return $q->where('employee_demo.organization', $level0->name);
@@ -1814,7 +1884,7 @@ class StatisticsReportController extends Controller
                     $topics = ConversationTopic::select('id','name')->get();
                     foreach($topics as $topic){
                         $subset = $conversations->where('conversation_topic_id', $topic->id );
-                        $unique_emp_topic_conversations = $subset->unique('id');
+                        $unique_emp_topic_conversations = $subset->unique('participant_id');
                         foreach ($unique_emp_topic_conversations as $conversation) {
                             $row['Employee ID'] = $conversation->employee_id;
                             $row['Name'] = $conversation->employee_name;
@@ -1876,7 +1946,7 @@ class StatisticsReportController extends Controller
                     
                     foreach($topics as $topic){
                         $subset = $conversations->where('conversation_topic_id', $topic->id );
-                        $unique_emp_topic_conversations = $subset->unique('id');
+                        $unique_emp_topic_conversations = $subset->unique('participant_id');
                         foreach ($unique_emp_topic_conversations as $conversation) {
                             $row['Employee ID'] = $conversation->employee_id;
                             $row['Name'] = $conversation->employee_name;
