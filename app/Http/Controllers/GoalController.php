@@ -113,7 +113,6 @@ class GoalController extends Controller
             }
         }
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
-        $goal_types_modal = $goaltypes;
         
         /*
         if ($request->is("goal/current")) {
@@ -132,13 +131,13 @@ class GoalController extends Controller
             return view('goal.index', compact('goals', 'type', 'goaltypes', 'user', 'tags', 'type_desc_str'));
         } 
         */
-
+        /*
         array_unshift($goaltypes, [
             "id" => "0",
             "description" => '',
             "name" => "Any"
         ]);        
-
+        */
         $query = $query->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
         ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id');
@@ -232,7 +231,7 @@ class GoalController extends Controller
         
         $from = 'goal';        
         
-        return view('goal.index', compact('goals', 'type', 'goaltypes', 'goal_types_modal', 'tagsList', 'sortby', 'sortorder', 'createdBy', 'user', 'employees', 'tags', 'type_desc_str', 'statusList','from'));
+        return view('goal.index', compact('goals', 'type', 'goaltypes', 'tagsList', 'sortby', 'sortorder', 'createdBy', 'user', 'employees', 'tags', 'type_desc_str', 'statusList','from'));
     }
 
     /**
