@@ -124,7 +124,7 @@
                         <b>Goal Type</b>
                         <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="{{$type_desc_str}}"> </i>
                         <!-- <x-tooltip-dropdown-outside name="goal_type_id" :options="$goaltypes" label="Goal Type" popoverstr="{{$type_desc_str}}" tooltipField="description" displayField="name" />                         -->
-                        <x-dropdown :list="$goaltypes" name="goal_type_id" />
+                        <x-dropdown :list="$goal_types_modal" name="goal_type_id" />
                     </div>
                     </div>
                        <div class="col-6">
