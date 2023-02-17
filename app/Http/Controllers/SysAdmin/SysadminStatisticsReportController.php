@@ -1201,6 +1201,11 @@ class SysadminStatisticsReportController extends Controller
                 ->with('topic:id,name')
                 ->with('signoff_user:id,name')
                 ->with('signoff_supervisor:id,name'); 
+        
+        $sql_str = $sql_chart4->toSql();
+        $sql_bing = $sql_chart4->getBindings();
+        error_log(print_r($sql_str,true));
+        error_log(print_r($sql_bing,true));        
                 
         // SQL for Chart 5
          $sql_chart5 = ConversationParticipant::selectRaw("conversations.*, users.employee_id, employee_name, users.email,
@@ -1460,11 +1465,7 @@ class SysadminStatisticsReportController extends Controller
                 $callback = function() use($conversations, $columns) {
                     $file = fopen('php://output', 'w');
                     fputcsv($file, $columns);
-                    $topics = ConversationTopic::select('id','name')->get();
-                    foreach($topics as $topic){
-                        $subset = $conversations->where('conversation_topic_id', $topic->id );
-                        $unique_emp_topic_conversations = $subset->unique('id');
-                        foreach ($unique_emp_topic_conversations as $conversation) {
+                        foreach ($conversations as $conversation) {
                             $row['Employee ID'] = $conversation->employee_id;
                             $row['Name'] = $conversation->employee_name;
                             $row['Email'] = $conversation->email;
@@ -1485,8 +1486,7 @@ class SysadminStatisticsReportController extends Controller
                                       $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
                                     ));
                         }
-                    } 
-        
+                    
                     fclose($file);
                 };
         
@@ -1521,12 +1521,8 @@ class SysadminStatisticsReportController extends Controller
                 $callback = function() use($conversations, $columns) {
                     $file = fopen('php://output', 'w');
                     fputcsv($file, $columns);
-                    $topics = ConversationTopic::select('id','name')->get();
                     
-                    foreach($topics as $topic){
-                        $subset = $conversations->where('conversation_topic_id', $topic->id );
-                        $unique_emp_topic_conversations = $subset->unique('id');
-                        foreach ($unique_emp_topic_conversations as $conversation) {
+                    foreach ($conversations as $conversation) {
                             $row['Employee ID'] = $conversation->employee_id;
                             $row['Name'] = $conversation->employee_name;
                             $row['Email'] = $conversation->email;
@@ -1547,7 +1543,6 @@ class SysadminStatisticsReportController extends Controller
                                       $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
                                     ));
                         }
-                    } 
         
                     fclose($file);
                 };
