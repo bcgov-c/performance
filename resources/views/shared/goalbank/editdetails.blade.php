@@ -83,7 +83,13 @@
 				<small  class="text-danger error-target_date"></small>
 			</div>
 		</div>
-
+		<div class="row">
+				<div class="col col-md-2">
+					<b> Display Name </b>
+					<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Organizational title to display when listing in Goal Bank."> </i>
+					<x-input name="display_name" />
+				</div>
+			</div>
 		<div class="col-md-3 mb-2">
 			<button class="btn btn-primary mt-2" type="submit" name="btn_send" value="btn_send">Save Changes</button>
 			<button class="btn btn-secondary mt-2">Cancel</button>
