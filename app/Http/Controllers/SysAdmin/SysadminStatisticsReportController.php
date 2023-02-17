@@ -1445,7 +1445,15 @@ class SysadminStatisticsReportController extends Controller
 
                 $filename = 'Employees of Open Conversation By Topic.csv';
                 $conversations =  $sql_chart4->get();
-                $conversations = $conversations->unique('employee_id'); 
+                $conversations_unique = array();
+                $topics = ConversationTopic::select('id','name')->get();
+                foreach($topics as $topic){
+                        $subset = $conversations->where('conversation_topic_id', $topic->id );
+                        $unique_subset = $subset->unique('employee_id');
+                        foreach($unique_subset as $item) {
+                            array_push($conversations_unique,$item);
+                        }                        
+                }
                 
                 $headers = array(
                     "Content-type"        => "text/csv",
@@ -1459,12 +1467,12 @@ class SysadminStatisticsReportController extends Controller
                         "Conversation Due Date",
                                 "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
                            ];
-        
-                $callback = function() use($conversations, $columns) {
+                
+                $callback = function() use($conversations_unique, $columns) {
                     $file = fopen('php://output', 'w');
                     fputcsv($file, $columns);
                     
-                    foreach ($conversations as $conversation) {
+                    foreach ($conversations_unique as $conversation) {
                         $row['Employee ID'] = $conversation->employee_id;
                         $row['Name'] = $conversation->employee_name;
                         $row['Email'] = $conversation->email;
@@ -1496,7 +1504,15 @@ class SysadminStatisticsReportController extends Controller
 
                 $filename = 'Employees of Completed Conversation By Topic.csv';
                 $conversations =  $sql_chart5->get();
-                $conversations =  $conversations->unique('employee_id');
+                $conversations_unique = array();
+                $topics = ConversationTopic::select('id','name')->get();
+                foreach($topics as $topic){
+                        $subset = $conversations->where('conversation_topic_id', $topic->id );
+                        $unique_subset = $subset->unique('employee_id');
+                        foreach($unique_subset as $item) {
+                            array_push($conversations_unique,$item);
+                        }                        
+                }
 
                 if (array_key_exists($request->range, $this->overdue_groups) ) {
                     $users = $users->whereBetween('overdue_in_days', $this->overdue_groups[$request->range]);  
@@ -1515,11 +1531,11 @@ class SysadminStatisticsReportController extends Controller
                                 "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
                            ];
         
-                $callback = function() use($conversations, $columns) {
+                $callback = function() use($conversations_unique, $columns) {
                     $file = fopen('php://output', 'w');
                     fputcsv($file, $columns);
                     
-                    foreach ($conversations as $conversation) {
+                    foreach ($conversations_unique as $conversation) {
                             $row['Employee ID'] = $conversation->employee_id;
                             $row['Name'] = $conversation->employee_name;
                             $row['Email'] = $conversation->email;
