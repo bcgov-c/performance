@@ -1881,11 +1881,7 @@ class StatisticsReportController extends Controller
                 $callback = function() use($conversations, $columns) {
                     $file = fopen('php://output', 'w');
                     fputcsv($file, $columns);
-                    $topics = ConversationTopic::select('id','name')->get();
-                    foreach($topics as $topic){
-                        $subset = $conversations->where('conversation_topic_id', $topic->id );
-                        $unique_emp_topic_conversations = $subset->unique('participant_id');
-                        foreach ($unique_emp_topic_conversations as $conversation) {
+                    foreach ($conversations as $conversation) {
                             $row['Employee ID'] = $conversation->employee_id;
                             $row['Name'] = $conversation->employee_name;
                             $row['Email'] = $conversation->email;
@@ -1906,7 +1902,6 @@ class StatisticsReportController extends Controller
                                       $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
                                     ));
                         }
-                    } 
         
                     fclose($file);
                 };
@@ -1942,12 +1937,8 @@ class StatisticsReportController extends Controller
                 $callback = function() use($conversations, $columns) {
                     $file = fopen('php://output', 'w');
                     fputcsv($file, $columns);
-                    $topics = ConversationTopic::select('id','name')->get();
                     
-                    foreach($topics as $topic){
-                        $subset = $conversations->where('conversation_topic_id', $topic->id );
-                        $unique_emp_topic_conversations = $subset->unique('participant_id');
-                        foreach ($unique_emp_topic_conversations as $conversation) {
+                    foreach ($conversations as $conversation) {
                             $row['Employee ID'] = $conversation->employee_id;
                             $row['Name'] = $conversation->employee_name;
                             $row['Email'] = $conversation->email;
@@ -1968,7 +1959,6 @@ class StatisticsReportController extends Controller
                                       $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
                                     ));
                         }
-                    } 
         
                     fclose($file);
                 };
