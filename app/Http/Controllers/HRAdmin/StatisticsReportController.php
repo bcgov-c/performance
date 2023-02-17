@@ -1590,7 +1590,7 @@ class StatisticsReportController extends Controller
                 })
                 ->whereNull('deleted_at')                
                 ->join('users', 'users.id', 'conversation_participants.participant_id') 
-                ->join('conversations','conversations.id','conversation_participants.participant_id')
+                ->join('conversations','conversations.id','conversation_participants.conversations_id')
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 })
@@ -1636,7 +1636,7 @@ class StatisticsReportController extends Controller
                     employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
                     users.next_conversation_date as next_due_date")
             ->join('users', 'users.id', 'conversation_participants.participant_id') 
-            ->join('conversations','conversations.id','conversation_participants.participant_id')
+            ->join('conversations','conversations.id','conversation_participants.conversations_id')
             ->join('employee_demo', function($join) {
                 $join->on('employee_demo.employee_id', '=', 'users.employee_id');
             })
@@ -1862,7 +1862,7 @@ class StatisticsReportController extends Controller
             case 4:
 
                 $filename = 'Employees of Open Conversation By Topic.csv';
-                $conversations =  $sql_chart4->get();
+                $conversations =  $sql_chart4->unique('employee_id')->get();
         
                 $headers = array(
                     "Content-type"        => "text/csv",
@@ -1914,7 +1914,7 @@ class StatisticsReportController extends Controller
             case 5:
 
                 $filename = 'Employees of Completed Conversation By Topic.csv';
-                $conversations =  $sql_chart5->get();
+                $conversations =  $sql_chart5->unique('employee_id')->get();
 
                 if (array_key_exists($request->range, $this->overdue_groups) ) {
                     $users = $users->whereBetween('overdue_in_days', $this->overdue_groups[$request->range]);  

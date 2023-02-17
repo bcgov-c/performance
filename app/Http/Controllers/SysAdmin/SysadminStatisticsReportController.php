@@ -1162,7 +1162,7 @@ class SysadminStatisticsReportController extends Controller
                 })
                 ->whereNull('deleted_at')                
                 ->join('users', 'users.id', 'conversation_participants.participant_id') 
-                ->join('conversations','conversations.id','conversation_participants.participant_id')       
+                ->join('conversations','conversations.id','conversation_participants.conversations_id')       
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
@@ -1212,7 +1212,7 @@ class SysadminStatisticsReportController extends Controller
                     organization, level1_program, level2_division, level3_branch, level4,
                     users.next_conversation_date as next_due_date")
             ->join('users', 'users.id', 'conversation_participants.participant_id') 
-            ->join('conversations','conversations.id','conversation_participants.participant_id')    
+            ->join('conversations','conversations.id','conversation_participants.conversations_id')    
             ->join('employee_demo', function($join) {
                 $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
@@ -1446,7 +1446,7 @@ class SysadminStatisticsReportController extends Controller
             case 4:
 
                 $filename = 'Employees of Open Conversation By Topic.csv';
-                $conversations =  $sql_chart4->get();
+                $conversations =  $sql_chart4->unique('employee_id')->get();
         
                 $headers = array(
                     "Content-type"        => "text/csv",
@@ -1498,7 +1498,7 @@ class SysadminStatisticsReportController extends Controller
             case 5:
 
                 $filename = 'Employees of Completed Conversation By Topic.csv';
-                $conversations =  $sql_chart5->get();
+                $conversations =  $sql_chart5->unique('employee_id')->get();
 
                 if (array_key_exists($request->range, $this->overdue_groups) ) {
                     $users = $users->whereBetween('overdue_in_days', $this->overdue_groups[$request->range]);  
