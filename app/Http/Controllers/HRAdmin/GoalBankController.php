@@ -137,36 +137,38 @@ class GoalBankController extends Controller
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql->select([ 
-            'employee_demo.employee_id'
-            , 'employee_demo.employee_name'
-            , 'employee_demo.jobcode_desc'
-            , 'employee_demo.employee_email'
-            , 'employee_demo.organization'
-            , 'employee_demo.level1_program'
-            , 'employee_demo.level2_division'
-            , 'employee_demo.level3_branch'
-            , 'employee_demo.level4'
-            , 'employee_demo.deptid'
-        ])
+        $matched_emp_ids = $sql
+        // ->select([ 
+        //     'employee_demo.employee_id'
+        //     , 'employee_demo.employee_name'
+        //     , 'employee_demo.jobcode_desc'
+        //     , 'employee_demo.employee_email'
+        //     , 'employee_demo.organization'
+        //     , 'employee_demo.level1_program'
+        //     , 'employee_demo.level2_division'
+        //     , 'employee_demo.level3_branch'
+        //     , 'employee_demo.level4'
+        //     , 'employee_demo.deptid'
+        // ])
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
         // Matched Employees 
         $edemoWhere = $this->ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4);
         $esql = clone $edemoWhere; 
-        $ematched_emp_ids = $esql->select([ 
-            'employee_demo.employee_id'
-            , 'employee_demo.employee_name'
-            , 'employee_demo.jobcode_desc'
-            , 'employee_demo.employee_email'
-            , 'employee_demo.organization'
-            , 'employee_demo.level1_program'
-            , 'employee_demo.level2_division'
-            , 'employee_demo.level3_branch'
-            , 'employee_demo.level4'
-            , 'employee_demo.deptid'
-        ])
+        $ematched_emp_ids = $esql
+        // ->select([ 
+        //     'employee_demo.employee_id'
+        //     , 'employee_demo.employee_name'
+        //     , 'employee_demo.jobcode_desc'
+        //     , 'employee_demo.employee_email'
+        //     , 'employee_demo.organization'
+        //     , 'employee_demo.level1_program'
+        //     , 'employee_demo.level2_division'
+        //     , 'employee_demo.level3_branch'
+        //     , 'employee_demo.level4'
+        //     , 'employee_demo.deptid'
+        // ])
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
 
@@ -285,18 +287,19 @@ class GoalBankController extends Controller
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql->select([ 
-            'employee_demo.employee_id', 
-            'employee_demo.employee_name', 
-            'employee_demo.jobcode_desc', 
-            'employee_demo.employee_email', 
-            'employee_demo.organization', 
-            'employee_demo.level1_program', 
-            'employee_demo.level2_division',
-            'employee_demo.level3_branch',
-            'employee_demo.level4', 
-            'employee_demo.deptid'
-        ])
+        $matched_emp_ids = $sql
+        // ->select([ 
+        //     'employee_demo.employee_id', 
+        //     'employee_demo.employee_name', 
+        //     'employee_demo.jobcode_desc', 
+        //     'employee_demo.employee_email', 
+        //     'employee_demo.organization', 
+        //     'employee_demo.level1_program', 
+        //     'employee_demo.level2_division',
+        //     'employee_demo.level3_branch',
+        //     'employee_demo.level4', 
+        //     'employee_demo.deptid'
+        // ])
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
@@ -485,18 +488,19 @@ class GoalBankController extends Controller
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql->select([ 
-            'employee_demo.employee_id', 
-            'employee_demo.employee_name', 
-            'employee_demo.jobcode_desc', 
-            'employee_demo.employee_email', 
-            'employee_demo.organization', 
-            'employee_demo.level1_program', 
-            'employee_demo.level2_division',
-            'employee_demo.level3_branch',
-            'employee_demo.level4', 
-            'employee_demo.deptid'
-        ])
+        $matched_emp_ids = $sql
+        // ->select([ 
+        //     'employee_demo.employee_id', 
+        //     'employee_demo.employee_name', 
+        //     'employee_demo.jobcode_desc', 
+        //     'employee_demo.employee_email', 
+        //     'employee_demo.organization', 
+        //     'employee_demo.level1_program', 
+        //     'employee_demo.level2_division',
+        //     'employee_demo.level3_branch',
+        //     'employee_demo.level4', 
+        //     'employee_demo.deptid'
+        // ])
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
@@ -627,35 +631,37 @@ class GoalBankController extends Controller
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql->select([ 
-            'employee_demo.employee_id'
-            , 'employee_demo.employee_name'
-            , 'employee_demo.jobcode_desc'
-            , 'employee_demo.employee_email'
-            , 'employee_demo.organization'
-            , 'employee_demo.level1_program'
-            , 'employee_demo.level2_division'
-            , 'employee_demo.level3_branch'
-            , 'employee_demo.level4'
-            , 'employee_demo.deptid'
-        ])
+        $matched_emp_ids = $sql
+        // ->select([ 
+        //     'employee_demo.employee_id'
+        //     , 'employee_demo.employee_name'
+        //     , 'employee_demo.jobcode_desc'
+        //     , 'employee_demo.employee_email'
+        //     , 'employee_demo.organization'
+        //     , 'employee_demo.level1_program'
+        //     , 'employee_demo.level2_division'
+        //     , 'employee_demo.level3_branch'
+        //     , 'employee_demo.level4'
+        //     , 'employee_demo.deptid'
+        // ])
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
         $ademoWhere = $this->abaseFilteredWhere($request, $alevel0, $alevel1, $alevel2, $alevel3, $alevel4);
         $asql = clone $ademoWhere; 
-        $amatched_emp_ids = $asql->select([ 
-            'employee_demo.employee_id'
-            , 'employee_demo.employee_name'
-            , 'employee_demo.jobcode_desc'
-            , 'employee_demo.employee_email'
-            , 'employee_demo.organization'
-            , 'employee_demo.level1_program'
-            , 'employee_demo.level2_division'
-            , 'employee_demo.level3_branch'
-            , 'employee_demo.level4'
-            , 'employee_demo.deptid'
-        ])
+        $amatched_emp_ids = $asql
+        // ->select([ 
+        //     'employee_demo.employee_id'
+        //     , 'employee_demo.employee_name'
+        //     , 'employee_demo.jobcode_desc'
+        //     , 'employee_demo.employee_email'
+        //     , 'employee_demo.organization'
+        //     , 'employee_demo.level1_program'
+        //     , 'employee_demo.level2_division'
+        //     , 'employee_demo.level3_branch'
+        //     , 'employee_demo.level4'
+        //     , 'employee_demo.deptid'
+        // ])
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
@@ -737,6 +743,7 @@ class GoalBankController extends Controller
             , 'created_by' => $current_user->id
             , 'by_admin' => 2
             , 'isMandatory' => $request->input('isMandatory')
+            , 'display_name' => $request->input('display_name')
             ]
         );
         
@@ -1088,6 +1095,7 @@ class GoalBankController extends Controller
                 , 'user_id' => $current_user->id
                 , 'created_by' => $current_user->id
                 , 'by_admin' => 2
+                , 'display_name' => $request->input('display_name')
                 ]
             );
 
@@ -1212,6 +1220,7 @@ class GoalBankController extends Controller
             , 'start_date' => $request->input('start_date')
             , 'target_date' => $request->input('target_date')
             , 'is_mandatory' => $request->input('is_mandatory')
+            , 'display_name' => $request->input('display_name')
             ]
         );
         $resultrec->tags()->sync($request->tag_ids);
@@ -1690,6 +1699,7 @@ class GoalBankController extends Controller
                 'goals.title',
                 'goals.created_at',
                 'goals.is_mandatory',
+                'goals.display_name',
                 'ced.employee_name as creator_name',
             )
             ->addSelect(['org_audience' => 
@@ -1780,19 +1790,35 @@ class GoalBankController extends Controller
                     }
                 });
             })
-            ->select (
-                'employee_demo.employee_id',
-                'employee_demo.employee_name',
-                'employee_demo.jobcode_desc',
-                'employee_demo.organization',
-                'employee_demo.level1_program',
-                'employee_demo.level2_division',
-                'employee_demo.level3_branch',
-                'employee_demo.level4',
-                'employee_demo.deptid',
-                'goals.id as goal_id',
-                'goals_shared_with.id as share_id'
-            );
+            // ->select (
+            //     'employee_demo.employee_id',
+            //     'employee_demo.employee_name',
+            //     'employee_demo.jobcode_desc',
+            //     'employee_demo.organization',
+            //     'employee_demo.level1_program',
+            //     'employee_demo.level2_division',
+            //     'employee_demo.level3_branch',
+            //     'employee_demo.level4',
+            //     'employee_demo.deptid',
+            //     'goals.id as goal_id',
+            //     'goals_shared_with.id as share_id',
+            //     'goals.display_name'
+            // );
+            ->selectRaw ("
+                employee_demo.employee_id,
+                employee_demo.employee_name,
+                employee_demo.jobcode_desc,
+                employee_demo.organization,
+                employee_demo.level1_program,
+                employee_demo.level2_division,
+                employee_demo.level3_branch,
+                employee_demo.level4,
+                employee_demo.deptid,
+                goals.id as goal_id,
+                goals_shared_with.id as share_id,
+                goals.display_name,
+                CASE WHEN (SELECT 1 FROM users AS su WHERE su.reporting_to = users.id) = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor
+            ");
             return Datatables::of($query)
             ->addIndexColumn()
             ->addcolumn('action', function($row) {
