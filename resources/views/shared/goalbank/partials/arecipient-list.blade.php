@@ -90,6 +90,7 @@
                     {title: '<input name="aselect_all" value="1" id="aemployee-list-select-all" type="checkbox" />', ariaTitle: 'aemployee-list-select-all', target: 0, type: 'string', data: 'aselect_users', name: 'aselect_users', orderable: false, searchable: false},
                     {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', className: 'dt-nowrap'},
                     {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', className: 'dt-nowrap'},
+                    {title: 'Supervisor', ariaTitle: 'Supervisor', target: 0, type: 'string', data: 'isSupervisor', name: 'isSupervisor', searchable: true, className: 'dt-nowrap'},
                     {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', className: 'dt-nowrap'},
                     {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'employee_email', className: 'dt-nowrap'},
                     {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', className: 'dt-nowrap'},
