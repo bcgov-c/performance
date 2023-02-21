@@ -123,24 +123,15 @@
                     },
                     columns: 
                     [
-                        {title: 'Goal Title', ariaTitle: 'Goal Title', target: 0, type: 'string', data: 'click_title'
-                            , name: 'click_title', searchable: true, className: 'dt-nowrap'},
-                        {title: 'Goal Type', ariaTitle: 'Goal Type', target: 0, type: 'string', data: 'click_goal_type'
-                            , name: 'click_goal_type', searchable: true, className: 'dt-nowrap'},
-                        {title: 'Mandatory', ariaTitle: 'Mandatory', target: 0, type: 'string', data: 'mandatory'
-                            , name: 'mandatory', searchable: true, className: 'dt-nowrap'},
-                        {title: 'Goal Creation Date', ariaTitle: 'Goal Creation Date', target: 0, type: 'date', data: 'created_at'
-                            , name: 'created_at', searchable: true, className: 'dt-nowrap'},
-                        {title: 'Created By', ariaTitle: 'Created By', target: 0, type: 'string', data: 'click_creator_name'
-                            , name: 'click_creator_name', searchable: true, className: 'dt-nowrap'},
-                        {title: 'Individual Audience', ariaTitle: 'Individual Audience', target: 0, type: 'num', data: 'audience'
-                            , name: 'audience', searchable: true},
-                        {title: 'Business Unit Audience', ariaTitle: 'Business Unit Audience', target: 0, type: 'num', data: 'org_audience'
-                            , name: 'org_audience', searchable: true},
-                        {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action'
-                            , name: 'action', orderable: false, searchable: false},
-                        {title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'string', data: 'id'
-                            , name: 'id', searchable: false, visible: false},
+                        {title: 'Goal Title', ariaTitle: 'Goal Title', target: 0, type: 'string', data: 'click_title', name: 'click_title', searchable: true, className: 'dt-nowrap'},
+                        {title: 'Goal Type', ariaTitle: 'Goal Type', target: 0, type: 'string', data: 'click_goal_type', name: 'click_goal_type', searchable: true, className: 'dt-nowrap'},
+                        {title: 'Mandatory', ariaTitle: 'Mandatory', target: 0, type: 'string', data: 'mandatory', name: 'mandatory', searchable: true, className: 'dt-nowrap'},
+                        {title: 'Goal Creation Date', ariaTitle: 'Goal Creation Date', target: 0, type: 'date', data: 'created_at', name: 'created_at', searchable: true, className: 'dt-nowrap'},
+                        {title: 'Created By', ariaTitle: 'Created By', target: 0, type: 'string', data: 'click_creator_name', name: 'click_creator_name', searchable: true, className: 'dt-nowrap'},
+                        {title: 'Individual Audience', ariaTitle: 'Individual Audience', target: 0, type: 'num', data: 'audience', name: 'audience', searchable: true},
+                        {title: 'Business Unit Audience', ariaTitle: 'Business Unit Audience', target: 0, type: 'num', data: 'org_audience', name: 'org_audience', searchable: true},
+                        {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},
+                        {title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'string', data: 'id', name: 'id', searchable: false, visible: false},
                     ]
                 } );
             });
