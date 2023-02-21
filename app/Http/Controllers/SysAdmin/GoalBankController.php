@@ -1618,14 +1618,14 @@ class GoalBankController extends Controller
             ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
                 $q->where(function($query) use ($request) {
                     return $query->whereRaw("goals.title LIKE '%".$request->search_text."%'")
-                        ->orWhereRaw("ced.employee_name LIKE '%".$request->search_text."%'");
+                        ->orWhereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%')");
                 });
             })
             ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
                 return $q->whereRaw("goals.title LIKE '%".$request->search_text."%'");
             })
             ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
-                return $q->whereRaw("ced.employee_name LIKE '%".$request->search_text."%'");
+                return $q->whereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%')");
             })
             ->distinct()
             ->select
@@ -1653,7 +1653,11 @@ class GoalBankController extends Controller
                 return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.$row->goal_type_name.' value="'.$row->id.'">'.$row->goal_type_name.'</a>';
             })
             ->addcolumn('click_creator_name', function ($row) {
-                return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.$row->creator_name.' value="'.$row->id.'">'.$row->creator_name.'</a>';
+                if ($row->display_name) {
+                    return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.$row->display_name.' value="'.$row->id.'">'.$row->display_name.'</a>';
+                } else {
+                    return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.$row->creator_name.' value="'.$row->id.'">'.$row->creator_name.'</a>';
+                }
             })
             ->addColumn('mandatory', function ($row) {
                 return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.($row->is_mandatory ? "Mandatory" : "Suggested").' value="'.$row->id.'">'.($row->is_mandatory ? "Mandatory" : "Suggested").'</a>';

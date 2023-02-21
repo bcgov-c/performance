@@ -87,12 +87,12 @@
 				<div class="col col-md-2">
 					<b> Display Name </b>
 					<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Organizational title to display when listing in Goal Bank."> </i>
-					<x-input name="display_name" />
+					<x-input name="display_name" :value="$goaldetail->display_name"/>
 				</div>
 			</div>
 		<div class="col-md-3 mb-2">
 			<button class="btn btn-primary mt-2" type="submit" name="btn_send" value="btn_send">Save Changes</button>
-			<button class="btn btn-secondary mt-2">Cancel</button>
+			<button type="button" class="btn btn-cancel mt-2" onClick="window.location='{{ URL::previous() }}'">Cancel</button>
 		</div>
 
 	</form>
