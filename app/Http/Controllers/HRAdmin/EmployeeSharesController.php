@@ -175,6 +175,7 @@ class EmployeeSharesController extends Controller
             ->withErrors($validator)
             ->withInput();
         }
+        
         // $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $selected_emp_ids = $request->userCheck ? $request->userCheck : [];
         // $eselected_emp_ids = $request->eselected_emp_ids ? json_decode($request->eselected_emp_ids) : [];
@@ -184,7 +185,7 @@ class EmployeeSharesController extends Controller
         $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
         $eselected_org_nodes = $request->eselected_org_nodes ? json_decode($request->eselected_org_nodes) : [];
         $current_user = User::find(Auth::id());
-        $employee_ids = ($request->userCheck) ? $request->userCheck : [];
+        $employee_ids = ($request->userCheck) ? $request->userCheck : [];         
 
         $eeToShare = EmployeeDemo::select('users.id')
             ->join('users', 'employee_demo.employee_id', 'users.employee_id')
@@ -211,10 +212,33 @@ class EmployeeSharesController extends Controller
         }
 
         $reason = $request->input_reason;
-
+        
         foreach ($eeToShare as $eeOne) {
-            foreach ($shareTo as $toOne) {
-                //skip if same
+            foreach ($shareTo as $toOne) {                
+                //not allow direct team members be shared to their manager
+                $get_direct = Users::select('id')
+                           ->where('id', '=', $eeOne->id)
+                           ->where('reporting_to', '=', $toOne->id)
+                           ->count();                 
+                if($get_direct > 0){
+                    return redirect()->route(request()->segment(1).'.employeeshares')
+                            ->with('message', " Employee is not allowed to be shared with the direct supervior. Please review and try again.");                    
+                }    
+                //not allow exsiting shared team members be shared to the same 
+                $get_shared = sharedProfile::select('id')
+                           ->where('shared_id', '=', $eeOne->id)
+                           ->where('shared_with', '=', $toOne->id)
+                           ->count(); 
+                if($get_shared > 0){
+                    return redirect()->route(request()->segment(1).'.employeeshares')
+                            ->with('message', " Employee has be shared with the selected supervior. Please review and try again.");                    
+                }                 
+            }
+        }        
+        
+        foreach ($eeToShare as $eeOne) {
+            foreach ($shareTo as $toOne) {                
+                //skip if same adn
                 if ($eeOne->id <> $toOne->id) {
                     $result = SharedProfile::updateOrCreate(
                         ['shared_id' => $eeOne->id
