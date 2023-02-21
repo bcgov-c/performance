@@ -139,18 +139,6 @@ class GoalBankController extends Controller
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
         $matched_emp_ids = $sql
-        // ->select([ 
-        //     'employee_demo.employee_id'
-        //     , 'employee_demo.employee_name'
-        //     , 'employee_demo.jobcode_desc'
-        //     , 'employee_demo.employee_email'
-        //     , 'employee_demo.organization'
-        //     , 'employee_demo.level1_program'
-        //     , 'employee_demo.level2_division'
-        //     , 'employee_demo.level3_branch'
-        //     , 'employee_demo.level4'
-        //     , 'employee_demo.deptid'
-        // ])
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
@@ -158,18 +146,6 @@ class GoalBankController extends Controller
         $edemoWhere = $this->ebaseFilteredWhere($request, $elevel0, $elevel1, $elevel2, $elevel3, $elevel4);
         $esql = clone $edemoWhere; 
         $ematched_emp_ids = $esql
-        // ->select([ 
-        //     'employee_demo.employee_id'
-        //     , 'employee_demo.employee_name'
-        //     , 'employee_demo.jobcode_desc'
-        //     , 'employee_demo.employee_email'
-        //     , 'employee_demo.organization'
-        //     , 'employee_demo.level1_program'
-        //     , 'employee_demo.level2_division'
-        //     , 'employee_demo.level3_branch'
-        //     , 'employee_demo.level4'
-        //     , 'employee_demo.deptid'
-        // ])
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
@@ -188,7 +164,9 @@ class GoalBankController extends Controller
         //no need private in goalbank module
         unset($goalTypes[3]);
         
-        return view('shared.goalbank.createindex', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'type_desc_str') );
+        $currentView = $request->segment(2);
+
+        return view('shared.goalbank.createindex', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'type_desc_str', 'currentView') );
     }
 
 
@@ -289,18 +267,6 @@ class GoalBankController extends Controller
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
         $matched_emp_ids = $sql
-        // ->select([ 
-        //     'employee_demo.employee_id', 
-        //     'employee_demo.employee_name', 
-        //     'employee_demo.jobcode_desc', 
-        //     'employee_demo.employee_email', 
-        //     'employee_demo.organization', 
-        //     'employee_demo.level1_program', 
-        //     'employee_demo.level2_division',
-        //     'employee_demo.level3_branch',
-        //     'employee_demo.level4', 
-        //     'employee_demo.deptid'
-        // ])
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
@@ -309,7 +275,9 @@ class GoalBankController extends Controller
         ->whereIntegerInRaw('id', [3, 4])
         ->pluck('longname', 'id');
 
-        return view('shared.goalbank.index', compact('criteriaList','matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'roles', 'goalTypes', 'mandatoryOrSuggested', 'tags') );
+        $currentView = $request->segment(2);
+
+        return view('shared.goalbank.index', compact('criteriaList','matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'roles', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'currentView') );
     
     }
 
@@ -472,18 +440,6 @@ class GoalBankController extends Controller
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
         $matched_emp_ids = $sql
-        // ->select([ 
-        //     'employee_demo.employee_id', 
-        //     'employee_demo.employee_name', 
-        //     'employee_demo.jobcode_desc', 
-        //     'employee_demo.employee_email', 
-        //     'employee_demo.organization', 
-        //     'employee_demo.level1_program', 
-        //     'employee_demo.level2_division',
-        //     'employee_demo.level3_branch',
-        //     'employee_demo.level4', 
-        //     'employee_demo.deptid'
-        // ])
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
@@ -505,7 +461,9 @@ class GoalBankController extends Controller
         }
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
 
-        return view('shared.goalbank.editgoal', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'roles', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'goaldetail', 'request', 'goal_id', 'type_desc_str') );
+        $currentView = $request->segment(3);
+
+        return view('shared.goalbank.editgoal', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'roles', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'goaldetail', 'request', 'goal_id', 'type_desc_str', 'currentView') );
     
     }
 
@@ -615,36 +573,12 @@ class GoalBankController extends Controller
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql = clone $demoWhere; 
         $matched_emp_ids = $sql
-        // ->select([ 
-        //     'employee_demo.employee_id'
-        //     , 'employee_demo.employee_name'
-        //     , 'employee_demo.jobcode_desc'
-        //     , 'employee_demo.employee_email'
-        //     , 'employee_demo.organization'
-        //     , 'employee_demo.level1_program'
-        //     , 'employee_demo.level2_division'
-        //     , 'employee_demo.level3_branch'
-        //     , 'employee_demo.level4'
-        //     , 'employee_demo.deptid'
-        // ])
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
         $ademoWhere = $this->abaseFilteredWhere($request, $alevel0, $alevel1, $alevel2, $alevel3, $alevel4);
         $asql = clone $ademoWhere; 
         $amatched_emp_ids = $asql
-        // ->select([ 
-        //     'employee_demo.employee_id'
-        //     , 'employee_demo.employee_name'
-        //     , 'employee_demo.jobcode_desc'
-        //     , 'employee_demo.employee_email'
-        //     , 'employee_demo.organization'
-        //     , 'employee_demo.level1_program'
-        //     , 'employee_demo.level2_division'
-        //     , 'employee_demo.level3_branch'
-        //     , 'employee_demo.level4'
-        //     , 'employee_demo.deptid'
-        // ])
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
         
@@ -663,8 +597,9 @@ class GoalBankController extends Controller
         }
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
 
-        return view('shared.goalbank.editone', compact('criteriaList', 'acriteriaList', 'matched_emp_ids', 'amatched_emp_ids', 'old_selected_emp_ids', 'aold_selected_emp_ids', 'old_selected_org_nodes', 'aold_selected_org_nodes', 'goalTypes', 'mandatoryOrSuggested', 'amandatoryOrSuggested', 'tags', 'atags', 'goaldetail', 'request', 'goal_id', 'type_desc_str') );
-    
+        $currentView = $request->segment(3);
+
+        return view('shared.goalbank.editone', compact('criteriaList', 'acriteriaList', 'matched_emp_ids', 'amatched_emp_ids', 'old_selected_emp_ids', 'aold_selected_emp_ids', 'old_selected_org_nodes', 'aold_selected_org_nodes', 'goalTypes', 'mandatoryOrSuggested', 'amandatoryOrSuggested', 'tags', 'atags', 'goaldetail', 'request', 'goal_id', 'type_desc_str', 'currentView') );    
     }
 
     public function editdetails(Request $request, $id) 
@@ -690,7 +625,9 @@ class GoalBankController extends Controller
         }
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
 
-        return view('shared.goalbank.editdetails', compact('goalTypes', 'mandatoryOrSuggested', 'amandatoryOrSuggested', 'tags', 'goaldetail', 'request', 'goal_id', 'type_desc_str') );
+        $currentView = $request->segment(3);
+
+        return view('shared.goalbank.editdetails', compact('goalTypes', 'mandatoryOrSuggested', 'amandatoryOrSuggested', 'tags', 'goaldetail', 'request', 'goal_id', 'type_desc_str', 'currentView') );
     
     }
 
@@ -966,12 +903,6 @@ class GoalBankController extends Controller
 
             $sql = clone $demoWhere; 
 
-            // $reqMatched = clone $demoWhere;
-            // $reqMatched->select('employee_demo.employee_id')
-            // ->orderBy('employee_demo.employee_id')
-            // ->pluck('employee_demo.employee_id');
-            // // ->get();
-
             $employees = $sql->select([ 
                   'employee_id'
                 , 'employee_name'
@@ -1017,7 +948,9 @@ class GoalBankController extends Controller
                 , 'employee_demo.level3_branch'
                 , 'employee_demo.level4'
                 , 'employee_demo.deptid'
-            ]);
+            ])
+            ->selectRaw("CASE WHEN (SELECT DISTINCT 1 FROM users AS u, users AS su WHERE su.reporting_to = u.id AND u.employee_id = employee_demo.employee_id) = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor")
+            ;
             return Datatables::of($eemployees)
             ->addColumn('eselect_users', static function ($eemployee) {
                 return '<input pid="1335" type="checkbox" id="euserCheck'. 
@@ -1051,7 +984,9 @@ class GoalBankController extends Controller
                 , 'employee_demo.level3_branch'
                 , 'employee_demo.level4'
                 , 'employee_demo.deptid'
-            ]);
+            ])
+            ->selectRaw("CASE WHEN (SELECT DISTINCT 1 FROM users AS u, users AS su WHERE su.reporting_to = u.id AND u.employee_id = employee_demo.employee_id) = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor")
+            ;
             return Datatables::of($aemployees)
             ->addColumn('aselect_users', static function ($aemployee) {
                     return '<input pid="1335" type="checkbox" id="auserCheck'. 
@@ -1599,7 +1534,9 @@ class GoalBankController extends Controller
             'cby'=> 'Created By',
         );
 
-        return view('shared.goalbank.manageindex', compact ('request', 'criteriaList'));
+        $currentView = $request->segment(3);
+
+        return view('shared.goalbank.manageindex', compact ('request', 'criteriaList', 'currentView'));
     }
 
     public function managegetList(Request $request) {
@@ -1691,23 +1628,6 @@ class GoalBankController extends Controller
             ->leftjoin('goals_shared_with', 'goals.id', '=', 'goals_shared_with.goal_id')
             ->join('users', 'users.id', '=', 'goals_shared_with.user_id')
             ->leftjoin('employee_demo', 'employee_demo.employee_id', '=', 'users.employee_id')
-            // ->leftjoin('admin_orgs', function ($j1) {
-            //     $j1->on(function ($j1a) {
-            //         $j1a->whereRAW('admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL))');
-            //     } )
-            //     ->on(function ($j2a) {
-            //         $j2a->whereRAW('admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL))');
-            //     } )
-            //     ->on(function ($j3a) {
-            //         $j3a->whereRAW('admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL))');
-            //     } )
-            //     ->on(function ($j4a) {
-            //         $j4a->whereRAW('admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL))');
-            //     } )
-            //     ->on(function ($j5a) {
-            //         $j5a->whereRAW('admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL))');
-            //     } );
-            // } )   
             ->when($level0, function($q) use($level0) {return $q->where('employee_demo.organization', $level0->name);})
             ->when($level1, function($q) use($level1) {return $q->where('employee_demo.level1_program', $level1->name);})
             ->when($level2, function($q) use($level2) {return $q->where('employee_demo.level2_division', $level2->name);})
@@ -1727,34 +1647,23 @@ class GoalBankController extends Controller
                     }
                 });
             })
-            // ->select (
-            //     'employee_demo.employee_id',
-            //     'employee_demo.employee_name',
-            //     'employee_demo.jobcode_desc',
-            //     'employee_demo.organization',
-            //     'employee_demo.level1_program',
-            //     'employee_demo.level2_division',
-            //     'employee_demo.level3_branch',
-            //     'employee_demo.level4',
-            //     'employee_demo.deptid',
-            //     'goals.id as goal_id',
-            //     'goals_shared_with.id as share_id'
-            // );
-            ->selectRaw ("
-                employee_demo.employee_id,
-                employee_demo.employee_name,
-                employee_demo.jobcode_desc,
-                employee_demo.organization,
-                employee_demo.level1_program,
-                employee_demo.level2_division,
-                employee_demo.level3_branch,
-                employee_demo.level4,
-                employee_demo.deptid,
-                goals.id as goal_id,
-                goals_shared_with.id as share_id,
-                goals.display_name,
-                CASE WHEN (SELECT 1 FROM users AS su WHERE su.reporting_to = users.id) = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor
-            ");
+            ->when($request->supervisorCheckbox, function($q) use($level0) {return $q->whereRaw("isSupervisor = 'Yes'");})
+            ->select ([
+                'employee_demo.employee_id',
+                'employee_demo.employee_name',
+                'employee_demo.jobcode_desc',
+                'employee_demo.organization',
+                'employee_demo.level1_program',
+                'employee_demo.level2_division',
+                'employee_demo.level3_branch',
+                'employee_demo.level4',
+                'employee_demo.deptid',
+                'goals.id as goal_id',
+                'goals_shared_with.id as share_id',
+                'goals.display_name'
+            ])
+            ->selectRaw("CASE WHEN (SELECT DISTINCT 1 FROM users AS su WHERE su.reporting_to = users.id) = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor")
+            ;
             return Datatables::of($query)
             ->addIndexColumn()
             ->addcolumn('action', function($row) {
@@ -1840,12 +1749,6 @@ class GoalBankController extends Controller
 
         // Add dasboard message to each participant_id
         foreach ($notify_users_ids as $key => $value) {
-            // DashboardNotification::create([
-            //         'user_id' => $value,
-            //         'notification_type' => 'GB',        // Goal Bank
-            //         'comment' => $goalBank->user->name . ' added a new goal to your goal bank.',
-            //         'related_id' => $goalBank->id,
-            // ]);
             // Use Class to create DashboardNotification
 			$notification = new \App\MicrosoftGraph\SendDashboardNotification();
 			$notification->user_id = $value;

@@ -236,57 +236,6 @@
 					//List
 					$('#currenttable').DataTable().rows().invalidate().draw();
                                         	
-                       	
-					// $('#currenttable').DataTable().destroy();
-					// $('#currenttable').empty();
-					// $('#currenttable').DataTable(
-					// 	{
-					// 		processing: true,
-					// 		serverSide: true,
-					// 		scrollX: true,
-					// 		stateSave: true,
-					// 		deferRender: true,
-					// 		ajax: {
-					// 			url: "{{ route(request()->segment(1).'.goalbank.getgoalinds', $goaldetail->id) }}",
-					// 			type: 'GET',
-					// 			data: function(d) {
-					// 				d.dd_level0 = $('#dd_level0').val();
-					// 				d.dd_level1 = $('#dd_level1').val();
-					// 				d.dd_level2 = $('#dd_level2').val();
-					// 				d.dd_level3 = $('#dd_level3').val();
-					// 				d.dd_level4 = $('#dd_level4').val();
-					// 				d.criteria = $('#criteria').val();
-					// 				d.search_text = $('#search_text').val();
-					// 			}
-					// 		},
-					// 		columns: [
-					// 			{title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id'
-					// 				, name: 'employee_id', searchable: true, className: 'dt-nowrap'},
-					// 			{title: 'Name', ariaTitle: 'Employee Name', target: 0, type: 'string', data: 'employee_name'
-					// 				, name: 'employee_name', searchable: true, className: 'dt-nowrap'},
-					// 			{title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc'
-					// 				, name: 'jobcode_desc', searchable: true, className: 'dt-nowrap'},
-					// 			{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization'
-					// 				, name: 'organization', searchable: true, className: 'dt-nowrap'},
-					// 			{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program'
-					// 				, name: 'level1_program', searchable: true, className: 'dt-nowrap'},
-					// 			{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division'
-					// 				, name: 'level2_division', searchable: true, className: 'dt-nowrap'},
-					// 			{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch'
-					// 				, name: 'level3_branch', searchable: true, className: 'dt-nowrap'},
-					// 			{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4'
-					// 				, name: 'level4', searchable: true, className: 'dt-nowrap'},
-					// 			{title: 'Dept ID', ariaTitle: 'Dept ID', target: 0, type: 'string', data: 'deptid'
-					// 				, name: 'deptid', searchable: true, className: 'dt-nowrap'},
-					// 			{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action'
-					// 				, name: 'action', orderable: false, searchable: false, className: 'dt-nowrap'},
-					// 			{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id'
-					// 				, name: 'goal_id', searchable: false, visible: false, className: 'dt-nowrap'},
-					// 			{title: 'ID', ariaTitle: 'ID', target: 0, type: 'num', data: 'share_id'
-					// 				, name: 'share_id', searchable: false, visible: false, className: 'dt-nowrap'},
-					// 		]
-					// 	}
-					// );
 					//Tree
 					target = $('#nav-tree'); 
 					ddnotempty = $('#dd_level0').val() + $('#dd_level1').val() + $('#dd_level2').val() + $('#dd_level3').val() + $('#dd_level4').val();
@@ -353,12 +302,6 @@
 					// dd(g_selected_orgnodes);
 					return true; // return false to cancel form action
 				});
-
-				// CKEDITOR.replace('what', {
-				// 	toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ],disableNativeSpellChecker: false});
-
-				// CKEDITOR.replace('measure_of_success', {
-				// 	toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ],disableNativeSpellChecker: false});
 
 				// Tab  -- LIST Page  activate
 				$("#anav-list-tab").on("click", function(e) {
@@ -568,43 +511,6 @@
 					e.preventDefault();
 					$('#aemployee-list-table').DataTable().rows().invalidate().draw();
 
-					//List
-					// $('#aemployee-list-table').DataTable().destroy();
-					// $('#aemployee-list-table').empty();
-					// $('#aemployee-list-table').DataTable(
-					// 	{
-					// 		processing: true,
-					// 		serverSide: true,
-					// 		scrollX: true,
-					// 		stateSave: true,
-					// 		deferRender: true,
-					// 		ajax: {
-					// 			url: "{{ route(request()->segment(1).'.goalbank.aemployee.list') }}",
-					// 			type: 'GET',
-					// 			data: function(d) {
-					// 				d.add_level0 = $('#add_level0').val();
-					// 				d.add_level1 = $('#add_level1').val();
-					// 				d.add_level2 = $('#add_level2').val();
-					// 				d.add_level3 = $('#add_level3').val();
-					// 				d.add_level4 = $('#add_level4').val();
-					// 				d.acriteria = $('#acriteria').val();
-					// 				d.asearch_text = $('#asearch_text').val();
-					// 			}
-					// 		},
-					// 		columns: [
-		            //         	{title: '<input name="aselect_all" value="1" id="aemployee-list-select-all" type="checkbox" />', ariaTitle: 'aemployee-list-select-all', target: 0, type: 'string', data: 'aselect_users', name: 'aselect_users', orderable: false, searchable: false},
-					// 			{title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', searchable: true, className: 'dt-nowrap'},
-					// 			{title: 'Name', ariaTitle: 'Employee Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', searchable: true, className: 'dt-nowrap'},
-					// 			{title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', searchable: true, className: 'dt-nowrap'},
-					// 			{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', searchable: true, className: 'dt-nowrap'},
-					// 			{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', searchable: true, className: 'dt-nowrap'},
-					// 			{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', searchable: true, className: 'dt-nowrap'},
-					// 			{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', searchable: true, className: 'dt-nowrap'},
-					// 			{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true, className: 'dt-nowrap'},
-					// 			{title: 'Dept ID', ariaTitle: 'Dept ID', target: 0, type: 'string', data: 'deptid', name: 'deptid', searchable: true, className: 'dt-nowrap'},
-					// 		]
-					// 	}
-					// );
 					//Tree
 					target = $('#anav-tree'); 
 					ddnotempty = $('#add_level0').val() + $('#add_level1').val() + $('#add_level2').val() + $('#add_level3').val() + $('#add_level4').val();
