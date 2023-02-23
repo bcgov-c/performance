@@ -479,7 +479,7 @@ class GoalController extends Controller
         ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
         ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')   
-        ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'))
+        ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'))
         ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'users.name', 'goals.is_mandatory');
         // Admin List filter below
         if ($request->has('is_mandatory') && $request->is_mandatory !== null) {
@@ -576,7 +576,7 @@ class GoalController extends Controller
         
         // $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goalTypes, $tagsList);
         // $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','users.name as username',DB::raw('group_concat(distinct tags.name) as tagnames'));
-        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'));
+        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'));
         $query = $query->union($adminGoals);
         
         if (!$request->has('sortorder') || $request->sortorder == '') {

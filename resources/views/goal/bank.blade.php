@@ -94,7 +94,11 @@
                                             <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->created_at == null ?: $goal->created_at->format('M d, Y') }}</a>
                                         </td>
                                         <td style="width:15%">
-                                            <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->username }}</a>
+                                            @if ($goal->display_name) 
+                                                <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->display_name }}</a>
+                                            @else
+                                                <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->username }}</a>
+                                            @endif
                                         </td>
                                         <td style="width:15%">
                                             <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->is_mandatory ? 'Mandatory' : 'Suggested' }}</a>
