@@ -6,11 +6,13 @@ use DateTime;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\EmployeeDemo;
+use App\Models\JobDataAudit;
 use App\Models\JobSchedAudit;
 use App\Models\SharedProfile;
 use App\Models\UserReportingTo;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 
 class SyncUserProfile extends Command
@@ -49,6 +51,7 @@ class SyncUserProfile extends Command
 
         $switch = strtolower(env('PRCS_SYNC_USER_PROFILES'));
         $manualoverride = (strtolower($this->option('manual')) ? true : false);
+        $exceptions = [];
 
         if ($switch == 'on' || $manualoverride) {
 
@@ -71,7 +74,7 @@ class SyncUserProfile extends Command
 
             $cutoff_time = Carbon::now();
 
-            $this->SyncUserProfile($last_cutoff_time, $cutoff_time);
+            $this->SyncUserProfile($last_cutoff_time, $cutoff_time, $audit_id, $exceptions);
 
             $end_time = Carbon::now();
             JobSchedAudit::updateOrInsert(
@@ -83,7 +86,8 @@ class SyncUserProfile extends Command
                 'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
                 'end_time' => date('Y-m-d H:i:s', strtotime($end_time)),
                 'cutoff_time' => date('Y-m-d H:i:s', strtotime($cutoff_time)),
-                'status' => 'Completed'
+                'status' => 'Completed',
+                'details' => $exceptions
             ]
             );
 
@@ -102,7 +106,7 @@ class SyncUserProfile extends Command
         return 0;
     }
 
-    protected function SyncUserProfile($last_sync_at, $new_sync_at)
+    protected function SyncUserProfile($last_sync_at, $new_sync_at, $audit_id, &$exceptions)
     {
 
         // $new_sync_at = Carbon::now();
@@ -111,6 +115,7 @@ class SyncUserProfile extends Command
 
         $employees = EmployeeDemo::whereNotIn('guid', ['', ' '])
             ->whereNotIn('employee_email', ['', ' '])
+            ->whereNotIn('employee_id', ['', ' '])
             ->where(function ($query) use ($last_sync_at) {
                 $query->whereNull('date_updated');
                 $query->orWhere('date_updated', '>=', $last_sync_at );
@@ -135,75 +140,169 @@ class SyncUserProfile extends Command
         $password = Hash::make(env('SYNC_USER_PROFILE_SECRET'));
         foreach ($employees as $employee) {
 
-          //$reporting_to = $this->getReportingUserId($employee);
-          $reporting_to = null;
+            //$reporting_to = $this->getReportingUserId($employee);
+            $reporting_to = null;
 
-          // Check the user by GUID 
-          $user = User::where('guid', $employee->guid)->first();
+            // Check the user by GUID 
+            //   $user = User::where('guid', $employee->guid)->first();
+            $user = User::where('employee_id', $employee->employee_id)
+            ->orderBy('id', 'desc')
+            ->first();
 
-          if ($user) {
+            if ($user) {
 
-                if (!(strtolower(trim($user->email)) == strtolower(trim($employee->employee_email))) )  {
-                    $this->info('Warning: Same GUID but difference email | ' . $user->guid . ' -> ' . $user->email . ' - demo ' .
-                    $employee->employee_email );
-                }
+                // if (!(strtolower(trim($user->email)) == strtolower(trim($employee->employee_email))) )  {
+                //     $this->info('Warning: Same GUID but difference email | ' . $user->guid . ' -> ' . $user->email . ' - demo ' .
+                //     $employee->employee_email );
+                // }
 
-                $user->name = $employee->employee_first_name . ' ' . $employee->employee_last_name;
-                //$user->email = $employee->employee_email;
-                // $user->guid = $employee->guid;
-                $user->employee_id = $employee->employee_id;
-                $user->empl_record = $employee->empl_record;
-                //$user->reporting_to = $reporting_to;
-                $user->joining_date = $employee->position_start_date;
-                $user->acctlock = $employee->date_deleted ? true : false;
-                $user->last_sync_at = $new_sync_at;
-    
-                $user->save();
+                $dup_email = User::where('email', $employee->employee_email)
+                ->where('id', '!=', $user->id)
+                ->first();
 
-                // Grant employee Role
-                if (!$user->hasRole('Employee')) {
-                    $user->assignRole('Employee');
-                }
-
-                if (!$user->hasRole('Supervisor')) {
-                    $this->assignSupervisorRole( $user );
-                }
-
-
-          } else {
-
-              $user = User::where('email', $employee->employee_email)->first()  ;
- 
-              if ($user) {
-                    if (!($user->guid == $employee->guid))  {
-                        $this->info(' *SKIP*: Same email but difference guid | ' . $user->email . ' -> ' . $user->guid . ' - demo ' .
-                                    $employee->guid );
-                    }
-
-              } else {
-
-                    $user = User::create([
-                        'guid' => $employee->guid,
-                        'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name,
-                        'email' => $employee->employee_email,
-                        //'reporting_to' => $reporting_to,
+                if ($dup_email) {
+                    $exceptions [] = [
                         'employee_id' => $employee->employee_id,
                         'empl_record' => $employee->empl_record,
-                        'joining_date' => $employee->position_start_date,
-                        'password' => $password,
-                        'acctlock' => $employee->date_deleted ? true : false,
-                        'last_sync_at' => $new_sync_at,
-                    ]);
+                        'employee_email' => $employee->employee_email,
+                        'exception' => "Email address already in use by UID ".$dup_email->id."."
+                    ];
+                } else {
 
+                    DB::beginTransaction();
+                    try {
+                        $old_values = [ 
+                            'table' => 'users',                        
+                            'id' => $user->id, 
+                            'employee_id' => $user->employee_id, 
+                            'name' => $user->name, 
+                            'email' => $user->email, 
+                            'empl_record' => $user->empl_record, 
+                            'joining_date' => $user->joining_date, 
+                            'acctlock' => $user->acctlock, 
+                            'last_sync_at' => $user->last_sync_at
+                        ];
 
-                    $user->assignRole('Employee');
+                        $user->name = $employee->employee_first_name . ' ' . $employee->employee_last_name;
+                        $user->email = $employee->employee_email;
+                        // $user->guid = $employee->guid;
+                        $user->employee_id = $employee->employee_id;
+                        $user->empl_record = $employee->empl_record;
+                        //$user->reporting_to = $reporting_to;
+                        $user->joining_date = $employee->position_start_date;
+                        $user->acctlock = $employee->date_deleted ? true : false;
+                        $user->last_sync_at = $new_sync_at;
+            
+                        $user->save();
 
-                    // Grant 'Supervisor' Role based on ODS demo database
-                    $this->assignSupervisorRole( $user );
+                        $new_values = [ 
+                            'table' => 'users',                        
+                            'id' => $user->id, 
+                            'employee_id' => $employee->employee_id, 
+                            'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name, 
+                            'email' => $employee->employee_email, 
+                            'empl_record' => $employee->empl_record, 
+                            'joining_date' => $employee->position_start_date, 
+                            'acctlock' => $employee->date_deleted ? true : false, 
+                            'last_sync_at' => $new_sync_at
+                        ];
+                        $audit = new JobDataAudit;
+                        $audit->job_sched_id = $audit_id;
+                        $audit->old_values = json_encode($old_values);
+                        $audit->new_values = json_encode($new_values);
+                        $audit->save();
 
+                        // Grant employee Role
+                        if (!$user->hasRole('Employee')) {
+                            $user->assignRole('Employee');
+                        }
 
-              }
-          }
+                        if (!$user->hasRole('Supervisor')) {
+                            $this->assignSupervisorRole( $user );
+                        }
+                        DB::commit();
+                    } catch (Exception $e) {
+                        echo 'Unable to update user profile for EID # '.$employee->employee_id.'.'; echo "\r\n";
+                        DB::rollback();
+                    }
+
+                }
+
+            } else {
+
+            //   $user = User::where('email', $employee->employee_email)->first()  ;
+ 
+            //   if ($user) {
+            //         if (!($user->guid == $employee->guid))  {
+            //             $this->info(' *SKIP*: Same email but difference guid | ' . $user->email . ' -> ' . $user->guid . ' - demo ' .
+            //                         $employee->guid );
+            //         }
+
+            //   } else {
+
+                $dup_email = User::where('email', $employee->employee_email)
+                ->where('employee_id', '!=', $employee->employee_id)
+                ->first();
+
+                if ($dup_email) {
+                    $exceptions [] = [
+                        'employee_id' => $employee->employee_id,
+                        'empl_record' => $employee->empl_record,
+                        'employee_email' => $employee->employee_email,
+                        'exception' => "Email address already in use by EID ".$dup_email->employee_id."."
+                    ];
+                } else {
+
+                    DB::beginTransaction();
+                    try {
+
+                        $user = User::create([
+                            'guid' => $employee->guid,
+                            'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name,
+                            'email' => $employee->employee_email,
+                            //'reporting_to' => $reporting_to,
+                            'employee_id' => $employee->employee_id,
+                            'empl_record' => $employee->empl_record,
+                            'joining_date' => $employee->position_start_date,
+                            'password' => $password,
+                            'acctlock' => $employee->date_deleted ? true : false,
+                            'last_sync_at' => $new_sync_at,
+                        ]);
+
+                        $old_values = [ 
+                            'table' => 'users'
+                        ];
+                        $new_values = [ 
+                            'table' => 'users',                        
+                            'guid' => $employee->guid,
+                            'employee_id' => $employee->employee_id, 
+                            'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name, 
+                            'email' => $employee->employee_email, 
+                            'empl_record' => $employee->empl_record, 
+                            'joining_date' => $employee->position_start_date, 
+                            'password' => '********',
+                            'acctlock' => $employee->date_deleted ? true : false, 
+                            'last_sync_at' => $new_sync_at
+                        ];
+                        $audit = new JobDataAudit;
+                        $audit->job_sched_id = $audit_id;
+                        $audit->old_values = json_encode($old_values);
+                        $audit->new_values = json_encode($new_values);
+                        $audit->save();
+        
+                        $user->assignRole('Employee');
+
+                        // Grant 'Supervisor' Role based on ODS demo database
+                        $this->assignSupervisorRole( $user );
+
+                    } catch (Exception $e) {
+                        echo 'Unable to create user profile for EID # '.$employee->employee_id.'.'; echo "\r\n";
+                        DB::rollback();
+                    }
+                }
+
+            //   }
+            }
         
         }
 
