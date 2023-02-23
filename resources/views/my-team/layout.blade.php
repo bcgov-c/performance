@@ -176,6 +176,8 @@
 //                            $("#employee-profile-sharing-modal").modal('hide');
                             alert("Successfully shared");
                             window.location.reload(true);
+                        } else {
+                            alert("Sharing failed");
                         }
                     },
                     beforeSend: function() {
