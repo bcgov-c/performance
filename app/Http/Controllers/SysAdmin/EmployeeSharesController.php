@@ -211,6 +211,29 @@ class EmployeeSharesController extends Controller
         }
 
         $reason = $request->input_reason;
+        
+        foreach ($eeToShare as $eeOne) {
+            foreach ($shareTo as $toOne) {                
+                //not allow direct team members be shared to their manager
+                $get_direct = User::select('id')
+                           ->where('id', '=', $eeOne->id)
+                           ->where('reporting_to', '=', $toOne->id)
+                           ->count();                 
+                if($get_direct > 0){
+                    return redirect()->route(request()->segment(1).'.employeeshares')
+                            ->with('message', " Employee is not allowed to be shared with the direct supervior. Please review and try again.");                    
+                }    
+                //not allow exsiting shared team members be shared to the same 
+                $get_shared = sharedProfile::select('id')
+                           ->where('shared_id', '=', $eeOne->id)
+                           ->where('shared_with', '=', $toOne->id)
+                           ->count(); 
+                if($get_shared > 0){
+                    return redirect()->route(request()->segment(1).'.employeeshares')
+                            ->with('message', " Employee has be shared with the selected supervior. Please review and try again.");                    
+                }                 
+            }
+        }   
 
         foreach ($eeToShare as $eeOne) {
             foreach ($shareTo as $toOne) {
