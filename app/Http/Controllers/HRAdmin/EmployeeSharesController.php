@@ -216,7 +216,7 @@ class EmployeeSharesController extends Controller
         foreach ($eeToShare as $eeOne) {
             foreach ($shareTo as $toOne) {                
                 //not allow direct team members be shared to their manager
-                $get_direct = Users::select('id')
+                $get_direct = User::select('id')
                            ->where('id', '=', $eeOne->id)
                            ->where('reporting_to', '=', $toOne->id)
                            ->count();                 
