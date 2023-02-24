@@ -513,6 +513,8 @@ class GoalBankController extends Controller
             $aold_selected_emp_ids = isset($old['aselected_emp_ids']) ? json_decode($old['aselected_emp_ids']) : [];
             $aold_selected_org_nodes = isset($old['aselected_org_nodes']) ? json_decode($old['aselected_org_nodes']) : [];
 
+            $request->supervisorCheckbox = isset($old['supervisorCheckbox']) ? $old['supervisorCheckbox'] : null;
+            $request->asupervisorCheckbox = isset($old['asupervisorCheckbox']) ? $old['asupervisorCheckbox'] : null;
         } 
 
         // no validation and move filter variable to old 
@@ -527,6 +529,7 @@ class GoalBankController extends Controller
                 'search_text' => $request->search_text,
                 'orgCheck' => $request->orgCheck,
                 'userCheck' => $request->userCheck,
+                'supervisorCheckbox' => $request->supervisorCheckbox,
             ]);
         }
 
@@ -541,6 +544,7 @@ class GoalBankController extends Controller
                 'asearch_text' => $request->asearch_text,
                 'aorgCheck' => $request->aorgCheck,
                 'auserCheck' => $request->auserCheck,
+                'asupervisorCheckbox' => $request->asupervisorCheckbox,
             ]);
         }
 
@@ -985,6 +989,7 @@ class GoalBankController extends Controller
                 , 'employee_demo.level4'
                 , 'employee_demo.deptid'
             ])
+            ->when($request->asupervisorCheckbox, function($q) {return $q->whereRaw("EXISTS (SELECT DISTINCT 1 FROM users AS u, users AS su WHERE su.reporting_to = u.id AND u.employee_id = employee_demo.employee_id)");})
             ->selectRaw("CASE WHEN (SELECT DISTINCT 1 FROM users AS u, users AS su WHERE su.reporting_to = u.id AND u.employee_id = employee_demo.employee_id) = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor")
             ;
             return Datatables::of($aemployees)
@@ -1647,7 +1652,7 @@ class GoalBankController extends Controller
                     }
                 });
             })
-            ->when($request->supervisorCheckbox, function($q) use($level0) {return $q->whereRaw("isSupervisor = 'Yes'");})
+            ->when($request->supervisorCheckbox, function($q) {return $q->whereRaw("EXISTS (SELECT DISTINCT 1 FROM users AS su WHERE su.reporting_to = users.id)");})
             ->select ([
                 'employee_demo.employee_id',
                 'employee_demo.employee_name',

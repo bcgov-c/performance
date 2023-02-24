@@ -212,6 +212,7 @@
 							d.dd_level4 = $('#dd_level4').val();
 							d.criteria = $('#criteria').val();
 							d.search_text = $('#search_text').val();
+							d.supervisorCheckbox = $('input[name="supervisorCheckbox"]:checked').val();
 						}
 					},
 					columns: [
@@ -595,11 +596,17 @@
 					e.preventDefault();
 					$('#criteria').val('all');
 					$('#search_text').val(null);
+					$('#supervisorCheckbox').prop('checked', false);
 					$('#dd_level0').val(null).trigger('change');
 					$('#dd_level1').val(null).trigger('change');
 					$('#dd_level2').val(null).trigger('change');
 					$('#dd_level3').val(null).trigger('change');
 					$('#dd_level4').val(null).trigger('change');
+				});
+
+				$('#supervisorCheckbox').change(function (e){
+					e.preventDefault();
+					$('#btn_search').click();
 				});
 
 				$('#add_level0').change(function (e) {
@@ -643,11 +650,17 @@
 					e.preventDefault();
 					$('#acriteria').val('all');
 					$('#asearch_text').val(null);
+					$('#asupervisorCheckbox').prop('checked', false);
 					$('#add_level0').val(null);
 					$('#add_level1').val(null);
 					$('#add_level2').val(null);
 					$('#add_level3').val(null);
 					$('#add_level4').val(null);
+					$('#abtn_search').click();
+				});
+
+				$('#asupervisorCheckbox').change(function (e){
+					e.preventDefault();
 					$('#abtn_search').click();
 				});
 

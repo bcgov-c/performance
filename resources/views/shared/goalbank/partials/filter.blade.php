@@ -58,7 +58,7 @@
             <div class="form-group row"> </div>
             <div class="form-group row">
                 <span class="float-left float-bottom">  
-                    <button type="button" class="btn btn-primary" id="btn_search" name="btn_search" value="btn_search" >Filter</button>
+                    <button type="button" class="btn btn-primary" id="btn_search" name="btn_search" value="btn_search">Filter</button>
                     <button type="button" class="btn btn-secondary  " id="btn_search_reset" name="btn_reset" value="btn_reset">Reset</button>
                 </span>
             </div>
@@ -67,7 +67,7 @@
             <div class="form-group col-md-2" id="supervisor_group">
                 <div class="form-group row"> </div>
                 <div class="form-group row">
-                    <input id="supervisorCheckbox" type="checkbox" name="supervisorCheckbox" value="Yes" aria-label="Display Supervisors Only"> &nbsp &nbsp <b>Display Supervisors Only</b>
+                    <input id="supervisorCheckbox" type="checkbox" name="supervisorCheckbox" aria-label="Display Supervisors Only" value="1"> &nbsp &nbsp <b>Display Supervisors Only</b>
                 </div>
             </div>
         @endif
