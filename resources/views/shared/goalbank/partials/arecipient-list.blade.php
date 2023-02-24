@@ -58,6 +58,7 @@
                         d.add_level4 = $('#add_level4').val();
                         d.acriteria = $('#acriteria').val();
                         d.asearch_text = $('#asearch_text').val();
+                        d.asupervisorCheckbox = $('input[name="asupervisorCheckbox"]:checked').val();
                     }
                 },
                 "fnDrawCallback": function() {
