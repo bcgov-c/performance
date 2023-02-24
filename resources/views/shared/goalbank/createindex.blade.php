@@ -656,11 +656,17 @@
 					e.preventDefault();
 					$('#criteria').val('all');
 					$('#search_text').val(null);
+					$('#supervisorCheckbox').prop('checked', false);
 					$('#dd_level0').val(null).trigger('change');
 					$('#dd_level1').val(null).trigger('change');
 					$('#dd_level2').val(null).trigger('change');
 					$('#dd_level3').val(null).trigger('change');
 					$('#dd_level4').val(null).trigger('change');
+					$('#btn_search').click();
+				});
+
+				$('#supervisorCheckbox').change(function (e){
+					e.preventDefault();
 					$('#btn_search').click();
 				});
 

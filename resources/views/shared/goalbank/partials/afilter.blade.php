@@ -64,7 +64,7 @@
             </div>
         </div>
         @if ($currentView == "editone")
-            <div class="form-group col-md-2" id="supervisor_group">
+            <div class="form-group col-md-2" id="asupervisor_group">
                 <div class="form-group row"> </div>
                 <div class="form-group row">
                     <input id="asupervisorCheckbox" type="checkbox" name="asupervisorCheckbox" value="Yes" aria-label="Display Supervisors Only"> &nbsp &nbsp <b>Display Supervisors Only</b>

@@ -78,6 +78,8 @@ class GoalBankController extends Controller
 
             $eold_selected_emp_ids = isset($old['eselected_emp_ids']) ? json_decode($old['eselected_emp_ids']) : [];
             $eold_selected_org_nodes = isset($old['eselected_org_nodes']) ? json_decode($old['eselected_org_nodes']) : [];
+
+            $request->supervisorCheckbox = isset($old['supervisorCheckbox']) ? $old['supervisorCheckbox'] : null;
         } 
 
         // no validation and move filter variable to old 
@@ -92,6 +94,7 @@ class GoalBankController extends Controller
                 'search_text' => $request->search_text,
                 'orgCheck' => $request->orgCheck,
                 'userCheck' => $request->userCheck,
+                'supervisorCheckbox' => $request->supervisorCheckbox,
             ]);
         }
 
@@ -918,7 +921,10 @@ class GoalBankController extends Controller
                 , 'employee_demo.level3_branch'
                 , 'employee_demo.level4'
                 , 'employee_demo.deptid'
-            ]);
+            ])
+            ->when($request->supervisorCheckbox, function($q) {return $q->whereRaw("EXISTS (SELECT DISTINCT 1 FROM users AS u, users AS su WHERE su.reporting_to = u.id AND u.employee_id = employee_demo.employee_id)");})
+            ->selectRaw("CASE WHEN (SELECT DISTINCT 1 FROM users AS u, users AS su WHERE su.reporting_to = u.id AND u.employee_id = employee_demo.employee_id) = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor")
+            ;
             return Datatables::of($employees)
             ->addColumn('select_users', static function ($employee) {
                 return '<input pid="1335" type="checkbox" id="userCheck'. 
