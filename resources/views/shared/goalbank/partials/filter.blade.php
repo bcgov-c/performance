@@ -63,7 +63,7 @@
                 </span>
             </div>
         </div>
-        @if ($currentView == "editone")
+        @if ($currentView == "editone" || $currentView == "goalbank")
             <div class="form-group col-md-2" id="supervisor_group">
                 <div class="form-group row"> </div>
                 <div class="form-group row">
