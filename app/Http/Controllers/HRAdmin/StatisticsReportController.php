@@ -914,8 +914,9 @@ class StatisticsReportController extends Controller
         
         $conversations = $sql->get();
         
-        //Log::warning(print_r($sql->toSql(),true));
-        //Log::warning(print_r($sql->getBindings(),true));
+        Log::warning('HR Chart 2');
+        Log::warning(print_r($sql->toSql(),true));
+        Log::warning(print_r($sql->getBindings(),true));
         
 
         // Chart2 -- Open Conversation
@@ -1123,12 +1124,16 @@ class StatisticsReportController extends Controller
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
                     ->from('admin_org_users')
-                    ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                    ->whereColumn('admin_org_users.allowed_user_id', 'conversations.user_id')
                     ->whereIn('admin_org_users.access_type', [0,2,3])
                     ->where('admin_org_users.granted_to_id', '=', Auth::id());
         });
         
         $emp_conversations = $sql->get();
+        
+        Log::warning('HR Chart 4');
+        Log::warning(print_r($sql->toSql(),true));
+        Log::warning(print_r($sql->getBindings(),true));
                 
         // Chart4 -- Open Conversation for employees
         $topics = ConversationTopic::select('id','name')->get();
@@ -1219,7 +1224,7 @@ class StatisticsReportController extends Controller
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
                     ->from('admin_org_users')
-                    ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                    ->whereColumn('admin_org_users.allowed_user_id', 'conversations.user_id')
                     ->whereIn('admin_org_users.access_type', [0,2,3])
                     ->where('admin_org_users.granted_to_id', '=', Auth::id());
         })
@@ -1627,7 +1632,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('admin_org_users')
-                            ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'conversations.user_id')
                             ->whereIn('admin_org_users.access_type', [0,2,3])
                             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 });
@@ -1680,7 +1685,7 @@ class StatisticsReportController extends Controller
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
                         ->from('admin_org_users')
-                        ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
+                        ->whereColumn('admin_org_users.allowed_user_id', 'conversations.user_id')
                         ->whereIn('admin_org_users.access_type', [0,2,3])
                         ->where('admin_org_users.granted_to_id', '=', Auth::id());
             });
