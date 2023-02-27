@@ -75,6 +75,10 @@ class Kernel extends ConsoleKernel
         ->dailyAt('02:30')
         ->appendOutputTo(storage_path('logs/NotifyConversationDue.log'));
         
+        $schedule->command('command:CleanShareProfile')
+        ->timezone('America/Vancouver')    
+        ->dailyAt('05:00');
+        
         $schedule->command('notify:daily')
         ->dailyAt('08:00')
         ->appendOutputTo(storage_path('logs/daily.log'));
