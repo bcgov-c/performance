@@ -1888,7 +1888,7 @@ class StatisticsReportController extends Controller
                     "Expires"             => "0"
                 );
         
-                $columns = ["Employee ID", "Employee Name", "Email", "Conversation Name",
+                $columns = ["Employee ID", "Employee Name", "Email", "Conversation Name", "Conversation Participant",
                         "Conversation Due Date",
                                 "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
                            ];
@@ -1902,6 +1902,7 @@ class StatisticsReportController extends Controller
                         $row['Name'] = $conversation->employee_name;
                         $row['Email'] = $conversation->email;
                         $row['Conversation Name'] = $conversation->conversation_name;
+                        $row['Conversation Participant'] = implode(', ', $conversation->conversationParticipants->pluck('participant.name')->toArray() );
                         $row['Conversation Due Date'] = $conversation->next_due_date;
                         $row['Organization'] = $conversation->organization;
                         $row['Level 1'] = $conversation->level1_program;
@@ -1951,7 +1952,7 @@ class StatisticsReportController extends Controller
                     "Expires"             => "0"
                 );
         
-                $columns = ["Employee ID", "Employee Name", "Email","Conversation Name",
+                $columns = ["Employee ID", "Employee Name", "Email","Conversation Name","Conversation Participant",
                         "Conversation Due Date",
                                 "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
                            ];
@@ -1965,6 +1966,7 @@ class StatisticsReportController extends Controller
                             $row['Name'] = $conversation->employee_name;
                             $row['Email'] = $conversation->email;
                             $row['Conversation Name'] = $conversation->conversation_name;
+                            $row['Conversation Participant'] = implode(', ', $conversation->conversationParticipants->pluck('participant.name')->toArray() );
                             $row['Conversation Due Date'] = $conversation->next_due_date;
                             $row['Organization'] = $conversation->organization;
                             $row['Level 1'] = $conversation->level1_program;
