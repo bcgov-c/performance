@@ -1888,7 +1888,7 @@ class StatisticsReportController extends Controller
                     "Expires"             => "0"
                 );
         
-                $columns = ["Employee ID", "Employee Name", "Email", "Conversation Name",
+                $columns = ["Employee ID", "Employee Name", "Email", "Conversation Name", "Conversation Participant",
                         "Conversation Due Date",
                                 "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
                            ];
@@ -1901,7 +1901,17 @@ class StatisticsReportController extends Controller
                         $row['Employee ID'] = $conversation->employee_id;
                         $row['Name'] = $conversation->employee_name;
                         $row['Email'] = $conversation->email;
-                        $row['Conversation Name'] = $conversation->conversation_name;
+                        $row['Conversation Name'] = $conversation->conversation_name;    
+                        $participants = DB::table('conversation_participants')
+                                        ->select('users.name')
+                                        ->join('users', 'conversation_participants.participant_id', '=', 'users.id')
+                                        ->where('conversation_participants.conversation_id', $conversation->id)
+                                        ->get();      
+                        $participants_arr = array();
+                        foreach($participants as $participant){
+                            $participants_arr[] = $participant->name;
+                        }
+                        $row['Conversation Participant'] = implode(', ', $participants_arr );
                         $row['Conversation Due Date'] = $conversation->next_due_date;
                         $row['Organization'] = $conversation->organization;
                         $row['Level 1'] = $conversation->level1_program;
@@ -1910,7 +1920,7 @@ class StatisticsReportController extends Controller
                         $row['Level 4'] = $conversation->level4;
         
                         fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], // $row['Next Conversation Due'],
-                        $row['Conversation Name'],
+                        $row['Conversation Name'],$row['Conversation Participant'],
                             $row['Conversation Due Date'],
                                  $row['Organization'],
                                   $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
@@ -1951,7 +1961,7 @@ class StatisticsReportController extends Controller
                     "Expires"             => "0"
                 );
         
-                $columns = ["Employee ID", "Employee Name", "Email","Conversation Name",
+                $columns = ["Employee ID", "Employee Name", "Email","Conversation Name","Conversation Participant",
                         "Conversation Due Date",
                                 "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
                            ];
@@ -1965,15 +1975,24 @@ class StatisticsReportController extends Controller
                             $row['Name'] = $conversation->employee_name;
                             $row['Email'] = $conversation->email;
                             $row['Conversation Name'] = $conversation->conversation_name;
+                            $participants = DB::table('conversation_participants')
+                                        ->select('users.name')
+                                        ->join('users', 'conversation_participants.participant_id', '=', 'users.id')
+                                        ->where('conversation_participants.conversation_id', $conversation->id)
+                                        ->get();  
+                            $participants_arr = array();
+                            foreach($participants as $participant){
+                                $participants_arr[] = $participant->name;
+                            }
+                            $row['Conversation Participant'] = implode(', ', $participants_arr );
                             $row['Conversation Due Date'] = $conversation->next_due_date;
                             $row['Organization'] = $conversation->organization;
                             $row['Level 1'] = $conversation->level1_program;
                             $row['Level 2'] = $conversation->level2_division;
                             $row['Level 3'] = $conversation->level3_branch;
                             $row['Level 4'] = $conversation->level4;
-
                             fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], // $row['Next Conversation Due'],
-                            $row["Conversation Name"],$row['Conversation Due Date'], 
+                            $row["Conversation Name"],$row['Conversation Participant'],$row['Conversation Due Date'], 
                                      $row['Organization'],
                                       $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
                                     ));
