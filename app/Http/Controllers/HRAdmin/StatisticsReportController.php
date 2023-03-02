@@ -836,7 +836,7 @@ class StatisticsReportController extends Controller
         //     return $query->whereNull('signoff_user_id')
         //                 ->orWhereNull('supervisor_signoff_id');
         // })
-        ->where('conversation_participants.participant_id','=','conversations.user_id')
+        //->where('conversation_participants.participant_id','=','conversations.user_id')
         ->where(function($query) {
             $query->where(function($query) {
                 $query->whereNull('signoff_user_id')
@@ -965,7 +965,7 @@ class StatisticsReportController extends Controller
         ->join('employee_demo', function($join) {
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
         })
-        ->where('conversation_participants.participant_id','=','conversations.user_id')
+        //->where('conversation_participants.participant_id','=','conversations.user_id')
         ->where(function($query) {
             $query->where(function($query) {
                 $query->whereNotNull('signoff_user_id')
@@ -1397,7 +1397,7 @@ class StatisticsReportController extends Controller
                 })
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N')")
-                ->where('conversation_participants.participant_id','=','conversations.user_id')
+                //->where('conversation_participants.participant_id','=','conversations.user_id')
                 ->where(function($query) {
                     $query->where(function($query) {
                         $query->where('users.due_date_paused', 'N')
@@ -1511,7 +1511,7 @@ class StatisticsReportController extends Controller
             //     return $query->whereNotNull('signoff_user_id')
             //                  ->whereNotNull('supervisor_signoff_id');
             // })
-            ->where('conversation_participants.participant_id','=','conversations.user_id')
+            //->where('conversation_participants.participant_id','=','conversations.user_id')
             ->where(function($query) {
                 $query->where(function($query) {
                     $query->whereNotNull('signoff_user_id')
