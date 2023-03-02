@@ -595,15 +595,12 @@ class SysadminStatisticsReportController extends Controller
         }
 
         // SQL for Chart 2
-        $sql = Conversation::join('users', 'users.id', 'conversations.user_id') 
+        $sql = Conversation::join('conversation_participants', 'conversations.id', 'conversation_participants.conversation_id') 
+        ->join('users', function($join) {
+            $join->on('users.id', '=', 'conversation_participants.participant_id');   
+        }) 
         ->join('employee_demo', function($join) {
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-            // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
-        })
-        ->join('conversation_participants', function($join) {
-            $join->on('users.id', '=', 'conversation_participants.participant_id');   
-            // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-            // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
         })
         // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
         // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
@@ -710,15 +707,12 @@ class SysadminStatisticsReportController extends Controller
         $data['chart3']['groups'] = array();
 
         // SQL for Chart 3
-        $completed_conversations = Conversation::join('users', 'users.id', 'conversations.user_id') 
+        $completed_conversations = Conversation::join('conversation_participants', 'conversations.id', 'conversation_participants.conversation_id')  
+        ->join('users', function($join) {
+            $join->on('users.id', '=', 'conversation_participants.participant_id');   
+        }) 
         ->join('employee_demo', function($join) {
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-            // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
-        })
-        ->join('conversation_participants', function($join) {
-            $join->on('users.id', '=', 'conversation_participants.participant_id');
-            // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-            // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
         })
         // ->where(function ($query)  {
         //         return $query->whereNotNull('signoff_user_id')
@@ -1035,10 +1029,11 @@ class SysadminStatisticsReportController extends Controller
                     });
                 })
                 ->whereNull('deleted_at')                
-                ->join('users', 'users.id', 'conversations.user_id') 
-                ->join('conversation_participants','users.id','conversation_participants.participant_id')        
+                 ->join('conversation_participants','conversations.id','conversation_participants.conversation_id')        
+                ->join('users', 'users.id', 'conversation_participants.participant_id') 
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                    // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
@@ -1080,10 +1075,11 @@ class SysadminStatisticsReportController extends Controller
          $sql_chart3 = Conversation::selectRaw("conversations.*, users.employee_id, employee_name, users.email,
                     organization, level1_program, level2_division, level3_branch, level4,
                     users.next_conversation_date as next_due_date")
-            ->join('users', 'users.id', 'conversations.user_id') 
-            ->join('conversation_participants','users.id','conversation_participants.participant_id')     
+            ->join('conversation_participants','conversations.id','conversation_participants.conversation_id')        
+            ->join('users', 'users.id', 'conversation_participants.participant_id')
             ->join('employee_demo', function($join) {
                 $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
             })
             // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
