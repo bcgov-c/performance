@@ -910,7 +910,8 @@ class StatisticsReportController extends Controller
                     ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
                     ->whereIn('admin_org_users.access_type', [0,2,3])
                     ->where('admin_org_users.granted_to_id', '=', Auth::id());
-        });
+        })
+        ->where('conversation_participants.role','<>','mgr');
         
         $conversations = $sql->get();
         
@@ -1042,6 +1043,7 @@ class StatisticsReportController extends Controller
                     ->whereIn('admin_org_users.access_type', [0,2,3])
                     ->where('admin_org_users.granted_to_id', '=', Auth::id());
         })
+        ->where('conversation_participants.role','<>','mgr')
         // ->where( function($query) {
         //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
         //           ->where('employee_demo.employee_status', 'A');
@@ -1467,6 +1469,7 @@ class StatisticsReportController extends Controller
                             ->whereIn('admin_org_users.access_type', [0,2,3])
                             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 })
+                ->where('conversation_participants.role','<>','mgr')
                 ->with('topic:id,name')
                 ->with('signoff_user:id,name')
                 ->with('signoff_supervisor:id,name');

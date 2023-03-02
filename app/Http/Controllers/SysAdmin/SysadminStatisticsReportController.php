@@ -642,6 +642,7 @@ class SysadminStatisticsReportController extends Controller
             //         ->whereDate('unlock_until', '>=', Carbon::today() );
             });
         })
+        ->where('conversation_participants.role','<>','mgr')
         ->whereNull('conversations.deleted_at');
         // ->whereRaw("DATEDIFF (
         //             COALESCE (
@@ -760,6 +761,7 @@ class SysadminStatisticsReportController extends Controller
         //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
         //           ->where('employee_demo.employee_status', 'A');
         // })
+        ->where('conversation_participants.role','<>','mgr')
         ->get();
         
         $total_unique_emp = 0;
@@ -1031,7 +1033,7 @@ class SysadminStatisticsReportController extends Controller
                     });
                 })
                 ->whereNull('deleted_at')                
-                 ->join('conversation_participants','conversations.id','conversation_participants.conversation_id')        
+                ->join('conversation_participants','conversations.id','conversation_participants.conversation_id')        
                 ->join('users', 'users.id', 'conversation_participants.participant_id') 
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
@@ -1066,6 +1068,7 @@ class SysadminStatisticsReportController extends Controller
                 ->when( $request->topic_id, function($q) use($request) {
                     $q->where('conversations.conversation_topic_id', $request->topic_id);
                 })
+                ->where('conversation_participants.role','<>','mgr')
                 // ->where( function($query) {
                 //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
                 //           ->where('employee_demo.employee_status', 'A');
@@ -1133,6 +1136,7 @@ class SysadminStatisticsReportController extends Controller
             //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
             //           ->where('employee_demo.employee_status', 'A');
             // })
+            ->where('conversation_participants.role','<>','mgr')
             ->with('topic:id,name')
             ->with('signoff_user:id,name')
             ->with('signoff_supervisor:id,name')
