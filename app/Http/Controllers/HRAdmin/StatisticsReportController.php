@@ -708,9 +708,9 @@ class StatisticsReportController extends Controller
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 })
-                ->join('conversation_participants', function($join) {
-                    $join->on('users.id', '=', 'conversation_participants.participant_id');
-                })
+                //->join('conversation_participants', function($join) {
+                //    $join->on('users.id', '=', 'conversation_participants.participant_id');
+                //})
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 
@@ -1277,9 +1277,9 @@ class StatisticsReportController extends Controller
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 })
-                ->join('conversation_participants', function($join) {
-                    $join->on('users.id', '=', 'conversation_participants.participant_id');
-                })
+                //->join('conversation_participants', function($join) {
+                //    $join->on('users.id', '=', 'conversation_participants.participant_id');
+                //})
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 

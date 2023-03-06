@@ -546,9 +546,9 @@ class SysadminStatisticsReportController extends Controller
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
-                ->join('conversation_participants', function($join) {
-                    $join->on('users.id', '=', 'conversation_participants.participant_id');
-                })
+                //->join('conversation_participants', function($join) {
+                //    $join->on('users.id', '=', 'conversation_participants.participant_id');
+                //})
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                 ->where(function($query) {
@@ -975,9 +975,9 @@ class SysadminStatisticsReportController extends Controller
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
-                ->join('conversation_participants', function($join) {
-                    $join->on('users.id', '=', 'conversation_participants.participant_id');
-                })
+                //->join('conversation_participants', function($join) {
+                //    $join->on('users.id', '=', 'conversation_participants.participant_id');
+                //})
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                 ->where(function($query) {
