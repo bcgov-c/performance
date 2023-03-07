@@ -103,9 +103,27 @@ class CleanShareProfile extends Command
         
         }
         
+        //echo 'Processed '.$counter.'.'; echo "\r\n";
+        //$end_time = Carbon::now();
+        //$this->info('CleanShareProfile, Completed: '.$end_time);
+        //Log::info($end_time->format('c').' - '.$processname.' - Finished');
+        
         echo 'Processed '.$counter.'.'; echo "\r\n";
         $end_time = Carbon::now();
+        DB::table('job_sched_audit')->updateOrInsert(
+            [
+                'id' => $audit_id
+            ],
+            [
+                'job_name' => $job_name,
+                'start_time' => date('Y-m-d H:i:s',strtotime($start_time)),
+                'end_time' => date('Y-m-d H:i:s',strtotime($end_time)),
+                'status' => 'Completed',
+                'details' => 'Processed '.$counter.' rows.',
+            ]
+        );
         $this->info('CleanShareProfile, Completed: '.$end_time);
         Log::info($end_time->format('c').' - '.$processname.' - Finished');
     } 
+    
 }
