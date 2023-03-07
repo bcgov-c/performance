@@ -230,7 +230,7 @@ class EmployeeSharesController extends Controller
                            ->count(); 
                 if($get_shared > 0){
                     return redirect()->route(request()->segment(1).'.employeeshares')
-                            ->with('message', " Employee has be shared with the selected supervior. Please review and try again.");                    
+                            ->with('message', " Employee has been shared with the selected supervior. Please review and try again.");                    
                 }                 
             }
         }   
