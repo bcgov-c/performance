@@ -6,11 +6,13 @@ use DateTime;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\EmployeeDemo;
+use App\Models\JobDataAudit;
 use App\Models\JobSchedAudit;
 use App\Models\SharedProfile;
 use App\Models\UserReportingTo;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 
 class SyncUserProfile extends Command
@@ -72,7 +74,7 @@ class SyncUserProfile extends Command
 
             $cutoff_time = Carbon::now();
 
-            $this->SyncUserProfile($last_cutoff_time, $cutoff_time);
+            $this->SyncUserProfile($last_cutoff_time, $cutoff_time, $audit_id, $exceptions);
 
             $end_time = Carbon::now();
             $result = JobSchedAudit::updateOrCreate(
@@ -112,6 +114,7 @@ class SyncUserProfile extends Command
 
         $employees = EmployeeDemo::whereNotIn('guid', ['', ' '])
             ->whereNotIn('employee_email', ['', ' '])
+            ->whereNotIn('employee_id', ['', ' '])
             ->where(function ($query) use ($last_sync_at) {
                 $query->whereNull('date_updated');
                 $query->orWhere('date_updated', '>=', $last_sync_at );
@@ -227,22 +230,9 @@ class SyncUserProfile extends Command
                         DB::rollback();
                     }
 
-                if (!(strtolower(trim($user->email)) == strtolower(trim($employee->employee_email))) )  {
-                    $this->info('Warning: Same GUID but difference email | ' . $user->guid . ' -> ' . $user->email . ' - demo ' .
-                    $employee->employee_email );
                 }
 
-                $user->name = $employee->employee_first_name . ' ' . $employee->employee_last_name;
-                //$user->email = $employee->employee_email;
-                // $user->guid = $employee->guid;
-                $user->employee_id = $employee->employee_id;
-                $user->empl_record = $employee->empl_record;
-                //$user->reporting_to = $reporting_to;
-                $user->joining_date = $employee->position_start_date;
-                $user->acctlock = $employee->date_deleted ? true : false;
-                $user->last_sync_at = $new_sync_at;
-    
-                $user->save();
+            } else {
 
                 $dup_email = User::where('email', $employee->employee_email)
                 ->select('employee_id')
@@ -295,6 +285,8 @@ class SyncUserProfile extends Command
         
                         $user->assignRole('Employee');
 
+                        // Grant 'Supervisor' Role based on ODS demo database
+                        $this->assignSupervisorRole( $user );
 
                         DB::commit();
                     } catch (Exception $e) {
