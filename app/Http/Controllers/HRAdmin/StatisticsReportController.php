@@ -775,6 +775,7 @@ class StatisticsReportController extends Controller
                 //     } );
                 // })
                 // ->where('admin_orgs.user_id', '=', Auth::id());
+                ->where('users.excused_flag', '<>', '1')
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('admin_org_users')
@@ -1344,6 +1345,7 @@ class StatisticsReportController extends Controller
                 //     } );
                 // })
                 // ->where('admin_orgs.user_id', '=', Auth::id());
+                ->where('users.excused_flag', '<>', '1')
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('admin_org_users')
@@ -1868,7 +1870,7 @@ class StatisticsReportController extends Controller
                 
             case 4:
 
-                $filename = 'Employees of Open Conversation By Topic.csv';
+                $filename = 'Open Conversations by Employee.csv.csv';
                 $conversations =  $sql_chart4->get();
                 $conversations_unique = array();
                 $topics = ConversationTopic::select('id','name')->get();
@@ -1889,7 +1891,7 @@ class StatisticsReportController extends Controller
                 );
         
                 $columns = ["Employee ID", "Employee Name", "Email", "Conversation Name", "Conversation Participant",
-                        "Conversation Due Date",
+                        "Conversation Due Date", "Employee Sign-Off", "Supervisor Sign-off", 
                                 "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
                            ];
         
@@ -1913,6 +1915,8 @@ class StatisticsReportController extends Controller
                         }
                         $row['Conversation Participant'] = implode(', ', $participants_arr );
                         $row['Conversation Due Date'] = $conversation->next_due_date;
+                        $row['Employee Sign-Off'] = $conversation->signoff_user  ? $conversation->signoff_user->name : '';
+                        $row['Supervisor Sign-off'] = $conversation->signoff_supervisor ? $conversation->signoff_supervisor->name : '';
                         $row['Organization'] = $conversation->organization;
                         $row['Level 1'] = $conversation->level1_program;
                         $row['Level 2'] = $conversation->level2_division;
@@ -1922,6 +1926,7 @@ class StatisticsReportController extends Controller
                         fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], // $row['Next Conversation Due'],
                         $row['Conversation Name'],$row['Conversation Participant'],
                             $row['Conversation Due Date'],
+                        $row["Employee Sign-Off"], $row["Supervisor Sign-off"],
                                  $row['Organization'],
                                   $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
                                 ));
@@ -1937,7 +1942,7 @@ class StatisticsReportController extends Controller
             
             case 5:
 
-                $filename = 'Employees of Completed Conversation By Topic.csv';
+                $filename = 'Completed Open Conversations by Employee.csv.csv';
                 $conversations =  $sql_chart5->get();
                 $conversations_unique = array();
                 $topics = ConversationTopic::select('id','name')->get();
@@ -1962,7 +1967,7 @@ class StatisticsReportController extends Controller
                 );
         
                 $columns = ["Employee ID", "Employee Name", "Email","Conversation Name","Conversation Participant",
-                        "Conversation Due Date",
+                        "Conversation Due Date", "Employee Sign-Off", "Supervisor Sign-off", 
                                 "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
                            ];
         
@@ -1986,6 +1991,8 @@ class StatisticsReportController extends Controller
                             }
                             $row['Conversation Participant'] = implode(', ', $participants_arr );
                             $row['Conversation Due Date'] = $conversation->next_due_date;
+                            $row['Employee Sign-Off'] = $conversation->signoff_user  ? $conversation->signoff_user->name : '';
+                            $row['Supervisor Sign-off'] = $conversation->signoff_supervisor ? $conversation->signoff_supervisor->name : '';
                             $row['Organization'] = $conversation->organization;
                             $row['Level 1'] = $conversation->level1_program;
                             $row['Level 2'] = $conversation->level2_division;
@@ -1993,6 +2000,7 @@ class StatisticsReportController extends Controller
                             $row['Level 4'] = $conversation->level4;
                             fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], // $row['Next Conversation Due'],
                             $row["Conversation Name"],$row['Conversation Participant'],$row['Conversation Due Date'], 
+                        $row["Employee Sign-Off"], $row["Supervisor Sign-off"],
                                      $row['Organization'],
                                       $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
                                     ));
