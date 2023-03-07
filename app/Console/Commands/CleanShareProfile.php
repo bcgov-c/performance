@@ -92,6 +92,7 @@ class CleanShareProfile extends Command
                             $audit->old_values = json_encode($old_values);
                             $audit->new_values = json_encode($new_values);
                             $audit->save();
+                            DB::commit();
                             $counter++;
                     } catch (Exception $e) {
                         echo 'Unable to clean shared profile ID '.$item->id.'.'; echo "\r\n";
