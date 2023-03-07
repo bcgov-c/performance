@@ -177,7 +177,7 @@
                             alert("Successfully shared");
                             window.location.reload(true);
                         } else {
-                            alert("Sharing failed");
+                            alert(result.message);
                         }
                     },
                     beforeSend: function() {

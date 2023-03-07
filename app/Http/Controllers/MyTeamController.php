@@ -206,6 +206,7 @@ class MyTeamController extends Controller
         //check if shared_id is direct team member of shared with users
         $shared_id = $input['shared_id'];
         $skip_sharing = false;
+        $error_msg = '';
         foreach ($input['share_with_users'] as $shared_with_user_id) {
             //not allow direct team members be shared to their manager
             $get_direct = User::select('id')
@@ -213,7 +214,8 @@ class MyTeamController extends Controller
                            ->where('reporting_to', '=', $shared_with_user_id)
                            ->count();                 
             if($get_direct > 0){
-                $skip_sharing = true;                   
+                $skip_sharing = true;   
+                $error_msg = 'The employee has already been shared with that supervisor. They cannot be shared with the same supervisor more than once.';
             }    
             //not allow exsiting shared team members be shared to the same 
             $get_shared = sharedProfile::select('id')
@@ -221,7 +223,8 @@ class MyTeamController extends Controller
                            ->where('shared_with', '=', $shared_with_user_id)
                            ->count(); 
             if($get_shared > 0){
-                $skip_sharing = true;      
+                $skip_sharing = true;  
+                $error_msg = 'The employee already reports directly to that supervisor. Employees cannot be shared with their direct supervisor.';
             }      
         }
         
@@ -298,7 +301,7 @@ class MyTeamController extends Controller
             DB::commit();
             return $this->respondeWith($sharedProfile);
         }                
-        return response()->json(['success' => false, 'message' => 'Sharing failed']);
+        return response()->json(['success' => false, 'message' => $error_msg]);
     }
 
     public function userList(Request $request) {
