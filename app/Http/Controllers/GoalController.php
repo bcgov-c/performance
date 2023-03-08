@@ -635,6 +635,7 @@ class GoalController extends Controller
                     ->select('shared_profiles.shared_id', 'users.name')
                     ->join('users', 'users.id', '=', 'shared_profiles.shared_id')
                     ->where('shared_profiles.shared_with', Auth::id())
+                    ->where('shared_profiles.shared_item', 'like', '%1%')
                     ->get();
 
         return view('goal.bank', array_merge(compact('bankGoals', 'tags', 'user', 'tagsList', 'goalTypes', 'type_desc_str', 'mandatoryOrSuggested', 'createdBy', 'goals_count', 'sortby','sortorder',
