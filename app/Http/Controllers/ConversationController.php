@@ -332,6 +332,7 @@ class ConversationController extends Controller
                $shareinfo_0 = DB::table('shared_profiles')                        
                                     ->select('shared_with')
                                     ->where('shared_id', '=', $value)
+                                    ->where('shared_item', 'like', '%2%')
                                     ->get();   
                 foreach($shareinfo_0 as $shareitem){
                    if($shareitem->shared_with == $actualOwner) {
@@ -352,6 +353,7 @@ class ConversationController extends Controller
                 $shareinfo_1 = DB::table('shared_profiles')                        
                                     ->select('shared_with')
                                     ->where('shared_id', '=', $actualOwner)
+                                    ->where('shared_item', 'like', '%2%')
                                     ->get(); 
                 foreach($shareinfo_1 as $shareitem){
                     if($shareitem->shared_with == $value) {
