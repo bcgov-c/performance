@@ -91,6 +91,7 @@ class MyTeamController extends Controller
                     ->select('shared_profiles.shared_id', 'users.name')
                     ->join('users', 'users.id', '=', 'shared_profiles.shared_id')
                     ->where('shared_profiles.shared_with', Auth::id())
+                    ->where('shared_profiles.shared_item', 'like', '%1%')
                     ->get();
         
         if(count($shared_employees)>0) {
@@ -576,6 +577,7 @@ class MyTeamController extends Controller
                     ->select('shared_profiles.shared_id', 'users.name')
                     ->join('users', 'users.id', '=', 'shared_profiles.shared_id')
                     ->where('shared_profiles.shared_with', Auth::id())
+                    ->where('shared_profiles.shared_item', 'like', '%1%')
                     ->get();
         
         if(count($shared_employees)>0) {
