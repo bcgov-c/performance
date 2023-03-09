@@ -168,6 +168,7 @@ class EmployeeSharesController extends Controller
         $messages = [
             'required' => 'The :attribute field is required.',
         ];
+        
         $validator = Validator::make($input, $rules, $messages);
         if ($validator->fails()) {
             return redirect()->route(request()->segment(1).'.employeeshares')
@@ -210,6 +211,9 @@ class EmployeeSharesController extends Controller
             $elements = array("2");
         }
 
+        Log::info(print_r($eeToShare,true));
+        Log::info(print_r($shareTo,true));
+        
         $reason = $request->input_reason;
         
         foreach ($eeToShare as $eeOne) {
@@ -221,7 +225,7 @@ class EmployeeSharesController extends Controller
                            ->count();                 
                 if($get_direct > 0){
                     return redirect()->route(request()->segment(1).'.employeeshares')
-                            ->with('message', " Employee is not allowed to be shared with the direct supervior. Please review and try again.");                    
+                            ->with('message', " The employee already reports directly to that supervisor. Employees cannot be shared with their direct supervisor.");                    
                 }    
                 //not allow exsiting shared team members be shared to the same 
                 $get_shared = sharedProfile::select('id')
@@ -230,7 +234,7 @@ class EmployeeSharesController extends Controller
                            ->count(); 
                 if($get_shared > 0){
                     return redirect()->route(request()->segment(1).'.employeeshares')
-                            ->with('message', " Employee has been shared with the selected supervior. Please review and try again.");                    
+                            ->with('message', " The employee has already been shared with that supervisor. They cannot be shared with the same supervisor more than once.");                    
                 }                 
             }
         }   
