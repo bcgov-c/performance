@@ -55,9 +55,9 @@
                         d.dd_level2 = $('#dd_level2').val();
                         d.dd_level3 = $('#dd_level3').val();
                         d.dd_level4 = $('#dd_level4').val();
+                        d.dd_superv = $('#dd_superv').val();
                         d.criteria = $('#criteria').val();
                         d.search_text = $('#search_text').val();
-                        d.supervisorCheckbox = $('input[name="supervisorCheckbox"]:checked').val();
                     }
                 },
                 "fnDrawCallback": function() {

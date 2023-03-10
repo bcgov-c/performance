@@ -630,12 +630,12 @@
 					e.preventDefault();
 				});
 
-				$('#dd_level4').change(function (e){
+				$('#criteria').change(function (e){
 					e.preventDefault();
 					$('#btn_search').click();
 				});
 
-				$('#criteria').change(function (e){
+				$('#dd_superv').change(function (e){
 					e.preventDefault();
 					$('#btn_search').click();
 				});
@@ -654,9 +654,9 @@
 
 				$('#btn_search_reset').click(function (e){
 					e.preventDefault();
+					$('#dd_superv').val('all');
 					$('#criteria').val('all');
 					$('#search_text').val(null);
-					$('#supervisorCheckbox').prop('checked', false);
 					$('#dd_level0').val(null).trigger('change');
 					$('#dd_level1').val(null).trigger('change');
 					$('#dd_level2').val(null).trigger('change');
@@ -665,7 +665,7 @@
 					$('#btn_search').click();
 				});
 
-				$('#supervisorCheckbox').change(function (e){
+				$('#dd_level4').change(function (e){
 					e.preventDefault();
 					$('#btn_search').click();
 				});

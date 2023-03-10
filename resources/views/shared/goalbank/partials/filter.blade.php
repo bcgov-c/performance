@@ -42,6 +42,16 @@
         </div>
         <div class="form-group col-md-2" id="blank5th">
         </div>
+        @if ($currentView == "editone" || $currentView == "goalbank")
+            <div class="form-group col-md-2" id="superv_group">
+                <label for="dd_superv">Supervisor Status</label>
+                <select id="dd_superv" name="dd_superv" class="form-control select2">
+                    @foreach( $supervisorList as $key => $value )
+                        <option value="{{ $key }}" {{  old('dd_superv') == $key ? 'selected' : '' }} >{{ $value }}</option>
+                    @endforeach
+                </select>
+            </div>
+        @endif
         <div class="form-group col-md-2" id="criteria_group">
             <label for="criteria">Search Criteria</label>
             <select id="criteria" name="criteria" class="form-control">
@@ -63,14 +73,6 @@
                 </span>
             </div>
         </div>
-        @if ($currentView == "editone" || $currentView == "goalbank")
-            <div class="form-group col-md-2" id="supervisor_group">
-                <div class="form-group row"> </div>
-                <div class="form-group row">
-                    <input id="supervisorCheckbox" type="checkbox" name="supervisorCheckbox" aria-label="Display Supervisors Only" value="1"> &nbsp &nbsp <b>Display Supervisors Only</b>
-                </div>
-            </div>
-        @endif
     </div>
 </div>
 

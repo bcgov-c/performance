@@ -54,6 +54,8 @@ class GoalBankController extends Controller
             $request->dd_level3 = isset($old['dd_level3']) ? $old['dd_level3'] : null;
             $request->dd_level4 = isset($old['dd_level4']) ? $old['dd_level4'] : null;
 
+            $request->dd_superv = isset($old['dd_superv']) ? $old['dd_superv'] : null;
+
             $request->criteria = isset($old['criteria']) ? $old['criteria'] : null;
             $request->search_text = isset($old['search_text']) ? $old['search_text'] : null;
             
@@ -77,8 +79,6 @@ class GoalBankController extends Controller
 
             $eold_selected_emp_ids = isset($old['eselected_emp_ids']) ? json_decode($old['eselected_emp_ids']) : [];
             $eold_selected_org_nodes = isset($old['eselected_org_nodes']) ? json_decode($old['eselected_org_nodes']) : [];
-
-            $request->supervisorCheckbox = isset($old['supervisorCheckbox']) ? $old['supervisorCheckbox'] : null;
         } 
 
         // no validation and move filter variable to old 
@@ -89,11 +89,11 @@ class GoalBankController extends Controller
                 'dd_level2' => $request->dd_level2,
                 'dd_level3' => $request->dd_level3,
                 'dd_level4' => $request->dd_level4,
+                'dd_superv' => $request->dd_superv,
                 'criteria' => $request->criteria,
                 'search_text' => $request->search_text,
                 'orgCheck' => $request->orgCheck,
                 'userCheck' => $request->userCheck,
-                'supervisorCheckbox' => $request->supervisorCheckbox,
             ]);
         }
 
@@ -151,6 +151,8 @@ class GoalBankController extends Controller
         ->orderBy('employee_demo.employee_id')
         ->pluck('employee_demo.employee_id');        
 
+        $supervisorList = $this->supervisor_list();
+
         $criteriaList = $this->search_criteria_list();
         $ecriteriaList = $this->search_criteria_list();
 
@@ -168,7 +170,7 @@ class GoalBankController extends Controller
 
         $currentView = $request->segment(2);
 
-        return view('shared.goalbank.createindex', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'type_desc_str', 'currentView') );
+        return view('shared.goalbank.createindex', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'type_desc_str', 'currentView', 'supervisorList') );
     }
 
 
@@ -511,6 +513,9 @@ class GoalBankController extends Controller
             $request->dd_level3 = isset($old['dd_level3']) ? $old['dd_level3'] : null;
             $request->dd_level4 = isset($old['dd_level4']) ? $old['dd_level4'] : null;
 
+            $request->dd_superv = isset($old['dd_superv']) ? $old['dd_superv'] : null;
+            $request->qdd_superv = isset($old['qdd_superv']) ? $old['qdd_superv'] : null;
+
             $request->search_text = isset($old['search_text']) ? $old['search_text'] : null;
             
             $request->orgCheck = isset($old['orgCheck']) ? $old['orgCheck'] : null;
@@ -532,9 +537,6 @@ class GoalBankController extends Controller
 
             $aold_selected_emp_ids = isset($old['aselected_emp_ids']) ? json_decode($old['aselected_emp_ids']) : [];
             $aold_selected_org_nodes = isset($old['aselected_org_nodes']) ? json_decode($old['aselected_org_nodes']) : [];
-
-            $request->supervisorCheckbox = isset($old['supervisorCheckbox']) ? $old['supervisorCheckbox'] : null;
-            $request->asupervisorCheckbox = isset($old['asupervisorCheckbox']) ? $old['asupervisorCheckbox'] : null;
         } 
 
         // no validation and move filter variable to old 
@@ -545,11 +547,11 @@ class GoalBankController extends Controller
                 'dd_level2' => $request->dd_level2,
                 'dd_level3' => $request->dd_level3,
                 'dd_level4' => $request->dd_level4,
+                'dd_superv' => $request->dd_superv,
                 'criteria' => $request->criteria,
                 'search_text' => $request->search_text,
                 'orgCheck' => $request->orgCheck,
                 'userCheck' => $request->userCheck,
-                'supervisorCheckbox' => $request->supervisorCheckbox,
             ]);
         }
 
@@ -560,11 +562,11 @@ class GoalBankController extends Controller
                 'add_level2' => $request->add_level2,
                 'add_level3' => $request->add_level3,
                 'add_level4' => $request->add_level4,
+                'add_superv' => $request->add_superv,
                 'acriteria' => $request->acriteria,
                 'asearch_text' => $request->asearch_text,
                 'aorgCheck' => $request->aorgCheck,
                 'auserCheck' => $request->auserCheck,
-                'asupervisorCheckbox' => $request->asupervisorCheckbox,
             ]);
         }
 
@@ -610,6 +612,8 @@ class GoalBankController extends Controller
         $acriteriaList = $this->search_criteria_list();
         $goal_id = $id;
 
+        $supervisorList = $this->supervisor_list();
+
         $goaldetail = Goal::withoutGlobalScopes()->find($request->id);
 
         $type_desc_arr = array();
@@ -623,7 +627,7 @@ class GoalBankController extends Controller
 
         $currentView = $request->segment(3);
 
-        return view('shared.goalbank.editone', compact('criteriaList', 'acriteriaList', 'matched_emp_ids', 'amatched_emp_ids', 'old_selected_emp_ids', 'aold_selected_emp_ids', 'old_selected_org_nodes', 'aold_selected_org_nodes', 'goalTypes', 'mandatoryOrSuggested', 'amandatoryOrSuggested', 'tags', 'atags', 'goaldetail', 'request', 'goal_id', 'type_desc_str', 'currentView') );
+        return view('shared.goalbank.editone', compact('criteriaList', 'acriteriaList', 'matched_emp_ids', 'amatched_emp_ids', 'old_selected_emp_ids', 'aold_selected_emp_ids', 'old_selected_org_nodes', 'aold_selected_org_nodes', 'goalTypes', 'mandatoryOrSuggested', 'amandatoryOrSuggested', 'tags', 'atags', 'goaldetail', 'request', 'goal_id', 'type_desc_str', 'currentView', 'supervisorList') );
     
     }
 
@@ -939,7 +943,8 @@ class GoalBankController extends Controller
                 , 'employee_demo.level4'
                 , 'employee_demo.deptid'
             ])
-            ->when($request->supervisorCheckbox, function($q) {return $q->whereRaw("EXISTS (SELECT DISTINCT 1 FROM users AS u, users AS su WHERE su.reporting_to = u.id AND u.employee_id = employee_demo.employee_id)");})
+            ->when($request->dd_superv == 'sup', function($q) {return $q->whereRaw("EXISTS (SELECT DISTINCT 1 FROM users AS u, users AS su WHERE su.reporting_to = u.id AND u.employee_id = employee_demo.employee_id)");})
+            ->when($request->dd_superv == 'non', function($q) {return $q->whereRaw("NOT EXISTS (SELECT DISTINCT 1 FROM users AS u, users AS su WHERE su.reporting_to = u.id AND u.employee_id = employee_demo.employee_id)");})
             ->selectRaw("CASE WHEN (SELECT DISTINCT 1 FROM users AS u, users AS su WHERE su.reporting_to = u.id AND u.employee_id = employee_demo.employee_id) = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor")
             ;
             return Datatables::of($employees)
@@ -1012,7 +1017,8 @@ class GoalBankController extends Controller
                 , 'employee_demo.level4'
                 , 'employee_demo.deptid'
             ])
-            ->when($request->asupervisorCheckbox, function($q) {return $q->whereRaw("EXISTS (SELECT DISTINCT 1 FROM users AS u, users AS su WHERE su.reporting_to = u.id AND u.employee_id = employee_demo.employee_id)");})
+            ->when($request->add_superv == 'sup', function($q) {return $q->whereRaw("EXISTS (SELECT DISTINCT 1 FROM users AS u, users AS su WHERE su.reporting_to = u.id AND u.employee_id = employee_demo.employee_id)");})
+            ->when($request->add_superv == 'non', function($q) {return $q->whereRaw("NOT EXISTS (SELECT DISTINCT 1 FROM users AS u, users AS su WHERE su.reporting_to = u.id AND u.employee_id = employee_demo.employee_id)");})
             ->selectRaw("CASE WHEN (SELECT DISTINCT 1 FROM users AS u, users AS su WHERE su.reporting_to = u.id AND u.employee_id = employee_demo.employee_id) = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor")
             ;
             return Datatables::of($aemployees)
@@ -1270,6 +1276,14 @@ class GoalBankController extends Controller
             'name'=> 'Employee Name',
             'job' => 'Classification', 
             'dpt' => 'Department ID'
+        ];
+    }
+
+    protected function supervisor_list() {
+        return [
+            'all' => 'All',
+            'sup' => 'Supervisors Only', 
+            'non'=> 'Non-Supervisors Only',
         ];
     }
 
@@ -1734,6 +1748,8 @@ class GoalBankController extends Controller
             ->when($level2, function($q) use($level2) {return $q->where('employee_demo.level2_division', $level2->name);})
             ->when($level3, function($q) use($level3) {return $q->where('employee_demo.level3_branch', $level3->name);})
             ->when($level4, function($q) use($level4) {return $q->where('employee_demo.level4', $level4->name);})
+            ->when($request->dd_superv == 'sup', function($q) use($request){return $q->whereRaw("EXISTS (SELECT DISTINCT 1 FROM users AS su WHERE su.reporting_to = users.id)");})
+            ->when($request->dd_superv == 'non', function($q) use($request){return $q->whereRaw("NOT EXISTS (SELECT DISTINCT 1 FROM users AS su WHERE su.reporting_to = users.id)");})
             ->when($request->criteria == 'name', function($q) use($request){return $q->where('employee_demo.employee_name', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'job', function($q) use($request){return $q->where('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%");})
@@ -1748,7 +1764,6 @@ class GoalBankController extends Controller
                     }
                 });
             })
-            ->when($request->supervisorCheckbox, function($q) {return $q->whereRaw("EXISTS (SELECT DISTINCT 1 FROM users AS su WHERE su.reporting_to = users.id)");})
             ->select ([
                 'employee_demo.employee_id',
                 'employee_demo.employee_name',
