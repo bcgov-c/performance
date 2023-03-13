@@ -15,6 +15,23 @@ use App\Http\Controllers\HRAdmin\HRAdminSharedController;
 
 Route::group(['middleware' => ['role:HR Admin']], function () 
 {
+    //Shared functions v2.0
+    Route::get('/hradmin/org-organizations2', [HRAdminSharedController::class,'getOrganizationsV2']);
+    Route::get('/hradmin/org-programs2', [HRAdminSharedController::class,'getProgramsV2']);
+    Route::get('/hradmin/org-divisions2', [HRAdminSharedController::class,'getDivisionsV2']);
+    Route::get('/hradmin/org-branches2', [HRAdminSharedController::class,'getBranchesV2']);
+    Route::get('/hradmin/org-level42', [HRAdminSharedController::class,'getLevel4V2']);
+    // Route::get('/hradmin/eorg-organizations2', [HRAdminSharedController::class,'egetOrganizationsV2']);
+    // Route::get('/hradmin/eorg-programs2', [HRAdminSharedController::class,'egetProgramsV2']);
+    // Route::get('/hradmin/eorg-divisions2', [HRAdminSharedController::class,'egetDivisionsV2']);
+    // Route::get('/hradmin/eorg-branches2', [HRAdminSharedController::class,'egetBranchesV2']);
+    // Route::get('/hradmin/eorg-level42', [HRAdminSharedController::class,'egetLevel4V2']);
+    // Route::get('/hradmin/aorg-organizations2', [HRAdminSharedController::class,'agetOrganizationsV2']);
+    // Route::get('/hradmin/aorg-programs2', [HRAdminSharedController::class,'agetProgramsV2']);
+    // Route::get('/hradmin/aorg-divisions2', [HRAdminSharedController::class,'agetDivisionsV2']);
+    // Route::get('/hradmin/aorg-branches2', [HRAdminSharedController::class,'agetBranchesV2']);
+    // Route::get('/hradmin/aorg-level42', [HRAdminSharedController::class,'agetLevel4V2']);
+    
     //Shared functions
     Route::get('/hradmin/org-organizations', [HRAdminSharedController::class,'getOrganizations']);
     Route::get('/hradmin/org-programs', [HRAdminSharedController::class,'getPrograms']);

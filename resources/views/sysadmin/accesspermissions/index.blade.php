@@ -416,6 +416,7 @@
 								},
 
 								error: function () {
+									// Create New Access Page, Step 3
 									alert("error");
 									$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
 								}

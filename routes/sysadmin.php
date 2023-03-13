@@ -22,6 +22,23 @@ use Illuminate\Http\Request;
 
 Route::group(['middleware' => ['role:Sys Admin']], function () 
 {
+    //Shared functions v2.0
+    Route::get('/sysadmin/org-organizations2', [SysAdminSharedController::class,'getOrganizationsV2']);
+    Route::get('/sysadmin/org-programs2', [SysAdminSharedController::class,'getProgramsV2']);
+    Route::get('/sysadmin/org-divisions2', [SysAdminSharedController::class,'getDivisionsV2']);
+    Route::get('/sysadmin/org-branches2', [SysAdminSharedController::class,'getBranchesV2']);
+    Route::get('/sysadmin/org-level42', [SysAdminSharedController::class,'getLevel4V2']);
+    Route::get('/sysadmin/eorg-organizations2', [SysAdminSharedController::class,'egetOrganizationsV2']);
+    Route::get('/sysadmin/eorg-programs2', [SysAdminSharedController::class,'egetProgramsV2']);
+    Route::get('/sysadmin/eorg-divisions2', [SysAdminSharedController::class,'egetDivisionsV2']);
+    Route::get('/sysadmin/eorg-branches2', [SysAdminSharedController::class,'egetBranchesV2']);
+    Route::get('/sysadmin/eorg-level42', [SysAdminSharedController::class,'egetLevel4V2']);
+    Route::get('/sysadmin/aorg-organizations2', [SysAdminSharedController::class,'agetOrganizationsV2']);
+    Route::get('/sysadmin/aorg-programs2', [SysAdminSharedController::class,'agetProgramsV2']);
+    Route::get('/sysadmin/aorg-divisions2', [SysAdminSharedController::class,'agetDivisionsV2']);
+    Route::get('/sysadmin/aorg-branches2', [SysAdminSharedController::class,'agetBranchesV2']);
+    Route::get('/sysadmin/aorg-level42', [SysAdminSharedController::class,'agetLevel4V2']);
+    
     //Shared functions
     Route::get('/sysadmin/org-organizations', [SysAdminSharedController::class,'getOrganizations']);
     Route::get('/sysadmin/org-programs', [SysAdminSharedController::class,'getPrograms']);

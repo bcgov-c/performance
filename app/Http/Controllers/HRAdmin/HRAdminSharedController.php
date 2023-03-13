@@ -4,12 +4,92 @@ namespace App\Http\Controllers\HRAdmin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\EmployeeDemoTree;
 use App\Models\OrganizationTree;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class HRAdminSharedController extends Controller
 {
+    public function getOrganizationsV2(Request $request) {
+        $orgs = EmployeeDemoTree::join('admin_orgs', 'admin_orgs.orgid', 'employee_demo_tree.id')
+        ->whereRaw('admin_orgs.user_id = '.Auth::id())
+        ->orderby('employee_demo_tree.name', 'asc')
+        ->select('employee_demo_tree.id', 'employee_demo_tree.name')
+        ->where('employee_demo_tree.level', 0)
+        ->when($request->q, function ($q) use($request) { return $q->whereRaw("employee_demo_tree.name LIKE '%{$request->q}%'"); })
+        ->get();
+        $formatted_orgs = [];
+        foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
+        return response()->json($formatted_orgs);
+    } 
+
+    public function getProgramsV2(Request $request) {
+        $orgs = EmployeeDemoTree::join('admin_orgs', 'admin_orgs.orgid', 'employee_demo_tree.id')
+        ->whereRaw('admin_orgs.user_id = '.Auth::id())
+        ->orderby('employee_demo_tree.name', 'asc')
+        ->select('employee_demo_tree.id', 'employee_demo_tree.name')
+        ->where('employee_demo_tree.level', 1)
+        ->when($request->q, function ($q) use($request) { return $q->whereRaw("employee_demo_tree.name LIKE '%{$request->q}%'"); })
+        ->when($request->level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->level0); })
+        ->get();
+        $formatted_orgs = [];
+        foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
+        return response()->json($formatted_orgs);
+    } 
+
+    public function getDivisionsV2(Request $request) {
+        $orgs = EmployeeDemoTree::join('admin_orgs', 'admin_orgs.orgid', 'employee_demo_tree.id')
+        ->whereRaw('admin_orgs.user_id = '.Auth::id())
+        ->orderby('employee_demo_tree.name', 'asc')
+        ->select('employee_demo_tree.id', 'employee_demo_tree.name')
+        ->where('employee_demo_tree.level', 2)
+        ->when($request->q, function ($q) use($request) { return $q->whereRaw("employee_demo_tree.name LIKE '%{$request->q}%'"); })
+        ->when($request->level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->level0); })
+        ->when($request->level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->level1); })
+        ->get();
+        $formatted_orgs = [];
+        foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
+        return response()->json($formatted_orgs);
+    } 
+
+    public function getBranchesV2(Request $request) {
+        $orgs = EmployeeDemoTree::join('admin_orgs', 'admin_orgs.orgid', 'employee_demo_tree.id')
+        ->whereRaw('admin_orgs.user_id = '.Auth::id())
+        ->orderby('employee_demo_tree.name', 'asc')
+        ->select('employee_demo_tree.id', 'employee_demo_tree.name')
+        ->where('employee_demo_tree.level', 3)
+        ->when($request->q, function ($q) use($request) { return $q->whereRaw("employee_demo_tree.name LIKE '%{$request->q}%'"); })
+        ->when($request->level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->level0); })
+        ->when($request->level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->level1); })
+        ->when($request->level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->level2); })
+        ->get();
+        $formatted_orgs = [];
+        foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
+        return response()->json($formatted_orgs);
+    } 
+
+    public function getLevel4V2(Request $request) {
+        $orgs = EmployeeDemoTree::join('admin_orgs', 'admin_orgs.orgid', 'employee_demo_tree.id')
+        ->whereRaw('admin_orgs.user_id = '.Auth::id())
+        ->orderby('employee_demo_tree.name', 'asc')
+        ->select('employee_demo_tree.id', 'employee_demo_tree.name')
+        ->where('employee_demo_tree.level', 4)
+        ->when($request->q, function ($q) use($request) { return $q->whereRaw("employee_demo_tree.name LIKE '%{$request->q}%'"); })
+        ->when($request->level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->level0); })
+        ->when($request->level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->level1); })
+        ->when($request->level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->level2); })
+        ->when($request->level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->level3); })
+        ->get();
+        $formatted_orgs = [];
+        foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
+        return response()->json($formatted_orgs);
+    } 
+
+
+    
+
+
     public function getOrganizations(Request $request) {
         $orgs = OrganizationTree::join('admin_orgs', function ($j1) {
             $j1->on(function ($j1a) {
