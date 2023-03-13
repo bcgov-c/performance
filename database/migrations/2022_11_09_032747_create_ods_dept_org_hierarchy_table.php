@@ -41,21 +41,28 @@ class CreateOdsDeptOrgHierarchyTable extends Migration
             $table->string('organization')->nullable();
             $table->string('organization_label')->nullable();
             $table->string('organization_deptid')->nullable();
+            $table->string('organization_key')->nullable();
             $table->string('level1')->nullable();
             $table->string('level1_label')->nullable();
             $table->string('level1_deptid')->nullable();
+            $table->string('level1_key')->nullable();
             $table->string('level2')->nullable();
             $table->string('level2_label')->nullable();
             $table->string('level2_deptid')->nullable();
+            $table->string('level2_key')->nullable();
             $table->string('level3')->nullable();
             $table->string('level3_label')->nullable();
             $table->string('level3_deptid')->nullable();
+            $table->string('level3_key')->nullable();
             $table->string('level4')->nullable();
             $table->string('level4_label')->nullable();
             $table->string('level4_deptid')->nullable();
+            $table->string('level4_key')->nullable();
             $table->string('level5')->nullable();
             $table->string('level5_label')->nullable();
             $table->string('level5_deptid')->nullable();
+            $table->string('level5_key')->nullable();
+            $table->string('search_key')->nullable();
             $table->longtext('org_path')->nullable();
             $table->datetime('date_deleted')->nullable();
             $table->dateTime('date_updated')->nullable();
@@ -66,9 +73,10 @@ class CreateOdsDeptOrgHierarchyTable extends Migration
             $table->tinyInteger('duplicate')->default(0);
             $table->timestamps();
             $table->primary('orgid');
-            $table->index(['date_updated'], 'idx_byDateUpdated1');
-            $table->index(['deptid', 'date_updated'], 'idx_byDeptDateUpdated1');
-            $table->index(['hlevel', 'pkey', 'okey'], 'idx_byHierarchy1');
+            $table->index(['deptid', 'okey'], 'idx_byHierarchyDeptOkey');
+            $table->index(['name', 'okey'], 'idx_byHierarchyNameOkey');
+            $table->index(['ulevel', 'okey'], 'idx_byHierarchyUlevelOkey');
+            $table->index(['okey'], 'idx_byHierarchyokey');
         });
     }
 

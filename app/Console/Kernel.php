@@ -37,6 +37,10 @@ class Kernel extends ConsoleKernel
         ->timezone('America/Vancouver')
         ->dailyAt('00:10');
 
+        $schedule->command('command:GetODSDeptHierarchy')
+        ->timezone('America/Vancouver')
+        ->dailyAt('00:15');
+  
         $schedule->command('command:BuildOrgTree')
         ->timezone('America/Vancouver')
         ->dailyAt('00:20');
@@ -75,6 +79,10 @@ class Kernel extends ConsoleKernel
         ->dailyAt('02:30')
         ->appendOutputTo(storage_path('logs/NotifyConversationDue.log'));
         
+        $schedule->command('command:BuildEmployeeDemoTree')
+        ->timezone('America/Vancouver')
+        ->dailyAt('03:00');
+  
         $schedule->command('command:CleanShareProfile')
         ->timezone('America/Vancouver')    
         ->dailyAt('05:00');

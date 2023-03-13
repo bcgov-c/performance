@@ -98,7 +98,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/eorg-organizations'
+                    url: '/sysadmin/eorg-organizations2'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -129,7 +129,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/eorg-programs' 
+                    url: '/sysadmin/eorg-programs2' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -161,7 +161,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/eorg-divisions' 
+                    url: '/sysadmin/eorg-divisions2' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -194,7 +194,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/eorg-branches' 
+                    url: '/sysadmin/eorg-branches2' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -228,7 +228,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/eorg-level4' 
+                    url: '/sysadmin/eorg-level42' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -324,7 +324,7 @@
                 }
             });
 
-            $('#ebtn_search_reset').click(function() {
+            $('#ebtn_search_reset').click(function(e) {
                 e.preventDefault();
                 $('#edd_level0').val(null).trigger('change');
                 $('#edd_level1').val(null).trigger('change');

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class AdminOrgUser extends Model
 {
+    public $table = 'admin_org_users';
+
     use HasFactory;
 
     protected $fillable = [

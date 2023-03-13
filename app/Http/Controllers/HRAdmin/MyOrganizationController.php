@@ -8,9 +8,9 @@ use App\Models\Conversation;
 use App\Models\EmployeeDemo;
 use App\Models\EmployeeDemoJunior;
 use App\Models\ExcusedClassification;
-use App\Models\OrganizationTree;
+use App\Models\EmployeeDemoTree;
 use App\Models\SharedProfile;
-use App\Models\UserDemoJrView;
+use App\Models\HRUserDemoJrView;
 use App\Models\Goal;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
@@ -61,11 +61,11 @@ class MyOrganizationController extends Controller
             ]);
         }
 
-        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+        $level0 = $request->dd_level0 ? EmployeeDemoTree::where('id', $request->dd_level0)->first() : null;
+        $level1 = $request->dd_level1 ? EmployeeDemoTree::where('id', $request->dd_level1)->first() : null;
+        $level2 = $request->dd_level2 ? EmployeeDemoTree::where('id', $request->dd_level2)->first() : null;
+        $level3 = $request->dd_level3 ? EmployeeDemoTree::where('id', $request->dd_level3)->first() : null;
+        $level4 = $request->dd_level4 ? EmployeeDemoTree::where('id', $request->dd_level4)->first() : null;
 
         $request->session()->flash('level0', $level0);
         $request->session()->flash('level1', $level1);
@@ -83,27 +83,24 @@ class MyOrganizationController extends Controller
         if ($request->ajax()) 
         {
             $authId = Auth::id();
-            $level0 = $request->dd_level0 ? OrganizationTree::where('organization_trees.id', $request->dd_level0)->first() : null;
-            $level1 = $request->dd_level1 ? OrganizationTree::where('organization_trees.id', $request->dd_level1)->first() : null;
-            $level2 = $request->dd_level2 ? OrganizationTree::where('organization_trees.id', $request->dd_level2)->first() : null;
-            $level3 = $request->dd_level3 ? OrganizationTree::where('organization_trees.id', $request->dd_level3)->first() : null;
-            $level4 = $request->dd_level4 ? OrganizationTree::where('organization_trees.id', $request->dd_level4)->first() : null;
-            $query = UserDemoJrView::from('user_demo_jr_view as u')
-            ->whereIn('u.user_id', function ($org) use ($authId) {
-                $org->select('o.user_id')
-                ->from('auth_users as o')
-                ->whereRaw("o.type = 'HR' AND o.auth_id = ".$authId);
-            })
-            ->when($level0, function($q) use($level0) {$q->where('u.organization', $level0->name);})
-            ->when($level1, function($q) use($level1) {$q->where('u.level1_program', $level1->name);})
-            ->when($level2, function($q) use($level2) {$q->where('u.level2_division', $level2->name);})
-            ->when($level3, function($q) use($level3) {$q->where('u.level3_branch', $level3->name);})
-            ->when($level4, function($q) use($level4) {$q->where('u.level4', $level4->name);})
-            ->when($request->criteria == 'id' && $request->search_text, function($q) use($request){return $q->whereRaw("u.employee_id like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'name' && $request->search_text, function($q) use($request){return $q->whereRaw("u.employee_name like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'job' && $request->search_text, function($q) use($request){return $q->whereRaw("u.jobcode_desc like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'dpt' && $request->search_text, function($q) use($request){return $q->whereRaw("u.deptid like '%".$request->search_text."%'");})
-            ->when($request->criteria == 'all' && $request->search_text, function($q) use ($request) {$q->whereRaw("(u.employee_id like '%".$request->search_text."%' or u.employee_name like '%".$request->search_text."%' or u.jobcode_desc like '%".$request->search_text."%' or u.deptid like '%".$request->search_text."%')");})
+            $query = HRUserDemoJrView::from('hr_user_demo_jr_view as u')
+            // DIRECT JOIN is fasted for page loading
+            // ->join('admin_orgs as o', 'o.orgid', 'u.orgid')->whereRaw("o.user_id = {$authId} AND o.version = 2")
+            ->whereRaw("u.ao_user_id = {$authId}")
+            // IN LIST is 2nd fastest based on random page load
+            // ->whereIn('u.orgid', function ($org) use ($authId) { $org->select('o.orgid')->from('admin_orgs as o')->whereRaw("o.version = 2 AND o.user_id = {$authId}"); })
+            // EXISTS is the slowest of the 3 options
+            // ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs AS o WHERE o.orgid = u.orgid AND o.user_id = {$authId} AND o.version = 2)")
+            ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
+            ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
+            ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
+            ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
+            ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
+            ->when($request->criteria == 'id' && $request->search_text, function($q) use($request) { return $q->whereRaw("u.employee_id like '%{$request->search_text}%'"); })
+            ->when($request->criteria == 'name' && $request->search_text, function($q) use($request) {return $q->whereRaw("u.employee_name like '%{$request->search_text}%'"); })
+            ->when($request->criteria == 'job' && $request->search_text, function($q) use($request) {return $q->whereRaw("u.jobcode_desc like '%{$request->search_text}%'"); })
+            ->when($request->criteria == 'dpt' && $request->search_text, function($q) use($request) {return $q->whereRaw("u.deptid like '%{$request->search_text}%'"); })
+            ->when($request->criteria == 'all' && $request->search_text, function($q) use($request) { $q->whereRaw("(u.employee_id like '%{$request->search_text}%' or u.employee_name like '%{$request->search_text}%' or u.jobcode_desc like '%{$request->search_text}%' or u.deptid like '%{$request->search_text}%')"); })
             ->whereNull('u.date_deleted')
             ->selectRaw ("
                 u.user_id,
@@ -112,6 +109,7 @@ class MyOrganizationController extends Controller
                 u.employee_id,
                 u.employee_name, 
                 u.jobcode_desc,
+                u.orgid,
                 u.organization,
                 u.level1_program,
                 u.level2_division,
