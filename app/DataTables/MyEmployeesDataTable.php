@@ -58,7 +58,7 @@ class MyEmployeesDataTable extends DataTable
                     $landingPage = 'conversation.templates';
                     return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
                 }
-                if (isset($jr->next_conversation_date) && $jr->next_conversation_date) {
+                if (isset($jr->next_conversation_date) && $jr->next_conversation_date) { 
                     if ($jr->next_conversation_date) {
                         $text = Carbon::parse($jr->next_conversation_date)->format('M d, Y');
                         $landingPage = 'conversation.templates';
