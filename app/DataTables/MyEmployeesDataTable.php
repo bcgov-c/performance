@@ -46,7 +46,7 @@ class MyEmployeesDataTable extends DataTable
                 return view('my-team.partials.link-to-profile', compact(['row', 'text', 'landingPage']));
             })->addColumn('nextConversationDue', function ($row) {
                 $jr = EmployeeDemoJunior::where('employee_id', $row->employee_id)->getQuery()->orderBy('id', 'desc')->first();
-                if ($jr && isset($jr->excused_type) && $jr->excused_type) {
+                if (isset($jr->excused_type) && $jr->excused_type) {
                     if ($jr->excused_type == 'A') {
                         $text = 'Paused';
                         $landingPage = 'conversation.templates';
@@ -58,7 +58,7 @@ class MyEmployeesDataTable extends DataTable
                     $landingPage = 'conversation.templates';
                     return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
                 }
-                if ($jr && isset($jr->next_conversation_date) && $jr->next_conversation_date) {
+                if (isset($jr->next_conversation_date) && $jr->next_conversation_date) {
                     if ($jr->next_conversation_date) {
                         $text = Carbon::parse($jr->next_conversation_date)->format('M d, Y');
                         $landingPage = 'conversation.templates';
