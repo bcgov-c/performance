@@ -95,13 +95,11 @@ class BuildEmployeeDemoTree extends Command
                 $allDepts = $allDepts->get();
                 foreach ($allDepts AS $dept) {
                     $node = EmployeeDemoTree::where('id', $dept->okey)->first();
-                    if ($dept->headcount) {
-                        $groupcount = $dept->headcount;
-                    } else {
-                        $groupcount = EmployeeDemo::whereNull('date_deleted')
-                        ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM ods_dept_org_hierarchy AS a WHERE a.deptid = employee_demo.deptid AND a.{$field} = {$dept->okey})")
+                    $groupcount = EmployeeDemo::from('employee_demo AS egc1')
+                        ->join('ods_dept_org_hierarchy AS ogc1', 'egc1.deptid', 'ogc1.deptid')
+                        ->whereNull('egc1.date_deleted')
+                        ->whereRaw("ogc1.{$field} = {$dept->okey}")
                         ->count();
-                    }
                     if (!$node) {
                         $node = new EmployeeDemoTree([
                             'id' => $dept->okey,
@@ -157,7 +155,7 @@ class BuildEmployeeDemoTree extends Command
                             default:
                                 break;
                         }
-                        $this->info("  created {$dept->okey} - {$dept->name}");
+                        $this->info("  created {$level} - {$dept->okey} - {$dept->name}");
                         $count_insert++;
                     } else {
                         $node->name = $dept->name;
@@ -177,7 +175,7 @@ class BuildEmployeeDemoTree extends Command
                         $node->level4_deptid = $dept->level4_deptid;
                         $node->level5_deptid = $dept->level5_deptid;
                         $node->save();
-                        $this->info("  updated {$dept->okey} - {$dept->name}");
+                        $this->info("  updated {$level} - {$dept->okey} - {$dept->name}");
                         $count_update++;
                     }
                     $total++;
