@@ -297,7 +297,7 @@ jobs:
 
   # Deploy App images in Training
   deployTraining:
-    name: Deploy APP to Dev environment
+    name: Deploy APP to Training environment
     runs-on: ubuntu-latest
     if: github.ref_name == 'training'
     env:
