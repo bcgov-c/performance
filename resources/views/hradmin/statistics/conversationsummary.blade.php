@@ -32,27 +32,7 @@
 		</div>
 	  </div>
 	</div>
-	<div class="col-sm-12 col-md-10 col-lg-4">
-	  <div class="card">
-		<div class="card-body">
-		  <div class="chart has-fixed-height" id="pie_basic_2">
-			Loading...
-		  </div>
-		</div>
-	  </div>
-	</div>
-
-	<p class="print-only page-break">&nbsp;</p>
-
-	<div class="col-sm-12 col-md-10 col-lg-4">
-		<div class="card">
-		  <div class="card-body">
-			<div class="chart has-fixed-height" id="pie_basic_3">
-				Loading...
-			  </div>
-		  </div>
-		</div>
-	  </div>
+	
         
           <div class="col-sm-12 col-md-10 col-lg-4">
 			<div class="card">
@@ -132,8 +112,6 @@
 $(function() {
 	
 	var	pie_basic_1_data = {!!json_encode( $data['chart1'] )!!};
-	var	pie_basic_2_data = {!!json_encode( $data['chart2'] )!!};
-	var	pie_basic_3_data = {!!json_encode( $data['chart3'] )!!};
         var	pie_basic_4_data = {!!json_encode( $data['chart4'] )!!};
         var	pie_basic_5_data = {!!json_encode( $data['chart5'] )!!};
         
@@ -317,8 +295,6 @@ $(function() {
 
 	// Call fundtion to create a new chart
 	createChart('pie_basic_1', pie_basic_1_data);
-	createChart('pie_basic_2', pie_basic_2_data);
-	createChart('pie_basic_3', pie_basic_3_data);
         createChart('pie_basic_4', pie_basic_4_data);
         createChart('pie_basic_5', pie_basic_5_data);
 	

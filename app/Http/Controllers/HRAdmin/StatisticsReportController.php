@@ -1585,7 +1585,7 @@ class StatisticsReportController extends Controller
         // SQL - Chart 4
         $sql_chart4 = ConversationParticipant::selectRaw("conversations.*, conversation_topics.name as conversation_name, users.employee_id, employee_demo.employee_name, users.email,
                         employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
-                        users.next_conversation_date as next_due_date")
+                        users.next_conversation_date as next_due_date, supervisor.name as supervisor_name, employee.name as employee_name")
                 //->where(function($query) {
                 //    $query->where(function($query) {
                 //        $query->whereRaw("DATEDIFF ( users.next_conversation_date, curdate() ) > 0 ")
@@ -1605,6 +1605,8 @@ class StatisticsReportController extends Controller
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 })
+                ->leftJoin('users as supervisor', 'supervisor.id', '=', 'conversations.supervisor_signoff_id')
+                ->leftJoin('users as employee', 'employee.id', '=', 'conversations.signoff_user_id')   
                 ->where(function($query) {
                     $query->where(function($query) {
                         $query->where('users.due_date_paused', 'N')
@@ -1645,13 +1647,15 @@ class StatisticsReportController extends Controller
         // SQL for Chart 5
          $sql_chart5 = ConversationParticipant::selectRaw("conversations.*, conversation_topics.name as conversation_name, users.employee_id, employee_demo.employee_name, users.email,
                     employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
-                    users.next_conversation_date as next_due_date")
+                    users.next_conversation_date as next_due_date, supervisor.name as supervisor_name, employee.name as employee_name")
             ->join('users', 'users.id', 'conversation_participants.participant_id') 
             ->join('conversations','conversations.id','conversation_participants.conversation_id')
             ->join('conversation_topics','conversations.conversation_topic_id','conversation_topics.id')         
             ->join('employee_demo', function($join) {
                 $join->on('employee_demo.employee_id', '=', 'users.employee_id');
             })
+            ->leftJoin('users as supervisor', 'supervisor.id', '=', 'conversations.supervisor_signoff_id')
+            ->leftJoin('users as employee', 'employee.id', '=', 'conversations.signoff_user_id')   
             ->where(function($query) {
                     $query->where(function($query) {
                         $query->where('users.due_date_paused', 'N')
@@ -1915,8 +1919,8 @@ class StatisticsReportController extends Controller
                         }
                         $row['Conversation Participant'] = implode(', ', $participants_arr );
                         $row['Conversation Due Date'] = $conversation->next_due_date;
-                        $row['Employee Sign-Off'] = $conversation->signoff_user  ? $conversation->signoff_user->name : '';
-                        $row['Supervisor Sign-off'] = $conversation->signoff_supervisor ? $conversation->signoff_supervisor->name : '';
+                        $row['Employee Sign-Off'] = $conversation->employee_name;
+                        $row['Supervisor Sign-off'] = $conversation->supervisor_name;
                         $row['Organization'] = $conversation->organization;
                         $row['Level 1'] = $conversation->level1_program;
                         $row['Level 2'] = $conversation->level2_division;
@@ -1991,8 +1995,8 @@ class StatisticsReportController extends Controller
                             }
                             $row['Conversation Participant'] = implode(', ', $participants_arr );
                             $row['Conversation Due Date'] = $conversation->next_due_date;
-                            $row['Employee Sign-Off'] = $conversation->signoff_user  ? $conversation->signoff_user->name : '';
-                            $row['Supervisor Sign-off'] = $conversation->signoff_supervisor ? $conversation->signoff_supervisor->name : '';
+                            $row['Employee Sign-Off'] = $conversation->employee_name;
+                            $row['Supervisor Sign-off'] = $conversation->supervisor_name;
                             $row['Organization'] = $conversation->organization;
                             $row['Level 1'] = $conversation->level1_program;
                             $row['Level 2'] = $conversation->level2_division;
@@ -2000,7 +2004,7 @@ class StatisticsReportController extends Controller
                             $row['Level 4'] = $conversation->level4;
                             fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], // $row['Next Conversation Due'],
                             $row["Conversation Name"],$row['Conversation Participant'],$row['Conversation Due Date'], 
-                        $row["Employee Sign-Off"], $row["Supervisor Sign-off"],
+                            $row["Employee Sign-Off"], $row["Supervisor Sign-off"],
                                      $row['Organization'],
                                       $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
                                     ));
