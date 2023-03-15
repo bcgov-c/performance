@@ -95,9 +95,10 @@ class BuildEmployeeDemoTree extends Command
                 $allDepts = $allDepts->get();
                 foreach ($allDepts AS $dept) {
                     $node = EmployeeDemoTree::where('id', $dept->okey)->first();
-                    $groupcount = EmployeeDemo::join('ods_dept_org_hierarchy', 'employee_demo.deptid', 'ods_dept_org_hierarchy.deptid')
-                        ->whereNull('employee_demo.date_deleted')
-                        ->whereRaw("ods_dept_org_hierarchy.{$field} = {$dept->okey}")
+                    $groupcount = EmployeeDemo::from('employee_demo AS egc1')
+                        ->join('ods_dept_org_hierarchy AS ogc1', 'egc1.deptid', 'ogc1.deptid')
+                        ->whereNull('egc1.date_deleted')
+                        ->whereRaw("ogc1.{$field} = {$dept->okey}")
                         ->count();
                     if (!$node) {
                         $node = new EmployeeDemoTree([
