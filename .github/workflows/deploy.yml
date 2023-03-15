@@ -109,6 +109,7 @@ jobs:
           oc -n ${NAMESPACE} process -f openshift/app/performance-dc.yml \
                 -p APP_NAME=${APP} \
                 -p SITE_URL=${APP_HOST} \
+                -p CONFIG_MAP=config-env-perf \
                 -p DB_HOST=mysql-0.mysqlh \
                 -p PERFORMANCE_MEMORY_LIMIT=4Gi \
                 -p REPLICA_COUNT=1 \
@@ -185,6 +186,7 @@ jobs:
           oc -n ${NAMESPACE} process -f openshift/app/performance-dc.yml \
                 -p APP_NAME=${APP} \
                 -p SITE_URL=${APP_HOST} \
+                -p CONFIG_MAP=config-env-perf \
                 -p DB_HOST=mysql-0.mysqlh \
                 -p PERFORMANCE_MEMORY_LIMIT=4Gi \
                 -p REPLICA_COUNT=1 \
@@ -260,6 +262,7 @@ jobs:
           oc -n ${NAMESPACE} process -f openshift/app/performance-dc.yml \
                 -p APP_NAME=${APP} \
                 -p SITE_URL=${APP_HOST} \
+                -p CONFIG_MAP=config-env-perf \
                 -p DB_HOST=mysql-0.mysql \
                 -p PERFORMANCE_MEMORY_LIMIT=4Gi \
                 -p REPLICA_COUNT=2 \
@@ -336,6 +339,7 @@ jobs:
           oc -n ${NAMESPACE} process -f openshift/app/performance-dc.yml \
                 -p APP_NAME=${APP} \
                 -p SITE_URL=${APP_HOST} \
+                -p CONFIG_MAP=config-env-perf-training \
                 -p DB_HOST=mysql-training-0.mysql-training-h \
                 -p PERFORMANCE_MEMORY_LIMIT=4Gi \
                 -p REPLICA_COUNT=1 \
