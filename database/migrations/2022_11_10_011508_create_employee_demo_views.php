@@ -191,6 +191,12 @@ class CreateEmployeeDemoViews extends Migration
      */
     public function up()
     {
+        DB::statement('DROP VIEW IF EXISTS employees_vw');
+        DB::statement('DROP VIEW IF EXISTS employees_by_guid_vw');
+        DB::statement('DROP VIEW IF EXISTS users_vw');
+        DB::statement('DROP VIEW IF EXISTS users_active_by_org_vw');
+        DB::statement('DROP VIEW IF EXISTS users_active_by_dept_vw');
+
         self::createView("employees_vw", self::$employeedemo_sql, "", self::$order_by_guid);
         self::createView("employees_by_guid_vw", self::$employeedemo_sql, "", self::$order_by_guid);
         self::createView("users_vw", self::$users_employeedemo_sql, "", self::$order_by_id);
