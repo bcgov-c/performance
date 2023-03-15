@@ -341,7 +341,7 @@ jobs:
                 -p REPLICA_COUNT=1 \
                 -p PROJECT_NAMESPACE=332842-test \
                 -p DB_SERVICE_NAME=mysql-training-0.mysql-training-h \
-                -p PERFORMANCE_VOLUME_CAPACITY=10Gi \
+                -p PERFORMANCE_VOLUME_CAPACITY=4Gi \
                 -p DB_NAME=performance-db-training \
                 -p DB_USER=root\
                 -p HTTP_PORT=8000 \
