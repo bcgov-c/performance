@@ -35,7 +35,7 @@ jobs:
       BUILD_NAMESPACE: 332842-tools
       BRANCH: ${{ github.ref_name }}
       BUILD_TAG: ${{ github.ref_name }}
-      APP: performance-training
+      APP: performance
     steps:
       # Checkout the PR branch
       - name: Print env
