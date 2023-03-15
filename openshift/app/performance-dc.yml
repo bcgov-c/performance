@@ -176,7 +176,7 @@ objects:
           volumes:
             - name: config-vol
               configMap:
-                name: config-env-perf
+                name: ${CONFIG_MAP}
                 items:
                   - key: .env
                     path: .env
@@ -203,6 +203,10 @@ parameters:
     name: SITE_URL
     required: true
     value: '${SITE_URL}'
+  - description: Config Map name
+    displayName: configMap
+    name: CONFIG_MAP
+    required: true
   - description: Image registry
     displayName: Image Registry
     name: IMAGE_REGISTRY
