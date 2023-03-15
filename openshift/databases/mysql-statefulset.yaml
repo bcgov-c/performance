@@ -7,15 +7,15 @@ spec:
     matchLabels:
       app: performance-mysql-training
   serviceName: mysql-training-h
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
-        app: performance-mysql-training
+        app: erformance-mysql-training
     spec:
       initContainers:
       - name: init-mysql
-        image: aro.jfrog.io/performance-app/mysql:5.7
+        image: aro.jfrog.io/performance-app/mysql:test
         command:
         - bash
         - "-c"
@@ -63,12 +63,33 @@ spec:
           mountPath: /etc/mysql/conf.d
       containers:
       - name: mysql
-        image: aro.jfrog.io/performance-app/mysql:5.7
+        image: aro.jfrog.io/performance-app/mysql:test
         env:
-        - name: MYSQL_ALLOW_EMPTY_PASSWORD
-          value: "1"
-        - name: ALLOW_EMPTY_PASSWORD
-          value: "yes"
+        - name: MYSQL_ROOT_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-training-secret
+              key: MYSQL_ROOT_USER
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-training-secret
+              key: MYSQL_ROOT_PASSWORD
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-training-secret
+              key: MYSQL_PASSWORD  
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-training-secret
+              key: MYSQL_USER
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: mysql-training-secret
+              key: MYSQL_DATABASE   
         ports:
         - name: mysql
           containerPort: 3306
