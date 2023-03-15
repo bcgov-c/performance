@@ -6,6 +6,7 @@ use stdClass;
 use Carbon\Carbon;
 use App\Models\Tag;
 use App\Models\Goal;
+use App\Models\GoalComment;
 use App\Models\User;
 use App\Models\GoalType;
 use App\Models\Conversation;
@@ -1147,7 +1148,7 @@ class SysadminStatisticsReportController extends Controller
         // SQL - Chart 4
         $sql_chart4 = ConversationParticipant::selectRaw("conversations.*, conversation_topics.name as conversation_name, users.employee_id, employee_name, users.email,
                         organization, level1_program, level2_division, level3_branch, level4,
-                        users.next_conversation_date as next_due_date")               
+                        users.next_conversation_date as next_due_date, supervisor.name as supervisor_name, employee.name as employee_name")               
                 //->where(function($query) {
                 //   $query->where(function($query) {
                 //        $query->whereRaw("DATEDIFF ( users.next_conversation_date, curdate() ) > 0 ")
@@ -1177,6 +1178,8 @@ class SysadminStatisticsReportController extends Controller
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
+                ->leftJoin('users as supervisor', 'supervisor.id', '=', 'conversations.supervisor_signoff_id')
+                ->leftJoin('users as employee', 'employee.id', '=', 'conversations.signoff_user_id')        
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                 ->where(function($query) {
@@ -1208,15 +1211,14 @@ class SysadminStatisticsReportController extends Controller
                 //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
                 //           ->where('employee_demo.employee_status', 'A');
                 // })
-                //->with('topic:id,name')
-                //->with('signoff_user:id,name')
-                //->with('signoff_supervisor:id,name'); 
-            
+        Log::warning(print_r($sql_chart4->toSql(),true));
+        Log::warning(print_r($sql_chart4->getBindings(),true));                
+                
                 
         // SQL for Chart 5
          $sql_chart5 = ConversationParticipant::selectRaw("conversations.*, conversation_topics.name as conversation_name, users.employee_id, employee_name, users.email,
                     organization, level1_program, level2_division, level3_branch, level4,
-                    users.next_conversation_date as next_due_date")
+                    users.next_conversation_date as next_due_date, supervisor.name as supervisor_name, employee.name as employee_name")
             ->join('users', 'users.id', 'conversation_participants.participant_id') 
             ->join('conversations','conversations.id','conversation_participants.conversation_id')   
             ->join('conversation_topics','conversations.conversation_topic_id','conversation_topics.id')    
@@ -1224,6 +1226,8 @@ class SysadminStatisticsReportController extends Controller
                 $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
             })
+            ->leftJoin('users as supervisor', 'supervisor.id', '=', 'conversations.supervisor_signoff_id')
+            ->leftJoin('users as employee', 'employee.id', '=', 'conversations.signoff_user_id')   
             // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
             // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
             ->where(function($query) {
@@ -1497,8 +1501,8 @@ class SysadminStatisticsReportController extends Controller
                         }
                         $row['Conversation Participant'] = implode(', ', $participants_arr );
                         $row['Conversation Due Date'] = $conversation->next_due_date;
-                        $row['Employee Sign-Off'] = $conversation->signoff_user  ? $conversation->signoff_user->name : '';
-                        $row['Supervisor Sign-off'] = $conversation->signoff_supervisor ? $conversation->signoff_supervisor->name : '';
+                        $row['Employee Sign-Off'] = $conversation->employee_name;
+                        $row['Supervisor Sign-off'] = $conversation->supervisor_name;
                         $row['Organization'] = $conversation->organization;
                         $row['Level 1'] = $conversation->level1_program;
                         $row['Level 2'] = $conversation->level2_division;
@@ -1573,8 +1577,8 @@ class SysadminStatisticsReportController extends Controller
                             }
                             $row['Conversation Participant'] = implode(', ', $participants_arr );
                             $row['Conversation Due Date'] = $conversation->next_due_date;
-                            $row['Employee Sign-Off'] = $conversation->signoff_user  ? $conversation->signoff_user->name : '';
-                            $row['Supervisor Sign-off'] = $conversation->signoff_supervisor ? $conversation->signoff_supervisor->name : '';
+                            $row['Employee Sign-Off'] = $conversation->employee_name;
+                            $row['Supervisor Sign-off'] = $conversation->supervisor_name;
                             $row['Organization'] = $conversation->organization;
                             $row['Level 1'] = $conversation->level1_program;
                             $row['Level 2'] = $conversation->level2_division;
@@ -2121,5 +2125,6 @@ class SysadminStatisticsReportController extends Controller
         }
 
     }
+    
     
 }
