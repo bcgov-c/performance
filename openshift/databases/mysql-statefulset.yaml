@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: mysql
+  name: mysql-training
 spec:
   selector:
     matchLabels:
-      app: performance-mysql
-  serviceName: mysqlh
+      app: performance-mysql-training
+  serviceName: mysql-training-h
   replicas: 2
   template:
     metadata:
       labels:
-        app: performance-mysql
+        app: performance-mysql-training
     spec:
       initContainers:
       - name: init-mysql
@@ -163,7 +163,7 @@ spec:
         emptyDir: {}
       - name: config-map
         configMap:
-          name: mysql
+          name: mysql-training
   volumeClaimTemplates:
   - metadata:
       name: data
