@@ -783,7 +783,9 @@ class StatisticsReportController extends Controller
                             ->whereIn('admin_org_users.access_type', [0,2,3])
                             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 });
-
+        Log::warning('Chart 1');
+        Log::warning(print_r($sql_2->toSql(),true));
+        Log::warning(print_r($sql_2->getBindings(),true)); 
         $next_due_users = $sql_2->get();
         $data = array();
 
@@ -1585,7 +1587,7 @@ class StatisticsReportController extends Controller
         // SQL - Chart 4
         $sql_chart4 = ConversationParticipant::selectRaw("conversations.*, conversation_topics.name as conversation_name, users.employee_id, employee_demo.employee_name, users.email,
                         employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
-                        users.next_conversation_date as next_due_date, supervisor.name as supervisor_name, employee.name as employee_name")
+                        users.next_conversation_date as next_due_date, supervisor.name as sign_supervisor_name, employee.name as sign_employee_name")
                 //->where(function($query) {
                 //    $query->where(function($query) {
                 //        $query->whereRaw("DATEDIFF ( users.next_conversation_date, curdate() ) > 0 ")
@@ -1647,7 +1649,7 @@ class StatisticsReportController extends Controller
         // SQL for Chart 5
          $sql_chart5 = ConversationParticipant::selectRaw("conversations.*, conversation_topics.name as conversation_name, users.employee_id, employee_demo.employee_name, users.email,
                     employee_demo.organization, employee_demo.level1_program, employee_demo.level2_division, employee_demo.level3_branch, employee_demo.level4,
-                    users.next_conversation_date as next_due_date, supervisor.name as supervisor_name, employee.name as employee_name")
+                    users.next_conversation_date as next_due_date, supervisor.name as sign_supervisor_name, employee.name as sign_employee_name")
             ->join('users', 'users.id', 'conversation_participants.participant_id') 
             ->join('conversations','conversations.id','conversation_participants.conversation_id')
             ->join('conversation_topics','conversations.conversation_topic_id','conversation_topics.id')         
@@ -1919,8 +1921,8 @@ class StatisticsReportController extends Controller
                         }
                         $row['Conversation Participant'] = implode(', ', $participants_arr );
                         $row['Conversation Due Date'] = $conversation->next_due_date;
-                        $row['Employee Sign-Off'] = $conversation->employee_name;
-                        $row['Supervisor Sign-off'] = $conversation->supervisor_name;
+                        $row['Employee Sign-Off'] = $conversation->sign_employee_name;
+                        $row['Supervisor Sign-off'] = $conversation->sign_supervisor_name;
                         $row['Organization'] = $conversation->organization;
                         $row['Level 1'] = $conversation->level1_program;
                         $row['Level 2'] = $conversation->level2_division;
@@ -1995,8 +1997,8 @@ class StatisticsReportController extends Controller
                             }
                             $row['Conversation Participant'] = implode(', ', $participants_arr );
                             $row['Conversation Due Date'] = $conversation->next_due_date;
-                            $row['Employee Sign-Off'] = $conversation->employee_name;
-                            $row['Supervisor Sign-off'] = $conversation->supervisor_name;
+                            $row['Employee Sign-Off'] = $conversation->sign_employee_name;
+                            $row['Supervisor Sign-off'] = $conversation->sign_supervisor_name;
                             $row['Organization'] = $conversation->organization;
                             $row['Level 1'] = $conversation->level1_program;
                             $row['Level 2'] = $conversation->level2_division;
