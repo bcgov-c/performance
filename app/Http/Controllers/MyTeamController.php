@@ -216,7 +216,7 @@ class MyTeamController extends Controller
                            ->count();                 
             if($get_direct > 0){
                 $skip_sharing = true;   
-                $error_msg = 'The employee has already been shared with that supervisor. They cannot be shared with the same supervisor more than once.';
+                $error_msg = 'The employee already reports directly to that supervisor. Employees cannot be shared with their direct supervisor.';
             }    
             //not allow exsiting shared team members be shared to the same 
             $get_shared = sharedProfile::select('id')
@@ -225,7 +225,7 @@ class MyTeamController extends Controller
                            ->count(); 
             if($get_shared > 0){
                 $skip_sharing = true;  
-                $error_msg = 'The employee already reports directly to that supervisor. Employees cannot be shared with their direct supervisor.';
+                $error_msg = 'The employee has already been shared with that supervisor. They cannot be shared with the same supervisor more than once.';
             }      
         }
         
