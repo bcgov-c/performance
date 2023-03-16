@@ -104,6 +104,9 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
     Route::get('/sysadmin/statistics/org-divisions', [SysadminStatisticsReportController::class,'getDivisions']);
     Route::get('/sysadmin/statistics/org-branches', [SysadminStatisticsReportController::class,'getBranches']);
     Route::get('/sysadmin/statistics/org-level4', [SysadminStatisticsReportController::class,'getLevel4']);
+    
+    Route::get('/sysadmin/statistics/filereports', [SysadminStatisticsReportController::class, 'filereports'])->name('sysadmin.statistics.filereports');
+    Route::get('/sysadmin/statistics/filereports-export', [SysadminStatisticsReportController::class, 'filereportsExport'])->name('sysadmin.statistics.filereports.export');
 
     //Goal Bank
     Route::group(['middleware' => ['auth']], function() {    
