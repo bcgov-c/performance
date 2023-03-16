@@ -110,8 +110,6 @@ class SyncUserProfile extends Command
     private function SyncUserProfile($last_sync_at, $new_sync_at, $audit_id, &$exceptions) 
     {
 
-        // $new_sync_at = Carbon::now();
-        // $last_sync_at = User::max('last_sync_at'); 
         $last_sync_at = '1990-01-01';       // always do the full set
 
         $employees = EmployeeDemo::whereNotIn('guid', ['', ' '])
@@ -121,10 +119,6 @@ class SyncUserProfile extends Command
                 $query->whereNull('date_updated');
                 $query->orWhere('date_updated', '>=', $last_sync_at );
             })
-            //->whereNotNull('date_updated')
-            //->where('date_updated', '>=', $last_sync_at )
-            //->whereIn('employee_id',['105823', '060061', '107653',
-            //'115637','131116','139238','145894','146113','152843','152921','163102'] )
             ->orderBy('employee_id')
             ->orderBy('job_indicator', 'desc')
             ->orderBy('empl_record')
@@ -137,15 +131,15 @@ class SyncUserProfile extends Command
         $this->info( now() );
         $this->info('Step 1 - Create and Update User Profile (but no update on reporting to)' );
 
-
         $password = Hash::make(env('SYNC_USER_PROFILE_SECRET'));
         foreach ($employees as $employee) {
 
-          //$reporting_to = $this->getReportingUserId($employee);
-          $reporting_to = null;
+            $reporting_to = null;
 
-          // Check the user by GUID 
-          $user = User::where('guid', $employee->guid)->first();
+            // Check the user by GUID 
+            $user = User::where('employee_id', $employee->employee_id)
+            ->orderBy('id', 'desc')
+            ->first();
 
             if ($user) {
 
@@ -307,45 +301,8 @@ class SyncUserProfile extends Command
                     } 
                 }
 
-                if (!$user->hasRole('Supervisor')) {
-                    $this->assignSupervisorRole( $user );
-                }
-
-
-          } else {
-
-              $user = User::where('email', $employee->employee_email)->first()  ;
- 
-              if ($user) {
-                    if (!($user->guid == $employee->guid))  {
-                        $this->info(' *SKIP*: Same email but difference guid | ' . $user->email . ' -> ' . $user->guid . ' - demo ' .
-                                    $employee->guid );
-                    }
-
-              } else {
-
-                    $user = User::create([
-                        'guid' => $employee->guid,
-                        'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name,
-                        'email' => $employee->employee_email,
-                        //'reporting_to' => $reporting_to,
-                        'employee_id' => $employee->employee_id,
-                        'empl_record' => $employee->empl_record,
-                        'joining_date' => $employee->position_start_date,
-                        'password' => $password,
-                        'acctlock' => $employee->date_deleted ? true : false,
-                        'last_sync_at' => $new_sync_at,
-                    ]);
-
-
-                    $user->assignRole('Employee');
-
-                    // Grant 'Supervisor' Role based on ODS demo database
-                    $this->assignSupervisorRole( $user );
-
-
-              }
-          }
+            //   }
+            }
         
         }
 
@@ -370,9 +327,6 @@ class SyncUserProfile extends Command
 
                         // Update Reporting Tos
                         if ($reporting_to) {
-                            // $user->reportingTos()->updateOrCreate([
-                            //     'reporting_to_id' => $reporting_to,
-                            // ]);
                             UserReportingTo::updateOrCreate(
                                 [
                                     'user_id' => $user->id
@@ -383,7 +337,6 @@ class SyncUserProfile extends Command
                             );
                         }
                     }
-
                 }
             } else {
                 $exceptions .= json_encode([ 
@@ -446,17 +399,6 @@ class SyncUserProfile extends Command
                 $text = 'Supervisor Not found - ' . $employee->supervisor_emplid . ' | employee - ' . $employee->employee_id; 
                 $this->info( 'Step 2: ' . $text );
                 
-/*
-                $reportingToUser = User::create([
-                    'name' => $supervisor->employee_first_name . ' ' . $supervisor->employee_last_name,
-                    'email' => (trim($supervisor->employee_email)) ? $supervisor->employee_email : $supervisor->employee_id,
-                    'guid' => $supervisor->guid,
-                    'joining_date' => $supervisor->position_start_date,
-                    'password' => Hash::make('mywatchdog'),
-                ]);
-
-                return $reportingToUser->id;
-*/
             }
         }
 
@@ -472,7 +414,6 @@ class SyncUserProfile extends Command
         $isManager = false;
         $hasSharedProfile = false;
 
-        // To determine the login user whether is manager or not 
         // To determine the login user whether is manager or not 
         $mgr = User::where('reporting_to', $user->id)->first();
         $isManager = $mgr ? true : false;
