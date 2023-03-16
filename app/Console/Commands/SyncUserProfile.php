@@ -51,7 +51,7 @@ class SyncUserProfile extends Command
 
         $switch = strtolower(env('PRCS_SYNC_USER_PROFILES'));
         $manualoverride = (strtolower($this->option('manual')) ? true : false);
-        $exceptions = '';
+        $exceptions = ''; 
 
         if ($switch == 'on' || $manualoverride) {
 
@@ -77,20 +77,20 @@ class SyncUserProfile extends Command
             $this->SyncUserProfile($last_cutoff_time, $cutoff_time, $audit_id, $exceptions);
 
             $end_time = Carbon::now();
-            $result = JobSchedAudit::updateOrCreate(
-                [
-                    'id' => $audit_id
-                ]
-                ,
-                [
-                    'job_name' => $this->signature,
-                    'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
-                    'end_time' => date('Y-m-d H:i:s', strtotime($end_time)),
-                    'cutoff_time' => date('Y-m-d H:i:s', strtotime($cutoff_time)),
-                    'status' => 'Completed',
-                    'details' => $exceptions
-                ]
-            );
+            $result = JobSchedAudit::updateOrCreate( 
+                [ 
+                    'id' => $audit_id 
+                ] 
+                , 
+                [ 
+                    'job_name' => $this->signature, 
+                    'start_time' => date('Y-m-d H:i:s', strtotime($start_time)), 
+                    'end_time' => date('Y-m-d H:i:s', strtotime($end_time)), 
+                    'cutoff_time' => date('Y-m-d H:i:s', strtotime($cutoff_time)), 
+                    'status' => 'Completed', 
+                    'details' => $exceptions 
+                ] 
+            ); 
 
         } else {
             $start_time = Carbon::now()->format('c');
@@ -107,7 +107,7 @@ class SyncUserProfile extends Command
         return 0;
     }
 
-    private function SyncUserProfile($last_sync_at, $new_sync_at, $audit_id, &$exceptions)
+    private function SyncUserProfile($last_sync_at, $new_sync_at, $audit_id, &$exceptions) 
     {
 
         $last_sync_at = '1990-01-01';       // always do the full set
@@ -144,18 +144,18 @@ class SyncUserProfile extends Command
             if ($user) {
 
                 $dup_email = User::where('email', $employee->employee_email)
-                ->select('id')
+                ->select('id') 
                 ->where('id', '!=', $user->id)
                 ->first();
 
                 if ($dup_email) {
-                    $exceptions .= json_encode([
+                    $exceptions .= json_encode([ 
                         'employee_id' => $employee->employee_id,
                         'empl_record' => $employee->empl_record,
                         'employee_email' => $employee->employee_email,
-                        'exception' => 'Email address already in use by UID '.$dup_email->id.'.'
-                    ]);
-                    $this->info( 'Step 1: Email address already in use by UID '.$dup_email->id.'.' );
+                        'exception' => 'Email address already in use by UID '.$dup_email->id.'.' 
+                    ]); 
+                    $this->info( 'Step 1: Email address already in use by UID '.$dup_email->id.'.' ); 
                 } else {
 
                     DB::beginTransaction();
@@ -167,7 +167,7 @@ class SyncUserProfile extends Command
                             'name' => $user->name, 
                             'email' => $user->email, 
                             'empl_record' => $user->empl_record, 
-                            'joining_date' => date('Y-m-d',strtotime($user->joining_date)), 
+                            'joining_date' => date('Y-m-d',strtotime($user->joining_date)),  
                             'acctlock' => $user->acctlock, 
                             'last_sync_at' => $user->last_sync_at
                         ];
@@ -178,37 +178,37 @@ class SyncUserProfile extends Command
                             'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name, 
                             'email' => $employee->employee_email, 
                             'empl_record' => $employee->empl_record, 
-                            'joining_date' => date('Y-m-d',strtotime($employee->position_start_date)), 
-                            'acctlock' => $employee->date_deleted ? 1 : 0, 
-                            'last_sync_at' => $user->last_sync_at
-                        ];
-
-                        if ($old_values != $new_values) {
-                            $user->name = $employee->employee_first_name . ' ' . $employee->employee_last_name;
-                            $user->email = $employee->employee_email;
-                            $user->employee_id = $employee->employee_id;
-                            $user->empl_record = $employee->empl_record;
-                            $user->joining_date = date('Y-m-d',strtotime($employee->position_start_date));
-                            $user->acctlock = $employee->date_deleted ? 1 : 0;
-                            $user->last_sync_at = $new_sync_at;
-                            $user->save();
-                            $new_values = [ 
-                                'table' => 'users',                        
-                                'id' => $user->id, 
-                                'employee_id' => $employee->employee_id, 
-                                'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name, 
-                                'email' => $employee->employee_email, 
-                                'empl_record' => $employee->empl_record, 
-                                'joining_date' => date('Y-m-d',strtotime($employee->position_start_date)), 
-                                'acctlock' => $employee->date_deleted ? 1 : 0, 
-                                'last_sync_at' => $new_sync_at
-                            ];
-                            $audit = new JobDataAudit;
-                            $audit->job_sched_id = $audit_id;
-                            $audit->old_values = json_encode($old_values);
-                            $audit->new_values = json_encode($new_values);
-                            $audit->save();
-                        }
+                            'joining_date' => date('Y-m-d',strtotime($employee->position_start_date)),  
+                            'acctlock' => $employee->date_deleted ? 1 : 0,  
+                            'last_sync_at' => $user->last_sync_at 
+                        ]; 
+ 
+                        if ($old_values != $new_values) { 
+                            $user->name = $employee->employee_first_name . ' ' . $employee->employee_last_name; 
+                            $user->email = $employee->employee_email; 
+                            $user->employee_id = $employee->employee_id; 
+                            $user->empl_record = $employee->empl_record; 
+                            $user->joining_date = date('Y-m-d',strtotime($employee->position_start_date)); 
+                            $user->acctlock = $employee->date_deleted ? 1 : 0;  
+                            $user->last_sync_at = $new_sync_at; 
+                            $user->save(); 
+                            $new_values = [  
+                                'table' => 'users',                         
+                                'id' => $user->id,  
+                                'employee_id' => $employee->employee_id,  
+                                'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name,  
+                                'email' => $employee->employee_email,  
+                                'empl_record' => $employee->empl_record,  
+                                'joining_date' => date('Y-m-d',strtotime($employee->position_start_date)),  
+                                'acctlock' => $employee->date_deleted ? 1 : 0,  
+                                'last_sync_at' => $new_sync_at 
+                            ]; 
+                            $audit = new JobDataAudit; 
+                            $audit->job_sched_id = $audit_id; 
+                            $audit->old_values = json_encode($old_values); 
+                            $audit->new_values = json_encode($new_values); 
+                            $audit->save(); 
+                        } 
 
                         // Grant employee Role
                         if (!$user->hasRole('Employee')) {
@@ -219,15 +219,15 @@ class SyncUserProfile extends Command
                             $this->assignSupervisorRole( $user );
                         }
                         DB::commit();
-                    } catch (Exception $e) {
-                        $exceptions .= json_encode([
-                            'employee_id' => $employee->employee_id,
-                            'empl_record' => $employee->empl_record,
-                            'employee_email' => $employee->employee_email,
-                            'exception' => 'Unable to update user profile for EID # '.$employee->employee_id.'.'
-                        ]);
-                        $this->info( 'Step 1: Unable to update user profile for EID # '.$employee->employee_id.'.' );
-                        DB::rollback();
+                    } catch (Exception $e) { 
+                        $exceptions .= json_encode([ 
+                            'employee_id' => $employee->employee_id, 
+                            'empl_record' => $employee->empl_record, 
+                            'employee_email' => $employee->employee_email, 
+                            'exception' => 'Unable to update user profile for EID # '.$employee->employee_id.'.' 
+                        ]); 
+                        $this->info( 'Step 1: Unable to update user profile for EID # '.$employee->employee_id.'.' ); 
+                        DB::rollback(); 
                     }
 
                 }
@@ -235,18 +235,18 @@ class SyncUserProfile extends Command
             } else {
 
                 $dup_email = User::where('email', $employee->employee_email)
-                ->select('employee_id')
+                ->select('employee_id') 
                 ->where('employee_id', '!=', $employee->employee_id)
                 ->first();
 
                 if ($dup_email) {
-                    $exceptions .= json_encode([
+                    $exceptions .= json_encode([ 
                         'employee_id' => $employee->employee_id,
                         'empl_record' => $employee->empl_record,
                         'employee_email' => $employee->employee_email,
-                        'exception' => 'Email address already in use by EID '.$dup_email->employee_id.'.'
-                    ]);
-                    $this->info( 'Step 1: Email address already in use by EID '.$dup_email->employee_id.'.' );
+                        'exception' => 'Email address already in use by EID '.$dup_email->employee_id.'.' 
+                    ]); 
+                    $this->info( 'Step 1: Email address already in use by EID '.$dup_email->employee_id.'.' ); 
                 } else {
 
                     DB::beginTransaction();
@@ -288,17 +288,17 @@ class SyncUserProfile extends Command
                         // Grant 'Supervisor' Role based on ODS demo database
                         $this->assignSupervisorRole( $user );
 
-                        DB::commit();
-                    } catch (Exception $e) {
-                        $exceptions .= json_encode([
-                            'employee_id' => $employee->employee_id,
-                            'empl_record' => $employee->empl_record,
-                            'employee_email' => $employee->employee_email,
-                            'exception' => 'Unable to update user profile for EID # '.$employee->employee_id.'.'
-                        ]);
-                        $this->info( 'Step 1: Unable to create user profile for EID # '.$employee->employee_id.'.' );
-                        DB::rollback();
-                    }
+                        DB::commit(); 
+                    } catch (Exception $e) { 
+                        $exceptions .= json_encode([ 
+                            'employee_id' => $employee->employee_id, 
+                            'empl_record' => $employee->empl_record, 
+                            'employee_email' => $employee->employee_email, 
+                            'exception' => 'Unable to update user profile for EID # '.$employee->employee_id.'.' 
+                        ]); 
+                        $this->info( 'Step 1: Unable to create user profile for EID # '.$employee->employee_id.'.' ); 
+                        DB::rollback(); 
+                    } 
                 }
 
             //   }
@@ -312,9 +312,9 @@ class SyncUserProfile extends Command
 
         foreach ($employees as $employee) {
 
-            $reporting_to = $this->getReportingUserId($employee, $exceptions);  
+            $reporting_to = $this->getReportingUserId($employee, $exceptions);   
             
-            $user = User::where('employee_id', $employee->employee_id)->first();
+            $user = User::where('employee_id', $employee->employee_id)->first(); 
 
             if ($user) {
 
@@ -339,14 +339,14 @@ class SyncUserProfile extends Command
                     }
                 }
             } else {
-                $exceptions .= json_encode([
-                    'employee_id' => $employee->employee_id,
-                    'empl_record' => $employee->empl_record,
-                    'employee_email' => $employee->employee_email,
-                    'exception' => 'User not found by employee id, EID # '.$employee->employee_id.'.'
-                ]);
-                $this->info('Step 2: User ' . $employee->employee_email . ' - ' . 
-                            $employee->employee_id . ' not found by employee id.');
+                $exceptions .= json_encode([ 
+                    'employee_id' => $employee->employee_id, 
+                    'empl_record' => $employee->empl_record,  
+                    'employee_email' => $employee->employee_email, 
+                    'exception' => 'User not found by employee id, EID # '.$employee->employee_id.'.' 
+                ]); 
+                $this->info('Step 2: User ' . $employee->employee_email . ' - ' .  
+                            $employee->employee_id . ' not found by employee id.'); 
             }
           
         }
@@ -372,12 +372,12 @@ class SyncUserProfile extends Command
         //                                         'Social Development and Poverty Reduction']);
         // })->update(['acctlock'=>true, 'last_sync_at' => $new_sync_at]);
 
-        $this->info( now() );        
-
-        return null;
+        $this->info( now() );         
+ 
+        return null; 
     }
 
-    private function getReportingUserId($employee, &$exceptions)
+    private function getReportingUserId($employee, &$exceptions) 
     {
 
         $supervisor = EmployeeDemo::where('employee_id', $employee->supervisor_emplid)
@@ -390,14 +390,13 @@ class SyncUserProfile extends Command
             if ($user) {
                 return $user->id;
             } else {
-                $exceptions .= json_encode([
-                    'employee_id' => $employee->employee_id,
-                    'empl_record' => $employee->empl_record,
-                    'employee_email' => $employee->employee_email,
-                    'exception' => 'Supervisor not SEID # '.$employee->supervisor_emplid.' for employee '.$employee->employee_id.'.'
-                ]);
-                $text = 'Supervisor Not found - ' . $employee->supervisor_emplid . ' | employee - ' .
-                    $employee->employee_id;
+                $exceptions .= json_encode([ 
+                    'employee_id' => $employee->employee_id, 
+                    'empl_record' => $employee->empl_record, 
+                    'employee_email' => $employee->employee_email, 
+                    'exception' => 'Supervisor not SEID # '.$employee->supervisor_emplid.' for employee '.$employee->employee_id.'.' 
+                ]); 
+                $text = 'Supervisor Not found - ' . $employee->supervisor_emplid . ' | employee - ' . $employee->employee_id; 
                 $this->info( 'Step 2: ' . $text );
                 
             }
@@ -433,8 +432,8 @@ class SyncUserProfile extends Command
                 $user->assignRole($role);
             }
         }
-
-        return null;
+ 
+        return null; 
     }
 
 }
