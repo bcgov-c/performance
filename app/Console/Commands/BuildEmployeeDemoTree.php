@@ -73,6 +73,17 @@ class BuildEmployeeDemoTree extends Command
                 $allDepts = OrganizationHierarchy::distinct()
                 ->select("odoh.*")
                 ->selectRaw("(SELECT COUNT(e.employee_id) FROM employee_demo AS e WHERE e.deptid = odoh.deptid AND e.date_deleted IS NULL) AS headcount")
+                ->selectRaw("
+                    CASE
+                        WHEN odoh.ulevel = 0 then (select count(e0.employee_id) from ods_dept_org_hierarchy AS h0, employee_demo AS e0 WHERE e0.deptid = h0.deptid AND odoh.okey = h0.organization_key AND e0.date_deleted is null)
+                        WHEN odoh.ulevel = 1 then (select count(e1.employee_id) from ods_dept_org_hierarchy AS h1, employee_demo AS e1 WHERE e1.deptid = h1.deptid AND odoh.okey = h1.level1_key AND e1.date_deleted is null)
+                        WHEN odoh.ulevel = 2 then (select count(e2.employee_id) from ods_dept_org_hierarchy AS h2, employee_demo AS e2 WHERE e2.deptid = h2.deptid AND odoh.okey = h2.level2_key AND e2.date_deleted is null)
+                        WHEN odoh.ulevel = 3 then (select count(e3.employee_id) from ods_dept_org_hierarchy AS h3, employee_demo AS e3 WHERE e3.deptid = h3.deptid AND odoh.okey = h3.level3_key AND e3.date_deleted is null)
+                        WHEN odoh.ulevel = 4 then (select count(e4.employee_id) from ods_dept_org_hierarchy AS h4, employee_demo AS e4 WHERE e4.deptid = h4.deptid AND odoh.okey = h4.level4_key AND e4.date_deleted is null)
+                        WHEN odoh.ulevel = 5 then (select count(e5.employee_id) from ods_dept_org_hierarchy AS h5, employee_demo AS e5 WHERE e5.deptid = h5.deptid AND odoh.okey = h5.level5_key AND e5.date_deleted is null)
+                        ELSE 0
+                    END AS groupcount
+                ")
                 ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM employee_demo AS d WHERE d.deptid = ods_dept_org_hierarchy.deptid)")
                 ->orderBy("odoh.name")
                 ->orderBy("odoh.okey");
@@ -95,11 +106,6 @@ class BuildEmployeeDemoTree extends Command
                 $allDepts = $allDepts->get();
                 foreach ($allDepts AS $dept) {
                     $node = EmployeeDemoTree::where('id', $dept->okey)->first();
-                    $groupcount = EmployeeDemo::from('employee_demo AS egc1')
-                        ->join('ods_dept_org_hierarchy AS ogc1', 'egc1.deptid', 'ogc1.deptid')
-                        ->whereNull('egc1.date_deleted')
-                        ->whereRaw("ogc1.{$field} = {$dept->okey}")
-                        ->count();
                     if (!$node) {
                         $node = new EmployeeDemoTree([
                             'id' => $dept->okey,
@@ -108,7 +114,7 @@ class BuildEmployeeDemoTree extends Command
                             'status' => 1,
                             'level' => $dept->ulevel,
                             'headcount' => $dept->headcount,
-                            'groupcount' => $groupcount,
+                            'groupcount' => $dept->groupcount,
                             'organization' =>  $dept->organization_label,
                             'level1_program' =>  $dept->level1_label,
                             'level2_division' =>  $dept->level2_label,
@@ -161,7 +167,7 @@ class BuildEmployeeDemoTree extends Command
                         $node->name = $dept->name;
                         $node->deptid = $dept->deptid;
                         $node->headcount = $dept->headcount;
-                        $node->groupcount = $groupcount;
+                        $node->groupcount = $dept->groupcount;
                         $node->organization = $dept->organization_label;
                         $node->level1_program = $dept->level1_label;
                         $node->level2_division = $dept->level2_label;
