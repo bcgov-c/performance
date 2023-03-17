@@ -775,6 +775,7 @@ class StatisticsReportController extends Controller
                 //     } );
                 // })
                 // ->where('admin_orgs.user_id', '=', Auth::id());
+                ->whereNull('employee_demo.date_deleted')
                 ->where('users.excused_flag', '<>', '1')
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
@@ -851,6 +852,7 @@ class StatisticsReportController extends Controller
             //         ->whereDate('unlock_until', '>=', Carbon::today() );
             });
         })
+        ->whereNull('employee_demo.date_deleted')
         ->whereNull('conversations.deleted_at')
         // ->whereRaw("DATEDIFF (
         //             COALESCE (
@@ -981,6 +983,7 @@ class StatisticsReportController extends Controller
             //           ->whereDate('unlock_until', '<', Carbon::today() );
             });
         })
+        ->whereNull('employee_demo.date_deleted')
         ->whereNull('conversations.deleted_at')   
         // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
         // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
@@ -1114,6 +1117,7 @@ class StatisticsReportController extends Controller
                     ->orWhereNull('supervisor_signoff_id');
             });
         })
+        ->whereNull('employee_demo.date_deleted')
         ->whereNull('conversations.deleted_at')
         //->where(function($query) {
         //            $query->where(function($query) {
@@ -1197,6 +1201,7 @@ class StatisticsReportController extends Controller
             });
         })
         ->whereNull('conversations.deleted_at')   
+        ->whereNull('employee_demo.date_deleted')
         // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
         // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
         ->where(function($query) {
@@ -1348,6 +1353,7 @@ class StatisticsReportController extends Controller
                 // })
                 // ->where('admin_orgs.user_id', '=', Auth::id());
                 ->where('users.excused_flag', '<>', '1')
+                ->whereNull('employee_demo.date_deleted')        
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('admin_org_users')
@@ -1474,6 +1480,7 @@ class StatisticsReportController extends Controller
                             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 })
                 ->where('conversation_participants.role','<>','mgr')
+                ->whereNull('employee_demo.date_deleted')        
                 ->with('topic:id,name')
                 ->with('signoff_user:id,name')
                 ->with('signoff_supervisor:id,name');
@@ -1530,7 +1537,8 @@ class StatisticsReportController extends Controller
                 //           ->whereDate('unlock_until', '<', Carbon::today() );
                 });
             })
-            ->whereNull('deleted_at')              
+            ->whereNull('deleted_at')   
+            ->whereNull('employee_demo.date_deleted')        
             ->when( $request->topic_id, function($q) use($request) {
                 $q->where('conversations.conversation_topic_id', $request->topic_id);
             })
@@ -1617,6 +1625,7 @@ class StatisticsReportController extends Controller
                 })
 
                 ->where('conversation_participants.role','emp')
+                ->whereNull('employee_demo.date_deleted')        
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
                 })
@@ -1665,6 +1674,7 @@ class StatisticsReportController extends Controller
                     });
                 }) 
             ->where('conversation_participants.role','emp')       
+            ->whereNull('employee_demo.date_deleted')            
             ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                 return $q->where('employee_demo.organization', $level0->name);
             })

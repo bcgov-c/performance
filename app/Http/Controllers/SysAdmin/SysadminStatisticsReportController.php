@@ -574,7 +574,8 @@ class SysadminStatisticsReportController extends Controller
                 ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.level4', $level4->name);
                 })
-                ->where('users.excused_flag', '<>', '1');
+                ->where('users.excused_flag', '<>', '1')
+                ->whereNull('employee_demo.date_deleted');
                 // ->where( function($query) {
                 //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
                 //           ->where('employee_demo.employee_status', 'A');
@@ -650,6 +651,7 @@ class SysadminStatisticsReportController extends Controller
             });
         })
         ->where('conversation_participants.role','<>','mgr')
+        ->whereNull('employee_demo.date_deleted')        
         ->whereNull('conversations.deleted_at');
         // ->whereRaw("DATEDIFF (
         //             COALESCE (
@@ -769,6 +771,7 @@ class SysadminStatisticsReportController extends Controller
         //           ->where('employee_demo.employee_status', 'A');
         // })
         ->where('conversation_participants.role','<>','mgr')
+        ->whereNull('employee_demo.date_deleted')        
         ->get();
         
         $total_unique_emp = 0;
@@ -830,6 +833,7 @@ class SysadminStatisticsReportController extends Controller
                     ->orWhereNull('supervisor_signoff_id');
             });
         })
+        ->whereNull('employee_demo.date_deleted')
         ->whereNull('conversations.deleted_at');
         //->where(function($query) {
         //            $query->where(function($query) {
@@ -931,6 +935,7 @@ class SysadminStatisticsReportController extends Controller
         ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.level4', $level4->name);
         })
+        ->whereNull('employee_demo.date_deleted')
         // ->where( function($query) {
         //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
         //           ->where('employee_demo.employee_status', 'A');
@@ -1009,6 +1014,7 @@ class SysadminStatisticsReportController extends Controller
                 ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.level4', $level4->name);
                 })
+                ->whereNull('employee_demo.date_deleted')
                 ->where('users.excused_flag', '<>', '1');
                 // ->where( function($query) {
                 //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
@@ -1081,6 +1087,7 @@ class SysadminStatisticsReportController extends Controller
                 //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
                 //           ->where('employee_demo.employee_status', 'A');
                 // })
+                ->whereNull('employee_demo.date_deleted')        
                 ->with('topic:id,name')
                 ->with('signoff_user:id,name')
                 ->with('signoff_supervisor:id,name');
@@ -1144,6 +1151,7 @@ class SysadminStatisticsReportController extends Controller
             //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01") ')
             //           ->where('employee_demo.employee_status', 'A');
             // })
+            ->whereNull('employee_demo.date_deleted')
             ->where('conversation_participants.role','<>','mgr')
             ->with('topic:id,name')
             ->with('signoff_user:id,name')
@@ -1194,6 +1202,7 @@ class SysadminStatisticsReportController extends Controller
                     });
                 })
                 ->where('conversation_participants.role','emp')        
+                ->whereNull('employee_demo.date_deleted')        
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
                 })
@@ -1273,6 +1282,7 @@ class SysadminStatisticsReportController extends Controller
                 });
             })
             ->whereNull('deleted_at')  
+            ->whereNull('employee_demo.date_deleted')        
             ->when( $request->topic_id, function($q) use($request) {
                 $q->where('conversations.conversation_topic_id', $request->topic_id);
             })
