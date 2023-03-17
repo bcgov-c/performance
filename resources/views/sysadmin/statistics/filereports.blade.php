@@ -85,7 +85,7 @@
                 </div>
                 <span class="float-left" style="margin-top:10px;">
                     <button type="submit" class="btn btn-primary" name="btn_search" value="btn_search"> <i class="fas fa-search"></i> Search</button>
-                    <button type="button" class="btn btn-primary bulk-output"> <i class="fas fa-file-pdf"></i> Bulk Download</button>
+                    <!----<button type="button" class="btn btn-primary bulk-output"> <i class="fas fa-file-pdf"></i> Bulk Download</button>---->
                 </span>
 	</form>
     </div>
