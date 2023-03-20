@@ -1751,7 +1751,7 @@ class StatisticsReportController extends Controller
                             }
                         }
 
-                        $row['Employee ID'] = $user->employee_id;
+                        $row['Employee ID'] = "[".$user->employee_id."]";
                         $row['Name'] = $user->employee_name;
                         $row['Email'] = $user->email;
                         $row['Next Conversation Due'] = $user->next_due_date;
@@ -1799,7 +1799,7 @@ class StatisticsReportController extends Controller
                     fputcsv($file, $columns);
         
                     foreach ($conversations as $conversation) {
-                        $row['Employee ID'] = $conversation->employee_id;
+                        $row['Employee ID'] = "[".$conversation->employee_id."]";
                         $row['Name'] = $conversation->employee_name;
                         $row['Email'] = $conversation->user->email;
                         $row['Conversation Due Date'] = $conversation->next_due_date;
@@ -1856,7 +1856,7 @@ class StatisticsReportController extends Controller
                     fputcsv($file, $columns);
         
                     foreach ($conversations as $conversation) {
-                        $row['Employee ID'] = $conversation->employee_id;
+                        $row['Employee ID'] = "[".$conversation->employee_id."]";
                         $row['Name'] = $conversation->employee_name;
                         $row['Email'] = $conversation->user->email;
                         $row['Conversation Due Date'] = $conversation->next_due_date;
@@ -1916,7 +1916,7 @@ class StatisticsReportController extends Controller
                     fputcsv($file, $columns);
                     
                     foreach ($conversations_unique as $conversation) {
-                        $row['Employee ID'] = $conversation->employee_id;
+                        $row['Employee ID'] = "[".$conversation->employee_id."]";
                         $row['Name'] = $conversation->employee_name;
                         $row['Email'] = $conversation->email;
                         $row['Conversation Name'] = $conversation->conversation_name;    
@@ -1992,7 +1992,7 @@ class StatisticsReportController extends Controller
                     fputcsv($file, $columns);
                     
                     foreach ($conversations_unique as $conversation) {
-                            $row['Employee ID'] = $conversation->employee_id;
+                            $row['Employee ID'] = "[".$conversation->employee_id."]";
                             $row['Name'] = $conversation->employee_name;
                             $row['Email'] = $conversation->email;
                             $row['Conversation Name'] = $conversation->conversation_name;
