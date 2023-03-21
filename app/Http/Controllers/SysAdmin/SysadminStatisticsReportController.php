@@ -2240,6 +2240,7 @@ class SysadminStatisticsReportController extends Controller
                                                         });
                                                     })
                                                   ->whereNull('conversations.deleted_at')
+                                                  ->where('conversation_participants.role', '=', 'emp')          
                                                   ->where('employee_demo.employee_id', '=', $request->employee_id)          
                                                   ->get();
                                 $data["open_conversations"] = $open_conversations;   
@@ -2269,6 +2270,7 @@ class SysadminStatisticsReportController extends Controller
                                                         });
                                                     })
                                                   ->whereNull('conversations.deleted_at')
+                                                  ->where('conversation_participants.role', '=', 'emp')             
                                                   ->where('employee_demo.employee_id', '=', $request->employee_id)     
                                                   ->get();
                             $data["completed_conversations"] = $completed_conversations;  
