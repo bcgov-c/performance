@@ -1,7 +1,7 @@
 <x-side-layout title="{{ __('Statistic and Reports - Performance Development Platform') }}">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-primary leading-tight" role="banner">
-            Performance Evaluation Reports
+            Employee Record
         </h2> 
 		
     </x-slot>
@@ -43,20 +43,17 @@
                 <table class="table">
                     <tr>
                         <th>Topic</th>
-                        <th>Owner</th>
                         <th>Participants</th>
                         <th>Supervisor Sign Off</th>
                         <th>Employee Sign Off</th>
                     </tr>
                     <tr>
                         <td><?php echo $data["selected_conversation"]->topic; ?></td>
-                        <td><?php echo $data["selected_conversation"]->employee_name; ?></td>
                         <td><?php echo $data["selected_conversation"]->participants; ?></td>
-                        <td><?php echo $data["selected_conversation"]->sign_supervisor_name; ?></td>
-                        <td><?php echo $data["selected_conversation"]->sign_employee_name; ?></td>
+                        <td><?php echo $data["selected_conversation"]->sign_supervisor_name; ?> <?php if($data["selected_conversation"]->supervisor_signoff_time != ''){?>[<?php echo $data["selected_conversation"]->supervisor_signoff_time; ?>]<?php } ?></td>
+                        <td><?php echo $data["selected_conversation"]->sign_employee_name; ?>  <?php if($data["selected_conversation"]->sign_off_time != ''){?>[<?php echo $data["selected_conversation"]->sign_off_time; ?>]<?php } ?></td>
                     </tr>
-                </table>                
-                <?php } ?>
+                </table>  
                 
                 <?php if ($data["selected_conversation"]->topic == 'Performance Check-In') { ?>
                 <ul>
@@ -154,6 +151,10 @@
                     </li>
                 </ul>
                 <?php } ?>
+                
+                <?php } ?>
+                
+                
                 
             </div>    
         </div>

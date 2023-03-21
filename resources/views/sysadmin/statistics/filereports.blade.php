@@ -1,7 +1,7 @@
 <x-side-layout title="{{ __('Statistic and Reports - Performance Development Platform') }}">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-primary leading-tight" role="banner">
-            Performance Evaluation Reports
+            Employee Record
         </h2> 
 		@include('sysadmin.statistics.partials.tabs')
     </x-slot>
