@@ -39,6 +39,7 @@ class CreateHrUserDemoJrView extends Migration
                 d.jobcode_desc,
                 d.job_indicator,
                 edt.id AS orgid,
+                edt.level,
                 edt.organization,
                 edt.level1_program,
                 edt.level2_division,

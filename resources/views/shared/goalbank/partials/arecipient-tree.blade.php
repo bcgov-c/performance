@@ -385,35 +385,29 @@ function atoggle_indeterminate( prev_input ) {
 }
 
 function aload_employees_on_node( tree_id ) {
-
     var target = '#aemployees-' + tree_id;
-    
     if($.trim($(target).html())=='') {
         $.ajax({
-            url: '/'+'{{ request()->segment(1) }}'+'/goalbank/aemployees/'+tree_id,
+            url: '/'+'{{ request()->segment(1) }}'+'/goalbank/employees/'+tree_id+'/a',
             type: 'GET',
             data: $("#notify-form").serialize(),
             dataType: 'html',
-            // beforeSend: function() {
-            //     //$('#pageLoader').show();  
-            //     $(".loading-spinner").show();                    
-            // },
+            beforeSend: function() {
+                $(".loading-spinner").show();                    
+            },
             success: function (result) {
                 $(target).html(''); 
                 $(target).html(result);
-
                 anodes = $(target).find('input:checkbox');
                 $.each( anodes, function( index, chkbox ) {
                     if (ag_selected_employees.includes(chkbox.value)) {
                         $(chkbox).prop('checked', true);
                     } 
                 });
-
             },
-            // complete: function() {
-            //     //$('#pageLoader').hide();  
-            //     $(".loading-spinner").hide();
-            // },
+            complete: function() {
+                $(".loading-spinner").hide();
+            },
             error: function () {
                 alert("error");
                 $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');

@@ -199,17 +199,6 @@
 					}
 				});
 
-				// $('#notify-form').submit(function() {
-				// 	// console.log('Search Button Clicked');			
-				// 	// assign back the selected employees to server
-				// 	var text = JSON.stringify(ag_selected_employees);
-				// 	$('#aselected_emp_ids').val( text );
-				// 	var text2 = JSON.stringify(ag_selected_orgnodes);
-				// 	$('#aselected_org_nodes').val( text2 );
-				// 	// dd(g_selected_orgnodes);
-				// 	return true; // return false to cancel form action
-				// });
-
 				CKEDITOR.replace('what', {
 					toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent", "Link"] ],disableNativeSpellChecker: false});
 
@@ -220,11 +209,6 @@
 					$('#pageLoader').show();
 				});
 
-				// $(window).resize(function(){
-				// 	location.reload();
-				// 	return;
-				// });
- 
 			});
 
 		</script>
