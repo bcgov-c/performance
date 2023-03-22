@@ -48,7 +48,7 @@
                 select: true,
                 order: [[1, 'asc']],
                 ajax: {
-                    url: '{{ "/".request()->segment(1)."/goalbank/employee-list/e" }}',
+                    url: '/'+'{{ request()->segment(1) }}'+'/goalbank/employee-list/e',
                     data: function (d) {
                         d.edd_level0 = $('#edd_level0').val();
                         d.edd_level1 = $('#edd_level1').val();
