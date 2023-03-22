@@ -348,9 +348,7 @@ $(document).ready(function() {
 
         do {
             value = '#eorgCheck' + pid;
-            //console.log(  value );
             etoggle_indeterminate( value );
-            //console.log("parent : " + pid);                
             pid = $('#eorgCheck' + pid).attr('pid');    
         } 
         while (pid);
@@ -403,25 +401,14 @@ $(document).ready(function() {
                 // TODO : add to selected listed
                 //if no employee class, then have to add all 
                 
-                // User level checkbox 
-                // if ( $(e.target).attr('name') == 'userCheck[]') {
-                    emp_id = $(e.target).val();  
-                    // console.log('$(e.target).val()');
-                    // console.log($(e.target).val());
-                    if (!g_selected_orgnodes.includes(emp_id)) {
-                        g_selected_orgnodes.push( emp_id );    
-                    } 
-                // }
+                emp_id = $(e.target).val();  
+                if (!g_selected_orgnodes.includes(emp_id)) {
+                    g_selected_orgnodes.push( emp_id );    
+                } 
 
                 node  = $(e.target).val();
-                // console.log('node');
-                // console.log(node);
-                // console.log('hasOwnProperty');
-                // console.log(eg_employees_by_org.hasOwnProperty( node ));
                 if (eg_employees_by_org.hasOwnProperty( node )) {
                     $.each(eg_employees_by_org[ node  ], function(index, emp) {
-                        // console.log('emp');
-                        // console.log(emp);
                        if (!g_selected_orgnodes.includes(emp.employee_id)) {
                             g_selected_orgnodes.push( emp.employee_id );    
                         } 
@@ -429,37 +416,21 @@ $(document).ready(function() {
                 }
 
                 nodes = $(location).find('input:checkbox')
-                // console.log('nodes');
-                // console.log(nodes);
                 $.each( nodes, function( index, chkbox ) {
-                    // console.log('eg_employees_by_org.hasOwnProperty(chkbox.value)');
-                    // console.log(eg_employees_by_org.hasOwnProperty(chkbox.value));
-                    // console.log('chkbox.value');
-                    // console.log(chkbox.value);
                     if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
                         $.each(eg_employees_by_org[chkbox.value], function(index, emp) {
-                            // console.log('emp');
-                            // console.log(emp);
                             if (!g_selected_orgnodes.includes(emp.employee_id)) {
                                 g_selected_orgnodes.push( emp.employee_id );    
                             }
                         })
                     } else {
-                        // if (chkbox.name == 'userCheck[]') {
-                            // console.log('!g_selected_orgnodes.includes(chkbox.value)');
-                            // console.log(!g_selected_orgnodes.includes(chkbox.value));
                             if (!g_selected_orgnodes.includes(chkbox.value)) {
                                 g_selected_orgnodes.push( chkbox.value);    
                             }
-                        // }
                     }
                 });
-                // console.log('g_selected_orgnodes');
-                // console.log(g_selected_orgnodes);
 
             } else {
-
-                //$(location).collapse('hide');
 
                 // unchecked the children 
                 items = $(location).find('input:checkbox');
@@ -506,14 +477,10 @@ $(document).ready(function() {
             pid = $(this).find('input:first').attr('pid');
             do {
                 value = '#eorgCheck' + pid;
-                //console.log(  value );
                 etoggle_indeterminate( value );
-                //console.log("parent : " + pid);                
                 pid = $('#eorgCheck' + pid).attr('pid');    
             } 
             while (pid);
-
-            // console.log( g_selected_orgnodes);     
 
         }
 

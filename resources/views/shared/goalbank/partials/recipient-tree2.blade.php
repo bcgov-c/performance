@@ -377,104 +377,101 @@ function etoggle_indeterminate( prev_input ) {
 
 }
 
-$("#eaccordion-level0 .card-header").on("click","a", function(e) {
-    //e.preventDefault(); 	
+function load_employees_on_node( tree_id ) {
+    var target = '#employees-' + tree_id;
+    if($.trim($(target).html())=='') {
+        $.ajax({
+            url: '/'+'{{ request()->segment(1) }}'+'/goalbank/employees/'+tree_id+'/e',
+            type: 'GET',
+            data: $("#notify-form").serialize(),
+            dataType: 'html',
+            beforeSend: function() {
+                $(".loading-spinner").show();                    
+            },
+            success: function (result) {
+                $(target).html(''); 
+                $(target).html(result);
 
+                nodes = $(target).find('input:checkbox');
+                $.each( nodes, function( index, chkbox ) {
+                    if (g_selected_employees.includes(chkbox.value)) {
+                        $(chkbox).prop('checked', true);
+                    } 
+                });
+            },
+            complete: function() {
+                $(".loading-spinner").hide();
+            },
+            error: function () {
+                alert("error");
+                $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
+            }
+        });
+    }
+}
+
+$("#eaccordion-level0 .card-header.employees").on("click", "a", function(e) {
+    var tree_id = $(this).attr('data');
+    load_employees_on_node(tree_id);
+});
+
+$("#eaccordion-level0 .card-header").on("click","a", function(e) {
     if (e.target.tagName != "INPUT") {
         // do link
-        //alert("Doing link functionality");
     } else {
         e.stopPropagation();
-
         //var location  = '#ecollapse-' + $(e.target).val();
         var location = $(this).attr('href') ;
-
         if (e.target.checked) {
             // expand itself
             $(location).collapse();
-
             // to-do : checked all the following 
             items = $(location).find('input:checkbox');
             $.each(items, function(index, item) {
                 $(item).prop('checked', true);
                 $(item).prop("indeterminate", false);
             })  
-
             // TODO : add to selected listed
             //if no employee class, then have to add all 
-            
             // User level checkbox 
-            // if ( $(e.target).attr('name') == 'userCheck[]') {
                 emp_id = $(e.target).val();  
-                // console.log('$(e.target).val()');
-                // console.log($(e.target).val());
                 if (!g_selected_orgnodes.includes(emp_id)) {
                     g_selected_orgnodes.push( emp_id );    
                 } 
-            // }
-
             node  = $(e.target).val();
-            // console.log('node');
-            // console.log(node);
-            // console.log('hasOwnProperty');
-            // console.log(eg_employees_by_org.hasOwnProperty( node ));
             if (eg_employees_by_org.hasOwnProperty( node )) {
                 $.each(eg_employees_by_org[ node  ], function(index, emp) {
-                    // console.log('emp');
-                    // console.log(emp);
                    if (!g_selected_orgnodes.includes(emp.employee_id)) {
                         g_selected_orgnodes.push( emp.employee_id );    
                     } 
                 })  
             }
-
             nodes = $(location).find('input:checkbox')
-            // console.log('nodes');
-            // console.log(nodes);
             $.each( nodes, function( index, chkbox ) {
-                // console.log('eg_employees_by_org.hasOwnProperty(chkbox.value)');
-                // console.log(eg_employees_by_org.hasOwnProperty(chkbox.value));
-                // console.log('chkbox.value');
-                // console.log(chkbox.value);
                 if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
                     $.each(eg_employees_by_org[chkbox.value], function(index, emp) {
-                        // console.log('emp');
-                        // console.log(emp);
                         if (!g_selected_orgnodes.includes(emp.employee_id)) {
                             g_selected_orgnodes.push( emp.employee_id );    
                         }
                     })
                 } else {
-                    // if (chkbox.name == 'userCheck[]') {
-                        // console.log('!g_selected_orgnodes.includes(chkbox.value)');
-                        // console.log(!g_selected_orgnodes.includes(chkbox.value));
                         if (!g_selected_orgnodes.includes(chkbox.value)) {
                             g_selected_orgnodes.push( chkbox.value);    
                         }
-                    // }
                 }
             });
-            // console.log('g_selected_orgnodes');
-            // console.log(g_selected_orgnodes);
-
         } else {
-
-            //$(location).collapse('hide');
-
             // unchecked the children 
             items = $(location).find('input:checkbox');
             $.each(items, function(index, item) {
                 $(item).prop('checked', false);
                 $(item).prop("indeterminate", false);
             })  
-
-
                 emp_id = $(e.target).val();  
                 var index = $.inArray(emp_id, g_selected_orgnodes);
                 if (index > -1) {
                     g_selected_orgnodes.splice( index, 1 );
                 }
-
             node = $(e.target).val();
             if (eg_employees_by_org.hasOwnProperty( node )) {
                 $.each(eg_employees_by_org[ node  ], function(index, emp) {
@@ -483,7 +480,6 @@ $("#eaccordion-level0 .card-header").on("click","a", function(e) {
                     } 
                 })  
             }
-
             nodes = $(location).find('input:checkbox');
             $.each( nodes, function( index, chkbox ) {
                 if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
@@ -502,21 +498,14 @@ $("#eaccordion-level0 .card-header").on("click","a", function(e) {
             });
             
         }      
-
         pid = $(this).find('input:first').attr('pid');
         do {
             value = '#eorgCheck' + pid;
-            //console.log(  value );
             etoggle_indeterminate( value );
-            //console.log("parent : " + pid);                
             pid = $('#eorgCheck' + pid).attr('pid');    
         } 
         while (pid);
-
-        // console.log( g_selected_orgnodes);     
-
     }
-
 });
 
 $("#eaccordion-level0").on('shown.bs.collapse', function () {

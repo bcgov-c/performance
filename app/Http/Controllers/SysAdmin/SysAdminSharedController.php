@@ -12,10 +12,11 @@ use Illuminate\Support\Facades\DB;
 class SysAdminSharedController extends Controller
 {
     public function getOrganizationsV2(Request $request) {
-        $orgs = EmployeeDemoTree::orderBy('name','asc')
-            ->select('id', 'name')
-            ->where('level', 0)
-            ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
+        $orgs = EmployeeDemoTree::from('employee_demo_tree AS t')
+            ->orderBy('t.name', 'asc')
+            ->select('t.id', 't.name')
+            ->where('t.level', 0)
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("t.name LIKE '%{$request->q}%'"); })
             ->get();
         $formatted_orgs = [];
         foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
@@ -23,12 +24,12 @@ class SysAdminSharedController extends Controller
     } 
 
     public function getProgramsV2(Request $request) {
-        $orgs = EmployeeDemoTree::orderBy('name', 'asc')
-            ->select('id', 'name')
-            ->where('level', 1)
-            ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
-            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
-            ->groupBy('name')
+        $orgs = EmployeeDemoTree::from('employee_demo_tree AS t')
+            ->orderBy('t.name', 'asc')
+            ->select('t.id', 't.name')
+            ->where('t.level', 1)
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("t.name LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('t.organization_key', $request->level0); })
             ->get();
         $formatted_orgs = [];
         foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
@@ -36,14 +37,13 @@ class SysAdminSharedController extends Controller
     } 
 
     public function getDivisionsV2(Request $request) {
-        $orgs = EmployeeDemoTree::orderBy('name', 'asc')
-            ->select('id', 'name')
-            ->where('level', 2)
-            ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
-            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
-            ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); })
-            ->groupBy('name')
-            ->limit(300)
+        $orgs = EmployeeDemoTree::from('employee_demo_tree AS t')
+            ->orderBy('t.name', 'asc')
+            ->select('t.id', 't.name')
+            ->where('t.level', 2)
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("t.name LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('t.organization_key', $request->level0); })
+            ->when($request->level1, function ($q) use($request) { return $q->where('t.level1_key', $request->level1); })
             ->get();
         $formatted_orgs = [];
         foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
@@ -51,15 +51,14 @@ class SysAdminSharedController extends Controller
     } 
 
     public function getBranchesV2(Request $request) {
-        $orgs = EmployeeDemoTree::orderBy('name', 'asc')
-            ->select('id', 'name')
-            ->where('level', 3)
-            ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
-            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
-            ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); })
-            ->when($request->level2, function ($q) use($request) { return $q->where('level2_key', $request->level2); })
-            ->groupBy('name')
-            ->limit(300)
+        $orgs = EmployeeDemoTree::from('employee_demo_tree AS t')
+            ->orderBy('t.name', 'asc')
+            ->select('t.id', 't.name')
+            ->where('t.level', 3)
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("t.name LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('t.organization_key', $request->level0); })
+            ->when($request->level1, function ($q) use($request) { return $q->where('t.level1_key', $request->level1); })
+            ->when($request->level2, function ($q) use($request) { return $q->where('t.level2_key', $request->level2); })
             ->get();
         $formatted_orgs = [];
         foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
@@ -67,16 +66,15 @@ class SysAdminSharedController extends Controller
     } 
 
     public function getLevel4V2(Request $request) {
-        $orgs = EmployeeDemoTree::orderBy('name', 'asc')
-            ->select('id', 'name')
-            ->where('level', 4)
-            ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
-            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
-            ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); })
-            ->when($request->level2, function ($q) use($request) { return $q->where('level2_key', $request->level2); })
-            ->when($request->level3, function ($q) use($request) { return $q->where('level3_key', $request->level3); })
-            ->groupBy('name')
-            ->limit(300)
+        $orgs = EmployeeDemoTree::from('employee_demo_tree AS t')
+            ->orderBy('t.name', 'asc')
+            ->select('t.id', 't.name')
+            ->where('t.level', 4)
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("t.name LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('t.organization_key', $request->level0); })
+            ->when($request->level1, function ($q) use($request) { return $q->where('t.level1_key', $request->level1); })
+            ->when($request->level2, function ($q) use($request) { return $q->where('t.level2_key', $request->level2); })
+            ->when($request->level3, function ($q) use($request) { return $q->where('t.level3_key', $request->level3); })
             ->get();
         $formatted_orgs = [];
         foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ]; }
@@ -156,7 +154,7 @@ class SysAdminSharedController extends Controller
     } 
 
     public function agetOrganizationsV2(Request $request) {
-        $orgs = OrgTreeDemo::orderBy('name', 'asc')
+        $orgs = EmployeeDemoTree::orderBy('name', 'asc')
             ->select('id', 'name')
             ->where('level', 0)
             ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
@@ -226,6 +224,10 @@ class SysAdminSharedController extends Controller
         foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
         return response()->json($formatted_orgs);
     } 
+
+
+
+
 
     public function getOrganizations(Request $request) {
         $orgs = OrganizationTree::

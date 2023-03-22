@@ -12,8 +12,14 @@ class AdminOrg extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'version', 'orgid',
-        'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4',
+        'user_id', 
+        'version', 
+        'orgid',
+        'organization', 
+        'level1_program', 
+        'level2_division', 
+        'level3_branch', 
+        'level4',
         'inherited'
     ];
 }

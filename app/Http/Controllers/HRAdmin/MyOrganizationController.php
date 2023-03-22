@@ -83,24 +83,18 @@ class MyOrganizationController extends Controller
         if ($request->ajax()) 
         {
             $authId = Auth::id();
-            $query = HRUserDemoJrView::from('hr_user_demo_jr_view as u')
-            // DIRECT JOIN is fasted for page loading
-            // ->join('admin_orgs as o', 'o.orgid', 'u.orgid')->whereRaw("o.user_id = {$authId} AND o.version = 2")
+            $query = HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
             ->whereRaw("u.ao_user_id = {$authId}")
-            // IN LIST is 2nd fastest based on random page load
-            // ->whereIn('u.orgid', function ($org) use ($authId) { $org->select('o.orgid')->from('admin_orgs as o')->whereRaw("o.version = 2 AND o.user_id = {$authId}"); })
-            // EXISTS is the slowest of the 3 options
-            // ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs AS o WHERE o.orgid = u.orgid AND o.user_id = {$authId} AND o.version = 2)")
             ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
             ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
             ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
             ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
             ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
-            ->when($request->criteria == 'id' && $request->search_text, function($q) use($request) { return $q->whereRaw("u.employee_id like '%{$request->search_text}%'"); })
-            ->when($request->criteria == 'name' && $request->search_text, function($q) use($request) {return $q->whereRaw("u.employee_name like '%{$request->search_text}%'"); })
-            ->when($request->criteria == 'job' && $request->search_text, function($q) use($request) {return $q->whereRaw("u.jobcode_desc like '%{$request->search_text}%'"); })
-            ->when($request->criteria == 'dpt' && $request->search_text, function($q) use($request) {return $q->whereRaw("u.deptid like '%{$request->search_text}%'"); })
-            ->when($request->criteria == 'all' && $request->search_text, function($q) use($request) { $q->whereRaw("(u.employee_id like '%{$request->search_text}%' or u.employee_name like '%{$request->search_text}%' or u.jobcode_desc like '%{$request->search_text}%' or u.deptid like '%{$request->search_text}%')"); })
+            ->when($request->criteria == 'id' && $request->search_text, function($q) use($request) { return $q->whereRaw("u.employee_id LIKE '%{$request->search_text}%'"); })
+            ->when($request->criteria == 'name' && $request->search_text, function($q) use($request) { return $q->whereRaw("u.employee_name LIKE '%{$request->search_text}%'"); })
+            ->when($request->criteria == 'job' && $request->search_text, function($q) use($request) { return $q->whereRaw("u.jobcode_desc LIKE '%{$request->search_text}%'"); })
+            ->when($request->criteria == 'dpt' && $request->search_text, function($q) use($request) { return $q->whereRaw("u.deptid LIKE '%{$request->search_text}%'"); })
+            ->when($request->criteria == 'all' && $request->search_text, function($q) use($request) { return $q->whereRaw("(u.employee_id LIKE '%{$request->search_text}%' OR u.employee_name LIKE '%{$request->search_text}%' OR u.jobcode_desc LIKE '%{$request->search_text}%' OR u.deptid LIKE '%{$request->search_text}%')"); })
             ->whereNull('u.date_deleted')
             ->selectRaw ("
                 u.user_id,
