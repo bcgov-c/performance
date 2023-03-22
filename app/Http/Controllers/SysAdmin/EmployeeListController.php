@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Goal;
 use App\Models\EmployeeDemoJunior;
-use App\Models\OrganizationTree;
+use App\Models\EmployeeDemoTree;
 use App\Models\SharedProfile;
 use App\Models\UserDemoJrView;
 use Yajra\Datatables\Datatables;
@@ -48,17 +48,11 @@ class EmployeeListController extends Controller
             ]);
         }
 
-        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
-
-        $request->session()->flash('level0', $level0);
-        $request->session()->flash('level1', $level1);
-        $request->session()->flash('level2', $level2);
-        $request->session()->flash('level3', $level3);
-        $request->session()->flash('level4', $level4);
+        $request->session()->flash('level0', $request->dd_level0);
+        $request->session()->flash('level1', $request->dd_level1);
+        $request->session()->flash('level2', $request->dd_level2);
+        $request->session()->flash('level3', $request->dd_level3);
+        $request->session()->flash('level4', $request->dd_level4);
 
         $criteriaList = $this->search_criteria_list();
 
@@ -92,17 +86,11 @@ class EmployeeListController extends Controller
             ]);
         }
 
-        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
-
-        $request->session()->flash('level0', $level0);
-        $request->session()->flash('level1', $level1);
-        $request->session()->flash('level2', $level2);
-        $request->session()->flash('level3', $level3);
-        $request->session()->flash('level4', $level4);
+        $request->session()->flash('level0', $request->dd_level0);
+        $request->session()->flash('level1', $request->dd_level1);
+        $request->session()->flash('level2', $request->dd_level2);
+        $request->session()->flash('level3', $request->dd_level3);
+        $request->session()->flash('level4', $request->dd_level4);
 
         $criteriaList = $this->search_criteria_list();
 
@@ -113,19 +101,14 @@ class EmployeeListController extends Controller
     {
         if ($request->ajax()) 
         {
-            $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-            $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-            $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-            $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-            $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
             $query = UserDemoJrView::from('user_demo_jr_view AS u')
             ->whereNull('u.date_deleted')
-            ->when($level0, function($q) use($level0) { $q->where('u.organization', $level0->name); })
-            ->when($level1, function($q) use($level1) { $q->where('u.level1_program', $level1->name); })
-            ->when($level2, function($q) use($level2) { $q->where('u.level2_division', $level2->name); })
-            ->when($level3, function($q) use($level3) { $q->where('u.level3_branch', $level3->name); })
-            ->when($level4, function($q) use($level4) { $q->where('u.level4', $level4->name); })
-            ->when($request->search_text, function($q) use ($request) { $q->whereRaw($request->criteria." like '%".$request->search_text."%'"); })
+            ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
+            ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
+            ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
+            ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
+            ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
+            ->when($request->search_text, function($q) use ($request) { return $q->whereRaw("{$request->criteria} like '%{$request->search_text}%'"); })
             ->selectRaw ("
                 u.user_id AS id,
                 u.guid,
@@ -185,20 +168,14 @@ class EmployeeListController extends Controller
     }
 
     public function exportCurrent(Request $request) {
-        // $level0 = $request->dd_level0 ? OrganizationTree::where('organization_trees.id', $request->dd_level0)->first() : null;
-        // $level1 = $request->dd_level1 ? OrganizationTree::where('organization_trees.id', $request->dd_level1)->first() : null;
-        // $level2 = $request->dd_level2 ? OrganizationTree::where('organization_trees.id', $request->dd_level2)->first() : null;
-        // $level3 = $request->dd_level3 ? OrganizationTree::where('organization_trees.id', $request->dd_level3)->first() : null;
-        // $level4 = $request->dd_level4 ? OrganizationTree::where('organization_trees.id', $request->dd_level4)->first() : null;
-        // dd($request->all());
         $query = UserDemoJrView::from('user_demo_jr_view AS u')
         ->whereNull('u.date_deleted')
-        // ->when($level0, function($q) use($level0) {$q->where('u.organization', $level0->name);})
-        // ->when($level1, function($q) use($level1) {$q->where('u.level1_program', $level1->name);})
-        // ->when($level2, function($q) use($level2) {$q->where('u.level2_division', $level2->name);})
-        // ->when($level3, function($q) use($level3) {$q->where('u.level3_branch', $level3->name);})
-        // ->when($level4, function($q) use($level4) {$q->where('u.level4', $level4->name);})
-        // ->when($request->search_text, function($q) use ($request) { $q->whereRaw($request->criteria." like '%".$request->search_text."%'"); })
+        ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
+        ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
+        ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
+        ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
+        ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
+        ->when($request->search_text, function($q) use ($request) { return $q->whereRaw("{$request->criteria} like '%{$request->search_text}%'"); })
         ->orderBy('u.employee_id')
         ->selectRaw ("
             u.user_id AS id,
@@ -320,19 +297,14 @@ class EmployeeListController extends Controller
     {
         if ($request->ajax()) 
         {
-            $level0 = $request->dd_level0 ? OrganizationTree::where('organization_trees.id', $request->dd_level0)->first() : null;
-            $level1 = $request->dd_level1 ? OrganizationTree::where('organization_trees.id', $request->dd_level1)->first() : null;
-            $level2 = $request->dd_level2 ? OrganizationTree::where('organization_trees.id', $request->dd_level2)->first() : null;
-            $level3 = $request->dd_level3 ? OrganizationTree::where('organization_trees.id', $request->dd_level3)->first() : null;
-            $level4 = $request->dd_level4 ? OrganizationTree::where('organization_trees.id', $request->dd_level4)->first() : null;
             $query = UserDemoJrView::from('user_demo_jr_view AS u')
             ->whereNotNull('u.date_deleted')
-            ->when($level0, function($q) use($level0) {$q->where('u.organization', $level0->name);})
-            ->when($level1, function($q) use($level1) {$q->where('u.level1_program', $level1->name);})
-            ->when($level2, function($q) use($level2) {$q->where('u.level2_division', $level2->name);})
-            ->when($level3, function($q) use($level3) {$q->where('u.level3_branch', $level3->name);})
-            ->when($level4, function($q) use($level4) {$q->where('u.level4', $level4->name);})
-            ->when($request->search_text, function($q) use ($request) { $q->whereRaw($request->criteria." like '%".$request->search_text."%'"); })
+            ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
+            ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
+            ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
+            ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
+            ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
+            ->when($request->search_text, function($q) use ($request) { return $q->whereRaw("{$request->criteria} like '%{$request->search_text}%'"); })
             ->orderBy('u.employee_id')
             ->selectRaw ("
                 u.user_id AS id,

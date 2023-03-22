@@ -136,17 +136,11 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/goalbank/savenewgoal', [GoalBankController::class, 'savenewgoal'])->name('sysadmin.goalbank.savenewgoalget');
         Route::post('/sysadmin/goalbank/savenewgoal', [GoalBankController::class, 'savenewgoal'])->name('sysadmin.goalbank.savenewgoal');
 
-        Route::get('/sysadmin/goalbank/org-tree', [GoalBankController::class,'loadOrganizationTree']);
-        Route::get('/sysadmin/goalbank/employees/{id}', [GoalBankController::class,'getEmployees']);
-        Route::get('/sysadmin/goalbank/employee-list', [GoalBankController::class, 'getDatatableEmployees'])->name('sysadmin.goalbank.employee.list');
-
-        Route::get('/sysadmin/goalbank/aorg-tree', [GoalBankController::class,'aloadOrganizationTree']);
-        Route::get('/sysadmin/goalbank/aemployees/{id}', [GoalBankController::class,'agetEmployees']);
-        Route::get('/sysadmin/goalbank/aemployee-list', [GoalBankController::class, 'agetDatatableEmployees'])->name('sysadmin.goalbank.aemployee.list');
-
-        Route::get('/sysadmin/goalbank/eorg-tree', [GoalBankController::class,'eloadOrganizationTree']);
-        Route::get('/sysadmin/goalbank/eemployees/{id}', [GoalBankController::class,'egetEmployees']);
-        Route::get('/sysadmin/goalbank/eemployee-list', [GoalBankController::class, 'egetDatatableEmployees'])->name('sysadmin.goalbank.eemployee.list');
+        Route::get('/sysadmin/goalbank/org-tree', [GoalBankController::class,'loadOrganizationTree'])->name('sysadmin.goalbank.org-tree');
+        Route::get('/sysadmin/goalbank/eorg-tree', [GoalBankController::class,'eloadOrganizationTree'])->name('sysadmin.goalbank.eorg-tree');
+        Route::get('/sysadmin/goalbank/aorg-tree', [GoalBankController::class,'aloadOrganizationTree'])->name('sysadmin.goalbank.aorg-tree');
+        Route::get('/sysadmin/goalbank/employees/{id}/{option?}', [GoalBankController::class,'getEmployees'])->name('sysadmin.goalbank.getEmployees');
+        Route::get('/sysadmin/goalbank/employee-list/{option?}', [GoalBankController::class, 'getDatatableEmployees'])->name('sysadmin.goalbank.employee.list');
 
         Route::get('/sysadmin/goalbank/managegoals', [GoalBankController::class, 'manageindex'])->name('sysadmin.goalbank.manageindex');
         Route::get('/sysadmin/goalbank/managegetlist', [GoalBankController::class, 'managegetList'])->name('sysadmin.goalbank.managegetlist');
@@ -259,17 +253,17 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/accesspermissions/users', [AccessPermissionsController::class, 'getUsers'])->name('sysadmin.accesspermissions.users.list');
         
         Route::get('/sysadmin/accesspermissions/org-tree', [AccessPermissionsController::class,'loadOrganizationTree']);
-        Route::get('/sysadmin/accesspermissions/org-organizations', [AccessPermissionsController::class,'getOrganizations']);
-        Route::get('/sysadmin/accesspermissions/org-programs', [AccessPermissionsController::class,'getPrograms']);
-        Route::get('/sysadmin/accesspermissions/org-divisions', [AccessPermissionsController::class,'getDivisions']);
-        Route::get('/sysadmin/accesspermissions/org-branches', [AccessPermissionsController::class,'getBranches']);
-        Route::get('/sysadmin/accesspermissions/org-level4', [AccessPermissionsController::class,'getLevel4']);
+        // Route::get('/sysadmin/accesspermissions/org-organizations', [AccessPermissionsController::class,'getOrganizations']);
+        // Route::get('/sysadmin/accesspermissions/org-programs', [AccessPermissionsController::class,'getPrograms']);
+        // Route::get('/sysadmin/accesspermissions/org-divisions', [AccessPermissionsController::class,'getDivisions']);
+        // Route::get('/sysadmin/accesspermissions/org-branches', [AccessPermissionsController::class,'getBranches']);
+        // Route::get('/sysadmin/accesspermissions/org-level4', [AccessPermissionsController::class,'getLevel4']);
         Route::get('/sysadmin/accesspermissions/eorg-tree', [AccessPermissionsController::class,'eloadOrganizationTree']);
-        Route::get('/sysadmin/accesspermissions/eorg-organizations', [AccessPermissionsController::class,'geteOrganizations']);
-        Route::get('/sysadmin/accesspermissions/eorg-programs', [AccessPermissionsController::class,'getePrograms']);
-        Route::get('/sysadmin/accesspermissions/eorg-divisions', [AccessPermissionsController::class,'geteDivisions']);
-        Route::get('/sysadmin/accesspermissions/eorg-branches', [AccessPermissionsController::class,'geteBranches']);
-        Route::get('/sysadmin/accesspermissions/eorg-level4', [AccessPermissionsController::class,'geteLevel4']);
+        // Route::get('/sysadmin/accesspermissions/eorg-organizations', [AccessPermissionsController::class,'geteOrganizations']);
+        // Route::get('/sysadmin/accesspermissions/eorg-programs', [AccessPermissionsController::class,'getePrograms']);
+        // Route::get('/sysadmin/accesspermissions/eorg-divisions', [AccessPermissionsController::class,'geteDivisions']);
+        // Route::get('/sysadmin/accesspermissions/eorg-branches', [AccessPermissionsController::class,'geteBranches']);
+        // Route::get('/sysadmin/accesspermissions/eorg-level4', [AccessPermissionsController::class,'geteLevel4']);
         Route::get('/sysadmin/accesspermissions/job-titles', [AccessPermissionsController::class,'getJobTitles']);
         Route::get('/sysadmin/accesspermissions/employees/{id}', [AccessPermissionsController::class,'getEmployees']);
         Route::get('/sysadmin/accesspermissions/employee-list', [AccessPermissionsController::class, 'getDatatableEmployees'])->name('sysadmin.accesspermissions.employee.list');

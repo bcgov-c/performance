@@ -474,20 +474,20 @@ class AccessPermissionsController extends Controller
         ];
     }
 
-    protected function baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4) {
+    protected function baseFilteredWhere($request) {
         // Base Where Clause
         return UserListView::from('user_list_view AS u')
         ->whereRaw("(TRIM(u.guid) <> '' AND NOT u.guid IS NULL)")
-        ->when( $level0, function ($q) use($level0) { $q->where('u.organization', $level0->name); })
-        ->when( $level1, function ($q) use($level1) { $q->where('u.level1_program', $level1->name); })
-        ->when( $level2, function ($q) use($level2) { $q->where('u.level2_division', $level2->name); })
-        ->when( $level3, function ($q) use($level3) { $q->where('u.level3_branch', $level3->name); })
-        ->when( $level4, function ($q) use($level4) { $q->where('u.level4', $level4->name); })
-        ->when( $request->search_text && $request->criteria == 'emp', function ($q) use($request) { $q->whereRaw("u.employee_id LIKE '%{$request->search_text}%'"); })
-        ->when( $request->search_text && $request->criteria == 'name', function ($q) use($request) { $q->whereRaw("u.display_name LIKE '%{$request->search_text}%'"); })
-        ->when( $request->search_text && $request->criteria == 'job', function ($q) use($request) { $q->whereRaw("u.jobcode_desc LIKE '%{$request->search_text}%'"); })
-        ->when( $request->search_text && $request->criteria == 'dpt', function ($q) use($request) { $q->whereRaw("u.deptid LIKE '%{$request->search_text}%'"); })
-        ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) { $q->whereRaw("(u.employee_id LIKE '%{$request->search_text}%' OR u.display_name LIKE '%{$request->search_text}%' OR u.jobcode_desc LIKE '%{$request->search_text}%' OR u.deptid LIKE '%{$request->search_text}%')"); });
+        ->when( $request->dd_level0, function ($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
+        ->when( $request->dd_level1, function ($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
+        ->when( $request->dd_level2, function ($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
+        ->when( $request->dd_level3, function ($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
+        ->when( $request->dd_level4, function ($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
+        ->when( $request->search_text && $request->criteria == 'emp', function ($q) use($request) { return $q->whereRaw("u.employee_id LIKE '%{$request->search_text}%'"); })
+        ->when( $request->search_text && $request->criteria == 'name', function ($q) use($request) { return $q->whereRaw("u.display_name LIKE '%{$request->search_text}%'"); })
+        ->when( $request->search_text && $request->criteria == 'job', function ($q) use($request) { return $q->whereRaw("u.jobcode_desc LIKE '%{$request->search_text}%'"); })
+        ->when( $request->search_text && $request->criteria == 'dpt', function ($q) use($request) { return $q->whereRaw("u.deptid LIKE '%{$request->search_text}%'"); })
+        ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) { return $q->whereRaw("(u.employee_id LIKE '%{$request->search_text}%' OR u.display_name LIKE '%{$request->search_text}%' OR u.jobcode_desc LIKE '%{$request->search_text}%' OR u.deptid LIKE '%{$request->search_text}%')"); });
     }
 
     protected function ebaseFilteredWhere($request) {
@@ -496,8 +496,8 @@ class AccessPermissionsController extends Controller
         ->whereRaw("TRIM(u.guid) <> '' AND NOT u.guid IS NULL")
         ->when( $request->edd_level0, function ($q) use($request) { return $q->where('u.organization_key', $request->edd_level0); })
         ->when( $request->edd_level1, function ($q) use($request) { return $q->where('u.level1_key', $request->edd_level1); })
-        ->when( $request->edd_level2, function ($q) use($request) { return $q->where('u.level2_division_key', $request->edd_level2); })
-        ->when( $request->edd_level3, function ($q) use($request) { return $q->where('u.level3_branch_key', $request->edd_level3); })
+        ->when( $request->edd_level2, function ($q) use($request) { return $q->where('u.level2_key', $request->edd_level2); })
+        ->when( $request->edd_level3, function ($q) use($request) { return $q->where('u.level3_key', $request->edd_level3); })
         ->when( $request->edd_level4, function ($q) use($request) { return $q->where('u.level4_key', $request->edd_level4); });
     }
 
@@ -506,37 +506,37 @@ class AccessPermissionsController extends Controller
         $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
         $sql_level0 = clone $demoWhere; 
         $sql_level0->join('employee_demo_tree AS o', function($join) {
-            $join->on('u.organization', 'o.organization')
+            $join->on('u.organization_key', 'o.organization_key')
                 ->where('o.level', 0);
             });
         $sql_level1 = clone $demoWhere; 
         $sql_level1->join('employee_demo_tree AS o', function($join) {
-            $join->on('u.organization', 'o.organization')
-                ->on('u.level1_program', 'o.level1_program')
+            $join->on('u.organization_key', 'o.organization_key')
+                ->on('u.level1_key', 'o.level1_key')
                 ->where('o.level', 1);
             });
         $sql_level2 = clone $demoWhere; 
         $sql_level2->join('employee_demo_tree AS o', function($join) {
-            $join->on('u.organization', 'o.organization')
-                ->on('u.level1_program', 'o.level1_program')
-                ->on('u.level2_division', 'o.level2_division')
+            $join->on('u.organization_key', 'o.organization_key')
+                ->on('u.level1_key', 'o.level1_key')
+                ->on('u.level2_key', 'o.level2_key')
                 ->where('o.level', 2);    
             });    
         $sql_level3 = clone $demoWhere; 
         $sql_level3->join('employee_demo_tree AS o', function($join) {
-            $join->on('u.organization', 'o.organization')
-                ->on('u.level1_program', 'o.level1_program')
-                ->on('u.level2_division', 'o.level2_division')
-                ->on('u.level3_branch', 'o.level3_branch')
+            $join->on('u.organization_key', 'o.organization_key')
+                ->on('u.level1_key', 'o.level1_key')
+                ->on('u.level2_key', 'o.level2_key')
+                ->on('u.level3_key', 'o.level3_key')
                 ->where('o.level',3);    
             });
         $sql_level4 = clone $demoWhere; 
         $sql_level4->join('employee_demo_tree AS o', function($join) {
-            $join->on('u.organization', 'o.organization')
-                ->on('u.level1_program', 'o.level1_program')
-                ->on('u.level2_division', 'o.level2_division')
-                ->on('u.level3_branch', 'o.level3_branch')
-                ->on('u.level4', 'o.level4')
+            $join->on('u.organization_key', 'o.organization_key')
+                ->on('u.level1_key', 'o.level1_key')
+                ->on('u.level2_key', 'o.level2_key')
+                ->on('u.level3_key', 'o.level3_key')
+                ->on('u.level4_key', 'o.level4_key')
                 ->where('o.level', 4);
             });
         return  [$sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4];
