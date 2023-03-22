@@ -49,7 +49,7 @@
                 select: true,
                 order: [[1, 'asc']],
                 ajax: {
-                    url: '{{ "/".request()->segment(1)."/goalbank/employee-list/a" }}',
+                    url: '/'+'{{ request()->segment(1) }}'+'/goalbank/employee-list/a',
 
                     data: function (d) {
                         d.add_level0 = $('#add_level0').val();
