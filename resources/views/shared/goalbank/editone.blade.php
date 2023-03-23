@@ -325,7 +325,7 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                					url: '{{ "/" . request()->segment(1) . "/goalbank/aorg-tree" }}',
+                					url: '{{ "/".request()->segment(1)."/goalbank/aorg-tree" }}',
                                     type: 'GET',
                                     data: $("#notify-form").serialize(),
                                     dataType: 'html',
@@ -511,7 +511,6 @@
 				$('#abtn_search').click(function(e) {
 					e.preventDefault();
 					$('#aemployee-list-table').DataTable().rows().invalidate().draw();
-
 					//Tree
 					target = $('#anav-tree'); 
 					ddnotempty = $('#add_level0').val() + $('#add_level1').val() + $('#add_level2').val() + $('#add_level3').val() + $('#add_level4').val();
@@ -519,31 +518,26 @@
 						// To do -- ajax called to load the tree
 						$.when( 
 							$.ajax({
-                				url: '{{ "/" . request()->segment(1) . "/goalbank/aorg-tree" }}',
+                				url: '{{ "/".request()->segment(1)."/goalbank/aorg-tree" }}',
 								type: 'GET',
 								data: $("#notify-form").serialize(),
 								dataType: 'html',
-
-								// beforeSend: function() {
-								// 	$("#etree-loading-spinner").show();                    
-								// },
-
+								beforeSend: function() {
+									$("#etree-loading-spinner").show();                    
+								},
 								success: function (result) {
 									$('#anav-tree').html(''); 
 									$('#anav-tree').html(result);
 									$('#anav-tree').attr('loaded','loaded');
 								},
-
-								// complete: function() {
-								// 	$("#etree-loading-spinner").hide();
-								// },
-
+								complete: function() {
+									$("#etree-loading-spinner").hide();
+								},
 								error: function () {
 									alert("error");
 									$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
 								}
 							})
-							
 						).then(function( data, textStatus, jqXHR ) {
 							//alert( jqXHR.status ); // Alerts 200
 							anodes = $('#aaccordion-level0 input:checkbox');

@@ -21,18 +21,19 @@
 
 @push('css')
 
-    <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" rel="stylesheet">
 	<style>
-	#employee-list-table_filter label {
-		text-align: right !important;
-        padding-right: 10px;
-	} 
+        #employee-list-table_filter label {
+            text-align: right !important;
+            padding-right: 10px;
+        } 
     </style>
 @endpush
 
 @push('js')
-    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
 
     <script>
     

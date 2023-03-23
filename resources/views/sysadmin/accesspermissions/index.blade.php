@@ -7,7 +7,6 @@
     </div>
 
 	<p class="px-3">Follow the steps below to select an employee and assign them additional functions within the Performance platform.</p>
-	<!-- <p class="px-3">Cras quis augue quis risus auctor facilisis quis ac ligula. Fusce vehicula consequat dui, et egestas augue sodales aliquam. In hac habitasse platea dictumst. Curabitur sit amet nulla nibh. Morbi mollis malesuada diam ut egestas. Pellentesque blandit placerat nisi ac facilisis. Vivamus consequat, nisl a lacinia ultricies, velit leo consequat magna, sit amet condimentum justo nibh id nisl. Quisque mattis condimentum cursus. Nullam eget congue augue, a molestie leo. Aenean sollicitudin convallis arcu non maximus. Curabitur ut lacinia nisi. Nam cursus venenatis lacus aliquet dapibus. Nulla facilisi.</p> -->
 
 
 	<br>
@@ -138,8 +137,6 @@
 				position: fixed;
 				top: 25%;
 				left: 47%;
-				/* height: 100%;
-				width: 100%; */
 				width: 10em;
 				height: 10em;
 				z-index: 9000000;
@@ -170,6 +167,14 @@
 
 				$('#pageLoader').hide();
 
+				function navTreeActive() {
+					return $('#nav-tree').attr('class').search(/active/i) > 0 ?? false;
+				}
+
+				function navListActive() {
+					return $('#nav-list').attr('class').search(/active/i) > 0 ?? false;
+				}
+
 				$('#notify-form').keydown(function (e) {
 					if (e.keyCode == 13) {
 						e.preventDefault();
@@ -178,8 +183,6 @@
 				});
 
 				$('#notify-form').submit(function() {
-					// console.log('Search Button Clicked');			
-
 					// assign back the selected employees to server
 					var text = JSON.stringify(g_selected_employees);
 					$('#selected_emp_ids').val( text );
@@ -188,13 +191,11 @@
 					return true; // return false to cancel form action
 				});
 
-
 				// Tab  -- LIST Page  activate
 				$("#nav-list-tab").on("click", function(e) {
 					table  = $('#employee-list-table').DataTable();
 					table.rows().invalidate().draw();
 				});
-
 
 				// Tab  -- TREE activate
 				$("#nav-tree-tab").on("click", function(e) {
@@ -228,18 +229,29 @@
                                 })
                                 
                             ).then(function( data, textStatus, jqXHR ) {
-                                //alert( jqXHR.status ); // Alerts 200
                                 nodes = $('#accordion-level0 input:checkbox');
                                 redrawTreeCheckboxes();	
                             }); 
                         
                         } else {
-                            redrawTreeCheckboxes();
+							$(target).removeAttr('loaded');
+							$("#nav-tree-tab").click();
                         }
                     } else {
+						$(target).removeAttr('loaded');
 						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
 					}
 				});
+
+				$('#btn_search').click(function(e) {
+					e.preventDefault();
+					if (navListActive()) {
+						$('#employee-list-table').DataTable().rows().invalidate().draw();
+					}
+					if (navTreeActive()) {
+						$("#nav-tree-tab").click();
+					}
+				}); 
 
 				function redrawTreeCheckboxes() {
 					// redraw the selection 
@@ -278,7 +290,6 @@
 
 				function eredrawTreeCheckboxes() {
 					// redraw the selection 
-					//console.log('eredraw triggered');
 					enodes = $('#eaccordion-level0 input:checkbox');
 					$.each( enodes, function( index, chkbox ) {
 						if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
@@ -396,7 +407,6 @@
 						$.when( 
 							$.ajax({
 								url: '/sysadmin/accesspermissions/eorg-tree',
-								// url: $url,
 								type: 'GET',
 								data: $("#notify-form").serialize(),
 								dataType: 'html',
@@ -423,7 +433,6 @@
 							})
 							
 						).then(function( data, textStatus, jqXHR ) {
-							//alert( jqXHR.status ); // Alerts 200
 							enodes = $('#eaccordion-level0 input:checkbox');
 							eredrawTreeCheckboxes();	
 						}); 
@@ -431,11 +440,6 @@
 						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
 					};
 				});
-
-				$('#btn_search').click(function(e) {
-					e.preventDefault();
-					$('#employee-list-table').DataTable().rows().invalidate().draw();
-				}); 
 
 				$(window).on('beforeunload', function(){
 					$('#pageLoader').show();
@@ -445,23 +449,6 @@
 					location.reload();
 					return;
 				});
-
-				// Model -- Confirmation Box
-
-				// var modalConfirm = function(callback) {
-				// 	$("#btn-confirm").on("click", function(){
-				// 		$("#mi-modal").modal('show');
-				// 	});
-				// 	$("#modal-btn-si").on("click", function(){
-				// 		callback(true);
-				// 		$("#mi-modal").modal('hide');
-				// 	});
-					
-				// 	$("#modal-btn-no").on("click", function(){
-				// 		callback(false);
-				// 		$("#mi-modal").modal('hide');
-				// 	});
-				// };
 
 			});
 

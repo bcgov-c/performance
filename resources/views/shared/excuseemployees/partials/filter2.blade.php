@@ -2,7 +2,7 @@
 <div class="card p-3">
        
         <div class="form-row">
-          <div class="form-group col-md-2">
+          <div class="form-group col-md-2" id="elvlgroup0">
             <label for="edd_level0">Organization</label>
             <select id="edd_level0" name="edd_level0" class="form-control select2">
                 @if ( old('edd_level0') && session()->get('elevel0') )
@@ -10,7 +10,7 @@
                 @endif
             </select>
           </div>
-          <div class="form-group col-md-2">
+          <div class="form-group col-md-2" id="elvlgroup1">
             <label for="edd_level1">Level 1</label>
             <select id="edd_level1" name="edd_level1" class="form-control select2">
                 @if ( old('edd_level1') && session()->get('elevel1') )
@@ -18,7 +18,7 @@
                 @endif
             </select>
             </div>
-            <div class="form-group col-md-2">
+            <div class="form-group col-md-2" id="elvlgroup2">
                 <label for="edd_level2">Level 2</label>
                 <select id="edd_level2" name="edd_level2" class="form-control select2">
                     @if ( old('edd_level2') && session()->get('elevel2') )
@@ -26,7 +26,7 @@
                     @endif
                 </select>
             </div>
-            <div class="form-group col-md-2">
+            <div class="form-group col-md-2" id="elvlgroup3">
                 <label for="edd_level3">Level 3</label>
                 <select id="edd_level3" name="edd_level3" class="form-control select2">
                     @if ( old('edd_level3') && session()->get('elevel3') )
@@ -34,7 +34,7 @@
                     @endif
                 </select>
             </div>
-            <div class="form-group col-md-2">
+            <div class="form-group col-md-2" id="elvlgroup4">
                 <label for="edd_level4">Level 4</label>
                 <select id="edd_level4" name="edd_level4" class="form-control select2">
                     @if ( old('edd_level4') && session()->get('elevel4') )
@@ -81,159 +81,164 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-    $('#edd_level0').select2({
-        placeholder: 'Select Organization',
-        allowClear: true,
-        ajax: {
-            url: '{{ "/" . request()->segment(1) . "/eorg-organizations" }}'
-            , dataType: 'json'
-            , delay: 250
-            , data: function(params) {
-                var query = {
-                    'q': params.term
-                , }
-                return query;
-            }
-            , processResults: function(data) {
-                return {
-                    results: data
-                    };
-            }
-            , cache: false
-        }
-    });
 
-    $('#edd_level1').select2({
-        placeholder: 'Select Level 1',
-        allowClear: true,
-        ajax: {
-            url: '{{ "/" . request()->segment(1) . "/eorg-programs" }}'
-            , dataType: 'json'
-            , delay: 250
-            , data: function(params) {
-                var query = {
-                    'q': params.term,
-                    'elevel0': $('#edd_level0').children("option:selected").val()
-                , }
-                return query;
-            }
-            , processResults: function(data) {
-                return {
-                    results: data
-                    };
-            }
-            , cache: false
-        }
-    });
+        $(document).ready(function() {
 
-    $('#edd_level2').select2({
-        placeholder: 'Select Level 2',
-        allowClear: true,
-        ajax: {
-            url: '{{ "/" . request()->segment(1) . "/eorg-divisions" }}'
-            , dataType: 'json'
-            , delay: 250
-            , data: function(params) {
-                var query = {
-                    'q': params.term,
-                    'elevel0': $('#edd_level0').children("option:selected").val(),
-                    'elevel1': $('#edd_level1').children("option:selected").val()
-                , }
-                return query;
-            }
-            , processResults: function(data) {
-                return {
-                    results: data
-                    };
-            }
-            , cache: false
-        }
-    });
+            $('#edd_level0').select2({
+                placeholder: 'Select Organization',
+                allowClear: true,
+                ajax: {
+                    url: '{{ "/".request()->segment(1)."/eorg-organizations2" }}'
+                    , dataType: 'json'
+                    , delay: 250
+                    , data: function(params) {
+                        var query = {
+                            'q': params.term
+                        , }
+                        return query;
+                    }
+                    , processResults: function(data) {
+                        return {
+                            results: data
+                            };
+                    }
+                    , cache: false
+                }
+            });
 
-    $('#edd_level3').select2({
-        placeholder: 'Select Level 3',
-        allowClear: true,
-        ajax: {
-            url: '{{ "/" . request()->segment(1) . "/eorg-branches" }}'
-            , dataType: 'json'
-            , delay: 250
-            , data: function(params) {
-                var query = {
-                    'q': params.term,
-                    'elevel0': $('#edd_level0').children("option:selected").val(),
-                    'elevel1': $('#edd_level1').children("option:selected").val(),
-                    'elevel2': $('#edd_level2').children("option:selected").val()
-                , }
-                return query;
-            }
-            , processResults: function(data) {
-                return {
-                    results: data
-                    };
-            }
-            , cache: false
-        }
-    });
+            $('#edd_level1').select2({
+                placeholder: 'Select Level 1',
+                allowClear: true,
+                ajax: {
+                    url: '{{ "/".request()->segment(1)."/eorg-programs2" }}'
+                    , dataType: 'json'
+                    , delay: 250
+                    , data: function(params) {
+                        var query = {
+                            'q': params.term,
+                            'elevel0': $('#edd_level0').children("option:selected").val()
+                        , }
+                        return query;
+                    }
+                    , processResults: function(data) {
+                        return {
+                            results: data
+                            };
+                    }
+                    , cache: false
+                }
+            });
 
-    $('#edd_level4').select2({
-        placeholder: 'Select Level 4',
-        allowClear: true,
-        ajax: {
-            url: '{{ "/" . request()->segment(1) . "/eorg-level4" }}'
-            , dataType: 'json'
-            , delay: 250
-            , data: function(params) {
-                var query = {
-                    'q': params.term,
-                    'elevel0': $('#edd_level0').children("option:selected").val(),
-                    'elevel1': $('#edd_level1').children("option:selected").val(),
-                    'elevel2': $('#edd_level2').children("option:selected").val(),
-                    'elevel3': $('#edd_level3').children("option:selected").val()
-                , }
-                return query;
-            }
-            , processResults: function(data) {
-                return {
-                    results: data
-                    };
-            }
-            , cache: false
-        }
-    });
-    
-    $('#edd_level0').on('select2:select', function (e) {
-        // Do something
-        $('#edd_level1').val(null).trigger('change');
-        $('#edd_level2').val(null).trigger('change');
-        $('#edd_level3').val(null).trigger('change');
-        $('#edd_level4').val(null).trigger('change');
-    });
+            $('#edd_level2').select2({
+                placeholder: 'Select Level 2',
+                allowClear: true,
+                ajax: {
+                    url: '{{ "/".request()->segment(1)."/eorg-divisions2" }}'
+                    , dataType: 'json'
+                    , delay: 250
+                    , data: function(params) {
+                        var query = {
+                            'q': params.term,
+                            'elevel0': $('#edd_level0').children("option:selected").val(),
+                            'elevel1': $('#edd_level1').children("option:selected").val()
+                        , }
+                        return query;
+                    }
+                    , processResults: function(data) {
+                        return {
+                            results: data
+                            };
+                    }
+                    , cache: false
+                }
+            });
 
-    $('#edd_level1').on('select2:select', function (e) {
-        // Do something
-        $('#edd_level2').val(null).trigger('change');
-        $('#edd_level3').val(null).trigger('change');
-        $('#edd_level4').val(null).trigger('change');
-    });
+            $('#edd_level3').select2({
+                placeholder: 'Select Level 3',
+                allowClear: true,
+                ajax: {
+                    url: '{{ "/".request()->segment(1)."/eorg-branches2" }}'
+                    , dataType: 'json'
+                    , delay: 250
+                    , data: function(params) {
+                        var query = {
+                            'q': params.term,
+                            'elevel0': $('#edd_level0').children("option:selected").val(),
+                            'elevel1': $('#edd_level1').children("option:selected").val(),
+                            'elevel2': $('#edd_level2').children("option:selected").val()
+                        , }
+                        return query;
+                    }
+                    , processResults: function(data) {
+                        return {
+                            results: data
+                            };
+                    }
+                    , cache: false
+                }
+            });
 
-    $('#edd_level2').on('select2:select', function (e) {
-        // Do something
-        $('#edd_level3').val(null).trigger('change');
-        $('#edd_level4').val(null).trigger('change');
-    });
+            $('#edd_level4').select2({
+                placeholder: 'Select Level 4',
+                allowClear: true,
+                ajax: {
+                    url: '{{ "/".request()->segment(1)."/eorg-level42" }}'
+                    , dataType: 'json'
+                    , delay: 250
+                    , data: function(params) {
+                        var query = {
+                            'q': params.term,
+                            'elevel0': $('#edd_level0').children("option:selected").val(),
+                            'elevel1': $('#edd_level1').children("option:selected").val(),
+                            'elevel2': $('#edd_level2').children("option:selected").val(),
+                            'elevel3': $('#edd_level3').children("option:selected").val()
+                        , }
+                        return query;
+                    }
+                    , processResults: function(data) {
+                        return {
+                            results: data
+                            };
+                    }
+                    , cache: false
+                }
+            });
+            
+            $('#edd_level0').on('select2:select', function (e) {
+                e.preventDefault();
+                $('#edd_level1').val(null).trigger('change');
+                $('#edd_level2').val(null).trigger('change');
+                $('#edd_level3').val(null).trigger('change');
+                $('#edd_level4').val(null).trigger('change');
+            });
 
-    $('#edd_level3').on('select2:select', function (e) {
-        // Do something
-        $('#edd_level4').val(null).trigger('change');
-    });
+            $('#edd_level1').on('select2:select', function (e) {
+                e.preventDefault();
+                $('#edd_level2').val(null).trigger('change');
+                $('#edd_level3').val(null).trigger('change');
+                $('#edd_level4').val(null).trigger('change');
+            });
 
-    $('#ebtn_search_reset').click(function() {
-        $('#edd_level0').val(null).trigger('change');
-        $('#edd_level1').val(null).trigger('change');
-        $('#edd_level2').val(null).trigger('change');
-        $('#edd_level3').val(null).trigger('change');
-        $('#edd_level4').val(null).trigger('change');
-    });
+            $('#edd_level2').on('select2:select', function (e) {
+                e.preventDefault();
+                $('#edd_level3').val(null).trigger('change');
+                $('#edd_level4').val(null).trigger('change');
+            });
+
+            $('#edd_level3').on('select2:select', function (e) {
+                e.preventDefault();
+                $('#edd_level4').val(null).trigger('change');
+            });
+
+            $('#ebtn_search_reset').click(function() {
+                $('#edd_level0').val(null).trigger('change');
+                $('#edd_level1').val(null).trigger('change');
+                $('#edd_level2').val(null).trigger('change');
+                $('#edd_level3').val(null).trigger('change');
+                $('#edd_level4').val(null).trigger('change');
+            });
+
+        });
 
     </script>
 
