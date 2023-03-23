@@ -17,8 +17,6 @@
                         <th>Owner</th>
                         <th>Business Unit</th>
                         <th>Ministry</th>
-                        <th>Description</th>
-                        <th>Measure Of Success</th>
                         <th>Start Date</th>
                         <th>End Date</th>
                     </tr>
@@ -27,12 +25,17 @@
                         <td><?php echo $data["selected_goal"]->name; ?></td>
                         <td><?php echo $data["selected_goal"]->business_unit; ?></td>
                         <td><?php echo $data["selected_goal"]->organization; ?></td>
-                        <td><?php echo $data["selected_goal"]->what; ?></td>
-                        <td><?php echo $data["selected_goal"]->measure_of_success; ?></td>
                         <td><?php echo $data["selected_goal"]->start_date; ?></td>
                         <td><?php echo $data["selected_goal"]->target_date; ?></td>
                     </tr>
-                </table>                
+                </table>   
+                
+                <p><b>Description</b></p>
+                <?php echo $data["selected_goal"]->what; ?>
+                
+                <p><b>Measure Of Success</b></p>
+                <?php echo $data["selected_goal"]->measure_of_success; ?>
+                
                 <?php } ?>
                 
                 <?php if(isset($data["selected_goal_comments"])){?>

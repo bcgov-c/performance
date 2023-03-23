@@ -17,17 +17,17 @@
                         @endif
                     </div>
                     <div class="form-group col-md-4">
-                        <b>Completion Date (Start): </b><br/>
-                        <input label="Completion Date (Start)" type="date" name="start_date" value="<?php echo $start_date; ?>" />
+                        <b>Start Date: </b><br/>
+                        <input label="Start Date" type="date" name="start_date" value="<?php echo $start_date; ?>" />
                         @if(isset($data["error"]) && $data["error"]["start_date"])
-                        <small class="text-danger error-start_date">Completion Date (Start) is required</small>
+                        <small class="text-danger error-start_date">Start Date is required</small>
                         @endif
                     </div>
                     <div class="form-group col-md-4">
-                        <b>Completion Date ((End): </b><br/>
-                        <input label="Completion Date ((End)" type="date" name="end_date" value="<?php echo $end_date; ?>" />
+                        <b>End Date: </b><br/>
+                        <input label="End Date" type="date" name="end_date" value="<?php echo $end_date; ?>" />
                         @if(isset($data["error"]) && $data["error"]["end_date"])
-                        <small class="text-danger error-end_date">Completion Date (End) is required</small>
+                        <small class="text-danger error-end_date">End Date is required</small>
                         @endif
                     </div>
                 </div>
@@ -102,6 +102,7 @@
                     <th>Title</th>
                     <th>Business Unit</th>
                     <th>Ministry</th>
+                    <th>Created At</th>
                     <th>&nbsp;</th>
                 </tr>
                 <?php foreach($data["active_goals"] as $item){?>
@@ -110,6 +111,7 @@
                     <td><?php echo $item->title; ?></td>
                     <td><?php echo $item->business_unit; ?></td>
                     <td><?php echo $item->organization; ?></td>
+                    <td><?php echo $item->created_at; ?></td>
                     <td>
                         <a href="/sysadmin/statistics/filereports-export?type=selected_goal&id=<?php echo $item->id; ?>"><button type="button" class="btn btn-primary"> <i class="fas fa-file-pdf"></i> Download</button></a>
                     </td>
@@ -127,6 +129,7 @@
                     <th>Title</th>
                     <th>Business Unit</th>
                     <th>Ministry</th>
+                    <th>Created At</th>
                     <th>&nbsp;</th>
                 </tr>
                 <?php foreach($data["past_goals"] as $item){?>
@@ -135,6 +138,7 @@
                     <td><?php echo $item->title; ?></td>
                     <td><?php echo $item->business_unit; ?></td>
                     <td><?php echo $item->organization; ?></td>
+                    <td><?php echo $item->created_at; ?></td>
                     <td><a href="/sysadmin/statistics/filereports-export?type=selected_goal&id=<?php echo $item->id; ?>"><button type="button" class="btn btn-primary"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
                 <tr/>    
                 <?php }?>
@@ -150,6 +154,7 @@
                     <th>Title</th>
                     <th>Business Unit</th>
                     <th>Ministry</th>
+                    <th>Created At</th>
                     <th>&nbsp;</th>
                 </tr>
                 <?php foreach($data["open_conversations"] as $item){?>
@@ -158,6 +163,7 @@
                     <td><?php echo $item->topic; ?></td>
                     <td><?php echo $item->business_unit; ?></td>
                     <td><?php echo $item->organization; ?></td>
+                    <td><?php echo $item->created_at; ?></td>
                     <td><a href="/sysadmin/statistics/filereports-export?type=selected_conversation&id=<?php echo $item->conversation_id; ?>"><button type="button" class="btn btn-primary"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
                 <tr/>    
                 <?php }?>
@@ -173,6 +179,7 @@
                     <th>Title</th>
                     <th>Business Unit</th>
                     <th>Ministry</th>
+                    <th>Latest Signoff At</th>
                     <th>&nbsp;</th>
                 </tr>
                 <?php foreach($data["completed_conversations"] as $item){?>
@@ -181,6 +188,7 @@
                     <td><?php echo $item->topic; ?></td>
                     <td><?php echo $item->business_unit; ?></td>
                     <td><?php echo $item->organization; ?></td>
+                    <td><?php echo $item->latest_update; ?></td>
                     <td><a href="/sysadmin/statistics/filereports-export?type=selected_conversation&id=<?php echo $item->conversation_id; ?>"><button type="button" class="btn btn-primary"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
                 <tr/>    
                 <?php }?>
