@@ -109,6 +109,7 @@ class EmployeeListController extends Controller
             ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
             ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
             ->when($request->search_text, function($q) use ($request) { return $q->whereRaw("{$request->criteria} like '%{$request->search_text}%'"); })
+            ->orderBy('u.employee_id')
             ->selectRaw ("
                 u.user_id AS id,
                 u.guid,
@@ -377,6 +378,12 @@ class EmployeeListController extends Controller
     public function exportPast(Request $request) {
         $query = UserDemoJrView::from('user_demo_jr_view AS u')
         ->whereNotNull('u.date_deleted')
+        ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
+        ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
+        ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
+        ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
+        ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
+        ->when($request->search_text, function($q) use ($request) { return $q->whereRaw("{$request->criteria} like '%{$request->search_text}%'"); })
         ->orderBy('u.employee_id')
         ->selectRaw ("
             u.user_id AS id,
