@@ -2170,7 +2170,7 @@ class SysadminStatisticsReportController extends Controller
                 if(!empty($request->record_types)){
                     foreach($request->record_types as $item){
                         if($item == "active_goals"){
-                            $active_goals = Goal::selectRaw("goals.id, users.name, goals.title, employee_demo.organization, employee_demo.business_unit")
+                            $active_goals = Goal::selectRaw("goals.id, users.name, goals.title, goals.created_at, employee_demo.organization, employee_demo.business_unit")
                                     ->join('users', function($join) {
                                         $join->on('users.id', '=', 'goals.user_id');   
                                     }) 
@@ -2182,18 +2182,19 @@ class SysadminStatisticsReportController extends Controller
                                     ->where(function($query) use($request) {   
                                             $query->where(function($query) use($request) {   
                                                             $query ->where([
-                                                                ['goals.target_date','>=',$request->start_date],
-                                                                ['goals.target_date','<=',$request->end_date]
+                                                                ['goals.created_at','>=',$request->start_date],
+                                                                ['goals.created_at','<=',$request->end_date]
                                                             ])
                                                             ->orWhereNull('goals.target_date');
                                         });
                                     })  
-                                    ->where('employee_demo.employee_id', '=', $request->employee_id)           
+                                    ->where('employee_demo.employee_id', '=', $request->employee_id)  
+                                    ->orderBy('goals.created_at', 'DESC')        
                                     ->get();                                    
                             $data["active_goals"] = $active_goals;
                         }
                         if($item == "past_goals"){
-                            $past_goals = Goal::selectRaw("goals.id, users.name, goals.title, employee_demo.organization, employee_demo.business_unit")
+                            $past_goals = Goal::selectRaw("goals.id, users.name, goals.title, goals.created_at, employee_demo.organization, employee_demo.business_unit")
                                     ->join('users', function($join) {
                                         $join->on('users.id', '=', 'goals.user_id');   
                                     }) 
@@ -2205,18 +2206,19 @@ class SysadminStatisticsReportController extends Controller
                                     ->where(function($query) use($request) {   
                                             $query->where(function($query) use($request) {   
                                                             $query ->where([
-                                                                ['goals.target_date','>=',$request->start_date],
-                                                                ['goals.target_date','<=',$request->end_date]
+                                                                ['goals.created_at','>=',$request->start_date],
+                                                                ['goals.created_at','<=',$request->end_date]
                                                             ])
                                                             ->orWhereNull('goals.target_date');
                                         });
                                     })  
-                                    ->where('employee_demo.employee_id', '=', $request->employee_id)           
+                                    ->where('employee_demo.employee_id', '=', $request->employee_id)     
+                                    ->orderBy('goals.created_at', 'DESC')              
                                     ->get();
                             $data["past_goals"] = $past_goals;
                         }
                         if($item == "open_conversations"){
-                            $open_conversations = ConversationParticipant::selectRaw("conversation_participants.conversation_id, users.name, conversation_topics.name as topic, employee_demo.organization, employee_demo.business_unit")
+                            $open_conversations = ConversationParticipant::selectRaw("conversation_participants.conversation_id, users.name, conversation_topics.name as topic, employee_demo.organization, employee_demo.business_unit, conversations.created_at")
                                                   ->join('conversations', function($join) {
                                                         $join->on('conversations.id', '=', 'conversation_participants.conversation_id');   
                                                   }) 
@@ -2230,8 +2232,8 @@ class SysadminStatisticsReportController extends Controller
                                                         $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                                   })
                                                   ->where([
-                                                        ['conversations.date','>=',$request->start_date],
-                                                        ['conversations.date','<=',$request->end_date]
+                                                        ['conversations.created_at','>=',$request->start_date],
+                                                        ['conversations.created_at','<=',$request->end_date]
                                                   ])
                                                   ->where(function($query) {
                                                         $query->where(function($query) {
@@ -2241,12 +2243,13 @@ class SysadminStatisticsReportController extends Controller
                                                     })
                                                   ->whereNull('conversations.deleted_at')
                                                   ->where('conversation_participants.role', '=', 'emp')          
-                                                  ->where('employee_demo.employee_id', '=', $request->employee_id)          
+                                                  ->where('employee_demo.employee_id', '=', $request->employee_id)   
+                                                  ->orderBy('conversations.created_at', 'DESC')                
                                                   ->get();
                                 $data["open_conversations"] = $open_conversations;   
                         }
                         if($item == "completed_conversations"){
-                            $completed_conversations = ConversationParticipant::selectRaw("conversation_participants.conversation_id, users.name, conversation_topics.name as topic, employee_demo.organization, employee_demo.business_unit")
+                            $completed_conversations = ConversationParticipant::selectRaw("conversation_participants.conversation_id, users.name, conversation_topics.name as topic, employee_demo.organization, employee_demo.business_unit,GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as latest_update")
                                                   ->join('conversations', function($join) {
                                                         $join->on('conversations.id', '=', 'conversation_participants.conversation_id');   
                                                   })
@@ -2260,9 +2263,13 @@ class SysadminStatisticsReportController extends Controller
                                                         $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                                   })
                                                   ->where([
-                                                        ['conversations.date','>=',$request->start_date],
-                                                        ['conversations.date','<=',$request->end_date]
+                                                        ['conversations.sign_off_time','>=',$request->start_date],
+                                                        ['conversations.supervisor_signoff_time','>=',$request->start_date]
                                                   ])
+                                                  ->where([
+                                                        ['conversations.sign_off_time','<=',$request->end_date],
+                                                        ['conversations.supervisor_signoff_time','<=',$request->end_date]
+                                                  ])        
                                                   ->where(function($query) {
                                                         $query->where(function($query) {
                                                             $query->whereNotNull('signoff_user_id')
@@ -2271,7 +2278,8 @@ class SysadminStatisticsReportController extends Controller
                                                     })
                                                   ->whereNull('conversations.deleted_at')
                                                   ->where('conversation_participants.role', '=', 'emp')             
-                                                  ->where('employee_demo.employee_id', '=', $request->employee_id)     
+                                                  ->where('employee_demo.employee_id', '=', $request->employee_id)  
+                                                  ->orderBy('conversations.id', 'DESC')              
                                                   ->get();
                             $data["completed_conversations"] = $completed_conversations;  
                         }
