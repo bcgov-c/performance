@@ -544,7 +544,7 @@ class GoalBankController extends Controller
                     [
                         'goal_id' => $resultrec->id,
                         'version' => '2', 
-                        'orgid' => $org1->orgid,
+                        'orgid' => $org1->id,
                         'created_at' => date('Y-m-d H:i:s'),
                         'updated_at' => date('Y-m-d H:i:s') 
                     ],
@@ -729,7 +729,6 @@ class GoalBankController extends Controller
 
     public function updategoal(Request $request) {
         $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
-        $current_user = Auth::id();
         $organizationList = EmployeeDemoTree::select('id')
             ->whereIn('id', $selected_org_nodes)
             ->distinct()
@@ -742,7 +741,7 @@ class GoalBankController extends Controller
                 [
                     'goal_id' => $resultrec->id,
                     'version' => '2',
-                    'orgid' => $org1->orgid
+                    'orgid' => $org1->id
                 ],
                 [
                     'updated_at' => date('Y-m-d H:i:s')
