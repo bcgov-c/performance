@@ -98,7 +98,7 @@
         placeholder: 'select organization',
         allowClear: true,
         ajax: {
-            url: '/sysadmin/statistics/org-organizations'
+            url: '/sysadmin/org-organizations2'
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -120,7 +120,7 @@
         placeholder: 'select level 1',
         allowClear: true,
         ajax: {
-            url: '/sysadmin/statistics/org-programs' 
+            url: '/sysadmin/org-programs2' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -143,7 +143,7 @@
         placeholder: 'select level 2',
         allowClear: true,
         ajax: {
-            url: '/sysadmin/statistics/org-divisions' 
+            url: '/sysadmin/org-divisions2' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -167,7 +167,7 @@
         placeholder: 'select level 3',
         allowClear: true,
         ajax: {
-            url: '/sysadmin/statistics/org-branches' 
+            url: '/sysadmin/org-branches2' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -192,7 +192,7 @@
         placeholder: 'select level 4',
         allowClear: true,
         ajax: {
-            url: '/sysadmin/statistics/org-level4' 
+            url: '/sysadmin/org-level42' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
