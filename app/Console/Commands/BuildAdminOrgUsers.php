@@ -65,8 +65,6 @@ class BuildAdminOrgUsers extends Command
             $this->info( now() );
             $this->info('Build Assigned Admin Org Users');
 
-            $granted_to_ids = AdminOrg::distinct('user_id')->orderBy('user_id')->pluck('user_id');
-
             $this->info( 'Step 1: Truncate Table' );
             AdminOrgUser::truncate();
             
@@ -81,9 +79,8 @@ class BuildAdminOrgUsers extends Command
                     UserDemoJrView::join('admin_orgs', 'admin_orgs.orgid', 'user_demo_jr_view.orgid')
                     ->where('admin_orgs.version', 2)
                     ->whereNull('user_demo_jr_view.date_deleted')
-                    ->select('admin_orgs.user_id', 'user_demo_jr_view.user_id', 'admin_orgs.id')
+                    ->select('admin_orgs.user_id', 'user_demo_jr_view.user_id', 'admin_orgs.orgid')
                     ->distinct()
-                    
                 );
 
 
