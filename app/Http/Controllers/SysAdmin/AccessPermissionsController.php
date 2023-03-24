@@ -4,24 +4,26 @@ namespace App\Http\Controllers\SysAdmin;
 
 
 
+use Exception;
 use App\Models\User;
 use App\Models\AdminOrg;
+use App\Models\AdminOrgUser;
 use App\Models\EmployeeDemo;
 use App\Models\UserListView;
-use App\Models\UserManageAccessView;
 use Illuminate\Http\Request;
-use App\Models\OrganizationTree;
+use App\Models\UserDemoJrView;
 use App\Models\EmployeeDemoTree;
+use App\Models\OrganizationTree;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\UserManageAccessView;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
-use Exception;
 
 
 class AccessPermissionsController extends Controller
@@ -254,6 +256,9 @@ class AccessPermissionsController extends Controller
                         break;
                     }
                 }
+
+                $this->refreshAdminOrgUsersById($newId->id);
+
             };  
         }
 
@@ -758,6 +763,9 @@ class AccessPermissionsController extends Controller
                     ->update(['role_id' => $request->accessselect, 'reason' => $request->reason]);
                     $orgs = AdminOrg::where('user_id', '=', $request->input('model_id'))
                     ->delete();
+
+                    $this->refreshAdminOrgUsersById( $request->model_id );
+
                 return redirect()->back();
                 }
                 catch (Exception $e) {
@@ -769,6 +777,9 @@ class AccessPermissionsController extends Controller
                 ->where('model_id', $request->model_id)
                 ->where('role_id', 3)
                 ->update(['reason' => $request->reason]);
+
+                $this->refreshAdminOrgUsersById( $request->model_id );
+
                 return redirect()->back();
             }
         } else {
@@ -793,9 +804,33 @@ class AccessPermissionsController extends Controller
         if ($request->input('role_id') == 3) {
             $orgs = AdminOrg::where('user_id', $request->input('model_id'))
             ->delete();
+
+            $this->refreshAdminOrgUsersById( $request->input('model_id') );
         }
         return redirect()->back();
     }
 
+    protected function refreshAdminOrgUsersById($user_id) 
+    {
+
+        // #809 Update the model 'AdminOrgUsers' on the latest updated user, and instantly available on Statistics and Reporting 
+        // Step 1 -- Clean up for the updated user id
+        AdminOrgUser::where('granted_to_id', $user_id)->where('access_type', 0)->where('shared_profile_id', 0)->delete();
+
+        // Step 2 -- insert record
+        AdminOrgUser::insertUsing([
+            'granted_to_id', 'allowed_user_id',
+            'admin_org_id'
+        ], 
+            UserDemoJrView::join('admin_orgs', 'admin_orgs.orgid', 'user_demo_jr_view.orgid')
+                ->where('admin_orgs.version', 2)
+                ->whereNull('user_demo_jr_view.date_deleted')
+                ->where('admin_orgs.user_id',  $user_id )
+                ->select('admin_orgs.user_id', 'user_demo_jr_view.user_id', 'admin_orgs.id')
+                ->distinct()
+
+        );
+
+    }
 
 }
