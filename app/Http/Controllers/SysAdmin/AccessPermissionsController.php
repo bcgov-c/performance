@@ -826,7 +826,7 @@ class AccessPermissionsController extends Controller
                 ->where('admin_orgs.version', 2)
                 ->whereNull('user_demo_jr_view.date_deleted')
                 ->where('admin_orgs.user_id',  $user_id )
-                ->select('admin_orgs.user_id', 'user_demo_jr_view.user_id', 'admin_orgs.id')
+                ->select('admin_orgs.user_id', 'user_demo_jr_view.user_id', 'admin_orgs.orgid')
                 ->distinct()
 
         );
