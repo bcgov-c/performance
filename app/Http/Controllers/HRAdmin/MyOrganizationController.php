@@ -34,10 +34,8 @@ class MyOrganizationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         $errors = session('errors');
-
         if ($errors) {
             $old = session()->getOldInput();
             $request->dd_level0 = isset($old['dd_level0']) ? $old['dd_level0'] : null;
@@ -48,7 +46,6 @@ class MyOrganizationController extends Controller
             $request->criteria = isset($old['criteria']) ? $old['criteria'] : null;
             $request->search_text = isset($old['search_text']) ? $old['search_text'] : null;
         } 
-
         if ($request->btn_search) {
             session()->put('_old_input', [
                 'dd_level0' => $request->dd_level0,
@@ -60,42 +57,28 @@ class MyOrganizationController extends Controller
                 'search_text' => $request->search_text,
             ]);
         }
-
-        $level0 = $request->dd_level0 ? EmployeeDemoTree::where('id', $request->dd_level0)->first() : null;
-        $level1 = $request->dd_level1 ? EmployeeDemoTree::where('id', $request->dd_level1)->first() : null;
-        $level2 = $request->dd_level2 ? EmployeeDemoTree::where('id', $request->dd_level2)->first() : null;
-        $level3 = $request->dd_level3 ? EmployeeDemoTree::where('id', $request->dd_level3)->first() : null;
-        $level4 = $request->dd_level4 ? EmployeeDemoTree::where('id', $request->dd_level4)->first() : null;
-
-        $request->session()->flash('level0', $level0);
-        $request->session()->flash('level1', $level1);
-        $request->session()->flash('level2', $level2);
-        $request->session()->flash('level3', $level3);
-        $request->session()->flash('level4', $level4);
-
+        $request->session()->flash('level0', $request->dd_level0);
+        $request->session()->flash('level1', $request->dd_level1);
+        $request->session()->flash('level2', $request->dd_level2);
+        $request->session()->flash('level3', $request->dd_level3);
+        $request->session()->flash('level4', $request->dd_level4);
         $criteriaList = $this->search_criteria_list();
-
         return view('hradmin.myorg.myorganization', compact ('request', 'criteriaList'));
     }
 
-    public function getList(Request $request)
-    {
-        if ($request->ajax()) 
-        {
+    public function getList(Request $request) {
+        if ($request->ajax()) {
             $authId = Auth::id();
             $query = HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
             ->whereRaw("u.ao_user_id = {$authId}")
+            ->whereNull('u.date_deleted')
             ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
             ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
             ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
             ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
             ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
-            ->when($request->criteria == 'id' && $request->search_text, function($q) use($request) { return $q->whereRaw("u.employee_id LIKE '%{$request->search_text}%'"); })
-            ->when($request->criteria == 'name' && $request->search_text, function($q) use($request) { return $q->whereRaw("u.employee_name LIKE '%{$request->search_text}%'"); })
-            ->when($request->criteria == 'job' && $request->search_text, function($q) use($request) { return $q->whereRaw("u.jobcode_desc LIKE '%{$request->search_text}%'"); })
-            ->when($request->criteria == 'dpt' && $request->search_text, function($q) use($request) { return $q->whereRaw("u.deptid LIKE '%{$request->search_text}%'"); })
-            ->when($request->criteria == 'all' && $request->search_text, function($q) use($request) { return $q->whereRaw("(u.employee_id LIKE '%{$request->search_text}%' OR u.employee_name LIKE '%{$request->search_text}%' OR u.jobcode_desc LIKE '%{$request->search_text}%' OR u.deptid LIKE '%{$request->search_text}%')"); })
-            ->whereNull('u.date_deleted')
+            ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { return $q->whereRaw("u.{$request->criteria} like '%{$request->search_text}%'"); })
+            ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(u.employee_id LIKE '%{$request->search_text}%' OR u.employee_name LIKE '%{$request->search_text}%' OR u.jobcode_desc LIKE '%{$request->search_text}%' OR u.deptid LIKE '%{$request->search_text}%')"); })
             ->selectRaw ("
                 u.user_id,
                 u.guid,
@@ -148,10 +131,10 @@ class MyOrganizationController extends Controller
     protected function search_criteria_list() {
         return [
             'all' => 'All',
-            'emp' => 'Employee ID', 
-            'name'=> 'Employee Name',
-            'job' => 'Classification', 
-            'dpt' => 'Department ID'
+            'employee_id' => 'Employee ID', 
+            'employee_name'=> 'Employee Name',
+            'jobcode_desc' => 'Classification', 
+            'deptid' => 'Department ID'
         ];
     }
 
