@@ -9,6 +9,7 @@ use App\Models\AdminOrgUser;
 use App\Models\EmployeeDemo;
 use App\Models\JobSchedAudit;
 use App\Models\SharedProfile;
+use App\Models\UserDemoJrView;
 use Illuminate\Console\Command;
 
 class BuildAdminOrgUsers extends Command
@@ -76,26 +77,13 @@ class BuildAdminOrgUsers extends Command
             AdminOrgUser::insertUsing([
                     'granted_to_id', 'allowed_user_id',
                     'admin_org_id'
-                ], User::withoutGlobalScopes()->select('admin_orgs.user_id', 'users.id',
-                            'admin_orgs.id')
-                        ->join('employee_demo', 'users.guid', '=', 'employee_demo.guid')
-                        ->join('admin_orgs', function ($j1) {
-                            $j1->on(function ($j1a) {
-                                $j1a->whereRAW('(admin_orgs.organization = employee_demo.organization OR ((admin_orgs.organization = "" OR admin_orgs.organization IS NULL) AND (employee_demo.organization = "" OR employee_demo.organization IS NULL)))');
-                            } )
-                            ->on(function ($j2a) {
-                                $j2a->whereRAW('(admin_orgs.level1_program = employee_demo.level1_program OR ((admin_orgs.level1_program = "" OR admin_orgs.level1_program IS NULL) AND (employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL)))');
-                            } )
-                            ->on(function ($j3a) {
-                                $j3a->whereRAW('(admin_orgs.level2_division = employee_demo.level2_division OR ((admin_orgs.level2_division = "" OR admin_orgs.level2_division IS NULL) AND (employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL)))');
-                            } )
-                            ->on(function ($j4a) {
-                                $j4a->whereRAW('(admin_orgs.level3_branch = employee_demo.level3_branch OR ((admin_orgs.level3_branch = "" OR admin_orgs.level3_branch IS NULL) AND (employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL)))');
-                            } )
-                            ->on(function ($j5a) {
-                                $j5a->whereRAW('(admin_orgs.level4 = employee_demo.level4 OR ((admin_orgs.level4 = "" OR admin_orgs.level4 IS NULL) AND (employee_demo.level4 = "" OR employee_demo.level4 IS NULL)))');
-                            } );
-                        })
+                ],
+                    UserDemoJrView::join('admin_orgs', 'admin_orgs.orgid', 'user_demo_jr_view.orgid')
+                    ->where('admin_orgs.version', 2)
+                    ->whereNull('user_demo_jr_view.date_deleted')
+                    ->select('admin_orgs.user_id', 'user_demo_jr_view.user_id', 'admin_orgs.id')
+                    ->distinct()
+                    
                 );
 
 
