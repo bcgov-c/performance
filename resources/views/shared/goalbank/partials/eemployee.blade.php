@@ -7,7 +7,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-1">
-                        <input pid="{{ $parent_id }}" 
+                        <input pid="{{ $eparent_id }}" 
                         type="checkbox"  id="euserCheck{{ $employee->employee_id }}" name="euserCheck[]" 
                         {{ (is_array(old('euserCheck')) and in_array($employee->employee_id, old('euserCheck'))) ? ' checked' : '' }}
                                value="{{ $employee->employee_id }}">
