@@ -128,8 +128,8 @@
                         <p>Are you sure to send out this message ?</p>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-primary mt-2" type="submit" name="btn_send" value="btn_send">Share</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button class="btn btn-primary mt-2 sharebtn" type="button" name="btn_send" value="btn_send">Share</button>
+                        <button type="button" class="btn btn-secondary cancelbtn" data-dismiss="modal">Cancel</button>
                     </div>
                     
                 </div>
@@ -694,6 +694,13 @@
             @error('input_reason')
                 $('input[name=input_reason]').addClass('is-invalid');
             @enderror
+            
+            $(".sharebtn").click(function(){
+                $(".sharebtn").hide();
+                $(".cancelbtn").hide();
+                $("#notify-form").submit();
+            });
+            
 
         </script>
 
