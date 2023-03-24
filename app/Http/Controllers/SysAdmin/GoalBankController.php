@@ -989,10 +989,15 @@ class GoalBankController extends Controller
                         'goals.display_name',
                         'ced.employee_name as creator_name',
                     )
+                ->addSelect(['audience' =>
+                    GoalSharedWith::whereColumn('goal_id', 'goals.id')
+                        ->selectRAW('count(distinct id)')
+                ] )
                 ->addSelect(['org_audience' => 
                     GoalBankOrg::whereColumn('goal_id', 'goals.id')
-                    ->where('version', 2)
-                    ->selectRAW('count(distinct goal_bank_orgs.id)')
+                        ->where('version', 2)
+                        ->whereNotNull('orgid')
+                        ->selectRAW('count(distinct goal_bank_orgs.id)')
                 ] )
                 ->addSelect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
             return Datatables::of($query)
@@ -1016,8 +1021,8 @@ class GoalBankController extends Controller
                 ->editColumn('created_at', function ($row) {
                     return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.($row->created_at ? $row->created_at->format('F d, Y') : null).' value="'.$row->id.'">'.($row->created_at ? $row->created_at->format('F d, Y') : null).'</a>';
                 })
-                ->addColumn('audience', function ($row) {
-                    return '<a href="'.route(request()->segment(1).'.goalbank.editone', $row->id).'" aria-label="Edit Goal For Individuals" value="'.$row->id.'">'.$row->sharedWith()->count().' Employees</a>';
+                ->editColumn('audience', function ($row) {
+                    return '<a href="'.route(request()->segment(1).'.goalbank.editone', $row->id).'" aria-label="Edit Goal For Individuals" value="'.$row->id.'">'.$row->audience.' Employees</a>';
                 })
                 ->editColumn('org_audience', function ($row) {
                     return '<a href="'.route(request()->segment(1).'.goalbank.editpage', $row->id).'" aria-label="Edit Goal For Business Units" value="'.$row->id.'">'.$row->org_audience.' Business Units</a>';
