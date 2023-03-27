@@ -24,6 +24,9 @@ use App\Exports\SharedEmployeeExport;
 use App\Exports\ExcusedEmployeeExport;
 use Illuminate\Support\Facades\Log;
 
+use Dompdf\Dompdf;
+use Dompdf\Options;
+
 class SysadminStatisticsReportController extends Controller
 {
     private $groups;
@@ -1148,7 +1151,7 @@ class SysadminStatisticsReportController extends Controller
                 );
         
                 $columns = ["Employee ID", "Employee Name", "Email","Conversation Name","Conversation Participant",
-                        "Conversation Due Date", "Employee Sign-Off", "Supervisor Sign-off", 
+                        "Employee Sign-Off", "Employee Sign-Off Time", "Supervisor Sign-off", "Supervisor Sign-off Time", 
                                 "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
                            ];
         
@@ -1183,8 +1186,7 @@ class SysadminStatisticsReportController extends Controller
                             $row['Level 4'] = $conversation->level4;
 
                             fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], // $row['Next Conversation Due'],
-                            $row["Conversation Name"],$row['Conversation Participant'],  $row['Conversation Due Date'],  
-                        $row["Employee Sign-Off"], $row["Employee Sign-Off Time"], $row["Supervisor Sign-off"], $row["Supervisor Sign-Off Time"],
+                            $row["Conversation Name"],$row['Conversation Participant'],  $row["Employee Sign-Off"], $row["Employee Sign-Off Time"], $row["Supervisor Sign-off"], $row["Supervisor Sign-Off Time"],
                                      $row['Organization'],
                                       $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
                                     ));
@@ -1680,9 +1682,22 @@ class SysadminStatisticsReportController extends Controller
                                 
                 $data["selected_goal"] = $selected_goal[0];
                 $data["selected_goal_comments"] = $commentTree;
+
+                $options = new Options();
+                $options->set('defaultFont', 'Arial');
+                $dompdf = new Dompdf($options);
+                // Fetch the HTML content to be converted to PDF
+                $html = view('sysadmin.statistics.filereportsexport', compact('data'))->render();
+                // Load HTML content
+                $dompdf->loadHtml($html);
+                // Set paper size and orientation
+                $dompdf->setPaper('A4', 'portrait');
+                // Render the HTML as PDF
+                $dompdf->render();
+                // Output the generated PDF to the browser
+                return $dompdf->stream('employee_record.pdf');                
                 
-                
-                return view('sysadmin.statistics.filereportsexport', compact('data'));
+                //return view('sysadmin.statistics.filereportsexport', compact('data'));
             }
             if($request->type == 'selected_conversation'){
                 $conversation_id = $request->id;                
