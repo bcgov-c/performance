@@ -1171,9 +1171,11 @@ class SysadminStatisticsReportController extends Controller
                                 $participants_arr[] = $participant->name;
                             }
                             $row['Conversation Participant'] = implode(', ', $participants_arr );
-                            $row['Conversation Due Date'] = $conversation->next_due_date;
+                            //$row['Conversation Due Date'] = $conversation->next_due_date;
                             $row['Employee Sign-Off'] = $conversation->sign_employee_name;
+                            $row['Employee Sign-Off Time'] = $conversation->sign_off_time;
                             $row['Supervisor Sign-off'] = $conversation->sign_supervisor_name;
+                            $row['Supervisor Sign-Off Time'] = $conversation->supervisor_signoff_time;
                             $row['Organization'] = $conversation->organization;
                             $row['Level 1'] = $conversation->level1_program;
                             $row['Level 2'] = $conversation->level2_division;
@@ -1182,7 +1184,7 @@ class SysadminStatisticsReportController extends Controller
 
                             fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], // $row['Next Conversation Due'],
                             $row["Conversation Name"],$row['Conversation Participant'],  $row['Conversation Due Date'],  
-                        $row["Employee Sign-Off"], $row["Supervisor Sign-off"],
+                        $row["Employee Sign-Off"], $row["Employee Sign-Off Time"], $row["Supervisor Sign-off"], $row["Supervisor Sign-Off Time"],
                                      $row['Organization'],
                                       $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
                                     ));
@@ -1678,6 +1680,8 @@ class SysadminStatisticsReportController extends Controller
                                 
                 $data["selected_goal"] = $selected_goal[0];
                 $data["selected_goal_comments"] = $commentTree;
+                
+                
                 return view('sysadmin.statistics.filereportsexport', compact('data'));
             }
             if($request->type == 'selected_conversation'){
@@ -1744,6 +1748,5 @@ class SysadminStatisticsReportController extends Controller
         $output .= $prepend . '</ul>' . PHP_EOL;
         return $output;
     }
-
-
+    
 }
