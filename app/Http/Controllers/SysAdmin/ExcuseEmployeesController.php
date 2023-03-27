@@ -32,17 +32,18 @@ class ExcuseEmployeesController extends Controller
         $old_selected_emp_ids = []; // $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $old_selected_org_nodes = []; // $request->old_selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
 
-        $request->session()->flash('dd_level0', $request->dd_level0);
-        $request->session()->flash('dd_level1', $request->dd_level1);
-        $request->session()->flash('dd_level2', $request->dd_level2);
-        $request->session()->flash('dd_level3', $request->dd_level3);
-        $request->session()->flash('dd_level4', $request->dd_evel4);
+        $request->session()->flash('level0', $request->dd_level0);
+        $request->session()->flash('level1', $request->dd_level1);
+        $request->session()->flash('level2', $request->dd_level2);
+        $request->session()->flash('level3', $request->dd_level3);
+        $request->session()->flash('level4', $request->dd_evel4);
         $request->session()->flash('userCheck', $request->userCheck);  // Dynamic load 
         
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request);
         $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql->select([ 
+        $matched_emp_ids = $sql
+        ->select([ 
                 'u.employee_id', 
                 'u.employee_name', 
                 'u.jobcode_desc', 
@@ -99,11 +100,11 @@ class ExcuseEmployeesController extends Controller
             ]);
         }
 
-        $request->session()->flash('dd_level0', $request->dd_level0);
-        $request->session()->flash('dd_level1', $request->dd_level1);
-        $request->session()->flash('dd_level2', $request->dd_level2);
-        $request->session()->flash('dd_level3', $request->dd_level3);
-        $request->session()->flash('dd_level4', $request->dd_level4);
+        $request->session()->flash('level0', $request->dd_level0);
+        $request->session()->flash('level1', $request->dd_level1);
+        $request->session()->flash('level2', $request->dd_level2);
+        $request->session()->flash('level3', $request->dd_level3);
+        $request->session()->flash('level4', $request->dd_level4);
 
         $criteriaList = $this->search_criteria_list();
         return view('shared.excuseemployees.managehistory', compact ('request', 'criteriaList'));
@@ -220,28 +221,28 @@ class ExcuseEmployeesController extends Controller
 
     public function eloadOrganizationTree(Request $request) {
 
-        list($esql_level0, $esql_level1, $esql_level2, $esql_level3, $esql_level4) = 
-            $this->ebaseFilteredSQLs($request);
-        
-        $rows = $esql_level4->groupBy('o.id')->select('o.id')
-            ->union( $esql_level3->groupBy('o.id')->select('o.id') )
-            ->union( $esql_level2->groupBy('o.id')->select('o.id') )
-            ->union( $esql_level1->groupBy('o.id')->select('o.id') )
-            ->union( $esql_level0->groupBy('o.id')->select('o.id') )
-            ->pluck('o.id'); 
+            list($esql_level0, $esql_level1, $esql_level2, $esql_level3, $esql_level4) = 
+                $this->ebaseFilteredSQLs($request);
+            
+            $rows = $esql_level4->groupBy('o.id')->select('o.id')
+                ->union( $esql_level3->groupBy('o.id')->select('o.id') )
+                ->union( $esql_level2->groupBy('o.id')->select('o.id') )
+                ->union( $esql_level1->groupBy('o.id')->select('o.id') )
+                ->union( $esql_level0->groupBy('o.id')->select('o.id') )
+                ->pluck('o.id'); 
 
-        $eorgs = OrganizationTree::whereIn('id', $rows->toArray() )->get()->toTree();
-        
-        $eempIdsByOrgId = [];
-        $eempIdsByOrgId = $rows->groupBy('id')->all();
+            $eorgs = OrganizationTree::whereIn('id', $rows->toArray() )->get()->toTree();
+            
+            $eempIdsByOrgId = [];
+            $eempIdsByOrgId = $rows->groupBy('id')->all();
 
         if($request->ajax()){
             return view('shared.excuseemployees.partials.recipient-tree2', compact('eorgs','eempIdsByOrgId') );
         } 
-
+    
     }
   
-public function getDatatableEmployees(Request $request) {
+    public function getDatatableEmployees(Request $request) {
 
         if($request->ajax()){
 
@@ -498,5 +499,6 @@ public function getDatatableEmployees(Request $request) {
         $esql_level4->where('level', '=', 4);
         return  [$esql_level0, $esql_level1, $esql_level2, $esql_level3, $esql_level4];
     }
+
 
 }

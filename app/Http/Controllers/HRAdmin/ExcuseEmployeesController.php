@@ -22,19 +22,21 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 
 
-class ExcuseEmployeesController extends Controller {
+class ExcuseEmployeesController extends Controller
+{
 
-    public function addindex(Request $request)  {
+    public function addindex(Request $request) 
+    {
         $errors = session('errors');
 
         $old_selected_emp_ids = []; // $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $old_selected_org_nodes = []; // $request->old_selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
 
-        $request->session()->flash('dd_level0', $request->dd_level0);
-        $request->session()->flash('dd_level1', $request->dd_level1);
-        $request->session()->flash('dd_level2', $request->dd_level2);
-        $request->session()->flash('dd_level3', $request->dd_level3);
-        $request->session()->flash('dd_level4', $request->dd_level4);
+        $request->session()->flash('level0', $request->dd_level0);
+        $request->session()->flash('level1', $request->dd_level1);
+        $request->session()->flash('level2', $request->dd_level2);
+        $request->session()->flash('level3', $request->dd_level3);
+        $request->session()->flash('level4', $request->dd_level4);
         $request->session()->flash('userCheck', $request->userCheck);  // Dynamic load 
         
         // Matched Employees 
@@ -98,11 +100,11 @@ class ExcuseEmployeesController extends Controller {
             ]);
         }
 
-        $request->session()->flash('dd_level0', $request->dd_level0);
-        $request->session()->flash('dd_level1', $request->dd_level1);
-        $request->session()->flash('dd_level2', $request->dd_level2);
-        $request->session()->flash('dd_level3', $request->dd_level3);
-        $request->session()->flash('dd_level4', $request->dd_level4);
+        $request->session()->flash('level0', $request->dd_level0);
+        $request->session()->flash('level1', $request->dd_level1);
+        $request->session()->flash('level2', $request->dd_level2);
+        $request->session()->flash('level3', $request->dd_level3);
+        $request->session()->flash('level4', $request->dd_level4);
 
         $criteriaList = $this->search_criteria_list();
         return view('shared.excuseemployees.managehistory', compact ('request', 'criteriaList'));
@@ -244,6 +246,7 @@ class ExcuseEmployeesController extends Controller {
     
     }
 
+  
     public function getDatatableEmployees(Request $request) {
 
         if($request->ajax()){
@@ -506,5 +509,6 @@ class ExcuseEmployeesController extends Controller {
         $esql_level4->where('level', '=', 4);
         return  [$esql_level0, $esql_level1, $esql_level2, $esql_level3, $esql_level4];
     }
+
 
 }
