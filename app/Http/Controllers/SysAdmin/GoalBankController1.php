@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\HRAdmin;
+namespace App\Http\Controllers\SysAdmin;
 
 
 use Carbon\Carbon;
@@ -15,14 +15,13 @@ use App\Models\GoalSharedWith;
 use App\Models\UserDemoJrView;
 use App\MicrosoftGraph\SendMail;
 use App\Models\EmployeeDemoTree;
-use App\Models\HRUserDemoJrView;
-use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Goals\CreateGoalRequest;
 use Illuminate\Validation\ValidationException;
@@ -35,11 +34,11 @@ class GoalBankController extends Controller
         $this->getDropdownValues($mandatoryOrSuggested);
         $tags = Tag::all(["id","name"])->sortBy("name")->toArray();
         $errors = session('errors');
-        $request->firstTime = true;        
-        $old_selected_emp_ids = []; // $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
-        $old_selected_org_nodes = []; // $request->old_selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
-        $eold_selected_emp_ids = []; // $request->eselected_emp_ids ? json_decode($request->eselected_emp_ids) : [];
-        $eold_selected_org_nodes = []; // $request->eold_selected_org_nodes ? json_decode($request->eselected_org_nodes) : [];
+        $request->firstTime = true;
+        $old_selected_emp_ids = []; 
+        $old_selected_org_nodes = []; 
+        $eold_selected_emp_ids = []; 
+        $eold_selected_org_nodes = [];
         if ($errors) {
             $old = session()->getOldInput();
             $request->dd_level0 = isset($old['dd_level0']) ? $old['dd_level0'] : null;
@@ -135,7 +134,6 @@ class GoalBankController extends Controller
         return view('shared.goalbank.createindex', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'type_desc_str', 'currentView', 'supervisorList') );
     }
 
-
     public function index(Request $request) {
         $goalTypes = GoalType::all()->toArray();
         $this->getDropdownValues($mandatoryOrSuggested);
@@ -217,13 +215,10 @@ class GoalBankController extends Controller
 
     public function getgoalorgs(Request $request, $goal_id) {
         if ($request->ajax()) {
-            $current_user = Auth::id();
             $query = GoalBankOrg::from('goal_bank_orgs AS b')
                 ->where('b.goal_id', $goal_id)
                 ->where('b.version', 2)
                 ->join('employee_demo_tree AS t', 't.id', 'b.orgid')
-                ->join('admin_orgs AS o', 'b.orgid', 'o.orgid')
-                ->where('o.user_id', $current_user)
                 ->when( $request->dd_level0, function ($q) use($request) { return $q->where('t.organization_key', '=', $request->dd_level0); })
                 ->when( $request->dd_level1, function ($q) use($request) { return $q->where('t.level1_key', $request->dd_level1); })
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('t.level2_key', $request->dd_level2); })
@@ -339,13 +334,13 @@ class GoalBankController extends Controller
         $demoWhere = $this->baseFilteredWhere($request, "");
         $sql = clone $demoWhere; 
         $matched_emp_ids = $sql
-        ->orderBy('u.employee_id')
-        ->pluck('u.employee_id');        
+            ->orderBy('u.employee_id')
+            ->pluck('u.employee_id');        
         $criteriaList = $this->search_criteria_list();
         $ecriteriaList = $this->search_criteria_list();
         $roles = DB::table('roles')
-        ->whereIntegerInRaw('id', [3, 4])
-        ->pluck('longname', 'id');
+            ->whereIntegerInRaw('id', [3, 4])
+            ->pluck('longname', 'id');
         $goal_id = $id;
         $goaldetail = Goal::withoutGlobalScopes()->find($request->id);
         $type_desc_arr = array();
@@ -379,7 +374,7 @@ class GoalBankController extends Controller
             $request->dd_level3 = isset($old['dd_level3']) ? $old['dd_level3'] : null;
             $request->dd_level4 = isset($old['dd_level4']) ? $old['dd_level4'] : null;
             $request->dd_superv = isset($old['dd_superv']) ? $old['dd_superv'] : null;
-            $request->qdd_superv = isset($old['qdd_superv']) ? $old['qdd_superv'] : null;
+            $request->add_superv = isset($old['add_superv']) ? $old['add_superv'] : null;
             $request->search_text = isset($old['search_text']) ? $old['search_text'] : null;
             $request->orgCheck = isset($old['orgCheck']) ? $old['orgCheck'] : null;
             $request->userCheck = isset($old['userCheck']) ? $old['userCheck'] : null;
@@ -461,8 +456,7 @@ class GoalBankController extends Controller
         }
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
         $currentView = $request->segment(3);
-        return view('shared.goalbank.editone', compact('criteriaList', 'acriteriaList', 'matched_emp_ids', 'amatched_emp_ids', 'old_selected_emp_ids', 'aold_selected_emp_ids', 'old_selected_org_nodes', 'aold_selected_org_nodes', 'goalTypes', 'mandatoryOrSuggested', 'amandatoryOrSuggested', 'tags', 'atags', 'goaldetail', 'request', 'goal_id', 'type_desc_str', 'currentView', 'supervisorList') );
-    
+        return view('shared.goalbank.editone', compact('criteriaList', 'acriteriaList', 'matched_emp_ids', 'amatched_emp_ids', 'old_selected_emp_ids', 'aold_selected_emp_ids', 'old_selected_org_nodes', 'aold_selected_org_nodes', 'goalTypes', 'mandatoryOrSuggested', 'amandatoryOrSuggested', 'tags', 'atags', 'goaldetail', 'request', 'goal_id', 'type_desc_str', 'currentView', 'supervisorList') );    
     }
 
     public function editdetails(Request $request, $id) {
@@ -493,9 +487,9 @@ class GoalBankController extends Controller
                 $request->session()->flash('tags_miss', 'The tags field is required');
             }   elseif($request->input('what') == '') {
                 $request->session()->flash('what_miss', 'The description field is required');
-            }             
-            return \Redirect::route('hradmin.goalbank')->with('message', " There are one or more errors on the page. Please review and try again.");
-        }       
+            }               
+            return \Redirect::route('sysadmin.goalbank')->with('message', " There are one or more errors on the page. Please review and try again.");
+        }  
         $current_user = User::find(Auth::id());
         $resultrec = Goal::withoutGlobalScopes()
         ->create(
@@ -509,7 +503,7 @@ class GoalBankController extends Controller
             , 'target_date' => $request->input('target_date')
             , 'user_id' => $current_user->id
             , 'created_by' => $current_user->id
-            , 'by_admin' => 2
+            , 'by_admin' => '1'
             , 'isMandatory' => $request->input('isMandatory')
             , 'display_name' => $request->input('display_name')
             ]
@@ -521,7 +515,7 @@ class GoalBankController extends Controller
             $selected_emp_ids = $request->userCheck ? $request->userCheck : [];
             $toRecipients = EmployeeDemo::from('employee_demo AS d')
                 ->select('u.id')
-                ->join('users AS u', 'd.employee_id', 'u.employee_id')
+                ->join('users as u', 'd.employee_id', 'u.employee_id')
                 ->whereIn('d.employee_id', $selected_emp_ids )
                 ->distinct()
                 ->select ('u.id')
@@ -530,12 +524,10 @@ class GoalBankController extends Controller
             foreach ($toRecipients as $newId) {
                 $result = DB::table('goals_shared_with')
                     ->updateOrInsert(
-                        [
-                            'goal_id' => $resultrec->id,
-                            'user_id' => $newId->id
+                        ['goal_id' => $resultrec->id
+                        , 'user_id' => $newId->id
                         ],
-                        [
-                        ]
+                        []
                     );
             }
             $notify_audiences = $selected_emp_ids;
@@ -552,11 +544,11 @@ class GoalBankController extends Controller
                 $result = GoalBankOrg::create(
                     [
                         'goal_id' => $resultrec->id,
-                        'version' => '2',
+                        'version' => '2', 
                         'orgid' => $org1->id,
                         'created_at' => date('Y-m-d H:i:s'),
                         'updated_at' => date('Y-m-d H:i:s') 
-                    ]
+                    ],
                 );
                 if(!$result){
                     break;
@@ -650,7 +642,7 @@ class GoalBankController extends Controller
         ->union( $sql_level0->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row") ) )
         ->pluck('count_row', 'o.id');  
         // Employee ID by Tree ID
-        $aempIdsByOrgId = [];
+        $eempIdsByOrgId = [];
         $demoWhere = $this->baseFilteredWhere($request, "a");
         $sql = clone $demoWhere; 
         $rows = $sql->select('orgid AS id', 'employee_id')
@@ -683,12 +675,12 @@ class GoalBankController extends Controller
                 ->when($request->dd_superv == 'non', function($q) { return $q->whereRaw("NOT EXISTS (SELECT DISTINCT 1 FROM users AS u2, users AS su WHERE su.reporting_to = u2.id AND u2.employee_id = u.employee_id)"); })
                 ->selectRaw("CASE WHEN (SELECT DISTINCT 1 FROM users AS u3, users AS su WHERE su.reporting_to = u3.id AND u3.employee_id = u.employee_id) = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor");
             return Datatables::of($employees)
-                ->addColumn($option.'select_users', static function ($employee) use ($option) {
-                    return '<input pid="1335" type="checkbox" id="'.$option.'userCheck'. 
-                        $employee->employee_id.'" name="'.$option.'userCheck[]" value="'.$employee->employee_id.'" class="dt-body-center">';
-                })
-                ->rawColumns([$option.'select_users', 'action'])
-                ->make(true);
+            ->addColumn($option.'select_users', static function ($employee) use ($option) {
+                return '<input pid="1335" type="checkbox" id="'.$option.'userCheck'. 
+                    $employee->employee_id.'" name="'.$option.'userCheck[]" value="'.$employee->employee_id.'" class="dt-body-center">';
+            })
+            ->rawColumns([$option.'select_users', 'action'])
+            ->make(true);
         }
     }
 
@@ -701,54 +693,55 @@ class GoalBankController extends Controller
             ->distinct()
             ->orderBy('id')
             ->get();
-        $resultrec = Goal::create(
-            [
-                'goal_type_id' => $request->input('goal_type_id'), 
-                'is_library' => true, 'is_shared' => true, 
-                'title' => $request->input('title'), 
-                'what' => $request->input('what'), 
-                'measure_of_success' => $request->input('measure_of_success'), 
-                'start_date' => $request->input('start_date'), 
-                'target_date' => $request->input('target_date'), 
-                'measure_of_success' => $request->input('measure_of_success'), 
-                'user_id' => $current_user->id, 
-                'created_by' => $current_user->id, 
-                'by_admin' => 2, 
-                'display_name' => $request->input('display_name')
-            ]
-        );
-        $resultrec->tags()->sync($request->tag_ids);
-        foreach($organizationList as $org1) {
-            $result = GoalBankOrg::create(
+
+            $resultrec = Goal::create(
                 [
-                    'goal_id' => $resultrec->id, 
-                    'version' => '2', 
-                    'orgid' => $org1->id, 
-                    'created_at' => date('Y-m-d H:i:s'), 
-                    'updated_at' => date('Y-m-d H:i:s') 
+                    'goal_type_id' => $request->input('goal_type_id'), 
+                    'is_library' => true, 'is_shared' => true, 
+                    'title' => $request->input('title'), 
+                    'what' => $request->input('what'), 
+                    'measure_of_success' => $request->input('measure_of_success'), 
+                    'start_date' => $request->input('start_date'), 
+                    'target_date' => $request->input('target_date'), 
+                    'measure_of_success' => $request->input('measure_of_success'), 
+                    'user_id' => $current_user->id, 
+                    'created_by' => $current_user->id, 
+                    'by_admin' => 1, 
+                    'display_name' => $request->input('display_name')
                 ]
-            );
-            if(!$result){
-                break;
+                );
+            $resultrec->tags()->sync($request->tag_ids);
+            foreach($organizationList as $org1) {
+                $result = GoalBankOrg::create(
+                    [
+                        'goal_id' => $resultrec->id, 
+                        'version' => '2', 
+                        'orgid' => $org1->id, 
+                        'created_at' => date('Y-m-d H:i:s'), 
+                        'updated_at' => date('Y-m-d H:i:s') 
+                    ]
+                );
+                if(!$result){
+                    break;
+                }
             }
-        }
         return redirect()->route(request()->segment(1).'.goalbank.index')
             ->with('success', 'Add new goal successful.');
     }
 
     public function updategoal(Request $request) {
-        $selected_org_nodes = $request->eorgCheck ? $request->eorgCheck : [];
+     
+        $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
 
         // Get the old employees listing 
         $old_ee_ids =  GoalSharedWith::join('users', 'goals_shared_with.user_id', 'users.id')
-                    ->where('goal_id', $request->goal_id)->distinct()->pluck('users.employee_id')->toArray();
+                                ->where('goal_id', $request->goal_id)->distinct()->pluck('users.employee_id')->toArray();
         $old_org_ee_ids = UserDemoJrView::from('user_demo_jr_view AS u')
-                    ->join('goal_bank_orgs', 'u.orgid', 'goal_bank_orgs.orgid')
-                    ->where('goal_bank_orgs.goal_id', $request->goal_id)
-                    ->pluck('u.employee_id')
-                    ->toArray(); 
+                                ->join('goal_bank_orgs', 'u.orgid', 'goal_bank_orgs.orgid')
+                                ->where('goal_bank_orgs.goal_id', $request->goal_id)
+                                ->pluck('u.employee_id')
+                                ->toArray(); 
 
-        $current_user = Auth::id();
         $organizationList = EmployeeDemoTree::select('id')
             ->whereIn('id', $selected_org_nodes)
             ->orWhereIn('level4_key', $selected_org_nodes)
@@ -760,8 +753,8 @@ class GoalBankController extends Controller
             $result = DB::table('goal_bank_orgs')
             ->updateorinsert(
                 [
-                    'goal_id' => $resultrec->id, 
-                    'version' => '2', 
+                    'goal_id' => $resultrec->id,
+                    'version' => '2',
                     'orgid' => $org1->id
                 ],
                 [
@@ -776,13 +769,14 @@ class GoalBankController extends Controller
         // call notify_on_dashboard for the newly added emplid of the goal         
         $new_org_ee_ids = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
         $notify_audiences = array_diff($new_org_ee_ids, $old_ee_ids, $old_org_ee_ids);        
-        $this->notify_on_dashboard($resultrec, $notify_audiences);   
+        $this->notify_on_dashboard($resultrec, $notify_audiences);       
 
         return redirect()->route(request()->segment(1).'.goalbank.manageindex')
             ->with('success', 'Goal update successful.');
     }
 
     public function updategoalone(Request $request, $id) {
+
         $aselected_emp_ids = $request->auserCheck ? $request->auserCheck : [];
 
         // Get the old employees listing 
@@ -818,13 +812,13 @@ class GoalBankController extends Controller
         // call notify_on_dashboard for the newly added emplid of the goal 
         $notify_audiences = array_diff($aselected_emp_ids, $old_ee_ids, $old_org_ee_ids);
         $this->notify_on_dashboard($resultrec, $notify_audiences);
-        
+
         return redirect()->route(request()->segment(1).'.goalbank.manageindex')
             ->with('success', 'Goal update successful.');
     }
 
     public function updategoaldetails(Request $request, $id) {
-        $resultrec = Goal::withoutGlobalScopes()->findorfail($id);
+        $resultrec = Goal::withoutGlobalScopes()->findorfail( $id );
         if ($request->title == '' || $request->what== ''  || $request->tag_ids== '') {
             if($request->title == '') {
                 $request->session()->flash('title_miss', 'The title field is required');
@@ -833,7 +827,7 @@ class GoalBankController extends Controller
             } elseif($request->tag_ids == '') {
                 $request->session()->flash('tags_miss', 'The tags field is required');
             }                 
-            return \Redirect::route('hradmin.goalbank.editdetails', [$id])->with('message', " There are one or more errors on the page. Please review and try again.");
+            return \Redirect::route('sysadmin.goalbank.editdetails', [$id])->with('message', " There are one or more errors on the page. Please review and try again.");
         } 
         $resultrec->update(
             [
@@ -853,12 +847,13 @@ class GoalBankController extends Controller
     }
 
     public function getUsers(Request $request) {
-        $users =  User::whereRaw("name like '%{$request->search}%'")
-            ->whereNotNull('email')->paginate();
+        $search = $request->search;
+        $users =  User::whereRaw("name like '%".$search."%'")
+                    ->whereNotNull('email')->paginate();
         return ['data'=> $users];
     }
 
-    public function getEmployees(Request $request, $id, $option = null) {
+    public function getEmployees(Request $request,  $id, $option = null) {
         list($sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4) = $this->baseFilteredSQLs($request, $option);
         $rows = $sql_level4->where('id', $id)
             ->union( $sql_level3->where('id', $id) )
@@ -908,8 +903,7 @@ class GoalBankController extends Controller
         $field4 = "{$option}dd_level4";
         $criteria = "{$option}criteria";
         $search_text = "{$option}search_text";
-        return HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
-            ->whereRaw("u.ao_user_id = {$authId}")
+        return UserDemoJrView::from('user_demo_jr_view AS u')
             ->whereNull('u.date_deleted')
             ->when($request->{$field0}, function($q) use($request, $field0) { return $q->whereRaw("u.organization_key = {$request->{$field0}}"); })
             ->when($request->{$field1}, function($q) use($request, $field1) { return $q->whereRaw("u.level1_key = {$request->{$field1}}"); })
@@ -1004,12 +998,11 @@ class GoalBankController extends Controller
 
     public function managegetList(Request $request) {
         if ($request->ajax()) {
-            $ownedgoals = Goal::withoutGlobalScopes()
+            $query = Goal::withoutGlobalScopes()
                 ->join('users as cu', 'cu.id', 'goals.created_by')
                 ->leftjoin('employee_demo as ced', 'ced.employee_id', 'cu.employee_id')
                 ->where('is_library', true)
-                ->where('goals.created_by', Auth::id())
-                ->where('by_admin', 2)
+                ->whereIn('by_admin', [1, 2])
                 ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
                     $q->where(function($query) use ($request) {
                         return $query->whereRaw("goals.title LIKE '%".$request->search_text."%'")
@@ -1040,10 +1033,9 @@ class GoalBankController extends Controller
                     GoalBankOrg::whereColumn('goal_id', 'goals.id')
                         ->where('version', 2)
                         ->whereNotNull('orgid')
-                        ->selectRAW('count(distinct id)')
+                        ->selectRAW('count(distinct goal_bank_orgs.id)')
                 ] )
-                ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
-            $query = $ownedgoals;
+                ->addSelect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
             return Datatables::of($query)
                 ->addIndexColumn()
                 ->addcolumn('click_title', function ($row) {
@@ -1086,8 +1078,7 @@ class GoalBankController extends Controller
                 ->from('goals AS g')
                 ->where('g.id', $goal_id)
                 ->join('goals_shared_with AS s', 'g.id', 's.goal_id')
-                ->join('hr_user_demo_jr_view AS u', 'u.user_id', 's.user_id')
-                ->where('u.ao_user_id', Auth::id())
+                ->join('user_demo_jr_view AS u', 'u.user_id', 's.user_id')
                 ->distinct()
                 ->when($request->dd_level0, function($q) use($request) {return $q->where('u.organization_key', $request->dd_level0);})
                 ->when($request->dd_level1, function($q) use($request) {return $q->where('u.level1_key', $request->dd_level1);})
@@ -1153,28 +1144,28 @@ class GoalBankController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function deletegoal(Request $request, $goal_id) {
-        $query1 = DB::table('goal_tags') 
-            ->where('goal_id', '=', $goal_id) 
-            ->delete(); 
+        $query1 = DB::table('goal_tags')
+            ->where('goal_id', '=', $goal_id)
+            ->delete();
         $query2 = DB::table('goal_bank_orgs')
-            ->where('goal_id', '=', $goal_id)  
-            ->delete(); 
+            ->where('goal_id', '=', $goal_id)
+            ->delete();
         $query3 = DB::table('goals_shared_with')
-            ->where('goal_id', '=', $goal_id)  
-            ->delete(); 
-        $query4 = DB::table('goals') 
-            ->where('goals.id', '=', $goal_id) 
-            ->where('goals.is_library', true) 
-            ->delete(); 
-        return redirect()->back(); 
+            ->where('goal_id', '=', $goal_id)
+            ->delete();
+        $query4 = DB::table('goals')
+            ->where('id', '=', $goal_id)
+            ->delete();
+        return redirect()->back();
     }
-    
+
     protected function get_employees_by_selected_org_nodes($selected_org_nodes) {
-        $employees = HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
+        $employees = UserDemoJrView::from('user_demo_jr_view AS u')
             ->whereIn('u.orgid', $selected_org_nodes)
             ->pluck('employee_id'); 
         return ($employees ? $employees->toArray() : []); 
     }
+
 
     protected function notify_on_dashboard($goalBank, $employee_ids) {
         // find user id based on the employee_id
@@ -1187,41 +1178,24 @@ class GoalBankController extends Controller
 			$notification->notification_type = 'GB';
 			$notification->comment = $goalBank->user->name . ' added a new goal to your goal bank.';
 			$notification->related_id = $goalBank->id;
-			$notification->notify_user_id = $value;
+			$notification->notify_user_id =  $value;
 			$notification->send(); 
         }
-        // Additional Step -- sent out email message if required
-        $this->notify_employees($goalBank, $employee_ids);
     }
 
     protected function notify_employees($goalBank, $employee_ids) {
-
-        // Filter out the employee based on the Organization level and individual user preferences. 
-        $filtered_ee_ids = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization', 'access_organizations.organization')
-                                ->leftjoin('user_preferences', 'user_demo_jr_view.user_id', 'user_preferences.user_id')
-                                ->whereIn('user_demo_jr_view.employee_id', $employee_ids)
-                                ->where('access_organizations.allow_email_msg', 'Y')
-                                ->where( function($query) {
-                                    $query->where('user_preferences.goal_bank_flag', 'Y');
-                                })
-                                ->pluck('user_demo_jr_view.employee_id')
-                                ->toArray(); 
-
-        if (count($filtered_ee_ids) > 0) {
-
-            // find user id based on the employee_id
-            $bcc_user_ids = User::whereIn('employee_id', $filtered_ee_ids)->pluck('id');
-            // Send Out Email Notification to Employee
-            $sendMail = new SendMail();
-            $sendMail->bccRecipients = $bcc_user_ids;  
-            $sendMail->sender_id = null;
-            $sendMail->useQueue = true;
-            $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
-            array_push($sendMail->bindvariables, "");
-            array_push($sendMail->bindvariables, $goalBank->user ? $goalBank->user->name : '');   // Person who added goal to goal bank
-            array_push($sendMail->bindvariables, $goalBank->title);       // goal title
-            array_push($sendMail->bindvariables, $goalBank->mandatory_status_descr);           // Mandatory or suggested status
-            $response = $sendMail->sendMailWithGenericTemplate();
-        }
+        // find user id based on the employee_id
+        $bcc_user_ids = User::whereIn('employee_id', $employee_ids)->pluck('id');
+        // Send Out Email Notification to Employee
+        $sendMail = new SendMail();
+        $sendMail->bccRecipients = $bcc_user_ids;  
+        $sendMail->sender_id = null;
+        $sendMail->useQueue = false;
+        $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
+        array_push($sendMail->bindvariables, "");
+        array_push($sendMail->bindvariables, $goalBank->user ? $goalBank->user->name : '');   // Person who added goal to goal bank
+        array_push($sendMail->bindvariables, $goalBank->title);       // goal title
+        array_push($sendMail->bindvariables, $goalBank->mandatory_status_descr);           // Mandatory or suggested status
+        // $response = $sendMail->sendMailWithGenericTemplate();
     }
 }
