@@ -1179,21 +1179,39 @@ class GoalBankController extends Controller
 			$notification->notify_user_id =  $value;
 			$notification->send(); 
         }
+
+        // Additional Step -- sent out email message if required
+        $this->notify_employees($goalBank, $employee_ids);
     }
 
     protected function notify_employees($goalBank, $employee_ids) {
-        // find user id based on the employee_id
-        $bcc_user_ids = User::whereIn('employee_id', $employee_ids)->pluck('id');
-        // Send Out Email Notification to Employee
-        $sendMail = new SendMail();
-        $sendMail->bccRecipients = $bcc_user_ids;  
-        $sendMail->sender_id = null;
-        $sendMail->useQueue = false;
-        $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
-        array_push($sendMail->bindvariables, "");
-        array_push($sendMail->bindvariables, $goalBank->user ? $goalBank->user->name : '');   // Person who added goal to goal bank
-        array_push($sendMail->bindvariables, $goalBank->title);       // goal title
-        array_push($sendMail->bindvariables, $goalBank->mandatory_status_descr);           // Mandatory or suggested status
-        // $response = $sendMail->sendMailWithGenericTemplate();
+
+         // Filter out the employee based on the Organization level and individual user preferences. 
+         $filtered_ee_ids = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization', 'access_organizations.organization')
+                                    ->leftjoin('user_preferences', 'user_demo_jr_view.user_id', 'user_preferences.user_id')
+                                    ->whereIn('user_demo_jr_view.employee_id', $employee_ids)
+                                    ->where('access_organizations.allow_email_msg', 'Y')
+                                    ->where( function($query) {
+                                        $query->where('user_preferences.goal_bank_flag', 'Y');
+                                    })
+                                    ->pluck('user_demo_jr_view.employee_id')
+                                    ->toArray(); 
+
+        if (count($filtered_ee_ids)) {
+            // find user id based on the employee_id
+            $bcc_user_ids = User::whereIn('employee_id', $filtered_ee_ids)->pluck('id');
+
+            // Send Out Email Notification to Employee
+            $sendMail = new SendMail();
+            $sendMail->bccRecipients = $bcc_user_ids;  
+            $sendMail->sender_id = null;
+            $sendMail->useQueue = true;
+            $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
+            array_push($sendMail->bindvariables, "");
+            array_push($sendMail->bindvariables, $goalBank->user ? $goalBank->user->name : '');   // Person who added goal to goal bank
+            array_push($sendMail->bindvariables, $goalBank->title);       // goal title
+            array_push($sendMail->bindvariables, $goalBank->mandatory_status_descr);           // Mandatory or suggested status
+            $response = $sendMail->sendMailWithGenericTemplate();
+        }
     }
 }
