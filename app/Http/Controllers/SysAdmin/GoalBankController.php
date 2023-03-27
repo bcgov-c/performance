@@ -93,18 +93,18 @@ class GoalBankController extends Controller
                 'euserCheck' => $request->euserCheck,
             ]);
         }
-        $request->session()->flash('level0', $request->dd_level0);
-        $request->session()->flash('level1', $request->dd_level1);
-        $request->session()->flash('level2', $request->dd_level2);
-        $request->session()->flash('level3', $request->dd_level3);
-        $request->session()->flash('level4', $request->dd_level4);
+        $request->session()->flash('dd_level0', $request->dd_level0);
+        $request->session()->flash('dd_level1', $request->dd_level1);
+        $request->session()->flash('dd_level2', $request->dd_level2);
+        $request->session()->flash('dd_level3', $request->dd_level3);
+        $request->session()->flash('dd_level4', $request->dd_level4);
         $request->session()->flash('userCheck', $request->userCheck);  // Dynamic load 
         $request->session()->flash('euserCheck', $request->euserCheck);  // Dynamic load 
-        $request->session()->flash('elevel0', $request->edd_level0);
-        $request->session()->flash('elevel1', $request->edd_elevel1);
-        $request->session()->flash('elevel2', $request->edd_elevel2);
-        $request->session()->flash('elevel3', $request->edd_elevel3);
-        $request->session()->flash('elevel4', $request->edd_elevel4);
+        $request->session()->flash('edd_level0', $request->edd_level0);
+        $request->session()->flash('edd_level1', $request->edd_elevel1);
+        $request->session()->flash('edd_level2', $request->edd_elevel2);
+        $request->session()->flash('edd_level3', $request->edd_elevel3);
+        $request->session()->flash('edd_level4', $request->edd_elevel4);
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, "");
         $sql = clone $demoWhere; 
@@ -188,17 +188,17 @@ class GoalBankController extends Controller
                 'euserCheck' => $request->euserCheck,
             ]);
         }
-        $request->session()->flash('level0', $request->dd_level0);
-        $request->session()->flash('level1', $request->dd_level1);
-        $request->session()->flash('level2', $request->dd_level2);
-        $request->session()->flash('level3', $request->dd_level3);
-        $request->session()->flash('level4', $request->dd_level4);
+        $request->session()->flash('dd_level0', $request->dd_level0);
+        $request->session()->flash('dd_level1', $request->dd_level1);
+        $request->session()->flash('dd_level2', $request->dd_level2);
+        $request->session()->flash('dd_level3', $request->dd_level3);
+        $request->session()->flash('dd_level4', $request->dd_level4);
         $request->session()->flash('userCheck', $request->userCheck);  // Dynamic load 
-        $request->session()->flash('elevel0', $request->edd_level0);
-        $request->session()->flash('elevel1', $request->edd_level1);
-        $request->session()->flash('elevel2', $request->edd_level2);
-        $request->session()->flash('elevel3', $request->edd_level3);
-        $request->session()->flash('elevel4', $request->edd_level4);
+        $request->session()->flash('edd_level0', $request->edd_level0);
+        $request->session()->flash('edd_level1', $request->edd_level1);
+        $request->session()->flash('edd_level2', $request->edd_level2);
+        $request->session()->flash('edd_level3', $request->edd_level3);
+        $request->session()->flash('edd_level4', $request->edd_level4);
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, "");
         $sql = clone $demoWhere; 
@@ -319,17 +319,17 @@ class GoalBankController extends Controller
                 'euserCheck' => $request->euserCheck,
             ]);
         }
-        $request->session()->flash('level0', $request->dd_level0);
-        $request->session()->flash('level1', $request->dd_level1);
-        $request->session()->flash('level2', $request->dd_level2);
-        $request->session()->flash('level3', $request->dd_level3);
-        $request->session()->flash('level4', $request->dd_level4);
+        $request->session()->flash('dd_level0', $request->dd_level0);
+        $request->session()->flash('dd_level1', $request->dd_level1);
+        $request->session()->flash('dd_level2', $request->dd_level2);
+        $request->session()->flash('dd_level3', $request->dd_level3);
+        $request->session()->flash('dd_level4', $request->dd_level4);
         $request->session()->flash('userCheck', $request->userCheck);  // Dynamic load 
-        $request->session()->flash('elevel0', $request->edd_level0);
-        $request->session()->flash('elevel1', $request->edd_level1);
-        $request->session()->flash('elevel2', $request->edd_level2);
-        $request->session()->flash('elevel3', $request->edd_level3);
-        $request->session()->flash('elevel4', $request->edd_level4);
+        $request->session()->flash('edd_level0', $request->edd_level0);
+        $request->session()->flash('edd_level1', $request->edd_level1);
+        $request->session()->flash('edd_level2', $request->edd_level2);
+        $request->session()->flash('edd_level3', $request->edd_level3);
+        $request->session()->flash('edd_level4', $request->edd_level4);
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, "");
         $sql = clone $demoWhere; 
@@ -420,17 +420,17 @@ class GoalBankController extends Controller
                 'auserCheck' => $request->auserCheck,
             ]);
         }
-        $request->session()->flash('level0', $request->dd_level0);
-        $request->session()->flash('level1', $request->dd_level1);
-        $request->session()->flash('level2', $request->dd_level2);
-        $request->session()->flash('level3', $request->dd_level3);
-        $request->session()->flash('level4', $request->dd_level4);
+        $request->session()->flash('dd_level0', $request->dd_level0);
+        $request->session()->flash('dd_level1', $request->dd_level1);
+        $request->session()->flash('dd_level2', $request->dd_level2);
+        $request->session()->flash('dd_level3', $request->dd_level3);
+        $request->session()->flash('dd_level4', $request->dd_level4);
         $request->session()->flash('userCheck', $request->userCheck);  // Dynamic load 
-        $request->session()->flash('alevel0', $request->add_level0);
-        $request->session()->flash('alevel1', $request->add_level1);
-        $request->session()->flash('alevel2', $request->add_level2);
-        $request->session()->flash('alevel3', $request->add_level3);
-        $request->session()->flash('alevel4', $request->add_level4);
+        $request->session()->flash('add_level0', $request->add_level0);
+        $request->session()->flash('add_level1', $request->add_level1);
+        $request->session()->flash('add_level2', $request->add_level2);
+        $request->session()->flash('add_level3', $request->add_level3);
+        $request->session()->flash('add_level4', $request->add_level4);
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, "");
         $sql = clone $demoWhere; 
@@ -536,6 +536,7 @@ class GoalBankController extends Controller
             $selected_org_nodes = $request->eorgCheck ? $request->eorgCheck : [];
             $organizationList = EmployeeDemoTree::select('id')
                 ->whereIn('id', $selected_org_nodes)
+                ->orWhereIn('level4_key', $selected_org_nodes)
                 ->distinct()
                 ->orderBy('id')
                 ->get();
@@ -688,6 +689,7 @@ class GoalBankController extends Controller
         $current_user = User::find(Auth::id());
         $organizationList = EmployeeDemoTree::select('id')
             ->whereIn('id', $selected_org_nodes)
+            ->orWhereIn('level4_key', $selected_org_nodes)
             ->distinct()
             ->orderBy('id')
             ->get();
@@ -731,6 +733,7 @@ class GoalBankController extends Controller
         $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
         $organizationList = EmployeeDemoTree::select('id')
             ->whereIn('id', $selected_org_nodes)
+            ->orWhereIn('level4_key', $selected_org_nodes)
             ->distinct()
             ->orderBy('id')
             ->get();
@@ -946,11 +949,11 @@ class GoalBankController extends Controller
                 'search_text' => $request->search_text,
             ]);
         }
-        $request->session()->flash('level0', $request->dd_level0);
-        $request->session()->flash('level1', $request->dd_level1);
-        $request->session()->flash('level2', $request->dd_level2);
-        $request->session()->flash('level3', $request->dd_level3);
-        $request->session()->flash('level4', $request->dd_level4);
+        $request->session()->flash('dd_level0', $request->dd_level0);
+        $request->session()->flash('dd_level1', $request->dd_level1);
+        $request->session()->flash('dd_level2', $request->dd_level2);
+        $request->session()->flash('dd_level3', $request->dd_level3);
+        $request->session()->flash('dd_level4', $request->dd_level4);
         $criteriaList = array(
             'all' => 'All',
             'gt' => 'Goal Title', 
@@ -1145,6 +1148,8 @@ class GoalBankController extends Controller
 			$notification->notify_user_id =  $value;
 			$notification->send(); 
         }
+        // Additional Step -- sent out email message if required
+        $this->notify_employees($goalBank, $employee_ids);
     }
 
     protected function notify_employees($goalBank, $employee_ids) {
