@@ -1246,7 +1246,7 @@ class StatisticsReportController extends Controller
             
             case 5:
 
-                $filename = 'Completed Open Conversations by Employee.csv.csv';
+                $filename = 'Completed Conversations by Employee.csv.csv';
                 $conversations =  $sql_chart5->get();
                 $conversations_unique = array();
                 $topics = ConversationTopic::select('id','name')->get();
