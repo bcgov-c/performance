@@ -1,6 +1,11 @@
-<h2 class="font-semibold text-xl text-primary leading-tight" role="banner">
+<x-side-layout title="{{ __('Statistic and Reports - Performance Development Platform') }}">
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-primary leading-tight" role="banner">
             Employee Record
         </h2> 
+		
+    </x-slot>
+    </div>
     <div class="card p-3">  
         <div class="form-row">
             <div class="form-group col-md-12">
@@ -159,3 +164,61 @@
     </div>
 
     
+<?php 
+
+
+?>
+    
+
+<x-slot name="css">
+	<style>
+		@media screen  {
+		.chart {
+			/* min-width:  180px;  */
+			min-height: 480px;
+		}	
+	
+		.print-only {
+			display: none;
+		}
+	}	
+	
+	@media print {
+	
+		@page { size:letter } 
+		body { 
+			
+			max-width: 800px !important;
+			margin-left: 100px !important;
+	
+		}	 
+		.no-print, .no-print *
+		{
+			display: none !important;
+		}
+		.chart {
+			/* min-width:  180px;  */
+			margin-left: 60px; 
+		}	
+	
+		.row {
+			display: block;
+		}
+		.page-break  { 
+			display:block; 
+			page-break-before : always ; 
+	
+		}
+		  
+	}
+	</style>
+</x-slot>
+
+
+</x-side-layout>
+<style>
+    label{
+        display:inline;
+        margin-right: 30px;
+    } 
+</style> 
