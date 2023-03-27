@@ -1123,7 +1123,7 @@ class SysadminStatisticsReportController extends Controller
             
             case 5:
 
-                $filename = 'Completed Open Conversations by Employee.csv';
+                $filename = 'Completed Conversations by Employee.csv';
                 $conversations =  $sql_chart5->get();
                 $conversations_unique = array();
                 $topics = ConversationTopic::select('id','name')->get();
@@ -1148,7 +1148,7 @@ class SysadminStatisticsReportController extends Controller
                 );
         
                 $columns = ["Employee ID", "Employee Name", "Email","Conversation Name","Conversation Participant",
-                        "Conversation Due Date", "Employee Sign-Off", "Supervisor Sign-off", 
+                        "Employee Sign-Off", "Employee Sign-Off Time", "Supervisor Sign-off", "Supervisor Sign-off Time", 
                                 "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
                            ];
         
@@ -1171,9 +1171,11 @@ class SysadminStatisticsReportController extends Controller
                                 $participants_arr[] = $participant->name;
                             }
                             $row['Conversation Participant'] = implode(', ', $participants_arr );
-                            $row['Conversation Due Date'] = $conversation->next_due_date;
+                            //$row['Conversation Due Date'] = $conversation->next_due_date;
                             $row['Employee Sign-Off'] = $conversation->sign_employee_name;
+                            $row['Employee Sign-Off Time'] = $conversation->sign_off_time;
                             $row['Supervisor Sign-off'] = $conversation->sign_supervisor_name;
+                            $row['Supervisor Sign-off Time'] = $conversation->supervisor_signoff_time;
                             $row['Organization'] = $conversation->organization;
                             $row['Level 1'] = $conversation->level1_program;
                             $row['Level 2'] = $conversation->level2_division;
@@ -1181,8 +1183,8 @@ class SysadminStatisticsReportController extends Controller
                             $row['Level 4'] = $conversation->level4;
 
                             fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], // $row['Next Conversation Due'],
-                            $row["Conversation Name"],$row['Conversation Participant'],  $row['Conversation Due Date'],  
-                        $row["Employee Sign-Off"], $row["Supervisor Sign-off"],
+                            $row["Conversation Name"],$row['Conversation Participant'], 
+                        $row["Employee Sign-Off"], $row["Employee Sign-Off Time"], $row["Supervisor Sign-off"],$row["Supervisor Sign-off Time"],
                                      $row['Organization'],
                                       $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
                                     ));
