@@ -222,7 +222,6 @@ class AccessPermissionsController extends Controller
         if($request->input('accessselect') == 3) {
             $organizationList = EmployeeDemoTree::select('id')
             ->whereIn('id', $selected_org_nodes)
-            ->orWhereIn('level4_key', $selected_org_nodes)
             ->distinct()
             ->orderBy('id')
             ->get();
