@@ -1157,7 +1157,7 @@ class SysadminStatisticsReportController extends Controller
                     fputcsv($file, $columns);
                     
                     foreach ($conversations_unique as $conversation) {
-                            $row['Employee ID'] = "[".$conversation->employee_id."]";
+                            $row['Employee ID'] = " ".$conversation->employee_id;
                             $row['Name'] = $conversation->employee_name;
                             $row['Email'] = $conversation->email;
                             $row['Conversation Name'] = $conversation->conversation_name;
