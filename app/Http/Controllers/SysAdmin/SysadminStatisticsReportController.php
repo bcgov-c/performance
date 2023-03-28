@@ -987,7 +987,6 @@ class SysadminStatisticsReportController extends Controller
         
                     fclose($file);
                 };
-                kasjdkasjdk;
         
                 return response()->stream($callback, 200, $headers);
 
