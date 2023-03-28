@@ -35,16 +35,16 @@ RUN apt-get update -y && apt -y upgrade && apt-get install -y \
     vim \
 	sudo
 
-RUN apt-get update && apt-get install -y cron && cron
+#RUN apt-get update && apt-get install -y cron && cron
 
 # Copy cron file to the cron.d directory
-COPY /laravelcron /etc/cron.d/laravelcron
+#COPY /laravelcron /etc/cron.d/laravelcron
 
 # Give execution rights on the cron job
-RUN chmod 0644 /etc/cron.d/laravelcron
+#RUN chmod 0644 /etc/cron.d/laravelcron
 
 # Apply cron job
-RUN crontab /etc/cron.d/laravelcron
+#RUN crontab /etc/cron.d/laravelcron
 
 RUN ln -sf /proc/self/fd/1 /var/log/apache2/access.log && \
     ln -sf /proc/self/fd/1 /var/log/apache2/error.log && \
@@ -106,10 +106,13 @@ RUN chown -R www-data:www-data /var/www/html/storage/app /var/www/html/storage/f
 
 RUN chmod 4111 /usr/bin/sudo
 
-RUN useradd -l -u 1001510000 -c "1001510000" 1001510000 && \
-    addgroup crond-users && \
-    chgrp crond-users /var/run/crond.pid && \
-    usermod -a -G crond-users 1001510000
+RUN chmod -R 755 /var/log/apache2
+RUN chown -R www-data:www-data /var/log/apache2
+
+#RUN useradd -l -u 1001510000 -c "1001510000" 1001510000 && \
+    #addgroup crond-users && \
+    #chgrp crond-users /var/run/crond.pid && \
+    #usermod -a -G crond-users 1001510000
 
 
 EXPOSE 8000
@@ -117,8 +120,8 @@ EXPOSE 8000
 
 
 # Add a command to base-image entrypont script
-RUN sed -i 's/^exec /service cron start\n\nexec /' /usr/local/bin/apache2-foreground
+#RUN sed -i 's/^exec /service cron start\n\nexec /' /usr/local/bin/apache2-foreground
 
-#CMD /usr/local/bin/apache2-foreground
+CMD /usr/local/bin/apache2-foreground
 
 #RUN /usr/local/bin/apache2-foreground
