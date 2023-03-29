@@ -12,7 +12,6 @@ use App\Models\GoalType;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
 use Illuminate\Http\Request;
-use App\Models\OrganizationTree;
 use App\Models\ConversationTopic;
 use Illuminate\Support\Facades\DB;
 use App\Exports\ConversationExport;

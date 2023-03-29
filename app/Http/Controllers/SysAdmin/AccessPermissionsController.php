@@ -13,7 +13,6 @@ use App\Models\UserListView;
 use Illuminate\Http\Request;
 use App\Models\UserDemoJrView;
 use App\Models\EmployeeDemoTree;
-use App\Models\OrganizationTree;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -131,7 +130,7 @@ class AccessPermissionsController extends Controller
         ->pluck('o.id'); 
         $eorgs = EmployeeDemoTree::whereIn('id', $rows->toArray())->get()->toTree();
         $eempIdsByOrgId = [];
-        $eempIdsByOrgId = $rows->groupBy('o.id')->all();
+        $eempIdsByOrgId = $rows->groupBy('orgid')->all();
         if($request->ajax()) { return view('sysadmin.accesspermissions.partials.recipient-tree2', compact('eorgs', 'eempIdsByOrgId')); } 
     }
 
