@@ -47,7 +47,7 @@
 </div>
 
 <x-slot name="css">
-    <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
     <style>
         #notification-table_filter label {
             text-align: right !important;
@@ -101,8 +101,8 @@
 
 <x-slot name="js">
 
-<script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
 
 <script>
     let g_matched_employees = {!!json_encode($matched_dn_ids)!!};
