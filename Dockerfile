@@ -104,12 +104,14 @@ RUN bash -c 'mkdir -p /var/www/html/storage{app,framework,logs}'
 RUN chmod -R 755 /var/www/html/storage
 RUN chown -R www-data:www-data /var/www/html/storage/app /var/www/html/storage/framework /var/www/html/storage/logs
 
-RUN chmod 4111 /usr/bin/sudo
+RUN chmod 4111 /usr/bin/sudo 
+RUN chmod -R 755 /var/log/apache2 
+RUN chown -R www-data:www-data /var/log/apache2 
 
-RUN useradd -l -u 1001510000 -c "1001510000" 1001510000 && \
-    addgroup crond-users && \
-    chgrp crond-users /var/run/crond.pid && \
-    usermod -a -G crond-users 1001510000
+#RUN useradd -l -u 1001510000 -c "1001510000" 1001510000 && \
+    #addgroup crond-users && \
+    #chgrp crond-users /var/run/crond.pid && \
+    #usermod -a -G crond-users 1001510000
 
 
 EXPOSE 8000
