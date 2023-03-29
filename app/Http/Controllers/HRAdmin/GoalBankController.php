@@ -377,7 +377,6 @@ class GoalBankController extends Controller
             $request->dd_level3 = isset($old['dd_level3']) ? $old['dd_level3'] : null;
             $request->dd_level4 = isset($old['dd_level4']) ? $old['dd_level4'] : null;
             $request->dd_superv = isset($old['dd_superv']) ? $old['dd_superv'] : null;
-            $request->qdd_superv = isset($old['qdd_superv']) ? $old['qdd_superv'] : null;
             $request->search_text = isset($old['search_text']) ? $old['search_text'] : null;
             $request->orgCheck = isset($old['orgCheck']) ? $old['orgCheck'] : null;
             $request->userCheck = isset($old['userCheck']) ? $old['userCheck'] : null;
@@ -388,6 +387,7 @@ class GoalBankController extends Controller
             $request->add_level2 = isset($old['add_level2']) ? $old['add_level2'] : null;
             $request->add_level3 = isset($old['add_level3']) ? $old['add_level3'] : null;
             $request->add_level4 = isset($old['add_level4']) ? $old['add_level4'] : null;
+            $request->add_superv = isset($old['add_superv']) ? $old['add_superv'] : null;
             $request->asearch_text = isset($old['asearch_text']) ? $old['asearch_text'] : null;
             $request->aorgCheck = isset($old['aorgCheck']) ? $old['aorgCheck'] : null;
             $request->auserCheck = isset($old['auserCheck']) ? $old['auserCheck'] : null;
@@ -460,7 +460,6 @@ class GoalBankController extends Controller
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
         $currentView = $request->segment(3);
         return view('shared.goalbank.editone', compact('criteriaList', 'acriteriaList', 'matched_emp_ids', 'amatched_emp_ids', 'old_selected_emp_ids', 'aold_selected_emp_ids', 'old_selected_org_nodes', 'aold_selected_org_nodes', 'goalTypes', 'mandatoryOrSuggested', 'amandatoryOrSuggested', 'tags', 'atags', 'goaldetail', 'request', 'goal_id', 'type_desc_str', 'currentView', 'supervisorList') );
-    
     }
 
     public function editdetails(Request $request, $id) {
