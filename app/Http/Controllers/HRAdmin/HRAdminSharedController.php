@@ -19,6 +19,7 @@ class HRAdminSharedController extends Controller
             ->select('t.id', 't.name')
             ->where('t.level', 0)
             ->when($request->q, function ($q) use($request) { return $q->whereRaw("t.name LIKE '%{$request->q}%'"); })
+            ->limit(300)
             ->get();
         $formatted_orgs = [];
         foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
@@ -34,6 +35,7 @@ class HRAdminSharedController extends Controller
         ->where('t.level', 1)
         ->when($request->q, function ($q) use($request) { return $q->whereRaw("t.name LIKE '%{$request->q}%'"); })
         ->when($request->level0, function ($q) use($request) { return $q->where('t.organization_key', $request->level0); })
+        ->limit(300)
         ->get();
         $formatted_orgs = [];
         foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
@@ -50,6 +52,7 @@ class HRAdminSharedController extends Controller
         ->when($request->q, function ($q) use($request) { return $q->whereRaw("t.name LIKE '%{$request->q}%'"); })
         ->when($request->level0, function ($q) use($request) { return $q->where('t.organization_key', $request->level0); })
         ->when($request->level1, function ($q) use($request) { return $q->where('t.level1_key', $request->level1); })
+        ->limit(300)
         ->get();
         $formatted_orgs = [];
         foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
@@ -67,6 +70,7 @@ class HRAdminSharedController extends Controller
         ->when($request->level0, function ($q) use($request) { return $q->where('t.organization_key', $request->level0); })
         ->when($request->level1, function ($q) use($request) { return $q->where('t.level1_key', $request->level1); })
         ->when($request->level2, function ($q) use($request) { return $q->where('t.level2_key', $request->level2); })
+        ->limit(300)
         ->get();
         $formatted_orgs = [];
         foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
@@ -85,6 +89,7 @@ class HRAdminSharedController extends Controller
         ->when($request->level1, function ($q) use($request) { return $q->where('t.level1_key', $request->level1); })
         ->when($request->level2, function ($q) use($request) { return $q->where('t.level2_key', $request->level2); })
         ->when($request->level3, function ($q) use($request) { return $q->where('t.level3_key', $request->level3); })
+        ->limit(300)
         ->get();
         $formatted_orgs = [];
         foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
