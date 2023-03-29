@@ -391,7 +391,7 @@ $(function() {
 		placeholder: 'select organization',
 		allowClear: true,
 		ajax: {
-			url: '/hradmin/notifications/org-organizations'
+			url: '/sysadmin/org-organizations2'
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -413,7 +413,7 @@ $(function() {
 		placeholder: 'select level 1',
 		allowClear: true,
 		ajax: {
-			url: '/hradmin/notifications/org-programs' 
+			url: '/sysadmin/org-programs2' 
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -436,7 +436,7 @@ $(function() {
 		placeholder: 'select level 2',
 		allowClear: true,
 		ajax: {
-			url: '/hradmin/notifications/org-divisions' 
+			url: '/sysadmin/org-divisions2' 
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -460,7 +460,7 @@ $(function() {
 		placeholder: 'select level 3',
 		allowClear: true,
 		ajax: {
-			url: '/hradmin/notifications/org-branches' 
+			url: '/sysadmin/org-branches2' 
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -485,7 +485,7 @@ $(function() {
 		placeholder: 'select level 4',
 		allowClear: true,
 		ajax: {
-			url: '/hradmin/notifications/org-level4' 
+			url: '/sysadmins/org-level42' 
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
