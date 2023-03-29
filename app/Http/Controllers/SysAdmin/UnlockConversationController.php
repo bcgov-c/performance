@@ -5,7 +5,6 @@ namespace App\Http\Controllers\SysAdmin;
 use App\Models\User;
 use App\Models\Conversation;
 use Illuminate\Http\Request;
-use App\Models\OrganizationTree;
 use Yajra\Datatables\Datatables;
 use App\Models\ConversationTopic;
 use Illuminate\Support\Facades\DB;
