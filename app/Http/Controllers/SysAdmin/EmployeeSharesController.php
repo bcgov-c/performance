@@ -290,7 +290,7 @@ class EmployeeSharesController extends Controller {
             ->groupBy('orgid', 'employee_id')
             ->orderBy('orgid')->orderBy('employee_id')
             ->get();
-        $eempIdsByOrgId = $rows->groupBy('id')->all();
+        $eempIdsByOrgId = $rows->groupBy('orgid')->all();
         if($request->ajax()){
             return view('shared.employeeshares.partials.erecipient-tree', compact('eorgs', 'ecountByOrg', 'eempIdsByOrgId') );
         } 

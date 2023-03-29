@@ -618,7 +618,7 @@ class GoalBankController extends Controller
             ->groupBy('orgid', 'employee_id')
             ->orderBy('orgid')->orderBy('employee_id')
             ->get();
-        $eempIdsByOrgId = $rows->groupBy('id')->all();
+        $eempIdsByOrgId = $rows->groupBy('orgid')->all();
         if($request->ajax()){
             return view('shared.goalbank.partials.recipient-tree2', compact('eorgs','ecountByOrg','eempIdsByOrgId') );
         }
