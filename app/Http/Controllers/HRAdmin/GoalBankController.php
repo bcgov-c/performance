@@ -10,18 +10,20 @@ use App\Models\User;
 use App\Models\GoalType;
 use App\Models\GoalBankOrg;
 use App\Models\EmployeeDemo;
-use App\Models\HRUserDemoJrView;
 use Illuminate\Http\Request;
+use App\Models\GoalSharedWith;
+use App\Models\UserDemoJrView;
 use App\MicrosoftGraph\SendMail;
 use App\Models\EmployeeDemoTree;
+use App\Models\HRUserDemoJrView;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
 use App\Http\Requests\Goals\CreateGoalRequest;
 use Illuminate\Validation\ValidationException;
 
@@ -735,6 +737,16 @@ class GoalBankController extends Controller
 
     public function updategoal(Request $request) {
         $selected_org_nodes = $request->eorgCheck ? $request->eorgCheck : [];
+
+        // Get the old employees listing 
+        $old_ee_ids =  GoalSharedWith::join('users', 'goals_shared_with.user_id', 'users.id')
+                    ->where('goal_id', $request->goal_id)->distinct()->pluck('users.employee_id')->toArray();
+        $old_org_ee_ids = UserDemoJrView::from('user_demo_jr_view AS u')
+                    ->join('goal_bank_orgs', 'u.orgid', 'goal_bank_orgs.orgid')
+                    ->where('goal_bank_orgs.goal_id', $request->goal_id)
+                    ->pluck('u.employee_id')
+                    ->toArray(); 
+
         $current_user = Auth::id();
         $organizationList = EmployeeDemoTree::select('id')
             ->whereIn('id', $selected_org_nodes)
@@ -759,12 +771,28 @@ class GoalBankController extends Controller
                 break;
             }
         }
+
+        // call notify_on_dashboard for the newly added emplid of the goal         
+        $new_org_ee_ids = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
+        $notify_audiences = array_diff($new_org_ee_ids, $old_ee_ids, $old_org_ee_ids);        
+        $this->notify_on_dashboard($resultrec, $notify_audiences);   
+
         return redirect()->route(request()->segment(1).'.goalbank.manageindex')
             ->with('success', 'Goal update successful.');
     }
 
     public function updategoalone(Request $request, $id) {
         $aselected_emp_ids = $request->auserCheck ? $request->auserCheck : [];
+
+        // Get the old employees listing 
+        $old_ee_ids =  GoalSharedWith::join('users', 'goals_shared_with.user_id', 'users.id')
+                                ->where('goal_id', $id)->distinct()->pluck('users.employee_id')->toArray();
+        $old_org_ee_ids = UserDemoJrView::from('user_demo_jr_view AS u')
+                                ->join('goal_bank_orgs', 'u.orgid', 'goal_bank_orgs.orgid')
+                                ->where('goal_bank_orgs.goal_id', $id)
+                                ->pluck('u.employee_id')
+                                ->toArray(); 
+
         $aselected_org_nodes = $request->aselected_org_nodes ? json_decode($request->aselected_org_nodes) : [];
         $current_user = Auth::id();
         $resultrec = Goal::withoutGlobalScopes()->findorfail( $id );
@@ -785,6 +813,11 @@ class GoalBankController extends Controller
                     []
                 );
         }
+
+        // call notify_on_dashboard for the newly added emplid of the goal 
+        $notify_audiences = array_diff($aselected_emp_ids, $old_ee_ids, $old_org_ee_ids);
+        $this->notify_on_dashboard($resultrec, $notify_audiences);
+        
         return redirect()->route(request()->segment(1).'.goalbank.manageindex')
             ->with('success', 'Goal update successful.');
     }
