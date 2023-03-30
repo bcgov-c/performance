@@ -454,23 +454,8 @@ class GoalController extends Controller
 
         $adminGoals = Goal::withoutGlobalScopes()
         ->join('goal_bank_orgs', 'goals.id', '=', 'goal_bank_orgs.goal_id')
-        ->join('employee_demo', function ($j1) {
-            $j1->on(function ($j1a) {
-                $j1a->whereRAW('employee_demo.organization = goal_bank_orgs.organization OR ((employee_demo.organization = "" OR employee_demo.organization IS NULL) AND (goal_bank_orgs.organization = "" OR goal_bank_orgs.organization IS NULL))');
-            } )
-            ->on(function ($j2a) {
-                $j2a->whereRAW('employee_demo.level1_program = goal_bank_orgs.level1_program OR ((employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL) AND (goal_bank_orgs.level1_program = "" OR goal_bank_orgs.level1_program IS NULL))');
-            } )
-            ->on(function ($j3a) {
-                $j3a->whereRAW('employee_demo.level2_division = goal_bank_orgs.level2_division OR ((employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL) AND (goal_bank_orgs.level2_division = "" OR goal_bank_orgs.level2_division IS NULL))');
-            } )
-            ->on(function ($j4a) {
-                $j4a->whereRAW('employee_demo.level3_branch = goal_bank_orgs.level3_branch OR ((employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL) AND (goal_bank_orgs.level3_branch = "" OR goal_bank_orgs.level3_branch IS NULL))');
-            } )
-            ->on(function ($j5a) {
-                $j5a->whereRAW('employee_demo.level4 = goal_bank_orgs.level4 OR ((employee_demo.level4 = "" OR employee_demo.level4 IS NULL) AND (goal_bank_orgs.level4 = "" OR goal_bank_orgs.level4 IS NULL))');
-            } );
-        } )
+        ->join('employee_demo_tree AS gt', 'gt.id', 'goal_bank_orgs.orgid')
+        ->join('employee_demo', 'employee_demo.deptid', 'gt.deptid')
         ->join('users', 'users.employee_id', '=', 'employee_demo.employee_id')
         ->leftjoin('users as u2', 'u2.id', '=', 'goals.created_by')
         ->where('users.id', '=', Auth::id())
