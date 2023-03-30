@@ -93,9 +93,9 @@
     <div class="card p-3"> 
         @if(!$submit)
         <p>To retrieve performance evaluation records, use the fields above to search for an employee, time frame, and record type.</p>        
-        @else        
-            @if(count($data["active_goals"]) > 0)
-                <b>Active Goals</b><hr/>
+        @else
+            <b>Active Goals</b><hr/>
+            @if(count($data["active_goals"]) > 0)                
                 <table>            
                 <tr>
                     <th>Name</th>
@@ -119,10 +119,13 @@
                 <?php }?>
                 </table>
                 <hr/>
+            @else
+                <p>There are no records for the employee ID and date range selected.</p>
+                <hr/>
             @endif
             <p></p>
-            @if(count($data["past_goals"]) > 0)
-                <b>Past Goals</b><hr/>
+            <b>Past Goals</b><hr/>
+            @if(count($data["past_goals"]) > 0)                
                 <table>            
                 <tr>
                     <th>Name</th>
@@ -144,10 +147,13 @@
                 <?php }?>
                 </table>
                 <hr/>
+            @else
+                <p>There are no records for the employee ID and date range selected.</p>
+                <hr/>
             @endif
             <p></p>
-            @if(count($data["open_conversations"]) > 0)
-                <b>Open Conversations</b><hr/>
+            <b>Open Conversations</b><hr/>
+            @if(count($data["open_conversations"]) > 0)                
                 <table>            
                 <tr>
                     <th>Name</th>
@@ -169,10 +175,13 @@
                 <?php }?>
                 </table>
                 <hr/>
+            @else
+                <p>There are no records for the employee ID and date range selected.</p>
+                <hr/>
             @endif
             <p></p>
-            @if(count($data["completed_conversations"]) > 0)
-                <b>Completed Conversations</b><hr/>
+            <b>Completed Conversations</b><hr/>
+            @if(count($data["completed_conversations"]) > 0)                
                 <table>            
                 <tr>
                     <th>Name</th>
@@ -190,9 +199,12 @@
                     <td><?php echo $item->organization; ?></td>
                     <td><?php echo $item->latest_update; ?></td>
                     <td><a href="/sysadmin/statistics/filereports-export?type=selected_conversation&id=<?php echo $item->conversation_id; ?>"><button type="button" class="btn btn-primary"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
-                <tr/>    
+                <tr/>                   
                 <?php }?>
                 </table>
+            @else
+                <p>There are no records for the employee ID and date range selected.</p>
+                <hr/>
             @endif
         @endif
         
