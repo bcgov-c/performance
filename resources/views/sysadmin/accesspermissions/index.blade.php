@@ -307,7 +307,7 @@
 								$(chkbox).prop("indeterminate", false);
 							}
 						} else {
-							if ( $(chkbox).attr('name') == 'userCheck[]') {
+							if ( $(chkbox).attr('name') == 'euserCheck[]') {
 								if (g_selected_orgnodes.includes(chkbox.value)) {
 									$(chkbox).prop('checked', true);
 								} else {
@@ -400,6 +400,7 @@
 				}
 
 				$('#ebtn_search').click(function(e) {
+					g_selected_orgnodes = [];
 					target = $('#enav-tree'); 
 					ddnotempty = $('#edd_level0').val() + $('#edd_level1').val() + $('#edd_level2').val() + $('#edd_level3').val() + $('#edd_level4').val();
 					if(ddnotempty) {
@@ -427,16 +428,19 @@
 
 								error: function () {
 									// Create New Access Page, Step 3
+									$(target).removeAttr('loaded');
 									alert("error");
 									$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
 								}
 							})
 							
 						).then(function( data, textStatus, jqXHR ) {
+							//alert( jqXHR.status ); // Alerts 200
 							enodes = $('#eaccordion-level0 input:checkbox');
 							eredrawTreeCheckboxes();	
 						}); 
 					} else {
+						$(target).removeAttr('loaded');
 						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
 					};
 				});
