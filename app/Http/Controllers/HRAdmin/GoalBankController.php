@@ -528,7 +528,7 @@ class GoalBankController extends Controller
             , 'user_id' => $current_user->id
             , 'created_by' => $current_user->id
             , 'by_admin' => 2
-            , 'isMandatory' => $request->input('isMandatory')
+            , 'is_mandatory' => $request->input('is_mandatory')
             , 'display_name' => $request->input('display_name')
             ]
         );
