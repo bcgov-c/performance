@@ -409,7 +409,7 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                					url: '{{ "/".request()->segment(1)."/goalbank/org-tree/" }}',
+                					url: '{{ "/".request()->segment(1)."/goalbank/org-tree" }}',
                                     type: 'GET',
                                     data: $("#notify-form").serialize(),
                                     dataType: 'html',
