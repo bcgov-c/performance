@@ -479,7 +479,7 @@ class MyTeamController extends Controller
 			$notification = new \App\MicrosoftGraph\SendDashboardNotification();
 			$notification->user_id =  $user_id;
 			$notification->notification_type = 'GB';
-			$notification->comment = $goal->user->name . ' added a new goal to your goal bank.';
+			$notification->comment = ($goal->display_name ? $goal->display_name : $goal->user->name) . ' added a new goal to your goal bank.';
 			$notification->related_id = $goal->id;
             $notification->notify_user_id = $user_id;
 			$notification->send(); 
@@ -506,7 +506,7 @@ class MyTeamController extends Controller
 
                 $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
                 array_push($sendMail->bindvariables, $user->name);                            // Recipient of the email
-                array_push($sendMail->bindvariables, $goal->user ? $goal->user->name : '');   // Person who added goal to goal bank
+                array_push($sendMail->bindvariables, $goal->user ? ($goal->display_name ? $goal->display_name : $goal->user->name) : '');   // Person who added goal to goal bank
                 array_push($sendMail->bindvariables, $goal->title);                           // goal title
                 array_push($sendMail->bindvariables, $goal->mandatory_status_descr);          // Mandatory or suggested status
                 $response = $sendMail->sendMailWithGenericTemplate();
