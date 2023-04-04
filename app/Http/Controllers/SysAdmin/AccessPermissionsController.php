@@ -202,7 +202,6 @@ class AccessPermissionsController extends Controller
                     'reason' => $request->input('reason')  
                 ]
             );
-            Log::info($inheritedList);
             if($request->input('accessselect') == '3') {
                 foreach($organizationList as $org1) {
                     $result = AdminOrg::updateOrCreate(
