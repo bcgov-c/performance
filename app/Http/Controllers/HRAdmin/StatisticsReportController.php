@@ -461,7 +461,7 @@ class StatisticsReportController extends Controller
                         DATEDIFF ( users.next_conversation_date
                             , curdate() )
                     as overdue_in_days")
-                ->join('employee_demo', function($join) {
+                ->leftJoin('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 })
                 ->where(function($query) {
@@ -800,7 +800,7 @@ class StatisticsReportController extends Controller
         employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4,
                     DATEDIFF ( users.next_conversation_date, curdate() )  as overdue_in_days,
                     users.next_conversation_date as next_due_date")
-                ->join('employee_demo', function($join) {
+                ->leftJoin('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 })
                 ->where(function($query) {
