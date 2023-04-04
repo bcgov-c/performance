@@ -1731,7 +1731,23 @@ class SysadminStatisticsReportController extends Controller
                 $conversation[0]->participants = implode(', ', $participants_arr );
                 
                 $data["selected_conversation"] = $conversation[0];
-                return view('sysadmin.statistics.filereportsexport', compact('data'));
+                
+                
+                $options = new Options();
+                $options->set('defaultFont', 'Arial');
+                $dompdf = new Dompdf($options);
+                // Fetch the HTML content to be converted to PDF
+                $html = view('sysadmin.statistics.filereportsexport', compact('data'))->render();
+                // Load HTML content
+                $dompdf->loadHtml($html);
+                // Set paper size and orientation
+                $dompdf->setPaper('A4', 'portrait');
+                // Render the HTML as PDF
+                $dompdf->render();
+                // Output the generated PDF to the browser
+                return $dompdf->stream('employee_record.pdf');                
+                
+                //return view('sysadmin.statistics.filereportsexport', compact('data'));      
             }
         }
                 
