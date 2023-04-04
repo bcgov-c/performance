@@ -556,7 +556,9 @@ class CalcNextConversationDate extends Command
                 ->whereColumn('employee_demo_jr.employee_id', 'users.employee_id')
                 ->where(function($query) {
                     $query->whereRaw( 'employee_demo_jr.next_conversation_date <> users.next_conversation_date')
-                            ->orWhereRaw( 'employee_demo_jr.due_date_paused <> users.due_date_paused');
+                            ->orWhereRaw( 'employee_demo_jr.due_date_paused <> users.due_date_paused')
+                            ->orWhereNull('users.next_conversation_date')
+                            ->orWhereNull('users.due_date_paused');
                 });
         })
         ->update([
