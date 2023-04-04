@@ -499,6 +499,7 @@ class StatisticsReportController extends Controller
         foreach($this->overdue_groups as $key => $range)
         {
             $subset = $next_due_users->whereBetween('overdue_in_days', $range );
+            $subset = $subset->unique('employee_id');
             array_push( $data['chart1']['groups'],  [ 'name' => $key, 'value' => $subset->count(), 
                         ]);
         }
@@ -1008,7 +1009,7 @@ class StatisticsReportController extends Controller
 
                 $filename = 'Next Conversation Due.csv';
                 $users =  $sql_chart1->get();
-
+                $users = $users->unique('employee_id');
                 if (array_key_exists($request->range, $this->overdue_groups) ) {
                     $users = $users->whereBetween('overdue_in_days', $this->overdue_groups[$request->range]);  
                 }
