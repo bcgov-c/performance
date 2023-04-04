@@ -31,6 +31,7 @@ class AccessPermissionsController extends Controller
         $errors = session('errors');
         $old_selected_emp_ids = []; // $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $old_selected_org_nodes = []; // $request->old_selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
+        $old_selected_inherited = []; // $request->old_selected_inherited ? json_decode($request->selected_inherited) : [];
         // no validation and move filter variable to old 
         if ($request->btn_search) {
             session()->put('_old_input', [
@@ -86,7 +87,7 @@ class AccessPermissionsController extends Controller
         $roles = DB::table('roles')
         ->whereIntegerInRaw('id', [3, 4])
         ->pluck('longname', 'id');
-        return view('sysadmin.accesspermissions.index', compact('criteriaList','matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'roles') );
+        return view('sysadmin.accesspermissions.index', compact('criteriaList','matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'old_selected_inherited', 'roles') );
     }
 
     public function loadOrganizationTree(Request $request) {
@@ -166,6 +167,7 @@ class AccessPermissionsController extends Controller
         $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $request->userCheck = $selected_emp_ids;
         $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
+        $selected_inherited = $request->selected_inherited ? json_decode($request->selected_inherited) : [];
         $current_user = User::find(Auth::id());
         $employee_ids = ($request->userCheck) ? $request->userCheck : [];
         $toRecipients = UserListView::select('user_id AS id')
@@ -180,6 +182,13 @@ class AccessPermissionsController extends Controller
             ->distinct()
             ->orderBy('id')
             ->get();
+            $inheritedList = EmployeeDemoTree::select('id')
+            ->whereIn('id', $selected_inherited)
+            ->orWhereIn('level4_key', $selected_inherited)
+            ->distinct()
+            ->orderBy('id')
+            ->pluck('id')
+            ->toArray();
         }
         foreach ($toRecipients as $newId) {
             $result = DB::table('model_has_roles')
@@ -193,6 +202,7 @@ class AccessPermissionsController extends Controller
                     'reason' => $request->input('reason')  
                 ]
             );
+            Log::info($inheritedList);
             if($request->input('accessselect') == '3') {
                 foreach($organizationList as $org1) {
                     $result = AdminOrg::updateOrCreate(
@@ -202,6 +212,7 @@ class AccessPermissionsController extends Controller
                             'orgid' => $org1->id
                         ],
                         [
+                            'inherited' => in_array($org1->id, $inheritedList, true) ? 1 : 0,
                             'updated_at' => date('Y-m-d H:i:s')
                         ],
                     );
@@ -364,8 +375,10 @@ class AccessPermissionsController extends Controller
                 , role_longname
                 , model_id
                 , sysadmin
+                , org_count
             ");
             return Datatables::of($query)
+            ->editColumn('org_count', function ($row) { return $row->org_count > 0 ? $row->org_count : ""; })
             ->addIndexColumn()
             ->addcolumn('action', function($row) {
                 return '<button 
@@ -389,24 +402,26 @@ class AccessPermissionsController extends Controller
     public function getAdminOrgs(Request $request, $model_id) {
         if ($request->ajax()) {
             $query = AdminOrg::where('user_id', $model_id)
-            ->where('version', '2')
-            ->leftJoin('employee_demo_tree', 'admin_orgs.orgid', 'employee_demo_tree.id')
-            ->orderBy('employee_demo_tree.organization')
-            ->orderBy('employee_demo_tree.level1_program')
-            ->orderBy('employee_demo_tree.level2_division')
-            ->orderBy('employee_demo_tree.level3_branch')
-            ->orderBy('employee_demo_tree.level4')
-            ->select (
-                'employee_demo_tree.organization',
-                'employee_demo_tree.level1_program',
-                'employee_demo_tree.level2_division',
-                'employee_demo_tree.level3_branch',
-                'employee_demo_tree.level4',
-                'user_id',
+                ->where('version', '2')
+                ->leftJoin('employee_demo_tree', 'admin_orgs.orgid', 'employee_demo_tree.id')
+                ->orderBy('employee_demo_tree.organization')
+                ->orderBy('employee_demo_tree.level1_program')
+                ->orderBy('employee_demo_tree.level2_division')
+                ->orderBy('employee_demo_tree.level3_branch')
+                ->orderBy('employee_demo_tree.level4')
+                ->select (
+                    'employee_demo_tree.organization',
+                    'employee_demo_tree.level1_program',
+                    'employee_demo_tree.level2_division',
+                    'employee_demo_tree.level3_branch',
+                    'employee_demo_tree.level4',
+                    'inherited',
+                    'user_id',
             );
             return Datatables::of($query)
-            ->addIndexColumn()
-            ->make(true);
+                ->editColumn('inherited', function ($row) { return $row->inherited == 1 ? "Yes" : "No"; })
+                ->addIndexColumn()
+                ->make(true);
         }
     }
 
