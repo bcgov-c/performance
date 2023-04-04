@@ -125,7 +125,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <p>Are you sure to send out this message ?</p>
+                        <p class="msg">Are you sure to send out this message ?</p>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-primary mt-2 sharebtn" type="button" name="btn_send" value="btn_send">Share</button>
@@ -692,6 +692,8 @@
             $(".sharebtn").click(function(){
                 $(".sharebtn").hide();
                 $(".cancelbtn").hide();
+                $(".msg").html("Processing request. Please do not close this window.");
+                
                 $("#notify-form").submit();
             });
             
