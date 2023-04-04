@@ -5,9 +5,9 @@
     </h3> 
     <div class="card p-3">  
         <div class="form-row">
-            <div class="form-group col-md-12">
-                <b>Goal Details:</b> <p>
+            <div class="form-group col-md-12">                
                 <?php if(isset($data["selected_goal"])){?>
+                <b>Goal Details:</b> <p>
                 <table class="table">
                     <tr>
                         <th>Title</th>
@@ -40,6 +40,7 @@
                 <?php } ?>
                 
                 <?php if(isset($data["selected_conversation"])){?>
+                <b>Conversation Details:</b> <p>
                 <table class="table">
                     <tr>
                         <th>Topic</th>
