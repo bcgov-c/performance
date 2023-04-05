@@ -187,8 +187,7 @@ class AccessPermissionsController extends Controller
             ->orWhereIn('level4_key', $selected_inherited)
             ->distinct()
             ->orderBy('id')
-            ->pluck('id')
-            ->toArray();
+            ->get();
         }
         foreach ($toRecipients as $newId) {
             $result = DB::table('model_has_roles')
@@ -211,7 +210,22 @@ class AccessPermissionsController extends Controller
                             'orgid' => $org1->id
                         ],
                         [
-                            'inherited' => in_array($org1->id, $inheritedList, true) ? 1 : 0,
+                            'updated_at' => date('Y-m-d H:i:s')
+                        ],
+                    );
+                    if(!$result){
+                        break;
+                    }
+                }
+                foreach($inheritedList as $org1) {
+                    $result = AdminOrg::updateOrCreate(
+                        [
+                            'user_id' => $newId->id,
+                            'version' => '2',
+                            'orgid' => $org1->id
+                        ],
+                        [
+                            'inherited' => 1,
                             'updated_at' => date('Y-m-d H:i:s')
                         ],
                     );
