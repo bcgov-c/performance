@@ -392,6 +392,8 @@
 					$('#selected_emp_ids').val( text );
 					var text2 = JSON.stringify(g_selected_orgnodes);
 					$('#selected_org_nodes').val( text2 );
+					var text3 = JSON.stringify(g_selected_inherited);
+					$('#selected_inherited').val( text3 );
 					return true; // return false to cancel form action
 				});
 

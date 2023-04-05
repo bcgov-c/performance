@@ -224,11 +224,13 @@ class GoalBankController extends Controller
                 ->join('employee_demo_tree AS t', 't.id', 'b.orgid')
                 ->join('admin_orgs AS o', 'b.orgid', 'o.orgid')
                 ->where('o.user_id', $current_user)
-                ->when( $request->dd_level0, function ($q) use($request) { return $q->where('t.organization_key', '=', $request->dd_level0); })
-                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('t.level1_key', $request->dd_level1); })
-                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('t.level2_key', $request->dd_level2); })
-                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('t.level3_key', $request->dd_level3); })
-                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('t.level4_key', $request->dd_level4); })
+                ->where('o.inherited', 0)
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('t.organization_key', $request->dd_level0); })
+                ->when($request->dd_level1, function ($q) use($request) { return $q->where('t.level1_key', $request->dd_level1); })
+                ->when($request->dd_level2, function ($q) use($request) { return $q->where('t.level2_key', $request->dd_level2); })
+                ->when($request->dd_level3, function ($q) use($request) { return $q->where('t.level3_key', $request->dd_level3); })
+                ->when($request->dd_level4, function ($q) use($request) { return $q->where('t.level4_key', $request->dd_level4); })
+                ->distinct()
                 ->select (
                     'b.orgid AS orgid',
                     't.organization AS organization',
@@ -236,7 +238,7 @@ class GoalBankController extends Controller
                     't.level2_division AS level2_division',
                     't.level3_branch AS level3_branch',
                     't.level4 AS level4',
-                    'b.inherited',
+                    'b.inherited AS inherited',
                     'b.goal_id',
                     'b.id'
                 )
@@ -245,7 +247,42 @@ class GoalBankController extends Controller
                 ->orderBy('t.level2_division')
                 ->orderBy('t.level3_branch')
                 ->orderBy('t.level4');
+            $queryInherited = GoalBankOrg::from('goal_bank_orgs AS b')
+                ->where('b.goal_id', $goal_id)
+                ->where('b.version', 2)
+                ->join('employee_demo_tree AS t', 't.id', 'b.orgid')
+                ->where(function($where) use($current_user) {
+                    return $where->whereRaw("EXISTS (SELECT DISTINCT 1 FROM employee_demo_tree l0, admin_orgs o WHERE o.user_id = {$current_user} AND o.version = 2 AND o.inherited = 1 AND l0.id = o.orgid AND l0.level = 0 AND l0.organization_key = t.organization_key)")
+                               ->orWhereRaw("EXISTS (SELECT DISTINCT 1 FROM employee_demo_tree l1, admin_orgs o WHERE o.user_id = {$current_user} AND o.version = 2 AND o.inherited = 1 AND l1.id = o.orgid AND l1.level = 1 AND l1.organization_key = t.organization_key AND l1.level1_key = t.level1_key)")
+                               ->orWhereRaw("EXISTS (SELECT DISTINCT 1 FROM employee_demo_tree l2, admin_orgs o WHERE o.user_id = {$current_user} AND o.version = 2 AND o.inherited = 1 AND l2.id = o.orgid AND l2.level = 2 AND l2.organization_key = t.organization_key AND l2.level1_key = t.level1_key AND l2.level2_key = t.level2_key)")
+                               ->orWhereRaw("EXISTS (SELECT DISTINCT 1 FROM employee_demo_tree l3, admin_orgs o WHERE o.user_id = {$current_user} AND o.version = 2 AND o.inherited = 1 AND l3.id = o.orgid AND l3.level = 3 AND l3.organization_key = t.organization_key AND l3.level1_key = t.level1_key AND l3.level2_key = t.level2_key AND l3.level3_key = t.level3_key)")
+                               ->orWhereRaw("EXISTS (SELECT DISTINCT 1 FROM employee_demo_tree l4, admin_orgs o WHERE o.user_id = {$current_user} AND o.version = 2 AND o.inherited = 1 AND l4.id = o.orgid AND l4.level = 4 AND l4.organization_key = t.organization_key AND l4.level1_key = t.level1_key AND l4.level2_key = t.level2_key AND l4.level3_key = t.level3_key AND l4.level4_key = t.level4_key)");
+                })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('t.organization_key', '=', $request->dd_level0); })
+                ->when($request->dd_level1, function ($q) use($request) { return $q->where('t.level1_key', $request->dd_level1); })
+                ->when($request->dd_level2, function ($q) use($request) { return $q->where('t.level2_key', $request->dd_level2); })
+                ->when($request->dd_level3, function ($q) use($request) { return $q->where('t.level3_key', $request->dd_level3); })
+                ->when($request->dd_level4, function ($q) use($request) { return $q->where('t.level4_key', $request->dd_level4); })
+                ->distinct()
+                ->select (
+                    'b.orgid AS orgid',
+                    't.organization AS organization',
+                    't.level1_program AS level1_program',
+                    't.level2_division AS level2_division',
+                    't.level3_branch AS level3_branch',
+                    't.level4 AS level4',
+                    'b.inherited AS inherited',
+                    'b.goal_id',
+                    'b.id'
+                )
+                ->orderBy('t.organization')
+                ->orderBy('t.level1_program')
+                ->orderBy('t.level2_division')
+                ->orderBy('t.level3_branch')
+                ->orderBy('t.level4');
+            $query = $query->union($queryInherited);
             return Datatables::of($query)
+                ->editColumn('inherited', function ($row) { return $row->inherited == 1 ? "Yes" : "No"; })
                 ->addIndexColumn()
                 ->addcolumn('action', function($row) {
                     $btn = '<a href="/'.request()->segment(1).'/goalbank/deleteorg/' . $row->id . '" class="btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete Org" id="delete_org" value="'. $row->id .'"><i class="fa fa-trash"></i></a>';
@@ -276,6 +313,7 @@ class GoalBankController extends Controller
         $errors = session('errors');
         $old_selected_emp_ids = []; // $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $old_selected_org_nodes = []; // $request->old_selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
+        $old_selected_inherited = []; // $request->old_selected_inherited ? json_decode($request->selected_inherited) : [];
         $tags = Tag::all(["id","name"])->sortBy("name")->toArray();
         if ($errors) {
             $old = session()->getOldInput();
@@ -289,13 +327,16 @@ class GoalBankController extends Controller
             $request->userCheck = isset($old['userCheck']) ? $old['userCheck'] : null;
             $old_selected_emp_ids = isset($old['selected_emp_ids']) ? json_decode($old['selected_emp_ids']) : [];
             $old_selected_org_nodes = isset($old['selected_org_nodes']) ? json_decode($old['selected_org_nodes']) : [];
+            $old_selected_inherited = isset($old['selected_inherited']) ? json_decode($old['selected_inherited']) : [];
             $request->edd_level0 = isset($old['edd_level0']) ? $old['edd_level0'] : null;
             $request->edd_level1 = isset($old['edd_level1']) ? $old['edd_level1'] : null;
             $request->edd_level2 = isset($old['edd_level2']) ? $old['edd_level2'] : null;
             $request->edd_level3 = isset($old['edd_level3']) ? $old['edd_level3'] : null;
             $request->edd_level4 = isset($old['edd_level4']) ? $old['edd_level4'] : null;
-            $old_selected_emp_ids = isset($old['selected_emp_ids']) ? json_decode($old['selected_emp_ids']) : [];
-            $old_selected_org_nodes = isset($old['selected_org_nodes']) ? json_decode($old['selected_org_nodes']) : [];
+            $request->edd_superv = isset($old['edd_superv']) ? $old['edd_superv'] : null;
+            $eold_selected_emp_ids = isset($old['eselected_emp_ids']) ? json_decode($old['eselected_emp_ids']) : [];
+            $eold_selected_org_nodes = isset($old['eselected_org_nodes']) ? json_decode($old['eselected_org_nodes']) : [];
+            $eold_selected_inherited = isset($old['eselected_inherited']) ? json_decode($old['eselected_inherited']) : [];
         } 
         // no validation and move filter variable to old 
         if ($request->btn_search) {
@@ -357,7 +398,7 @@ class GoalBankController extends Controller
         }
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
         $currentView = $request->segment(3);
-        return view('shared.goalbank.editgoal', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'roles', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'goaldetail', 'request', 'goal_id', 'type_desc_str', 'currentView') );
+        return view('shared.goalbank.editgoal', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'old_selected_inherited', 'roles', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'goaldetail', 'request', 'goal_id', 'type_desc_str', 'currentView') );
     }
 
     public function editone(Request $request, $id) {
@@ -541,9 +582,16 @@ class GoalBankController extends Controller
         }
         if($request->opt_audience == "byOrg") {
             $selected_org_nodes = $request->eorgCheck ? $request->eorgCheck : [];
+            $selected_inherited = $request->selected_inherited ? json_decode($request->selected_inherited) : [];
             $organizationList = EmployeeDemoTree::select('id')
                 ->whereIn('id', $selected_org_nodes)
                 ->orWhereIn('level4_key', $selected_org_nodes)
+                ->distinct()
+                ->orderBy('id')
+                ->get();
+            $inheritedList = EmployeeDemoTree::select('id')
+                ->whereIn('id', $selected_inherited)
+                ->orWhereIn('level4_key', $selected_inherited)
                 ->distinct()
                 ->orderBy('id')
                 ->get();
@@ -556,6 +604,21 @@ class GoalBankController extends Controller
                         'created_at' => date('Y-m-d H:i:s'),
                         'updated_at' => date('Y-m-d H:i:s') 
                     ]
+                );
+                if(!$result){
+                    break;
+                }
+            }
+            foreach($inheritedList as $org1) {
+                $result = GoalBankOrg::create(
+                    [
+                        'goal_id' => $resultrec->id,
+                        'version' => '2', 
+                        'orgid' => $org1->id,
+                        'inherited' => 1,
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s') 
+                    ],
                 );
                 if(!$result){
                     break;
@@ -737,7 +800,7 @@ class GoalBankController extends Controller
 
     public function updategoal(Request $request) {
         $selected_org_nodes = $request->eorgCheck ? $request->eorgCheck : [];
-
+        $selected_inherited = $request->selected_inherited ? json_decode($request->selected_inherited) : [];
         // Get the old employees listing 
         $old_ee_ids =  GoalSharedWith::join('users', 'goals_shared_with.user_id', 'users.id')
                     ->where('goal_id', $request->goal_id)->distinct()->pluck('users.employee_id')->toArray();
@@ -746,7 +809,6 @@ class GoalBankController extends Controller
                     ->where('goal_bank_orgs.goal_id', $request->goal_id)
                     ->pluck('u.employee_id')
                     ->toArray(); 
-
         $current_user = Auth::id();
         $organizationList = EmployeeDemoTree::select('id')
             ->whereIn('id', $selected_org_nodes)
@@ -754,7 +816,13 @@ class GoalBankController extends Controller
             ->distinct()
             ->orderBy('id')
             ->get();
-        $resultrec = Goal::withoutGlobalScopes()->findorfail( $request->goal_id );
+        $inheritedList = EmployeeDemoTree::select('id')
+            ->whereIn('id', $selected_inherited)
+            ->orWhereIn('level4_key', $selected_inherited)
+            ->distinct()
+            ->orderBy('id')
+            ->get();
+        $resultrec = Goal::withoutGlobalScopes()->findorfail($request->goal_id);
         foreach($organizationList as $org1) {
             $result = DB::table('goal_bank_orgs')
             ->updateorinsert(
@@ -771,19 +839,33 @@ class GoalBankController extends Controller
                 break;
             }
         }
-
+        foreach($inheritedList as $org1) {
+            $result = DB::table('goal_bank_orgs')
+            ->updateorinsert(
+                [
+                    'goal_id' => $resultrec->id,
+                    'version' => '2',
+                    'orgid' => $org1->id
+                ],
+                [
+                    'inherited' => '1',
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]
+            );
+            if(!$result){
+                break;
+            }
+        }
         // call notify_on_dashboard for the newly added emplid of the goal         
         $new_org_ee_ids = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
         $notify_audiences = array_diff($new_org_ee_ids, $old_ee_ids, $old_org_ee_ids);        
         $this->notify_on_dashboard($resultrec, $notify_audiences);   
-
         return redirect()->route(request()->segment(1).'.goalbank.manageindex')
             ->with('success', 'Goal update successful.');
     }
 
     public function updategoalone(Request $request, $id) {
         $aselected_emp_ids = $request->auserCheck ? $request->auserCheck : [];
-
         // Get the old employees listing 
         $old_ee_ids =  GoalSharedWith::join('users', 'goals_shared_with.user_id', 'users.id')
                                 ->where('goal_id', $id)->distinct()->pluck('users.employee_id')->toArray();
@@ -792,7 +874,6 @@ class GoalBankController extends Controller
                                 ->where('goal_bank_orgs.goal_id', $id)
                                 ->pluck('u.employee_id')
                                 ->toArray(); 
-
         $aselected_org_nodes = $request->aselected_org_nodes ? json_decode($request->aselected_org_nodes) : [];
         $current_user = Auth::id();
         $resultrec = Goal::withoutGlobalScopes()->findorfail( $id );
@@ -813,11 +894,9 @@ class GoalBankController extends Controller
                     []
                 );
         }
-
         // call notify_on_dashboard for the newly added emplid of the goal 
         $notify_audiences = array_diff($aselected_emp_ids, $old_ee_ids, $old_org_ee_ids);
         $this->notify_on_dashboard($resultrec, $notify_audiences);
-        
         return redirect()->route(request()->segment(1).'.goalbank.manageindex')
             ->with('success', 'Goal update successful.');
     }
