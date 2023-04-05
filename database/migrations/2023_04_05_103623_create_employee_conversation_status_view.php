@@ -23,8 +23,8 @@ class CreateEmployeeConversationStatusView extends Migration
             left join `conversation_participants` on `conversation_participants`.`participant_id` = `user_demo_jr_view`.`user_id` 
             left join `conversations` on `conversation_participants`.`conversation_id` = `conversations`.`id` 
             where ((`due_date_paused` = 'N' or `due_date_paused` is null))
-            and `date_deleted` is null; 
-            ORDER BY employee_id
+            and `date_deleted` is null
+            ORDER BY employee_id; 
         ");
     }
 
