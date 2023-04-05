@@ -155,6 +155,7 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
     Route::get('/hradmin/statistics/goalsummary-export', [StatisticsReportController::class, 'goalSummaryExport'])->name('hradmin.statistics.goalsummary.export');
     Route::get('/hradmin/statistics/goalsummary-tag-export', [StatisticsReportController::class, 'goalSummaryTagExport'])->name('hradmin.statistics.goalsummary.tag.export');
     Route::get('/hradmin/statistics/conversationsummary', [StatisticsReportController::class, 'conversationsummary'])->name('hradmin.statistics.conversationsummary');
+    Route::get('/hradmin/statistics/conversationstatus', [StatisticsReportController::class, 'conversationstatus'])->name('hradmin.statistics.conversationstatus');
     Route::get('/hradmin/statistics/conversationsummary-export', [StatisticsReportController::class, 'conversationSummaryExport'])->name('hradmin.statistics.conversationsummary.export');
     Route::get('/hradmin/statistics/sharedsummary', [StatisticsReportController::class, 'sharedsummary'])->name('hradmin.statistics.sharedsummary');
     Route::get('/hradmin/statistics/sharedsummary-export', [StatisticsReportController::class, 'sharedSummaryExport'])->name('hradmin.statistics.sharedsummary.export');

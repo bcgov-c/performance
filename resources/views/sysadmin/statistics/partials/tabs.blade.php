@@ -4,6 +4,11 @@
           Goals Summary
         </x-button>
     </div>
+    <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'sysadmin.statistics.conversationstatus' ? 'border-primary' : ''}}">
+        <x-button role="tab" :href="route('sysadmin.statistics.conversationstatus')" style="">
+          Conversations Status
+        </x-button>
+    </div>
     <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'sysadmin.statistics.conversationsummary' ? 'border-primary' : ''}}">
         <x-button role="tab" :href="route('sysadmin.statistics.conversationsummary')" style="">
           Conversations Summary

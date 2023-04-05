@@ -712,118 +712,6 @@ class SysadminStatisticsReportController extends Controller
         }     
         
         
-        // Chart6 -- Employee Has Open Conversation
-        $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, 
-                            organization, level1_program, level2_division, level3_branch, level4,
-                case when conversation_id IS NULL then 'No' else 'Yes' end as has_conversation            
-                ")
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('due_date_paused', 'N')
-                            ->orWhereNull('due_date_paused');
-                    });
-                })
-                ->leftJoin('conversation_participants', function($join) {
-                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
-                })
-                ->leftJoin('conversations', function($join) {
-                    $join->on('conversation_participants.conversation_id', '=', 'conversations.id');
-                })
-                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
-                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
-                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
-                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
-                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })      
-                ->whereNull('date_deleted')     
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->whereNull('conversations.id')
-                            ->orwhere(function($query) {
-                                $query->where(function($query) {
-                                    $query->whereNull('signoff_user_id')
-                                        ->orWhereNull('supervisor_signoff_id');
-                                });
-                            });
-                        });
-                });
-                
-        Log::warning('Chart 6');
-        Log::warning(print_r($sql_6->toSql(),true));
-        Log::warning(print_r($sql_6->getBindings(),true));        
-        
-        $users = $sql_6->get();
-        $users = $users->unique('employee_id');
-        // Chart 6 
-        $legends = ['Yes', 'No'];
-        $data['chart6']['chart_id'] = 6;
-        $data['chart6']['title'] = 'Employee Has Open Conversation';
-        $data['chart6']['legend'] = $legends;
-        $data['chart6']['groups'] = array();
-
-        foreach($legends as $legend)
-        {
-            $subset = $users->where('has_conversation', '=', $legend);
-            array_push( $data['chart6']['groups'],  [ 'name' => $legend, 'value' => $subset->count(),
-                            'legend' => $legend, 
-                        ]);
-        } 
-        
-        
-        // Chart7 -- Employee Has Completed Conversation
-        $sql_7 = UserDemoJrView::selectRaw("employee_id, employee_name, 
-                            organization, level1_program, level2_division, level3_branch, level4,
-                case when conversation_id IS NULL then 'No' else 'Yes' end as has_conversation            
-                ")
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('due_date_paused', 'N')
-                            ->orWhereNull('due_date_paused');
-                    });
-                })
-                ->leftJoin('conversation_participants', function($join) {
-                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
-                })
-                ->leftJoin('conversations', function($join) {
-                    $join->on('conversation_participants.conversation_id', '=', 'conversations.id');
-                })
-                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
-                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
-                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
-                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
-                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })      
-                ->whereNull('date_deleted')     
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->whereNull('conversations.id')
-                            ->orwhere(function($query) {
-                                $query->where(function($query) {
-                                    $query->whereNotNull('signoff_user_id')
-                                        ->WhereNotNull('supervisor_signoff_id');
-                                });
-                            });
-                        });
-                });
-                
-        Log::warning('Chart 7');
-        Log::warning(print_r($sql_7->toSql(),true));
-        Log::warning(print_r($sql_7->getBindings(),true));        
-        
-        $users = $sql_7->get();
-        $users = $users->unique('employee_id');
-        // Chart 7 
-        $legends = ['Yes', 'No'];
-        $data['chart7']['chart_id'] = 7;
-        $data['chart7']['title'] = 'Employee Has Completed Conversation';
-        $data['chart7']['legend'] = $legends;
-        $data['chart7']['groups'] = array();
-
-        foreach($legends as $legend)
-        {
-            $subset = $users->where('has_conversation', '=', $legend);
-            array_push( $data['chart7']['groups'],  [ 'name' => $legend, 'value' => $subset->count(),
-                            'legend' => $legend, 
-                        ]);
-        } 
         return view('sysadmin.statistics.conversationsummary',compact('data'));
 
     }
@@ -2064,6 +1952,136 @@ class SysadminStatisticsReportController extends Controller
         $output .= $prepend . '</ul>' . PHP_EOL;
         return $output;
     }
+    
+    
+    public function conversationStatus(Request $request)
+    {
+
+        // send back the input parameters
+        $this->preservedInputParams($request);
+
+        $request->session()->flash('dd_level0', $request->dd_level0);
+        $request->session()->flash('dd_level1', $request->dd_level1);
+        $request->session()->flash('dd_level2', $request->dd_level2);
+        $request->session()->flash('dd_level3', $request->dd_level3);
+        $request->session()->flash('dd_level4', $request->dd_level4);
+        
+        // Chart6 -- Employee Has Open Conversation
+        $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, 
+                            organization, level1_program, level2_division, level3_branch, level4,
+                case when conversation_id IS NULL then 'No' else 'Yes' end as has_conversation            
+                ")
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
+                    });
+                })
+                ->leftJoin('conversation_participants', function($join) {
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                })
+                ->leftJoin('conversations', function($join) {
+                    $join->on('conversation_participants.conversation_id', '=', 'conversations.id');
+                })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })      
+                ->whereNull('date_deleted')     
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereNull('conversations.id')
+                            ->orwhere(function($query) {
+                                $query->where(function($query) {
+                                    $query->whereNull('signoff_user_id')
+                                        ->orWhereNull('supervisor_signoff_id');
+                                });
+                            });
+                        });
+                });
+                
+        Log::warning('Chart 6');
+        Log::warning(print_r($sql_6->toSql(),true));
+        Log::warning(print_r($sql_6->getBindings(),true));        
+        
+        $users = $sql_6->get();
+        $users = $users->unique('employee_id');
+        // Chart 6 
+        $legends = ['Yes', 'No'];
+        $data['chart6']['chart_id'] = 6;
+        $data['chart6']['title'] = 'Employee Has Open Conversation';
+        $data['chart6']['legend'] = $legends;
+        $data['chart6']['groups'] = array();
+
+        foreach($legends as $legend)
+        {
+            $subset = $users->where('has_conversation', '=', $legend);
+            array_push( $data['chart6']['groups'],  [ 'name' => $legend, 'value' => $subset->count(),
+                            'legend' => $legend, 
+                        ]);
+        } 
+        
+        
+        // Chart7 -- Employee Has Completed Conversation
+        $sql_7 = UserDemoJrView::selectRaw("employee_id, employee_name, 
+                            organization, level1_program, level2_division, level3_branch, level4,
+                case when conversation_id IS NULL then 'No' else 'Yes' end as has_conversation            
+                ")
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
+                    });
+                })
+                ->leftJoin('conversation_participants', function($join) {
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                })
+                ->leftJoin('conversations', function($join) {
+                    $join->on('conversation_participants.conversation_id', '=', 'conversations.id');
+                })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })      
+                ->whereNull('date_deleted')     
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereNull('conversations.id')
+                            ->orwhere(function($query) {
+                                $query->where(function($query) {
+                                    $query->whereNotNull('signoff_user_id')
+                                        ->WhereNotNull('supervisor_signoff_id');
+                                });
+                            });
+                        });
+                });
+                
+        Log::warning('Chart 7');
+        Log::warning(print_r($sql_7->toSql(),true));
+        Log::warning(print_r($sql_7->getBindings(),true));        
+        
+        $users = $sql_7->get();
+        $users = $users->unique('employee_id');
+        // Chart 7 
+        $legends = ['Yes', 'No'];
+        $data['chart7']['chart_id'] = 7;
+        $data['chart7']['title'] = 'Employee Has Completed Conversation';
+        $data['chart7']['legend'] = $legends;
+        $data['chart7']['groups'] = array();
+
+        foreach($legends as $legend)
+        {
+            $subset = $users->where('has_conversation', '=', $legend);
+            array_push( $data['chart7']['groups'],  [ 'name' => $legend, 'value' => $subset->count(),
+                            'legend' => $legend, 
+                        ]);
+        } 
+        return view('sysadmin.statistics.conversationstatus',compact('data'));
+
+    }
+    
 
 
 }
