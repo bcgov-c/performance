@@ -138,8 +138,6 @@ $(function() {
 	var	pie_basic_1_data = {!!json_encode( $data['chart1'] )!!};
         var	pie_basic_4_data = {!!json_encode( $data['chart4'] )!!};
         var	pie_basic_5_data = {!!json_encode( $data['chart5'] )!!};
-        var	pie_basic_6_data = {!!json_encode( $data['chart6'] )!!};
-        var	pie_basic_7_data = {!!json_encode( $data['chart7'] )!!};
 
 	var allCharts = [];
 	var export_url = '{{ route('sysadmin.statistics.conversationsummary.export') }}';  
@@ -496,8 +494,6 @@ $(function() {
 	createChart('pie_basic_1', pie_basic_1_data);
         createChart('pie_basic_4', pie_basic_4_data);
         createChart('pie_basic_5', pie_basic_5_data);
-        createYesNoChart('pie_basic_6', pie_basic_6_data);
-        createYesNoChart('pie_basic_7', pie_basic_7_data);
 	
 	// trigger: resize the chart when the windows resize
 	window.onresize = function() {
