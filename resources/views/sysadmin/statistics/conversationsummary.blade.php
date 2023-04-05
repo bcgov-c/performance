@@ -54,30 +54,6 @@
 				</div>
 			</div>
 		</div>
-                
-                <p class="print-only page-break">&nbsp;</p>
-
-		<div class="col-sm-12 col-md-10 col-lg-4">
-			<div class="card">
-				<div class="card-body">
-					<div class="chart has-fixed-height" id="pie_basic_6">
-						Loading...
-					</div>
-				</div>
-			</div>
-		</div>
-                
-                <p class="print-only page-break">&nbsp;</p>
-
-		<div class="col-sm-12 col-md-10 col-lg-4">
-			<div class="card">
-				<div class="card-body">
-					<div class="chart has-fixed-height" id="pie_basic_7">
-						Loading...
-					</div>
-				</div>
-			</div>
-		</div>
 
   </div>
 </span>
