@@ -3,7 +3,7 @@
         <h2 class="font-semibold text-xl text-primary leading-tight" role="banner">
             Goal Summary 
         </h2> 
-		@include('hradmin.statistics.partials.tabs')
+		@include('sysadmin.statistics.partials.tabs')
     </x-slot>
 
 	<div class="d-flex justify-content-end mb-4 no-print">
@@ -13,7 +13,7 @@
 	<form id="filter-form" class="no-print">
 		<input type="hidden" name="filter_params" value="{{ old('filter') }}">
 		
-		@include('hradmin.statistics.partials.filter',['formaction' => route('hradmin.statistics.conversationsummary') ])
+		@include('sysadmin.statistics.partials.filter',['formaction' => route('sysadmin.statistics.conversationsummary') ])
 
 	</form>
 
@@ -23,21 +23,11 @@
 <span id="pdf-output">
 
   <div class="row justify-content-center">
-	<div class="col-sm-12 col-md-10 col-lg-4">
-	  <div class="card">
-		<div class="card-body">
-		  <div class="chart has-fixed-height" id="pie_basic_1">
-			Loading...
-		  </div>
-		</div>
-	  </div>
-	</div>
-	
-        
-          <div class="col-sm-12 col-md-10 col-lg-4">
+		
+		<div class="col-sm-12 col-md-10 col-lg-4">
 			<div class="card">
 				<div class="card-body">
-					<div class="chart has-fixed-height" id="pie_basic_4">
+					<div class="chart has-fixed-height" id="pie_basic_6">
 						Loading...
 					</div>
 				</div>
@@ -49,12 +39,13 @@
 		<div class="col-sm-12 col-md-10 col-lg-4">
 			<div class="card">
 				<div class="card-body">
-					<div class="chart has-fixed-height" id="pie_basic_5">
+					<div class="chart has-fixed-height" id="pie_basic_7">
 						Loading...
 					</div>
 				</div>
 			</div>
-		</div>  
+		</div>
+
   </div>
 </span>
 
@@ -111,12 +102,11 @@
 
 $(function() {
 	
-	var	pie_basic_1_data = {!!json_encode( $data['chart1'] )!!};
-        var	pie_basic_4_data = {!!json_encode( $data['chart4'] )!!};
-        var	pie_basic_5_data = {!!json_encode( $data['chart5'] )!!};
-        
+        var	pie_basic_6_data = {!!json_encode( $data['chart6'] )!!};
+        var	pie_basic_7_data = {!!json_encode( $data['chart7'] )!!};
+
 	var allCharts = [];
-	var export_url = '{{ route('hradmin.statistics.conversationsummary.export') }}';  
+	var export_url = '{{ route('sysadmin.statistics.conversationsummary.export') }}';  
 
 	function createChart(divId, myData) {
 
@@ -141,7 +131,7 @@ $(function() {
 				left: 'center',
 				triggerEvent: true,
 				textStyle: {
-					fontSize: 16,
+					fontSize: 20,
 					fontWeight: 1000,
 					color: '#6c757d',
 				},
@@ -166,7 +156,7 @@ $(function() {
 							chart_id = myChart.getModel().option.chart_id;
 							filter = $('input[name=filter_params').val();
 							
-							let _url = export_url+ '?chart=' + chart_id + filter; // + '&ids=' + ids;
+							let _url = export_url+ '?chart=' + chart_id + filter;
       						window.location.href = _url;
 						}
 					},
@@ -282,13 +272,16 @@ $(function() {
 
 			// prepare the parameters for calling export on difference segments
 			chart_id = myChart.getModel().option.chart_id;
+			// let _url = export_url + '?chart=' + chart_id + '&ids=' + params.data.ids;
 			filter = $('input[name=filter_params').val();
-			let _url = export_url + '?chart=' + chart_id + '&range=' + params.data.name + "&topic_id=" + params.data.topic_id + filter;
+			let _url = export_url + '?chart=' + chart_id + '&range=' + params.data.name + '&topic_id=' + params.data.topic_id + filter;
+
 	      	window.location.href = _url;
 
 		});
 
 	}
+        
         
         function createYesNoChart(divId, myData) {
 
@@ -461,11 +454,11 @@ $(function() {
 
 	}
         
+        
 
 	// Call fundtion to create a new chart
-	createChart('pie_basic_1', pie_basic_1_data);
-        createChart('pie_basic_4', pie_basic_4_data);
-        createChart('pie_basic_5', pie_basic_5_data);
+        createYesNoChart('pie_basic_6', pie_basic_6_data);
+        createYesNoChart('pie_basic_7', pie_basic_7_data);
 	
 	// trigger: resize the chart when the windows resize
 	window.onresize = function() {
