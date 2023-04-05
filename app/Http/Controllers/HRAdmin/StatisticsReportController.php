@@ -1163,46 +1163,28 @@ class StatisticsReportController extends Controller
             });
             
         // sql6 -- Employee Has Open Conversation
-        $sql_6 = User::selectRaw("users.employee_id, users.email, users.empl_record, employee_name, 
-                            employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4,
+        $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, 
+                            organization, level1_program, level2_division, level3_branch, level4,
                 case when conversation_id IS NULL then 'No' else 'Yes' end as has_conversation            
                 ")
-                ->join('employee_demo', function($join) {
-                    $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-                })
                 ->where(function($query) {
                     $query->where(function($query) {
-                        $query->where('users.due_date_paused', 'N')
-                            ->orWhereNull('users.due_date_paused');
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
                     });
                 })
-                ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                 ->leftJoin('conversation_participants', function($join) {
-                    $join->on('conversation_participants.participant_id', '=', 'users.id');
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
                 })
                 ->leftJoin('conversations', function($join) {
                     $join->on('conversation_participants.conversation_id', '=', 'conversations.id');
                 })
-                ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('users.excused_flag', '<>', '1')
-                            ->orWhereNull('users.excused_flag');
-                    });
-                })        
-                ->whereNull('employee_demo.date_deleted')
-                ->whereNotNull('employee_demo.employee_id')   
-                ->whereExists(function ($query) {
-                    $query->select(DB::raw(1))
-                            ->from('admin_org_users')
-                            ->whereColumn('admin_org_users.allowed_user_id', 'conversation_participants.participant_id')
-                            ->whereIn('admin_org_users.access_type', [0,2])
-                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
-                })        
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })      
+                ->whereNull('date_deleted')     
                 ->where(function($query) {
                     $query->where(function($query) {
                         $query->whereNull('conversations.id')
@@ -1213,60 +1195,56 @@ class StatisticsReportController extends Controller
                                 });
                             });
                         });
-                });    
-                
-                
-        // sql7 -- Employee Has Completed Conversation
-        $sql_7 = User::selectRaw("users.employee_id, users.email, users.empl_record, employee_name, 
-                            employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4,
-                case when conversation_id IS NULL then 'No' else 'Yes' end as has_conversation            
-                ")
-                ->join('employee_demo', function($join) {
-                    $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-                })
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('users.due_date_paused', 'N')
-                            ->orWhereNull('users.due_date_paused');
-                    });
-                })
-                ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
-                ->leftJoin('conversation_participants', function($join) {
-                    $join->on('conversation_participants.participant_id', '=', 'users.id');
-                })
-                ->leftJoin('conversations', function($join) {
-                    $join->on('conversation_participants.conversation_id', '=', 'conversations.id');
-                })
-                ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('users.excused_flag', '<>', '1')
-                            ->orWhereNull('users.excused_flag');
-                    });
                 })        
-                ->whereNull('employee_demo.date_deleted')
-                ->whereNotNull('employee_demo.employee_id')    
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('admin_org_users')
                             ->whereColumn('admin_org_users.allowed_user_id', 'conversation_participants.participant_id')
                             ->whereIn('admin_org_users.access_type', [0,2])
                             ->where('admin_org_users.granted_to_id', '=', Auth::id());
-                })         
+                });    
+                
+                
+        // sql7 -- Employee Has Completed Conversation
+        $sql_7 = UserDemoJrView::selectRaw("employee_id, employee_name, 
+                            organization, level1_program, level2_division, level3_branch, level4,
+                case when conversation_id IS NULL then 'No' else 'Yes' end as has_conversation            
+                ")
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
+                    });
+                })
+                ->leftJoin('conversation_participants', function($join) {
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                })
+                ->leftJoin('conversations', function($join) {
+                    $join->on('conversation_participants.conversation_id', '=', 'conversations.id');
+                })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })      
+                ->whereNull('date_deleted')     
                 ->where(function($query) {
                     $query->where(function($query) {
                         $query->whereNull('conversations.id')
                             ->orwhere(function($query) {
                                 $query->where(function($query) {
                                     $query->whereNotNull('signoff_user_id')
-                                        ->whereNotNull('supervisor_signoff_id');  
+                                        ->WhereNotNull('supervisor_signoff_id');
                                 });
                             });
                         });
+                })           
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('admin_org_users')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'conversation_participants.participant_id')
+                            ->whereIn('admin_org_users.access_type', [0,2])
+                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 });       
             
         // Generating Output file 
