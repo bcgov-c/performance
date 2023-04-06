@@ -1810,7 +1810,13 @@ class SysadminStatisticsReportController extends Controller
         // Chart6 -- Employee Has Open Conversation
          
         //get all employee number
-        $employees = UserDemoJrView::distinct('employee_id')->count();
+        $employees = UserDemoJrView::distinct('employee_id')                
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })   
+                ->count();
          
         //get employees has open conversations
         $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, 
@@ -1839,7 +1845,7 @@ class SysadminStatisticsReportController extends Controller
                             ->orWhereNull('excused_flag');
                     });
                 }) 
-                ->whereNull('employee_demo.date_deleted')
+                ->whereNull('date_deleted')
                 ->whereNotNull('conversation_id')        
                 ->where(function($query) {
                     $query->where(function($query) {
@@ -1906,7 +1912,7 @@ class SysadminStatisticsReportController extends Controller
                             ->orWhereNull('excused_flag');
                     });
                 }) 
-                ->whereNull('employee_demo.date_deleted')
+                ->whereNull('date_deleted')
                 ->whereNotNull('conversation_id')           
                 ->where(function($query) {
                     $query->where(function($query) {
@@ -1975,7 +1981,7 @@ class SysadminStatisticsReportController extends Controller
                             ->orWhereNull('excused_flag');
                     });
                 }) 
-                ->whereNull('employee_demo.date_deleted')
+                ->whereNull('date_deleted')
                 ->whereNotNull('conversation_id')          
                 ->where(function($query) {
                     $query->where(function($query) {
@@ -2012,7 +2018,7 @@ class SysadminStatisticsReportController extends Controller
                             ->orWhereNull('excused_flag');
                     });
                 }) 
-                ->whereNull('employee_demo.date_deleted')
+                ->whereNull('date_deleted')
                 ->whereNotNull('conversation_id')           
                 ->where(function($query) {
                     $query->where(function($query) {
@@ -2034,8 +2040,14 @@ class SysadminStatisticsReportController extends Controller
                 
                 if($request->legend == 'No'){
                     //get has conversation users employee_id list
-                    $excludedIds = $userspluck('employee_id');
-                    $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)->get();
+                    $excludedIds = $users->pluck('employee_id');
+                    $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)
+                            ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                            ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                            ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                            ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                            ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
+                            ->get();
                 }  
 
                 $headers = array(
@@ -2083,8 +2095,14 @@ class SysadminStatisticsReportController extends Controller
                 
                 if($request->legend == 'No'){
                     //get has conversation users employee_id list
-                    $excludedIds = $userspluck('employee_id');
-                    $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)->get();
+                    $excludedIds = $users->pluck('employee_id');
+                    $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)
+                            ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                            ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                            ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                            ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                            ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
+                            ->get();
                 }  
 
                 $headers = array(
