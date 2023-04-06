@@ -1827,7 +1827,19 @@ class SysadminStatisticsReportController extends Controller
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
                 ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                 ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
-                ->whereNull('date_deleted')
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
+                    });
+                })
+		->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('excused_flag', '<>', '1')
+                            ->orWhereNull('excused_flag');
+                    });
+                }) 
+                ->whereNull('employee_demo.date_deleted')
                 ->whereNotNull('conversation_id')        
                 ->where(function($query) {
                     $query->where(function($query) {
@@ -1882,8 +1894,20 @@ class SysadminStatisticsReportController extends Controller
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
                 ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                 ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
-                ->whereNull('date_deleted')
-                ->whereNotNull('conversation_id')        
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
+                    });
+                })
+		->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('excused_flag', '<>', '1')
+                            ->orWhereNull('excused_flag');
+                    });
+                }) 
+                ->whereNull('employee_demo.date_deleted')
+                ->whereNotNull('conversation_id')           
                 ->where(function($query) {
                     $query->where(function($query) {
                         $query->whereNotNull('signoff_user_id')
@@ -1939,8 +1963,20 @@ class SysadminStatisticsReportController extends Controller
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
                 ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                 ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
-                ->whereNull('date_deleted')
-                ->whereNotNull('conversation_id')        
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
+                    });
+                })
+		->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('excused_flag', '<>', '1')
+                            ->orWhereNull('excused_flag');
+                    });
+                }) 
+                ->whereNull('employee_demo.date_deleted')
+                ->whereNotNull('conversation_id')          
                 ->where(function($query) {
                     $query->where(function($query) {
                         $query->whereNull('signoff_user_id')
@@ -1964,8 +2000,20 @@ class SysadminStatisticsReportController extends Controller
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
                 ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                 ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
-                ->whereNull('date_deleted')
-                ->whereNotNull('conversation_id')        
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
+                    });
+                })
+		->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('excused_flag', '<>', '1')
+                            ->orWhereNull('excused_flag');
+                    });
+                }) 
+                ->whereNull('employee_demo.date_deleted')
+                ->whereNotNull('conversation_id')           
                 ->where(function($query) {
                     $query->where(function($query) {
                         $query->whereNotNull('signoff_user_id')
