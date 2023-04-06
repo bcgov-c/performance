@@ -95,6 +95,7 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
     Route::get('/sysadmin/statistics/conversationsummary', [SysadminStatisticsReportController::class, 'conversationsummary'])->name('sysadmin.statistics.conversationsummary');
     Route::get('/sysadmin/statistics/conversationstatus', [SysadminStatisticsReportController::class, 'conversationstatus'])->name('sysadmin.statistics.conversationstatus');
     Route::get('/sysadmin/statistics/conversationsummary-export', [SysadminStatisticsReportController::class, 'conversationSummaryExport'])->name('sysadmin.statistics.conversationsummary.export');
+    Route::get('/sysadmin/statistics/conversationstatus-export', [SysadminStatisticsReportController::class, 'conversationStatusExport'])->name('sysadmin.statistics.conversationstatus.export');
     Route::get('/sysadmin/statistics/sharedsummary', [SysadminStatisticsReportController::class, 'sharedsummary'])->name('sysadmin.statistics.sharedsummary');
     Route::get('/sysadmin/statistics/sharedsummary-export', [SysadminStatisticsReportController::class, 'sharedSummaryExport'])->name('sysadmin.statistics.sharedsummary.export');
     Route::get('/sysadmin/statistics/excusedsummary', [SysadminStatisticsReportController::class, 'excusedsummary'])->name('sysadmin.statistics.excusedsummary');
