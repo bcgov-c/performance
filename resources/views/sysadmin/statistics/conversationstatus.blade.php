@@ -13,7 +13,7 @@
 	<form id="filter-form" class="no-print">
 		<input type="hidden" name="filter_params" value="{{ old('filter') }}">
 		
-		@include('sysadmin.statistics.partials.filter',['formaction' => route('sysadmin.statistics.conversationsummary') ])
+		@include('sysadmin.statistics.partials.filter',['formaction' => route('sysadmin.statistics.conversationstatus') ])
 
 	</form>
 
