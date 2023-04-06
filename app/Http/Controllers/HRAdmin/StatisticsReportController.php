@@ -1866,7 +1866,7 @@ class StatisticsReportController extends Controller
                             ->orWhereNull('excused_flag');
                     });
                 }) 
-                ->whereNull('employee_demo.date_deleted')
+                ->whereNull('date_deleted')
                 ->whereNotNull('conversation_id')      
                 ->where(function($query) {
                     $query->where(function($query) {
@@ -1939,7 +1939,7 @@ class StatisticsReportController extends Controller
                             ->orWhereNull('excused_flag');
                     });
                 }) 
-                ->whereNull('employee_demo.date_deleted')
+                ->whereNull('date_deleted')
                 ->whereNotNull('conversation_id')       
                 ->where(function($query) {
                     $query->where(function($query) {
@@ -2016,7 +2016,7 @@ class StatisticsReportController extends Controller
                             ->orWhereNull('excused_flag');
                     });
                 }) 
-                ->whereNull('employee_demo.date_deleted')
+                ->whereNull('date_deleted')
                 ->whereNotNull('conversation_id')           
                 ->where(function($query) {
                     $query->where(function($query) {
@@ -2060,7 +2060,7 @@ class StatisticsReportController extends Controller
                             ->orWhereNull('excused_flag');
                     });
                 }) 
-                ->whereNull('employee_demo.date_deleted')
+                ->whereNull('date_deleted')
                 ->whereNotNull('conversation_id')            
                 ->where(function($query) {
                     $query->where(function($query) {
@@ -2089,7 +2089,7 @@ class StatisticsReportController extends Controller
                 
                 if($request->legend == 'No'){
                     //get has conversation users employee_id list
-                    $excludedIds = $userspluck('employee_id');
+                    $excludedIds = $users->pluck('employee_id');
                     $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)->get();
                 }  
 
@@ -2138,7 +2138,7 @@ class StatisticsReportController extends Controller
                 
                 if($request->legend == 'No'){
                     //get has conversation users employee_id list
-                    $excludedIds = $userspluck('employee_id');
+                    $excludedIds = $users->pluck('employee_id');
                     $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)->get();
                 }  
 
