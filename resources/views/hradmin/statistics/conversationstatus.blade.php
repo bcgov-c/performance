@@ -13,7 +13,7 @@
 	<form id="filter-form" class="no-print">
 		<input type="hidden" name="filter_params" value="{{ old('filter') }}">
 		
-		@include('hradmin.statistics.partials.filter',['formaction' => route('hradmin.statistics.conversationsummary') ])
+		@include('hradmin.statistics.partials.filter',['formaction' => route('hradmin.statistics.conversationstatus') ])
 
 	</form>
 
