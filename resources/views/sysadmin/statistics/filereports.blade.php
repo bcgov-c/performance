@@ -94,7 +94,17 @@
         @if(!$submit)
         <p>To retrieve performance evaluation records, use the fields above to search for an employee, time frame, and record type.</p>        
         @else
-            <b>Active Goals</b><hr/>
+            <div class="row">
+                <div class="col-md-6">
+                  <label for="input-field" class="form-label">Active Goals:</label>
+                </div>
+                @if(count($data["active_goals"]) > 0)   
+                <div class="col-md-6">
+                  <a href="/sysadmin/statistics/filereports-export?type=active_goal&employee_id={{$employee_id}}&start_date={{$start_date}}&end_date={{$end_date}}"><button type="button" class="btn btn-primary  float-right"> <i class="fas fa-file-pdf"></i> Bulk Download</button></a>
+                </div>
+                @endif
+            </div>
+            <hr/>
             @if(count($data["active_goals"]) > 0)                
                 <table>            
                 <tr>
@@ -113,7 +123,7 @@
                     <td><?php echo $item->organization; ?></td>
                     <td><?php echo $item->created_at; ?></td>
                     <td>
-                        <a href="/sysadmin/statistics/filereports-export?type=selected_goal&id=<?php echo $item->id; ?>"><button type="button" class="btn btn-primary"> <i class="fas fa-file-pdf"></i> Download</button></a>
+                        <a href="/sysadmin/statistics/filereports-export?type=selected_goal&id=<?php echo $item->id; ?>"><button type="button" class="btn btn-primary   float-right"> <i class="fas fa-file-pdf"></i> Download</button></a>
                     </td>
                 <tr/>    
                 <?php }?>
@@ -124,7 +134,17 @@
                 <hr/>
             @endif
             <p></p>
-            <b>Past Goals</b><hr/>
+            <div class="row">
+                <div class="col-md-6">
+                  <label for="input-field" class="form-label">Past Goals:</label>
+                </div>
+                @if(count($data["past_goals"]) > 0)   
+                <div class="col-md-6">
+                  <a href="/sysadmin/statistics/filereports-export?type=past_goal&employee_id={{$employee_id}}&start_date={{$start_date}}&end_date={{$end_date}}"><button type="button" class="btn btn-primary  float-right"> <i class="fas fa-file-pdf"></i> Bulk Download</button></a>
+                </div>
+                @endif
+            </div>
+            <hr/>
             @if(count($data["past_goals"]) > 0)                
                 <table>            
                 <tr>
@@ -142,7 +162,7 @@
                     <td><?php echo $item->business_unit; ?></td>
                     <td><?php echo $item->organization; ?></td>
                     <td><?php echo $item->created_at; ?></td>
-                    <td><a href="/sysadmin/statistics/filereports-export?type=selected_goal&id=<?php echo $item->id; ?>"><button type="button" class="btn btn-primary"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
+                    <td><a href="/sysadmin/statistics/filereports-export?type=selected_goal&id=<?php echo $item->id; ?>"><button type="button" class="btn btn-primary   float-right"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
                 <tr/>    
                 <?php }?>
                 </table>
@@ -152,7 +172,17 @@
                 <hr/>
             @endif
             <p></p>
-            <b>Open Conversations</b><hr/>
+            <div class="row">
+                <div class="col-md-6">
+                  <label for="input-field" class="form-label">Open Conversations:</label>
+                </div>
+                @if(count($data["open_conversations"]) > 0)   
+                <div class="col-md-6">
+                  <a href="/sysadmin/statistics/filereports-export?type=open_conversation&employee_id={{$employee_id}}&start_date={{$start_date}}&end_date={{$end_date}}"><button type="button" class="btn btn-primary  float-right"> <i class="fas fa-file-pdf"></i> Bulk Download</button></a>
+                </div>
+                @endif
+            </div>
+            <hr/>
             @if(count($data["open_conversations"]) > 0)                
                 <table>            
                 <tr>
@@ -170,7 +200,7 @@
                     <td><?php echo $item->business_unit; ?></td>
                     <td><?php echo $item->organization; ?></td>
                     <td><?php echo $item->created_at; ?></td>
-                    <td><a href="/sysadmin/statistics/filereports-export?type=selected_conversation&id=<?php echo $item->conversation_id; ?>"><button type="button" class="btn btn-primary"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
+                    <td><a href="/sysadmin/statistics/filereports-export?type=selected_conversation&id=<?php echo $item->conversation_id; ?>"><button type="button" class="btn btn-primary  float-right"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
                 <tr/>    
                 <?php }?>
                 </table>
@@ -180,7 +210,17 @@
                 <hr/>
             @endif
             <p></p>
-            <b>Completed Conversations</b><hr/>
+            <div class="row">
+                <div class="col-md-6">
+                  <label for="input-field" class="form-label">Completed Conversations:</label>
+                </div>
+                @if(count($data["completed_conversations"]) > 0)   
+                <div class="col-md-6">
+                  <a href="/sysadmin/statistics/filereports-export?type=completed_conversation&employee_id={{$employee_id}}&start_date={{$start_date}}&end_date={{$end_date}}"><button type="button" class="btn btn-primary  float-right"> <i class="fas fa-file-pdf"></i> Bulk Download</button></a>
+                </div>
+                @endif
+            </div>
+            <hr/>
             @if(count($data["completed_conversations"]) > 0)                
                 <table>            
                 <tr>
@@ -198,7 +238,7 @@
                     <td><?php echo $item->business_unit; ?></td>
                     <td><?php echo $item->organization; ?></td>
                     <td><?php echo $item->latest_update; ?></td>
-                    <td><a href="/sysadmin/statistics/filereports-export?type=selected_conversation&id=<?php echo $item->conversation_id; ?>"><button type="button" class="btn btn-primary"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
+                    <td><a href="/sysadmin/statistics/filereports-export?type=selected_conversation&id=<?php echo $item->conversation_id; ?>"><button type="button" class="btn btn-primary  float-right"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
                 <tr/>                   
                 <?php }?>
                 </table>
