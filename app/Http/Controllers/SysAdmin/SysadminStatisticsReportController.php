@@ -12,7 +12,6 @@ use App\Models\GoalType;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
 use App\Models\UserDemoJrView;
-use App\Models\EmployeeConversationStatusView;
 use Illuminate\Http\Request;
 use App\Models\ConversationTopic;
 use Illuminate\Support\Facades\DB;
@@ -1968,31 +1967,43 @@ class SysadminStatisticsReportController extends Controller
         $request->session()->flash('dd_level4', $request->dd_level4);
         
         // Chart6 -- Employee Has Open Conversation
-        $sql_6 = EmployeeConversationStatusView::selectRaw("employee_id, employee_name, 
-                            organization, level1_program, level2_division, level3_branch, level4,
-                case when has_conversation = 0 then 'No' else 'Yes' end as has_conversation,  
-                case when conversation_completed = 0 then 'No' else 'Yes' end as conversation_completed
-                ")
+         
+        //get all employee number
+        $employees = UserDemoJrView::count();
+         
+        //get employees has open conversations
+        $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, 
+                            organization, level1_program, level2_division, level3_branch, level4
+                 ")
+                ->join('conversation_participants', function($join) {
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                })
+                ->join('conversations', function($join) {
+                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
+                })
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
                 ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
                 ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
-                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })      
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
                 ->whereNull('date_deleted')
+                ->whereNotNull('conversation_id')        
                 ->where(function($query) {
-                    $query->where('has_conversation', '=', 0)
-                            ->orwhere(function($query) {
-                                $query->where('has_conversation', '=', 1)
-                                        ->Where('conversation_completed', '=', 0);
-                            });
+                    $query->where(function($query) {
+                        $query->whereNull('signoff_user_id')
+                              ->orWhereNull('supervisor_signoff_id');
+                    });
                 });
                 
         Log::warning('Chart 6');
         Log::warning(print_r($sql_6->toSql(),true));
         Log::warning(print_r($sql_6->getBindings(),true));        
-        
+ 
         $users = $sql_6->get();
         $users = $users->unique('employee_id');
+        
+        $has_conversation = $users->count();
+        $no_conversation = $employees - $has_conversation;
         // Chart 6 
         $legends = ['Yes', 'No'];
         $data['chart6']['chart_id'] = 6;
@@ -2002,31 +2013,41 @@ class SysadminStatisticsReportController extends Controller
         
         foreach($legends as $legend)
         {            
-            $subset = $users->where('has_conversation', '=', $legend);
-            array_push( $data['chart6']['groups'],  [ 'name' => $legend, 'value' => $subset->count(),
+            if($legend == 'No') {
+                $subset = $no_conversation;
+            } else {
+                $subset = $has_conversation;
+            }
+            
+            array_push( $data['chart6']['groups'],  [ 'name' => $legend, 'value' => $subset,
                             'legend' => $legend, 
                         ]);
         } 
         
         
         // Chart7 -- Employee Has Completed Conversation
-        $sql_7 = EmployeeConversationStatusView::selectRaw("employee_id, employee_name, 
-                            organization, level1_program, level2_division, level3_branch, level4,
-                case when has_conversation = 0 then 'No' else 'Yes' end as has_conversation,  
-                case when conversation_completed = 0 then 'No' else 'Yes' end as conversation_completed     
-                ")
+        //get employees has Completed conversations
+        $sql_7 = UserDemoJrView::selectRaw("employee_id, employee_name, 
+                            organization, level1_program, level2_division, level3_branch, level4
+                 ")
+                ->join('conversation_participants', function($join) {
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                })
+                ->join('conversations', function($join) {
+                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
+                })
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
                 ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
                 ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
-                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })      
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
                 ->whereNull('date_deleted')
+                ->whereNotNull('conversation_id')        
                 ->where(function($query) {
-                    $query->where('has_conversation','=',  0)
-                            ->orwhere(function($query) {
-                                $query->where('has_conversation', '=', 1)
-                                        ->Where('conversation_completed', '=', 1);
-                            });
+                    $query->where(function($query) {
+                        $query->whereNotNull('signoff_user_id')
+                              ->WhereNotNull('supervisor_signoff_id');
+                    });
                 });
                 
         Log::warning('Chart 7');
@@ -2035,6 +2056,9 @@ class SysadminStatisticsReportController extends Controller
         
         $users = $sql_7->get();
         $users = $users->unique('employee_id');
+        
+        $has_conversation = $users->count();
+        $no_conversation = $employees - $has_conversation;
         // Chart 7 
         $legends = ['Yes', 'No'];
         $data['chart7']['chart_id'] = 7;
@@ -2044,8 +2068,12 @@ class SysadminStatisticsReportController extends Controller
 
         foreach($legends as $legend)
         {
-            $subset = $users->where('has_conversation', '=', $legend);
-            array_push( $data['chart7']['groups'],  [ 'name' => $legend, 'value' => $subset->count(),
+            if($legend == 'No') {
+                $subset = $no_conversation;
+            } else {
+                $subset = $has_conversation;
+            }
+            array_push( $data['chart7']['groups'],  [ 'name' => $legend, 'value' => $subset,
                             'legend' => $legend, 
                         ]);
         } 
