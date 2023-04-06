@@ -1765,7 +1765,7 @@ class SysadminStatisticsReportController extends Controller
                 $comments = $this->getCommentTree($goal_comments, '');
                 $commentTree = $this->getCommentTreeHtml($comments);
                 
-                $item["selected_goal"] = $active_goal;
+                $item["selected_goal"] = $past_goal;
                 $item["selected_goal_comments"] = $commentTree;                
                 
                 array_push($data, $item);
