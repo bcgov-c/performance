@@ -1219,19 +1219,34 @@ class GoalBankController extends Controller
 
 
     protected function notify_on_dashboard($goalBank, $employee_ids) {
-        // find user id based on the employee_id
-        $notify_users_ids = User::whereIn('employee_id', $employee_ids)->pluck('id');
-        // Add dasboard message to each participant_id
-        foreach ($notify_users_ids as $key => $value) {
-            // Use Class to create DashboardNotification
-			$notification = new \App\MicrosoftGraph\SendDashboardNotification();
-			$notification->user_id = $value;
-			$notification->notification_type = 'GB';
-			$notification->comment = ($goalBank->display_name ? $goalBank->display_name : $goalBank->user->name) . ' added a new goal to your goal bank.';
-			$notification->related_id = $goalBank->id;
-			$notification->notify_user_id =  $value;
-			$notification->send(); 
+
+        // Filter out the employee based on the Organization level and individual user preferences. 
+        $filtered_ee_ids = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization', 'access_organizations.organization')
+                                ->leftjoin('user_preferences', 'user_demo_jr_view.user_id', 'user_preferences.user_id')
+                                ->whereIn('user_demo_jr_view.employee_id', $employee_ids)
+                                ->where('access_organizations.allow_inapp_msg', 'Y')
+                                ->where( function($query) {
+                                    $query->where('user_preferences.goal_bank_flag', 'Y');
+                                })
+                                ->pluck('user_demo_jr_view.employee_id')
+                                ->toArray(); 
+
+        if (count($filtered_ee_ids)) {
+            // find user id based on the employee_id
+            $notify_users_ids = User::whereIn('employee_id', $employee_ids)->pluck('id');
+            // Add dasboard message to each participant_id
+            foreach ($notify_users_ids as $key => $value) {
+                // Use Class to create DashboardNotification
+                $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                $notification->user_id = $value;
+                $notification->notification_type = 'GB';
+                $notification->comment = ($goalBank->display_name ? $goalBank->display_name : $goalBank->user->name) . ' added a new goal to your goal bank.';
+                $notification->related_id = $goalBank->id;
+                $notification->notify_user_id =  $value;
+                $notification->send(); 
+            }
         }
+
         // Additional Step -- sent out email message if required
         $this->notify_employees($goalBank, $employee_ids);
     }
