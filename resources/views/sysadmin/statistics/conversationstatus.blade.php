@@ -106,7 +106,7 @@ $(function() {
         var	pie_basic_7_data = {!!json_encode( $data['chart7'] )!!};
 
 	var allCharts = [];
-	var export_url = '{{ route('sysadmin.statistics.conversationsummary.export') }}';  
+	var export_url = '{{ route('sysadmin.statistics.conversationstatus.export') }}';  
 
 	function createChart(divId, myData) {
 

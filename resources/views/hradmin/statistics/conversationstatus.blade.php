@@ -104,7 +104,7 @@ $(function() {
         var	pie_basic_7_data = {!!json_encode( $data['chart7'] )!!};
         
 	var allCharts = [];
-	var export_url = '{{ route('hradmin.statistics.conversationsummary.export') }}';  
+	var export_url = '{{ route('hradmin.statistics.conversationstatus.export') }}';  
 
 	function createChart(divId, myData) {
 

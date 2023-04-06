@@ -1836,7 +1836,8 @@ class StatisticsReportController extends Controller
         $request->session()->flash('dd_level4', $request->dd_level4);
         
         //get all employee number
-        $employees = UserDemoJrView::count();
+        //get all employee number
+        $employees = UserDemoJrView::distinct('employee_id')->count();
 
         // Chart6 -- Employee Has Open Conversation
         $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, 
@@ -1960,6 +1961,178 @@ class StatisticsReportController extends Controller
 
         return view('hradmin.statistics.conversationstatus',compact('data'));
 
+    }
+    
+    
+    public function conversationStatusExport(Request $request) {        
+        // sql6 -- Employee Has Open Conversation
+        $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, 
+                            organization, level1_program, level2_division, level3_branch, level4
+                 ")
+                ->join('conversation_participants', function($join) {
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                })
+                ->join('conversations', function($join) {
+                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
+                })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
+                ->whereNull('date_deleted')
+                ->whereNotNull('conversation_id')        
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereNull('signoff_user_id')
+                              ->orWhereNull('supervisor_signoff_id');
+                    });
+                })                 
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('admin_org_users')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'conversation_participants.participant_id')
+                            ->whereIn('admin_org_users.access_type', [0,2])
+                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                });
+                
+                
+        // sql7 -- Employee Has Completed Conversation
+        $sql_7 = UserDemoJrView::selectRaw("employee_id, employee_name, 
+                            organization, level1_program, level2_division, level3_branch, level4
+                 ")
+                ->join('conversation_participants', function($join) {
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                })
+                ->join('conversations', function($join) {
+                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
+                })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
+                ->whereNull('date_deleted')
+                ->whereNotNull('conversation_id')        
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereNotNull('signoff_user_id')
+                              ->WhereNotNull('supervisor_signoff_id');
+                    });
+                }) 
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('admin_org_users')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'conversation_participants.participant_id')
+                            ->whereIn('admin_org_users.access_type', [0,2])
+                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                });      
+            
+
+        // Generating Output file 
+        $filename = 'Conversations.xlsx';
+        switch ($request->chart) {
+                
+            case 6:
+
+                $filename = 'Employee Has Open Conversation.csv';
+                $users =  $sql_6->get();
+                $users = $users->unique('employee_id');
+                
+                if($request->legend == 'No'){
+                    //get has conversation users employee_id list
+                    $excludedIds = $userspluck('employee_id');
+                    $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)->get();
+                }  
+
+                $headers = array(
+                    "Content-type"        => "text/csv",
+                    "Content-Disposition" => "attachment; filename=$filename",
+                    "Pragma"              => "no-cache",
+                    "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                    "Expires"             => "0"
+                );
+        
+                $columns = ["Employee ID", "Employee Name", "Email",
+                                "Organization", "Level 1", "Level 2", "Level 3", "Level 4",
+                           ];
+        
+                $callback = function() use($users, $columns) {
+                    $file = fopen('php://output', 'w');
+                    fputcsv($file, $columns);
+        
+                    foreach ($users as $user) {
+                        $row['Employee ID'] = "[".$user->employee_id."]";
+                        $row['Name'] = $user->employee_name;
+                        $row['Email'] = $user->email;
+                        $row['Organization'] = $user->organization;
+                        $row['Level 1'] = $user->level1_program;
+                        $row['Level 2'] = $user->level2_division;
+                        $row['Level 3'] = $user->level3_branch;
+                        $row['Level 4'] = $user->level4;
+        
+                        fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Organization'],
+                                    $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
+                    }
+        
+                    fclose($file);
+                };
+        
+                return response()->stream($callback, 200, $headers);
+
+                break;    
+            
+            case 7:
+
+                $filename = 'Employee Has Complete Conversation.csv';
+                $users =  $sql_7->get();
+                $users = $users->unique('employee_id');
+                
+                if($request->legend == 'No'){
+                    //get has conversation users employee_id list
+                    $excludedIds = $userspluck('employee_id');
+                    $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)->get();
+                }  
+
+                $headers = array(
+                    "Content-type"        => "text/csv",
+                    "Content-Disposition" => "attachment; filename=$filename",
+                    "Pragma"              => "no-cache",
+                    "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                    "Expires"             => "0"
+                );
+        
+                $columns = ["Employee ID", "Employee Name", "Email",
+                                "Organization", "Level 1", "Level 2", "Level 3", "Level 4",
+                           ];
+        
+                $callback = function() use($users, $columns) {
+                    $file = fopen('php://output', 'w');
+                    fputcsv($file, $columns);
+        
+                    foreach ($users as $user) {
+                        $row['Employee ID'] = "[".$user->employee_id."]";
+                        $row['Name'] = $user->employee_name;
+                        $row['Email'] = $user->email;
+                        $row['Organization'] = $user->organization;
+                        $row['Level 1'] = $user->level1_program;
+                        $row['Level 2'] = $user->level2_division;
+                        $row['Level 3'] = $user->level3_branch;
+                        $row['Level 4'] = $user->level4;
+        
+                        fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Organization'],
+                                    $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
+                    }
+        
+                    fclose($file);
+                };
+        
+                return response()->stream($callback, 200, $headers);
+
+                break;  
+                
+        }
+        
     }
     
 }
