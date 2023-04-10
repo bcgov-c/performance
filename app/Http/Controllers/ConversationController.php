@@ -815,7 +815,8 @@ class ConversationController extends Controller
         $templates = $query->get();
         $searchValue = $request->search ?? '';
         $conversationMessage = Conversation::warningMessage();
-        return view('conversation.templates', compact('templates', 'searchValue', 'conversationMessage', 'viewType', 'user'));
+        $participants = session()->has('original-auth-id') ? User::where('id', Auth::id())->get() : $user->avaliableReportees()->get();
+        return view('conversation.templates', compact('templates', 'searchValue', 'conversationMessage', 'viewType', 'user', 'participants'));
     }
 
     public function templateDetail($id) {
