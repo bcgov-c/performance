@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\EmployeeDemoTree;
 use App\Models\OrganizationHierarchy;
 use App\Models\JobSchedAudit;
-use App\Models\EmployeeDemo; 
+use App\Models\EmployeeDemo;
 use Carbon\Carbon;
 
 class BuildEmployeeDemoTree extends Command
