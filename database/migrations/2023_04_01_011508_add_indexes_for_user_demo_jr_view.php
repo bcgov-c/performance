@@ -40,7 +40,10 @@ class AddIndexesForUserDemoJrView extends Migration
     {
         $this->down();
         $this->createTableIndexIfNotExist('employee_demo_jr', 'idx_for_userdemojrview_j', ['employee_id', 'id']);
-        $this->createTableIndexIfNotExist('employee_demo_tree', 'idx_edt_deptid_id', ['deptid', 'id']);
+        $this->createTableIndexIfNotExist('employee_demo_tree', 'idx_edt_deptid', ['deptid']);
+        $this->createTableIndexIfNotExist('employee_demo', 'idx_employee_demo_deptid', ['deptid']);
+        $this->createTableIndexIfNotExist('employee_demo', 'employee_demo_employee_id_empl_record_index', ['employee_id', 'empl_record']);
+        $this->createTableIndexIfNotExist('users', 'idx_users_id', ['id']);
     }
 
     /**
@@ -51,6 +54,9 @@ class AddIndexesForUserDemoJrView extends Migration
     public function down()
     {
         $this->dropExistingTableIndex('employee_demo_jr', 'idx_for_userdemojrview_j');
-        $this->dropExistingTableIndex('employee_demo_tree', 'idx_edt_deptid_id');
+        $this->dropExistingTableIndex('employee_demo_tree', 'idx_edt_deptid');
+        $this->dropExistingTableIndex('employee_demo', 'idx_employee_demo_deptid');
+        $this->dropExistingTableIndex('employee_demo', 'employee_demo_employee_id_empl_record_index');
+        $this->dropExistingTableIndex('users', 'idx_users_id');
     }
 }

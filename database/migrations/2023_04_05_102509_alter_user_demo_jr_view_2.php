@@ -134,7 +134,7 @@ class AlterUserDemoJrView2 extends Migration
                     edt.level5_deptid
                 FROM
                     employee_demo_tree AS edt USE INDEX (idx_edt_deptid) ,
-                    employee_demo AS d USE INDEX (idx_employee_demo_deptid, PRIMARY) 
+                    employee_demo AS d USE INDEX (employee_demo_deptid_index, employee_demo_employee_id_empl_record_index) 
                 WHERE
                     edt.deptid = d.deptid
                 ) AS main,
@@ -180,7 +180,7 @@ class AlterUserDemoJrView2 extends Migration
                     edo.employee_name AS reporting_to_name,
                     edo.employee_email AS reporting_to_email
                 FROM 
-                    users AS u USE INDEX (PRIMARY)
+                    users AS u USE INDEX (idx_users_id)
                     LEFT JOIN excused_reasons AS r ON r.id = u.excused_reason_id
                     LEFT JOIN users AS en ON en.id = u.excused_updated_by
                     LEFT JOIN users AS urt ON urt.id = u.reporting_to
