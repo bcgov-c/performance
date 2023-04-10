@@ -13,9 +13,6 @@ class CreateUserListView extends Migration
      */
     public function up()
     {
-
-        DB::statement('DROP VIEW IF EXISTS user_list_view');
-
         \DB::statement("
             CREATE VIEW user_list_view
             AS

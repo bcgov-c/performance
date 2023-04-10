@@ -13,8 +13,6 @@ class CreateUserDemoJrHistoryView extends Migration
      */
     public function up()
     {
-        DB::statement('DROP VIEW IF EXISTS user_demo_jr_history_view;');
-
         \DB::statement("
             CREATE VIEW user_demo_jr_history_view
             AS

@@ -5,9 +5,6 @@
     td{
         padding:20px;
     }
-    .float-right {
-        float: right;
-    }
 </style>    
 
 <x-side-layout title="{{ __('My Conversations - Performance Development Platform') }}">
@@ -25,189 +22,173 @@
         <div class="col-md-8"> @include('conversation.partials.tabs')</div>
     </div>
     <div class="mt-4">
-        <div class="card">
-		<div class="card-header" id="heading_0">
-		<h5 class="mb-0"data-toggle="collapse" data-target="#collapse_0" aria-expanded="1" aria-controls="collapse_0">
-                    <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_0" aria-expanded="false" aria-controls="collapse_0">
-                            <button class="btn btn-link" >
-                            Instructions 
-                            </button>                        
-                            <span class="float-right"><i class="fa fa-chevron-down"></i></span>    
-                    </h5>
-                </h5>
-		</div>
-
-		<div id="collapse_0" class="collapse" aria-labelledby="heading_0">
-                    <div class="card-body">
-                            <p>
-                                Review the information below to determine which template best suits your needs. Templates include suggestions for when to select a given conversation topic, questions to consider when having the conversation, and an attestation and sign-off area to formalize the results.
-                            </p>
-                            <p>
-                                Once you've selected a template for use, select participants and hit "Use this template" to alert participants you want to meet. Conversations will still need to be scheduled independently in your outlook calendar.
-                            </p>
+        <div class="row">
+            <div class="col">
+                <p>
+                    Review the information below to determine which template best suits your needs. Templates include suggestions for when to select a given conversation topic, questions to consider when having the conversation, and an attestation and sign-off area to formalize the results.
+                </p>
+                <p>
+                    Once you've selected a template for use, select participants and hit "Use this template" to alert participants you want to meet. Conversations will still need to be scheduled independently in your outlook calendar.
+                </p>
+            </div>
+        </div>
+        <div class="row d-none">
+            <div class="col-8">
+                <form action="" id="search-templates-form">
+                    <div class="position-relative w-50">
+                        <button class="btn btn-primary btn-sm position-absolute" style="right:0;margin:3px;height:2rem">Search</button>
+                        <input class="form-control input clearfix float-left" id="search-input" name="search" value="{{$searchValue}}" />
                     </div>
-		</div>
-	</div>
-        
-        <div class="card">
-		<div class="card-header" id="heading_1">
-		<h5 class="mb-1"data-toggle="collapse" data-target="#collapse_1" aria-expanded="1" aria-controls="collapse_1">
-                    <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_1" aria-expanded="false" aria-controls="collapse_1">
-                            
-                            <button class="btn btn-link text-left">
-                                <p><strong>Performance Check-in Template</strong></p>
-                            </button> 
-                            <span class="float-right"><i class="fa fa-chevron-down"></i></span> 
-                            <button class="btn btn-link text-left">
-                                <p>The Performance check-In template can be used in most situations. 
-                                    It includes options to capture progress against goals, celebrate successes, 
-                                    discuss ways to improve future performance outcomes, and record an overall performance evaluation.</p>
-                            </button>   
-                    </h5>
-                </h5>
-		</div>
-                
-                <form id="conversation_form_1" action="{{ route ('conversation.store')}}" method="POST">
-                <input type="hidden" name="date" value="{{ \Carbon\Carbon::now() }}">
-                <input type="hidden" name="time" value="{{ \Carbon\Carbon::now() }}">      
-		<div id="collapse_1" class="collapse" aria-labelledby="heading_1">
-                    <div class="card-body">
-                        @foreach ($templates as $template)
-                        @if(strtolower($template->name) === 'performance check-in')   
-                            <input type="hidden" name="conversation_topic_id" value="{{$template->id}}">    
-                            <div class="card border ">
-                                <div class="card-body p-2">
-                                    <div class="row">
-                                        <div class="col-12">
-                                            @csrf
-                                            <table>
-                                                <tr style="border-bottom: solid #FCBA19">
-                                                    <th width="20%">Name</th>
-                                                    <th width="45%">When to use</th>
-                                                    <th width="15%">Participants</th>
-                                                    <th width="20%">&nbsp;</th>
-                                                </tr>
-                                                <tbody style="border-collapse: collapse;">
-                                                <tr style="background-color: #efefef">
-                                                    <td>{{$template->name}}</td>
-                                                    <td>{{$template->when_to_use}}</td>
-                                                    <td>
-                                                        <select class="form-control w-100 select" style="width:100%;" name="participant_id[]" id="participant_id" required>
-                                                            <option value="">None Selected</option>
-                                                            @foreach($participants as $p)
-                                                            @if(session()->has('view-profile-as'))
-                                                                @if(auth()->user()->id == $p->id)
-                                                                <option value="{{ $p->id }}">{{ $p->name }}</option>
-                                                                @endif
-                                                            @else
-                                                            <option value="{{ $p->id }}">{{ $p->name }}</option>
-                                                            @endif
-                                                            @endforeach
-                                                       </select>
-                                                    </td>                                                    
-                                                    <td>
-                                                        <button class="btn d-flex align-items-center" >
-                                                        <span class="btn btn-primary">Start Conversation</span>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                            </table>                                             
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                        @endforeach
-                    </div>
-		</div>
-                </form>    
-	</div>
-        
-        
-        <div class="card">
-		<div class="card-header" id="heading_2">
-		<h5 class="mb-2" data-toggle="collapse" data-target="#collapse_2" aria-expanded="1" aria-controls="collapse_2">
-                    <h5 class="mb-2" data-toggle="collapse" data-target="#collapse_2" aria-expanded="false" aria-controls="collapse_2">
-                            <button class="btn btn-link text-left">
-                                <p><strong>Other Templates</strong><p/>
-                            </button> 
-                            <span class="float-right"><i class="fa fa-chevron-down"></i></span> 
-                            <button class="btn btn-link text-left">
-                                <p>These templates can be used as required to support conversations that require a more 
-                                    specific focus. Select a topic below to read more in the <em>When to use this template section</em>.</p>
-                            </button>   
-                    </h5>
-                </h5>
-		</div>
-		
-		<div id="collapse_2" class="collapse" aria-labelledby="heading_2">
-                    <div class="card-body">
-                        @foreach ($templates as $template)
-                        @if(strtolower($template->name) !== 'performance check-in')   
-                            <form id="conversation_form_{{$template->id}}" action="{{ route ('conversation.store')}}" method="POST">
-                            <input type="hidden" name="date" value="{{ \Carbon\Carbon::now() }}">
-                            <input type="hidden" name="time" value="{{ \Carbon\Carbon::now() }}">   
-                            <input type="hidden" name="conversation_topic_id" value="{{$template->id}}">    
-                            <div class="card border ">
-                                <div class="card-body p-2">
-                                    <div class="row">
-                                        <div class="col-12">
-                                            @csrf
-                                            <table>
-                                                <tr style="border-bottom: solid #FCBA19">
-                                                    <th width="20%">Name</th>
-                                                    <th width="45%">When to use</th>
-                                                    <th width="15%">Participants</th>
-                                                    <th width="20%">&nbsp;</th>
-                                                </tr>
-                                                <tbody style="border-collapse: collapse;">
-                                                <tr style="background-color: #efefef">
-                                                    <td>{{$template->name}}</td>
-                                                    <td>{{$template->when_to_use}}</td>
-                                                    <td>
-                                                        <select class="form-control w-100 select" style="width:100%;" name="participant_id[]" id="participant_id_{{$template->id}}" required>
-                                                            <option value="">None Selected</option>
-                                                            @foreach($participants as $p)
-                                                            @if(session()->has('view-profile-as'))
-                                                                @if(auth()->user()->id == $p->id)
-                                                                <option value="{{ $p->id }}">{{ $p->name }}</option>
-                                                                @endif
-                                                            @else
-                                                            <option value="{{ $p->id }}">{{ $p->name }}</option>
-                                                            @endif
-                                                            @endforeach
-                                                       </select>
-                                                    </td>                                                    
-                                                    <td>
-                                                        <button class="btn d-flex align-items-center" onclick="javascript:otherTemp({{$template->id}})">
-                                                            <span class="btn btn-primary" >Start Conversation</span>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                            </table>                                             
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            </form>
-                        @endif
-                        @endforeach
-                    </div>
-		</div>
-                </form> 
-	</div>
-        
-        
-        
-        
+                </form>
+            </div>
+        </div>
     </div>
+    <div class="mt-4">
+        <div class="row">
+            <div class="col-12">
+                @foreach ($templates as $template)
+                    @if(strtolower($template->name) === 'performance check-in')                        
+                        <div class="card border ">
+                            <div class="card-body p-2">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <table>
+                                            <tr>
+                                                <td colspan="3" style="padding-bottom: 0px;">
+                                                    <p><strong>Performance Check-in Template</strong><p/>
+                                                    <p>The Performance check-In template can be used in most situations. It includes options to capture progress against goals, celebrate successes, discuss ways to improve future performance outcomes, and record an overall performance evaluation.</p>
+                                                </td>
+                                            </tr>
+                                            <tr style="border-bottom: solid #FCBA19">
+                                                <th width="20%">Name</th><th width="60%">When to use</th><th width="20%">&nbsp;</th>
+                                            </tr>
+                                            <tbody style="border-collapse: collapse;">
+                                            <tr style="background-color: #efefef">
+                                                <td>{{$template->name}}</td>
+                                                <td>{{$template->when_to_use}}</td>
+                                                <td>
+                                                    <button class="btn d-flex align-items-center w-100 template-btn" data-toggle="modal" data-target="#conversationTemplateDetail" data-id="{{$template->id}}">
+                                                    <span class="btn btn-primary btn-sm">View</span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+            <div class="col-12">
+                <div class="card border ">
+                    <div class="card-body p-2">
+                        <div class="row">
+                            <div class="col-12">
+                                <table>
+                                    <tr>
+                                        <td colspan="3" style="padding-bottom: 0px;">
+                                            <p><strong>Other Templates</strong><p/>
+                                            <p>These templates can be used as required to support conversations that require a more specific focus. Select a topic below to read more in the <em>When to use this template section</em>.</p>
+                                        </td>
+                                    </tr>
+                                    <tr style="border-bottom: solid #FCBA19">
+                                        <th width="20%">Name</th><th width="60%">When to use</th><th width="20%">&nbsp;</th>
+                                    </tr>
+                                    <tbody style="border-collapse: collapse;">
+                                    <?php $i = 0; ?>    
+                                    @foreach ($templates as $template)
+                                        @if(strtolower($template->name) !== 'performance check-in')
+                                        <tr <?php if($i % 2 != 0){ echo 'style="background-color: #efefef"';} ?>>
+                                            <td>{{$template->name}}</td>
+                                            <td>{{$template->when_to_use}}</td>
+                                            <td>
+                                                <button class="btn d-flex align-items-center w-100 template-btn" data-toggle="modal" data-target="#conversationTemplateDetail" data-id="{{$template->id}}">
+                                                <span class="btn btn-primary btn-sm">View</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        @endif
+                                        <?php $i++; ?>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                
+            </div>
+        </div>
+    </div>
+    @include('conversation.partials.template-detail-modal')
     <x-slot name="js">
         <script>
-            
-            
-            
+            function loadTemplate(id, cb) {
+                $.ajax({
+                    url: '/conversation/templates/' + id
+                    , success: cb
+                });
+            }
+
+            function setTemplateModalContent(content) {
+                $("#conversationTemplateDetail").find('.modal-content').html(content);
+                $("#participant_id").select2({
+                    maximumSelectionLength: 1
+                });
+
+            }
+
+
+
+            $(document).on('click', '.template-btn', function() {
+                const id = $(this).data('id');
+                loadTemplate(id, setTemplateModalContent);
+            });
+
+            $(document).on('change', '#template-select', function() {
+                const id = $(this).val();
+                loadTemplate(id, setTemplateModalContent);
+            });
+
+            $(document).on('click', '.btn-submit', function(e) {
+                /*
+                 if(!confirm('This will send a notification to all participants that you would like to schedule a conversation and will move this template to your Open Conversations tab. Would you like to continue?')){
+                     return false;
+                 }
+                */
+
+                e.preventDefault();
+                $.ajax({
+                    url: '/conversation'
+                    , type: 'POST'
+                    , data: $('#conversation_form').serialize()
+                    , success: function(result) {
+                        if (result.success) {
+                            window.location.href = '/conversation/upcoming';
+                        }
+                    }
+                    , error: function(error) {
+                        var errors = error.responseJSON.errors;
+                        $('.error-date-alert').hide();
+                        $('.text-danger').each(function(i, obj) {
+                            $('.text-danger').text('');
+                        });
+                        Object.entries(errors).forEach(function callback(value, index) {
+                            var className = '.error-' + value[0];
+                            $(className).text(value[1]);
+                            if (value[0] === 'date') {
+                                $('.error-date-alert').show();
+                            }
+                        });
+                    }
+                });
+            });
 
         </script>
     </x-slot>

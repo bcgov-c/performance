@@ -480,6 +480,7 @@
                 var goal_title = $("#goal_title").val();
                 var tags = $('.tags').val(); 
                 if (goal_title != '' && tags != ''){
+                   CKEDITOR.instances['what'].setData(''); 
                    CKEDITOR.instances['what'].setReadOnly(false);
                    CKEDITOR.instances['measure_of_success'].setReadOnly(false);
                    $('#start_date').prop("readonly",false);
@@ -495,7 +496,8 @@
             $(".tags").change(function(){
                 var goal_title = $("#goal_title").val();
                 var tags = $('.tags').val(); 
-                if (goal_title != '' && tags != ''){ 
+                if (goal_title != '' && tags != ''){
+                    CKEDITOR.instances['what'].setData(''); 
                     CKEDITOR.instances['what'].setReadOnly(false);
                     CKEDITOR.instances['measure_of_success'].setReadOnly(false);
                     $('#start_date').prop("readonly",false);

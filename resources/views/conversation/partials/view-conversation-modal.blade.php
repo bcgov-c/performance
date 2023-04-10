@@ -57,23 +57,6 @@
                 
                 
                 
-                <div class="card"  id="pfc_card">
-                        <div class="card-header panel-heading bg-primary" id="heading_2">
-                        <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_2" aria-expanded="false" aria-controls="collapse_2">
-                                <button class="btn btn-link" style="color:white">
-                                    <span class="acc-title">Preparing For The Conversation</span>
-                                    <span class="acc-status"  id="caret_2"><i class="fas fa-caret-down"></i></span>                                
-                                </button>
-                        </h5>
-                        </div>
-
-                        <div id="collapse_2" class="collapse" aria-labelledby="heading_2">
-                        <div class="card-body">
-                            <div id="preparing-for-conversation" class="p-3"> </div>
-                        </div>
-                        </div>
-                </div>
-                
                 
                 <div class="card" id="sdq_card">
                         <div class="card-header panel-heading bg-primary" id="heading_1">
@@ -88,6 +71,23 @@
                         <div id="collapse_1" class="collapse" aria-labelledby="heading_1">
                         <div class="card-body">
                             <div id="questions-to-consider" class="p-3"> </div>
+                        </div>
+                        </div>
+                </div>
+                
+                <div class="card"  id="pfc_card">
+                        <div class="card-header panel-heading bg-primary" id="heading_2">
+                        <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_2" aria-expanded="false" aria-controls="collapse_2">
+                                <button class="btn btn-link" style="color:white">
+                                    <span class="acc-title">Preparing For Conversation</span>
+                                    <span class="acc-status"  id="caret_2"><i class="fas fa-caret-down"></i></span>                                
+                                </button>
+                        </h5>
+                        </div>
+
+                        <div id="collapse_2" class="collapse" aria-labelledby="heading_2">
+                        <div class="card-body">
+                            <div id="preparing-for-conversation" class="p-3"> </div>
                         </div>
                         </div>
                 </div>

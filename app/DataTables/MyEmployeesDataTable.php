@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 
 class MyEmployeesDataTable extends DataTable
 {
@@ -58,7 +57,7 @@ class MyEmployeesDataTable extends DataTable
                     $landingPage = 'conversation.templates';
                     return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
                 }
-                if (isset($jr->next_conversation_date) && $jr->next_conversation_date) {
+                if ($jr->next_conversation_date) {
                     if ($jr->next_conversation_date) {
                         $text = Carbon::parse($jr->next_conversation_date)->format('M d, Y');
                         $landingPage = 'conversation.templates';
@@ -81,7 +80,7 @@ class MyEmployeesDataTable extends DataTable
                 ]);
                 if ($jr) {
                     $current_status = $jr->current_employee_status;
-                    if (isset($jr->excused_type) && $jr->excused_type) {
+                    if ($jr->excused_type) {
                         $excused_type = $jr->excused_type;
                         if ($jr->excused_type == 'A') {
                             $yesOrNo = 'Auto';

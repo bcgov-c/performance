@@ -13,9 +13,6 @@ class CreateUserManageAccessView extends Migration
      */
     public function up()
     {
-
-        DB::statement('DROP VIEW IF EXISTS user_manage_access_view');
-        
         \DB::statement("
             CREATE VIEW user_manage_access_view
             AS
