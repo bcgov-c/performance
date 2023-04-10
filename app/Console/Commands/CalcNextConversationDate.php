@@ -358,6 +358,8 @@ class CalcNextConversationDate extends Command
                             }
                         }
                     }
+                    $updated_by_rec = User::where('id', $excused_updated_by)->first();
+                    $updated_by_name = $updated_by_rec ? $updated_by_rec->name : null;
                     $excusedArrayTypes = ['statusStartExcuse', 'classStartExcuse', 'manualStartExcuse', 'statusNewExcuse', 'classNewExcuse', 'manualNewExcuse'];
                     if ($changeType != 'noChange') {
                         $newJr = new EmployeeDemoJunior;
@@ -377,6 +379,7 @@ class CalcNextConversationDate extends Command
                         $newJr->next_conversation_date = $initNextConversationDate ? Carbon::parse($initNextConversationDate) : null;
                         $newJr->created_by_id = $DefaultCreatorName;
                         $newJr->updated_by_id = $excused_updated_by ?? $DefaultCreatorName;
+                        $newJr->updated_by_name = $updated_by_name;
                         $newJr->excused_reason_id = $excused_reason_id;
                         $newJr->excused_reason_desc = $excused_reason_desc;
                         if($excused_updated_at) {
@@ -405,6 +408,7 @@ class CalcNextConversationDate extends Command
                             'next_conversation_date' => $initNextConversationDate ? Carbon::parse($initNextConversationDate) : null, 
                             'created_by_id' => $DefaultCreatorName, 
                             'updated_by_id' => $excused_updated_by ?? $DefaultCreatorName, 
+                            'updated_by_name' => $updated_by_name, 
                             'excused_reason_id' => $excused_reason_id, 
                             'excused_reason_desc' => $excused_reason_desc, 
                             'updated_at' => $excused_updated_at ? $excused_updated_at : null
@@ -435,6 +439,7 @@ class CalcNextConversationDate extends Command
                             $newJr->next_conversation_date = $initNextConversationDate ? Carbon::parse($initNextConversationDate) : null;
                             $newJr->created_by_id = $jr->created_by_id;
                             $newJr->updated_by_id = $jr->updated_by_id;
+                            $newJr->updated_by_name = $jr->updated_by_name;
                             $newJr->excused_reason_id = $jr->excused_reason_id;
                             $newJr->excused_reason_desc = $jr->excused_reason_desc;
                             $newJr->created_at = $jr->created_at;
@@ -462,6 +467,7 @@ class CalcNextConversationDate extends Command
                                 'next_conversation_date' => $initNextConversationDate ? Carbon::parse($initNextConversationDate) : null, 
                                 'created_by_id' => $jr->created_by_id, 
                                 'updated_by_id' => $jr->updated_by_id, 
+                                'updated_by_name' => $jr->updated_by_name, 
                                 'excused_reason_id' => $jr->excused_reason_id, 
                                 'excused_reason_desc' => $jr->excused_reason_desc, 
                                 'created_at' => $jr->created_at,
