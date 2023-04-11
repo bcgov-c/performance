@@ -50,6 +50,7 @@
                     <?php echo $item["selected_goal"]->measure_of_success; ?>
 
                     <?php if(isset($item["selected_goal_comments"])){?>
+                        <p><b>Comments</b></p>
                         <?php echo $item["selected_goal_comments"];?>
                     <?php } ?>
                     <p>
