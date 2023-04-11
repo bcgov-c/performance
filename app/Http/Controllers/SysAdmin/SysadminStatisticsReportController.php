@@ -1542,8 +1542,7 @@ class SysadminStatisticsReportController extends Controller
                                                             $query ->where([
                                                                 ['goals.created_at','>=',$request->start_date],
                                                                 ['goals.created_at','<=',$request->end_date]
-                                                            ])
-                                                            ->orWhereNull('goals.target_date');
+                                                            ]);
                                         });
                                     })  
                                     ->where('employee_demo.employee_id', '=', $request->employee_id)  
@@ -1566,8 +1565,7 @@ class SysadminStatisticsReportController extends Controller
                                                             $query ->where([
                                                                 ['goals.created_at','>=',$request->start_date],
                                                                 ['goals.created_at','<=',$request->end_date]
-                                                            ])
-                                                            ->orWhereNull('goals.target_date');
+                                                            ]);
                                         });
                                     })  
                                     ->where('employee_demo.employee_id', '=', $request->employee_id)     
@@ -1667,7 +1665,7 @@ class SysadminStatisticsReportController extends Controller
     {
         if($request->type == 'active_goal'){
             $data = array();
-            $active_goals = Goal::selectRaw("goals.id, users.name, goals.title, goals.created_at, employee_demo.organization, employee_demo.business_unit")
+            $active_goals = Goal::selectRaw("goals.id, users.name, goals.what, goals.measure_of_success, goals.created_at, goals.start_date, goals.target_date, employee_demo.organization, employee_demo.business_unit")
                                     ->join('users', function($join) {
                                         $join->on('users.id', '=', 'goals.user_id');   
                                     }) 
@@ -1681,8 +1679,7 @@ class SysadminStatisticsReportController extends Controller
                                                             $query ->where([
                                                                 ['goals.created_at','>=',$request->start_date],
                                                                 ['goals.created_at','<=',$request->end_date]
-                                                            ])
-                                                            ->orWhereNull('goals.target_date');
+                                                            ]);
                                         });
                                     })  
                                     ->where('employee_demo.employee_id', '=', $request->employee_id)  
@@ -1728,7 +1725,7 @@ class SysadminStatisticsReportController extends Controller
             
         } elseif($request->type == 'past_goal'){
             $data = array();
-            $past_goals = Goal::selectRaw("goals.id, users.name, goals.title, goals.created_at, employee_demo.organization, employee_demo.business_unit")
+            $past_goals = Goal::selectRaw("goals.id, users.name, goals.what, goals.measure_of_success, goals.created_at, goals.start_date, goals.target_date, employee_demo.organization, employee_demo.business_unit")
                                     ->join('users', function($join) {
                                         $join->on('users.id', '=', 'goals.user_id');   
                                     }) 
@@ -1742,8 +1739,7 @@ class SysadminStatisticsReportController extends Controller
                                                             $query ->where([
                                                                 ['goals.created_at','>=',$request->start_date],
                                                                 ['goals.created_at','<=',$request->end_date]
-                                                            ])
-                                                            ->orWhereNull('goals.target_date');
+                                                            ]);
                                         });
                                     })  
                                     ->where('employee_demo.employee_id', '=', $request->employee_id)     
