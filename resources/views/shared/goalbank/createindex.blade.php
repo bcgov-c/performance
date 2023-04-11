@@ -792,7 +792,6 @@
                 	});
             	});							
 
-
 			});
 
 			// Model -- Confirmation Box
