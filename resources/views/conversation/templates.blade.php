@@ -143,60 +143,54 @@
 		
 		<div id="collapse_2" class="collapse" aria-labelledby="heading_2">
                     <div class="card-body">
-                        @foreach ($templates as $template)
-                        @if(strtolower($template->name) !== 'performance check-in')   
-                            <form id="conversation_form_{{$template->id}}" action="{{ route ('conversation.store')}}" method="POST">
-                            <input type="hidden" name="date" value="{{ \Carbon\Carbon::now() }}">
-                            <input type="hidden" name="time" value="{{ \Carbon\Carbon::now() }}">   
-                            <input type="hidden" name="conversation_topic_id" value="{{$template->id}}">    
-                            <div class="card border ">
-                                <div class="card-body p-2">
-                                    <div class="row">
-                                        <div class="col-12">
-                                            @csrf
-                                            <table>
-                                                <tr style="border-bottom: solid #FCBA19">
-                                                    <th width="20%">Name</th>
-                                                    <th width="45%">When to use</th>
-                                                    <th width="15%">Participants</th>
-                                                    <th width="20%">&nbsp;</th>
-                                                </tr>
-                                                <tbody style="border-collapse: collapse;">
-                                                <tr style="background-color: #efefef">
-                                                    <td>{{$template->name}}</td>
-                                                    <td>{{$template->when_to_use}}</td>
-                                                    <td>
-                                                        <select class="form-control w-100 select" style="width:100%;" name="participant_id[]" id="participant_id_{{$template->id}}" required>
-                                                            <option value="">None Selected</option>
-                                                            @foreach($participants as $p)
-                                                            @if(session()->has('view-profile-as'))
-                                                                @if(auth()->user()->id == $p->id)
-                                                                <option value="{{ $p->id }}">{{ $p->name }}</option>
-                                                                @endif
-                                                            @else
-                                                            <option value="{{ $p->id }}">{{ $p->name }}</option>
-                                                            @endif
-                                                            @endforeach
-                                                       </select>
-                                                    </td>                                                    
-                                                    <td>
-                                                        <button class="btn d-flex align-items-center" onclick="javascript:otherTemp({{$template->id}})">
-                                                            <span class="btn btn-primary" >Start Conversation</span>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                            </table>                                             
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            </form>
-                        @endif
-                        @endforeach
+                        @csrf
+                        <table>
+                            <thead>
+                                <tr style="border-bottom: solid #FCBA19">
+                                    <th width="20%">Name</th>
+                                    <th width="45%">When to use</th>
+                                    <th width="15%">Participants</th>
+                                    <th width="20%">&nbsp;</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($templates as $template)
+                                @if(strtolower($template->name) !== 'performance check-in')
+                                <tr style="background-color: #efefef">
+                                    <td>{{$template->name}}</td>
+                                    <td>{{$template->when_to_use}}</td>
+                                    <td>
+                                        <select class="form-control w-100 select" style="width:100%;" name="participant_id_{{$template->id}}[]" id="participant_id_{{$template->id}}" required>
+                                            <option value="">None Selected</option>
+                                            @foreach($participants as $p)
+                                            @if(session()->has('view-profile-as'))
+                                            @if(auth()->user()->id == $p->id)
+                                            <option value="{{ $p->id }}">{{ $p->name }}</option>
+                                            @endif
+                                            @else
+                                            <option value="{{ $p->id }}">{{ $p->name }}</option>
+                                            @endif
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td>                                        
+                                            <button type="button" class="btn btn-primary d-flex align-items-center" onclick="javascript:conversation_sub({{$template->id}});">
+                                                <span>Start Conversation</span>
+                                            </button>
+                                    </td>
+                                </tr>
+                                @endif
+                                @endforeach
+                            </tbody>
+                        </table>
+                        <form id="conversation_form_2" action="{{ route ('conversation.store')}}" method="POST">
+                        <input type="hidden" name="date" value="{{ \Carbon\Carbon::now() }}">
+                        <input type="hidden" name="time" value="{{ \Carbon\Carbon::now() }}">  
+                        <input type="hidden" name="conversation_topic_id">  
+                        <input type="hidden" name="participant_id">
+                        </form>
                     </div>
 		</div>
-                </form> 
 	</div>
         
         
@@ -205,7 +199,50 @@
     </div>
     <x-slot name="js">
         <script>
-            
+            function conversation_sub(topic_id){
+                $('#conversation_form_2 input[name="conversation_topic_id"]').val(topic_id);
+                var allow_submit = true;
+                if(topic_id === 1){
+                    if ($('#participant_id_1')[0].checkValidity()) {
+                        var participant_id = $('#participant_id_1').val();     
+                    } else {
+                        $('#participant_id_1')[0].reportValidity();
+                        allow_submit = false;
+                    }             
+                }else if(topic_id === 2){
+                    if ($('#participant_id_2')[0].checkValidity()) {                        
+                        var participant_id = $('#participant_id_2').val();     
+                    } else {
+                        $('#participant_id_2')[0].reportValidity();
+                        allow_submit = false;
+                    } 
+                }else if(topic_id === 3){                    
+                    if ($('#participant_id_3')[0].checkValidity()) {                        
+                        var participant_id = $('#participant_id_3').val();    
+                    } else {
+                        $('#participant_id_3')[0].reportValidity();
+                        allow_submit = false;
+                    } 
+                }else if(topic_id === 4){
+                    if ($('#participant_id_4')[0].checkValidity()) {                        
+                        var participant_id = $('#participant_id_4').val();    
+                    } else {
+                        $('#participant_id_4')[0].reportValidity();
+                        allow_submit = false;
+                    } 
+                }else if(topic_id === 5){
+                    if ($('#participant_id_5')[0].checkValidity()) {                        
+                        var participant_id = $('#participant_id_5').val();    
+                    } else {
+                        $('#participant_id_5')[0].reportValidity();
+                        allow_submit = false;
+                    } 
+                }
+                $('#conversation_form_2 input[name="participant_id"]').val(participant_id);
+                if(allow_submit) {
+                    $('#conversation_form_2').submit();
+                }                
+            }
             
             
 

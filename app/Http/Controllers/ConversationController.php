@@ -287,135 +287,260 @@ class ConversationController extends Controller
         $conversation->date = $request->date;
         $conversation->time = $request->time;
         $conversation->save();
+        if(is_array($request->participant_id)){
+            foreach ($request->participant_id as $key => $value) {
+                $is_direct = false;
+                $mgrinfo_0 = DB::table('users')                        
+                                        ->select('reporting_to')
+                                        ->where('id', '=', $value)
+                                        ->get();
+                if($mgrinfo_0[0]->reporting_to == $actualOwner){
+                    ConversationParticipant::updateOrCreate([
+                        'conversation_id' => $conversation->id,
+                        'participant_id' => $value,
+                        'role' => 'emp',
+                    ]);
 
-        foreach ($request->participant_id as $key => $value) {
-            $is_direct = false;
-            $mgrinfo_0 = DB::table('users')                        
-                                    ->select('reporting_to')
-                                    ->where('id', '=', $value)
-                                    ->get();
-            if($mgrinfo_0[0]->reporting_to == $actualOwner){
-                ConversationParticipant::updateOrCreate([
-                    'conversation_id' => $conversation->id,
-                    'participant_id' => $value,
-                    'role' => 'emp',
-                ]);
-                
-                ConversationParticipant::updateOrCreate([
-                    'conversation_id' => $conversation->id,
-                    'participant_id' => $actualOwner,
-                    'role' => 'mgr',
-                ]);
-                $is_direct = true;
-            } 
-            
-            $mgrinfo_1 = DB::table('users')                        
-                                    ->select('reporting_to')
-                                    ->where('id', '=', $actualOwner)
-                                    ->get();
-            if($mgrinfo_1[0]->reporting_to == $value){
-                ConversationParticipant::updateOrCreate([
-                    'conversation_id' => $conversation->id,
-                    'participant_id' => $actualOwner,
-                    'role' => 'emp',
-                ]);
-                
-                ConversationParticipant::updateOrCreate([
-                    'conversation_id' => $conversation->id,
-                    'participant_id' => $value,
-                    'role' => 'mgr',
-                ]);
-                $is_direct = true;
-            }
-            
-            if (!$is_direct) {
-               $shareinfo_0 = DB::table('shared_profiles')                        
-                                    ->select('shared_with')
-                                    ->where('shared_id', '=', $value)
-                                    ->where('shared_item', 'like', '%2%')
-                                    ->get();   
-                foreach($shareinfo_0 as $shareitem){
-                   if($shareitem->shared_with == $actualOwner) {
-                        ConversationParticipant::updateOrCreate([
-                            'conversation_id' => $conversation->id,
-                            'participant_id' => $actualOwner,
-                            'role' => 'mgr',
-                        ]);
-                        
-                        ConversationParticipant::updateOrCreate([
-                            'conversation_id' => $conversation->id,
-                            'participant_id' => $value,
-                            'role' => 'emp',
-                        ]);
-                    }
-                }
-                              
-                $shareinfo_1 = DB::table('shared_profiles')                        
-                                    ->select('shared_with')
-                                    ->where('shared_id', '=', $actualOwner)
-                                    ->where('shared_item', 'like', '%2%')
-                                    ->get(); 
-                foreach($shareinfo_1 as $shareitem){
-                    if($shareitem->shared_with == $value) {
-                        ConversationParticipant::updateOrCreate([
-                            'conversation_id' => $conversation->id,
-                            'participant_id' => $value,
-                            'role' => 'mgr',
-                        ]);
-                        
-                        ConversationParticipant::updateOrCreate([
-                            'conversation_id' => $conversation->id,
-                            'participant_id' => $actualOwner,
-                            'role' => 'emp',
-                        ]);
-                    }
-                    
+                    ConversationParticipant::updateOrCreate([
+                        'conversation_id' => $conversation->id,
+                        'participant_id' => $actualOwner,
+                        'role' => 'mgr',
+                    ]);
+                    $is_direct = true;
                 } 
+
+                $mgrinfo_1 = DB::table('users')                        
+                                        ->select('reporting_to')
+                                        ->where('id', '=', $actualOwner)
+                                        ->get();
+                if($mgrinfo_1[0]->reporting_to == $value){
+                    ConversationParticipant::updateOrCreate([
+                        'conversation_id' => $conversation->id,
+                        'participant_id' => $actualOwner,
+                        'role' => 'emp',
+                    ]);
+
+                    ConversationParticipant::updateOrCreate([
+                        'conversation_id' => $conversation->id,
+                        'participant_id' => $value,
+                        'role' => 'mgr',
+                    ]);
+                    $is_direct = true;
+                }
+
+                if (!$is_direct) {
+                   $shareinfo_0 = DB::table('shared_profiles')                        
+                                        ->select('shared_with')
+                                        ->where('shared_id', '=', $value)
+                                        ->where('shared_item', 'like', '%2%')
+                                        ->get();   
+                    foreach($shareinfo_0 as $shareitem){
+                       if($shareitem->shared_with == $actualOwner) {
+                            ConversationParticipant::updateOrCreate([
+                                'conversation_id' => $conversation->id,
+                                'participant_id' => $actualOwner,
+                                'role' => 'mgr',
+                            ]);
+
+                            ConversationParticipant::updateOrCreate([
+                                'conversation_id' => $conversation->id,
+                                'participant_id' => $value,
+                                'role' => 'emp',
+                            ]);
+                        }
+                    }
+
+                    $shareinfo_1 = DB::table('shared_profiles')                        
+                                        ->select('shared_with')
+                                        ->where('shared_id', '=', $actualOwner)
+                                        ->where('shared_item', 'like', '%2%')
+                                        ->get(); 
+                    foreach($shareinfo_1 as $shareitem){
+                        if($shareitem->shared_with == $value) {
+                            ConversationParticipant::updateOrCreate([
+                                'conversation_id' => $conversation->id,
+                                'participant_id' => $value,
+                                'role' => 'mgr',
+                            ]);
+
+                            ConversationParticipant::updateOrCreate([
+                                'conversation_id' => $conversation->id,
+                                'participant_id' => $actualOwner,
+                                'role' => 'emp',
+                            ]);
+                        }
+
+                    } 
+                }
             }
+        } else {
+                $value = $request->participant_id;
+                $is_direct = false;
+                $mgrinfo_0 = DB::table('users')                        
+                                        ->select('reporting_to')
+                                        ->where('id', '=', $value)
+                                        ->get();
+                if($mgrinfo_0[0]->reporting_to == $actualOwner){
+                    ConversationParticipant::updateOrCreate([
+                        'conversation_id' => $conversation->id,
+                        'participant_id' => $value,
+                        'role' => 'emp',
+                    ]);
+
+                    ConversationParticipant::updateOrCreate([
+                        'conversation_id' => $conversation->id,
+                        'participant_id' => $actualOwner,
+                        'role' => 'mgr',
+                    ]);
+                    $is_direct = true;
+                } 
+
+                $mgrinfo_1 = DB::table('users')                        
+                                        ->select('reporting_to')
+                                        ->where('id', '=', $actualOwner)
+                                        ->get();
+                if($mgrinfo_1[0]->reporting_to == $value){
+                    ConversationParticipant::updateOrCreate([
+                        'conversation_id' => $conversation->id,
+                        'participant_id' => $actualOwner,
+                        'role' => 'emp',
+                    ]);
+
+                    ConversationParticipant::updateOrCreate([
+                        'conversation_id' => $conversation->id,
+                        'participant_id' => $value,
+                        'role' => 'mgr',
+                    ]);
+                    $is_direct = true;
+                }
+
+                if (!$is_direct) {
+                   $shareinfo_0 = DB::table('shared_profiles')                        
+                                        ->select('shared_with')
+                                        ->where('shared_id', '=', $value)
+                                        ->where('shared_item', 'like', '%2%')
+                                        ->get();   
+                    foreach($shareinfo_0 as $shareitem){
+                       if($shareitem->shared_with == $actualOwner) {
+                            ConversationParticipant::updateOrCreate([
+                                'conversation_id' => $conversation->id,
+                                'participant_id' => $actualOwner,
+                                'role' => 'mgr',
+                            ]);
+
+                            ConversationParticipant::updateOrCreate([
+                                'conversation_id' => $conversation->id,
+                                'participant_id' => $value,
+                                'role' => 'emp',
+                            ]);
+                        }
+                    }
+
+                    $shareinfo_1 = DB::table('shared_profiles')                        
+                                        ->select('shared_with')
+                                        ->where('shared_id', '=', $actualOwner)
+                                        ->where('shared_item', 'like', '%2%')
+                                        ->get(); 
+                    foreach($shareinfo_1 as $shareitem){
+                        if($shareitem->shared_with == $value) {
+                            ConversationParticipant::updateOrCreate([
+                                'conversation_id' => $conversation->id,
+                                'participant_id' => $value,
+                                'role' => 'mgr',
+                            ]);
+
+                            ConversationParticipant::updateOrCreate([
+                                'conversation_id' => $conversation->id,
+                                'participant_id' => $actualOwner,
+                                'role' => 'emp',
+                            ]);
+                        }
+
+                    } 
+                }
         }
         //DB::commit();
 
         // create a message on the participant's dasboard under home page
-        foreach ($request->participant_id as $key => $value) {
-            // DashboardNotification::create([
-            //     'user_id' => $value,
-            //     'notification_type' => 'CA',        // Conversation Added
-            //     'comment' => $conversation->user->name . ' would like to schedule a performance conversation with you.',
-            //     'related_id' => $conversation->id,
-            // ]);
-            $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-			$notification->user_id = $value;
-			$notification->notification_type = 'CA';
-			$notification->comment = $conversation->user->name . ' would like to schedule a performance conversation with you.';
-			$notification->related_id = $conversation->id;
-            $notification->notify_user_id = $value;
-			$notification->send(); 
+        if(is_array($request->participant_id)){
+            foreach ($request->participant_id as $key => $value) {
+                // DashboardNotification::create([
+                //     'user_id' => $value,
+                //     'notification_type' => 'CA',        // Conversation Added
+                //     'comment' => $conversation->user->name . ' would like to schedule a performance conversation with you.',
+                //     'related_id' => $conversation->id,
+                // ]);
+                $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                            $notification->user_id = $value;
+                            $notification->notification_type = 'CA';
+                            $notification->comment = $conversation->user->name . ' would like to schedule a performance conversation with you.';
+                            $notification->related_id = $conversation->id;
+                $notification->notify_user_id = $value;
+                            $notification->send(); 
 
 
-            // Send Out email when the conversation added
-            $user = User::where('id', $value)
-                            ->with('userPreference')
-                            ->first();
+                // Send Out email when the conversation added
+                $user = User::where('id', $value)
+                                ->with('userPreference')
+                                ->first();
 
-            if ($user && $user->allow_email_notification && $user->userPreference->conversation_setup_flag == 'Y') {                            
+                if ($user && $user->allow_email_notification && $user->userPreference->conversation_setup_flag == 'Y') {                            
 
-                $due = Conversation::nextConversationDue( $user );
+                    $due = Conversation::nextConversationDue( $user );
 
-                $topic = ConversationTopic::find($request->conversation_topic_id);
-                $sendMail = new \App\MicrosoftGraph\SendMail();
-                $sendMail->toRecipients = [ $value ];
-                $sendMail->sender_id = null;  // default sender is System
-                $sendMail->useQueue = false;
-                $sendMail->template = 'ADVICE_SCHEDULE_CONVERSATION';
-                array_push($sendMail->bindvariables, $user->name);
-                array_push($sendMail->bindvariables, $conversation->user->name );
-                array_push($sendMail->bindvariables, $conversation->topic->name );
-                array_push($sendMail->bindvariables, $due );
-                $response = $sendMail->sendMailWithGenericTemplate();
-            }
+                    $topic = ConversationTopic::find($request->conversation_topic_id);
+                    $sendMail = new \App\MicrosoftGraph\SendMail();
+                    $sendMail->toRecipients = [ $value ];
+                    $sendMail->sender_id = null;  // default sender is System
+                    $sendMail->useQueue = false;
+                    $sendMail->template = 'ADVICE_SCHEDULE_CONVERSATION';
+                    array_push($sendMail->bindvariables, $user->name);
+                    array_push($sendMail->bindvariables, $conversation->user->name );
+                    array_push($sendMail->bindvariables, $conversation->topic->name );
+                    array_push($sendMail->bindvariables, $due );
+                    $response = $sendMail->sendMailWithGenericTemplate();
+                }
 
+            }       
+        } else {
+                $value = $request->participant_id;
+                // DashboardNotification::create([
+                //     'user_id' => $value,
+                //     'notification_type' => 'CA',        // Conversation Added
+                //     'comment' => $conversation->user->name . ' would like to schedule a performance conversation with you.',
+                //     'related_id' => $conversation->id,
+                // ]);
+                $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                            $notification->user_id = $value;
+                            $notification->notification_type = 'CA';
+                            $notification->comment = $conversation->user->name . ' would like to schedule a performance conversation with you.';
+                            $notification->related_id = $conversation->id;
+                $notification->notify_user_id = $value;
+                            $notification->send(); 
+
+
+                // Send Out email when the conversation added
+                $user = User::where('id', $value)
+                                ->with('userPreference')
+                                ->first();
+
+                if ($user && $user->allow_email_notification && $user->userPreference->conversation_setup_flag == 'Y') {                            
+
+                    $due = Conversation::nextConversationDue( $user );
+
+                    $topic = ConversationTopic::find($request->conversation_topic_id);
+                    $sendMail = new \App\MicrosoftGraph\SendMail();
+                    $sendMail->toRecipients = [ $value ];
+                    $sendMail->sender_id = null;  // default sender is System
+                    $sendMail->useQueue = false;
+                    $sendMail->template = 'ADVICE_SCHEDULE_CONVERSATION';
+                    array_push($sendMail->bindvariables, $user->name);
+                    array_push($sendMail->bindvariables, $conversation->user->name );
+                    array_push($sendMail->bindvariables, $conversation->topic->name );
+                    array_push($sendMail->bindvariables, $due );
+                    $response = $sendMail->sendMailWithGenericTemplate();
+                }
         }
-
 
         if(request()->ajax()){
             return response()->json(['success' => true, 'message' => 'Conversation Created successfully']);
