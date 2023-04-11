@@ -1828,9 +1828,6 @@ class StatisticsReportController extends Controller
         //get all employee number
         //get all employee number
         $employees = UserDemoJrView::distinct('employee_id')
-                ->join('conversation_participants', function($join) {
-                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
-                })
                 ->where(function($query) {
                                 $query->where(function($query) {
                                     $query->where('excused_flag', '<>', '1')
@@ -1840,7 +1837,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('admin_org_users')
-                            ->whereColumn('admin_org_users.allowed_user_id', 'conversation_participants.participant_id')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'user_id')
                             ->whereIn('admin_org_users.access_type', [0,2])
                             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 })->count();
