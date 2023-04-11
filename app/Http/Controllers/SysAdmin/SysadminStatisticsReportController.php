@@ -2242,7 +2242,7 @@ class SysadminStatisticsReportController extends Controller
 
     public function conversationStatusExport(Request $request) {        
         // sql6 -- Employee Has Open Conversation
-        $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, email, next_conversation_date, reporting_to_name,
+        $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
                             organization, level1_program, level2_division, level3_branch, level4
                  ")
                 ->join('conversation_participants', function($join) {
@@ -2279,7 +2279,7 @@ class SysadminStatisticsReportController extends Controller
                 
                 
         // sql7 -- Employee Has Completed Conversation
-        $sql_7 = UserDemoJrView::selectRaw("employee_id, employee_name, email, next_conversation_date, reporting_to_name,
+        $sql_7 = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
                             organization, level1_program, level2_division, level3_branch, level4
                  ")
                 ->join('conversation_participants', function($join) {
@@ -2357,7 +2357,7 @@ class SysadminStatisticsReportController extends Controller
                     foreach ($users as $user) {
                         $row['Employee ID'] = "[".$user->employee_id."]";
                         $row['Name'] = $user->employee_name;
-                        $row['Email'] = $user->email;
+                        $row['Email'] = $user->employee_email;
                         $row['Organization'] = $user->organization;
                         $row['next_conversation_date'] = $user->next_conversation_date;
                         $row['reporting_to_name'] = $user->reporting_to_name;
@@ -2416,7 +2416,7 @@ class SysadminStatisticsReportController extends Controller
                     foreach ($users as $user) {
                         $row['Employee ID'] = "[".$user->employee_id."]";
                         $row['Name'] = $user->employee_name;
-                        $row['Email'] = $user->email;
+                        $row['Email'] = $user->employee_email;
                         $row['Organization'] = $user->organization;
                         $row['next_conversation_date'] = $user->next_conversation_date;
                         $row['reporting_to_name'] = $user->reporting_to_name;
