@@ -1837,7 +1837,17 @@ class StatisticsReportController extends Controller
         
         //get all employee number
         //get all employee number
-        $employees = UserDemoJrView::distinct('employee_id')->count();
+        $employees = UserDemoJrView::distinct('employee_id')
+                ->join('conversation_participants', function($join) {
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                })
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('admin_org_users')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'conversation_participants.participant_id')
+                            ->whereIn('admin_org_users.access_type', [0,2])
+                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                })->count();
 
         // Chart6 -- Employee Has Open Conversation
         $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, 
@@ -2090,7 +2100,15 @@ class StatisticsReportController extends Controller
                 if($request->legend == 'No'){
                     //get has conversation users employee_id list
                     $excludedIds = $users->pluck('employee_id');
-                    $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)->get();
+                    $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)
+                            ->whereExists(function ($query) {
+                                $query->select(DB::raw(1))
+                                        ->from('admin_org_users')
+                                        ->whereColumn('admin_org_users.allowed_user_id', 'user_id')
+                                        ->whereIn('admin_org_users.access_type', [0,2])
+                                        ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                            })
+                            ->get();
                 }  
 
                 $headers = array(
@@ -2143,7 +2161,15 @@ class StatisticsReportController extends Controller
                 if($request->legend == 'No'){
                     //get has conversation users employee_id list
                     $excludedIds = $users->pluck('employee_id');
-                    $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)->get();
+                    $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)
+                            ->whereExists(function ($query) {
+                                $query->select(DB::raw(1))
+                                        ->from('admin_org_users')
+                                        ->whereColumn('admin_org_users.allowed_user_id', 'user_id')
+                                        ->whereIn('admin_org_users.access_type', [0,2])
+                                        ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                            })
+                            ->get();
                 }  
 
                 $headers = array(
