@@ -2335,6 +2335,7 @@ class SysadminStatisticsReportController extends Controller
                             ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                             ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
                             ->get();
+                    $users = $users->unique('employee_id');        
                 }  
 
                 $headers = array(
@@ -2400,6 +2401,7 @@ class SysadminStatisticsReportController extends Controller
                             ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                             ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
                             ->get();
+                    $users = $users->unique('employee_id');            
                 }  
 
                 $headers = array(

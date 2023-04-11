@@ -1834,6 +1834,11 @@ class StatisticsReportController extends Controller
                                         ->orWhereNull('excused_flag');
                                 });
                             })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                                  
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('admin_org_users')
@@ -2106,6 +2111,7 @@ class StatisticsReportController extends Controller
                             });
                     
                     $users = $sql->get();
+                    $users = $users->unique('employee_id');
                     
                     Log::warning('Chart 6 export no');
                     Log::warning(print_r($sql->toSql(),true));
@@ -2182,6 +2188,7 @@ class StatisticsReportController extends Controller
                                         ->where('admin_org_users.granted_to_id', '=', Auth::id());
                             })
                             ->get();
+                    $users = $users->unique('employee_id');       
                 }  
 
                 $headers = array(
