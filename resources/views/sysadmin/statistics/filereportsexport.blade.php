@@ -35,8 +35,20 @@
                         <td><?php echo $data["selected_goal"]->name; ?></td>
                         <td><?php echo $data["selected_goal"]->business_unit; ?></td>
                         <td><?php echo $data["selected_goal"]->organization; ?></td>
-                        <td><?php echo $data["selected_goal"]->start_date; ?></td>
-                        <td><?php echo $data["selected_goal"]->target_date; ?></td>
+                        <td>
+                        <?php 
+                            $dateTime = $data["selected_goal"]->start_date;
+                            $dateTime = $dateTime->format('Y-m-d');
+                            echo $dateTime; 
+                            ?>
+                        </td>
+                        <td>
+                        <?php 
+                            $dateTime = $data["selected_goal"]->target_date;
+                            $dateTime = $dateTime->format('Y-m-d');
+                            echo $dateTime; 
+                            ?>
+                        </td>
                     </tr>
                 </table>   
                 
