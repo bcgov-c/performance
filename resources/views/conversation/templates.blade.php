@@ -30,7 +30,7 @@
 		<h5 class="mb-0"data-toggle="collapse" data-target="#collapse_0" aria-expanded="1" aria-controls="collapse_0">
                     <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_0" aria-expanded="false" aria-controls="collapse_0">
                             <button class="btn btn-link" >
-                            Instructions 
+                                <h4>Instructions</h4> 
                             </button>                        
                             <span class="float-right"><i class="fa fa-chevron-down"></i></span>    
                     </h5>
@@ -55,7 +55,7 @@
                     <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_1" aria-expanded="false" aria-controls="collapse_1">
                             
                             <button class="btn btn-link text-left">
-                                <p><strong>Performance Check-in Template</strong></p>
+                                <h4>Performance Check-in Template</h4>
                             </button> 
                             <span class="float-right"><i class="fa fa-chevron-down"></i></span> 
                             <button class="btn btn-link text-left">
@@ -130,7 +130,7 @@
 		<h5 class="mb-2" data-toggle="collapse" data-target="#collapse_2" aria-expanded="1" aria-controls="collapse_2">
                     <h5 class="mb-2" data-toggle="collapse" data-target="#collapse_2" aria-expanded="false" aria-controls="collapse_2">
                             <button class="btn btn-link text-left">
-                                <p><strong>Other Templates</strong><p/>
+                                <h4>Other Templates</h4>
                             </button> 
                             <span class="float-right"><i class="fa fa-chevron-down"></i></span> 
                             <button class="btn btn-link text-left">

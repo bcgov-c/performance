@@ -812,7 +812,7 @@ class ConversationController extends Controller
         if ($request->has('search') && $request->search) {
             $query = $query->where('name', 'LIKE', "%$request->search%");
         }
-        $templates = $query->get();
+        $templates = $query->orderBy('sort')->get();
         $searchValue = $request->search ?? '';
         $conversationMessage = Conversation::warningMessage();
         $participants = session()->has('original-auth-id') ? User::where('id', Auth::id())->get() : $user->avaliableReportees()->get();
