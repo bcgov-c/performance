@@ -491,9 +491,7 @@ class StatisticsReportController extends Controller
                             ->whereIn('admin_org_users.access_type', [0,2])
                             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 });
-        Log::warning('Chart 1');
-        Log::warning(print_r($sql_2->toSql(),true));
-        Log::warning(print_r($sql_2->getBindings(),true)); 
+                
         $next_due_users = $sql_2->get();
         $data = array();
 
@@ -549,11 +547,7 @@ class StatisticsReportController extends Controller
         ->where('conversation_participants.role','<>','mgr');
         
         $conversations = $sql->get();
-        
-        Log::warning('HR Chart 2');
-        Log::warning(print_r($sql->toSql(),true));
-        Log::warning(print_r($sql->getBindings(),true));
-        
+             
 
         // Chart2 -- Open Conversation
         $topics = ConversationTopic::select('id','name')->get();
@@ -694,10 +688,6 @@ class StatisticsReportController extends Controller
         
         $emp_conversations = $sql->get();
         
-        Log::warning('HR Chart 4');
-        Log::warning(print_r($sql->toSql(),true));
-        Log::warning(print_r($sql->getBindings(),true));
-                
         // Chart4 -- Open Conversation for employees
         $topics = ConversationTopic::select('id','name')->get();
         $data['chart4']['chart_id'] = 4;
@@ -1896,11 +1886,7 @@ class StatisticsReportController extends Controller
                             ->whereColumn('admin_org_users.allowed_user_id', 'conversation_participants.participant_id')
                             ->whereIn('admin_org_users.access_type', [0,2])
                             ->where('admin_org_users.granted_to_id', '=', Auth::id());
-                });
-                
-        Log::warning('Chart 6');
-        Log::warning(print_r($sql_6->toSql(),true));
-        Log::warning(print_r($sql_6->getBindings(),true));        
+                });      
         
         $users = $sql_6->get();
         $users = $users->unique('employee_id');
@@ -1970,11 +1956,7 @@ class StatisticsReportController extends Controller
                             ->whereIn('admin_org_users.access_type', [0,2])
                             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 });
-                
-        Log::warning('Chart 7');
-        Log::warning(print_r($sql_7->toSql(),true));
-        Log::warning(print_r($sql_7->getBindings(),true));        
-        
+                            
         $users = $sql_7->get();
         $users = $users->unique('employee_id');
         
@@ -2106,21 +2088,31 @@ class StatisticsReportController extends Controller
                 if($request->legend == 'No'){
                     //get has conversation users employee_id list
                     $excludedIds = $users->pluck('employee_id');
-                    $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)
+                    $sql = UserDemoJrView::whereNotIn('employee_id', $excludedIds)
                             ->where(function($query) {
                                 $query->where(function($query) {
                                     $query->where('excused_flag', '<>', '1')
                                         ->orWhereNull('excused_flag');
                                 });
-                            })
+                            })                             
+                            ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                            ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                            ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                            ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                            ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
                             ->whereExists(function ($query) {
                                 $query->select(DB::raw(1))
                                         ->from('admin_org_users')
                                         ->whereColumn('admin_org_users.allowed_user_id', 'user_id')
                                         ->whereIn('admin_org_users.access_type', [0,2])
                                         ->where('admin_org_users.granted_to_id', '=', Auth::id());
-                            })
-                            ->get();
+                            });
+                    
+                    $users = $sql->get();
+                    
+                    Log::warning('Chart 6 export no');
+                    Log::warning(print_r($sql->toSql(),true));
+                    Log::warning(print_r($sql->getBindings(),true));                
                 }  
 
                 $headers = array(
@@ -2179,7 +2171,12 @@ class StatisticsReportController extends Controller
                                     $query->where('excused_flag', '<>', '1')
                                         ->orWhereNull('excused_flag');
                                 });
-                            })
+                            }) 
+                            ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                            ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                            ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                            ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                            ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                            
                             ->whereExists(function ($query) {
                                 $query->select(DB::raw(1))
                                         ->from('admin_org_users')
