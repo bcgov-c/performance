@@ -450,9 +450,6 @@ class SysadminStatisticsReportController extends Controller
                 }) 
                 ->whereNull('employee_demo.date_deleted');
                 
-        Log::warning('Chart 1');
-        Log::warning(print_r($sql_2->toSql(),true));
-        Log::warning(print_r($sql_2->getBindings(),true));        
                 
         $next_due_users = $sql_2->get();
         $data = array();
@@ -2144,11 +2141,7 @@ class SysadminStatisticsReportController extends Controller
                         $query->whereNull('signoff_user_id')
                               ->orWhereNull('supervisor_signoff_id');
                     });
-                });
-                
-        Log::warning('Chart 6');
-        Log::warning(print_r($sql_6->toSql(),true));
-        Log::warning(print_r($sql_6->getBindings(),true));        
+                });       
  
         $users = $sql_6->get();
         $users = $users->unique('employee_id');
@@ -2211,11 +2204,7 @@ class SysadminStatisticsReportController extends Controller
                         $query->whereNotNull('signoff_user_id')
                               ->WhereNotNull('supervisor_signoff_id');
                     });
-                });
-                
-        Log::warning('Chart 7');
-        Log::warning(print_r($sql_7->toSql(),true));
-        Log::warning(print_r($sql_7->getBindings(),true));        
+                });     
         
         $users = $sql_7->get();
         $users = $users->unique('employee_id');
