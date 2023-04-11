@@ -129,7 +129,13 @@
                     <td><?php echo $item->title; ?></td>
                     <td><?php echo $item->business_unit; ?></td>
                     <td><?php echo $item->organization; ?></td>
-                    <td><?php echo $item->created_at; ?></td>
+                    <td>
+                        <?php 
+                        $dateTime = $item->created_at;
+                        $dateTime = $dateTime->format('Y-m-d');
+                        echo $dateTime; 
+                        ?>
+                    </td>
                     <td>
                         <a href="/sysadmin/statistics/filereports-export?type=selected_goal&id=<?php echo $item->id; ?>"><button type="button" class="btn btn-primary   float-right"> <i class="fas fa-file-pdf"></i> Download</button></a>
                     </td>
@@ -169,7 +175,13 @@
                     <td><?php echo $item->title; ?></td>
                     <td><?php echo $item->business_unit; ?></td>
                     <td><?php echo $item->organization; ?></td>
-                    <td><?php echo $item->created_at; ?></td>
+                    <td>
+                        <?php 
+                        $dateTime = $item->created_at;
+                        $dateTime = $dateTime->format('Y-m-d');
+                        echo $dateTime; 
+                        ?>
+                    </td>
                     <td><a href="/sysadmin/statistics/filereports-export?type=selected_goal&id=<?php echo $item->id; ?>"><button type="button" class="btn btn-primary   float-right"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
                 <tr/>    
                 <?php }?>
@@ -207,7 +219,13 @@
                     <td><?php echo $item->topic; ?></td>
                     <td><?php echo $item->business_unit; ?></td>
                     <td><?php echo $item->organization; ?></td>
-                    <td><?php echo $item->created_at; ?></td>
+                    <td>
+                        <?php 
+                        $dateTime = $item->created_at;
+                        $dateTime = $dateTime->format('Y-m-d');
+                        echo $dateTime; 
+                        ?>
+                    </td>
                     <td><a href="/sysadmin/statistics/filereports-export?type=selected_conversation&id=<?php echo $item->conversation_id; ?>"><button type="button" class="btn btn-primary  float-right"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
                 <tr/>    
                 <?php }?>
@@ -245,7 +263,13 @@
                     <td><?php echo $item->topic; ?></td>
                     <td><?php echo $item->business_unit; ?></td>
                     <td><?php echo $item->organization; ?></td>
-                    <td><?php echo $item->latest_update; ?></td>
+                    <td>
+                        <?php 
+                        $dateTime = $item->latest_update;
+                        $dateTime = $dateTime->format('Y-m-d');
+                        echo $dateTime; 
+                        ?>
+                    </td>
                     <td><a href="/sysadmin/statistics/filereports-export?type=selected_conversation&id=<?php echo $item->conversation_id; ?>"><button type="button" class="btn btn-primary  float-right"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
                 <tr/>                   
                 <?php }?>
