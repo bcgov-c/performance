@@ -116,12 +116,12 @@
             @if(count($data["active_goals"]) > 0)                
                 <table>            
                 <tr>
-                    <th>Name</th>
-                    <th>Title</th>
-                    <th>Business Unit</th>
-                    <th>Ministry</th>
-                    <th>Created At</th>
-                    <th>&nbsp;</th>
+                    <th width="10%">Name</th>
+                    <th width="30%">Title</th>
+                    <th width="10%">Business Unit</th>
+                    <th width="30%">Ministry</th>
+                    <th width="10%">Created At</th>
+                    <th width="10%">&nbsp;</th>
                 </tr>
                 <?php foreach($data["active_goals"] as $item){?>
                 <tr>
@@ -156,12 +156,12 @@
             @if(count($data["past_goals"]) > 0)                
                 <table>            
                 <tr>
-                    <th>Name</th>
-                    <th>Title</th>
-                    <th>Business Unit</th>
-                    <th>Ministry</th>
-                    <th>Created At</th>
-                    <th>&nbsp;</th>
+                    <th width="10%">Name</th>
+                    <th width="30%">Title</th>
+                    <th width="10%">Business Unit</th>
+                    <th width="30%">Ministry</th>
+                    <th width="10%">Created At</th>
+                    <th width="10%">&nbsp;</th>
                 </tr>
                 <?php foreach($data["past_goals"] as $item){?>
                 <tr>
@@ -194,12 +194,12 @@
             @if(count($data["open_conversations"]) > 0)                
                 <table>            
                 <tr>
-                    <th>Name</th>
-                    <th>Title</th>
-                    <th>Business Unit</th>
-                    <th>Ministry</th>
-                    <th>Created At</th>
-                    <th>&nbsp;</th>
+                    <th width="10%">Name</th>
+                    <th width="30%">Title</th>
+                    <th width="10%">Business Unit</th>
+                    <th width="30%">Ministry</th>
+                    <th width="10%">Created At</th>
+                    <th width="10%">&nbsp;</th>
                 </tr>
                 <?php foreach($data["open_conversations"] as $item){?>
                 <tr>
@@ -232,12 +232,12 @@
             @if(count($data["completed_conversations"]) > 0)                
                 <table>            
                 <tr>
-                    <th>Name</th>
-                    <th>Title</th>
-                    <th>Business Unit</th>
-                    <th>Ministry</th>
-                    <th>Latest Signoff At</th>
-                    <th>&nbsp;</th>
+                    <th width="10%">Name</th>
+                    <th width="30%">Title</th>
+                    <th width="10%">Business Unit</th>
+                    <th width="30%">Ministry</th>
+                    <th width="10%">Latest Signoff At</th>
+                    <th width="10%">&nbsp;</th>
                 </tr>
                 <?php foreach($data["completed_conversations"] as $item){?>
                 <tr>
