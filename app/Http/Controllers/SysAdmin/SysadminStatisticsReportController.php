@@ -2333,6 +2333,12 @@ class SysadminStatisticsReportController extends Controller
                     //get has conversation users employee_id list
                     $excludedIds = $users->pluck('employee_id');
                     $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)
+                            ->where(function($query) {
+                                $query->where(function($query) {
+                                    $query->where('excused_flag', '<>', '1')
+                                        ->orWhereNull('excused_flag');
+                                });
+                            }) 
                             ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
                             ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
                             ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
@@ -2392,6 +2398,12 @@ class SysadminStatisticsReportController extends Controller
                     //get has conversation users employee_id list
                     $excludedIds = $users->pluck('employee_id');
                     $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)
+                            ->where(function($query) {
+                                $query->where(function($query) {
+                                    $query->where('excused_flag', '<>', '1')
+                                        ->orWhereNull('excused_flag');
+                                });
+                            })
                             ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
                             ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
                             ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })

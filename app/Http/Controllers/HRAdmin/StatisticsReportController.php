@@ -1841,6 +1841,12 @@ class StatisticsReportController extends Controller
                 ->join('conversation_participants', function($join) {
                     $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
                 })
+                ->where(function($query) {
+                                $query->where(function($query) {
+                                    $query->where('excused_flag', '<>', '1')
+                                        ->orWhereNull('excused_flag');
+                                });
+                            })
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('admin_org_users')
@@ -2101,6 +2107,12 @@ class StatisticsReportController extends Controller
                     //get has conversation users employee_id list
                     $excludedIds = $users->pluck('employee_id');
                     $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)
+                            ->where(function($query) {
+                                $query->where(function($query) {
+                                    $query->where('excused_flag', '<>', '1')
+                                        ->orWhereNull('excused_flag');
+                                });
+                            })
                             ->whereExists(function ($query) {
                                 $query->select(DB::raw(1))
                                         ->from('admin_org_users')
@@ -2162,6 +2174,12 @@ class StatisticsReportController extends Controller
                     //get has conversation users employee_id list
                     $excludedIds = $users->pluck('employee_id');
                     $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)
+                            ->where(function($query) {
+                                $query->where(function($query) {
+                                    $query->where('excused_flag', '<>', '1')
+                                        ->orWhereNull('excused_flag');
+                                });
+                            })
                             ->whereExists(function ($query) {
                                 $query->select(DB::raw(1))
                                         ->from('admin_org_users')
