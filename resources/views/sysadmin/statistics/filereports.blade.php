@@ -39,7 +39,7 @@
                                 <td>
                                     <input class="form-check-input" type="checkbox" name="record_types[]" value="active_goals"
                                     <?php       
-                                    if (in_array("active_goals", $record_types)) {
+                                    if (is_array($record_types) && in_array("active_goals", $record_types)) {
                                         echo "checked";
                                     }
                                     ?>
@@ -49,7 +49,7 @@
                                 <td>
                                     <input class="form-check-input" type="checkbox" name="record_types[]" value="open_conversations"
                                     <?php       
-                                    if (in_array("open_conversations", $record_types)) {
+                                    if (is_array($record_types) && in_array("open_conversations", $record_types)) {
                                         echo "checked";
                                     }
                                     ?>       
@@ -61,7 +61,7 @@
                                 <td>
                                     <input class="form-check-input" type="checkbox" name="record_types[]" value="past_goals"
                                     <?php       
-                                    if (in_array("past_goals", $record_types)) {
+                                    if (is_array($record_types) && in_array("past_goals", $record_types)) {
                                         echo "checked";
                                     }
                                     ?>        
@@ -71,7 +71,7 @@
                                 <td>
                                     <input class="form-check-input" type="checkbox" name="record_types[]" value="completed_conversations"
                                     <?php       
-                                    if (in_array("completed_conversations", $record_types)) {
+                                    if (is_array($record_types) && in_array("completed_conversations", $record_types)) {
                                         echo "checked";
                                     }
                                     ?>        
@@ -80,6 +80,14 @@
                             <label class="form-check-label">Completed Conversations</label>
                                 </td>
                             </tr>
+                            @if(isset($data["error"]) && $data["error"]["record_types"])
+                            <tr>
+                                <td colspan="2">
+                                <small class="text-danger error-end_date">Record type is required</small>
+                                </td>
+                            </tr>    
+                            @endif
+                            
                         </table>    
                     </div> 
                 </div>

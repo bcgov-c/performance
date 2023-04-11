@@ -1516,6 +1516,7 @@ class SysadminStatisticsReportController extends Controller
             $data["error"]["employee_id"] = 0;
             $data["error"]["start_date"] = 0;
             $data["error"]["end_date"] = 0;
+            $data["error"]["record_types"] = 0;
             $data["active_goals"] = array();
             $data["past_goals"] = array();
             $data["open_conversations"] = array();
@@ -1526,7 +1527,7 @@ class SysadminStatisticsReportController extends Controller
             $end_date = $request->end_date;
             $record_types = $request->record_types;
             
-            if ($request->employee_id && $request->start_date && $request->end_date) {
+            if ($request->employee_id && $request->start_date && $request->end_date && $request->record_types) {
                 $submit = true;
                 if(!empty($request->record_types)){
                     foreach($request->record_types as $item){
@@ -1645,7 +1646,7 @@ class SysadminStatisticsReportController extends Controller
                             $data["completed_conversations"] = $completed_conversations;  
                         }
                     }
-                }
+                } 
             } else {
                 if (!$request->employee_id){
                     $data["error"]["employee_id"] = 1;
@@ -1655,6 +1656,9 @@ class SysadminStatisticsReportController extends Controller
                 }
                 if (!$request->end_date) {
                     $data["error"]["end_date"] = 1;
+                }
+                if (!$request->record_types){
+                    $data["error"]["record_types"] = 1;
                 }
             }
         }
