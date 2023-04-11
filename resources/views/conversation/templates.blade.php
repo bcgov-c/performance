@@ -50,7 +50,7 @@
 	</div>
         
         <div class="card">
-		<div class="card-header" id="heading_1">
+		<div class="card-header" id="heading_1" style="border-bottom-width: 0px;">
 		<h5 class="mb-1"data-toggle="collapse" data-target="#collapse_1" aria-expanded="1" aria-controls="collapse_1">
                     <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_1" aria-expanded="false" aria-controls="collapse_1">
                             
@@ -126,7 +126,7 @@
         
         
         <div class="card">
-		<div class="card-header" id="heading_2">
+		<div class="card-header" id="heading_2"  style="border-bottom-width: 0px;">
 		<h5 class="mb-2" data-toggle="collapse" data-target="#collapse_2" aria-expanded="1" aria-controls="collapse_2">
                     <h5 class="mb-2" data-toggle="collapse" data-target="#collapse_2" aria-expanded="false" aria-controls="collapse_2">
                             <button class="btn btn-link text-left">
