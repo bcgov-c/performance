@@ -41,7 +41,7 @@
                 
                     <?php if ($item["selected_conversation"]->topic == 'Performance Check-In') { ?>
                     <ul>
-                        <li><b>Employee Comments</b>
+                        <li style="margin-bottom: 10px;"><b>Employee Comments</b>
                             <ul>
                                 <li><b>Self Summary: </b><?php echo $item["selected_conversation"]->info_comment4;?></li>
                                 <li><b>Additional Comments: </b><?php echo $item["selected_conversation"]->info_comment7;?></li>
@@ -62,7 +62,7 @@
 
                     <?php if ($item["selected_conversation"]->topic == 'Goal Setting') { ?>
                     <ul>
-                        <li><b>Employee Comments</b>
+                        <li style="margin-bottom: 10px;"><b>Employee Comments</b>
                             <ul>
                                 <li><b>Comments: </b><?php echo $item["selected_conversation"]->info_comment4;?></li>
                                 <li><b>Action Items: </b><?php echo $item["selected_conversation"]->info_comment7;?></li>
@@ -79,7 +79,7 @@
 
                     <?php if ($item["selected_conversation"]->topic == 'Career Development') { ?>
                     <ul>
-                        <li><b>Employee Comments</b>
+                        <li style="margin-bottom: 10px;"><b>Employee Comments</b>
                             <ul>
                                 <li><b>Career Goal Statement: </b><?php echo $item["selected_conversation"]->info_comment4;?></li>
                                 <li><b>Strengths: </b><?php echo $item["selected_conversation"]->info_comment7;?></li>
@@ -101,7 +101,7 @@
 
                     <?php if ($item["selected_conversation"]->topic == 'Performance Improvement') { ?>
                     <ul>
-                        <li><b>Employee Comments</b>
+                        <li style="margin-bottom: 10px;"><b>Employee Comments</b>
                             <ul>
                                 <li><b>Self Summary: </b><?php echo $item["selected_conversation"]->info_comment4;?></li>
                                 <li><b>Additional Comments: </b><?php echo $item["selected_conversation"]->info_comment7;?></li>
@@ -121,7 +121,7 @@
 
                     <?php if ($item["selected_conversation"]->topic == 'Onboarding') { ?>
                     <ul>
-                        <li><b>Employee Comments</b>
+                        <li style="margin-bottom: 10px;"><b>Employee Comments</b>
                             <ul>
                                 <li><b>Comments: </b><?php echo $item["selected_conversation"]->info_comment4;?></li>
                                 <li><b>Action Items: </b><?php echo $item["selected_conversation"]->info_comment7;?></li>

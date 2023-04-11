@@ -1529,7 +1529,7 @@ class SysadminStatisticsReportController extends Controller
                 if(!empty($request->record_types)){
                     foreach($request->record_types as $item){
                         if($item == "active_goals"){
-                            $active_goals = Goal::selectRaw("goals.id, users.name, goals.title, goals.created_at, employee_demo.organization, employee_demo.business_unit")
+                            $active_goals = Goal::selectRaw("goals.id, users.name, goals.title, goals.start_date, goals.target_date, goals.created_at, employee_demo.organization, employee_demo.business_unit")
                                     ->join('users', function($join) {
                                         $join->on('users.id', '=', 'goals.user_id');   
                                     }) 
@@ -1552,7 +1552,7 @@ class SysadminStatisticsReportController extends Controller
                             $data["active_goals"] = $active_goals;
                         }
                         if($item == "past_goals"){
-                            $past_goals = Goal::selectRaw("goals.id, users.name, goals.title, goals.created_at, employee_demo.organization, employee_demo.business_unit")
+                            $past_goals = Goal::selectRaw("goals.id, users.name, goals.start_date, goals.target_date, goals.created_at, employee_demo.organization, employee_demo.business_unit")
                                     ->join('users', function($join) {
                                         $join->on('users.id', '=', 'goals.user_id');   
                                     }) 
@@ -1666,7 +1666,7 @@ class SysadminStatisticsReportController extends Controller
     {
         if($request->type == 'active_goal'){
             $data = array();
-            $active_goals = Goal::selectRaw("goals.id, users.name, goals.what, goals.measure_of_success, goals.created_at, goals.start_date, goals.target_date, employee_demo.organization, employee_demo.business_unit")
+            $active_goals = Goal::selectRaw("goals.id, users.name, goals.what, goals.measure_of_success, goals.created_at, goals.title, goals.start_date, goals.target_date, employee_demo.organization, employee_demo.business_unit")
                                     ->join('users', function($join) {
                                         $join->on('users.id', '=', 'goals.user_id');   
                                     }) 
@@ -1726,7 +1726,7 @@ class SysadminStatisticsReportController extends Controller
             
         } elseif($request->type == 'past_goal'){
             $data = array();
-            $past_goals = Goal::selectRaw("goals.id, users.name, goals.what, goals.measure_of_success, goals.created_at, goals.start_date, goals.target_date, employee_demo.organization, employee_demo.business_unit")
+            $past_goals = Goal::selectRaw("goals.id, users.name, goals.what, goals.measure_of_success, goals.title, goals.created_at, goals.start_date, goals.target_date, employee_demo.organization, employee_demo.business_unit")
                                     ->join('users', function($join) {
                                         $join->on('users.id', '=', 'goals.user_id');   
                                     }) 
