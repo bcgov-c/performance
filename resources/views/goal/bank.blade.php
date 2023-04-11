@@ -94,7 +94,11 @@
                                             <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->created_at == null ?: $goal->created_at->format('M d, Y') }}</a>
                                         </td>
                                         <td style="width:15%">
-                                            <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->username }}</a>
+                                            @if ($goal->display_name) 
+                                                <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->display_name }}</a>
+                                            @else
+                                                <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->username }}</a>
+                                            @endif
                                         </td>
                                         <td style="width:15%">
                                             <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->is_mandatory ? 'Mandatory' : 'Suggested' }}</a>
@@ -425,12 +429,7 @@
             selector: '[data-toggle-select]',
             trigger: 'click',
         });
-        
-        const minutes = 15;
-        const SessionTime = 1000 * 60 * minutes;
-        $(document).ready(function () {                
-            const myTimeout = setTimeout(sessionWarning, SessionTime);                
-        });    
+           
             
         function sessionWarning() {
             if (modal_open == true) {
@@ -466,8 +465,7 @@
                     }
                 });
                 
-                alert('You have been inactive for more than 15 minutes. Your goal have been automatically saved.');  
-                window.location.href= '/goal/goalbank';    
+                   
             }
         } 
 </script>    

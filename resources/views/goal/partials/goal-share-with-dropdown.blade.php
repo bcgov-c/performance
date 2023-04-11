@@ -51,7 +51,6 @@
             //error_log(print_r($employee_list,true));
             usort($employee_list, function($a, $b){ return strcmp($a["name"], $b["name"]); });
         }
-        
         ?>
         
         @foreach ($employee_list as $employee)

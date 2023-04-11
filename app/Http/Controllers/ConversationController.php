@@ -332,6 +332,7 @@ class ConversationController extends Controller
                $shareinfo_0 = DB::table('shared_profiles')                        
                                     ->select('shared_with')
                                     ->where('shared_id', '=', $value)
+                                    ->where('shared_item', 'like', '%2%')
                                     ->get();   
                 foreach($shareinfo_0 as $shareitem){
                    if($shareitem->shared_with == $actualOwner) {
@@ -352,6 +353,7 @@ class ConversationController extends Controller
                 $shareinfo_1 = DB::table('shared_profiles')                        
                                     ->select('shared_with')
                                     ->where('shared_id', '=', $actualOwner)
+                                    ->where('shared_item', 'like', '%2%')
                                     ->get(); 
                 foreach($shareinfo_1 as $shareitem){
                     if($shareitem->shared_with == $value) {
@@ -813,7 +815,8 @@ class ConversationController extends Controller
         $templates = $query->get();
         $searchValue = $request->search ?? '';
         $conversationMessage = Conversation::warningMessage();
-        return view('conversation.templates', compact('templates', 'searchValue', 'conversationMessage', 'viewType', 'user'));
+        $participants = session()->has('original-auth-id') ? User::where('id', Auth::id())->get() : $user->avaliableReportees()->get();
+        return view('conversation.templates', compact('templates', 'searchValue', 'conversationMessage', 'viewType', 'user', 'participants'));
     }
 
     public function templateDetail($id) {
