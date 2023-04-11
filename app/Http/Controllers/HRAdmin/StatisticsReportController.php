@@ -1990,7 +1990,7 @@ class StatisticsReportController extends Controller
     
     public function conversationStatusExport(Request $request) {        
         // sql6 -- Employee Has Open Conversation
-        $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, 
+        $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, email, next_conversation_date, reporting_to_name,
                             organization, level1_program, level2_division, level3_branch, level4
                  ")
                 ->join('conversation_participants', function($join) {
@@ -2034,7 +2034,7 @@ class StatisticsReportController extends Controller
                 
                 
         // sql7 -- Employee Has Completed Conversation
-        $sql_7 = UserDemoJrView::selectRaw("employee_id, employee_name, 
+        $sql_7 = UserDemoJrView::selectRaw("employee_id, employee_name, email, next_conversation_date, reporting_to_name,
                             organization, level1_program, level2_division, level3_branch, level4
                  ")
                 ->join('conversation_participants', function($join) {
@@ -2102,7 +2102,8 @@ class StatisticsReportController extends Controller
                 );
         
                 $columns = ["Employee ID", "Employee Name", "Email",
-                                "Organization", "Level 1", "Level 2", "Level 3", "Level 4",
+                                "Organization","Next Conversation Due","Reporting To",
+                                "Level 1", "Level 2", "Level 3", "Level 4",
                            ];
         
                 $callback = function() use($users, $columns) {
@@ -2114,12 +2115,15 @@ class StatisticsReportController extends Controller
                         $row['Name'] = $user->employee_name;
                         $row['Email'] = $user->email;
                         $row['Organization'] = $user->organization;
+                        $row['next_conversation_date'] = $user->next_conversation_date;
+                        $row['reporting_to_name'] = $user->reporting_to_name;
                         $row['Level 1'] = $user->level1_program;
                         $row['Level 2'] = $user->level2_division;
                         $row['Level 3'] = $user->level3_branch;
                         $row['Level 4'] = $user->level4;
         
                         fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Organization'],
+                                    $row['next_conversation_date'],$row['reporting_to_name'],
                                     $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
                     }
         
@@ -2151,7 +2155,8 @@ class StatisticsReportController extends Controller
                 );
         
                 $columns = ["Employee ID", "Employee Name", "Email",
-                                "Organization", "Level 1", "Level 2", "Level 3", "Level 4",
+                                "Organization","Next Conversation Due","Reporting To",
+                                "Level 1", "Level 2", "Level 3", "Level 4",
                            ];
         
                 $callback = function() use($users, $columns) {
@@ -2163,12 +2168,15 @@ class StatisticsReportController extends Controller
                         $row['Name'] = $user->employee_name;
                         $row['Email'] = $user->email;
                         $row['Organization'] = $user->organization;
+                        $row['next_conversation_date'] = $user->next_conversation_date;
+                        $row['reporting_to_name'] = $user->reporting_to_name;
                         $row['Level 1'] = $user->level1_program;
                         $row['Level 2'] = $user->level2_division;
                         $row['Level 3'] = $user->level3_branch;
                         $row['Level 4'] = $user->level4;
         
                         fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Organization'],
+                                    $row['next_conversation_date'],$row['reporting_to_name'],
                                     $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
                     }
         
