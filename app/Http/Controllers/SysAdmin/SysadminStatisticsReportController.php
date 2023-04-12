@@ -1540,8 +1540,8 @@ class SysadminStatisticsReportController extends Controller
                                     ->where(function($query) use($request) {   
                                             $query->where(function($query) use($request) {   
                                                             $query ->where([
-                                                                ['goals.created_at','>=',$request->start_date],
-                                                                ['goals.created_at','<=',$request->end_date]
+                                                                ['goals.created_at','>=',$request->start_date . ' 00:00:00'],
+                                                                ['goals.created_at','<=',$request->end_date . ' 23:59:59']
                                                             ]);
                                         });
                                     })  
@@ -1551,7 +1551,7 @@ class SysadminStatisticsReportController extends Controller
                             $data["active_goals"] = $active_goals;
                         }
                         if($item == "past_goals"){
-                            $past_goals = Goal::selectRaw("goals.id, users.name, goals.start_date, goals.target_date, goals.created_at, employee_demo.organization, employee_demo.business_unit")
+                            $past_goals = Goal::selectRaw("goals.id, users.name, goals.title, goals.start_date, goals.target_date, goals.created_at, employee_demo.organization, employee_demo.business_unit")
                                     ->join('users', function($join) {
                                         $join->on('users.id', '=', 'goals.user_id');   
                                     }) 
@@ -1563,8 +1563,8 @@ class SysadminStatisticsReportController extends Controller
                                     ->where(function($query) use($request) {   
                                             $query->where(function($query) use($request) {   
                                                             $query ->where([
-                                                                ['goals.created_at','>=',$request->start_date],
-                                                                ['goals.created_at','<=',$request->end_date]
+                                                                ['goals.created_at','>=',$request->start_date . ' 00:00:00'],
+                                                                ['goals.created_at','<=',$request->end_date . ' 23:59:59']
                                                             ]);
                                         });
                                     })  
@@ -1588,8 +1588,8 @@ class SysadminStatisticsReportController extends Controller
                                                         $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                                   })
                                                   ->where([
-                                                        ['conversations.created_at','>=',$request->start_date],
-                                                        ['conversations.created_at','<=',$request->end_date]
+                                                        ['conversations.created_at','>=',$request->start_date . ' 00:00:00'],
+                                                        ['conversations.created_at','<=',$request->end_date . ' 23:59:59']
                                                   ])
                                                   ->where(function($query) {
                                                         $query->where(function($query) {
@@ -1619,12 +1619,12 @@ class SysadminStatisticsReportController extends Controller
                                                         $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                                   })
                                                   ->where([
-                                                        ['conversations.sign_off_time','>=',$request->start_date],
-                                                        ['conversations.supervisor_signoff_time','>=',$request->start_date]
+                                                        ['conversations.sign_off_time','>=',$request->start_date . ' 00:00:00'],
+                                                        ['conversations.supervisor_signoff_time','>=',$request->start_date . ' 00:00:00'],
                                                   ])
                                                   ->where([
-                                                        ['conversations.sign_off_time','<=',$request->end_date],
-                                                        ['conversations.supervisor_signoff_time','<=',$request->end_date]
+                                                        ['conversations.sign_off_time','<=',$request->end_date . ' 23:59:59'],
+                                                        ['conversations.supervisor_signoff_time','<=',$request->end_date . ' 23:59:59'],
                                                   ])        
                                                   ->where(function($query) {
                                                         $query->where(function($query) {
@@ -1677,8 +1677,8 @@ class SysadminStatisticsReportController extends Controller
                                     ->where(function($query) use($request) {   
                                             $query->where(function($query) use($request) {   
                                                             $query ->where([
-                                                                ['goals.created_at','>=',$request->start_date],
-                                                                ['goals.created_at','<=',$request->end_date]
+                                                                ['goals.created_at','>=',$request->start_date . ' 00:00:00'],
+                                                                ['goals.created_at','<=',$request->end_date . ' 23:59:59']
                                                             ]);
                                         });
                                     })  
@@ -1737,8 +1737,8 @@ class SysadminStatisticsReportController extends Controller
                                     ->where(function($query) use($request) {   
                                             $query->where(function($query) use($request) {   
                                                             $query ->where([
-                                                                ['goals.created_at','>=',$request->start_date],
-                                                                ['goals.created_at','<=',$request->end_date]
+                                                                ['goals.created_at','>=',$request->start_date . ' 00:00:00'],
+                                                                ['goals.created_at','<=',$request->end_date . ' 23:59:59']
                                                             ]);
                                         });
                                     })  
