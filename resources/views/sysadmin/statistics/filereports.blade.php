@@ -132,7 +132,8 @@
                     <td>
                         <?php 
                         $dateTime = $item->created_at;
-                        if($dateTime != ''){
+                        if(strtotime($dateTime)){
+                            $dateTime = new DateTime($dateTime);
                             $dateTime = $dateTime->format('Y-m-d');
                         }
                         echo $dateTime; 
@@ -180,7 +181,8 @@
                     <td>
                         <?php 
                         $dateTime = $item->created_at;
-                        if($dateTime != ''){
+                        if(strtotime($dateTime)){
+                            $dateTime = new DateTime($dateTime);
                             $dateTime = $dateTime->format('Y-m-d');
                         }
                         echo $dateTime; 
@@ -226,7 +228,8 @@
                     <td>
                         <?php 
                         $dateTime = $item->created_at;
-                        if($dateTime != ''){
+                        if(strtotime($dateTime)){
+                            $dateTime = new DateTime($dateTime);
                             $dateTime = $dateTime->format('Y-m-d');
                         }
                         echo $dateTime; 
@@ -272,7 +275,8 @@
                     <td>
                         <?php 
                         $dateTime = $item->latest_update;
-                        if($dateTime != ''){
+                        if(strtotime($dateTime)){
+                            $dateTime = new DateTime($dateTime);
                             $dateTime = $dateTime->format('Y-m-d');
                         }
                         echo $dateTime; 
