@@ -41,7 +41,8 @@
                             <td>
                                 <?php 
                                 $dateTime = $data["selected_goal"]->start_date;
-                                if($dateTime != ''){
+                                if(strtotime($dateTime)){
+                                    $dateTime = new DateTime($dateTime);
                                     $dateTime = $dateTime->format('Y-m-d');
                                 }
                                 echo $dateTime; 
@@ -50,7 +51,8 @@
                             <td>
                                 <?php 
                                 $dateTime = $data["selected_goal"]->target_date;
-                                if($dateTime != ''){
+                                if(strtotime($dateTime)){
+                                    $dateTime = new DateTime($dateTime);
                                     $dateTime = $dateTime->format('Y-m-d');
                                 }
                                 echo $dateTime; 
