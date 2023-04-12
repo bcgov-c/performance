@@ -57,8 +57,9 @@
                             <button class="btn btn-link text-left">
                                 <h4>Performance Check-in Template</h4>
                             </button> 
+                            <br/>
                             <span class="float-right"><i class="fa fa-chevron-down"></i></span> 
-                            <button class="btn btn-link text-left">
+                            <button class="btn btn-link text-left" style="color:black">
                                 <p>The Performance check-In template can be used in most situations. 
                                     It includes options to capture progress against goals, celebrate successes, 
                                     discuss ways to improve future performance outcomes, and record an overall performance evaluation.</p>
@@ -84,14 +85,15 @@
                                                 <tr style="border-bottom: solid #FCBA19">
                                                     <th width="20%">Name</th>
                                                     <th width="45%">When to use</th>
-                                                    <th width="15%">Participants</th>
-                                                    <th width="20%">&nbsp;</th>
+                                                    <th width="15%">&nbsp;</th>
+                                                    <th width="20%"></th>
                                                 </tr>
                                                 <tbody style="border-collapse: collapse;">
                                                 <tr style="background-color: #efefef">
                                                     <td>{{$template->name}}</td>
                                                     <td>{{$template->when_to_use}}</td>
                                                     <td>
+                                                        <span style="font-size:0.9em;"><b>Participants</b></span><br/>
                                                         <select class="form-control w-100 select" style="width:100%;" name="participant_id[]" id="participant_id" required>
                                                             <option value="">None Selected</option>
                                                             @foreach($participant_users as $p)
@@ -132,8 +134,9 @@
                             <button class="btn btn-link text-left">
                                 <h4>Other Templates</h4>
                             </button> 
+                            <br/>
                             <span class="float-right"><i class="fa fa-chevron-down"></i></span> 
-                            <button class="btn btn-link text-left">
+                            <button class="btn btn-link text-left"  style="color:black">
                                 <p>These templates can be used as required to support conversations that require a more 
                                     specific focus. Select a topic below to read more in the <em>When to use this template section</em>.</p>
                             </button>   
@@ -149,7 +152,7 @@
                                 <tr style="border-bottom: solid #FCBA19">
                                     <th width="20%">Name</th>
                                     <th width="45%">When to use</th>
-                                    <th width="15%">Participants</th>
+                                    <th width="15%">&nbsp;</th>
                                     <th width="20%">&nbsp;</th>
                                 </tr>
                             </thead>
@@ -160,6 +163,7 @@
                                     <td>{{$template->name}}</td>
                                     <td>{{$template->when_to_use}}</td>
                                     <td>
+                                        <span style="font-size:0.9em;"><b>Participants</b></span><br/>
                                         <select class="form-control w-100 select" style="width:100%;" name="participant_id_{{$template->id}}[]" id="participant_id_{{$template->id}}" required>
                                             <option value="">None Selected</option>
                                             @foreach($participant_users as $p)
