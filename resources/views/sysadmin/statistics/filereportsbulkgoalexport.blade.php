@@ -40,7 +40,7 @@
                             <td><?php echo $item["selected_goal"]->organization; ?></td>
                             <td>
                                 <?php 
-                                $dateTime = $data["selected_goal"]->start_date;
+                                $dateTime = $item["selected_goal"]->start_date;
                                 if(strtotime($dateTime)){
                                     $dateTime = new DateTime($dateTime);
                                     $dateTime = $dateTime->format('Y-m-d');
@@ -50,7 +50,7 @@
                             </td>
                             <td>
                                 <?php 
-                                $dateTime = $data["selected_goal"]->target_date;
+                                $dateTime = $item["selected_goal"]->target_date;
                                 if(strtotime($dateTime)){
                                     $dateTime = new DateTime($dateTime);
                                     $dateTime = $dateTime->format('Y-m-d');
