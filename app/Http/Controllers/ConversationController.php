@@ -940,15 +940,7 @@ class ConversationController extends Controller
         $templates = $query->orderBy('sort')->get();
         $searchValue = $request->search ?? '';
         $conversationMessage = Conversation::warningMessage();
-        $participants = session()->has('original-auth-id') ? User::where('id', Auth::id())->get() : $user->avaliableReportees()->get();
-        return view('conversation.templates', compact('templates', 'searchValue', 'conversationMessage', 'viewType', 'user', 'participants'));
-    }
-
-    public function templateDetail($id) {
-        $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
-        $user = User::find($authId);
-        $template = ConversationTopic::findOrFail($id);
-        $allTemplates = ConversationTopic::all();
+        
         $participants = session()->has('original-auth-id') ? User::where('id', Auth::id())->get() : $user->avaliableReportees()->get();
         $reportingManager = $user->reportingManager()->get();
         $sharedProfile = SharedProfile::where('shared_with', Auth::id())->with('sharedUser')->get()->pluck('sharedUser');
@@ -961,7 +953,42 @@ class ConversationController extends Controller
         $adminemps = User::select('users.*')
         ->whereIn('users.id', $adminShared)->get('id', 'name');
         $participants = $participants->merge($adminemps);
+        
+        
+        
+        $participant_users = array();
+        $i = 0;
+        foreach ($participants as $participant){
+            $participant_users[$i]["id"] = $participant->id;
+            $participant_users[$i]["name"] = $participant->name;
+            $i++;
+        }
+        usort($participant_users, function($a, $b){ return strcmp($a["name"], $b["name"]); });
+        
+        return view('conversation.templates', compact('templates', 'searchValue', 'conversationMessage', 'viewType', 'user', 'participants', 'participant_users'));
+    }
 
+    public function templateDetail($id) {
+        $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
+        $user = User::find($authId);
+        $template = ConversationTopic::findOrFail($id);
+        $allTemplates = ConversationTopic::all();
+        
+        $participants = session()->has('original-auth-id') ? User::where('id', Auth::id())->get() : $user->avaliableReportees()->get();
+        $reportingManager = $user->reportingManager()->get();
+        $sharedProfile = SharedProfile::where('shared_with', Auth::id())->with('sharedUser')->get()->pluck('sharedUser');
+        $participants = $participants->toBase()->merge($reportingManager)->merge($sharedProfile);
+ 
+        $adminShared=SharedProfile::select('shared_with')
+        ->where('shared_id', '=', Auth::id())
+        ->where('shared_item', 'like', '%2%')
+        ->pluck('shared_with');
+        $adminemps = User::select('users.*')
+        ->whereIn('users.id', $adminShared)->get('id', 'name');
+        $participants = $participants->merge($adminemps);
+        
         return view('conversation.partials.template-detail-modal-body', compact('template','allTemplates','participants','reportingManager'));
     }
+    
+
 }

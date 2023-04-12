@@ -94,13 +94,13 @@
                                                     <td>
                                                         <select class="form-control w-100 select" style="width:100%;" name="participant_id[]" id="participant_id" required>
                                                             <option value="">None Selected</option>
-                                                            @foreach($participants as $p)
+                                                            @foreach($participant_users as $p)
                                                             @if(session()->has('view-profile-as'))
-                                                                @if(auth()->user()->id == $p->id)
-                                                                <option value="{{ $p->id }}">{{ $p->name }}</option>
+                                                                @if(auth()->user()->id == $p['id'])
+                                                                <option value="{{ $p['id'] }}">{{ $p['name'] }}</option>
                                                                 @endif
                                                             @else
-                                                            <option value="{{ $p->id }}">{{ $p->name }}</option>
+                                                            <option value="{{ $p['id'] }}">{{ $p['name'] }}</option>
                                                             @endif
                                                             @endforeach
                                                        </select>
@@ -162,13 +162,13 @@
                                     <td>
                                         <select class="form-control w-100 select" style="width:100%;" name="participant_id_{{$template->id}}[]" id="participant_id_{{$template->id}}" required>
                                             <option value="">None Selected</option>
-                                            @foreach($participants as $p)
+                                            @foreach($participant_users as $p)
                                             @if(session()->has('view-profile-as'))
-                                            @if(auth()->user()->id == $p->id)
-                                            <option value="{{ $p->id }}">{{ $p->name }}</option>
-                                            @endif
+                                                @if(auth()->user()->id == $p['id'])
+                                                <option value="{{ $p['id'] }}">{{ $p['name'] }}</option>
+                                                @endif
                                             @else
-                                            <option value="{{ $p->id }}">{{ $p->name }}</option>
+                                            <option value="{{ $p['id'] }}">{{ $p['name'] }}</option>
                                             @endif
                                             @endforeach
                                         </select>
