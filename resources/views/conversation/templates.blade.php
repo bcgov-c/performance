@@ -43,7 +43,7 @@
                                 Review the information below to determine which template best suits your needs. Templates include suggestions for when to select a given conversation topic, questions to consider when having the conversation, and an attestation and sign-off area to formalize the results.
                             </p>
                             <p>
-                                Once you've selected a template for use, select participants and hit "Use this template" to alert participants you want to meet. Conversations will still need to be scheduled independently in your outlook calendar.
+                                Once you've selected a template for use, select participants and hit "Start Conversation" to alert participants you want to meet. Conversations will still need to be scheduled independently in your outlook calendar.
                             </p>
                     </div>
 		</div>
@@ -136,7 +136,7 @@
                             <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
                             <button class="btn btn-link text-left"  style="color:black">
                                 <p>These templates can be used as required to support conversations that require a more 
-                                    specific focus. Select a topic below to read more in the <em>When to use this template section</em>.</p>
+                                    specific focus.</p>
                             </button>   
                     </h5>
                 </h5>
