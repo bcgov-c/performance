@@ -38,8 +38,10 @@ class GoalBankController extends Controller
         $request->firstTime = true;
         $old_selected_emp_ids = []; 
         $old_selected_org_nodes = []; 
+        $old_selected_inherited = []; 
         $eold_selected_emp_ids = []; 
         $eold_selected_org_nodes = [];
+        $eold_selected_inherited = [];
         if ($errors) {
             $old = session()->getOldInput();
             $request->dd_level0 = isset($old['dd_level0']) ? $old['dd_level0'] : null;
@@ -54,6 +56,7 @@ class GoalBankController extends Controller
             $request->userCheck = isset($old['userCheck']) ? $old['userCheck'] : null;
             $old_selected_emp_ids = isset($old['selected_emp_ids']) ? json_decode($old['selected_emp_ids']) : [];
             $old_selected_org_nodes = isset($old['selected_org_nodes']) ? json_decode($old['selected_org_nodes']) : [];
+            $old_selected_inherited = isset($old['selected_inherited']) ? json_decode($old['selected_inherited']) : [];
             $request->edd_level0 = isset($old['edd_level0']) ? $old['edd_level0'] : null;
             $request->edd_level1 = isset($old['edd_level1']) ? $old['edd_level1'] : null;
             $request->edd_level2 = isset($old['edd_level2']) ? $old['edd_level2'] : null;
@@ -66,6 +69,7 @@ class GoalBankController extends Controller
             $request->euserCheck = isset($old['euserCheck']) ? $old['euserCheck'] : null;
             $eold_selected_emp_ids = isset($old['eselected_emp_ids']) ? json_decode($old['eselected_emp_ids']) : [];
             $eold_selected_org_nodes = isset($old['eselected_org_nodes']) ? json_decode($old['eselected_org_nodes']) : [];
+            $eold_selected_inherited = isset($old['eselected_org_nodes']) ? json_decode($old['eselected_inherited']) : [];
         } 
         // no validation and move filter variable to old 
         if ($request->btn_search) {
