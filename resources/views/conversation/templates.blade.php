@@ -50,22 +50,23 @@
 	</div>
         
         <div class="card">
-		<div class="card-header" id="heading_1" style="border-bottom-width: 0px;">
-		<h5 class="mb-1"data-toggle="collapse" data-target="#collapse_1" aria-expanded="1" aria-controls="collapse_1">
-                    <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_1" aria-expanded="false" aria-controls="collapse_1">
-                            
-                            <button class="btn btn-link text-left">
-                                <h4>Performance Check-in Template</h4>
-                            </button> 
-                            <br/>
-                            <span class="float-right"  style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
-                            <button class="btn btn-link text-left" style="color:black">
-                                <p>The Performance check-In template can be used in most situations. 
-                                    It includes options to capture progress against goals, celebrate successes, 
-                                    discuss ways to improve future performance outcomes, and record an overall performance evaluation.</p>
-                            </button>   
+            
+            <div class="card-header" id="heading_1" style="border-bottom-width: 0px;">
+                    <h5 class="mb-1"data-toggle="collapse" data-target="#collapse_1" aria-expanded="1" aria-controls="collapse_1">
+                        <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_1" aria-expanded="false" aria-controls="collapse_1">
+
+                                <button class="btn btn-link text-left">
+                                    <h4>Performance Check-in Template</h4>
+                                </button> 
+                                <br/>
+                                <span class="float-right"  style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
+                                <button class="btn btn-link text-left" style="color:black">
+                                    <p>The Performance check-In template can be used in most situations. 
+                                        It includes options to capture progress against goals, celebrate successes, 
+                                        discuss ways to improve future performance outcomes, and record an overall performance evaluation.</p>
+                                </button>   
+                        </h5>
                     </h5>
-                </h5>
 		</div>
                 
                 <form id="conversation_form_1" action="{{ route ('conversation.store')}}" method="POST">
@@ -126,20 +127,21 @@
         
         
         <div class="card">
-		<div class="card-header" id="heading_2"  style="border-bottom-width: 0px;">
-		<h5 class="mb-2" data-toggle="collapse" data-target="#collapse_2" aria-expanded="1" aria-controls="collapse_2">
-                    <h5 class="mb-2" data-toggle="collapse" data-target="#collapse_2" aria-expanded="false" aria-controls="collapse_2">
-                            <button class="btn btn-link text-left">
-                                <h4>Other Templates</h4>
-                            </button> 
-                            <br/>
-                            <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
-                            <button class="btn btn-link text-left"  style="color:black">
-                                <p>These templates can be used as required to support conversations that require a more 
-                                    specific focus.</p>
-                            </button>   
+		
+            <div class="card-header" id="heading_2" style="border-bottom-width: 0px;">
+                    <h5 class="mb-2" data-toggle="collapse" data-target="#collapse_2" aria-expanded="1" aria-controls="collapse_2">
+                        <h5 class="mb-2" data-toggle="collapse" data-target="#collapse_2" aria-expanded="false" aria-controls="collapse_2">
+                                <button class="btn btn-link text-left">
+                                    <h4>Other Templates</h4>
+                                </button> 
+                                <br/>
+                                <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
+                                <button class="btn btn-link text-left"  style="color:black">
+                                    <p>These templates can be used as required to support conversations that require a more 
+                                        specific focus.</p>
+                                </button>   
+                        </h5>
                     </h5>
-                </h5>
 		</div>
 		
 		<div id="collapse_2" class="collapse" aria-labelledby="heading_2">
