@@ -20,7 +20,7 @@
                             <h6 class="mb-0">
                                 <a role="button" data-toggle="collapse" href="#ecollapse-{{ $eorg->id }}" aria-expanded="false" class="collapsed"
                                     aria-controls="ecollapse-{{ $eorg->id }}">
-                                    <input pid="" class="" type="checkbox"  id="eorgCheck{{ $eorg->id }}" name="eorgCheck[]" 
+                                    <input pid="" class="eorgCheck" type="checkbox"  id="eorgCheck{{ $eorg->id }}" name="eorgCheck[]" 
                                         {{ (is_array(old('eorgCheck')) and in_array($eorg->id, old('eorgCheck'))) ? ' checked' : '' }} value="{{ $eorg->id }}">    
                                     <span class="pr-2">{{ $eorg->name }}</span>
                                     <input pid="" class="einheritedCheck" type="checkbox" id="einheritedCheck{{ $eorg->id }}" name="einheritedCheck[]" style="vertical-align:middle; float:right; margin-right:100px"
@@ -42,7 +42,7 @@
                                                             href="#ecollapse-{{ $eprogram->id }}" aria-expanded="false" 
                                                             class="{{ $eprogram->children->count() == 0 ? 'disabled' : '' }} collapsed"
                                                             aria-controls="ecollapse-{{ $eprogram->id }}">
-                                                            <input pid="{{ $eorg->id }}"  class="" type="checkbox"  id="eorgCheck{{ $eprogram->id }}" 
+                                                            <input pid="{{ $eorg->id }}"  class="eorgCheck" type="checkbox"  id="eorgCheck{{ $eprogram->id }}" name="eorgCheck[]"
                                                                 {{ (is_array(old('eorgCheck')) and in_array($eprogram->id, old('eorgCheck'))) ? ' checked' : '' }} name="eorgCheck[]" value="{{ $eprogram->id }}"> 
                                                             <span class="pr-1">{{ $eprogram->name }}</span>
                                                             <input pid="" class="einheritedCheck" type="checkbox" id="einheritedCheck{{ $eprogram->id }}" name="einheritedCheck[]" style="vertical-align:middle; float:right; margin-right:100px"
@@ -62,7 +62,7 @@
                                                                             <h6 class="mb-0">
                                                                                 <a role="button" data-toggle="collapse" href="#ecollapse-{{ $edivision->id }}" aria-expanded="false" class="collapsed"
                                                                                     aria-controls="ecollapse-{{ $edivision->id }}">
-                                                                                    <input pid="{{ $eprogram->id }}" class="" type="checkbox"  id="eorgCheck{{ $edivision->id }}" name="eorgCheck[]" 
+                                                                                    <input pid="{{ $eprogram->id }}" class="eorgCheck" type="checkbox"  id="eorgCheck{{ $edivision->id }}" name="eorgCheck[]" 
                                                                                         {{ (is_array(old('eorgCheck')) and in_array($edivision->id, old('eorgCheck'))) ? ' checked' : '' }} value="{{ $edivision->id }}">
                                                                                     <span class="pr-1">{{ $edivision->name }}</span>
                                                                                     <input pid="" class="einheritedCheck" type="checkbox" id="einheritedCheck{{ $edivision->id }}" name="einheritedCheck[]" style="vertical-align:middle; float:right; margin-right:100px"
@@ -83,7 +83,7 @@
                                                                                                     <h6 class="mb-0">
                                                                                                         <a role="button" data-toggle="collapse" href="#ecollapse-{{ $ebranch->id }}" aria-expanded="false" class="collapsed"
                                                                                                             aria-controls="ecollapse-{{ $ebranch->id }}">
-                                                                                                            <input pid="{{ $edivision->id }}" class="" type="checkbox"  id="eorgCheck{{ $ebranch->id }}" name="eorgCheck[]" 
+                                                                                                            <input pid="{{ $edivision->id }}" class="eorgCheck" type="checkbox"  id="eorgCheck{{ $ebranch->id }}" name="eorgCheck[]" 
                                                                                                                 {{ (is_array(old('eorgCheck')) and in_array($ebranch->id, old('eorgCheck'))) ? ' checked' : '' }} value="{{ $ebranch->id }}">
                                                                                                             <span class="pr-1">{{ $ebranch->name }}</span>
                                                                                                             <input pid="" class="einheritedCheck" type="checkbox" id="einheritedCheck{{ $ebranch->id }}" name="einheritedCheck[]" style="vertical-align:middle; float:right; margin-right:100px"
@@ -102,7 +102,7 @@
                                                                                                                         <h6 class="mb-0">
                                                                                                                             <a role="button" data-toggle="collapse" href="#ecollapse-{{ $elevel4->id }}" aria-expanded="false" class="collapsed"
                                                                                                                                 aria-controls="ecollapse-{{ $elevel4->id }}" data="{{ $elevel4->id }}">
-                                                                                                                                <input pid="{{ $ebranch->id }}"  class="" type="checkbox"  id="eorgCheck{{ $elevel4->id }}" name="eorgCheck[]" 
+                                                                                                                                <input pid="{{ $ebranch->id }}"  class="eorgCheck" type="checkbox"  id="eorgCheck{{ $elevel4->id }}" name="eorgCheck[]" 
                                                                                                                                     {{ (is_array(old('eorgCheck')) and in_array($elevel4->id, old('eorgCheck'))) ? ' checked' : '' }} value="{{ $elevel4->id }}">
                                                                                                                                 <span class="pr-1">{{ $elevel4->name }}</span>
                                                                                                                                 <input pid="" class="einheritedCheck" type="checkbox" id="einheritedCheck{{ $elevel4->id }}" name="einheritedCheck[]" style="vertical-align:middle; float:right; margin-right:100px"
@@ -122,7 +122,7 @@
                                                                                                     <h6 class="mb-0">
                                                                                                         <a role="button" data-toggle="collapse" href="#ecollapse-{{ $ebranch->id }}" aria-expanded="false" class="collapsed"
                                                                                                             aria-controls="ecollapse-{{ $ebranch->id }}" data="{{ $ebranch->id }}">
-                                                                                                            <input pid="{{ $edivision->id }}" class="" type="checkbox"  id="eorgCheck{{ $ebranch->id }}" name="eorgCheck[]" 
+                                                                                                            <input pid="{{ $edivision->id }}" class="eorgCheck" type="checkbox"  id="eorgCheck{{ $ebranch->id }}" name="eorgCheck[]" 
                                                                                                                 {{ (is_array(old('eorgCheck')) and in_array($ebranch->id, old('eorgCheck'))) ? ' checked' : '' }} value="{{ $ebranch->id }}">
                                                                                                             <span class="pr-1">{{ $ebranch->name }}</span>
                                                                                                             <input pid="" class="einheritedCheck" type="checkbox" id="einheritedCheck{{ $ebranch->id }}" name="einheritedCheck[]" style="vertical-align:middle; float:right; margin-right:100px"
@@ -143,7 +143,7 @@
                                                                             <h6 class="mb-0">
                                                                                 <a role="button" data-toggle="collapse" href="#ecollapse-{{ $edivision->id }}" aria-expanded="false" class="collapsed"
                                                                                     aria-controls="ecollapse-{{ $edivision->id }}" data="{{ $edivision->id }}">
-                                                                                    <input pid="{{ $eprogram->id }}" class="" type="checkbox"  id="eorgCheck{{ $edivision->id }}" name="eorgCheck[]" 
+                                                                                    <input pid="{{ $eprogram->id }}" class="eorgCheck" type="checkbox"  id="eorgCheck{{ $edivision->id }}" name="eorgCheck[]" 
                                                                                         {{ (is_array(old('eorgCheck')) and in_array($edivision->id, old('eorgCheck'))) ? ' checked' : '' }} value="{{ $edivision->id }}">
                                                                                     <span class="pr-1">{{ $edivision->name }}</span>
                                                                                     <input pid="" class="einheritedCheck" type="checkbox" id="einheritedCheck{{ $edivision->id }}" name="einheritedCheck[]" style="vertical-align:middle; float:right; margin-right:100px"
@@ -164,7 +164,7 @@
                                                     <h6 class="mb-0">
                                                         <a role="button" data-toggle="collapse" href="#ecollapse-{{ $eprogram->id }}" aria-expanded="false" class="collapsed"
                                                             aria-controls="ecollapse-{{ $eprogram->id }}" data="{{ $eprogram->id }}">
-                                                            <input pid="{{ $eorg->id }}" class="" type="checkbox"  id="eorgCheck{{ $eprogram->id }}" name="eorgCheck[]" 
+                                                            <input pid="{{ $eorg->id }}" class="eorgCheck" type="checkbox"  id="eorgCheck{{ $eprogram->id }}" name="eorgCheck[]" 
                                                                 {{ (is_array(old('eorgCheck')) and in_array($eprogram->id, old('eorgCheck'))) ? ' checked' : '' }}
                                                                 value="{{ $eprogram->id }}">
                                                             <span class="pr-1">{{ $eprogram->name }}</span>
@@ -186,7 +186,7 @@
                         <div class="card-header" id="eheading-{{ $eorg->id }}">
                             <h6 class="mb-0">
                                 <a role="button" class="disabled collapsed">
-                                    <input pid="" class="" type="checkbox"  id="eorgCheck{{ $eorg->id }}" name="eorgCheck[]" 
+                                    <input pid="" class="eorgCheck" type="checkbox"  id="eorgCheck{{ $eorg->id }}" name="eorgCheck[]" 
                                         {{ (is_array(old('eorgCheck')) and in_array($eorg->id, old('eorgCheck'))) ? ' checked' : '' }} value="{{ $eorg->id }}">
                                     <span class="pr-1">{{ $eorg->name }}</span>
                                     <input pid="" class="einheritedCheck" type="checkbox" id="einheritedCheck{{ $eorg->id }}" name="einheritedCheck[]" style="vertical-align:middle; float:right; margin-right:100px"
@@ -384,6 +384,7 @@
         $("#eaccordion-level0 .card-header").on("click","a", function(e) {
             if (e.target.tagName != "INPUT") {
                 // do link
+                //alert("Doing link functionality");
             } else {
                 e.stopPropagation();
                 var location = $(this).attr('href') ;
@@ -394,8 +395,10 @@
                         // to-do : checked all the following 
                         items = $(location).find('input:checkbox');
                         $.each(items, function(index, item) {
-                            $(item).prop('checked', true);
-                            $(item).prop("indeterminate", false);
+                            if(item.name == 'eorgCheck[]'){
+                                $(item).prop('checked', true);
+                                $(item).prop("indeterminate", false);
+                            }
                         })  
                         // TODO : add to selected listed
                         //if no employee class, then have to add all 
@@ -414,30 +417,34 @@
                         }
                         nodes = $(location).find('input:checkbox')
                         $.each( nodes, function( index, chkbox ) {
-                            if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
-                                $.each(eg_employees_by_org[chkbox.value], function(index, emp) {
-                                    if (!g_selected_orgnodes.includes(emp.employee_id)) {
-                                        g_selected_orgnodes.push( emp.employee_id );    
-                                    }
-                                })
-                            } else {
-                                    if (!g_selected_orgnodes.includes(chkbox.value)) {
-                                        g_selected_orgnodes.push( chkbox.value);    
-                                    }
+                            if(chkbox.name == 'eorgCheck[]'){
+                                if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
+                                    $.each(eg_employees_by_org[chkbox.value], function(index, emp) {
+                                        if (!g_selected_orgnodes.includes(emp.employee_id)) {
+                                            g_selected_orgnodes.push( emp.employee_id );    
+                                        }
+                                    })
+                                } else {
+                                        if (!g_selected_orgnodes.includes(chkbox.value)) {
+                                            g_selected_orgnodes.push( chkbox.value);    
+                                        }
+                                }
                             }
                         });
                     } else {
                         // unchecked the children 
                         items = $(location).find('input:checkbox');
                         $.each(items, function(index, item) {
-                            $(item).prop('checked', false);
-                            $(item).prop("indeterminate", false);
-                        })  
-                            emp_id = $(e.target).val();  
-                            var index = $.inArray(emp_id, g_selected_orgnodes);
-                            if (index > -1) {
-                                g_selected_orgnodes.splice( index, 1 );
+                            if(item.name == 'eorgCheck[]'){
+                                $(item).prop('checked', false);
+                                $(item).prop("indeterminate", false);
                             }
+                        })  
+                        emp_id = $(e.target).val();  
+                        var index = $.inArray(emp_id, g_selected_orgnodes);
+                        if (index > -1) {
+                            g_selected_orgnodes.splice( index, 1 );
+                        }
                         node = $(e.target).val();
                         if (eg_employees_by_org.hasOwnProperty( node )) {
                             $.each(eg_employees_by_org[ node  ], function(index, emp) {
@@ -448,18 +455,20 @@
                         }
                         nodes = $(location).find('input:checkbox');
                         $.each( nodes, function( index, chkbox ) {
-                            if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
-                                $.each(eg_employees_by_org[chkbox.value], function(index, emp) {
-                                    var index = $.inArray(emp.employee_id, g_selected_orgnodes);
-                                    if (index > -1) {
-                                        g_selected_orgnodes.splice( index, 1 );
-                                    }
-                                })
-                            } else {
-                                    var index = $.inArray(chkbox.value, g_selected_orgnodes);
-                                    if (index > -1) {
-                                        g_selected_orgnodes.splice( index, 1 );
-                                    }
+                            if(chkbox.name == 'eorgCheck[]'){
+                                if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
+                                    $.each(eg_employees_by_org[chkbox.value], function(index, emp) {
+                                        var index = $.inArray(emp.employee_id, g_selected_orgnodes);
+                                        if (index > -1) {
+                                            g_selected_orgnodes.splice( index, 1 );
+                                        }
+                                    })
+                                } else {
+                                        var index = $.inArray(chkbox.value, g_selected_orgnodes);
+                                        if (index > -1) {
+                                            g_selected_orgnodes.splice( index, 1 );
+                                        }
+                                }
                             }
                         });
                     }      
