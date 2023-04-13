@@ -20,6 +20,7 @@ use App\Http\Requests\Conversation\UpdateRequest;
 use App\Http\Requests\Conversation\SignoffRequest;
 use App\Http\Requests\Conversation\UnSignoffRequest;
 use App\Http\Requests\Conversation\ConversationRequest;
+use Illuminate\Support\Facades\Log;
 
 class ConversationController extends Controller
 {
@@ -59,10 +60,12 @@ class ConversationController extends Controller
                                     ->where('participant_id', '<>', $authId)
                                     ->distinct()
                                     ->get();
+        
         $supervisor_ids = array();
         foreach($history_supervisors as $history_supervisor){
             $supervisor_ids[] = $history_supervisor->participant_id;
         }
+        Log::info('historic supervisors: '. print_r($supervisor_ids,true));
         
         //get historic team members
         $history_teams = DB::table('conversation_participants')
@@ -104,6 +107,7 @@ class ConversationController extends Controller
                     array_push($sharedSupervisorIds, $supervisor_id);
                 }
             }
+            Log::info('full supervisors: '. print_r($sharedSupervisorIds,true));
             
             $query->where(function($query) use ($authId, $supervisorId, $sharedSupervisorIds, $viewType) {
                 $query->where('user_id', $authId)->
@@ -170,6 +174,9 @@ class ConversationController extends Controller
                     $query->whereIn('participant_id', $sharedSupervisorIds);
                 });
             });
+            
+            //Log::info(print_r($query->toSql(),true)); 
+            //11Log::info(print_r($query->getBindings(),true)); 
             
              // With My Team
              if ($sharedSupervisorIds && $sharedSupervisorIds[0]) {
