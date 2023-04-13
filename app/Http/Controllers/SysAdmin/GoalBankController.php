@@ -59,6 +59,7 @@ class GoalBankController extends Controller
             $request->edd_level2 = isset($old['edd_level2']) ? $old['edd_level2'] : null;
             $request->edd_level3 = isset($old['edd_level3']) ? $old['edd_level3'] : null;
             $request->edd_level4 = isset($old['edd_level4']) ? $old['edd_level4'] : null;
+            $request->edd_superv = isset($old['edd_superv']) ? $old['edd_superv'] : null; 
             $request->ecriteria = isset($old['ecriteria']) ? $old['ecriteria'] : null;
             $request->esearch_text = isset($old['esearch_text']) ? $old['esearch_text'] : null;
             $request->eorgCheck = isset($old['eorgCheck']) ? $old['eorgCheck'] : null;
@@ -88,6 +89,7 @@ class GoalBankController extends Controller
                 'edd_level2' => $request->edd_level2,
                 'edd_level3' => $request->edd_level3,
                 'edd_level4' => $request->edd_level4,
+                'edd_superv' => $request->edd_superv, 
                 'ecriteria' => $request->ecriteria,
                 'esearch_text' => $request->esearch_text,
                 'eorgCheck' => $request->eorgCheck,
@@ -99,6 +101,7 @@ class GoalBankController extends Controller
         $request->session()->flash('dd_level2', $request->dd_level2);
         $request->session()->flash('dd_level3', $request->dd_level3);
         $request->session()->flash('dd_level4', $request->dd_level4);
+        $request->session()->flash('dd_superv', $request->dd_superv); 
         $request->session()->flash('userCheck', $request->userCheck);  // Dynamic load 
         $request->session()->flash('euserCheck', $request->euserCheck);  // Dynamic load 
         $request->session()->flash('edd_level0', $request->edd_level0);
@@ -106,6 +109,7 @@ class GoalBankController extends Controller
         $request->session()->flash('edd_level2', $request->edd_elevel2);
         $request->session()->flash('edd_level3', $request->edd_elevel3);
         $request->session()->flash('edd_level4', $request->edd_elevel4);
+        $request->session()->flash('edd_superv', $request->edd_superv); 
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, "");
         $sql = clone $demoWhere; 
@@ -149,6 +153,7 @@ class GoalBankController extends Controller
             $request->dd_level2 = isset($old['dd_level2']) ? $old['dd_level2'] : null;
             $request->dd_level3 = isset($old['dd_level3']) ? $old['dd_level3'] : null;
             $request->dd_level4 = isset($old['dd_level4']) ? $old['dd_level4'] : null;
+            $request->dd_superv = isset($old['dd_superv']) ? $old['dd_superv'] : null; 
             $request->search_text = isset($old['search_text']) ? $old['search_text'] : null;
             $request->orgCheck = isset($old['orgCheck']) ? $old['orgCheck'] : null;
             $request->userCheck = isset($old['userCheck']) ? $old['userCheck'] : null;
@@ -159,8 +164,9 @@ class GoalBankController extends Controller
             $request->edd_level2 = isset($old['edd_level2']) ? $old['edd_level2'] : null;
             $request->edd_level3 = isset($old['edd_level3']) ? $old['edd_level3'] : null;
             $request->edd_level4 = isset($old['edd_level4']) ? $old['edd_level4'] : null;
-            $old_selected_emp_ids = isset($old['selected_emp_ids']) ? json_decode($old['selected_emp_ids']) : [];
-            $old_selected_org_nodes = isset($old['selected_org_nodes']) ? json_decode($old['selected_org_nodes']) : [];
+            $request->edd_superv = isset($old['edd_superv']) ? $old['edd_superv'] : null; 
+            $eold_selected_emp_ids = isset($old['eselected_emp_ids']) ? json_decode($old['eselected_emp_ids']) : []; 
+            $eold_selected_org_nodes = isset($old['eselected_org_nodes']) ? json_decode($old['eselected_org_nodes']) : []; 
         } 
         // no validation and move filter variable to old 
         if ($request->btn_search) {
@@ -170,6 +176,7 @@ class GoalBankController extends Controller
                 'dd_level2' => $request->dd_level2,
                 'dd_level3' => $request->dd_level3,
                 'dd_level4' => $request->dd_level4,
+                'dd_superv' => $request->dd_superv, 
                 'criteria' => $request->criteria,
                 'search_text' => $request->search_text,
                 'orgCheck' => $request->orgCheck,
@@ -183,6 +190,7 @@ class GoalBankController extends Controller
                 'edd_level2' => $request->edd_level2,
                 'edd_level3' => $request->edd_level3,
                 'edd_level4' => $request->edd_level4,
+                'edd_superv' => $request->edd_superv, 
                 'ecriteria' => $request->ecriteria,
                 'esearch_text' => $request->esearch_text,
                 'eorgCheck' => $request->eorgCheck,
@@ -194,12 +202,14 @@ class GoalBankController extends Controller
         $request->session()->flash('dd_level2', $request->dd_level2);
         $request->session()->flash('dd_level3', $request->dd_level3);
         $request->session()->flash('dd_level4', $request->dd_level4);
+        $request->session()->flash('dd_superv', $request->dd_superv); 
         $request->session()->flash('userCheck', $request->userCheck);  // Dynamic load 
         $request->session()->flash('edd_level0', $request->edd_level0);
         $request->session()->flash('edd_level1', $request->edd_level1);
         $request->session()->flash('edd_level2', $request->edd_level2);
         $request->session()->flash('edd_level3', $request->edd_level3);
         $request->session()->flash('edd_level4', $request->edd_level4);
+        $request->session()->flash('edd_superv', $request->edd_superv); 
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, "");
         $sql = clone $demoWhere; 
@@ -282,6 +292,7 @@ class GoalBankController extends Controller
             $request->dd_level2 = isset($old['dd_level2']) ? $old['dd_level2'] : null;
             $request->dd_level3 = isset($old['dd_level3']) ? $old['dd_level3'] : null;
             $request->dd_level4 = isset($old['dd_level4']) ? $old['dd_level4'] : null;
+            $request->dd_superv = isset($old['dd_superv']) ? $old['dd_superv'] : null; 
             $request->search_text = isset($old['search_text']) ? $old['search_text'] : null;
             $request->orgCheck = isset($old['orgCheck']) ? $old['orgCheck'] : null;
             $request->userCheck = isset($old['userCheck']) ? $old['userCheck'] : null;
@@ -306,6 +317,7 @@ class GoalBankController extends Controller
                 'dd_level2' => $request->dd_level2,
                 'dd_level3' => $request->dd_level3,
                 'dd_level4' => $request->dd_level4,
+                'dd_superv' => $request->dd_superv, 
                 'criteria' => $request->criteria,
                 'search_text' => $request->search_text,
                 'orgCheck' => $request->orgCheck,
@@ -319,6 +331,7 @@ class GoalBankController extends Controller
                 'edd_level2' => $request->edd_level2,
                 'edd_level3' => $request->edd_level3,
                 'edd_level4' => $request->edd_level4,
+                'edd_superv' => $request->edd_superv, 
                 'ecriteria' => $request->ecriteria,
                 'esearch_text' => $request->esearch_text,
                 'eorgCheck' => $request->eorgCheck,
@@ -330,12 +343,14 @@ class GoalBankController extends Controller
         $request->session()->flash('dd_level2', $request->dd_level2);
         $request->session()->flash('dd_level3', $request->dd_level3);
         $request->session()->flash('dd_level4', $request->dd_level4);
+        $request->session()->flash('dd_superv', $request->dd_superv); 
         $request->session()->flash('userCheck', $request->userCheck);  // Dynamic load 
         $request->session()->flash('edd_level0', $request->edd_level0);
         $request->session()->flash('edd_level1', $request->edd_level1);
         $request->session()->flash('edd_level2', $request->edd_level2);
         $request->session()->flash('edd_level3', $request->edd_level3);
         $request->session()->flash('edd_level4', $request->edd_level4);
+        $request->session()->flash('edd_superv', $request->edd_superv); 
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, "");
         $sql = clone $demoWhere; 
@@ -431,12 +446,14 @@ class GoalBankController extends Controller
         $request->session()->flash('dd_level2', $request->dd_level2);
         $request->session()->flash('dd_level3', $request->dd_level3);
         $request->session()->flash('dd_level4', $request->dd_level4);
+        $request->session()->flash('dd_superv', $request->dd_superv); 
         $request->session()->flash('userCheck', $request->userCheck);  // Dynamic load 
         $request->session()->flash('add_level0', $request->add_level0);
         $request->session()->flash('add_level1', $request->add_level1);
         $request->session()->flash('add_level2', $request->add_level2);
         $request->session()->flash('add_level3', $request->add_level3);
         $request->session()->flash('add_level4', $request->add_level4);
+        $request->session()->flash('add_superv', $request->add_superv); 
         // Matched Employees 
         $demoWhere = $this->baseFilteredWhere($request, "");
         $sql = clone $demoWhere; 
@@ -670,7 +687,7 @@ class GoalBankController extends Controller
         ->union( $sql_level0->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row") ) )
         ->pluck('count_row', 'o.id');  
         // Employee ID by Tree ID
-        $eempIdsByOrgId = [];
+        $aempIdsByOrgId = []; 
         $demoWhere = $this->baseFilteredWhere($request, "a");
         $sql = clone $demoWhere; 
         $rows = $sql->select('orgid AS id', 'employee_id')
@@ -699,16 +716,16 @@ class GoalBankController extends Controller
                     'u.level4', 
                     'u.deptid'
                 ])
-                ->when($request->dd_superv == 'sup', function($q) { return $q->whereRaw("EXISTS (SELECT DISTINCT 1 FROM users AS u1, users AS su WHERE su.reporting_to = u1.id AND u1.employee_id = u.employee_id)"); })
-                ->when($request->dd_superv == 'non', function($q) { return $q->whereRaw("NOT EXISTS (SELECT DISTINCT 1 FROM users AS u2, users AS su WHERE su.reporting_to = u2.id AND u2.employee_id = u.employee_id)"); })
+                ->when($request->{$option.'dd_superv'} == 'sup', function($q) { return $q->whereRaw("EXISTS (SELECT DISTINCT 1 FROM users AS u1, users AS su WHERE su.reporting_to = u1.id AND u1.employee_id = u.employee_id)"); }) 
+                ->when($request->{$option.'dd_superv'} == 'non', function($q) { return $q->whereRaw("NOT EXISTS (SELECT DISTINCT 1 FROM users AS u2, users AS su WHERE su.reporting_to = u2.id AND u2.employee_id = u.employee_id)"); }) 
                 ->selectRaw("CASE WHEN (SELECT DISTINCT 1 FROM users AS u3, users AS su WHERE su.reporting_to = u3.id AND u3.employee_id = u.employee_id) = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor");
             return Datatables::of($employees)
-            ->addColumn($option.'select_users', static function ($employee) use ($option) {
-                return '<input pid="1335" type="checkbox" id="'.$option.'userCheck'. 
-                    $employee->employee_id.'" name="'.$option.'userCheck[]" value="'.$employee->employee_id.'" class="dt-body-center">';
-            })
-            ->rawColumns([$option.'select_users', 'action'])
-            ->make(true);
+                ->addColumn($option.'select_users', static function ($employee) use ($option) { 
+                    return '<input pid="1335" type="checkbox" id="'.$option.'userCheck'.  
+                        $employee->employee_id.'" name="'.$option.'userCheck[]" value="'.$employee->employee_id.'" class="dt-body-center">'; 
+                }) 
+                ->rawColumns([$option.'select_users', 'action']) 
+                ->make(true); 
         }
     }
 
@@ -889,13 +906,12 @@ class GoalBankController extends Controller
     }
 
     public function getUsers(Request $request) {
-        $search = $request->search;
-        $users =  User::whereRaw("name like '%".$search."%'")
-                    ->whereNotNull('email')->paginate();
+        $users =  User::whereRaw("name like '%{$request->search}%'") 
+            ->whereNotNull('email')->paginate(); 
         return ['data'=> $users];
     }
 
-    public function getEmployees(Request $request,  $id, $option = null) {
+    public function getEmployees(Request $request, $id, $option = null) { 
         list($sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4) = $this->baseFilteredSQLs($request, $option);
         $rows = $sql_level4->where('id', $id)
             ->union( $sql_level3->where('id', $id) )
@@ -904,16 +920,14 @@ class GoalBankController extends Controller
             ->union( $sql_level0->where('id', $id) );
         $employees = $rows->orderBy('employee_name')->get();
         $parent_id = $id;
-        $page = 'shared.goalbank.partials.employee';
-        if($option == 'e'){
+        $page = 'shared.goalbank.partials.'.$option.'employee'; 
+        if($option == 'e') { 
             $eparent_id = $parent_id;
             $eemployees = $employees;
-            $page = 'shared.goalbank.partials.'.$option.'employee';
         } 
-        if($option == 'a'){
+        if($option == 'a') { 
             $aparent_id = $parent_id;
             $aemployees = $employees;
-            $page = 'shared.goalbank.partials.'.$option.'employee';
         } 
         return view($page, compact($option.'parent_id', $option.'employees') ); 
     }
@@ -922,7 +936,7 @@ class GoalBankController extends Controller
         return [
             'all' => 'All',
             'employee_id' => 'Employee ID', 
-            'employee_'=> 'Employee Name',
+            'employee_name'=> 'Employee Name', 
             'jobcode_desc' => 'Classification', 
             'deptid' => 'Department ID'
         ];
@@ -933,29 +947,22 @@ class GoalBankController extends Controller
             'all' => 'All',
             'sup' => 'Supervisors Only', 
             'non'=> 'Non-Supervisors Only',
-        ];
-    }
-
-    protected function baseFilteredWhere($request, $option = null) {
-        $authId = Auth::id();
-        $field0 = "{$option}dd_level0";
-        $field1 = "{$option}dd_level1";
-        $field2 = "{$option}dd_level2";
-        $field3 = "{$option}dd_level3";
-        $field4 = "{$option}dd_level4";
-        $criteria = "{$option}criteria";
-        $search_text = "{$option}search_text";
-        return UserDemoJrView::from('user_demo_jr_view AS u')
-            ->whereNull('u.date_deleted')
-            ->when($request->{$field0}, function($q) use($request, $field0) { return $q->whereRaw("u.organization_key = {$request->{$field0}}"); })
-            ->when($request->{$field1}, function($q) use($request, $field1) { return $q->whereRaw("u.level1_key = {$request->{$field1}}"); })
-            ->when($request->{$field2}, function($q) use($request, $field2) { return $q->whereRaw("u.level2_key = {$request->{$field2}}"); })
-            ->when($request->{$field3}, function($q) use($request, $field3) { return $q->whereRaw("u.level3_key = {$request->{$field3}}"); })
-            ->when($request->{$field4}, function($q) use($request, $field4) { return $q->whereRaw("u.level4_key = {$request->{$field4}}"); })
-            ->when($request->{$search_text} && $request->{$criteria} != 'all', function($q) use ($request, $criteria, $search_text) { return $q->whereRaw("u.{$request->{$criteria}} like '%{$request->{$search_text}}%'"); })
-            ->when($request->{$search_text} && $request->{$criteria} == 'all', function($q) use($request, $search_text) { return $q->whereRaw("(u.employee_id LIKE '%{$request->{$search_text}}%' OR u.employee_name LIKE '%{$request->{$search_text}}%' OR u.jobcode_desc LIKE '%{$request->{$search_text}}%' OR u.deptid LIKE '%{$request->{$search_text}}%')"); });
-    }
-
+        ]; 
+    } 
+ 
+    protected function baseFilteredWhere($request, $option = null) { 
+        $authId = Auth::id(); 
+        return UserDemoJrView::from('user_demo_jr_view AS u') 
+            ->whereNull('u.date_deleted') 
+            ->when("{$request->{$option.'dd_level0'}}", function($q) use($request, $option) { return $q->whereRaw("u.organization_key = {$request->{$option.'dd_level0'}}"); }) 
+            ->when("{$request->{$option.'dd_level1'}}", function($q) use($request, $option) { return $q->whereRaw("u.level1_key = {$request->{$option.'dd_level1'}}"); }) 
+            ->when("{$request->{$option.'dd_level2'}}", function($q) use($request, $option) { return $q->whereRaw("u.level2_key = {$request->{$option.'dd_level2'}}"); }) 
+            ->when("{$request->{$option.'dd_level3'}}", function($q) use($request, $option) { return $q->whereRaw("u.level3_key = {$request->{$option.'dd_level3'}}"); }) 
+            ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); }) 
+            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("u.{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); }) 
+            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(u.employee_id LIKE '%{$request->{$option.'search_text'}}%' OR u.employee_name LIKE '%{$request->{$option.'search_text'}}%' OR u.jobcode_desc LIKE '%{$request->{$option.'search_text'}}%' OR u.deptid LIKE '%{$request->{$option.'search_text'}}%')"); }); 
+    } 
+ 
     protected function baseFilteredSQLs($request, $option = null) {
         $demoWhere = $this->baseFilteredWhere($request, $option);
         $sql_level0 = clone $demoWhere; 
@@ -1046,7 +1053,7 @@ class GoalBankController extends Controller
                 ->where('is_library', true)
                 ->whereIn('by_admin', [1, 2])
                 ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
-                    $q->where(function($query) use ($request) {
+                    return $q->where(function($query) use ($request) { 
                         return $query->whereRaw("goals.title LIKE '%".$request->search_text."%'")
                             ->orWhereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%')");
                     });
@@ -1057,6 +1064,7 @@ class GoalBankController extends Controller
                 ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
                     return $q->whereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%')");
                 })
+                ->orderBy('goals.display_name') 
                 ->distinct()
                 ->select
                     (
@@ -1078,6 +1086,7 @@ class GoalBankController extends Controller
                         ->selectRAW('count(distinct goal_bank_orgs.id)')
                 ] )
                 ->addSelect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
+                // Log::info($query->toSQL()); 
             return Datatables::of($query)
                 ->addIndexColumn()
                 ->addcolumn('click_title', function ($row) {
