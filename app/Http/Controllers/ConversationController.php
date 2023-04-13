@@ -943,7 +943,7 @@ class ConversationController extends Controller
         
         $participants = session()->has('original-auth-id') ? User::where('id', Auth::id())->get() : $user->avaliableReportees()->get();
         $reportingManager = $user->reportingManager()->get();
-        $sharedProfile = SharedProfile::where('shared_with', Auth::id())->with('sharedUser')->get()->pluck('sharedUser');
+        $sharedProfile = SharedProfile::where('shared_with', Auth::id())->with('sharedUser')->where('shared_item', 'like', '%2%')->get()->pluck('sharedUser');
         $participants = $participants->toBase()->merge($reportingManager)->merge($sharedProfile);
  
         $adminShared=SharedProfile::select('shared_with')
@@ -951,7 +951,7 @@ class ConversationController extends Controller
         ->where('shared_item', 'like', '%2%')
         ->pluck('shared_with');
         $adminemps = User::select('users.*')
-        ->whereIn('users.id', $adminShared)->get('id', 'name');
+        ->whereIn('usersssh.id', $adminShared)->get('id', 'name');
         $participants = $participants->merge($adminemps);
         
         
