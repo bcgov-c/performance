@@ -32,7 +32,7 @@
                             <button class="btn btn-link" >
                                 <h4>Instructions</h4> 
                             </button>                        
-                            <span class="float-right"><i class="fa fa-chevron-down"></i></span>    
+                            <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span>    
                     </h5>
                 </h5>
 		</div>
@@ -58,7 +58,7 @@
                                 <h4>Performance Check-in Template</h4>
                             </button> 
                             <br/>
-                            <span class="float-right"><i class="fa fa-chevron-down"></i></span> 
+                            <span class="float-right"  style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
                             <button class="btn btn-link text-left" style="color:black">
                                 <p>The Performance check-In template can be used in most situations. 
                                     It includes options to capture progress against goals, celebrate successes, 
@@ -76,7 +76,6 @@
                         @foreach ($templates as $template)
                         @if(strtolower($template->name) === 'performance check-in')   
                             <input type="hidden" name="conversation_topic_id" value="{{$template->id}}">    
-                            <div class="card border ">
                                 <div class="card-body p-2">
                                     <div class="row">
                                         <div class="col-12">
@@ -118,7 +117,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
                         @endif
                         @endforeach
                     </div>
@@ -135,7 +133,7 @@
                                 <h4>Other Templates</h4>
                             </button> 
                             <br/>
-                            <span class="float-right"><i class="fa fa-chevron-down"></i></span> 
+                            <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
                             <button class="btn btn-link text-left"  style="color:black">
                                 <p>These templates can be used as required to support conversations that require a more 
                                     specific focus. Select a topic below to read more in the <em>When to use this template section</em>.</p>
@@ -147,7 +145,7 @@
 		<div id="collapse_2" class="collapse" aria-labelledby="heading_2">
                     <div class="card-body">
                         @csrf
-                        <table>
+                        <table class="table table-striped">
                             <thead>
                                 <tr style="border-bottom: solid #FCBA19">
                                     <th width="20%">Name</th>
@@ -159,7 +157,7 @@
                             <tbody>
                                 @foreach ($templates as $template)
                                 @if(strtolower($template->name) !== 'performance check-in')
-                                <tr style="background-color: #efefef">
+                                <tr>
                                     <td>{{$template->name}}</td>
                                     <td>{{$template->when_to_use}}</td>
                                     <td>
