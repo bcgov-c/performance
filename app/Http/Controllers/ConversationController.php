@@ -173,10 +173,11 @@ class ConversationController extends Controller
                 orWhereHas('conversationParticipants', function ($query) use ($sharedSupervisorIds) {
                     $query->whereIn('participant_id', $sharedSupervisorIds);
                 });
-            });
+            })
+            ->WhereIn('supervisor_signoff_id', $sharedSupervisorIds);
             
-            //Log::info(print_r($query->toSql(),true)); 
-            //11Log::info(print_r($query->getBindings(),true)); 
+            Log::info(print_r($query->toSql(),true)); 
+            Log::info(print_r($query->getBindings(),true)); 
             
              // With My Team
              if ($sharedSupervisorIds && $sharedSupervisorIds[0]) {
