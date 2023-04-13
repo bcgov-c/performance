@@ -20,6 +20,7 @@ use App\Http\Requests\Conversation\UpdateRequest;
 use App\Http\Requests\Conversation\SignoffRequest;
 use App\Http\Requests\Conversation\UnSignoffRequest;
 use App\Http\Requests\Conversation\ConversationRequest;
+use Illuminate\Support\Facades\Log;
 
 class ConversationController extends Controller
 {
@@ -170,6 +171,9 @@ class ConversationController extends Controller
                     $query->whereIn('participant_id', $sharedSupervisorIds);
                 });
             });
+            
+            Log::info(print_r($query->toSql(),true)); 
+            Log::info(print_r($query->getBindings(),true)); 
             
              // With My Team
              if ($sharedSupervisorIds && $sharedSupervisorIds[0]) {
