@@ -87,6 +87,16 @@
             border-top: none !important;
         }
         
+        #notification-table input[name='itemCheck[]'] {
+            width: 1.1em;
+            height: 1.1em;
+        }
+
+        input[name='select_all'] {
+            width: 1.1em;
+            height: 1.1em;
+        }
+
         hr.separator {
                 border: 1px solid #EED202;
                 border-radius: 5px;
@@ -141,7 +151,7 @@
                 list = ( $('#notification-table input:checkbox') );
 
                 $.each(list, function( index, item ) {
-                    var pos = $.inArray(item.value , g_selected_employees);
+                    var pos = $.inArray( parseInt(item.value) , g_selected_employees);
                     // console.log( pos + ' - ' + item.value + ' - ' + g_selected_employees);
                     if ( pos === -1 ) {
                         $(item).prop('checked', false); // unchecked
@@ -177,7 +187,7 @@
         $('#notification-table tbody').on( 'click', 'input:checkbox', function () {
 
             // if the input checkbox is selected 
-            var id = this.value;
+            var id = parseInt(this.value);
             var index = $.inArray(id, g_selected_employees);
             if(this.checked) {
                 g_selected_employees.push( id );
