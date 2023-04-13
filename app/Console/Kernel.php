@@ -83,6 +83,10 @@ class Kernel extends ConsoleKernel
         ->timezone('America/Vancouver')
         ->dailyAt('03:00');
   
+        $schedule->command('command:PopulateUsersAnnexTable')
+        ->timezone('America/Vancouver')
+        ->dailyAt('04:00');
+  
         $schedule->command('command:CleanShareProfile')
         ->timezone('America/Vancouver')    
         ->dailyAt('05:00');
