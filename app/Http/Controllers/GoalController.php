@@ -228,7 +228,7 @@ class GoalController extends Controller
             $query = $query->orderBy($sortby, $sortorder);
         }
       
-        $goals = $query->groupBy('title');
+        $goals = $query->groupBy('id');
         $goals = $query->paginate(10);
         
         $from = 'goal';        
