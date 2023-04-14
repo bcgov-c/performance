@@ -484,7 +484,7 @@ class EmployeeSharesController extends Controller {
                     return $u2where->on('u2.user_id', 'sp.shared_with')
                         ->orWhereNull('u2.date_deleted');
                 })
-                ->join('admin_orgs AS ao2', function ($ao2) use ($request, $authId) {
+                ->join('admin_orgs AS ao2', function ($ao2) use ($authId) {
                     return $ao2->on('ao2.orgid', 'u2.orgid')
                         ->on('ao2.version', \DB::raw(2))
                         ->on('ao2.inherited', \DB::raw(0))
