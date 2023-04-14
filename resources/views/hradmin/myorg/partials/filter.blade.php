@@ -107,7 +107,7 @@
             placeholder: 'Select Organization',
             allowClear: true,
             ajax: {
-                url: '/hradmin/org-organizations2'
+                url: '/hradmin/org-organizations'
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
