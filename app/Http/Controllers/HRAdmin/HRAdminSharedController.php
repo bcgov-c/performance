@@ -23,7 +23,7 @@ class HRAdminSharedController extends Controller
             ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); });
         $orgsInherited = EmployeeDemoTree::select('organization_key AS orgid', 'organization AS name')
             ->when($request->q, function ($q) use($request) { return $q->whereRaw("organization LIKE '%{$request->q}%'"); })
-            ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs WHERE (orgid = organization_key OR orgid = level1_key OR orgid = level2_key OR orgid = level3_key OR orgid = level4_key) AND version = 2 AND inherited = 1 AND user_id = {$userid})");
+            ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs WHERE (orgid = organization_key OR orgid = level1_key OR orgid = level2_key OR orgid = level3_key OR orgid = level4_key) AND version = 2 AND inherited = 1 AND user_id = {$authId})");
         $orgs = $orgs->union($orgsInherited)
             ->distinct()
             ->orderby('name', 'asc')
@@ -46,7 +46,7 @@ class HRAdminSharedController extends Controller
         $orgsInherited = EmployeeDemoTree::select('level1_key AS orgid', 'level1_program AS name')
             ->when($request->q, function ($q) use($request) { return $q->whereRaw("level1_program LIKE '%{$request->q}%'"); })
             ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
-            ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs WHERE (orgid = organization_key OR orgid = level1_key OR orgid = level2_key OR orgid = level3_key OR orgid = level4_key) AND version = 2 AND inherited = 1 AND user_id = {$userid})");
+            ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs WHERE (orgid = organization_key OR orgid = level1_key OR orgid = level2_key OR orgid = level3_key OR orgid = level4_key) AND version = 2 AND inherited = 1 AND user_id = {$authId})");
         $orgs = $orgs->union($orgsInherited)
             ->distinct()
             ->orderby('name', 'asc')
@@ -71,7 +71,7 @@ class HRAdminSharedController extends Controller
             ->when($request->q, function ($q) use($request) { return $q->whereRaw("level2_division LIKE '%{$request->q}%'"); })
             ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
             ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); })
-            ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs WHERE (orgid = organization_key OR orgid = level1_key OR orgid = level2_key OR orgid = level3_key OR orgid = level4_key) AND version = 2 AND inherited = 1 AND user_id = {$userid})");
+            ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs WHERE (orgid = organization_key OR orgid = level1_key OR orgid = level2_key OR orgid = level3_key OR orgid = level4_key) AND version = 2 AND inherited = 1 AND user_id = {$authId})");
         $orgs = $orgs->union($orgsInherited)
             ->distinct()
             ->orderby('name', 'asc')
@@ -98,7 +98,7 @@ class HRAdminSharedController extends Controller
             ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
             ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); })
             ->when($request->level2, function ($q) use($request) { return $q->where('level2_key', $request->level2); })
-            ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs WHERE (orgid = organization_key OR orgid = level1_key OR orgid = level2_key OR orgid = level3_key OR orgid = level4_key) AND version = 2 AND inherited = 1 AND user_id = {$userid})");
+            ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs WHERE (orgid = organization_key OR orgid = level1_key OR orgid = level2_key OR orgid = level3_key OR orgid = level4_key) AND version = 2 AND inherited = 1 AND user_id = {$authId})");
         $orgs = $orgs->union($orgsInherited)
             ->distinct()
             ->orderby('name', 'asc')
