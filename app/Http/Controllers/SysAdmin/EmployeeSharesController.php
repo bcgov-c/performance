@@ -529,7 +529,7 @@ class EmployeeSharesController extends Controller {
         if ($request->ajax()) {
             $query = UserDemoJrView::from('user_demo_jr_view AS u')
                 ->join('employee_shares AS s', 's.user_id', 'u.user_id')
-                ->leftjoin('hr_user_demo_jr_view AS u2', 's.shared_with_id', 'u2.user_id')
+                ->leftjoin('user_demo_jr_view AS u2', 's.shared_with_id', 'u2.user_id')
                 ->leftjoin('shared_elements AS e', 'e.id', 's.shared_element_id')
                 ->where('u.user_id', $id)
                 ->select (

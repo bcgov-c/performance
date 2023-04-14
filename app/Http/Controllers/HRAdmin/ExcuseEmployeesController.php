@@ -9,6 +9,7 @@ use App\Models\ExcusedReason;
 use App\Models\EmployeeDemoTree;
 use App\Models\HRUserDemoJrView;
 use App\Models\HRUserDemoJrHistoryView;
+use App\Models\UserDemoJrView;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -38,19 +39,19 @@ class ExcuseEmployeesController extends Controller {
         $demoWhere = $this->baseFilteredWhere($request, "");
         $sql = clone $demoWhere; 
         $matched_emp_ids = $sql
-            ->select([ 
-                    'u.employee_id', 
-                    'u.employee_name', 
-                    'u.jobcode_desc', 
-                    'u.employee_email', 
-                    'u.organization', 
-                    'u.level1_program', 
-                    'u.level2_division', 
-                    'u.level3_branch',
-                    'u.level4',
-                    'u.deptid', 
-                    'u.jobcode_desc'
-                ])
+            // ->select([ 
+            //         'u.employee_id', 
+            //         'u.employee_name', 
+            //         'u.jobcode_desc', 
+            //         'u.employee_email', 
+            //         'u.organization', 
+            //         'u.level1_program', 
+            //         'u.level2_division', 
+            //         'u.level3_branch',
+            //         'u.level4',
+            //         'u.deptid', 
+            //         'u.jobcode_desc'
+            //     ])
             ->pluck('u.employee_id');        
         $criteriaList = $this->search_criteria_list();
         $reasons = ExcusedReason::where('id', '>', 2)->get();
@@ -230,42 +231,43 @@ class ExcuseEmployeesController extends Controller {
                 'search_text' => $request->search_text,
             ]);
             $sql = clone $demoWhere; 
-            $employees = $sql->selectRaw("
-                user_id as id
-                , guid
-                , excused_flag
-                , excused_reason_id
-                , excused_updated_by
-                , excused_updated_at
-                , employee_id
-                , employee_name
-                , jobcode
-                , jobcode_desc
-                , employee_email
-                , organization
-                , level1_program
-                , level2_division
-                , level3_branch
-                , level4
-                , deptid
-                , employee_status
-                , due_date_paused
-                , excused_type
-                , current_manual_excuse
-                , created_by_id
-                , updated_by_id
-                , updated_at
-                , created_at as j_created_at
-                , reason_id
-                , reason_name
-                , j_excused_reason_desc
-                , excusedtype
-                , excusedlink
-                , excused_by_name
-                , created_at_string
-                , employee_id_search
-                , employee_name_search
-                ");
+            $employees = $sql;
+            // ->selectRaw("
+            //     user_id as id
+            //     , guid
+            //     , excused_flag
+            //     , excused_reason_id
+            //     , excused_updated_by
+            //     , excused_updated_at
+            //     , employee_id
+            //     , employee_name
+            //     , jobcode
+            //     , jobcode_desc
+            //     , employee_email
+            //     , organization
+            //     , level1_program
+            //     , level2_division
+            //     , level3_branch
+            //     , level4
+            //     , deptid
+            //     , employee_status
+            //     , due_date_paused
+            //     , excused_type
+            //     , current_manual_excuse
+            //     , created_by_id
+            //     , updated_by_id
+            //     , updated_at
+            //     , created_at as j_created_at
+            //     , reason_id
+            //     , reason_name
+            //     , j_excused_reason_desc
+            //     , excusedtype
+            //     , excusedlink
+            //     , excused_by_name
+            //     , created_at_string
+            //     , employee_id_search
+            //     , employee_name_search
+            //     ");
             return Datatables::of($employees)
                 ->addColumn('select_users', static function ($employee) {
                     return '<input pid="1335" type="checkbox" id="userCheck'. 
@@ -380,8 +382,14 @@ class ExcuseEmployeesController extends Controller {
 
     protected function baseFilteredWhere($request, $option = null) {
         $authId = Auth::id();
-        return HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
-            ->whereRaw("u.ao_user_id = {$authId}")
+        $base = UserDemoJrView::from('user_demo_jr_view AS u')
+            ->selectRaw('u.*')
+            ->join('admin_orgs AS ao', function ($ao) use ($request, $authId) {
+                return $ao->on('ao.orgid', 'u.orgid')
+                    ->on('ao.version', DB::raw(2))
+                    ->on('ao.inherited', DB::raw(0))
+                    ->on('ao.user_id', DB::raw($authId));
+            })
             ->whereNull('u.date_deleted')
             ->when("{$request->{$option.'dd_level0'}}", function($q) use($request, $option) { return $q->whereRaw("u.organization_key = {$request->{$option.'dd_level0'}}"); })
             ->when("{$request->{$option.'dd_level1'}}", function($q) use($request, $option) { return $q->whereRaw("u.level1_key = {$request->{$option.'dd_level1'}}"); })
@@ -390,6 +398,40 @@ class ExcuseEmployeesController extends Controller {
             ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); })
             ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); })
             ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(employee_id LIKE '%{$request->{$option.'search_text'}}%' OR employee_name LIKE '%{$request->{$option.'search_text'}}%' OR excusedtype LIKE '%{$request->{$option.'search_text'}}%' OR j_excused_reason_desc LIKE '%{$request->{$option.'search_text'}}%' OR excused_by_name LIKE '%{$request->{$option.'search_text'}}%')"); });
+        $baseInherited = UserDemoJrView::from('user_demo_jr_view AS u')
+            ->selectRaw('u.*')
+            ->join('admin_org_tree_view AS ao', function ($ao) use ($authId) {
+                return $ao->on('ao.version', DB::raw(2))
+                    ->on('ao.inherited', DB::raw(1))
+                    ->on('ao.user_id', DB::raw($authId))
+                    ->on(function ($qon) {
+                        return $qon->whereRaw('ao.level = 0 AND ao.organization_key = u.organization_key')
+                            ->orWhereRaw('ao.level = 1 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key')
+                            ->orWhereRaw('ao.level = 2 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key AND ao.level2_key = u.level2_key')
+                            ->orWhereRaw('ao.level = 3 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key AND ao.level2_key = u.level2_key AND ao.level3_key = u.level3_key')
+                            ->orWhereRaw('ao.level = 4 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key AND ao.level2_key = u.level2_key AND ao.level3_key = u.level3_key AND ao.level4_key = u.level4_key');
+                    });
+            })
+            ->whereNull('u.date_deleted')
+            ->when("{$request->{$option.'dd_level0'}}", function($q) use($request, $option) { return $q->whereRaw("u.organization_key = {$request->{$option.'dd_level0'}}"); })
+            ->when("{$request->{$option.'dd_level1'}}", function($q) use($request, $option) { return $q->whereRaw("u.level1_key = {$request->{$option.'dd_level1'}}"); })
+            ->when("{$request->{$option.'dd_level2'}}", function($q) use($request, $option) { return $q->whereRaw("u.level2_key = {$request->{$option.'dd_level2'}}"); })
+            ->when("{$request->{$option.'dd_level3'}}", function($q) use($request, $option) { return $q->whereRaw("u.level3_key = {$request->{$option.'dd_level3'}}"); })
+            ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); })
+            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); })
+            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(employee_id LIKE '%{$request->{$option.'search_text'}}%' OR employee_name LIKE '%{$request->{$option.'search_text'}}%' OR excusedtype LIKE '%{$request->{$option.'search_text'}}%' OR j_excused_reason_desc LIKE '%{$request->{$option.'search_text'}}%' OR excused_by_name LIKE '%{$request->{$option.'search_text'}}%')"); });
+        $base = $base->union($baseInherited);
+        return $base;
+        // return HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
+        //     ->whereRaw("u.ao_user_id = {$authId}")
+        //     ->whereNull('u.date_deleted')
+        //     ->when("{$request->{$option.'dd_level0'}}", function($q) use($request, $option) { return $q->whereRaw("u.organization_key = {$request->{$option.'dd_level0'}}"); })
+        //     ->when("{$request->{$option.'dd_level1'}}", function($q) use($request, $option) { return $q->whereRaw("u.level1_key = {$request->{$option.'dd_level1'}}"); })
+        //     ->when("{$request->{$option.'dd_level2'}}", function($q) use($request, $option) { return $q->whereRaw("u.level2_key = {$request->{$option.'dd_level2'}}"); })
+        //     ->when("{$request->{$option.'dd_level3'}}", function($q) use($request, $option) { return $q->whereRaw("u.level3_key = {$request->{$option.'dd_level3'}}"); })
+        //     ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); })
+        //     ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); })
+        //     ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(employee_id LIKE '%{$request->{$option.'search_text'}}%' OR employee_name LIKE '%{$request->{$option.'search_text'}}%' OR excusedtype LIKE '%{$request->{$option.'search_text'}}%' OR j_excused_reason_desc LIKE '%{$request->{$option.'search_text'}}%' OR excused_by_name LIKE '%{$request->{$option.'search_text'}}%')"); });
         }
 
     protected function baseFilteredSQLs($request, $option = null) {
