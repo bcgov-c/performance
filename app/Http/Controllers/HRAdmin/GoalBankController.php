@@ -219,7 +219,7 @@ class GoalBankController extends Controller
             ->orderBy('employee_id')
             ->pluck('employee_id');        
         $criteriaList = $this->search_criteria_list();
-        $roles = DB::table('roles')
+        $roles = \DB::table('roles')
             ->whereIntegerInRaw('id', [3, 4])
             ->pluck('longname', 'id');
         $currentView = $request->segment(2);
@@ -312,7 +312,7 @@ class GoalBankController extends Controller
     }
 
     public function deleteindividual(Request $request, $id) {
-        $query = DB::table('goals_shared_with')
+        $query = \DB::table('goals_shared_with')
         ->where('id', $id)
         ->delete();
         return redirect()->back();
@@ -400,7 +400,7 @@ class GoalBankController extends Controller
         ->pluck('u.employee_id');        
         $criteriaList = $this->search_criteria_list();
         $ecriteriaList = $this->search_criteria_list();
-        $roles = DB::table('roles')
+        $roles = \DB::table('roles')
         ->whereIntegerInRaw('id', [3, 4])
         ->pluck('longname', 'id');
         $goal_id = $id;
@@ -586,7 +586,7 @@ class GoalBankController extends Controller
                 ->orderBy('d.employee_name')
                 ->get() ;
             foreach ($toRecipients as $newId) {
-                $result = DB::table('goals_shared_with')
+                $result = \DB::table('goals_shared_with')
                     ->updateOrInsert(
                         [
                             'goal_id' => $resultrec->id,
@@ -661,11 +661,11 @@ class GoalBankController extends Controller
             ->pluck('o.id'); 
         $orgs = EmployeeDemoTree::whereIn('id', $rows->toArray() )->get()->toTree();
         // Employee Count by Organization
-        $countByOrg = $sql_level4->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row"))
-        ->union( $sql_level3->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level2->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level1->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level0->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row") ) )
+        $countByOrg = $sql_level4->groupBy('o.id')->select('o.id', \DB::raw("COUNT(*) as count_row"))
+        ->union( $sql_level3->groupBy('o.id')->select('o.id', \DB::raw("COUNT(*) as count_row")) )
+        ->union( $sql_level2->groupBy('o.id')->select('o.id', \DB::raw("COUNT(*) as count_row")) )
+        ->union( $sql_level1->groupBy('o.id')->select('o.id', \DB::raw("COUNT(*) as count_row")) )
+        ->union( $sql_level0->groupBy('o.id')->select('o.id', \DB::raw("COUNT(*) as count_row") ) )
         ->pluck('count_row', 'o.id');  
         // Employee ID by Tree ID
         $empIdsByOrgId = [];
@@ -692,11 +692,11 @@ class GoalBankController extends Controller
             ->pluck('o.id'); 
         $eorgs = EmployeeDemoTree::whereIn('id', $rows->toArray() )->get()->toTree();
         // Employee Count by Organization
-        $ecountByOrg = $sql_level4->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row"))
-        ->union( $sql_level3->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level2->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level1->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level0->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row") ) )
+        $ecountByOrg = $sql_level4->groupBy('o.id')->select('o.id', \DB::raw("COUNT(*) as count_row"))
+        ->union( $sql_level3->groupBy('o.id')->select('o.id', \DB::raw("COUNT(*) as count_row")) )
+        ->union( $sql_level2->groupBy('o.id')->select('o.id', \DB::raw("COUNT(*) as count_row")) )
+        ->union( $sql_level1->groupBy('o.id')->select('o.id', \DB::raw("COUNT(*) as count_row")) )
+        ->union( $sql_level0->groupBy('o.id')->select('o.id', \DB::raw("COUNT(*) as count_row") ) )
         ->pluck('count_row', 'o.id');  
         // Employee ID by Tree ID
         $eempIdsByOrgId = [];
@@ -723,11 +723,11 @@ class GoalBankController extends Controller
             ->pluck('o.id'); 
         $aorgs = EmployeeDemoTree::whereIn('id', $rows->toArray() )->get()->toTree();
         // Employee Count by Organization
-        $acountByOrg = $sql_level4->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row"))
-        ->union( $sql_level3->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level2->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level1->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level0->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row") ) )
+        $acountByOrg = $sql_level4->groupBy('o.id')->select('o.id', \DB::raw("COUNT(*) as count_row"))
+        ->union( $sql_level3->groupBy('o.id')->select('o.id', \DB::raw("COUNT(*) as count_row")) )
+        ->union( $sql_level2->groupBy('o.id')->select('o.id', \DB::raw("COUNT(*) as count_row")) )
+        ->union( $sql_level1->groupBy('o.id')->select('o.id', \DB::raw("COUNT(*) as count_row")) )
+        ->union( $sql_level0->groupBy('o.id')->select('o.id', \DB::raw("COUNT(*) as count_row") ) )
         ->pluck('count_row', 'o.id');  
         // Employee ID by Tree ID
         $aempIdsByOrgId = [];
@@ -842,7 +842,7 @@ class GoalBankController extends Controller
             ->get();
         $resultrec = Goal::withoutGlobalScopes()->findorfail($request->goal_id);
         foreach($organizationList as $org1) {
-            $result = DB::table('goal_bank_orgs')
+            $result = \DB::table('goal_bank_orgs')
             ->updateorinsert(
                 [
                     'goal_id' => $resultrec->id, 
@@ -858,7 +858,7 @@ class GoalBankController extends Controller
             }
         }
         foreach($inheritedList as $org1) {
-            $result = DB::table('goal_bank_orgs')
+            $result = \DB::table('goal_bank_orgs')
             ->updateorinsert(
                 [
                     'goal_id' => $resultrec->id,
@@ -904,7 +904,7 @@ class GoalBankController extends Controller
             ->orderBy('employee_demo.employee_name')
             ->get() ;
         foreach ($toRecipients as $newId) {
-            $result = DB::table('goals_shared_with')
+            $result = \DB::table('goals_shared_with')
                 ->updateOrInsert(
                     ['goal_id' => $resultrec->id
                     , 'user_id' => $newId->id
@@ -1226,7 +1226,7 @@ class GoalBankController extends Controller
     }
 
     public function get_access_entry($roleId, $modelId) {
-        return DB::table('model_has_roles')
+        return \DB::table('model_has_roles')
             ->whereIn('model_id', [3, 4])
             ->where('model_type', '=', 'App\Models\User')
             ->where('role_id', '=', $roleId)
@@ -1240,16 +1240,16 @@ class GoalBankController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function deletegoal(Request $request, $goal_id) {
-        $query1 = DB::table('goal_tags') 
+        $query1 = \DB::table('goal_tags') 
             ->where('goal_id', '=', $goal_id) 
             ->delete(); 
-        $query2 = DB::table('goal_bank_orgs')
+        $query2 = \DB::table('goal_bank_orgs')
             ->where('goal_id', '=', $goal_id)  
             ->delete(); 
-        $query3 = DB::table('goals_shared_with')
+        $query3 = \DB::table('goals_shared_with')
             ->where('goal_id', '=', $goal_id)  
             ->delete(); 
-        $query4 = DB::table('goals') 
+        $query4 = \DB::table('goals') 
             ->where('goals.id', '=', $goal_id) 
             ->where('goals.is_library', true) 
             ->delete(); 

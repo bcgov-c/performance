@@ -550,7 +550,7 @@ class CalcNextConversationDate extends Command
         ->whereRaw("trim(users.guid) <> ''")
         ->whereNotNull('users.guid')
         ->whereExists(function ($query) {
-            $query->select(DB::raw(1))
+            $query->select(\DB::raw(1))
                 ->from('employee_demo_jr')
                 ->whereRaw("employee_demo_jr.id = (select max(id) from employee_demo_jr j2 where employee_demo_jr.employee_id = j2.employee_id)")
                 ->whereColumn('employee_demo_jr.employee_id', 'users.employee_id')
@@ -562,11 +562,11 @@ class CalcNextConversationDate extends Command
                 });
         })
         ->update([
-            'users.next_conversation_date' => DB::raw(" (select next_conversation_date from employee_demo_jr j1 
+            'users.next_conversation_date' => \DB::raw(" (select next_conversation_date from employee_demo_jr j1 
                                         where id = (select max(id) from employee_demo_jr j2 where j1.employee_id = j2.employee_id)
                                                 and users.employee_id = employee_id)" ),
 
-            'users.due_date_paused' =>  DB::raw(" (select due_date_paused from employee_demo_jr j1 
+            'users.due_date_paused' =>  \DB::raw(" (select due_date_paused from employee_demo_jr j1 
                                     where id = (select max(id) from employee_demo_jr j2 where j1.employee_id = j2.employee_id)
                                         and users.employee_id = employee_id)" )
         ]); 
