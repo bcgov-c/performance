@@ -83,11 +83,11 @@ class HRAdminSharedController extends Controller
     } 
 
     public function getBranchesV2(Request $request) {
-        $authid = Auth::id();
+        $authId = Auth::id();
         $orgs = AdminOrgTreeView::select('orgid', 'name')
             ->where('version', \DB::raw(2))
             ->where('inherited', \DB::raw(0))
-            ->where('user_id', \DB::raw($authid))
+            ->where('user_id', \DB::raw($authId))
             ->where('level', \DB::raw(3))
             ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
             ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
@@ -110,11 +110,11 @@ class HRAdminSharedController extends Controller
     } 
 
     public function getLevel4V2(Request $request) {
-        $authid = Auth::id();
+        $authId = Auth::id();
         $orgs = AdminOrgTreeView::select('orgid', 'name')
             ->where('version', \DB::raw(2))
             ->where('inherited', \DB::raw(0))
-            ->where('user_id', \DB::raw($authid))
+            ->where('user_id', \DB::raw($authId))
             ->where('level', \DB::raw(4))
             ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
             ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
@@ -127,7 +127,7 @@ class HRAdminSharedController extends Controller
             ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); })
             ->when($request->level2, function ($q) use($request) { return $q->where('level2_key', $request->level2); })
             ->when($request->level3, function ($q) use($request) { return $q->where('level3_key', $request->level3); })
-            ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs WHERE (orgid = organization_key OR orgid = level1_key OR orgid = level2_key OR orgid = level3_key OR orgid = level4_key) AND version = 2 AND inherited = 1 AND user_id = {$userid})");
+            ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs WHERE (orgid = organization_key OR orgid = level1_key OR orgid = level2_key OR orgid = level3_key OR orgid = level4_key) AND version = 2 AND inherited = 1 AND user_id = {$authId})");
         $orgs = $orgs->union($orgsInherited)
             ->distinct()
             ->orderby('name', 'asc')

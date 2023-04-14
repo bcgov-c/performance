@@ -10,7 +10,6 @@ use App\Models\EmployeeDemoJunior;
 use App\Models\ExcusedClassification;
 use App\Models\EmployeeDemoTree;
 use App\Models\SharedProfile;
-use App\Models\HRUserDemoJrView;
 use App\Models\UserDemoJrView;
 use App\Models\Goal;
 use Yajra\Datatables\Datatables;
@@ -24,9 +23,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
-
-
-
 
 class MyOrganizationController extends Controller {
     /**
@@ -70,10 +66,10 @@ class MyOrganizationController extends Controller {
         if ($request->ajax()) {
             $authId = Auth::id();
             $query = UserDemoJrView::from('user_demo_jr_view AS u')
-                // ->join('admin_orgs AS ao', 'ao.orgid', 'u.orgid') 
-                // ->whereRaw('ao.version = 2')
-                // ->whereRaw('ao.inherited = 0')
-                // ->whereRaw('ao.user_id = '.$authId)
+                ->join('admin_orgs AS ao', 'ao.orgid', 'u.orgid') 
+                ->whereRaw("ao.version = 2")
+                ->whereRaw("ao.inherited = 0")
+                ->whereRaw("ao.user_id = {$authId}")
                 ->whereNull('u.date_deleted')
                 ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
                 ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
