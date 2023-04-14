@@ -1549,7 +1549,8 @@ class SysadminStatisticsReportController extends Controller
                                     ->where('employee_demo.employee_id', '=', $request->employee_id)  
                                     ->orderBy('goals.created_at', 'DESC')        
                                     ->get();                                    
-                            $data["active_goals"] = $active_goals->unique('goals.id');
+                            $data["active_goals"] = $active_goals;
+                            
                         }
                         if($item == "past_goals"){
                             $past_goals = Goal::selectRaw("goals.id, users.name, goals.title, goals.start_date, goals.target_date, goals.created_at, employee_demo.organization, employee_demo.business_unit")
@@ -1572,7 +1573,7 @@ class SysadminStatisticsReportController extends Controller
                                     ->where('employee_demo.employee_id', '=', $request->employee_id)     
                                     ->orderBy('goals.created_at', 'DESC')              
                                     ->get();
-                            $data["past_goals"] = $past_goals->unique('goals.id');
+                            $data["past_goals"] = $past_goals;
                         }
                         if($item == "open_conversations"){
                             $open_conversations = ConversationParticipant::selectRaw("conversation_participants.conversation_id, users.name, conversation_topics.name as topic, employee_demo.organization, employee_demo.business_unit, conversations.created_at")
@@ -1603,7 +1604,7 @@ class SysadminStatisticsReportController extends Controller
                                                   ->where('employee_demo.employee_id', '=', $request->employee_id)   
                                                   ->orderBy('conversations.created_at', 'DESC')                
                                                   ->get();
-                                $data["open_conversations"] = $open_conversations->unique('conversations.id');   
+                                $data["open_conversations"] = $open_conversations;   
                         }
                         if($item == "completed_conversations"){
                             $completed_conversations = ConversationParticipant::selectRaw("conversation_participants.conversation_id, users.name, conversation_topics.name as topic, employee_demo.organization, employee_demo.business_unit,GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as latest_update")
@@ -1638,7 +1639,7 @@ class SysadminStatisticsReportController extends Controller
                                                   ->where('employee_demo.employee_id', '=', $request->employee_id)  
                                                   ->orderBy('conversations.id', 'DESC')              
                                                   ->get();
-                            $data["completed_conversations"] = $completed_conversations->unique('conversations.id');   
+                            $data["completed_conversations"] = $completed_conversations;   
                         }
                     }
                 } 
