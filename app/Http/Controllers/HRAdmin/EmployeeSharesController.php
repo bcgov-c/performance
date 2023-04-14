@@ -106,21 +106,7 @@ class EmployeeSharesController extends Controller {
         $demoWhere = $this->baseFilteredWhere($request, "");
         $edemoWhere = $this->baseFilteredWhere($request, "e");
         $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql
-        // ->select([ 
-        //         'employee_id', 
-        //         'employee_name', 
-        //         'jobcode_desc', 
-        //         'employee_email', 
-        //         'u.organization', 
-        //         'u.level1_program', 
-        //         'u.level2_division',
-        //         'u.level3_branch',
-        //         'u.level4', 
-        //         'deptid'
-        //     ])
-            ->orderBy('employee_id')
-            ->pluck('employee_id');        
+        $matched_emp_ids = $sql->pluck('employee_id');        
         $ematched_emp_ids = clone $matched_emp_ids;
         $criteriaList = $this->search_criteria_list();
         $ecriteriaList = $this->search_criteria_list();
@@ -148,13 +134,11 @@ class EmployeeSharesController extends Controller {
             ->join('users', 'employee_demo.employee_id', 'users.employee_id')
             ->whereIn('employee_demo.employee_id', $selected_emp_ids )
             ->distinct()
-            ->orderBy('employee_demo.employee_name')
             ->get() ;
         $shareTo = EmployeeDemo::select('users.id')
             ->join('users', 'employee_demo.employee_id', 'users.employee_id')
             ->whereIn('employee_demo.employee_id', $eselected_emp_ids )
             ->distinct()
-            ->orderBy('employee_demo.employee_name')
             ->get() ;
         if ($request->input_elements == 0) {
             $elements = array("1", "2");
@@ -337,7 +321,7 @@ class EmployeeSharesController extends Controller {
             ->union( $sql_level2->where('id', $id) )
             ->union( $sql_level1->where('id', $id) )
             ->union( $sql_level0->where('id', $id) );
-        $employees = $rows->orderBy('employee_name')->get();
+        $employees = $rows->get();
         $parent_id = $id;
         $page = 'shared.employeeshares.partials.employee';
         if($option == 'e'){
@@ -542,9 +526,7 @@ class EmployeeSharesController extends Controller {
                     'sp.created_at',
                     'sp.updated_at',
                     'sp.id as shared_profile_id',
-                )
-                ->orderBy('u.employee_id')
-                ->orderBy('delegate_ee_id');
+                );
             return Datatables::of($query)
                 ->addIndexColumn()
                 ->editColumn('shared_item', function ($row) {
