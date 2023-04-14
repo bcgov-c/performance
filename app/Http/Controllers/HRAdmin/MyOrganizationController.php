@@ -70,11 +70,51 @@ class MyOrganizationController extends Controller {
         if ($request->ajax()) {
             $authId = Auth::id();
             $query = UserDemoJrView::from('user_demo_jr_view AS u')
-                ->join('admin_orgs AS ao', function ($ao) use ($authId) {
-                    return $ao->on('ao.orgid', 'u.orgid')
-                        ->on('ao.version', \DB::raw(2))
-                        ->on('ao.inherited', \DB::raw(0))
-                        ->on('ao.user_id', \DB::raw($authId));
+                ->join('admin_orgs AS ao', 'ao.orgid', 'u.orgid') 
+                ->where('ao.version', \DB::raw(2))
+                ->where('ao.inherited', \DB::raw(0))
+                ->where('ao.user_id', \DB::raw($authId))
+                ->whereNull('u.date_deleted')
+                ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
+                ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
+                ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
+                ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
+                ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
+                ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { return $q->whereRaw("u.{$request->criteria} like '%{$request->search_text}%'"); })
+                ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(u.employee_id LIKE '%{$request->search_text}%' OR u.employee_name LIKE '%{$request->search_text}%' OR u.jobcode_desc LIKE '%{$request->search_text}%' OR u.deptid LIKE '%{$request->search_text}%')"); })
+                ->selectRaw ("
+                    u.user_id AS user_id,
+                    guid,
+                    excused_flag,
+                    employee_id,
+                    employee_name, 
+                    jobcode_desc,
+                    u.orgid AS orgid,
+                    u.organization AS organization,
+                    u.level1_program AS level1_program,
+                    u.level2_division AS level2_division,
+                    u.level3_branch AS level3_branch,
+                    u.level4 AS level4,
+                    u.deptid AS deptid,
+                    employee_status,
+                    due_date_paused,
+                    next_conversation_date,
+                    excusedtype,
+                    '' AS nextConversationDue,
+                    '' AS shared,
+                    '' AS reportees,
+                    '' AS activeGoals
+                ");
+            $queryInherited = UserDemoJrView::from('user_demo_jr_view AS u')
+                ->join('admin_org_tree_view AS ao', 'ao.version', \DB::raw(2)) 
+                ->where('ao.inherited', \DB::raw(1))
+                ->where('ao.user_id', \DB::raw($authId))
+                ->where(function ($qon) {
+                    return $qon->whereRaw('ao.level = 0 AND ao.organization_key = u.organization_key')
+                        ->orWhereRaw('ao.level = 1 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key')
+                        ->orWhereRaw('ao.level = 2 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key AND ao.level2_key = u.level2_key')
+                        ->orWhereRaw('ao.level = 3 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key AND ao.level2_key = u.level2_key AND ao.level3_key = u.level3_key')
+                        ->orWhereRaw('ao.level = 4 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key AND ao.level2_key = u.level2_key AND ao.level3_key = u.level3_key AND ao.level4_key = u.level4_key');
                 })
                 ->whereNull('u.date_deleted')
                 ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
@@ -107,51 +147,7 @@ class MyOrganizationController extends Controller {
                     '' AS reportees,
                     '' AS activeGoals
                 ");
-            //     $queryInherited = UserDemoJrView::from('user_demo_jr_view AS u')
-            //     ->join('admin_org_tree_view AS ao', function ($ao) use ($authId) {
-            //         return $ao->on('ao.version', \DB::raw(2))
-            //             ->on('ao.inherited', \DB::raw(1))
-            //             ->on('ao.user_id', \DB::raw($authId))
-            //             ->on(function ($qon) {
-            //                 return $qon->whereRaw('ao.level = 0 AND ao.organization_key = u.organization_key')
-            //                     ->orWhereRaw('ao.level = 1 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key')
-            //                     ->orWhereRaw('ao.level = 2 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key AND ao.level2_key = u.level2_key')
-            //                     ->orWhereRaw('ao.level = 3 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key AND ao.level2_key = u.level2_key AND ao.level3_key = u.level3_key')
-            //                     ->orWhereRaw('ao.level = 4 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key AND ao.level2_key = u.level2_key AND ao.level3_key = u.level3_key AND ao.level4_key = u.level4_key');
-            //             });
-            //     })
-            //     ->whereNull('u.date_deleted')
-            //     ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
-            //     ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
-            //     ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
-            //     ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
-            //     ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
-            //     ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { return $q->whereRaw("u.{$request->criteria} like '%{$request->search_text}%'"); })
-            //     ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(u.employee_id LIKE '%{$request->search_text}%' OR u.employee_name LIKE '%{$request->search_text}%' OR u.jobcode_desc LIKE '%{$request->search_text}%' OR u.deptid LIKE '%{$request->search_text}%')"); })
-            //     ->selectRaw ("
-            //         u.user_id AS user_id,
-            //         guid,
-            //         excused_flag,
-            //         employee_id,
-            //         employee_name, 
-            //         jobcode_desc,
-            //         u.orgid AS orgid,
-            //         u.organization AS organization,
-            //         u.level1_program AS level1_program,
-            //         u.level2_division AS level2_division,
-            //         u.level3_branch AS level3_branch,
-            //         u.level4 AS level4,
-            //         u.deptid AS deptid,
-            //         employee_status,
-            //         due_date_paused,
-            //         next_conversation_date,
-            //         excusedtype,
-            //         '' AS nextConversationDue,
-            //         '' AS shared,
-            //         '' AS reportees,
-            //         '' AS activeGoals
-            //     ");
-            // $query = $query->union($queryInherited);
+            $query = $query->union($queryInherited);
             return Datatables::of($query)->addIndexColumn()
                 ->editColumn('activeGoals', function($row) {
                     return (User::where('id', $row->user_id)->first()->activeGoals()->count() ?? '0').' Goals';
