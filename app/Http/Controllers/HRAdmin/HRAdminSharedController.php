@@ -14,12 +14,12 @@ use Illuminate\Support\Facades\DB;
 class HRAdminSharedController extends Controller
 {
     public function getOrganizationsV2(Request $request) {
-        $userid = Auth::id();
+        $authId = Auth::id();
         $orgs = AdminOrgTreeView::select('orgid', 'name')
-            ->where('version', DB::raw(2))
-            ->where('inherited', DB::raw(0))
-            ->where('user_id', DB::raw(Auth::id()))
-            ->where('level', DB::raw(0))
+            ->where('version', \DB::raw(2))
+            ->where('inherited', \DB::raw(0))
+            ->where('user_id', \DB::raw($authId))
+            ->where('level', \DB::raw(0))
             ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); });
         $orgsInherited = EmployeeDemoTree::select('organization_key AS orgid', 'organization AS name')
             ->when($request->q, function ($q) use($request) { return $q->whereRaw("organization LIKE '%{$request->q}%'"); })
@@ -35,12 +35,12 @@ class HRAdminSharedController extends Controller
     } 
 
     public function getProgramsV2(Request $request) {
-        $userid = Auth::id();
+        $authId = Auth::id();
         $orgs = AdminOrgTreeView::select('orgid', 'name')
-            ->where('version', DB::raw(2))
-            ->where('inherited', DB::raw(0))
-            ->where('user_id', DB::raw(Auth::id()))
-            ->where('level', DB::raw(1))
+            ->where('version', \DB::raw(2))
+            ->where('inherited', \DB::raw(0))
+            ->where('user_id', \DB::raw($authId))
+            ->where('level', \DB::raw(1))
             ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
             ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); });
         $orgsInherited = EmployeeDemoTree::select('level1_key AS orgid', 'level1_program AS name')
@@ -58,12 +58,12 @@ class HRAdminSharedController extends Controller
     } 
 
     public function getDivisionsV2(Request $request) {
-        $userid = Auth::id();
+        $authId = Auth::id();
         $orgs = AdminOrgTreeView::select('orgid', 'name')
-            ->where('version', DB::raw(2))
-            ->where('inherited', DB::raw(0))
-            ->where('user_id', DB::raw(Auth::id()))
-            ->where('level', DB::raw(2))
+            ->where('version', \DB::raw(2))
+            ->where('inherited', \DB::raw(0))
+            ->where('user_id', \DB::raw($authId))
+            ->where('level', \DB::raw(2))
             ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
             ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
             ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); });
@@ -83,12 +83,12 @@ class HRAdminSharedController extends Controller
     } 
 
     public function getBranchesV2(Request $request) {
-        $userid = Auth::id();
+        $authid = Auth::id();
         $orgs = AdminOrgTreeView::select('orgid', 'name')
-            ->where('version', DB::raw(2))
-            ->where('inherited', DB::raw(0))
-            ->where('user_id', DB::raw(Auth::id()))
-            ->where('level', DB::raw(3))
+            ->where('version', \DB::raw(2))
+            ->where('inherited', \DB::raw(0))
+            ->where('user_id', \DB::raw($authid))
+            ->where('level', \DB::raw(3))
             ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
             ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
             ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); })
@@ -110,12 +110,12 @@ class HRAdminSharedController extends Controller
     } 
 
     public function getLevel4V2(Request $request) {
-        $userid = Auth::id();
+        $authid = Auth::id();
         $orgs = AdminOrgTreeView::select('orgid', 'name')
-            ->where('version', DB::raw(2))
-            ->where('inherited', DB::raw(0))
-            ->where('user_id', DB::raw(Auth::id()))
-            ->where('level', DB::raw(4))
+            ->where('version', \DB::raw(2))
+            ->where('inherited', \DB::raw(0))
+            ->where('user_id', \DB::raw($authid))
+            ->where('level', \DB::raw(4))
             ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
             ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
             ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); })

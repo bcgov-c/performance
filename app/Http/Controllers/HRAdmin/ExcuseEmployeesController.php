@@ -386,9 +386,9 @@ class ExcuseEmployeesController extends Controller {
             ->selectRaw('u.*')
             ->join('admin_orgs AS ao', function ($ao) use ($request, $authId) {
                 return $ao->on('ao.orgid', 'u.orgid')
-                    ->on('ao.version', DB::raw(2))
-                    ->on('ao.inherited', DB::raw(0))
-                    ->on('ao.user_id', DB::raw($authId));
+                    ->on('ao.version', \DB::raw(2))
+                    ->on('ao.inherited', \DB::raw(0))
+                    ->on('ao.user_id', \DB::raw($authId));
             })
             ->whereNull('u.date_deleted')
             ->when("{$request->{$option.'dd_level0'}}", function($q) use($request, $option) { return $q->whereRaw("u.organization_key = {$request->{$option.'dd_level0'}}"); })
@@ -401,9 +401,9 @@ class ExcuseEmployeesController extends Controller {
         $baseInherited = UserDemoJrView::from('user_demo_jr_view AS u')
             ->selectRaw('u.*')
             ->join('admin_org_tree_view AS ao', function ($ao) use ($authId) {
-                return $ao->on('ao.version', DB::raw(2))
-                    ->on('ao.inherited', DB::raw(1))
-                    ->on('ao.user_id', DB::raw($authId))
+                return $ao->on('ao.version', \DB::raw(2))
+                    ->on('ao.inherited', \DB::raw(1))
+                    ->on('ao.user_id', \DB::raw($authId))
                     ->on(function ($qon) {
                         return $qon->whereRaw('ao.level = 0 AND ao.organization_key = u.organization_key')
                             ->orWhereRaw('ao.level = 1 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key')
