@@ -94,7 +94,6 @@ class EmployeeListController extends Controller {
                 ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
                 ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
                 ->when($request->search_text, function($q) use ($request) { return $q->whereRaw("{$request->criteria} like '%{$request->search_text}%'"); })
-                ->orderBy('u.employee_id')
                 ->selectRaw ("
                     u.user_id AS id,
                     u.guid,
@@ -162,7 +161,6 @@ class EmployeeListController extends Controller {
             ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
             ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
             ->when($request->search_text, function($q) use ($request) { return $q->whereRaw("{$request->criteria} like '%{$request->search_text}%'"); })
-            ->orderBy('u.employee_id')
             ->selectRaw ("
                 u.user_id AS id,
                 u.guid,
@@ -289,7 +287,6 @@ class EmployeeListController extends Controller {
                 ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
                 ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
                 ->when($request->search_text, function($q) use ($request) { return $q->whereRaw("{$request->criteria} like '%{$request->search_text}%'"); })
-                ->orderBy('u.employee_id')
                 ->selectRaw ("
                     u.user_id AS id,
                     u.guid,
@@ -367,7 +364,6 @@ class EmployeeListController extends Controller {
             ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
             ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
             ->when($request->search_text, function($q) use ($request) { return $q->whereRaw("{$request->criteria} like '%{$request->search_text}%'"); })
-            ->orderBy('u.employee_id')
             ->selectRaw ("
                 u.user_id AS id,
                 u.guid,

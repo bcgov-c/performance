@@ -51,7 +51,6 @@ class ExcuseEmployeesController extends Controller {
                     'u.deptid', 
                     'u.jobcode_desc'
                 ])
-            ->orderBy('u.employee_id')
             ->pluck('u.employee_id');        
         $criteriaList = $this->search_criteria_list();
         $reasons = ExcusedReason::where('id', '>', 2)->get();
@@ -148,9 +147,7 @@ class ExcuseEmployeesController extends Controller {
                     , '' as created_at_string
                     , '' as startdate_string
                     , '' as enddate_string
-                ")
-                ->orderBy('u.employee_id')
-                ->orderBy('u.jr_id');
+                ");
         return Datatables::of($query)
             ->addIndexColumn()
             ->editColumn('u.employee_name', function($row) {
@@ -328,7 +325,6 @@ class ExcuseEmployeesController extends Controller {
             ->whereIn('employee_demo.employee_id', $selected_emp_ids )
             ->distinct()
             ->select ('users.id')
-            ->orderBy('employee_demo.employee_name')
             ->get() ;
         foreach ($selection as $newId) {
             $result = User::where('id', '=', $newId->id)->update([
@@ -355,7 +351,7 @@ class ExcuseEmployeesController extends Controller {
             ->union( $sql_level2->where('id', $id) )
             ->union( $sql_level1->where('id', $id) )
             ->union( $sql_level0->where('id', $id) );
-        $employees = $rows->orderBy('employee_name')->get();
+        $employees = $rows->get();
         $parent_id = $id;
         return view('shared.excuseemployees.partials.employee', compact('parent_id', 'employees') ); 
     }

@@ -82,7 +82,6 @@ class AccessPermissionsController extends Controller
             u.level4, 
             u.deptid
         ")      
-        ->orderBy('u.employee_id')
         ->pluck('u.employee_id');
         $criteriaList = $this->search_criteria_list();
         $roles = DB::table('roles')
@@ -181,13 +180,11 @@ class AccessPermissionsController extends Controller
             ->whereIn('id', $selected_org_nodes)
             ->orWhereIn('level4_key', $selected_org_nodes)
             ->distinct()
-            ->orderBy('id')
             ->get();
             $inheritedList = EmployeeDemoTree::select('id')
             ->whereIn('id', $selected_inherited)
             ->orWhereIn('level4_key', $selected_inherited)
             ->distinct()
-            ->orderBy('id')
             ->get();
         }
         foreach ($toRecipients as $newId) {
@@ -418,11 +415,6 @@ class AccessPermissionsController extends Controller
             $query = AdminOrg::where('user_id', $model_id)
                 ->where('version', '2')
                 ->leftJoin('employee_demo_tree', 'admin_orgs.orgid', 'employee_demo_tree.id')
-                ->orderBy('employee_demo_tree.organization')
-                ->orderBy('employee_demo_tree.level1_program')
-                ->orderBy('employee_demo_tree.level2_division')
-                ->orderBy('employee_demo_tree.level3_branch')
-                ->orderBy('employee_demo_tree.level4')
                 ->select (
                     'employee_demo_tree.organization',
                     'employee_demo_tree.level1_program',
