@@ -70,10 +70,10 @@ class MyOrganizationController extends Controller {
         if ($request->ajax()) {
             $authId = Auth::id();
             $query = UserDemoJrView::from('user_demo_jr_view AS u')
-                ->join('admin_orgs AS ao', 'ao.orgid', 'u.orgid') 
-                ->whereRaw('ao.version = 2')
-                ->whereRaw('ao.inherited = 0')
-                ->whereRaw('ao.user_id = '.$authId)
+                // ->join('admin_orgs AS ao', 'ao.orgid', 'u.orgid') 
+                // ->whereRaw('ao.version = 2')
+                // ->whereRaw('ao.inherited = 0')
+                // ->whereRaw('ao.user_id = '.$authId)
                 ->whereNull('u.date_deleted')
                 ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
                 ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
