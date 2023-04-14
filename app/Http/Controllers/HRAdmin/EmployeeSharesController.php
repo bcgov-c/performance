@@ -473,23 +473,19 @@ class EmployeeSharesController extends Controller {
         if ($request->ajax()) {
             $authId = Auth::id();
             $query = UserDemoJrView::from('user_demo_jr_view AS u')
-                ->join('admin_orgs AS ao', function ($ao) use ($request, $authId) {
-                    return $ao->on('ao.orgid', 'u.orgid')
-                        ->on('ao.version', \DB::raw(2))
-                        ->on('ao.inherited', \DB::raw(0))
-                        ->on('ao.user_id', \DB::raw($authId));
-                })
+                ->join('admin_orgs AS ao', 'ao.orgid', 'u.orgid') 
+                ->where('ao.version', \DB::raw(2))
+                ->where('ao.inherited', \DB::raw(0))
+                ->where('ao.user_id', \DB::raw($authId))
                 ->join('shared_profiles AS sp', 'sp.shared_id', 'u.user_id')
                 ->leftjoin('user_demo_jr_view AS u2', function($u2where) {
                     return $u2where->on('u2.user_id', 'sp.shared_with')
                         ->orWhereNull('u2.date_deleted');
                 })
-                ->join('admin_orgs AS ao2', function ($ao2) use ($authId) {
-                    return $ao2->on('ao2.orgid', 'u2.orgid')
-                        ->on('ao2.version', \DB::raw(2))
-                        ->on('ao2.inherited', \DB::raw(0))
-                        ->on('ao2.user_id', \DB::raw($authId));
-                })
+                ->join('admin_orgs AS ao2', 'ao2.orgid', 'u2.orgid') 
+                ->where('ao2.version', \DB::raw(2))
+                ->where('ao2.inherited', \DB::raw(0))
+                ->where('ao2.user_id', \DB::raw($authId))
                 ->leftjoin('user_demo_jr_view AS cc', 'cc.user_id', 'sp.shared_by')
                 ->whereNull('u.date_deleted')
                 ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
