@@ -1547,7 +1547,7 @@ class SysadminStatisticsReportController extends Controller
                                     })  
                                     ->where('employee_demo.employee_id', '=', $request->employee_id)  
                                     ->orderBy('goals.created_at', 'DESC')        
-                                    ->get();                                    
+                                    ->get(); 
                             $data["active_goals"] = $active_goals;
                             
                         }
