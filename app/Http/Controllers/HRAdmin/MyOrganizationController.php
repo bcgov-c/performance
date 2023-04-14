@@ -172,8 +172,7 @@ class MyOrganizationController extends Controller {
                     return SharedProfile::where('shared_id', $row->user_id)->count() > 0 ? "Yes" : "No";
                 })
                 ->editColumn('reportees', function($row) {
-                    // return User::where('id', $row->user_id)->first()->reporteesCount() ?? '0';
-                    return '0';
+                    return User::where('id', $row->user_id)->first()->reporteesCount() ?? '0';
                 })
                 ->make(true);
         }
