@@ -106,20 +106,21 @@ class EmployeeSharesController extends Controller {
         $demoWhere = $this->baseFilteredWhere($request, "");
         $edemoWhere = $this->baseFilteredWhere($request, "e");
         $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql->select([ 
-                'u.employee_id', 
-                'u.employee_name', 
-                'u.jobcode_desc', 
-                'u.employee_email', 
-                'u.organization', 
-                'u.level1_program', 
-                'u.level2_division',
-                'u.level3_branch',
-                'u.level4', 
-                'u.deptid'
-            ])
-            ->orderBy('u.employee_id')
-            ->pluck('u.employee_id');        
+        $matched_emp_ids = $sql
+        // ->select([ 
+        //         'employee_id', 
+        //         'employee_name', 
+        //         'jobcode_desc', 
+        //         'employee_email', 
+        //         'u.organization', 
+        //         'u.level1_program', 
+        //         'u.level2_division',
+        //         'u.level3_branch',
+        //         'u.level4', 
+        //         'deptid'
+        //     ])
+            ->orderBy('employee_id')
+            ->pluck('employee_id');        
         $ematched_emp_ids = clone $matched_emp_ids;
         $criteriaList = $this->search_criteria_list();
         $ecriteriaList = $this->search_criteria_list();
@@ -301,18 +302,19 @@ class EmployeeSharesController extends Controller {
         if($request->ajax()){
             $demoWhere = $this->baseFilteredWhere($request, $option);
             $sql = clone $demoWhere; 
-            $employees = $sql->select([ 
-                'u.employee_id', 
-                'u.employee_name', 
-                'u.jobcode_desc', 
-                'u.employee_email', 
-                'u.organization', 
-                'u.level1_program', 
-                'u.level2_division', 
-                'u.level3_branch', 
-                'u.level4', 
-                'u.deptid'
-            ]);
+            $employees = $sql;
+            // ->select([ 
+            //     'u.employee_id', 
+            //     'u.employee_name', 
+            //     'u.jobcode_desc', 
+            //     'u.employee_email', 
+            //     'u.organization', 
+            //     'u.level1_program', 
+            //     'u.level2_division', 
+            //     'u.level3_branch', 
+            //     'u.level4', 
+            //     'u.deptid'
+            // ]);
             return Datatables::of($employees)
                 ->addColumn("{$option}select_users", static function ($employee) use($option) {
                         return '<input pid="1335" type="checkbox" id="'.$option.'userCheck'. 
@@ -363,8 +365,14 @@ class EmployeeSharesController extends Controller {
 
     protected function baseFilteredWhere($request, $option = null) {
         $authId = Auth::id();
-        return HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
-            ->whereRaw("u.ao_user_id = {$authId}")
+        $base = UserDemoJrView::from('user_demo_jr_view AS u')
+            ->selectRaw('u.*')
+            ->join('admin_orgs AS ao', function ($ao) use ($request, $authId) {
+                return $ao->on('ao.orgid', 'u.orgid')
+                    ->on('ao.version', DB::raw(2))
+                    ->on('ao.inherited', DB::raw(0))
+                    ->on('ao.user_id', DB::raw($authId));
+            })
             ->whereNull('u.date_deleted')
             ->when("{$request->{$option.'dd_level0'}}", function($q) use($request, $option) { return $q->whereRaw("u.organization_key = {$request->{$option.'dd_level0'}}"); })
             ->when("{$request->{$option.'dd_level1'}}", function($q) use($request, $option) { return $q->whereRaw("u.level1_key = {$request->{$option.'dd_level1'}}"); })
@@ -373,7 +381,31 @@ class EmployeeSharesController extends Controller {
             ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); })
             ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("u.{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); })
             ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(u.employee_id LIKE '%{$request->{$option.'search_text'}}%' OR u.employee_name LIKE '%{$request->{$option.'search_text'}}%' OR u.jobcode_desc LIKE '%{$request->{$option.'search_text'}}%' OR u.deptid LIKE '%{$request->{$option.'search_text'}}%')"); });
-        }
+        $baseInherited = UserDemoJrView::from('user_demo_jr_view AS u')
+            ->selectRaw('u.*')
+            ->join('admin_org_tree_view AS ao', function ($ao) use ($authId) {
+                return $ao->on('ao.version', DB::raw(2))
+                    ->on('ao.inherited', DB::raw(1))
+                    ->on('ao.user_id', DB::raw($authId))
+                    ->on(function ($qon) {
+                        return $qon->whereRaw('ao.level = 0 AND ao.organization_key = u.organization_key')
+                            ->orWhereRaw('ao.level = 1 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key')
+                            ->orWhereRaw('ao.level = 2 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key AND ao.level2_key = u.level2_key')
+                            ->orWhereRaw('ao.level = 3 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key AND ao.level2_key = u.level2_key AND ao.level3_key = u.level3_key')
+                            ->orWhereRaw('ao.level = 4 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key AND ao.level2_key = u.level2_key AND ao.level3_key = u.level3_key AND ao.level4_key = u.level4_key');
+                    });
+            })
+            ->whereNull('u.date_deleted')
+            ->when("{$request->{$option.'dd_level0'}}", function($q) use($request, $option) { return $q->whereRaw("u.organization_key = {$request->{$option.'dd_level0'}}"); })
+            ->when("{$request->{$option.'dd_level1'}}", function($q) use($request, $option) { return $q->whereRaw("u.level1_key = {$request->{$option.'dd_level1'}}"); })
+            ->when("{$request->{$option.'dd_level2'}}", function($q) use($request, $option) { return $q->whereRaw("u.level2_key = {$request->{$option.'dd_level2'}}"); })
+            ->when("{$request->{$option.'dd_level3'}}", function($q) use($request, $option) { return $q->whereRaw("u.level3_key = {$request->{$option.'dd_level3'}}"); })
+            ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); })
+            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("u.{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); })
+            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(u.employee_id LIKE '%{$request->{$option.'search_text'}}%' OR u.employee_name LIKE '%{$request->{$option.'search_text'}}%' OR u.jobcode_desc LIKE '%{$request->{$option.'search_text'}}%' OR u.deptid LIKE '%{$request->{$option.'search_text'}}%')"); });
+        $base = $base->union($baseInherited);
+        return $base;
+    }
 
     protected function baseFilteredSQLs($request, $option = null) {
         $demoWhere = $this->baseFilteredWhere($request, $option);
