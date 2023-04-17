@@ -81,7 +81,7 @@
                                     <div class="row">
                                         <div class="col-12">
                                             @csrf
-                                            <table>
+                                            <table class="table">
                                                 <tr style="border-bottom: solid #FCBA19">
                                                     <th width="20%">Name</th>
                                                     <th width="45%">When to use</th>
@@ -129,8 +129,8 @@
         <div class="card">
 		
             <div class="card-header" id="heading_2" style="border-bottom-width: 0px;">
-                    <h5 class="mb-2" data-toggle="collapse" data-target="#collapse_2" aria-expanded="1" aria-controls="collapse_2">
-                        <h5 class="mb-2" data-toggle="collapse" data-target="#collapse_2" aria-expanded="false" aria-controls="collapse_2">
+                    <h5 class="mb-1" data-toggle="collapse" data-target="#collapse_2" aria-expanded="1" aria-controls="collapse_2">
+                        <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_2" aria-expanded="false" aria-controls="collapse_2">
                                 <button class="btn btn-link text-left">
                                     <h4>Other Templates</h4>
                                 </button> 
@@ -146,6 +146,9 @@
 		
 		<div id="collapse_2" class="collapse" aria-labelledby="heading_2">
                     <div class="card-body">
+                        <div class="card-body p-2">
+                        <div class="row">
+                        <div class="col-12">
                         @csrf
                         <table class="table table-striped">
                             <thead>
@@ -156,7 +159,7 @@
                                     <th width="20%">&nbsp;</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody style="border-collapse: collapse;">
                                 @foreach ($templates as $template)
                                 @if(strtolower($template->name) !== 'performance check-in')
                                 <tr>
@@ -177,10 +180,11 @@
                                             @endforeach
                                         </select>
                                     </td>
-                                    <td>                                        
-                                            <button type="button" class="btn btn-primary d-flex align-items-center" onclick="javascript:conversation_sub({{$template->id}});">
-                                                <span>Start Conversation</span>
-                                            </button>
+                                    <td>   
+                                       
+                                        <button class="btn d-flex align-items-center" onclick="javascript:conversation_sub({{$template->id}});">
+                                            <span class="btn btn-primary">Start Conversation</span>
+                                        </button>
                                     </td>
                                 </tr>
                                 @endif
@@ -193,6 +197,9 @@
                         <input type="hidden" name="conversation_topic_id">  
                         <input type="hidden" name="participant_id">
                         </form>
+                        </div>
+                        </div>
+                        </div>
                     </div>
 		</div>
 	</div>
