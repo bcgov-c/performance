@@ -85,16 +85,15 @@
                                                 <tr style="border-bottom: solid #FCBA19">
                                                     <th width="20%">Name</th>
                                                     <th width="45%">When to use</th>
-                                                    <th width="15%">&nbsp;</th>
-                                                    <th width="20%"></th>
+                                                    <th width="15%">Participants</th>
+                                                    <th width="20%">&nbsp;</th>
                                                 </tr>
                                                 <tbody style="border-collapse: collapse;">
                                                 <tr style="background-color: #efefef">
                                                     <td>{{$template->name}}</td>
                                                     <td>{{$template->when_to_use}}</td>
                                                     <td>
-                                                        <span style="font-size:0.9em;"><b>Participants</b></span><br/>
-                                                        <select class="form-control w-100 select" style="width:100%;" name="participant_id[]" id="participant_id" required>
+                                                        <select class="form-control w-100 select" style="width:100%; margin-top: 8px;" name="participant_id[]" id="participant_id" required>
                                                             <option value="">None Selected</option>
                                                             @foreach($participant_users as $p)
                                                             @if(session()->has('view-profile-as'))
@@ -155,7 +154,7 @@
                                 <tr style="border-bottom: solid #FCBA19">
                                     <th width="20%">Name</th>
                                     <th width="45%">When to use</th>
-                                    <th width="15%">&nbsp;</th>
+                                    <th width="15%">Participants</th>
                                     <th width="20%">&nbsp;</th>
                                 </tr>
                             </thead>
@@ -166,8 +165,7 @@
                                     <td>{{$template->name}}</td>
                                     <td>{{$template->when_to_use}}</td>
                                     <td>
-                                        <span style="font-size:0.9em;"><b>Participants</b></span><br/>
-                                        <select class="form-control w-100 select" style="width:100%;" name="participant_id_{{$template->id}}[]" id="participant_id_{{$template->id}}" required>
+                                        <select class="form-control w-100 select" style="width:100%; margin-top: 8px;"" name="participant_id_{{$template->id}}[]" id="participant_id_{{$template->id}}" required>
                                             <option value="">None Selected</option>
                                             @foreach($participant_users as $p)
                                             @if(session()->has('view-profile-as'))
