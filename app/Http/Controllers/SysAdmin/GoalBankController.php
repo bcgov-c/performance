@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Goals\CreateGoalRequest;
 use Illuminate\Validation\ValidationException;
+use App\Models\DashboardNotification;
 
 
 class GoalBankController extends Controller
@@ -1217,6 +1218,11 @@ class GoalBankController extends Controller
         $query4 = DB::table('goals')
             ->where('id', '=', $goal_id)
             ->delete();
+
+        DashboardNotification::where('notification_type', 'GB')
+                                        ->where('related_id', $goal_id)
+                                        ->delete();
+
         return redirect()->back();
     }
 
