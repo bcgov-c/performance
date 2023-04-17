@@ -14,7 +14,8 @@ class AddIndexToEmployeeDemo3 extends Migration
      */
     public function up()
     {
-        $this->createTableIndexIfNotExist('employee_demo', 'idx_employee_demo_employeeid_date_deleted', ['employee_id', 'date_deleted']);
+        $this->dropExistingTableIndex('employee_demo', 'idx_employee_demo_employeeid_date_deleted');
+        $this->createTableIndexIfNotExist('employee_demo', 'idx_employee_demo_employee_id_date_deleted', ['employee_id', 'date_deleted']);
     }
 
     /**
@@ -24,7 +25,7 @@ class AddIndexToEmployeeDemo3 extends Migration
      */
     public function down()
     {
-        $this->dropExistingTableIndex('employee_demo', 'idx_employee_demo_employeeid_date_deleted');
+        $this->dropExistingTableIndex('employee_demo', 'idx_employee_demo_employee_id_date_deleted');
     }
 
     public function createTableIndexIfNotExist($tableName, $indexName, $fieldNames = []) {
