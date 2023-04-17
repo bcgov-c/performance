@@ -334,7 +334,7 @@
                         data: { ids : JSON.stringify(g_selected_employees), 
                         },
                         success: function (data) {
-                            oTable.ajax.reload(null, false);	// reload datatables
+                            oTable.ajax.reload(null, true);	// reload datatables
                             updateBadgeCount();
                             resetSelectedCheckBox();
                         },
