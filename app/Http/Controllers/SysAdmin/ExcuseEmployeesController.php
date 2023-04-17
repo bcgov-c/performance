@@ -427,4 +427,22 @@ public function getDatatableEmployees(Request $request) {
         return  [$sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4];
     }
 
+        /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function manageindexupdate(Request $request) {
+        $query = User::where('id', '=', $request->id)
+        ->update(['excused_flag' => $request->excused_flag
+        , 'excused_reason_id' => $request->excused_reason_id
+        , 'excused_updated_by' => Auth::id()
+        , 'excused_updated_at' => Carbon::now()]);
+        return redirect()->back();
+    }
+
+
+
 }

@@ -286,19 +286,19 @@ class EmployeeSharesController extends Controller {
         if($request->ajax()){
             $demoWhere = $this->baseFilteredWhere($request, $option);
             $sql = clone $demoWhere; 
-            $employees = $sql;
-            // ->select([ 
-            //     'u.employee_id', 
-            //     'u.employee_name', 
-            //     'u.jobcode_desc', 
-            //     'u.employee_email', 
-            //     'u.organization', 
-            //     'u.level1_program', 
-            //     'u.level2_division', 
-            //     'u.level3_branch', 
-            //     'u.level4', 
-            //     'u.deptid'
-            // ]);
+            $employees = $sql
+            ->select([ 
+                'u.employee_id', 
+                'u.employee_name', 
+                'u.jobcode_desc', 
+                'u.employee_email', 
+                'u.organization', 
+                'u.level1_program', 
+                'u.level2_division', 
+                'u.level3_branch', 
+                'u.level4', 
+                'u.deptid'
+            ]);
             return Datatables::of($employees)
                 ->addColumn("{$option}select_users", static function ($employee) use($option) {
                         return '<input pid="1335" type="checkbox" id="'.$option.'userCheck'. 
@@ -349,14 +349,9 @@ class EmployeeSharesController extends Controller {
 
     protected function baseFilteredWhere($request, $option = null) {
         $authId = Auth::id();
-        $base = UserDemoJrView::from('user_demo_jr_view AS u')
+        return HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
             ->selectRaw('u.*')
-            ->join('admin_orgs AS ao', function ($ao) use ($request, $authId) {
-                return $ao->on('ao.orgid', 'u.orgid')
-                    ->on('ao.version', \DB::raw(2))
-                    ->on('ao.inherited', \DB::raw(0))
-                    ->on('ao.user_id', \DB::raw($authId));
-            })
+            ->where('u.auth_id', \DB::raw($authId))
             ->whereNull('u.date_deleted')
             ->when("{$request->{$option.'dd_level0'}}", function($q) use($request, $option) { return $q->whereRaw("u.organization_key = {$request->{$option.'dd_level0'}}"); })
             ->when("{$request->{$option.'dd_level1'}}", function($q) use($request, $option) { return $q->whereRaw("u.level1_key = {$request->{$option.'dd_level1'}}"); })
@@ -365,30 +360,6 @@ class EmployeeSharesController extends Controller {
             ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); })
             ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("u.{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); })
             ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(u.employee_id LIKE '%{$request->{$option.'search_text'}}%' OR u.employee_name LIKE '%{$request->{$option.'search_text'}}%' OR u.jobcode_desc LIKE '%{$request->{$option.'search_text'}}%' OR u.deptid LIKE '%{$request->{$option.'search_text'}}%')"); });
-        $baseInherited = UserDemoJrView::from('user_demo_jr_view AS u')
-            ->selectRaw('u.*')
-            ->join('admin_org_tree_view AS ao', function ($ao) use ($authId) {
-                return $ao->on('ao.version', \DB::raw(2))
-                    ->on('ao.inherited', \DB::raw(1))
-                    ->on('ao.user_id', \DB::raw($authId))
-                    ->on(function ($qon) {
-                        return $qon->whereRaw('ao.level = 0 AND ao.organization_key = u.organization_key')
-                            ->orWhereRaw('ao.level = 1 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key')
-                            ->orWhereRaw('ao.level = 2 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key AND ao.level2_key = u.level2_key')
-                            ->orWhereRaw('ao.level = 3 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key AND ao.level2_key = u.level2_key AND ao.level3_key = u.level3_key')
-                            ->orWhereRaw('ao.level = 4 AND ao.organization_key = u.organization_key AND ao.level1_key = u.level1_key AND ao.level2_key = u.level2_key AND ao.level3_key = u.level3_key AND ao.level4_key = u.level4_key');
-                    });
-            })
-            ->whereNull('u.date_deleted')
-            ->when("{$request->{$option.'dd_level0'}}", function($q) use($request, $option) { return $q->whereRaw("u.organization_key = {$request->{$option.'dd_level0'}}"); })
-            ->when("{$request->{$option.'dd_level1'}}", function($q) use($request, $option) { return $q->whereRaw("u.level1_key = {$request->{$option.'dd_level1'}}"); })
-            ->when("{$request->{$option.'dd_level2'}}", function($q) use($request, $option) { return $q->whereRaw("u.level2_key = {$request->{$option.'dd_level2'}}"); })
-            ->when("{$request->{$option.'dd_level3'}}", function($q) use($request, $option) { return $q->whereRaw("u.level3_key = {$request->{$option.'dd_level3'}}"); })
-            ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); })
-            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("u.{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); })
-            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(u.employee_id LIKE '%{$request->{$option.'search_text'}}%' OR u.employee_name LIKE '%{$request->{$option.'search_text'}}%' OR u.jobcode_desc LIKE '%{$request->{$option.'search_text'}}%' OR u.deptid LIKE '%{$request->{$option.'search_text'}}%')"); });
-        $base = $base->union($baseInherited);
-        return $base;
     }
 
     protected function baseFilteredSQLs($request, $option = null) {
@@ -472,22 +443,22 @@ class EmployeeSharesController extends Controller {
     public function manageindexlist(Request $request) {
         if ($request->ajax()) {
             $authId = Auth::id();
-            $query = UserDemoJrView::from('user_demo_jr_view AS u')
-                ->join('admin_orgs AS ao', 'ao.orgid', 'u.orgid') 
-                ->where('ao.version', \DB::raw(2))
-                ->where('ao.inherited', \DB::raw(0))
-                ->where('ao.user_id', \DB::raw($authId))
+            $query = HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
                 ->join('shared_profiles AS sp', 'sp.shared_id', 'u.user_id')
-                ->leftjoin('user_demo_jr_view AS u2', function($u2where) {
-                    return $u2where->on('u2.user_id', 'sp.shared_with')
-                        ->orWhereNull('u2.date_deleted');
+                ->leftjoin('hr_user_demo_jr_view AS u2', function($u2on) {
+                    return $u2on->on(function($u2where) {
+                        return $u2where->whereRaw('u2.user_id = sp.shared_with AND u2.date_deleted IS NULL');
+                    });
                 })
-                ->join('admin_orgs AS ao2', 'ao2.orgid', 'u2.orgid') 
-                ->where('ao2.version', \DB::raw(2))
-                ->where('ao2.inherited', \DB::raw(0))
-                ->where('ao2.user_id', \DB::raw($authId))
-                ->leftjoin('user_demo_jr_view AS cc', 'cc.user_id', 'sp.shared_by')
-                ->whereNull('u.date_deleted')
+                // ->leftjoin('user_demo_jr_view AS cc', function($ccon) {
+                //     return $ccon->on(function($ccwhere) {
+                //         return $ccwhere->whereRaw('cc.user_id = sp.shared_by AND cc.date_deleted IS NULL');
+                //     });
+                // })
+                ->leftjoin('users as u3', 'u3.id', 'sp.shared_by')
+                ->leftjoin('employee_demo as cc', 'cc.employee_id', 'u3.employee_id' )
+                ->where('u.auth_id', \DB::raw($authId))
+                ->where('u2.auth_id', \DB::raw($authId))
                 ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
                 ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
                 ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
@@ -518,84 +489,43 @@ class EmployeeSharesController extends Controller {
                         ->orWhereRaw("u.jobcode_desc LIKE '%{$request->search_text}%'")
                         ->orWhereRaw("u.deptid LIKE '%{$request->search_text}%'");
                 })
-                ->select (
-                    'u.employee_id',
-                    'u.employee_name', 
-                    'u2.employee_id as delegate_ee_id',
-                    'u2.employee_name as delegate_ee_name',
-                    'u2.employee_name as alternate_delegate_name',
-                    'sp.shared_item',
-                    'u.jobcode_desc',
-                    'u.organization',
-                    'u.level1_program',
-                    'u.level2_division',
-                    'u.level3_branch',
-                    'u.level4',
-                    'u.deptid',
-                    'cc.employee_name as created_name',
-                    'sp.created_at',
-                    'sp.updated_at',
-                    'sp.id as shared_profile_id',
+                ->distinct()
+                ->selectRaw("
+                    u.employee_id,
+                    u.employee_name, 
+                    '' as delegate_ee_id,
+                    '' as delegate_ee_name,
+                    '' as alternate_delegate_name,
+                    sp.shared_item,
+                    u.jobcode_desc,
+                    u.organization,
+                    u.level1_program,
+                    u.level2_division,
+                    u.level3_branch,
+                    u.level4,
+                    u.deptid,
+                    cc.employee_name as created_name,
+                    sp.created_at,
+                    sp.updated_at,
+                    sp.id as shared_profile_id"
+
+
+                    // // 'u2.employee_id as delegate_ee_id',
+                    // // 'u2.employee_name as delegate_ee_name',
+                    // // 'u2.employee_name as alternate_delegate_name',
+                    // 'sp.shared_item',
+                    // 'u.jobcode_desc',
+                    // 'u.organization',
+                    // 'u.level1_program',
+                    // 'u.level2_division',
+                    // 'u.level3_branch',
+                    // 'u.level4',
+                    // 'u.deptid',
+                    // 'cc.employee_name as created_name',
+                    // 'sp.created_at',
+                    // 'sp.updated_at',
+                    // 'sp.id as shared_profile_id',
                 );
-
-
-
-
-            // $query = HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
-            //     ->whereRaw("u.ao_user_id = {$authId}")
-            //     ->join('shared_profiles AS sp', 'sp.shared_id', 'u.user_id')
-            //     ->leftjoin('hr_user_demo_jr_view AS u2', 'u2.user_id', 'sp.shared_with')
-            //     ->whereRaw("u2.ao_user_id = {$authId}")
-            //     ->leftjoin('user_demo_jr_view AS cc', 'cc.user_id', 'sp.shared_by')
-            //     ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
-            //     ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
-            //     ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
-            //     ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
-            //     ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
-            //     ->when($request->search_text && $request->criteria == 'employee_name', function($q) use($request) {
-            //         return $q->where(function ($r) use($request) {
-            //             return $r->whereRaw("u.{$request->criteria} LIKE '%{$request->search_text}%'")
-            //                 ->orWhereRaw("u2.{$request->criteria} LIKE '%{$request->search_text}%'")
-            //                 ->orWhereRaw("cc.{$request->criteria} LIKE '%{$request->search_text}%'");
-            //         });
-            //     })
-            //     ->when($request->search_text && $request->criteria == 'employee_id', function($q) use($request) {
-            //         return $q->where(function ($r) use($request) {
-            //             return $r->whereRaw("u.{$request->criteria} LIKE '%{$request->search_text}%'")
-            //                 ->orWhereRaw("u2.{$request->criteria} LIKE '%{$request->search_text}%'");
-            //         });
-            //     })
-            //     ->when($request->search_text && ($request->criteria == 'jobcode_desc' || $request->criteria == 'deptid'), function($q) use($request) {
-            //         return $q->whereRaw("u.{$request->criteria} LIKE '%{$request->search_text}%'");
-            //     })
-            //     ->when($request->search_text && $request->criteria == 'all', function($q) use($request) {
-            //         return $q->whereRaw("u.employee_id LIKE '%{$request->search_text}%'")
-            //             ->orWhereRaw("u.employee_name LIKE '%{$request->search_text}%'")
-            //             ->orWhereRaw("u2.employee_id LIKE '%{$request->search_text}%'")
-            //             ->orWhereRaw("u2.employee_name LIKE '%{$request->search_text}%'")
-            //             ->orWhereRaw("cc.employee_name LIKE '%{$request->search_text}%'")
-            //             ->orWhereRaw("u.jobcode_desc LIKE '%{$request->search_text}%'")
-            //             ->orWhereRaw("u.deptid LIKE '%{$request->search_text}%'");
-            //     })
-            //     ->select (
-            //         'u.employee_id',
-            //         'u.employee_name', 
-            //         'u2.employee_id as delegate_ee_id',
-            //         'u2.employee_name as delegate_ee_name',
-            //         'u2.employee_name as alternate_delegate_name',
-            //         'sp.shared_item',
-            //         'u.jobcode_desc',
-            //         'u.organization',
-            //         'u.level1_program',
-            //         'u.level2_division',
-            //         'u.level3_branch',
-            //         'u.level4',
-            //         'u.deptid',
-            //         'cc.employee_name as created_name',
-            //         'sp.created_at',
-            //         'sp.updated_at',
-            //         'sp.id as shared_profile_id',
-            //     );
             return Datatables::of($query)
                 ->addIndexColumn()
                 ->editColumn('shared_item', function ($row) {
@@ -619,11 +549,11 @@ class EmployeeSharesController extends Controller {
 
     public function manageindexviewshares(Request $request, $id) {
         if ($request->ajax()) {
-            $query = UserDemoJrView::from('user_demo_jr_view AS u')
+            $query = HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
                 ->join('employee_shares AS s', 's.user_id', 'u.user_id')
                 ->leftjoin('user_demo_jr_view AS u2', 'u2.user_id', 's.shared_with_id')
                 ->leftjoin('shared_elements AS e', 'e.id', 's.shared_element_id')
-                ->where('u.user_id', $id)
+                ->where('u.auth_id', $id)
                 ->select (
                     'u2.employee_id',
                     'u2.employee_name', 
@@ -632,19 +562,6 @@ class EmployeeSharesController extends Controller {
                     'u2.user_id as shared_with_id',
                 )
                 ->distinct();
-            // $query = UserDemoJrView::from('user_demo_jr_view AS u')
-            //     ->join('employee_shares AS s', 's.user_id', 'u.user_id')
-            //     ->leftjoin('hr_user_demo_jr_view AS u2', 's.shared_with_id', 'u2.user_id')
-            //     ->leftjoin('shared_elements AS e', 'e.id', 's.shared_element_id')
-            //     ->where('u.user_id', $id)
-            //     ->select (
-            //         'u2.employee_id',
-            //         'u2.employee_name', 
-            //         'u.user_id as user_id',
-            //         'e.name as element_name',
-            //         'u2.user_id as shared_with_id',
-            //     )
-            //     ->distinct();
             return Datatables::of($query)
                 ->addIndexColumn()
                 ->addcolumn('action', function($row) {

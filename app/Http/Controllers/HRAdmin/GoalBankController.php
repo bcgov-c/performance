@@ -996,7 +996,7 @@ class GoalBankController extends Controller
     protected function baseFilteredWhere($request, $option = null) { 
         $authId = Auth::id(); 
         return HRUserDemoJrView::from('hr_user_demo_jr_view AS u') 
-            ->whereRaw("u.ao_user_id = {$authId}") 
+            ->whereRaw("u.auth_id = {$authId}") 
             ->whereNull('u.date_deleted') 
             ->when("{$request->{$option.'dd_level0'}}", function($q) use($request, $option) { return $q->whereRaw("u.organization_key = {$request->{$option.'dd_level0'}}"); }) 
             ->when("{$request->{$option.'dd_level1'}}", function($q) use($request, $option) { return $q->whereRaw("u.level1_key = {$request->{$option.'dd_level1'}}"); }) 
@@ -1174,7 +1174,7 @@ class GoalBankController extends Controller
                 ->where('g.id', $goal_id)
                 ->join('goals_shared_with AS s', 'g.id', 's.goal_id')
                 ->join('hr_user_demo_jr_view AS u', 'u.user_id', 's.user_id')
-                ->where('u.ao_user_id', Auth::id())
+                ->where('u.auth_id', Auth::id())
                 ->distinct()
                 ->when($request->dd_level0, function($q) use($request) {return $q->where('u.organization_key', $request->dd_level0);})
                 ->when($request->dd_level1, function($q) use($request) {return $q->where('u.level1_key', $request->dd_level1);})
