@@ -1728,7 +1728,6 @@ class SysadminStatisticsReportController extends Controller
                                     ->join('employee_demo', function($join) {
                                             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                         })
-                                    ->whereNull('goal_comments.deleted_at')
                                     ->where('goal_comments.goal_id','=',$goal_id)           
                                     ->get();
                                         
@@ -2102,6 +2101,9 @@ class SysadminStatisticsReportController extends Controller
         $prepend = str_repeat(' ', $level);
         $output .= $prepend . '<ul>' . PHP_EOL;
         foreach($arr as $comment) {
+            if($comment['deleted_at'] = ''){
+                $comment['comment'] = 'Comment is deleted';
+            }
             $output .= $prepend . '    <li>' . $comment['name'] . ' ' . date('d/m/Y h:m:s', strtotime($comment['created_at'])) . ' ' . $comment['comment'] . PHP_EOL;
             if (!empty($comment['reply'])) {
                 $output .= $this->getCommentTreeHtml($comment['reply'], $level+1);
