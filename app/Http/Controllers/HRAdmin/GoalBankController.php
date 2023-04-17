@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Models\DashboardNotification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -1253,6 +1254,11 @@ class GoalBankController extends Controller
             ->where('goals.id', '=', $goal_id) 
             ->where('goals.is_library', true) 
             ->delete(); 
+
+        DashboardNotification::where('notification_type', 'GB')
+            ->where('related_id', $goal_id)
+            ->delete();            
+            
         return redirect()->back(); 
     }
     
