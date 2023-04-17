@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
-class AddIndexToEmployeeDemo3 extends Migration
+class AddIndexToEmployeeDemo3a extends Migration
 {
     /**
      * Run the migrations.
