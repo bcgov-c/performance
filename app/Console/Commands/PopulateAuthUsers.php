@@ -64,12 +64,11 @@ class PopulateAuthUsers extends Command
         $this->info(Carbon::now()->format('c')." - Deleted {$count_del} HR entries.");
 
         \DB::statement("
-            INSERT INTO auth_users (
+            INSERT INTO auth_users (type, auth_id, user_id) (
                 SELECT DISTINCT
                     'HR',
                     ao.user_id AS auth_id,
-                    u.id AS user_id,
-                    '{$now}'
+                    u.id AS user_id
                 FROM 
                     users 
                         AS u 
@@ -89,12 +88,11 @@ class PopulateAuthUsers extends Command
         $this->info(Carbon::now()->format('c')." - Inserted {$count_direct} HR Admin explicitly assigned users.");
 
         \DB::statement("
-            INSERT INTO auth_users (
+            INSERT INTO auth_users (type, auth_id, user_id) (
                 SELECT DISTINCT
                     'HR',
                     aotv.user_id AS auth_id,
-                    u.id AS user_id,
-                    '{$now}'
+                    u.id AS user_id
                 FROM 
                     users 
                         AS u 
