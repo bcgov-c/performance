@@ -59,9 +59,8 @@ class MyOrganizationController extends Controller {
     public function getList(Request $request) {
         if ($request->ajax()) {
             $authId = Auth::id();
-            // $query = HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
-            $query = HRUserDemoJrView::from('user_demo_jr_view AS u')
-                // ->where('auth_id', \DB::raw($authId))
+            $query = HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
+                ->where('auth_id', \DB::raw($authId))
                 ->whereNull('u.date_deleted')
                 ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
                 ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
@@ -71,7 +70,7 @@ class MyOrganizationController extends Controller {
                 ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { return $q->whereRaw("u.{$request->criteria} like '%{$request->search_text}%'"); })
                 ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(u.employee_id LIKE '%{$request->search_text}%' OR u.employee_name LIKE '%{$request->search_text}%' OR u.jobcode_desc LIKE '%{$request->search_text}%' OR u.deptid LIKE '%{$request->search_text}%')"); })
                 ->selectRaw ("
-                    u.user_id,
+                    user_id,
                     guid,
                     excused_flag,
                     employee_id,
