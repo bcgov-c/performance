@@ -135,7 +135,7 @@ class NotifyConversationDue extends Command
 
                 $dueIndays = 0;
                 $msg = '';
-                if ($dayDiff >= 7 and $dayDiff <= 30) {
+                if ($dayDiff >= 7 and $dayDiff < 30) {
                     $msg = 'REMINDER - your next conversation is due by ' . $due ;
                     $dueIndays = 30;
                 }
@@ -301,7 +301,7 @@ class NotifyConversationDue extends Command
 
                     $dueIndays = 0;
                     $msg = '';
-                    if ($dayDiff >= 7 and $dayDiff <= 30) {
+                    if ($dayDiff >= 7 and $dayDiff < 30) {
                         $msg = 'REMINDER - ' . $user->name . '\'s next conversation is due by ' . $due ;
                         $dueIndays = 30;
                     }
@@ -449,7 +449,7 @@ class NotifyConversationDue extends Command
                 $bSend = false;
                 $bind1 = $user->name;
                 $bind2 = $dueDate->format('M d, Y');
-                if ($dayDiff >= 7 and $dayDiff <= 30) {
+                if ($dayDiff >= 7 and $dayDiff < 30) {
                     $dueIndays = 30;
                     if ($pref->conversation_due_month == 'Y') {
                         // $subject = 'REMINDER - your next performance conversation is due in 1 month';
@@ -623,7 +623,7 @@ class NotifyConversationDue extends Command
                     $bind2 = $user->name;
                     $bind3 = $dueDate->format('M d, Y');
 
-                    if ($dayDiff >= 7 and $dayDiff <= 30) {
+                    if ($dayDiff >= 7 and $dayDiff < 30) {
                         $dueIndays = 30;
                         if ($pref->team_conversation_due_month == 'Y') {
                             // $subject = 'REMINDER - your next performance conversation is due in 1 month';
