@@ -70,7 +70,8 @@ class SetNextLevelManager extends Command
         $counter = 0;
         $updatecounter = 0;
 
-        EmployeeDemo::join('users', 'users.guid', 'employee_demo.guid')
+        EmployeeDemo::whereNull('employee_demo.date_deleted') 
+        ->join('users', 'users.employee_id', 'employee_demo.employee_id') 
         ->whereRaw("users.reporting_to IS NULL OR TRIM(users.reporting_to) = ''")
         ->whereRaw("trim(employee_demo.guid) <> ''")
         ->whereNotNull('employee_demo.guid')
