@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Carbon\Carbon;
+use Carbon\Carbon; 
 use App\Models\Conversation;
 use App\Models\User;
 use App\Models\EmployeeDemo;
@@ -358,6 +358,8 @@ class CalcNextConversationDate extends Command
                             }
                         }
                     }
+                    $updated_by_rec = User::where('id', $excused_updated_by)->first();
+                    $updated_by_name = $updated_by_rec ? $updated_by_rec->name : null;
                     $excusedArrayTypes = ['statusStartExcuse', 'classStartExcuse', 'manualStartExcuse', 'statusNewExcuse', 'classNewExcuse', 'manualNewExcuse'];
                     if ($changeType != 'noChange') {
                         $newJr = new EmployeeDemoJunior;
@@ -377,6 +379,7 @@ class CalcNextConversationDate extends Command
                         $newJr->next_conversation_date = $initNextConversationDate ? Carbon::parse($initNextConversationDate) : null;
                         $newJr->created_by_id = $DefaultCreatorName;
                         $newJr->updated_by_id = $excused_updated_by ?? $DefaultCreatorName;
+                        $newJr->updated_by_name = $updated_by_name;
                         $newJr->excused_reason_id = $excused_reason_id;
                         $newJr->excused_reason_desc = $excused_reason_desc;
                         if($excused_updated_at) {
@@ -405,6 +408,7 @@ class CalcNextConversationDate extends Command
                             'next_conversation_date' => $initNextConversationDate ? Carbon::parse($initNextConversationDate) : null, 
                             'created_by_id' => $DefaultCreatorName, 
                             'updated_by_id' => $excused_updated_by ?? $DefaultCreatorName, 
+                            'updated_by_name' => $updated_by_name, 
                             'excused_reason_id' => $excused_reason_id, 
                             'excused_reason_desc' => $excused_reason_desc, 
                             'updated_at' => $excused_updated_at ? $excused_updated_at : null
@@ -435,6 +439,7 @@ class CalcNextConversationDate extends Command
                             $newJr->next_conversation_date = $initNextConversationDate ? Carbon::parse($initNextConversationDate) : null;
                             $newJr->created_by_id = $jr->created_by_id;
                             $newJr->updated_by_id = $jr->updated_by_id;
+                            $newJr->updated_by_name = $jr->updated_by_name;
                             $newJr->excused_reason_id = $jr->excused_reason_id;
                             $newJr->excused_reason_desc = $jr->excused_reason_desc;
                             $newJr->created_at = $jr->created_at;
@@ -462,6 +467,7 @@ class CalcNextConversationDate extends Command
                                 'next_conversation_date' => $initNextConversationDate ? Carbon::parse($initNextConversationDate) : null, 
                                 'created_by_id' => $jr->created_by_id, 
                                 'updated_by_id' => $jr->updated_by_id, 
+                                'updated_by_name' => $jr->updated_by_name, 
                                 'excused_reason_id' => $jr->excused_reason_id, 
                                 'excused_reason_desc' => $jr->excused_reason_desc, 
                                 'created_at' => $jr->created_at,
@@ -544,21 +550,23 @@ class CalcNextConversationDate extends Command
         ->whereRaw("trim(users.guid) <> ''")
         ->whereNotNull('users.guid')
         ->whereExists(function ($query) {
-            $query->select(DB::raw(1))
+            $query->select(\DB::raw(1))
                 ->from('employee_demo_jr')
                 ->whereRaw("employee_demo_jr.id = (select max(id) from employee_demo_jr j2 where employee_demo_jr.employee_id = j2.employee_id)")
                 ->whereColumn('employee_demo_jr.employee_id', 'users.employee_id')
                 ->where(function($query) {
                     $query->whereRaw( 'employee_demo_jr.next_conversation_date <> users.next_conversation_date')
-                            ->orWhereRaw( 'employee_demo_jr.due_date_paused <> users.due_date_paused');
+                            ->orWhereRaw( 'employee_demo_jr.due_date_paused <> users.due_date_paused')
+                            ->orWhereNull('users.next_conversation_date')
+                            ->orWhereNull('users.due_date_paused');
                 });
         })
         ->update([
-            'users.next_conversation_date' => DB::raw(" (select next_conversation_date from employee_demo_jr j1 
+            'users.next_conversation_date' => \DB::raw(" (select next_conversation_date from employee_demo_jr j1 
                                         where id = (select max(id) from employee_demo_jr j2 where j1.employee_id = j2.employee_id)
                                                 and users.employee_id = employee_id)" ),
 
-            'users.due_date_paused' =>  DB::raw(" (select due_date_paused from employee_demo_jr j1 
+            'users.due_date_paused' =>  \DB::raw(" (select due_date_paused from employee_demo_jr j1 
                                     where id = (select max(id) from employee_demo_jr j2 where j1.employee_id = j2.employee_id)
                                         and users.employee_id = employee_id)" )
         ]); 

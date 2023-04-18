@@ -1,32 +1,60 @@
-<x-side-layout title="{{ __('Statistic and Reports - Performance Development Platform') }}">
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-primary leading-tight" role="banner">
+<style>
+    table {
+        border-collapse: collapse;
+    }
+
+    td, th {
+        border: 1px solid black;
+        padding:5px;
+    }
+    .page-break {
+        page-break-before: always;
+    }
+</style>
+<h2 class="font-semibold text-xl text-primary leading-tight">Performance Development</h2>
+
+    <h3  role="banner">
             Employee Record
-        </h2> 
-		
-    </x-slot>
-    </div>
+    </h3> 
     <div class="card p-3">  
         <div class="form-row">
-            <div class="form-group col-md-12">
-                <b>Goal Details:</b> <p>
+            <div class="form-group col-md-12">                
                 <?php if(isset($data["selected_goal"])){?>
+                <b>Goal Details:</b> <p>
                 <table class="table">
                     <tr>
-                        <th>Title</th>
-                        <th>Owner</th>
-                        <th>Business Unit</th>
-                        <th>Ministry</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
+                        <th width="10%">Title</th>
+                        <th width="10%">Owner</th>
+                        <th width="10%">Business Unit</th>
+                        <th width="50%">Ministry</th>
+                        <th width="10%">Start Date</th>
+                        <th width="10%">End Date</th>
                     </tr>
                     <tr>
                         <td><?php echo $data["selected_goal"]->title; ?></td>
                         <td><?php echo $data["selected_goal"]->name; ?></td>
                         <td><?php echo $data["selected_goal"]->business_unit; ?></td>
                         <td><?php echo $data["selected_goal"]->organization; ?></td>
-                        <td><?php echo $data["selected_goal"]->start_date; ?></td>
-                        <td><?php echo $data["selected_goal"]->target_date; ?></td>
+                        <td>
+                        <?php 
+                            $dateTime = $data["selected_goal"]->start_date;
+                            if(strtotime($dateTime)){
+                                $dateTime = new DateTime($dateTime);
+                                $dateTime = $dateTime->format('Y-m-d');
+                            }
+                            echo $dateTime; 
+                            ?>
+                        </td>
+                        <td>
+                        <?php 
+                            $dateTime = $data["selected_goal"]->target_date;
+                            if(strtotime($dateTime)){
+                                $dateTime = new DateTime($dateTime);
+                                $dateTime = $dateTime->format('Y-m-d');
+                            }
+                            echo $dateTime; 
+                            ?>
+                        </td>
                     </tr>
                 </table>   
                 
@@ -39,16 +67,18 @@
                 <?php } ?>
                 
                 <?php if(isset($data["selected_goal_comments"])){?>
+                    <p><b>Comments</b></p>
                     <?php echo $data["selected_goal_comments"];?>
                 <?php } ?>
                 
                 <?php if(isset($data["selected_conversation"])){?>
+                <b>Conversation Details:</b> <p>
                 <table class="table">
                     <tr>
-                        <th>Topic</th>
-                        <th>Participants</th>
-                        <th>Supervisor Sign Off</th>
-                        <th>Employee Sign Off</th>
+                        <th width="25%">Topic</th>
+                        <th width="25%">Participants</th>
+                        <th width="25%">Supervisor Sign Off</th>
+                        <th width="25%">Employee Sign Off</th>
                     </tr>
                     <tr>
                         <td><?php echo $data["selected_conversation"]->topic; ?></td>
@@ -60,7 +90,7 @@
                 
                 <?php if ($data["selected_conversation"]->topic == 'Performance Check-In') { ?>
                 <ul>
-                    <li><b>Employee Comments</b>
+                    <li style="margin-bottom: 10px;"><b>Employee Comments</b>
                         <ul>
                             <li><b>Self Summary: </b><?php echo $data["selected_conversation"]->info_comment4;?></li>
                             <li><b>Additional Comments: </b><?php echo $data["selected_conversation"]->info_comment7;?></li>
@@ -81,7 +111,7 @@
                 
                 <?php if ($data["selected_conversation"]->topic == 'Goal Setting') { ?>
                 <ul>
-                    <li><b>Employee Comments</b>
+                    <li style="margin-bottom: 10px;"><b>Employee Comments</b>
                         <ul>
                             <li><b>Comments: </b><?php echo $data["selected_conversation"]->info_comment4;?></li>
                             <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment7;?></li>
@@ -98,7 +128,7 @@
                 
                 <?php if ($data["selected_conversation"]->topic == 'Career Development') { ?>
                 <ul>
-                    <li><b>Employee Comments</b>
+                    <li style="margin-bottom: 10px;"><b>Employee Comments</b>
                         <ul>
                             <li><b>Career Goal Statement: </b><?php echo $data["selected_conversation"]->info_comment4;?></li>
                             <li><b>Strengths: </b><?php echo $data["selected_conversation"]->info_comment7;?></li>
@@ -120,7 +150,7 @@
                 
                 <?php if ($data["selected_conversation"]->topic == 'Performance Improvement') { ?>
                 <ul>
-                    <li><b>Employee Comments</b>
+                    <li style="margin-bottom: 10px;"><b>Employee Comments</b>
                         <ul>
                             <li><b>Self Summary: </b><?php echo $data["selected_conversation"]->info_comment4;?></li>
                             <li><b>Additional Comments: </b><?php echo $data["selected_conversation"]->info_comment7;?></li>
@@ -140,7 +170,7 @@
                 
                 <?php if ($data["selected_conversation"]->topic == 'Onboarding') { ?>
                 <ul>
-                    <li><b>Employee Comments</b>
+                    <li style="margin-bottom: 10px;"><b>Employee Comments</b>
                         <ul>
                             <li><b>Comments: </b><?php echo $data["selected_conversation"]->info_comment4;?></li>
                             <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment7;?></li>
@@ -162,63 +192,3 @@
             </div>    
         </div>
     </div>
-
-    
-<?php 
-
-
-?>
-    
-
-<x-slot name="css">
-	<style>
-		@media screen  {
-		.chart {
-			/* min-width:  180px;  */
-			min-height: 480px;
-		}	
-	
-		.print-only {
-			display: none;
-		}
-	}	
-	
-	@media print {
-	
-		@page { size:letter } 
-		body { 
-			
-			max-width: 800px !important;
-			margin-left: 100px !important;
-	
-		}	 
-		.no-print, .no-print *
-		{
-			display: none !important;
-		}
-		.chart {
-			/* min-width:  180px;  */
-			margin-left: 60px; 
-		}	
-	
-		.row {
-			display: block;
-		}
-		.page-break  { 
-			display:block; 
-			page-break-before : always ; 
-	
-		}
-		  
-	}
-	</style>
-</x-slot>
-
-
-</x-side-layout>
-<style>
-    label{
-        display:inline;
-        margin-right: 30px;
-    } 
-</style> 

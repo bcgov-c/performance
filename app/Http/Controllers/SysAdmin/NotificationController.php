@@ -104,7 +104,6 @@ class NotificationController extends Controller
                         return '';
                     }
                 })
-                //->removeColumn('password')
                 ->make(true);
         }
 
@@ -166,26 +165,20 @@ class NotificationController extends Controller
                 'userCheck' => $request->userCheck,
             ]);
         }
-
-        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
         $job_titles = $request->job_titles ? EmployeeDemo::whereIn('job_title', $request->job_titles)->select('job_title')
                     ->groupBy('job_title')->pluck('job_title') : null;
 
-        $request->session()->flash('level0', $level0);
-        $request->session()->flash('level1', $level1);
-        $request->session()->flash('level2', $level2);
-        $request->session()->flash('level3', $level3);
-        $request->session()->flash('level4', $level4);
+        $request->session()->flash('dd_level0', $request->dd_level0);
+        $request->session()->flash('dd_level1', $request->dd_level1);
+        $request->session()->flash('dd_level2', $request->dd_level2);
+        $request->session()->flash('dd_level3', $request->dd_level3);
+        $request->session()->flash('dd_level4', $request->dd_level4);
         $request->session()->flash('job_titles', $job_titles);
         $request->session()->flash('userCheck', $request->userCheck);  // Dynamic load 
         
 
         // Matched Employees 
-        $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4, $job_titles);
+        $demoWhere = $this->baseFilteredWhere($request, $job_titles);
         $sql = clone $demoWhere; 
         $matched_emp_ids = $sql->select([ 'employee_id', 'employee_name', 'job_title', 'employee_email', 
                 'employee_demo.organization', 'employee_demo.level1_program', 'employee_demo.level2_division',
@@ -203,48 +196,42 @@ class NotificationController extends Controller
 
 
     public function loadOrganizationTree(Request $request) {
-
-        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
         $job_titles = $request->job_titles ? EmployeeDemo::whereIn('job_title', $request->job_titles)->select('job_title')
                     ->groupBy('job_title')->pluck('job_title') : null;
 
         list($sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4) = 
-            $this->baseFilteredSQLs($request, $level0, $level1, $level2, $level3, $level4, $job_titles);
+            $this->baseFilteredSQLs($request, $job_titles);
         
-        $rows = $sql_level4->groupBy('organization_trees.id')->select('organization_trees.id')
-            ->union( $sql_level3->groupBy('organization_trees.id')->select('organization_trees.id') )
-            ->union( $sql_level2->groupBy('organization_trees.id')->select('organization_trees.id') )
-            ->union( $sql_level1->groupBy('organization_trees.id')->select('organization_trees.id') )
-            ->union( $sql_level0->groupBy('organization_trees.id')->select('organization_trees.id') )
-            ->pluck('organization_trees.id'); 
+        $rows = $sql_level4->groupBy('employee_demo_tree.id')->select('employee_demo_tree.id')
+            ->union( $sql_level3->groupBy('employee_demo_tree.id')->select('employee_demo_tree.id') )
+            ->union( $sql_level2->groupBy('employee_demo_tree.id')->select('employee_demo_tree.id') )
+            ->union( $sql_level1->groupBy('employee_demo_tree.id')->select('employee_demo_tree.id') )
+            ->union( $sql_level0->groupBy('employee_demo_tree.id')->select('employee_demo_tree.id') )
+            ->pluck('employee_demo_tree.id'); 
         $orgs = OrganizationTree::whereIn('id', $rows->toArray() )->get()->toTree();
 
         // Employee Count by Organization
-        $countByOrg = $sql_level4->groupBy('organization_trees.id')->select('organization_trees.id', DB::raw("COUNT(*) as count_row"))
-        ->union( $sql_level3->groupBy('organization_trees.id')->select('organization_trees.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level2->groupBy('organization_trees.id')->select('organization_trees.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level1->groupBy('organization_trees.id')->select('organization_trees.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level0->groupBy('organization_trees.id')->select('organization_trees.id', DB::raw("COUNT(*) as count_row") ) )
-        ->pluck('count_row', 'organization_trees.id');  
+        $countByOrg = $sql_level4->groupBy('employee_demo_tree.id')->select('employee_demo_tree.id', DB::raw("COUNT(*) as count_row"))
+        ->union( $sql_level3->groupBy('employee_demo_tree.id')->select('employee_demo_tree.id', DB::raw("COUNT(*) as count_row")) )
+        ->union( $sql_level2->groupBy('employee_demo_tree.id')->select('employee_demo_tree.id', DB::raw("COUNT(*) as count_row")) )
+        ->union( $sql_level1->groupBy('employee_demo_tree.id')->select('employee_demo_tree.id', DB::raw("COUNT(*) as count_row")) )
+        ->union( $sql_level0->groupBy('employee_demo_tree.id')->select('employee_demo_tree.id', DB::raw("COUNT(*) as count_row") ) )
+        ->pluck('count_row', 'employee_demo_tree.id');  
         
         // // Employee ID by Tree ID
         $empIdsByOrgId = [];
-        $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4, $job_titles);
+        $demoWhere = $this->baseFilteredWhere($request, $job_titles);
         $sql = clone $demoWhere; 
-        $rows = $sql->join('organization_trees', function($join) use($request) {
-                $join->on('employee_demo.organization', '=', 'organization_trees.organization')
-                    ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
-                    ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
-                    ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
-                    ->on('employee_demo.level4', '=', 'organization_trees.level4');
+        $rows = $sql->join('employee_demo_tree', function($join) use($request) {
+                $join->on('employee_demo.organization', '=', 'employee_demo_tree.organization')
+                    ->on('employee_demo.level1_program', '=', 'employee_demo_tree.level1_program')
+                    ->on('employee_demo.level2_division', '=', 'employee_demo_tree.level2_division')
+                    ->on('employee_demo.level3_branch', '=', 'employee_demo_tree.level3_branch')
+                    ->on('employee_demo.level4', '=', 'employee_demo_tree.level4');
                 })
-                ->select('organization_trees.id','employee_demo.employee_id')
-                ->groupBy('organization_trees.id', 'employee_demo.employee_id')
-                ->orderBy('organization_trees.id')->orderBy('employee_demo.employee_id')
+                ->select('employee_demo_tree.id','employee_demo.employee_id')
+                ->groupBy('employee_demo_tree.id', 'employee_demo.employee_id')
+                ->orderBy('employee_demo_tree.id')->orderBy('employee_demo.employee_id')
                 ->get();
 
         $empIdsByOrgId = $rows->groupBy('id')->all();
@@ -258,18 +245,11 @@ class NotificationController extends Controller
 
     public function getDatatableEmployees(Request $request) {
 
-
         if($request->ajax()){
-
-            $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-            $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-            $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-            $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-            $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
             $job_titles = $request->job_titles ? EmployeeDemo::whereIn('job_title', $request->job_titles)->select('job_title')
                         ->groupBy('job_title')->pluck('job_title') : null;
     
-            $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4, $job_titles);
+            $demoWhere = $this->baseFilteredWhere($request, $job_titles);
 
             $sql = clone $demoWhere; 
 
@@ -314,8 +294,6 @@ class NotificationController extends Controller
 
         //setup Validator and passing request data and rules
         $validator = Validator::make(request()->all(), [
-            // 'sender_id'          => 'required',
-            //'recipients'         => 'required',
             'orgCheck'         => 'required_if:userCheck,null',
             'userCheck'         => 'required_if:orgCheck,null',
             'subject'            => 'required',
@@ -341,7 +319,6 @@ class NotificationController extends Controller
             
             return redirect()->action([NotificationController::class, 'notify'] )
                ->withErrors($validator)->withInput();
-            //return redirect()->to( route('sysadmin.notifications.notify') )->withErrors($validator)->withInput();
           }
 
         // Send a notification to all participants that you would like to schedule a conversation 
@@ -384,143 +361,6 @@ class NotificationController extends Controller
     }
 
 
-    public function getOrganizations(Request $request) {
-
-        $orgs = OrganizationTree::orderby('name','asc')->select('id','name')
-            ->where('level',0)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(name) LIKE '%" . strtolower($request->q) . "%'");
-            })
-            ->get();
-
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($formatted_orgs);
-    } 
-
-    public function getPrograms(Request $request) {
-
-        $level0 = $request->level0 ? OrganizationTree::where('id',$request->level0)->first() : null;
-
-        $orgs = OrganizationTree::orderby('name','asc')->select(DB::raw('min(id) as id'),'name')
-            ->where('level',1)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $level0 , function ($q) use($level0) {
-                return $q->where('organization', $level0->name );
-            })
-            ->groupBy('name')
-            ->get();
-
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($formatted_orgs);
-    } 
-
-    public function getDivisions(Request $request) {
-
-        $level0 = $request->level0 ? OrganizationTree::where('id', $request->level0)->first() : null;
-        $level1 = $request->level1 ? OrganizationTree::where('id', $request->level1)->first() : null;
-
-        $orgs = OrganizationTree::orderby('name','asc')->select(DB::raw('min(id) as id'),'name')
-            ->where('level',2)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $level0 , function ($q) use($level0) {
-                return $q->where('organization', $level0->name) ;
-            })
-            ->when( $level1 , function ($q) use($level1) {
-                return $q->where('level1_program', $level1->name );
-            })
-            ->groupBy('name')
-            ->limit(300)
-            ->get();
-
-
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($formatted_orgs);
-    } 
-
-    public function getBranches(Request $request) {
-
-        $level0 = $request->level0 ? OrganizationTree::where('id', $request->level0)->first() : null;
-        $level1 = $request->level1 ? OrganizationTree::where('id', $request->level1)->first() : null;
-        $level2 = $request->level2 ? OrganizationTree::where('id', $request->level2)->first() : null;
-
-        $orgs = OrganizationTree::orderby('name','asc')->select(DB::raw('min(id) as id'),'name')
-            ->where('level',3)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $level0 , function ($q) use($level0) {
-                return $q->where('organization', $level0->name) ;
-            })
-            ->when( $level1 , function ($q) use($level1) {
-                return $q->where('level1_program', $level1->name );
-            })
-            ->when( $level2 , function ($q) use($level2) {
-                return $q->where('level2_division', $level2->name );
-            })
-            ->groupBy('name')
-            ->limit(300)
-            ->get();
-
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($formatted_orgs);
-    } 
-
-    public function getLevel4(Request $request) {
-
-        $level0 = $request->level0 ? OrganizationTree::where('id', $request->level0)->first() : null;
-        $level1 = $request->level1 ? OrganizationTree::where('id', $request->level1)->first() : null;
-        $level2 = $request->level2 ? OrganizationTree::where('id', $request->level2)->first() : null;
-        $level3 = $request->level3 ? OrganizationTree::where('id', $request->level3)->first() : null;
-
-        $orgs = OrganizationTree::orderby('name','asc')->select(DB::raw('min(id) as id'),'name')
-            ->where('level',4)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(name) LIKE '%" . strtolower($request->q) . "%'");
-                })
-            ->when( $level0 , function ($q) use($level0) {
-                return $q->where('organization', $level0->name) ;
-            })
-            ->when( $level1 , function ($q) use($level1) {
-                return $q->where('level1_program', $level1->name );
-            })
-            ->when( $level2 , function ($q) use($level2) {
-                return $q->where('level2_division', $level2->name );
-            })
-            ->when( $level3 , function ($q) use($level3) {
-                return $q->where('level3_branch', $level3->name );
-            })
-            ->groupBy('name')
-            ->limit(300)
-            ->get();
-
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($formatted_orgs);
-    } 
-
     public function getJobTitles() {
 
         $rows = EmployeeDemo::select('job_title')
@@ -538,139 +378,92 @@ class NotificationController extends Controller
     }
 
     public function getEmployees(Request $request,  $id) {
-
-    
-        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
         $job_titles = $request->job_titles ? EmployeeDemo::whereIn('job_title', $request->job_titles)->select('job_title')
                     ->groupBy('job_title')->pluck('job_title') : null;
 
         list($sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4) = 
-            $this->baseFilteredSQLs($request, $level0, $level1, $level2, $level3, $level4, $job_titles);
+            $this->baseFilteredSQLs($request);
        
-        $rows = $sql_level4->where('organization_trees.id', $id)
-            ->union( $sql_level3->where('organization_trees.id', $id) )
-            ->union( $sql_level2->where('organization_trees.id', $id) )
-            ->union( $sql_level1->where('organization_trees.id', $id) )
-            ->union( $sql_level0->where('organization_trees.id', $id) );
+        $rows = $sql_level4->where('employee_demo_tree.id', $id)
+            ->union( $sql_level3->where('employee_demo_tree.id', $id) )
+            ->union( $sql_level2->where('employee_demo_tree.id', $id) )
+            ->union( $sql_level1->where('employee_demo_tree.id', $id) )
+            ->union( $sql_level0->where('employee_demo_tree.id', $id) );
 
         $employees = $rows->get();
-        //$orgs = OrganizationTree::whereIn('id', $rows->toArray() )->get()->toTree();    
-
-        // $org = OrganizationTree::where('id', $id)->first();
-        // $employees = $org ? $org->employees() : [];
         $parent_id = $id;
         
-        // if($request->ajax()){
             return view('sysadmin.notifications.partials.employee', compact('parent_id', 'employees') ); 
-        // } 
     }
 
     protected function search_criteria_list() {
         return [
             'all' => 'All',
-            'emp' => 'Employee ID', 
-            'name'=> 'Employee Name',
-            'cls' => 'Classification', 
-            'dpt' => 'Department ID'
+            'employee_demo.employee_id' => 'Employee ID', 
+            'employee_demo.employee_name'=> 'Employee Name',
+            'employee_demo.classification_group' => 'Classification', 
+            'employee_demo.deptid' => 'Department ID'
         ];
     }
 
-    protected function baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4, $job_titles) {
-        // Base Where Clause
-        $demoWhere = EmployeeDemo::whereNull('employee_demo.date_deleted')
-        ->when( $level0, function ($q) use($level0) {
-            return $q->where('employee_demo.organization', $level0->name);
-        })
-        ->when( $level1, function ($q) use($level1) {
-            return $q->where('employee_demo.level1_program', $level1->name);
-        })
-        ->when( $level2, function ($q) use($level2) {
-            return $q->where('employee_demo.level2_division', $level2->name);
-        })
-        ->when( $level3, function ($q) use($level3) {
-            return $q->where('employee_demo.level3_branch', $level3->name);
-        })
-        ->when( $level4, function ($q) use($level4) {
-            return $q->where('employee_demo.level4', $level4->name);
-        })
-        ->when( $job_titles , function ($q) use($job_titles) {
-            return $q->whereIn('employee_demo.job_title', $job_titles->toArray() );
-        })
-        ->when( $request->active_since , function ($q) use($request) {
-            return $q->where('employee_demo.hire_dt', '>=', $request->active_since);
-        })
-        ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
-            $q->where(function($query) use ($request) {
-                
-                return $query->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->search_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->search_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.classification_group) LIKE '%" . strtolower($request->search_text) . "%'")
-                    ->orWhereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
-            });
-        })
-        ->when( $request->search_text && $request->criteria == 'emp', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.employee_id) LIKE '%" . strtolower($request->search_text) . "%'");
-        })
-        ->when( $request->search_text && $request->criteria == 'name', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.employee_name) LIKE '%" . strtolower($request->search_text) . "%'");
-        })
-        ->when( $request->search_text && $request->criteria == 'cls', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.classification_group) LIKE '%" . strtolower($request->search_text) . "%'");
-        })
-        ->when( $request->search_text && $request->criteria == 'dpt', function ($q) use($request) {
-            return $q->whereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
-        });
-        return $demoWhere;
+    protected function baseFilteredWhere($request, $job_titles) {
+        return EmployeeDemo::join('employee_demo_tree as u', 'u.deptid', 'employee_demo.deptid')
+            ->whereNull('employee_demo.date_deleted')
+            ->when($request->dd_level0, function($q) use($request) { return $q->whereRaw("u.organization_key = {$request->dd_level0}"); })
+            ->when($request->dd_level1, function($q) use($request) { return $q->whereRaw("u.level1_key = {$request->dd_level1}"); })
+            ->when($request->dd_level2, function($q) use($request) { return $q->whereRaw("u.level2_key = {$request->dd_level2}"); })
+            ->when($request->dd_level3, function($q) use($request) { return $q->whereRaw("u.level3_key = {$request->dd_level3}"); })
+            ->when($request->dd_level4, function($q) use($request) { return $q->whereRaw("u.level4_key = {$request->dd_level4}"); })
+            ->when($job_titles, function ($q) use($job_titles) { return $q->whereIn('employee_demo.job_title', $job_titles->toArray() ); })
+            ->when($request->active_since, function ($q) use($request) { return $q->where('employee_demo.hire_dt', '>=', $request->active_since); })
+            ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { return $q->whereRaw("{$request->criteria} like '%{$request->search_text}%'"); })
+            ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(employee_demo.employee_id LIKE '%{$request->search_text}%' OR employee_demo.employee_name LIKE '%{$request->search_text}%' OR employee_demo.classification_group LIKE '%{$request->search_text}%' OR employee_demo.deptid LIKE '%{$request->search_text}%')"); });
     }
 
 
-    protected function baseFilteredSQLs($request, $level0, $level1, $level2, $level3, $level4, $job_titles) {
+    protected function baseFilteredSQLs($request, $job_titles) {
 
         // Base Where Clause
-        $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4, $job_titles);
+        $demoWhere = $this->baseFilteredWhere($request, $job_titles);
 
         $sql_level0 = clone $demoWhere; 
-        $sql_level0->join('organization_trees', function($join) use($level0) {
-            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
-                ->where('organization_trees.level', '=', 0);
+        $sql_level0->join('employee_demo_tree', function($join) use($level0) {
+            $join->on('employee_demo.organization_key', '=', 'employee_demo_tree.organization_key')
+                ->where('employee_demo_tree.level', '=', 0);
             });
             
         $sql_level1 = clone $demoWhere; 
-        $sql_level1->join('organization_trees', function($join) use($level0, $level1) {
-            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
-                ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
-                ->where('organization_trees.level', '=', 1);
+        $sql_level1->join('employee_demo_tree', function($join) use($level0, $level1) {
+            $join->on('employee_demo.organization_key', '=', 'employee_demo_tree.organization_key')
+                ->on('employee_demo.level1_key', '=', 'employee_demo_tree.level1_key')
+                ->where('employee_demo_tree.level', '=', 1);
             });
             
         $sql_level2 = clone $demoWhere; 
-        $sql_level2->join('organization_trees', function($join) use($level0, $level1, $level2) {
-            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
-                ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
-                ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
-                ->where('organization_trees.level', '=', 2);    
+        $sql_level2->join('employee_demo_tree', function($join) use($level0, $level1, $level2) {
+            $join->on('employee_demo.organization_key', '=', 'employee_demo_tree.organization_key')
+                ->on('employee_demo.level1_key', '=', 'employee_demo_tree.level1_key')
+                ->on('employee_demo.level2_key', '=', 'employee_demo_tree.level2_key')
+                ->where('employee_demo_tree.level', '=', 2);    
             });    
             
         $sql_level3 = clone $demoWhere; 
-        $sql_level3->join('organization_trees', function($join) use($level0, $level1, $level2, $level3) {
-            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
-                ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
-                ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
-                ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
-                ->where('organization_trees.level', '=', 3);    
+        $sql_level3->join('employee_demo_tree', function($join) use($level0, $level1, $level2, $level3) {
+            $join->on('employee_demo.organization_key', '=', 'employee_demo_tree.organization_key')
+                ->on('employee_demo.level1_key', '=', 'employee_demo_tree.level1_key')
+                ->on('employee_demo.level2_key', '=', 'employee_demo_tree.level2_key')
+                ->on('employee_demo.level3_key', '=', 'employee_demo_tree.level3_key')
+                ->where('employee_demo_tree.level', '=', 3);    
             });
             
         $sql_level4 = clone $demoWhere; 
-        $sql_level4->join('organization_trees', function($join) use($level0, $level1, $level2, $level3, $level4) {
-            $join->on('employee_demo.organization', '=', 'organization_trees.organization')
-                ->on('employee_demo.level1_program', '=', 'organization_trees.level1_program')
-                ->on('employee_demo.level2_division', '=', 'organization_trees.level2_division')
-                ->on('employee_demo.level3_branch', '=', 'organization_trees.level3_branch')
-                ->on('employee_demo.level4', '=', 'organization_trees.level4')
-                ->where('organization_trees.level', '=', 4);
+        $sql_level4->join('employee_demo_tree', function($join) use($level0, $level1, $level2, $level3, $level4) {
+            $join->on('employee_demo.organization_key', '=', 'employee_demo_tree.organization_key')
+                ->on('employee_demo.level1_key', '=', 'employee_demo_tree.level1_key')
+                ->on('employee_demo.level2_key', '=', 'employee_demo_tree.level2_key')
+                ->on('employee_demo.level3_key', '=', 'employee_demo_tree.level3_key')
+                ->on('employee_demo.level4_key', '=', 'employee_demo_tree.level4_key')
+                ->where('employee_demo_tree.level', '=', 4);
             });
 
         return  [$sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4];

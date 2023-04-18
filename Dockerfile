@@ -11,7 +11,7 @@ WORKDIR /app
 COPY . /app
 
 RUN composer update --ignore-platform-reqs
-RUN composer require kalnoy/nestedset doctrine/dbal awobaz/compoships --ignore-platform-reqs
+RUN composer require kalnoy/nestedset doctrine/dbal awobaz/compoships dompdf/dompdf --ignore-platform-reqs
 
 RUN chgrp -R 0 /app && \
     chmod -R g=u /app
@@ -20,7 +20,7 @@ RUN chgrp -R 0 /app && \
 #
 # Build Server Deployment Image
 #
-FROM php:8.1-apache
+FROM php:8.0-apache
 
 WORKDIR /
 
@@ -104,10 +104,9 @@ RUN bash -c 'mkdir -p /var/www/html/storage{app,framework,logs}'
 RUN chmod -R 755 /var/www/html/storage
 RUN chown -R www-data:www-data /var/www/html/storage/app /var/www/html/storage/framework /var/www/html/storage/logs
 
-RUN chmod 4111 /usr/bin/sudo
-
-RUN chmod -R 755 /var/log/apache2
-RUN chown -R www-data:www-data /var/log/apache2
+RUN chmod 4111 /usr/bin/sudo 
+RUN chmod -R 755 /var/log/apache2 
+RUN chown -R www-data:www-data /var/log/apache2 
 
 #RUN useradd -l -u 1001510000 -c "1001510000" 1001510000 && \
     #addgroup crond-users && \

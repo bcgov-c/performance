@@ -125,7 +125,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <p>Are you sure to send out this message ?</p>
+                        <p class="msg">Are you sure to send out this message ?</p>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-primary mt-2 sharebtn" type="button" name="btn_send" value="btn_send">Share</button>
@@ -151,8 +151,8 @@
     <x-slot name="js">
 	
         <script src="//cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
-        <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
         <script>				
@@ -195,12 +195,6 @@
 
 
             $(document).ready(function(){
-
-                // $(".items-to-share-edit").multiselect({
-                //     allSelectedText: 'All',
-                //     selectAllText: 'All',
-                //     includeSelectAllOption: true
-                // });
 
                 $('#employee-list-table').DataTable( {
                     scrollX: true,
@@ -270,12 +264,12 @@
                     select: true,
                     order: [[1, 'asc']],
                     ajax: {
-                        url: '{{ route(request()->segment(1).'.employeeshares.eemployee.list') }}',
+                        url: '{{ route(request()->segment(1).'.employeeshares.employee.list', 'e') }}',
                         data: function (d) {
                             d.edd_level0 = $('#edd_level0').val();
                             d.edd_level1 = $('#edd_level1').val();
                             d.edd_level2 = $('#edd_level2').val();
-                            d.edd_level3 = $('e#dd_level3').val();
+                            d.edd_level3 = $('#edd_level3').val();
                             d.edd_level4 = $('#edd_level4').val();
                             d.ecriteria = $('#ecriteria').val();
                             d.esearch_text = $('#esearch_text').val();
@@ -307,16 +301,16 @@
                     },
                     columns: [
                         {title: '<input name="eselect_all" value="1" id="eemployee-list-select-all" type="checkbox" />', ariaTitle: 'eemployee-list-select-all', target: 0, type: 'string', data: 'eselect_users', name: 'eselect_users', orderable: false, searchable: false},
-                        {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'eemployee_id', name: 'eemployee_id', className: 'dt-nowrap'},
-                        {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'eemployee_name', name: 'eemployee_name', className: 'dt-nowrap'},
-                        {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'ejobcode_desc', name: 'ejobcode_desc', className: 'dt-nowrap'},
+                        {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', className: 'dt-nowrap'},
+                        {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', className: 'dt-nowrap'},
+                        {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', className: 'dt-nowrap'},
                         // {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'eemployee_email', name: 'eemployee_email', className: 'dt-nowrap'},
-                        {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'eorganization', name: 'eorganization', className: 'dt-nowrap'},
-                        {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'elevel1_program', name: 'elevel1_program', className: 'dt-nowrap'},
-                        {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'elevel2_division', name: 'elevel2_division', className: 'dt-nowrap'},
-                        {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'elevel3_branch', name: 'elevel3_branch', className: 'dt-nowrap'},
-                        {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'elevel4', name: 'elevel4', className: 'dt-nowrap'},
-                        {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'edeptid', name: 'edeptid', className: 'dt-nowrap'},
+                        {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', className: 'dt-nowrap'},
+                        {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', className: 'dt-nowrap'},
+                        {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', className: 'dt-nowrap'},
+                        {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', className: 'dt-nowrap'},
+                        {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', className: 'dt-nowrap'},
+                        {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', name: 'deptid', className: 'dt-nowrap'},
                     ],
                 });
 
@@ -698,6 +692,8 @@
             $(".sharebtn").click(function(){
                 $(".sharebtn").hide();
                 $(".cancelbtn").hide();
+                $(".msg").html("Processing request. Please do not close this window.");
+                
                 $("#notify-form").submit();
             });
             

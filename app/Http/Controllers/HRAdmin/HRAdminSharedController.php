@@ -6,88 +6,135 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\EmployeeDemoTree;
 use App\Models\OrganizationTree;
+use App\Models\AdminOrgTreeView;
+use App\Models\AdminOrgs;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class HRAdminSharedController extends Controller
 {
     public function getOrganizationsV2(Request $request) {
-        $orgs = EmployeeDemoTree::from('employee_demo_tree AS t')
-            ->join('admin_orgs AS o', 'o.orgid', 't.id')
-            ->whereRaw('o.user_id = '.Auth::id())
-            ->orderby('t.name', 'asc')
-            ->select('t.id', 't.name')
-            ->where('t.level', 0)
-            ->when($request->q, function ($q) use($request) { return $q->whereRaw("t.name LIKE '%{$request->q}%'"); })
+        $authId = Auth::id();
+        $orgs = AdminOrgTreeView::select('orgid', 'name')
+            ->where('version', \DB::raw(2))
+            ->where('inherited', \DB::raw(0))
+            ->where('user_id', \DB::raw($authId))
+            ->where('level', \DB::raw(0))
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); });
+        $orgsInherited = EmployeeDemoTree::select('organization_key AS orgid', 'organization AS name')
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("organization LIKE '%{$request->q}%'"); })
+            ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs WHERE (orgid = organization_key OR orgid = level1_key OR orgid = level2_key OR orgid = level3_key OR orgid = level4_key) AND version = 2 AND inherited = 1 AND user_id = {$authId})");
+        $orgs = $orgs->union($orgsInherited)
+            ->distinct()
+            ->orderby('name', 'asc')
+            ->limit(300)
             ->get();
         $formatted_orgs = [];
-        foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
+        foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->orgid, 'text' => $org->name]; }
         return response()->json($formatted_orgs);
     } 
 
     public function getProgramsV2(Request $request) {
-        $orgs = EmployeeDemoTree::from('employee_demo_tree AS t')
-        ->join('admin_orgs AS o', 'o.orgid', 't.id')
-        ->whereRaw('o.user_id = '.Auth::id())
-        ->orderby('t.name', 'asc')
-        ->select('t.id', 't.name')
-        ->where('t.level', 1)
-        ->when($request->q, function ($q) use($request) { return $q->whereRaw("t.name LIKE '%{$request->q}%'"); })
-        ->when($request->level0, function ($q) use($request) { return $q->where('t.organization_key', $request->level0); })
-        ->get();
+        $authId = Auth::id();
+        $orgs = AdminOrgTreeView::select('orgid', 'name')
+            ->where('version', \DB::raw(2))
+            ->where('inherited', \DB::raw(0))
+            ->where('user_id', \DB::raw($authId))
+            ->where('level', \DB::raw(1))
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); });
+        $orgsInherited = EmployeeDemoTree::select('level1_key AS orgid', 'level1_program AS name')
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("level1_program LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
+            ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs WHERE (orgid = organization_key OR orgid = level1_key OR orgid = level2_key OR orgid = level3_key OR orgid = level4_key) AND version = 2 AND inherited = 1 AND user_id = {$authId})");
+        $orgs = $orgs->union($orgsInherited)
+            ->distinct()
+            ->orderby('name', 'asc')
+            ->limit(300)
+            ->get();
         $formatted_orgs = [];
-        foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
+        foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->orgid, 'text' => $org->name]; }
         return response()->json($formatted_orgs);
     } 
 
     public function getDivisionsV2(Request $request) {
-        $orgs = EmployeeDemoTree::from('employee_demo_tree AS t')
-        ->join('admin_orgs AS o', 'o.orgid', 't.id')
-        ->whereRaw('o.user_id = '.Auth::id())
-        ->orderby('t.name', 'asc')
-        ->select('t.id', 't.name')
-        ->where('t.level', 2)
-        ->when($request->q, function ($q) use($request) { return $q->whereRaw("t.name LIKE '%{$request->q}%'"); })
-        ->when($request->level0, function ($q) use($request) { return $q->where('t.organization_key', $request->level0); })
-        ->when($request->level1, function ($q) use($request) { return $q->where('t.level1_key', $request->level1); })
-        ->get();
+        $authId = Auth::id();
+        $orgs = AdminOrgTreeView::select('orgid', 'name')
+            ->where('version', \DB::raw(2))
+            ->where('inherited', \DB::raw(0))
+            ->where('user_id', \DB::raw($authId))
+            ->where('level', \DB::raw(2))
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
+            ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); });
+        $orgsInherited = EmployeeDemoTree::select('level2_key AS orgid', 'level2_division AS name')
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("level2_division LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
+            ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); })
+            ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs WHERE (orgid = organization_key OR orgid = level1_key OR orgid = level2_key OR orgid = level3_key OR orgid = level4_key) AND version = 2 AND inherited = 1 AND user_id = {$authId})");
+        $orgs = $orgs->union($orgsInherited)
+            ->distinct()
+            ->orderby('name', 'asc')
+            ->limit(300)
+            ->get();
         $formatted_orgs = [];
-        foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
+        foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->orgid, 'text' => $org->name]; }
         return response()->json($formatted_orgs);
     } 
 
     public function getBranchesV2(Request $request) {
-        $orgs = EmployeeDemoTree::from('employee_demo_tree AS t')
-        ->join('admin_orgs AS o', 'o.orgid', 't.id')
-        ->whereRaw('o.user_id = '.Auth::id())
-        ->orderby('t.name', 'asc')
-        ->select('t.id', 't.name')
-        ->where('t.level', 3)
-        ->when($request->q, function ($q) use($request) { return $q->whereRaw("t.name LIKE '%{$request->q}%'"); })
-        ->when($request->level0, function ($q) use($request) { return $q->where('t.organization_key', $request->level0); })
-        ->when($request->level1, function ($q) use($request) { return $q->where('t.level1_key', $request->level1); })
-        ->when($request->level2, function ($q) use($request) { return $q->where('t.level2_key', $request->level2); })
-        ->get();
+        $authId = Auth::id();
+        $orgs = AdminOrgTreeView::select('orgid', 'name')
+            ->where('version', \DB::raw(2))
+            ->where('inherited', \DB::raw(0))
+            ->where('user_id', \DB::raw($authId))
+            ->where('level', \DB::raw(3))
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
+            ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); })
+            ->when($request->level2, function ($q) use($request) { return $q->where('level2_key', $request->level2); });
+        $orgsInherited = EmployeeDemoTree::select('level3_key AS orgid', 'level3_branch AS name')
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("level3_branch LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
+            ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); })
+            ->when($request->level2, function ($q) use($request) { return $q->where('level2_key', $request->level2); })
+            ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs WHERE (orgid = organization_key OR orgid = level1_key OR orgid = level2_key OR orgid = level3_key OR orgid = level4_key) AND version = 2 AND inherited = 1 AND user_id = {$authId})");
+        $orgs = $orgs->union($orgsInherited)
+            ->distinct()
+            ->orderby('name', 'asc')
+            ->limit(300)
+            ->get();
         $formatted_orgs = [];
-        foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
+        foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->orgid, 'text' => $org->name]; }
         return response()->json($formatted_orgs);
     } 
 
     public function getLevel4V2(Request $request) {
-        $orgs = EmployeeDemoTree::from('employee_demo_tree AS t')
-        ->join('admin_orgs AS o', 'o.orgid', 't.id')
-        ->whereRaw('o.user_id = '.Auth::id())
-        ->orderby('t.name', 'asc')
-        ->select('t.id', 't.name')
-        ->where('t.level', 4)
-        ->when($request->q, function ($q) use($request) { return $q->whereRaw("t.name LIKE '%{$request->q}%'"); })
-        ->when($request->level0, function ($q) use($request) { return $q->where('t.organization_key', $request->level0); })
-        ->when($request->level1, function ($q) use($request) { return $q->where('t.level1_key', $request->level1); })
-        ->when($request->level2, function ($q) use($request) { return $q->where('t.level2_key', $request->level2); })
-        ->when($request->level3, function ($q) use($request) { return $q->where('t.level3_key', $request->level3); })
-        ->get();
+        $authId = Auth::id();
+        $orgs = AdminOrgTreeView::select('orgid', 'name')
+            ->where('version', \DB::raw(2))
+            ->where('inherited', \DB::raw(0))
+            ->where('user_id', \DB::raw($authId))
+            ->where('level', \DB::raw(4))
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
+            ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); })
+            ->when($request->level2, function ($q) use($request) { return $q->where('level2_key', $request->level2); })
+            ->when($request->level3, function ($q) use($request) { return $q->where('level3_key', $request->level3); });
+        $orgsInherited = EmployeeDemoTree::select('level4_key AS orgid', 'level4 AS name')
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("level4 LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
+            ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); })
+            ->when($request->level2, function ($q) use($request) { return $q->where('level2_key', $request->level2); })
+            ->when($request->level3, function ($q) use($request) { return $q->where('level3_key', $request->level3); })
+            ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs WHERE (orgid = organization_key OR orgid = level1_key OR orgid = level2_key OR orgid = level3_key OR orgid = level4_key) AND version = 2 AND inherited = 1 AND user_id = {$authId})");
+        $orgs = $orgs->union($orgsInherited)
+            ->distinct()
+            ->orderby('name', 'asc')
+            ->limit(300)
+            ->get();
         $formatted_orgs = [];
-        foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
+        foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->orgid, 'text' => $org->name]; }
         return response()->json($formatted_orgs);
     } 
 

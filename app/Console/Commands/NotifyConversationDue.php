@@ -117,13 +117,17 @@ class NotifyConversationDue extends Command
                 if ($user->guid == $prev_guid) {
                     continue;
                 }
-
+                $prev_guid = $user->guid;
                 $row_count += 1;
 
                 //$due = Conversation::nextConversationDue( $user );
                 $due = $user->next_conversation_date;
 
                 $dueDate = \Carbon\Carbon::create($due);
+                // To avoid the past email sent out when the sysadmin turn on global flag under system access control
+                if ($dueDate < today()) {
+                    continue;
+                }
                 $now = Carbon::now();
                 $dayDiff = $now->diffInDays($dueDate, false);
     // Override for testing                        
@@ -208,8 +212,6 @@ class NotifyConversationDue extends Command
                     $skip_count += 1;
                 }
 
-                $prev_guid = $user->guid;
-
             }
 
         });
@@ -288,6 +290,10 @@ class NotifyConversationDue extends Command
                     $due = $user->next_conversation_date;
 
                     $dueDate = \Carbon\Carbon::create($due);
+                    // To avoid the past email sent out when the sysadmin turn on global flag under system access control
+                    if ($dueDate < today()) {
+                        continue;
+                    }
                     $now = Carbon::now();
                     $dayDiff = $now->diffInDays($dueDate, false);
     // Override for testing                        
@@ -413,7 +419,7 @@ class NotifyConversationDue extends Command
                 if ($user->guid == $prev_guid) {
                     continue;
                 }
-
+                $prev_guid = $user->guid;
                 $row_count += 1;
 
                 // User Prference 
@@ -427,6 +433,10 @@ class NotifyConversationDue extends Command
                 $due = $user->next_conversation_date;
         
                 $dueDate = \Carbon\Carbon::create($due);
+                // To avoid the past email sent out when the sysadmin turn on global flag under system access control
+                if ($dueDate < today()) {
+                    continue;
+                }
                 $now = Carbon::now();
                 $dayDiff = $now->diffInDays($dueDate, false);
     // Override for testing                        
@@ -505,8 +515,6 @@ class NotifyConversationDue extends Command
                     // $this->logInfo( $now->format('Y-m-d') . ' - E - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . ' ** SKIPPED ** (NOT DUE YET)' );
                     $skip_count += 1;
                 }
-
-                $prev_guid = $user->guid;
 
             }
 
@@ -595,6 +603,11 @@ class NotifyConversationDue extends Command
                     $due = $user->next_conversation_date;
 
                     $dueDate = \Carbon\Carbon::create($due);
+                    // To avoid the past email sent out when the sysadmin turn on global flag under system access control
+                    if ($dueDate < today()) {
+                        continue;
+                    }
+
                     $now = Carbon::now();
                     $dayDiff = $now->diffInDays($dueDate, false);
     // Override for testing                        

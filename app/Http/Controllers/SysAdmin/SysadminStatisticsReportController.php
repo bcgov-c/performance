@@ -11,8 +11,8 @@ use App\Models\User;
 use App\Models\GoalType;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
+use App\Models\UserDemoJrView;
 use Illuminate\Http\Request;
-use App\Models\OrganizationTree;
 use App\Models\ConversationTopic;
 use Illuminate\Support\Facades\DB;
 use App\Exports\ConversationExport;
@@ -23,6 +23,9 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\SharedEmployeeExport;
 use App\Exports\ExcusedEmployeeExport;
 use Illuminate\Support\Facades\Log;
+
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class SysadminStatisticsReportController extends Controller
 {
@@ -424,7 +427,7 @@ class SysadminStatisticsReportController extends Controller
                             DATEDIFF ( users.next_conversation_date
                             , curdate() )
                         as overdue_in_days")
-                ->join('employee_demo', function($join) {
+                ->leftJoin('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 })
                 ->where(function($query) {
@@ -439,12 +442,14 @@ class SysadminStatisticsReportController extends Controller
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
                 ->when( $request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
                 ->when( $request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
-                ->where('users.excused_flag', '<>', '1')
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('users.excused_flag', '<>', '1')
+                            ->orWhereNull('users.excused_flag');
+                    });
+                }) 
                 ->whereNull('employee_demo.date_deleted');
                 
-        Log::warning('Chart 1');
-        Log::warning(print_r($sql_2->toSql(),true));
-        Log::warning(print_r($sql_2->getBindings(),true));        
                 
         $next_due_users = $sql_2->get();
         $data = array();
@@ -701,7 +706,8 @@ class SysadminStatisticsReportController extends Controller
                     'topic_id' => $topic->id, 
                 ]);
         }     
-
+        
+        
         return view('sysadmin.statistics.conversationsummary',compact('data'));
 
     }
@@ -714,7 +720,7 @@ class SysadminStatisticsReportController extends Controller
             employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4,
                         DATEDIFF ( users.next_conversation_date, curdate() ) as overdue_in_days,
                         users.next_conversation_date as next_due_date")
-                ->join('employee_demo', function($join) {
+                ->leftJoin('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 })
                 ->where(function($query) {
@@ -723,14 +729,19 @@ class SysadminStatisticsReportController extends Controller
                             ->orWhereNull('users.due_date_paused');
                     });
                 })
-                ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
+                ->leftJoin('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
                 ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
                 ->when( $request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
                 ->when( $request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
                 ->whereNull('employee_demo.date_deleted')
-                ->where('users.excused_flag', '<>', '1');
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('users.excused_flag', '<>', '1')
+                            ->orWhereNull('users.excused_flag');
+                    });
+                }) ;
                 
         // SQL - Chart 2
         $sql_chart2 = Conversation::selectRaw("conversations.*, users.employee_id, employee_name, users.email,
@@ -837,6 +848,7 @@ class SysadminStatisticsReportController extends Controller
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
                 ->when( $request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
                 ->when( $request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); });
+             
                 
         // SQL for Chart 5
          $sql_chart5 = ConversationParticipant::selectRaw("conversations.*, conversation_topics.name as conversation_name, users.employee_id, employee_name, users.email,
@@ -873,10 +885,9 @@ class SysadminStatisticsReportController extends Controller
             ->whereNull('employee_demo.date_deleted')        
             ->when( $request->topic_id, function($q) use($request) {
                 $q->where('conversations.conversation_topic_id', $request->topic_id);
-            })
-            ;        
-                
-
+            });        
+                   
+            
 
         // Generating Output file 
         $filename = 'Conversations.xlsx';
@@ -1123,7 +1134,7 @@ class SysadminStatisticsReportController extends Controller
             
             case 5:
 
-                $filename = 'Completed Open Conversations by Employee.csv';
+                $filename = 'Completed Conversations by Employee.csv';
                 $conversations =  $sql_chart5->get();
                 $conversations_unique = array();
                 $topics = ConversationTopic::select('id','name')->get();
@@ -1148,7 +1159,7 @@ class SysadminStatisticsReportController extends Controller
                 );
         
                 $columns = ["Employee ID", "Employee Name", "Email","Conversation Name","Conversation Participant",
-                        "Conversation Due Date", "Employee Sign-Off", "Supervisor Sign-off", 
+                        "Employee Sign-Off", "Employee Sign-Off Time", "Supervisor Sign-off", "Supervisor Sign-off Time", 
                                 "Organization", "Level 1", "Level 2", "Level 3", "Level 4", 
                            ];
         
@@ -1157,7 +1168,7 @@ class SysadminStatisticsReportController extends Controller
                     fputcsv($file, $columns);
                     
                     foreach ($conversations_unique as $conversation) {
-                            $row['Employee ID'] = " ".$conversation->employee_id;
+                            $row['Employee ID'] = "[".$conversation->employee_id."]";
                             $row['Name'] = $conversation->employee_name;
                             $row['Email'] = $conversation->email;
                             $row['Conversation Name'] = $conversation->conversation_name;
@@ -1171,9 +1182,11 @@ class SysadminStatisticsReportController extends Controller
                                 $participants_arr[] = $participant->name;
                             }
                             $row['Conversation Participant'] = implode(', ', $participants_arr );
-                            $row['Conversation Due Date'] = $conversation->next_due_date;
+                            //$row['Conversation Due Date'] = $conversation->next_due_date;
                             $row['Employee Sign-Off'] = $conversation->sign_employee_name;
+                            $row['Employee Sign-Off Time'] = $conversation->sign_off_time;
                             $row['Supervisor Sign-off'] = $conversation->sign_supervisor_name;
+                            $row['Supervisor Sign-off Time'] = $conversation->supervisor_signoff_time;
                             $row['Organization'] = $conversation->organization;
                             $row['Level 1'] = $conversation->level1_program;
                             $row['Level 2'] = $conversation->level2_division;
@@ -1181,8 +1194,8 @@ class SysadminStatisticsReportController extends Controller
                             $row['Level 4'] = $conversation->level4;
 
                             fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], // $row['Next Conversation Due'],
-                            $row["Conversation Name"],$row['Conversation Participant'],  $row['Conversation Due Date'],  
-                        $row["Employee Sign-Off"], $row["Supervisor Sign-off"],
+                            $row["Conversation Name"],$row['Conversation Participant'], 
+                        $row["Employee Sign-Off"], $row["Employee Sign-Off Time"], $row["Supervisor Sign-off"],$row["Supervisor Sign-off Time"],
                                      $row['Organization'],
                                       $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], 
                                     ));
@@ -1194,6 +1207,7 @@ class SysadminStatisticsReportController extends Controller
                 return response()->stream($callback, 200, $headers);
 
                 break;
+                
                 
         }
         
@@ -1498,6 +1512,7 @@ class SysadminStatisticsReportController extends Controller
             $data["error"]["employee_id"] = 0;
             $data["error"]["start_date"] = 0;
             $data["error"]["end_date"] = 0;
+            $data["error"]["record_types"] = 0;
             $data["active_goals"] = array();
             $data["past_goals"] = array();
             $data["open_conversations"] = array();
@@ -1508,12 +1523,12 @@ class SysadminStatisticsReportController extends Controller
             $end_date = $request->end_date;
             $record_types = $request->record_types;
             
-            if ($request->employee_id && $request->start_date && $request->end_date) {
+            if ($request->employee_id && $request->start_date && $request->end_date && $request->record_types) {
                 $submit = true;
                 if(!empty($request->record_types)){
                     foreach($request->record_types as $item){
                         if($item == "active_goals"){
-                            $active_goals = Goal::selectRaw("goals.id, users.name, goals.title, goals.created_at, employee_demo.organization, employee_demo.business_unit")
+                            $active_goals = Goal::selectRaw("goals.id, users.name, goals.title, goals.start_date, goals.target_date, goals.created_at, employee_demo.organization, employee_demo.business_unit")
                                     ->join('users', function($join) {
                                         $join->on('users.id', '=', 'goals.user_id');   
                                     }) 
@@ -1525,19 +1540,19 @@ class SysadminStatisticsReportController extends Controller
                                     ->where(function($query) use($request) {   
                                             $query->where(function($query) use($request) {   
                                                             $query ->where([
-                                                                ['goals.created_at','>=',$request->start_date],
-                                                                ['goals.created_at','<=',$request->end_date]
-                                                            ])
-                                                            ->orWhereNull('goals.target_date');
+                                                                ['goals.created_at','>=',$request->start_date . ' 00:00:00'],
+                                                                ['goals.created_at','<=',$request->end_date . ' 23:59:59']
+                                                            ]);
                                         });
                                     })  
                                     ->where('employee_demo.employee_id', '=', $request->employee_id)  
                                     ->orderBy('goals.created_at', 'DESC')        
-                                    ->get();                                    
+                                    ->get(); 
                             $data["active_goals"] = $active_goals;
+                            
                         }
                         if($item == "past_goals"){
-                            $past_goals = Goal::selectRaw("goals.id, users.name, goals.title, goals.created_at, employee_demo.organization, employee_demo.business_unit")
+                            $past_goals = Goal::selectRaw("goals.id, users.name, goals.title, goals.start_date, goals.target_date, goals.created_at, employee_demo.organization, employee_demo.business_unit")
                                     ->join('users', function($join) {
                                         $join->on('users.id', '=', 'goals.user_id');   
                                     }) 
@@ -1545,14 +1560,13 @@ class SysadminStatisticsReportController extends Controller
                                         $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                     })
                                     ->whereNull('goals.deleted_at')
-                                    ->where('status','=','achieved')
+                                    ->where('status','<>','active')
                                     ->where(function($query) use($request) {   
                                             $query->where(function($query) use($request) {   
                                                             $query ->where([
-                                                                ['goals.created_at','>=',$request->start_date],
-                                                                ['goals.created_at','<=',$request->end_date]
-                                                            ])
-                                                            ->orWhereNull('goals.target_date');
+                                                                ['goals.created_at','>=',$request->start_date . ' 00:00:00'],
+                                                                ['goals.created_at','<=',$request->end_date . ' 23:59:59']
+                                                            ]);
                                         });
                                     })  
                                     ->where('employee_demo.employee_id', '=', $request->employee_id)     
@@ -1562,6 +1576,279 @@ class SysadminStatisticsReportController extends Controller
                         }
                         if($item == "open_conversations"){
                             $open_conversations = ConversationParticipant::selectRaw("conversation_participants.conversation_id, users.name, conversation_topics.name as topic, employee_demo.organization, employee_demo.business_unit, conversations.created_at")
+                                                  ->join('conversations', function($join) {
+                                                        $join->on('conversations.id', '=', 'conversation_participants.conversation_id');   
+                                                  }) 
+                                                  ->join('conversation_topics', function($join) {
+                                                        $join->on('conversations.conversation_topic_id', '=', 'conversation_topics.id');   
+                                                  }) 
+                                                  ->join('users', function($join) {
+                                                        $join->on('users.id', '=', 'conversation_participants.participant_id');   
+                                                  }) 
+                                                  ->join('employee_demo', function($join) {
+                                                        $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                                                  })
+                                                  ->where([
+                                                        ['conversations.created_at','>=',$request->start_date . ' 00:00:00'],
+                                                        ['conversations.created_at','<=',$request->end_date . ' 23:59:59']
+                                                  ])
+                                                  ->where(function($query) {
+                                                        $query->where(function($query) {
+                                                            $query->whereNull('signoff_user_id')
+                                                                ->orWhereNull('supervisor_signoff_id');
+                                                        });
+                                                    })
+                                                  ->whereNull('conversations.deleted_at')
+                                                  ->where('conversation_participants.role', '=', 'emp')          
+                                                  ->where('employee_demo.employee_id', '=', $request->employee_id)   
+                                                  ->orderBy('conversations.created_at', 'DESC')                
+                                                  ->get();
+                                $data["open_conversations"] = $open_conversations;   
+                        }
+                        if($item == "completed_conversations"){
+                            $completed_conversations = ConversationParticipant::selectRaw("conversation_participants.conversation_id, users.name, conversation_topics.name as topic, employee_demo.organization, employee_demo.business_unit,GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as latest_update")
+                                                  ->join('conversations', function($join) {
+                                                        $join->on('conversations.id', '=', 'conversation_participants.conversation_id');   
+                                                  })
+                                                  ->join('conversation_topics', function($join) {
+                                                        $join->on('conversations.conversation_topic_id', '=', 'conversation_topics.id');   
+                                                  }) 
+                                                  ->join('users', function($join) {
+                                                        $join->on('users.id', '=', 'conversation_participants.participant_id');
+                                                  }) 
+                                                  ->join('employee_demo', function($join) {
+                                                        $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                                                  })
+                                                  ->where([
+                                                        ['conversations.sign_off_time','>=',$request->start_date . ' 00:00:00'],
+                                                        ['conversations.supervisor_signoff_time','>=',$request->start_date . ' 00:00:00'],
+                                                  ])
+                                                  ->where([
+                                                        ['conversations.sign_off_time','<=',$request->end_date . ' 23:59:59'],
+                                                        ['conversations.supervisor_signoff_time','<=',$request->end_date . ' 23:59:59'],
+                                                  ])        
+                                                  ->where(function($query) {
+                                                        $query->where(function($query) {
+                                                            $query->whereNotNull('signoff_user_id')
+                                                                  ->whereNotNull('supervisor_signoff_id');
+                                                        });
+                                                    })
+                                                  ->whereNull('conversations.deleted_at')
+                                                  ->where('conversation_participants.role', '=', 'emp')             
+                                                  ->where('employee_demo.employee_id', '=', $request->employee_id)  
+                                                  ->orderBy('conversations.id', 'DESC')              
+                                                  ->get();
+                            $data["completed_conversations"] = $completed_conversations;  
+                            
+                            $sql = ConversationParticipant::selectRaw("conversation_participants.conversation_id, users.name, conversation_topics.name as topic, employee_demo.organization, employee_demo.business_unit,GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as latest_update")
+                                                  ->join('conversations', function($join) {
+                                                        $join->on('conversations.id', '=', 'conversation_participants.conversation_id');   
+                                                  })
+                                                  ->join('conversation_topics', function($join) {
+                                                        $join->on('conversations.conversation_topic_id', '=', 'conversation_topics.id');   
+                                                  }) 
+                                                  ->join('users', function($join) {
+                                                        $join->on('users.id', '=', 'conversation_participants.participant_id');   
+                                                  }) 
+                                                  ->join('employee_demo', function($join) {
+                                                        $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                                                  })
+                                                  ->where([
+                                                        ['conversations.sign_off_time','>=',$request->start_date . ' 00:00:00'],
+                                                        ['conversations.supervisor_signoff_time','>=',$request->start_date . ' 00:00:00'],
+                                                  ])
+                                                  ->where([
+                                                        ['conversations.sign_off_time','<=',$request->end_date . ' 23:59:59'],
+                                                        ['conversations.supervisor_signoff_time','<=',$request->end_date . ' 23:59:59'],
+                                                  ])        
+                                                  ->where(function($query) {
+                                                        $query->where(function($query) {
+                                                            $query->whereNotNull('signoff_user_id')
+                                                                  ->whereNotNull('supervisor_signoff_id');
+                                                        });
+                                                    })
+                                                  ->whereNull('conversations.deleted_at')
+                                                  ->where('conversation_participants.role', '=', 'emp')             
+                                                  ->where('employee_demo.employee_id', '=', $request->employee_id)  
+                                                  ->orderBy('conversations.id', 'DESC');
+                        }
+                    }
+                } 
+            } else {
+                if (!$request->employee_id){
+                    $data["error"]["employee_id"] = 1;
+                }
+                if (!$request->start_date) {
+                    $data["error"]["start_date"] = 1;
+                }
+                if (!$request->end_date) {
+                    $data["error"]["end_date"] = 1;
+                }
+                if (!$request->record_types){
+                    $data["error"]["record_types"] = 1;
+                }
+            }
+        }
+        //echo $start_date;exit;
+        return view('sysadmin.statistics.filereports', compact('data', 'submit', 'employee_id', 'start_date', 'end_date', 'record_types'));
+    }
+    
+    
+    public function fileReportsExport(Request $request)
+    {
+        if($request->type == 'active_goal'){
+            $data = array();
+            $active_goals = Goal::selectRaw("goals.id, users.name, goals.what, goals.measure_of_success, goals.created_at, goals.title, goals.start_date, goals.target_date, employee_demo.organization, employee_demo.business_unit")
+                                    ->join('users', function($join) {
+                                        $join->on('users.id', '=', 'goals.user_id');   
+                                    }) 
+                                    ->join('employee_demo', function($join) {
+                                        $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                                    })
+                                    ->whereNull('goals.deleted_at')
+                                    ->where('status','=','active')
+                                    ->where(function($query) use($request) {   
+                                            $query->where(function($query) use($request) {   
+                                                            $query ->where([
+                                                                ['goals.created_at','>=',$request->start_date . ' 00:00:00'],
+                                                                ['goals.created_at','<=',$request->end_date . ' 23:59:59']
+                                                            ]);
+                                        });
+                                    })
+                                    ->where('employee_demo.employee_id', '=', $request->employee_id)  
+                                    ->orderBy('goals.created_at', 'DESC')        
+                                    ->get(); 
+            foreach ($active_goals as $active_goal){
+                $goal_id = $active_goal->id;
+                $goal_comments = DB::table('goal_comments')
+                                    ->selectRaw("goal_comments.*, users.name, employee_demo.organization, employee_demo.organization, employee_demo.business_unit")
+                                    ->join('users', function($join) {
+                                            $join->on('users.id', '=', 'goal_comments.user_id');   
+                                        }) 
+                                    ->join('employee_demo', function($join) {
+                                            $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                                        })
+                                    ->where('goal_comments.goal_id','=',$goal_id)           
+                                    ->get(); 
+                $comments = array();
+                $i = 0;
+                foreach($goal_comments as $goal_item){
+                    $comments[$i]['id'] = $goal_item->id; 
+                    $comments[$i]['goal_id'] = $goal_item->goal_id; 
+                    $comments[$i]['user_id'] = $goal_item->user_id; 
+                    $comments[$i]['comment'] = $goal_item->comment; 
+                    $comments[$i]['created_at'] = $goal_item->created_at; 
+                    $comments[$i]['updated_at'] = $goal_item->updated_at; 
+                    $comments[$i]['deleted_at'] = $goal_item->deleted_at; 
+                    $comments[$i]['parent_id'] = $goal_item->parent_id; 
+                    $comments[$i]['name'] = $goal_item->name; 
+                    
+                    $i++;
+                }               
+                                        
+                $comments = $this->getCommentTree($comments, '');
+                $commentTree = $this->getCommentTreeHtml($comments);
+                
+                $item["selected_goal"] = $active_goal;
+                $item["selected_goal_comments"] = $commentTree;                
+                
+                array_push($data, $item);
+            }              
+            
+            $options = new Options();
+            $options->set('defaultFont', 'Arial');
+            $dompdf = new Dompdf($options);
+            // Fetch the HTML content to be converted to PDF
+            $html = view('sysadmin.statistics.filereportsbulkgoalexport', compact('data'))->render();
+            // Load HTML content
+            $dompdf->loadHtml($html);
+            // Set paper size and orientation
+            $dompdf->setPaper('A4', 'portrait');
+            // Render the HTML as PDF
+            $dompdf->render();
+            // Output the generated PDF to the browser
+            return $dompdf->stream('employee_record_active_goals.pdf');                
+                
+            //return view('sysadmin.statistics.filereportsexport', compact('data'));
+            
+        } elseif($request->type == 'past_goal'){
+            $data = array();
+            $past_goals = Goal::selectRaw("goals.id, users.name, goals.what, goals.measure_of_success, goals.title, goals.created_at, goals.start_date, goals.target_date, employee_demo.organization, employee_demo.business_unit")
+                                    ->join('users', function($join) {
+                                        $join->on('users.id', '=', 'goals.user_id');   
+                                    }) 
+                                    ->join('employee_demo', function($join) {
+                                        $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                                    })
+                                    ->whereNull('goals.deleted_at')
+                                    ->where('status','<>','active')
+                                    ->where(function($query) use($request) {   
+                                            $query->where(function($query) use($request) {   
+                                                            $query ->where([
+                                                                ['goals.created_at','>=',$request->start_date . ' 00:00:00'],
+                                                                ['goals.created_at','<=',$request->end_date . ' 23:59:59']
+                                                            ]);
+                                        });
+                                    })  
+                                    ->where('employee_demo.employee_id', '=', $request->employee_id)     
+                                    ->orderBy('goals.created_at', 'DESC')              
+                                    ->get();
+            foreach ($past_goals as $past_goal){
+                $goal_id = $past_goal->id;
+                $goal_comments = DB::table('goal_comments')
+                                    ->selectRaw("goal_comments.*, users.name, employee_demo.organization, employee_demo.organization, employee_demo.business_unit")
+                                    ->join('users', function($join) {
+                                            $join->on('users.id', '=', 'goal_comments.user_id');   
+                                        }) 
+                                    ->join('employee_demo', function($join) {
+                                            $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                                        })
+                                    ->where('goal_comments.goal_id','=',$goal_id)           
+                                    ->get(); 
+                $comments = array();
+                $i = 0;
+                foreach($goal_comments as $goal_item){
+                    $comments[$i]['id'] = $goal_item->id; 
+                    $comments[$i]['goal_id'] = $goal_item->goal_id; 
+                    $comments[$i]['user_id'] = $goal_item->user_id; 
+                    $comments[$i]['comment'] = $goal_item->comment; 
+                    $comments[$i]['created_at'] = $goal_item->created_at; 
+                    $comments[$i]['updated_at'] = $goal_item->updated_at; 
+                    $comments[$i]['deleted_at'] = $goal_item->deleted_at; 
+                    $comments[$i]['parent_id'] = $goal_item->parent_id; 
+                    $comments[$i]['name'] = $goal_item->name; 
+                    
+                    $i++;
+                }               
+                                        
+                $comments = $this->getCommentTree($comments, '');
+                $commentTree = $this->getCommentTreeHtml($comments);
+                
+                $item["selected_goal"] = $past_goal;
+                $item["selected_goal_comments"] = $commentTree;                
+                
+                array_push($data, $item);
+            }              
+            
+            $options = new Options();
+            $options->set('defaultFont', 'Arial');
+            $dompdf = new Dompdf($options);
+            // Fetch the HTML content to be converted to PDF
+            $html = view('sysadmin.statistics.filereportsbulkgoalexport', compact('data'))->render();
+            // Load HTML content
+            $dompdf->loadHtml($html);
+            // Set paper size and orientation
+            $dompdf->setPaper('A4', 'portrait');
+            // Render the HTML as PDF
+            $dompdf->render();
+            // Output the generated PDF to the browser
+            return $dompdf->stream('employee_record_past_goals.pdf');                
+                
+            //return view('sysadmin.statistics.filereportsexport', compact('data'));
+            
+        }elseif($request->type == 'open_conversation'){
+            $data = array();
+            $open_conversations = ConversationParticipant::selectRaw("conversation_participants.conversation_id, users.name, conversation_topics.name as topic, employee_demo.organization, employee_demo.business_unit, conversations.created_at")
                                                   ->join('conversations', function($join) {
                                                         $join->on('conversations.id', '=', 'conversation_participants.conversation_id');   
                                                   }) 
@@ -1589,10 +1876,61 @@ class SysadminStatisticsReportController extends Controller
                                                   ->where('employee_demo.employee_id', '=', $request->employee_id)   
                                                   ->orderBy('conversations.created_at', 'DESC')                
                                                   ->get();
-                                $data["open_conversations"] = $open_conversations;   
-                        }
-                        if($item == "completed_conversations"){
-                            $completed_conversations = ConversationParticipant::selectRaw("conversation_participants.conversation_id, users.name, conversation_topics.name as topic, employee_demo.organization, employee_demo.business_unit,GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as latest_update")
+                                                    
+            foreach($open_conversations as $item){
+                $conversation_id = $item->conversation_id;                
+                
+                $conversation = Conversation::selectRaw("conversations.*, conversation_topics.name as topic, users.employee_id, employee_demo.employee_name, users.email,
+                employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4,
+                        users.next_conversation_date as next_due_date, supervisor.name as sign_supervisor_name, employee.name as sign_employee_name")
+                ->whereNull('deleted_at')                        
+                ->join('conversation_participants','conversations.id','conversation_participants.conversation_id')        
+                ->join('users', 'users.id', 'conversation_participants.participant_id') 
+                ->join('conversation_topics','conversations.conversation_topic_id','conversation_topics.id')                
+                ->join('employee_demo', function($join) {
+                    $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                })
+                ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
+                ->leftJoin('users as supervisor', 'supervisor.id', '=', 'conversations.supervisor_signoff_id')
+                ->leftJoin('users as employee', 'employee.id', '=', 'conversations.signoff_user_id')   
+                ->where('conversation_participants.role','=','emp')
+                ->where('conversations.id','=',$conversation_id)
+                ->get();
+                
+                $participants = DB::table('conversation_participants')
+                                        ->select('users.name')
+                                        ->join('users', 'conversation_participants.participant_id', '=', 'users.id')
+                                        ->where('conversation_participants.conversation_id', $conversation_id)
+                                        ->get();      
+                $participants_arr = array();
+                foreach($participants as $participant){
+                    $participants_arr[] = $participant->name;
+                }
+                $conversation[0]->participants = implode(', ', $participants_arr );
+                
+                $item["selected_conversation"] = $conversation[0];
+                array_push($data, $item);
+            }               
+            
+            $options = new Options();
+            $options->set('defaultFont', 'Arial');
+            $dompdf = new Dompdf($options);
+            // Fetch the HTML content to be converted to PDF
+            $html = view('sysadmin.statistics.filereportsbulkconversationexport', compact('data'))->render();
+            // Load HTML content
+            $dompdf->loadHtml($html);
+            // Set paper size and orientation
+            $dompdf->setPaper('A4', 'portrait');
+            // Render the HTML as PDF
+            $dompdf->render();
+            // Output the generated PDF to the browser
+            return $dompdf->stream('employee_record_open_conversations.pdf');                
+                
+            //return view('sysadmin.statistics.filereportsexport', compact('data'));
+            
+        }elseif($request->type == 'completed_conversation'){
+            $data = array();
+            $completed_conversations = ConversationParticipant::selectRaw("conversation_participants.conversation_id, users.name, conversation_topics.name as topic, employee_demo.organization, employee_demo.business_unit,GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as latest_update")
                                                   ->join('conversations', function($join) {
                                                         $join->on('conversations.id', '=', 'conversation_participants.conversation_id');   
                                                   })
@@ -1624,32 +1962,59 @@ class SysadminStatisticsReportController extends Controller
                                                   ->where('employee_demo.employee_id', '=', $request->employee_id)  
                                                   ->orderBy('conversations.id', 'DESC')              
                                                   ->get();
-                            $data["completed_conversations"] = $completed_conversations;  
-                        }
-                    }
+                                                    
+            foreach($completed_conversations as $item){
+                $conversation_id = $item->conversation_id;                
+                
+                $conversation = Conversation::selectRaw("conversations.*, conversation_topics.name as topic, users.employee_id, employee_demo.employee_name, users.email,
+                employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4,
+                        users.next_conversation_date as next_due_date, supervisor.name as sign_supervisor_name, employee.name as sign_employee_name")
+                ->whereNull('deleted_at')                        
+                ->join('conversation_participants','conversations.id','conversation_participants.conversation_id')        
+                ->join('users', 'users.id', 'conversation_participants.participant_id') 
+                ->join('conversation_topics','conversations.conversation_topic_id','conversation_topics.id')                
+                ->join('employee_demo', function($join) {
+                    $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                })
+                ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
+                ->leftJoin('users as supervisor', 'supervisor.id', '=', 'conversations.supervisor_signoff_id')
+                ->leftJoin('users as employee', 'employee.id', '=', 'conversations.signoff_user_id')   
+                ->where('conversation_participants.role','=','emp')
+                ->where('conversations.id','=',$conversation_id)
+                ->get();
+                
+                $participants = DB::table('conversation_participants')
+                                        ->select('users.name')
+                                        ->join('users', 'conversation_participants.participant_id', '=', 'users.id')
+                                        ->where('conversation_participants.conversation_id', $conversation_id)
+                                        ->get();      
+                $participants_arr = array();
+                foreach($participants as $participant){
+                    $participants_arr[] = $participant->name;
                 }
-            } else {
-                if (!$request->employee_id){
-                    $data["error"]["employee_id"] = 1;
-                }
-                if (!$request->start_date) {
-                    $data["error"]["start_date"] = 1;
-                }
-                if (!$request->end_date) {
-                    $data["error"]["end_date"] = 1;
-                }
-            }
-        }
-        //echo $start_date;exit;
-        return view('sysadmin.statistics.filereports', compact('data', 'submit', 'employee_id', 'start_date', 'end_date', 'record_types'));
-    }
-    
-    
-    public function fileReportsExport(Request $request)
-    {
-        if($request->type == 'bulk'){
+                $conversation[0]->participants = implode(', ', $participants_arr );
+                
+                $item["selected_conversation"] = $conversation[0];
+                array_push($data, $item);
+            }               
             
-        } else {
+            $options = new Options();
+            $options->set('defaultFont', 'Arial');
+            $dompdf = new Dompdf($options);
+            // Fetch the HTML content to be converted to PDF
+            $html = view('sysadmin.statistics.filereportsbulkconversationexport', compact('data'))->render();
+            // Load HTML content
+            $dompdf->loadHtml($html);
+            // Set paper size and orientation
+            $dompdf->setPaper('A4', 'portrait');
+            // Render the HTML as PDF
+            $dompdf->render();
+            // Output the generated PDF to the browser
+            return $dompdf->stream('employee_record_completed_conversations.pdf');                
+                
+            //return view('sysadmin.statistics.filereportsexport', compact('data'));
+            
+        }else {
             if($request->type == 'selected_goal'){
                 $goal_id = $request->id;
                 $selected_goal = Goal::selectRaw("users.name, goals.*, employee_demo.organization, employee_demo.business_unit")
@@ -1662,23 +2027,53 @@ class SysadminStatisticsReportController extends Controller
                                     ->whereNull('goals.deleted_at')
                                     ->where('goals.id','=',$goal_id)           
                                     ->get();
-                $goal_comments = GoalComment::selectRaw("goal_comments.*, users.name, employee_demo.organization, employee_demo.organization, employee_demo.business_unit")
+                $goal_comments = DB::table('goal_comments')
+                                    ->selectRaw("goal_comments.*, users.name, employee_demo.organization, employee_demo.organization, employee_demo.business_unit")
                                     ->join('users', function($join) {
                                             $join->on('users.id', '=', 'goal_comments.user_id');   
                                         }) 
                                     ->join('employee_demo', function($join) {
                                             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                         })
-                                    ->whereNull('goal_comments.deleted_at')
                                     ->where('goal_comments.goal_id','=',$goal_id)           
-                                    ->get();
+                                    ->get(); 
+                $comments = array();
+                $i = 0;
+                foreach($goal_comments as $item){
+                    $comments[$i]['id'] = $item->id; 
+                    $comments[$i]['goal_id'] = $item->goal_id; 
+                    $comments[$i]['user_id'] = $item->user_id; 
+                    $comments[$i]['comment'] = $item->comment; 
+                    $comments[$i]['created_at'] = $item->created_at; 
+                    $comments[$i]['updated_at'] = $item->updated_at; 
+                    $comments[$i]['deleted_at'] = $item->deleted_at; 
+                    $comments[$i]['parent_id'] = $item->parent_id; 
+                    $comments[$i]['name'] = $item->name; 
+                    
+                    $i++;
+                }                                          
                                         
-                $comments = $this->getCommentTree($goal_comments, '');
+                $comments = $this->getCommentTree($comments, '');
                 $commentTree = $this->getCommentTreeHtml($comments);
                                 
                 $data["selected_goal"] = $selected_goal[0];
                 $data["selected_goal_comments"] = $commentTree;
-                return view('sysadmin.statistics.filereportsexport', compact('data'));
+                
+                $options = new Options();
+                $options->set('defaultFont', 'Arial');
+                $dompdf = new Dompdf($options);
+                // Fetch the HTML content to be converted to PDF
+                $html = view('sysadmin.statistics.filereportsexport', compact('data'))->render();
+                // Load HTML content
+                $dompdf->loadHtml($html);
+                // Set paper size and orientation
+                $dompdf->setPaper('A4', 'portrait');
+                // Render the HTML as PDF
+                $dompdf->render();
+                // Output the generated PDF to the browser
+                return $dompdf->stream('employee_record.pdf');                
+                
+                //return view('sysadmin.statistics.filereportsexport', compact('data'));
             }
             if($request->type == 'selected_conversation'){
                 $conversation_id = $request->id;                
@@ -1712,7 +2107,23 @@ class SysadminStatisticsReportController extends Controller
                 $conversation[0]->participants = implode(', ', $participants_arr );
                 
                 $data["selected_conversation"] = $conversation[0];
-                return view('sysadmin.statistics.filereportsexport', compact('data'));
+                
+                
+                $options = new Options();
+                $options->set('defaultFont', 'Arial');
+                $dompdf = new Dompdf($options);
+                // Fetch the HTML content to be converted to PDF
+                $html = view('sysadmin.statistics.filereportsexport', compact('data'))->render();
+                // Load HTML content
+                $dompdf->loadHtml($html);
+                // Set paper size and orientation
+                $dompdf->setPaper('A4', 'portrait');
+                // Render the HTML as PDF
+                $dompdf->render();
+                // Output the generated PDF to the browser
+                return $dompdf->stream('employee_record.pdf');                
+                
+                //return view('sysadmin.statistics.filereportsexport', compact('data'));      
             }
         }
                 
@@ -1735,7 +2146,12 @@ class SysadminStatisticsReportController extends Controller
         $prepend = str_repeat(' ', $level);
         $output .= $prepend . '<ul>' . PHP_EOL;
         foreach($arr as $comment) {
-            $output .= $prepend . '    <li>' . $comment['name'] . ' ' . date('d/m/Y h:m:s', strtotime($comment['created_at'])) . ' ' . $comment['comment'] . PHP_EOL;
+            if($comment['deleted_at'] != ''){
+                $comment_content = '<p>Comment is deleted</p>';
+            }else{
+                $comment_content = $comment['comment'];
+            }
+            $output .= $prepend . '    <li>' . $comment['name'] . ' ' . date('d/m/Y h:m:s', strtotime($comment['created_at'])) . ' ' . $comment_content . PHP_EOL;
             if (!empty($comment['reply'])) {
                 $output .= $this->getCommentTreeHtml($comment['reply'], $level+1);
             }
@@ -1744,6 +2160,370 @@ class SysadminStatisticsReportController extends Controller
         $output .= $prepend . '</ul>' . PHP_EOL;
         return $output;
     }
+    
+    
+    public function conversationStatus(Request $request)
+    {
 
+        // send back the input parameters
+        $this->preservedInputParams($request);
 
+        $request->session()->flash('dd_level0', $request->dd_level0);
+        $request->session()->flash('dd_level1', $request->dd_level1);
+        $request->session()->flash('dd_level2', $request->dd_level2);
+        $request->session()->flash('dd_level3', $request->dd_level3);
+        $request->session()->flash('dd_level4', $request->dd_level4);
+        
+        // Chart6 -- Employee Has Open Conversation
+         
+        //get all employee number
+        $employees = UserDemoJrView::distinct('employee_id')                
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })   
+                ->count();
+         
+        //get employees has open conversations
+        $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, 
+                            organization, level1_program, level2_division, level3_branch, level4
+                 ")
+                ->join('conversation_participants', function($join) {
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                })
+                ->join('conversations', function($join) {
+                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
+                })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
+                    });
+                })
+		->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('excused_flag', '<>', '1')
+                            ->orWhereNull('excused_flag');
+                    });
+                }) 
+                ->whereNull('date_deleted')
+                ->whereNotNull('conversation_id')        
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereNull('signoff_user_id')
+                              ->orWhereNull('supervisor_signoff_id');
+                    });
+                });       
+ 
+        $users = $sql_6->get();
+        $users = $users->unique('employee_id');
+        
+        $has_conversation = $users->count();
+        $no_conversation = $employees - $has_conversation;
+        // Chart 6 
+        $legends = ['Yes', 'No'];
+        $data['chart6']['chart_id'] = 6;
+        $data['chart6']['title'] = 'Employee Has Open Conversation';
+        $data['chart6']['legend'] = $legends;
+        $data['chart6']['groups'] = array();
+        
+        foreach($legends as $legend)
+        {            
+            if($legend == 'No') {
+                $subset = $no_conversation;
+            } else {
+                $subset = $has_conversation;
+            }
+            
+            array_push( $data['chart6']['groups'],  [ 'name' => $legend, 'value' => $subset,
+                            'legend' => $legend, 
+                        ]);
+        } 
+        
+        
+        // Chart7 -- Employee Has Completed Conversation
+        //get employees has Completed conversations
+        $sql_7 = UserDemoJrView::selectRaw("employee_id, employee_name, 
+                            organization, level1_program, level2_division, level3_branch, level4
+                 ")
+                ->join('conversation_participants', function($join) {
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                })
+                ->join('conversations', function($join) {
+                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
+                })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
+                    });
+                })
+		->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('excused_flag', '<>', '1')
+                            ->orWhereNull('excused_flag');
+                    });
+                }) 
+                ->whereNull('date_deleted')
+                ->whereNotNull('conversation_id')           
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereNotNull('signoff_user_id')
+                              ->WhereNotNull('supervisor_signoff_id');
+                    });
+                });     
+        
+        $users = $sql_7->get();
+        $users = $users->unique('employee_id');
+        
+        $has_conversation = $users->count();
+        $no_conversation = $employees - $has_conversation;
+        // Chart 7 
+        $legends = ['Yes', 'No'];
+        $data['chart7']['chart_id'] = 7;
+        $data['chart7']['title'] = 'Employee Has Completed Conversation';
+        $data['chart7']['legend'] = $legends;
+        $data['chart7']['groups'] = array();
+
+        foreach($legends as $legend)
+        {
+            if($legend == 'No') {
+                $subset = $no_conversation;
+            } else {
+                $subset = $has_conversation;
+            }
+            array_push( $data['chart7']['groups'],  [ 'name' => $legend, 'value' => $subset,
+                            'legend' => $legend, 
+                        ]);
+        } 
+        return view('sysadmin.statistics.conversationstatus',compact('data'));
+
+    }
+    
+
+    public function conversationStatusExport(Request $request) {        
+        // sql6 -- Employee Has Open Conversation
+        $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
+                            organization, level1_program, level2_division, level3_branch, level4
+                 ")
+                ->join('conversation_participants', function($join) {
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                })
+                ->join('conversations', function($join) {
+                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
+                })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
+                    });
+                })
+		->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('excused_flag', '<>', '1')
+                            ->orWhereNull('excused_flag');
+                    });
+                }) 
+                ->whereNull('date_deleted')
+                ->whereNotNull('conversation_id')          
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereNull('signoff_user_id')
+                              ->orWhereNull('supervisor_signoff_id');
+                    });
+                });
+                
+                
+        // sql7 -- Employee Has Completed Conversation
+        $sql_7 = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
+                            organization, level1_program, level2_division, level3_branch, level4
+                 ")
+                ->join('conversation_participants', function($join) {
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                })
+                ->join('conversations', function($join) {
+                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
+                })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
+                    });
+                })
+		->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('excused_flag', '<>', '1')
+                            ->orWhereNull('excused_flag');
+                    });
+                }) 
+                ->whereNull('date_deleted')
+                ->whereNotNull('conversation_id')           
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereNotNull('signoff_user_id')
+                              ->WhereNotNull('supervisor_signoff_id');
+                    });
+                });       
+            
+
+        // Generating Output file 
+        $filename = 'Conversations.xlsx';
+        switch ($request->chart) {
+                
+            case 6:
+
+                $filename = 'Employee Has Open Conversation.csv';
+                $users =  $sql_6->get();
+                $users = $users->unique('employee_id');
+                
+                if($request->legend == 'No'){
+                    //get has conversation users employee_id list
+                    $excludedIds = $users->pluck('employee_id');
+                    $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)
+                            ->where(function($query) {
+                                $query->where(function($query) {
+                                    $query->where('excused_flag', '<>', '1')
+                                        ->orWhereNull('excused_flag');
+                                });
+                            }) 
+                            ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                            ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                            ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                            ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                            ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
+                            ->get();
+                    $users = $users->unique('employee_id');        
+                }  
+
+                $headers = array(
+                    "Content-type"        => "text/csv",
+                    "Content-Disposition" => "attachment; filename=$filename",
+                    "Pragma"              => "no-cache",
+                    "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                    "Expires"             => "0"
+                );
+        
+                $columns = ["Employee ID", "Employee Name", "Email",
+                                "Organization","Next Conversation Due","Reporting To",
+                                "Level 1", "Level 2", "Level 3", "Level 4",
+                           ];
+        
+                $callback = function() use($users, $columns) {
+                    $file = fopen('php://output', 'w');
+                    fputcsv($file, $columns);
+        
+                    foreach ($users as $user) {
+                        $row['Employee ID'] = "[".$user->employee_id."]";
+                        $row['Name'] = $user->employee_name;
+                        $row['Email'] = $user->employee_email;
+                        $row['Organization'] = $user->organization;
+                        $row['next_conversation_date'] = $user->next_conversation_date;
+                        $row['reporting_to_name'] = $user->reporting_to_name;
+                        $row['Level 1'] = $user->level1_program;
+                        $row['Level 2'] = $user->level2_division;
+                        $row['Level 3'] = $user->level3_branch;
+                        $row['Level 4'] = $user->level4;
+        
+                        fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Organization'],
+                                    $row['next_conversation_date'],$row['reporting_to_name'],
+                                    $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
+                    }
+        
+                    fclose($file);
+                };
+        
+                return response()->stream($callback, 200, $headers);
+
+                break;    
+            
+            case 7:
+
+                $filename = 'Employee Has Complete Conversation.csv';
+                $users =  $sql_7->get();
+                $users = $users->unique('employee_id');
+                
+                if($request->legend == 'No'){
+                    //get has conversation users employee_id list
+                    $excludedIds = $users->pluck('employee_id');
+                    $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)
+                            ->where(function($query) {
+                                $query->where(function($query) {
+                                    $query->where('excused_flag', '<>', '1')
+                                        ->orWhereNull('excused_flag');
+                                });
+                            })
+                            ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                            ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                            ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                            ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                            ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
+                            ->get();
+                    $users = $users->unique('employee_id');            
+                }  
+
+                $headers = array(
+                    "Content-type"        => "text/csv",
+                    "Content-Disposition" => "attachment; filename=$filename",
+                    "Pragma"              => "no-cache",
+                    "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                    "Expires"             => "0"
+                );
+        
+                $columns = ["Employee ID", "Employee Name", "Email",
+                                "Organization","Next Conversation Due","Reporting To",
+                                "Level 1", "Level 2", "Level 3", "Level 4",
+                           ];
+        
+                $callback = function() use($users, $columns) {
+                    $file = fopen('php://output', 'w');
+                    fputcsv($file, $columns);
+        
+                    foreach ($users as $user) {
+                        $row['Employee ID'] = "[".$user->employee_id."]";
+                        $row['Name'] = $user->employee_name;
+                        $row['Email'] = $user->employee_email;
+                        $row['Organization'] = $user->organization;
+                        $row['next_conversation_date'] = $user->next_conversation_date;
+                        $row['reporting_to_name'] = $user->reporting_to_name;
+                        $row['Level 1'] = $user->level1_program;
+                        $row['Level 2'] = $user->level2_division;
+                        $row['Level 3'] = $user->level3_branch;
+                        $row['Level 4'] = $user->level4;
+        
+                        fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Organization'],
+                                    $row['next_conversation_date'],$row['reporting_to_name'],
+                                    $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
+                    }
+        
+                    fclose($file);
+                };
+        
+                return response()->stream($callback, 200, $headers);
+
+                break;  
+                
+        }
+        
+    }
 }

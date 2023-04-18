@@ -85,6 +85,7 @@
 		<br>
 
 		<input type="hidden" id="selected_org_nodes" name="selected_org_nodes" value="">
+		<input type="hidden" id="selected_inherited" name="selected_inherited" value="">
 
 		@include('sysadmin.accesspermissions.partials.filter2')
 
@@ -151,6 +152,7 @@
 			g_matched_employees = {!! json_encode($matched_emp_ids) !!};
 			g_selected_employees = {!! json_encode($old_selected_emp_ids) !!};
 			g_selected_orgnodes = {!! json_encode($old_selected_org_nodes) !!};
+			g_selected_inherited = {!! json_encode($old_selected_inherited) !!};
 			g_employees_by_org = [];
 
 			function confirmSaveAccessModal(){
@@ -188,6 +190,8 @@
 					$('#selected_emp_ids').val( text );
 					var text2 = JSON.stringify(g_selected_orgnodes);
 					$('#selected_org_nodes').val( text2 );
+					var text3 = JSON.stringify(g_selected_inherited);
+					$('#selected_inherited').val( text3 );
 					return true; // return false to cancel form action
 				});
 
@@ -307,7 +311,7 @@
 								$(chkbox).prop("indeterminate", false);
 							}
 						} else {
-							if ( $(chkbox).attr('name') == 'userCheck[]') {
+							if ( $(chkbox).attr('name') == 'euserCheck[]') {
 								if (g_selected_orgnodes.includes(chkbox.value)) {
 									$(chkbox).prop('checked', true);
 								} else {
@@ -400,6 +404,8 @@
 				}
 
 				$('#ebtn_search').click(function(e) {
+					g_selected_orgnodes = [];
+					g_selected_inherited = [];
 					target = $('#enav-tree'); 
 					ddnotempty = $('#edd_level0').val() + $('#edd_level1').val() + $('#edd_level2').val() + $('#edd_level3').val() + $('#edd_level4').val();
 					if(ddnotempty) {
@@ -427,16 +433,19 @@
 
 								error: function () {
 									// Create New Access Page, Step 3
+									$(target).removeAttr('loaded');
 									alert("error");
 									$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
 								}
 							})
 							
 						).then(function( data, textStatus, jqXHR ) {
+							//alert( jqXHR.status ); // Alerts 200
 							enodes = $('#eaccordion-level0 input:checkbox');
 							eredrawTreeCheckboxes();	
 						}); 
 					} else {
+						$(target).removeAttr('loaded');
 						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
 					};
 				});
@@ -445,10 +454,10 @@
 					$('#pageLoader').show();
 				});
 
-				$(window).resize(function(){
-					location.reload();
-					return;
-				});
+				// $(window).resize(function(){
+				// 	location.reload();
+				// 	return;
+				// });
 
 			});
 

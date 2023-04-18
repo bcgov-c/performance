@@ -47,7 +47,7 @@ class BuildEmployeeDemoTree extends Command
     {
 
         $start_time = Carbon::now()->format('c');
-        $this->info('Build Employee Demographics Tree, Started: '. $start_time);
+        $this->info(Carbon::now()->format('c')." - Build Employee Demographics Tree, Started: ". $start_time);
 
         $job_name = 'command:BuildEmployeeDemoTree';
         $switch = strtolower(env('PRCS_BUILD_ORG_TREE'));
@@ -69,7 +69,7 @@ class BuildEmployeeDemoTree extends Command
         if ($switch == 'on' || $manualoverride) {
             $level = 0;
             do {
-                $this->info(now()." Processing Level {$level}...");
+                $this->info(Carbon::now()->format('c')." - Processing Level {$level}...");
                 $allDepts = OrganizationHierarchy::distinct()
                 ->select("odoh.*")
                 ->selectRaw("(SELECT COUNT(e.employee_id) FROM employee_demo AS e WHERE e.deptid = odoh.deptid AND e.date_deleted IS NULL) AS headcount")
@@ -154,7 +154,7 @@ class BuildEmployeeDemoTree extends Command
                             default:
                                 break;
                         }
-                        $this->info("  created {$level} - {$dept->okey} - {$dept->name}");
+                        $this->info(Carbon::now()->format('c')." -   created {$level} - {$dept->okey} - {$dept->name}");
                         $count_insert++;
                     } else {
                         $node->name = $dept->name;
@@ -174,13 +174,31 @@ class BuildEmployeeDemoTree extends Command
                         $node->level4_deptid = $dept->level4_deptid;
                         $node->level5_deptid = $dept->level5_deptid;
                         $node->save();
-                        $this->info("  updated {$level} - {$dept->okey} - {$dept->name}");
+                        $this->info(Carbon::now()->format('c')." -   updated {$level} - {$dept->okey} - {$dept->name}");
                         $count_update++;
                     }
                     $total++;
                 }
                 $level++;
             } while ($level < 6);
+
+            // Update OrgId in employee_demo table
+            $this->info(Carbon::now()->format('c').' - Updating Org Ids in employee_demo...');
+            EmployeeDemo::whereRaw("deptid IS NULL OR TRIM(deptid) = ''")
+            ->update(['orgid' => null]);
+            $demoDepts = EmployeeDemo::distinct()
+            ->whereNotNull('deptid')
+            ->select('deptid')
+            ->orderBy('deptid')
+            ->get();
+            foreach($demoDepts as $dept){
+            $org = EmployeeDemoTree::where('deptid', $dept->deptid)
+                ->select('id')
+                ->first();
+            EmployeeDemo::where('deptid', $dept->deptid)
+                ->update(['orgid' => $org ? $org->id : null]);
+            }
+            $this->info(Carbon::now()->format('c').' - Org Ids updated in employee_demo.');
 
             $end_time = Carbon::now()->format('c');
             DB::table('job_sched_audit')->updateOrInsert(
@@ -196,9 +214,9 @@ class BuildEmployeeDemoTree extends Command
                 ]
             );
 
-            $this->info( "Build Employee Demographics Tree, Completed: {$end_time}");
+            $this->info(Carbon::now()->format('c')." - Build Employee Demographics Tree, Completed: {$end_time}");
         } else {
-            $this->info( "Process is currently disabled; or 'PRCS_BUILD_ORG_TREE=on' is currently missing in the .env file.");
+            $this->info(Carbon::now()->format('c')." - Process is currently disabled; or 'PRCS_BUILD_ORG_TREE=on' is currently missing in the .env file.");
         }
     }
 

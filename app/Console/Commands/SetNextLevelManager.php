@@ -74,8 +74,8 @@ class SetNextLevelManager extends Command
         ->whereRaw("users.reporting_to IS NULL OR TRIM(users.reporting_to) = ''")
         ->whereRaw("trim(employee_demo.guid) <> ''")
         ->whereNotNull('employee_demo.guid')
-        ->orderBy('employee_demo.employee_id')
-        ->orderBy('employee_demo.empl_record')
+        // ->orderBy('employee_demo.employee_id')
+        // ->orderBy('employee_demo.empl_record')
         ->chunk(10000, function($employeeDemo) use (&$counter, &$updatecounter, $start_time, $audit_id) {
             foreach ($employeeDemo as $demo) {
                 $reporting_to = $this->getReportingUserId($demo);  

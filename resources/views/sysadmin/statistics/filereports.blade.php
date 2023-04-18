@@ -39,7 +39,7 @@
                                 <td>
                                     <input class="form-check-input" type="checkbox" name="record_types[]" value="active_goals"
                                     <?php       
-                                    if (in_array("active_goals", $record_types)) {
+                                    if (is_array($record_types) && in_array("active_goals", $record_types)) {
                                         echo "checked";
                                     }
                                     ?>
@@ -49,7 +49,7 @@
                                 <td>
                                     <input class="form-check-input" type="checkbox" name="record_types[]" value="open_conversations"
                                     <?php       
-                                    if (in_array("open_conversations", $record_types)) {
+                                    if (is_array($record_types) && in_array("open_conversations", $record_types)) {
                                         echo "checked";
                                     }
                                     ?>       
@@ -61,7 +61,7 @@
                                 <td>
                                     <input class="form-check-input" type="checkbox" name="record_types[]" value="past_goals"
                                     <?php       
-                                    if (in_array("past_goals", $record_types)) {
+                                    if (is_array($record_types) && in_array("past_goals", $record_types)) {
                                         echo "checked";
                                     }
                                     ?>        
@@ -71,7 +71,7 @@
                                 <td>
                                     <input class="form-check-input" type="checkbox" name="record_types[]" value="completed_conversations"
                                     <?php       
-                                    if (in_array("completed_conversations", $record_types)) {
+                                    if (is_array($record_types) && in_array("completed_conversations", $record_types)) {
                                         echo "checked";
                                     }
                                     ?>        
@@ -80,6 +80,14 @@
                             <label class="form-check-label">Completed Conversations</label>
                                 </td>
                             </tr>
+                            @if(isset($data["error"]) && $data["error"]["record_types"])
+                            <tr>
+                                <td colspan="2">
+                                <small class="text-danger error-end_date">Record type is required</small>
+                                </td>
+                            </tr>    
+                            @endif
+                            
                         </table>    
                     </div> 
                 </div>
@@ -93,17 +101,27 @@
     <div class="card p-3"> 
         @if(!$submit)
         <p>To retrieve performance evaluation records, use the fields above to search for an employee, time frame, and record type.</p>        
-        @else        
-            @if(count($data["active_goals"]) > 0)
-                <b>Active Goals</b><hr/>
+        @else
+            <div class="row">
+                <div class="col-md-6">
+                  <label for="input-field" class="form-label">Active Goals:</label>
+                </div>
+                @if(count($data["active_goals"]) > 0)   
+                <div class="col-md-6">
+                  <a href="/sysadmin/statistics/filereports-export?type=active_goal&employee_id={{$employee_id}}&start_date={{$start_date}}&end_date={{$end_date}}"><button type="button" class="btn btn-primary  float-right"> <i class="fas fa-file-pdf"></i> Bulk Download</button></a>
+                </div>
+                @endif
+            </div>
+            <hr/>
+            @if(count($data["active_goals"]) > 0)                
                 <table>            
                 <tr>
-                    <th>Name</th>
-                    <th>Title</th>
-                    <th>Business Unit</th>
-                    <th>Ministry</th>
-                    <th>Created At</th>
-                    <th>&nbsp;</th>
+                    <th width="10%">Name</th>
+                    <th width="30%">Title</th>
+                    <th width="10%">Business Unit</th>
+                    <th width="30%">Ministry</th>
+                    <th width="10%">Created At</th>
+                    <th width="10%">&nbsp;</th>
                 </tr>
                 <?php foreach($data["active_goals"] as $item){?>
                 <tr>
@@ -111,26 +129,48 @@
                     <td><?php echo $item->title; ?></td>
                     <td><?php echo $item->business_unit; ?></td>
                     <td><?php echo $item->organization; ?></td>
-                    <td><?php echo $item->created_at; ?></td>
                     <td>
-                        <a href="/sysadmin/statistics/filereports-export?type=selected_goal&id=<?php echo $item->id; ?>"><button type="button" class="btn btn-primary"> <i class="fas fa-file-pdf"></i> Download</button></a>
+                        <?php 
+                        $dateTime = $item->created_at;
+                        if(strtotime($dateTime)){
+                            $dateTime = new DateTime($dateTime);
+                            $dateTime = $dateTime->format('Y-m-d');
+                        }
+                        echo $dateTime; 
+                        ?>
+                    </td>
+                    <td>
+                        <a href="/sysadmin/statistics/filereports-export?type=selected_goal&id=<?php echo $item->id; ?>"><button type="button" class="btn btn-primary   float-right"> <i class="fas fa-file-pdf"></i> Download</button></a>
                     </td>
                 <tr/>    
                 <?php }?>
                 </table>
                 <hr/>
+            @else
+                <p>There are no records for the employee ID and date range selected.</p>
+                <hr/>
             @endif
             <p></p>
-            @if(count($data["past_goals"]) > 0)
-                <b>Past Goals</b><hr/>
+            <div class="row">
+                <div class="col-md-6">
+                  <label for="input-field" class="form-label">Past Goals:</label>
+                </div>
+                @if(count($data["past_goals"]) > 0)   
+                <div class="col-md-6">
+                  <a href="/sysadmin/statistics/filereports-export?type=past_goal&employee_id={{$employee_id}}&start_date={{$start_date}}&end_date={{$end_date}}"><button type="button" class="btn btn-primary  float-right"> <i class="fas fa-file-pdf"></i> Bulk Download</button></a>
+                </div>
+                @endif
+            </div>
+            <hr/>
+            @if(count($data["past_goals"]) > 0)                
                 <table>            
                 <tr>
-                    <th>Name</th>
-                    <th>Title</th>
-                    <th>Business Unit</th>
-                    <th>Ministry</th>
-                    <th>Created At</th>
-                    <th>&nbsp;</th>
+                    <th width="10%">Name</th>
+                    <th width="30%">Title</th>
+                    <th width="10%">Business Unit</th>
+                    <th width="30%">Ministry</th>
+                    <th width="10%">Created At</th>
+                    <th width="10%">&nbsp;</th>
                 </tr>
                 <?php foreach($data["past_goals"] as $item){?>
                 <tr>
@@ -138,24 +178,46 @@
                     <td><?php echo $item->title; ?></td>
                     <td><?php echo $item->business_unit; ?></td>
                     <td><?php echo $item->organization; ?></td>
-                    <td><?php echo $item->created_at; ?></td>
-                    <td><a href="/sysadmin/statistics/filereports-export?type=selected_goal&id=<?php echo $item->id; ?>"><button type="button" class="btn btn-primary"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
+                    <td>
+                        <?php 
+                        $dateTime = $item->created_at;
+                        if(strtotime($dateTime)){
+                            $dateTime = new DateTime($dateTime);
+                            $dateTime = $dateTime->format('Y-m-d');
+                        }
+                        echo $dateTime; 
+                        ?>
+                    </td>
+                    <td><a href="/sysadmin/statistics/filereports-export?type=selected_goal&id=<?php echo $item->id; ?>"><button type="button" class="btn btn-primary   float-right"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
                 <tr/>    
                 <?php }?>
                 </table>
                 <hr/>
+            @else
+                <p>There are no records for the employee ID and date range selected.</p>
+                <hr/>
             @endif
             <p></p>
-            @if(count($data["open_conversations"]) > 0)
-                <b>Open Conversations</b><hr/>
+            <div class="row">
+                <div class="col-md-6">
+                  <label for="input-field" class="form-label">Open Conversations:</label>
+                </div>
+                @if(count($data["open_conversations"]) > 0)   
+                <div class="col-md-6">
+                  <a href="/sysadmin/statistics/filereports-export?type=open_conversation&employee_id={{$employee_id}}&start_date={{$start_date}}&end_date={{$end_date}}"><button type="button" class="btn btn-primary  float-right"> <i class="fas fa-file-pdf"></i> Bulk Download</button></a>
+                </div>
+                @endif
+            </div>
+            <hr/>
+            @if(count($data["open_conversations"]) > 0)                
                 <table>            
                 <tr>
-                    <th>Name</th>
-                    <th>Title</th>
-                    <th>Business Unit</th>
-                    <th>Ministry</th>
-                    <th>Created At</th>
-                    <th>&nbsp;</th>
+                    <th width="10%">Name</th>
+                    <th width="30%">Title</th>
+                    <th width="10%">Business Unit</th>
+                    <th width="30%">Ministry</th>
+                    <th width="10%">Created At</th>
+                    <th width="10%">&nbsp;</th>
                 </tr>
                 <?php foreach($data["open_conversations"] as $item){?>
                 <tr>
@@ -163,24 +225,46 @@
                     <td><?php echo $item->topic; ?></td>
                     <td><?php echo $item->business_unit; ?></td>
                     <td><?php echo $item->organization; ?></td>
-                    <td><?php echo $item->created_at; ?></td>
-                    <td><a href="/sysadmin/statistics/filereports-export?type=selected_conversation&id=<?php echo $item->conversation_id; ?>"><button type="button" class="btn btn-primary"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
+                    <td>
+                        <?php 
+                        $dateTime = $item->created_at;
+                        if(strtotime($dateTime)){
+                            $dateTime = new DateTime($dateTime);
+                            $dateTime = $dateTime->format('Y-m-d');
+                        }
+                        echo $dateTime; 
+                        ?>
+                    </td>
+                    <td><a href="/sysadmin/statistics/filereports-export?type=selected_conversation&id=<?php echo $item->conversation_id; ?>"><button type="button" class="btn btn-primary  float-right"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
                 <tr/>    
                 <?php }?>
                 </table>
                 <hr/>
+            @else
+                <p>There are no records for the employee ID and date range selected.</p>
+                <hr/>
             @endif
             <p></p>
-            @if(count($data["completed_conversations"]) > 0)
-                <b>Completed Conversations</b><hr/>
+            <div class="row">
+                <div class="col-md-6">
+                  <label for="input-field" class="form-label">Completed Conversations:</label>
+                </div>
+                @if(count($data["completed_conversations"]) > 0)   
+                <div class="col-md-6">
+                  <a href="/sysadmin/statistics/filereports-export?type=completed_conversation&employee_id={{$employee_id}}&start_date={{$start_date}}&end_date={{$end_date}}"><button type="button" class="btn btn-primary  float-right"> <i class="fas fa-file-pdf"></i> Bulk Download</button></a>
+                </div>
+                @endif
+            </div>
+            <hr/>
+            @if(count($data["completed_conversations"]) > 0)                
                 <table>            
                 <tr>
-                    <th>Name</th>
-                    <th>Title</th>
-                    <th>Business Unit</th>
-                    <th>Ministry</th>
-                    <th>Latest Signoff At</th>
-                    <th>&nbsp;</th>
+                    <th width="10%">Name</th>
+                    <th width="30%">Title</th>
+                    <th width="10%">Business Unit</th>
+                    <th width="30%">Ministry</th>
+                    <th width="10%">Latest Signoff At</th>
+                    <th width="10%">&nbsp;</th>
                 </tr>
                 <?php foreach($data["completed_conversations"] as $item){?>
                 <tr>
@@ -188,11 +272,23 @@
                     <td><?php echo $item->topic; ?></td>
                     <td><?php echo $item->business_unit; ?></td>
                     <td><?php echo $item->organization; ?></td>
-                    <td><?php echo $item->latest_update; ?></td>
-                    <td><a href="/sysadmin/statistics/filereports-export?type=selected_conversation&id=<?php echo $item->conversation_id; ?>"><button type="button" class="btn btn-primary"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
-                <tr/>    
+                    <td>
+                        <?php 
+                        $dateTime = $item->latest_update;
+                        if(strtotime($dateTime)){
+                            $dateTime = new DateTime($dateTime);
+                            $dateTime = $dateTime->format('Y-m-d');
+                        }
+                        echo $dateTime; 
+                        ?>
+                    </td>
+                    <td><a href="/sysadmin/statistics/filereports-export?type=selected_conversation&id=<?php echo $item->conversation_id; ?>"><button type="button" class="btn btn-primary  float-right"> <i class="fas fa-file-pdf"></i> Download</button></a></td>
+                <tr/>                   
                 <?php }?>
                 </table>
+            @else
+                <p>There are no records for the employee ID and date range selected.</p>
+                <hr/>
             @endif
         @endif
         

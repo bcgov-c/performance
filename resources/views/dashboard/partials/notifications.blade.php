@@ -38,6 +38,7 @@
     <table class="table" id="notification-table" style="width:100%;">
         <thead>
             <tr>
+                <th>Created At</th>
                 <th>Checkbox</th>
                 <th>Action</th>
             </tr>
@@ -47,7 +48,7 @@
 </div>
 
 <x-slot name="css">
-    <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
     <style>
         #notification-table_filter label {
             text-align: right !important;
@@ -86,6 +87,16 @@
             border-top: none !important;
         }
         
+        #notification-table input[name='itemCheck[]'] {
+            width: 1.1em;
+            height: 1.1em;
+        }
+
+        input[name='select_all'] {
+            width: 1.1em;
+            height: 1.1em;
+        }
+
         hr.separator {
                 border: 1px solid #EED202;
                 border-radius: 5px;
@@ -101,8 +112,8 @@
 
 <x-slot name="js">
 
-<script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
 
 <script>
     let g_matched_employees = {!!json_encode($matched_dn_ids)!!};
@@ -124,7 +135,7 @@
             retrieve: true,
             processing: true,
             serverSide: true,
-            // 'order': [[0, 'desc']],
+            'order': [[0, 'desc']],
             // "dom": '<<t>pi>',
             ajax: {
                 url: '{!! route("dashboard") !!}',
@@ -140,8 +151,8 @@
                 list = ( $('#notification-table input:checkbox') );
 
                 $.each(list, function( index, item ) {
-                    var pos = $.inArray(parseInt(item.value) , g_selected_employees);
-                    console.log( pos );
+                    var pos = $.inArray( parseInt(item.value) , g_selected_employees);
+                    // console.log( pos + ' - ' + item.value + ' - ' + g_selected_employees);
                     if ( pos === -1 ) {
                         $(item).prop('checked', false); // unchecked
                     } else {
@@ -166,6 +177,7 @@
 
             },
             columns: [
+                {data: 'created_at', visible: false },
                 {data: 'item_detail', name: 'item_detail', orderable: false, searchable: false,  width: '80%', className: 'py-1' },
                 {data: 'action', name: 'action', orderable: false, searchable: false, width: '20%', className: 'dt-right dt-nowrap my-0'},
             ]
@@ -175,7 +187,7 @@
         $('#notification-table tbody').on( 'click', 'input:checkbox', function () {
 
             // if the input checkbox is selected 
-            var id = this.value;
+            var id = parseInt(this.value);
             var index = $.inArray(id, g_selected_employees);
             if(this.checked) {
                 g_selected_employees.push( id );
