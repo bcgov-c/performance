@@ -2098,10 +2098,12 @@ class SysadminStatisticsReportController extends Controller
         $prepend = str_repeat(' ', $level);
         $output .= $prepend . '<ul>' . PHP_EOL;
         foreach($arr as $comment) {
-            if($comment['deleted_at'] == ''){
-                $comment['comment'] = 'Comment is deleted';
+            if($comment['deleted_at'] != ''){
+                $comment_content = 'Comment is deleted';
+            }else{
+                $comment_content = $comment['comment'];
             }
-            $output .= $prepend . '    <li>' . $comment['name'] . ' ' . date('d/m/Y h:m:s', strtotime($comment['created_at'])) . ' ' . $comment['comment'] . PHP_EOL;
+            $output .= $prepend . '    <li>' . $comment['name'] . ' ' . date('d/m/Y h:m:s', strtotime($comment['created_at'])) . ' ' . $comment_content . PHP_EOL;
             if (!empty($comment['reply'])) {
                 $output .= $this->getCommentTreeHtml($comment['reply'], $level+1);
             }
