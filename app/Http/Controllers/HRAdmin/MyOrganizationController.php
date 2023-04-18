@@ -59,8 +59,9 @@ class MyOrganizationController extends Controller {
     public function getList(Request $request) {
         if ($request->ajax()) {
             $authId = Auth::id();
-            $query = HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
-                ->where('auth_id', \DB::raw($authId))
+            // $query = HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
+            $query = HRUserDemoJrView::from('user_demo_jr_view AS u')
+                // ->where('auth_id', \DB::raw($authId))
                 ->whereNull('u.date_deleted')
                 ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
                 ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
