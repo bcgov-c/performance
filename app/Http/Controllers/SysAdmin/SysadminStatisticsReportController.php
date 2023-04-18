@@ -1787,7 +1787,6 @@ class SysadminStatisticsReportController extends Controller
                                     ->join('employee_demo', function($join) {
                                             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                         })
-                                    ->whereNull('goal_comments.deleted_at')
                                     ->where('goal_comments.goal_id','=',$goal_id)           
                                     ->get();
                                         
@@ -2004,7 +2003,6 @@ class SysadminStatisticsReportController extends Controller
                                     ->join('employee_demo', function($join) {
                                             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                         })
-                                    ->whereNull('goal_comments.deleted_at')
                                     ->where('goal_comments.goal_id','=',$goal_id)           
                                     ->get();
                                         
