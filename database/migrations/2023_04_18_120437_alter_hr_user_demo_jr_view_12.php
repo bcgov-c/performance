@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AlterHrUserDemoJrView11 extends Migration
+class AlterHrUserDemoJrView12 extends Migration
 {
     /**
      * Run the migrations.
