@@ -2099,7 +2099,7 @@ class SysadminStatisticsReportController extends Controller
         $prepend = str_repeat(' ', $level);
         $output .= $prepend . '<ul>' . PHP_EOL;
         foreach($arr as $comment) {
-            if($comment['deleted_at'] = ''){
+            if($comment['deleted_at'] == ''){
                 $comment['comment'] = 'Comment is deleted';
             }
             $output .= $prepend . '    <li>' . $comment['name'] . ' ' . date('d/m/Y h:m:s', strtotime($comment['created_at'])) . ' ' . $comment['comment'] . PHP_EOL;
