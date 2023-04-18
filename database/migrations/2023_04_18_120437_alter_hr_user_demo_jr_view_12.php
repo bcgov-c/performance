@@ -96,7 +96,6 @@ class AlterHrUserDemoJrView12 extends Migration
             FROM 
 				auth_users 
 					AS au
-					USE INDEX (idx_auth_users_type_auth_id_user_id)
 				INNER JOIN users 
 					AS u 
 					USE INDEX (idx_users_id)
