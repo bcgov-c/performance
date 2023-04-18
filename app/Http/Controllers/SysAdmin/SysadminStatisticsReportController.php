@@ -1715,7 +1715,6 @@ class SysadminStatisticsReportController extends Controller
                                                             ]);
                                         });
                                     })
-                                    ->whereNull('goal_comments.deleted_at')
                                     ->where('employee_demo.employee_id', '=', $request->employee_id)  
                                     ->orderBy('goals.created_at', 'DESC')        
                                     ->get(); 
