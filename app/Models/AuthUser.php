@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
-class JobDataAudit extends Model
+class AuthUser extends Model
 {
 
-    public $table = 'job_data_audit';
+    public $table = 'auth_users';
     public $timestamps = true;
-    public $incrementing = false;
+    public $incrementing = true;
 
     use HasFactory;
 
@@ -19,9 +19,9 @@ class JobDataAudit extends Model
 
     protected $fillable = [
         'id',
-        'job_sched_id',
-        'old_values',
-        'new_values',
+        'type',
+        'auth_id',
+        'user_id',
     ];
 
 }
