@@ -1721,7 +1721,8 @@ class SysadminStatisticsReportController extends Controller
                                     ->get(); 
             foreach ($active_goals as $active_goal){
                 $goal_id = $active_goal->id;
-                $goal_comments = GoalComment::selectRaw("goal_comments.*, users.name, employee_demo.organization, employee_demo.organization, employee_demo.business_unit")
+                $goal_comments = DB::table('goal_comments')
+                                    ->selectRaw("goal_comments.*, users.name, employee_demo.organization, employee_demo.organization, employee_demo.business_unit")
                                     ->join('users', function($join) {
                                             $join->on('users.id', '=', 'goal_comments.user_id');   
                                         }) 
@@ -1729,9 +1730,24 @@ class SysadminStatisticsReportController extends Controller
                                             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                         })
                                     ->where('goal_comments.goal_id','=',$goal_id)           
-                                    ->get();
+                                    ->get(); 
+                $comments = array();
+                $i = 0;
+                foreach($goal_comments as $goal_item){
+                    $comments[$i]['id'] = $goal_item->id; 
+                    $comments[$i]['goal_id'] = $goal_item->goal_id; 
+                    $comments[$i]['user_id'] = $goal_item->user_id; 
+                    $comments[$i]['comment'] = $goal_item->comment; 
+                    $comments[$i]['created_at'] = $goal_item->created_at; 
+                    $comments[$i]['updated_at'] = $goal_item->updated_at; 
+                    $comments[$i]['deleted_at'] = $goal_item->deleted_at; 
+                    $comments[$i]['parent_id'] = $goal_item->parent_id; 
+                    $comments[$i]['name'] = $goal_item->name; 
+                    
+                    $i++;
+                }               
                                         
-                $comments = $this->getCommentTree($goal_comments, '');
+                $comments = $this->getCommentTree($comments, '');
                 $commentTree = $this->getCommentTreeHtml($comments);
                 
                 $item["selected_goal"] = $active_goal;
@@ -1780,7 +1796,8 @@ class SysadminStatisticsReportController extends Controller
                                     ->get();
             foreach ($past_goals as $past_goal){
                 $goal_id = $past_goal->id;
-                $goal_comments = GoalComment::selectRaw("goal_comments.*, users.name, employee_demo.organization, employee_demo.organization, employee_demo.business_unit")
+                $goal_comments = DB::table('goal_comments')
+                                    ->selectRaw("goal_comments.*, users.name, employee_demo.organization, employee_demo.organization, employee_demo.business_unit")
                                     ->join('users', function($join) {
                                             $join->on('users.id', '=', 'goal_comments.user_id');   
                                         }) 
@@ -1788,9 +1805,24 @@ class SysadminStatisticsReportController extends Controller
                                             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                         })
                                     ->where('goal_comments.goal_id','=',$goal_id)           
-                                    ->get();
+                                    ->get(); 
+                $comments = array();
+                $i = 0;
+                foreach($goal_comments as $goal_item){
+                    $comments[$i]['id'] = $goal_item->id; 
+                    $comments[$i]['goal_id'] = $goal_item->goal_id; 
+                    $comments[$i]['user_id'] = $goal_item->user_id; 
+                    $comments[$i]['comment'] = $goal_item->comment; 
+                    $comments[$i]['created_at'] = $goal_item->created_at; 
+                    $comments[$i]['updated_at'] = $goal_item->updated_at; 
+                    $comments[$i]['deleted_at'] = $goal_item->deleted_at; 
+                    $comments[$i]['parent_id'] = $goal_item->parent_id; 
+                    $comments[$i]['name'] = $goal_item->name; 
+                    
+                    $i++;
+                }               
                                         
-                $comments = $this->getCommentTree($goal_comments, '');
+                $comments = $this->getCommentTree($comments, '');
                 $commentTree = $this->getCommentTreeHtml($comments);
                 
                 $item["selected_goal"] = $past_goal;
@@ -1996,7 +2028,8 @@ class SysadminStatisticsReportController extends Controller
                                     ->whereNull('goals.deleted_at')
                                     ->where('goals.id','=',$goal_id)           
                                     ->get();
-                $goal_comments = GoalComment::selectRaw("goal_comments.*, users.name, employee_demo.organization, employee_demo.organization, employee_demo.business_unit")
+                $goal_comments = DB::table('goal_comments')
+                                    ->selectRaw("goal_comments.*, users.name, employee_demo.organization, employee_demo.organization, employee_demo.business_unit")
                                     ->join('users', function($join) {
                                             $join->on('users.id', '=', 'goal_comments.user_id');   
                                         }) 
@@ -2004,9 +2037,24 @@ class SysadminStatisticsReportController extends Controller
                                             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                         })
                                     ->where('goal_comments.goal_id','=',$goal_id)           
-                                    ->get();
+                                    ->get(); 
+                $comments = array();
+                $i = 0;
+                foreach($goal_comments as $item){
+                    $comments[$i]['id'] = $item->id; 
+                    $comments[$i]['goal_id'] = $item->goal_id; 
+                    $comments[$i]['user_id'] = $item->user_id; 
+                    $comments[$i]['comment'] = $item->comment; 
+                    $comments[$i]['created_at'] = $item->created_at; 
+                    $comments[$i]['updated_at'] = $item->updated_at; 
+                    $comments[$i]['deleted_at'] = $item->deleted_at; 
+                    $comments[$i]['parent_id'] = $item->parent_id; 
+                    $comments[$i]['name'] = $item->name; 
+                    
+                    $i++;
+                }                                          
                                         
-                $comments = $this->getCommentTree($goal_comments, '');
+                $comments = $this->getCommentTree($comments, '');
                 $commentTree = $this->getCommentTreeHtml($comments);
                                 
                 $data["selected_goal"] = $selected_goal[0];
@@ -2100,7 +2148,7 @@ class SysadminStatisticsReportController extends Controller
         $output .= $prepend . '<ul>' . PHP_EOL;
         foreach($arr as $comment) {
             if($comment['deleted_at'] != ''){
-                $comment_content = 'Comment is deleted';
+                $comment_content = '<p>Comment is deleted</p>';
             }else{
                 $comment_content = $comment['comment'];
             }
