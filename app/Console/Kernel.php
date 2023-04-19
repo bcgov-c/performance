@@ -91,6 +91,10 @@ class Kernel extends ConsoleKernel
         ->timezone('America/Vancouver')    
         ->dailyAt('05:00');
         
+        $schedule->command('command:MaintainLogs')
+        ->timezone('America/Vancouver')    
+        ->dailyAt('06:00');
+        
         $schedule->command('notify:daily')
         ->dailyAt('08:00')
         ->appendOutputTo(storage_path('logs/daily.log'));
