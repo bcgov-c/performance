@@ -314,7 +314,10 @@ class SyncUserProfile extends Command
 
             $reporting_to = $this->getReportingUserId($employee, $exceptions);   
             
-            $user = User::where('employee_id', $employee->employee_id)->first(); 
+            $user = User::from(\DB::raw('users USE INDEX (idx_users_employeeid_emplrecord)'))
+                ->where('employee_id', $employee->employee_id)
+                ->select('id', 'reporting_to', 'last_sync_at')
+                ->first(); 
 
             if ($user) {
 
@@ -355,11 +358,14 @@ class SyncUserProfile extends Command
         $this->info( now() );        
         $this->info('Step 3 - Lock Out Inactivate User account');
 
-        $users = User::whereIn('guid',function($query) { 
-                    $query->select('guid')->from('employee_demo')->whereNotNull('date_deleted');
+        // $users = User::whereIn('guid',function($query) { 
+        //     $query->select('guid')->from('employee_demo')->whereNotNull('date_deleted');
+        //     })->update(['acctlock'=>true, 'last_sync_at' => $new_sync_at]);
+
+        $users = User::from(\DB::raw('users USE INDEX (idx_users_employeeid_emplrecord)'))->whereIn('employee_id',function($query) { 
+            $query->from(\DB::raw('employee_demo USE INDEX(idx_employee_demo_employee_id_date_deleted)'))->select('employee_id')->whereNotNull('date_deleted');
             })->update(['acctlock'=>true, 'last_sync_at' => $new_sync_at]);
 
-            
         // // Step 4 : Lock all users except pivot run users
         // $this->info( now() );        
         // $this->info('Step 4 - Lock Out Users except Pivot run based on organization');

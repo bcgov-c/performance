@@ -70,17 +70,17 @@ class SetNextLevelManager extends Command
         $counter = 0;
         $updatecounter = 0;
 
-        EmployeeDemo::whereNull('employee_demo.date_deleted') 
-        ->join('users', 'users.employee_id', 'employee_demo.employee_id') 
+        EmployeeDemo::whereNull('employee_demo.date_deleted')
+        ->join(\DB::raw('users USE INDEX (idx_users_employeeid_emplrecord)'), 'users.employee_id', 'employee_demo.employee_id')
         ->whereRaw("users.reporting_to IS NULL OR TRIM(users.reporting_to) = ''")
         ->whereRaw("trim(employee_demo.guid) <> ''")
         ->whereNotNull('employee_demo.guid')
-        // ->orderBy('employee_demo.employee_id')
-        // ->orderBy('employee_demo.empl_record')
+        ->orderBy('employee_demo.employee_id')
+        ->orderBy('employee_demo.empl_record')
         ->chunk(10000, function($employeeDemo) use (&$counter, &$updatecounter, $start_time, $audit_id) {
             foreach ($employeeDemo as $demo) {
                 $reporting_to = $this->getReportingUserId($demo);  
-                $user = User::whereRaw("employee_id = '".$demo->employee_id."'")->first();
+                $user = User::from(\DB::raw('users USE INDEX (idx_users_employeeid_emplrecord)'))->whereRaw("employee_id = '".$demo->employee_id."'")->first();
                 if ($user) {
                     if ($user->reporting_to != $reporting_to) {
                         DB::beginTransaction();
