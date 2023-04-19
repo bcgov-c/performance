@@ -65,7 +65,7 @@ class PopulateAuthUsers extends Command
         if($retentionData > $retentionSched) {
             $extraMessage = "PRCS_SCHED_LOG_RETENTION ({$retentionSched}) must be greater than or equal to PRCS_DATA_LOG_RETENTION ({$retentionData}).  ";
         } else {
-            $extraMessage = "Retaining {$retentionSched} days of job_data_audit, and {$retentionData}} days of job_data_audit.  ";
+            $extraMessage = "Retaining {$retentionSched} days of job_data_audit, and {$retentionData} days of job_data_audit.  ";
 
             $dateSched = date('Y-m-d H:i:s', strtotime(Carbon::now()->subDays($retentionSched)->format('c')));
             $dateData = date('Y-m-d H:i:s', strtotime(Carbon::now()->subDays($retentionData)->format('c')));
