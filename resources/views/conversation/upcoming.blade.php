@@ -96,11 +96,11 @@ i {
                     <div class="card-body">
                         <table class="table">
                             <tr style="border-bottom: solid #FCBA19">
-                                <th width="30%">Conversation Type</th>
-                                <th width="40%">Participants</th>
-                                <th width="10%">Employee Signed</th>
-                                <th width="10%">Supervisor Signed</th>
-                                <th width="10%">&nbsp;</th>
+                                <th width="30%" style="border-bottom: solid #FCBA19">Conversation Type</th>
+                                <th width="40%" style="border-bottom: solid #FCBA19">Participants</th>
+                                <th width="10%" style="border-bottom: solid #FCBA19">Employee Signed</th>
+                                <th width="10%" style="border-bottom: solid #FCBA19">Supervisor Signed</th>
+                                <th width="10%" style="border-bottom: solid #FCBA19">&nbsp;</th>
                             </tr>
 
                             @forelse ($conversations as $c)
@@ -228,11 +228,11 @@ i {
                         </form>
                         <table class="table">
                             <tr style="border-bottom: solid #FCBA19">
-                                <th width="30%">Conversation Type</th>
-                                <th width="40%">Participants</th>
-                                <th width="10%">Employee Signed</th>
-                                <th width="10%">Supervisor Signed</th>
-                                <th width="10%">&nbsp;</th>
+                                <th width="30%" style="border-bottom: solid #FCBA19">Conversation Type</th>
+                                <th width="40%" style="border-bottom: solid #FCBA19">Participants</th>
+                                <th width="10%" style="border-bottom: solid #FCBA19">Employee Signed</th>
+                                <th width="10%" style="border-bottom: solid #FCBA19">Supervisor Signed</th>
+                                <th width="10%" style="border-bottom: solid #FCBA19">&nbsp;</th>
                             </tr>
 
                             @forelse ($myTeamConversations as $c)
