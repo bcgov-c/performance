@@ -65,7 +65,6 @@ class ConversationController extends Controller
         foreach($history_supervisors as $history_supervisor){
             $supervisor_ids[] = $history_supervisor->participant_id;
         }
-        Log::info('historic supervisors: '. print_r($supervisor_ids,true));
         
         //get historic team members
         $history_teams = DB::table('conversation_participants')
@@ -79,8 +78,7 @@ class ConversationController extends Controller
         foreach($history_teams as $history_team){
             $team_ids[] = $history_team->participant_id;
         }
-        
-        
+                
         //get current team members
         $team_query = "SELECT users.id as id FROM users 
                         where users.reporting_to = $authId
@@ -99,6 +97,8 @@ class ConversationController extends Controller
         }
                 
         $type = 'upcoming';
+        $sub = false;
+        
         if ($request->is('conversation/past') || $request->is('my-team/conversations/past')) {
             $sharedSupervisorIds = SharedProfile::where('shared_id', Auth::id())->with('sharedWithUser')->get()->pluck('shared_with')->toArray();
             array_push($sharedSupervisorIds, $supervisorId);
@@ -107,7 +107,6 @@ class ConversationController extends Controller
                     array_push($sharedSupervisorIds, $supervisor_id);
                 }
             }
-            Log::info('full supervisors: '. print_r($sharedSupervisorIds,true));
             
             $query->where(function($query) use ($authId, $supervisorId, $sharedSupervisorIds, $viewType) {
                 $query->where('user_id', $authId)->
@@ -176,9 +175,6 @@ class ConversationController extends Controller
             })
             ->WhereIn('supervisor_signoff_id', $sharedSupervisorIds);
             
-            Log::info(print_r($query->toSql(),true)); 
-            Log::info(print_r($query->getBindings(),true)); 
-            
              // With My Team
              if ($sharedSupervisorIds && $sharedSupervisorIds[0]) {
                 $myTeamQuery->where(function($query) use ($sharedSupervisorIds,$myCurrentTeam_array) {
@@ -234,17 +230,32 @@ class ConversationController extends Controller
             if ($request->has('user_name') && $request->user_name) {
                 $emp_query .= " AND (empusers.name LIKE '%$request->user_name%' OR mgrusers.name LIKE '%$request->user_name%')"; 
             }
+            if ($request->has('team_members') && $request->team_members) {
+                $emp_query .= " AND emp_participants.participant_id = $request->team_members"; 
+            }
+            if ($request->has('employee_signed') && $request->employee_signed) {
+                $emp_query .= " AND conversations.signoff_user_id IS NOT NULL"; 
+            }
+            if ($request->has('supervisor_signed') && $request->supervisor_signed) {
+                $emp_query .= " AND conversations.supervisor_signoff_id IS NOT NULL";  
+            }
             $emp_query .= " ORDER BY conversations.id DESC";
             $myTeamConversations = DB::select($emp_query);
             
+            if ($request->has('sub') && $request->sub) {
+                $sub = true;
+            }
         }
         
         $supervisor_conversations = array();
         foreach ($conversations as $conversation) {
             array_push($supervisor_conversations, $conversation->id);
         }
-
-        $view = 'conversation.index';
+        
+        $view = 'conversation.upcoming';
+        if($type == 'past'){        
+            $view = 'conversation.past';
+        }
         $reportees = $user->reportees()->get();
         $topics = ConversationTopic::all();
         if ($type === 'past') {
@@ -255,9 +266,28 @@ class ConversationController extends Controller
           
         // redirect from DashboardController with the related id, then open modal box
         $open_modal_id = (session('open_modal_id'));
+        
+        $conversationList = ConversationTopic::all()->sortBy("name")->toArray();
+        array_unshift($conversationList, [
+            "id" => "0",
+            "name" => "Any"
+        ]);
+        
+        $team_qry = User::select('id', 'name')
+                        ->where('reporting_to',$authId)
+                        ->get();
+        $team_members = array();
+        $team_members[0]["id"] = '';
+        $team_members[0]["name"] = 'Any';
+        $i = 1;
+        foreach($team_qry as $item){
+            $team_members[$i]["id"] = $item->id;
+            $team_members[$i]["name"] = $item->name;
+            $i++;
+        }
 
         return view($view, compact('type', 'conversations', 'myTeamConversations', 'conversationTopics', 'conversationMessage', 'viewType', 'reportees', 'topics', 'textAboveFilter', 'user', 
-                                    'supervisor_conversations', 'open_modal_id'));
+                                    'supervisor_conversations', 'open_modal_id', 'conversationList','team_members', 'sub'));
     }
 
     /**
@@ -278,7 +308,6 @@ class ConversationController extends Controller
      */
     public function store(ConversationRequest $request)
     {
-
         //DB::beginTransaction();
         $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
         $isDirectRequest = true;
