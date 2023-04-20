@@ -83,10 +83,10 @@
                                             @csrf
                                             <table class="table">
                                                 <tr style="border-bottom: solid #FCBA19">
-                                                    <th width="20%">Name</th>
-                                                    <th width="45%">When to use</th>
-                                                    <th width="15%">Participants</th>
-                                                    <th width="20%">&nbsp;</th>
+                                                    <th width="20%" style="border-bottom: solid #FCBA19">Name</th>
+                                                    <th width="45%" style="border-bottom: solid #FCBA19">When to use</th>
+                                                    <th width="15%" style="border-bottom: solid #FCBA19"Participants</th>
+                                                    <th width="20%" style="border-bottom: solid #FCBA19">&nbsp;</th>
                                                 </tr>
                                                 <tbody style="border-collapse: collapse;">
                                                 <tr style="background-color: #efefef">
@@ -152,10 +152,10 @@
                         <table class="table table-striped">
                             <thead>
                                 <tr style="border-bottom: solid #FCBA19">
-                                    <th width="20%">Name</th>
-                                    <th width="45%">When to use</th>
-                                    <th width="15%">Participants</th>
-                                    <th width="20%">&nbsp;</th>
+                                    <th width="20%" style="border-bottom: solid #FCBA19">Name</th>
+                                    <th width="45%" style="border-bottom: solid #FCBA19">When to use</th>
+                                    <th width="15%" style="border-bottom: solid #FCBA19">Participants</th>
+                                    <th width="20%" style="border-bottom: solid #FCBA19">&nbsp;</th>
                                 </tr>
                             </thead>
                             <tbody style="border-collapse: collapse;">
