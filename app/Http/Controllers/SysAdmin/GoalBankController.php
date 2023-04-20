@@ -721,8 +721,8 @@ class GoalBankController extends Controller
                     'u.level4', 
                     'u.deptid'
                 ])
-                ->when($request->{$option.'dd_superv'} == 'sup', function($q) { return $q->whereRaw("EXISTS (SELECT DISTINCT 1 FROM users AS u1, users AS su WHERE su.reporting_to = u1.id AND u1.employee_id = u.employee_id)"); }) 
-                ->when($request->{$option.'dd_superv'} == 'non', function($q) { return $q->whereRaw("NOT EXISTS (SELECT DISTINCT 1 FROM users AS u2, users AS su WHERE su.reporting_to = u2.id AND u2.employee_id = u.employee_id)"); }) 
+                ->when($request->{$option.'dd_superv'} == 'sup', function($q) { return $q->whereRaw("(EXISTS (SELECT DISTINCT 1 FROM users AS u1, users AS su WHERE su.reporting_to = u1.id AND u1.employee_id = u.employee_id) OR sp.shared_with <> '')"); }) 
+                ->when($request->{$option.'dd_superv'} == 'non', function($q) { return $q->whereRaw("NOT EXISTS (SELECT DISTINCT 1 FROM users AS u2, users AS su WHERE su.reporting_to = u2.id AND u2.employee_id = u.employee_id) AND sp.shared_with IS NULL"); }) 
                 ->selectRaw("CASE WHEN (SELECT DISTINCT 1 FROM users AS u3, users AS su WHERE su.reporting_to = u3.id AND u3.employee_id = u.employee_id) = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor");
             return Datatables::of($employees)
                 ->addColumn($option.'select_users', static function ($employee) use ($option) { 
@@ -958,6 +958,12 @@ class GoalBankController extends Controller
     protected function baseFilteredWhere($request, $option = null) { 
         $authId = Auth::id(); 
         return UserDemoJrView::from('user_demo_jr_view AS u') 
+            ->leftjoin('shared_profiles AS sp', function($j) {
+                return $j->on(function($jon){
+                    return $jon->whereRaw("sp.shared_with = u.user_id AND sp.shared_item LIKE '%1%'");
+                });
+            })
+            ->distinct()
             ->whereNull('u.date_deleted') 
             ->when("{$request->{$option.'dd_level0'}}", function($q) use($request, $option) { return $q->whereRaw("u.organization_key = {$request->{$option.'dd_level0'}}"); }) 
             ->when("{$request->{$option.'dd_level1'}}", function($q) use($request, $option) { return $q->whereRaw("u.level1_key = {$request->{$option.'dd_level1'}}"); }) 
