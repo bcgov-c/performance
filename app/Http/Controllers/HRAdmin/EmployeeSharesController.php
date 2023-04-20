@@ -450,11 +450,6 @@ class EmployeeSharesController extends Controller {
                         return $u2where->whereRaw('u2.user_id = sp.shared_with AND u2.date_deleted IS NULL');
                     });
                 })
-                // ->leftjoin('user_demo_jr_view AS cc', function($ccon) {
-                //     return $ccon->on(function($ccwhere) {
-                //         return $ccwhere->whereRaw('cc.user_id = sp.shared_by AND cc.date_deleted IS NULL');
-                //     });
-                // })
                 ->leftjoin('users as u3', 'u3.id', 'sp.shared_by')
                 ->leftjoin('employee_demo as cc', 'cc.employee_id', 'u3.employee_id' )
                 ->where('u.auth_id', \DB::raw($authId))
@@ -489,42 +484,24 @@ class EmployeeSharesController extends Controller {
                         ->orWhereRaw("u.jobcode_desc LIKE '%{$request->search_text}%'")
                         ->orWhereRaw("u.deptid LIKE '%{$request->search_text}%'");
                 })
-                ->distinct()
-                ->selectRaw("
-                    u.employee_id,
-                    u.employee_name, 
-                    '' as delegate_ee_id,
-                    '' as delegate_ee_name,
-                    '' as alternate_delegate_name,
-                    sp.shared_item,
-                    u.jobcode_desc,
-                    u.organization,
-                    u.level1_program,
-                    u.level2_division,
-                    u.level3_branch,
-                    u.level4,
-                    u.deptid,
-                    cc.employee_name as created_name,
-                    sp.created_at,
-                    sp.updated_at,
-                    sp.id as shared_profile_id"
-
-
-                    // // 'u2.employee_id as delegate_ee_id',
-                    // // 'u2.employee_name as delegate_ee_name',
-                    // // 'u2.employee_name as alternate_delegate_name',
-                    // 'sp.shared_item',
-                    // 'u.jobcode_desc',
-                    // 'u.organization',
-                    // 'u.level1_program',
-                    // 'u.level2_division',
-                    // 'u.level3_branch',
-                    // 'u.level4',
-                    // 'u.deptid',
-                    // 'cc.employee_name as created_name',
-                    // 'sp.created_at',
-                    // 'sp.updated_at',
-                    // 'sp.id as shared_profile_id',
+                ->select (
+                    'u.employee_id',
+                    'u.employee_name', 
+                    'u2.employee_id as delegate_ee_id',
+                    'u2.employee_name as delegate_ee_name',
+                    'u2.employee_name as alternate_delegate_name',
+                    'sp.shared_item',
+                    'u.jobcode_desc',
+                    'u.organization',
+                    'u.level1_program',
+                    'u.level2_division',
+                    'u.level3_branch',
+                    'u.level4',
+                    'u.deptid',
+                    'cc.employee_name as created_name',
+                    'sp.created_at',
+                    'sp.updated_at',
+                    'sp.id as shared_profile_id',
                 );
             return Datatables::of($query)
                 ->addIndexColumn()
