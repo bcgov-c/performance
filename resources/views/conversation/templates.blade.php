@@ -58,8 +58,8 @@
                                 <button class="btn btn-link text-left">
                                     <h4>Performance Check-in Template</h4>
                                 </button> 
-                                <br/>
                                 <span class="float-right"  style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
+                                <br/>                                
                                 <button class="btn btn-link text-left" style="color:black">
                                     <p>The Performance check-In template can be used in most situations. 
                                         It includes options to capture progress against goals, celebrate successes, 
@@ -82,12 +82,14 @@
                                         <div class="col-12">
                                             @csrf
                                             <table class="table">
-                                                <tr style="border-bottom: solid #FCBA19">
-                                                    <th width="20%" style="border-bottom: solid #FCBA19">Name</th>
-                                                    <th width="45%" style="border-bottom: solid #FCBA19">When to use</th>
-                                                    <th width="15%" style="border-bottom: solid #FCBA19"Participants</th>
-                                                    <th width="20%" style="border-bottom: solid #FCBA19">&nbsp;</th>
-                                                </tr>
+                                                <thead class="headborder">
+                                                    <tr style="border-bottom: solid #FCBA19">
+                                                        <th width="20%" style="border-bottom: solid #FCBA19">Name</th>
+                                                        <th width="45%" style="border-bottom: solid #FCBA19">When to use</th>
+                                                        <th width="15%" style="border-bottom: solid #FCBA19"Participants</th>
+                                                        <th width="20%" style="border-bottom: solid #FCBA19">&nbsp;</th>
+                                                    </tr>
+                                                </tdhead>
                                                 <tbody style="border-collapse: collapse;">
                                                 <tr style="background-color: #efefef">
                                                     <td>{{$template->name}}</td>
@@ -133,8 +135,8 @@
                                 <button class="btn btn-link text-left">
                                     <h4>Other Templates</h4>
                                 </button> 
-                                <br/>
                                 <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
+                                <br/>                                
                                 <button class="btn btn-link text-left"  style="color:black">
                                     <p>These templates can be used as required to support conversations that require a more 
                                         specific focus.</p>
@@ -150,7 +152,7 @@
                         <div class="col-12">
                         @csrf
                         <table class="table table-striped">
-                            <thead>
+                            <thead class="headborder">
                                 <tr style="border-bottom: solid #FCBA19">
                                     <th width="20%" style="border-bottom: solid #FCBA19">Name</th>
                                     <th width="45%" style="border-bottom: solid #FCBA19">When to use</th>
@@ -277,6 +279,9 @@
                 padding: 0 5px;
             }
             
+            .headborder{
+                border-bottom: solid #FCBA19;
+            }
             
         </style>
     </x-slot>
