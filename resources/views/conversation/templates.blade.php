@@ -58,8 +58,8 @@
                                 <button class="btn btn-link text-left">
                                     <h4>Performance Check-in Template</h4>
                                 </button> 
-                                <br/>
                                 <span class="float-right"  style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
+                                <br/>                                
                                 <button class="btn btn-link text-left" style="color:black">
                                     <p>The Performance check-In template can be used in most situations. 
                                         It includes options to capture progress against goals, celebrate successes, 
@@ -133,8 +133,8 @@
                                 <button class="btn btn-link text-left">
                                     <h4>Other Templates</h4>
                                 </button> 
-                                <br/>
                                 <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
+                                <br/>                                
                                 <button class="btn btn-link text-left"  style="color:black">
                                     <p>These templates can be used as required to support conversations that require a more 
                                         specific focus.</p>
