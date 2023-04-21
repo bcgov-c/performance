@@ -309,7 +309,7 @@ i {
               { title: "Employee Signed", data: "employee_signed" },
               { title: "Supervisor Signed", data: "supervisor_signed" },
               {
-                title: "Delete",
+                title: "",
                 render: function(data, type, row) {
                   var disallowed = true;
                   if(row.signoff_user_id != ''|| !row.supervisor_signoff_id != ''){
