@@ -83,8 +83,8 @@ i {
                                 <button class="btn btn-link text-left">
                                     <h4>Conversations with My Supervisor</h4>
                                 </button> 
-                                <br/>
                                 <span class="float-right"  style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
+                                <br/>
                                 <button class="btn btn-link text-left" style="color:black">
                                     <p>The list enclosed contains all open conversations between you and your supervisor(s).</p>
                                 </button>   
@@ -94,7 +94,7 @@ i {
 
                 <div id="collapse_1" class="collapse" aria-labelledby="heading_1">
                     <div class="card-body">
-                        <table class="table">
+                        <table class="table table-striped">
                             <tr style="border-bottom: solid #FCBA19">
                                 <th width="30%" style="border-bottom: solid #FCBA19">Conversation Type</th>
                                 <th width="40%" style="border-bottom: solid #FCBA19">Participants</th>
@@ -106,7 +106,7 @@ i {
                             @forelse ($conversations as $c)
                             <tr>
                                 <td><a href="javascript:void();" class="ml-2 btn-view-conversation" data-id="{{ $c->id }}" data-toggle="modal" data-target="#viewConversationModal">{{ $c->name }}</a></td>
-                                <td>{{ $c->mgrname }} {{ $c->empname }}</td>
+                                <td>{{ $c->mgrname }}, {{ $c->empname }}</td>
                                 <td>
                                     @if($c->signoff_user_id != '' )
                                         Yes
@@ -146,8 +146,8 @@ i {
                                 <button class="btn btn-link text-left">
                                     <h4>Conversations with My Team</h4>
                                 </button> 
-                                <br/>
                                 <span class="float-right"  style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
+                                <br/>
                                 <button class="btn btn-link text-left" style="color:black">
                                     <p>The list enclosed contains all open conversations between you and your direct reports.</p>
                                 </button>   
@@ -226,47 +226,7 @@ i {
                                 </div>
                             </div>
                         </form>
-                        <table class="table">
-                            <tr style="border-bottom: solid #FCBA19">
-                                <th width="30%" style="border-bottom: solid #FCBA19">Conversation Type</th>
-                                <th width="40%" style="border-bottom: solid #FCBA19">Participants</th>
-                                <th width="10%" style="border-bottom: solid #FCBA19">Employee Signed</th>
-                                <th width="10%" style="border-bottom: solid #FCBA19">Supervisor Signed</th>
-                                <th width="10%" style="border-bottom: solid #FCBA19">&nbsp;</th>
-                            </tr>
-
-                            @forelse ($myTeamConversations as $c)
-                                @if (!in_array($c->id, $supervisor_conversations)) 
-                                    <tr>
-                                        <td><a href="javascript:void();" class="ml-2 btn-view-conversation" data-id="{{ $c->id }}" data-toggle="modal" data-target="#viewConversationModal">{{ $c->name }}</a></td>
-                                        <td>{{ $c->mgrname }} {{ $c->empname }}</td>
-                                        <td>
-                                            @if($c->signoff_user_id != '' )
-                                                Yes
-                                            @else
-                                                No
-                                            @endif    
-                                        </td>
-                                        <td>
-                                            @if($c->supervisor_signoff_id != '' )
-                                                Yes
-                                            @else
-                                                No
-                                            @endif  
-                                        </td>
-                                        <td><button class="btn btn-danger btn-sm float-right ml-2 delete-btn" data-id="{{ $c->id }}" data-disallowed="{{ (!!$c->signoff_user_id || !!$c->supervisor_signoff_id) ? 'true' : 'false'}}">
-                                                        <i class="fa-trash fa"></i>
-                                                    </button></td>
-                                    </tr>                                        
-                                @endif
-                                @empty
-                                <tr>
-                                    <td colspan="5">
-                                        No Conversations
-                                    </td>
-                                </tr>  
-                            @endforelse
-                        </table>
+                        <table style="width:100%" id='employee_conversations' class="table table-striped"> </table>
                     </div>
                 </div>   
         </div>
@@ -287,6 +247,22 @@ i {
 
 </x-side-layout>
 
+@push('css')
+
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+	<style>
+        #employee-list-table_filter label {
+            text-align: right !important;
+            padding-right: 10px;
+        } 
+    </style>
+@endpush
+
+@push('js')
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+@endpush    
+
 <script>
   $('#collapse_1').on('show.bs.collapse', function () {
     $('#caret_1').html('<i class="fas fa-caret-up"></i>');
@@ -306,11 +282,49 @@ i {
   $('.filtersub').on('change', function() {
     $('#filter-menu').submit();
   });  
-    
-  @if(request()->sub)  
-      $('#collapse_2').slideToggle();
-  @endif    
-    
+
+  var show_collapse = false;
+  var conversation_topic_id = $('#conversation_topic_id').val();
+  var team_members = $('#team_members').val();
+  var employee_signed = $('#employee_signed').val();
+  var supervisor_signed = $('#supervisor_signed').val();
+  if(conversation_topic_id != 0 || team_members != '' || employee_signed != '' || supervisor_signed != ''){
+      var show_collapse = true;
+  }  
+  if(show_collapse){
+      $('#collapse_2').collapse('show');
+      var show_collapse = false;
+  } else {
+      $('#collapse_2').collapse('hide');
+  }
+  
+  $(document).ready(function() {
+        const json_myTeamConversations = <?php echo $json_myTeamConversations;?>;
+        const table = $('#employee_conversations').DataTable({
+            data: json_myTeamConversations,
+            columns: [
+              { title: "ID", data: "id" },
+              { title: "Name", data: "name" },
+              { title: "Participants", data: "participants" },
+              { title: "Employee Signed", data: "employee_signed" },
+              { title: "Supervisor Signed", data: "supervisor_signed" },
+              {
+                title: "Delete",
+                render: function(data, type, row) {
+                  var disallowed = true;
+                  if(row.signoff_user_id != ''|| !row.supervisor_signoff_id != ''){
+                      disallowed = false;
+                  }
+                  return '<button class="btn btn-danger btn-sm float-right ml-2 delete-btn" data-id="' + row.id + '" data-disallowed="'+ disallowed +'"><i class="fa-trash fa"></i></button>';
+                }
+              }
+            ],
+            dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>'
+         });
+         table.column(0).visible(false); 
+         
+
+  });  
 </script>
 
 <style>
@@ -333,4 +347,11 @@ i {
 	right:11px;
     }
     
+    #upcoming {
+        font-weight: bold;
+      }
+      
+    #employee_conversations {
+        width: 100%;
+    }  
 </style> 
