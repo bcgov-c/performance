@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Models\JobSchedAudit;
 
-class PopulateAuthUsers extends Command
+class MaintainLogs extends Command
 {
     /**
      * The name and signature of the console command.
