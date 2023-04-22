@@ -82,12 +82,14 @@
                                         <div class="col-12">
                                             @csrf
                                             <table class="table">
-                                                <tr style="border-bottom: solid #FCBA19">
-                                                    <th width="20%" style="border-bottom: solid #FCBA19">Name</th>
-                                                    <th width="45%" style="border-bottom: solid #FCBA19">When to use</th>
-                                                    <th width="15%" style="border-bottom: solid #FCBA19"Participants</th>
-                                                    <th width="20%" style="border-bottom: solid #FCBA19">&nbsp;</th>
-                                                </tr>
+                                                <thead class="headborder">
+                                                    <tr style="border-bottom: solid #FCBA19">
+                                                        <th width="20%" style="border-bottom: solid #FCBA19">Name</th>
+                                                        <th width="45%" style="border-bottom: solid #FCBA19">When to use</th>
+                                                        <th width="15%" style="border-bottom: solid #FCBA19"Participants</th>
+                                                        <th width="20%" style="border-bottom: solid #FCBA19">&nbsp;</th>
+                                                    </tr>
+                                                </tdhead>
                                                 <tbody style="border-collapse: collapse;">
                                                 <tr style="background-color: #efefef">
                                                     <td>{{$template->name}}</td>
@@ -150,7 +152,7 @@
                         <div class="col-12">
                         @csrf
                         <table class="table table-striped">
-                            <thead>
+                            <thead class="headborder">
                                 <tr style="border-bottom: solid #FCBA19">
                                     <th width="20%" style="border-bottom: solid #FCBA19">Name</th>
                                     <th width="45%" style="border-bottom: solid #FCBA19">When to use</th>
@@ -277,6 +279,9 @@
                 padding: 0 5px;
             }
             
+            .headborder{
+                border-bottom: solid #FCBA19;
+            }
             
         </style>
     </x-slot>

@@ -94,7 +94,7 @@ i {
 
                 <div id="collapse_1" class="collapse" aria-labelledby="heading_1">
                     <div class="card-body">
-                        <table class="table table-striped">
+                        <table class="table">
                             <tr style="border-bottom: solid #FCBA19">
                                 <th width="30%" style="border-bottom: solid #FCBA19">Conversation Type</th>
                                 <th width="40%" style="border-bottom: solid #FCBA19">Participants</th>
@@ -106,7 +106,7 @@ i {
                             @forelse ($conversations as $c)
                             <tr>
                                 <td><a href="javascript:void();" class="ml-2 btn-view-conversation" data-id="{{ $c->id }}" data-toggle="modal" data-target="#viewConversationModal">{{ $c->name }}</a></td>
-                                <td>{{ $c->mgrname }}, {{ $c->empname }}</td>
+                                <td>{{ $c->mgrname }} {{ $c->empname }}</td>
                                 <td>
                                     @if($c->signoff_user_id != '' )
                                         Yes
@@ -282,49 +282,11 @@ i {
   $('.filtersub').on('change', function() {
     $('#filter-menu').submit();
   });  
-
-  var show_collapse = false;
-  var conversation_topic_id = $('#conversation_topic_id').val();
-  var team_members = $('#team_members').val();
-  var employee_signed = $('#employee_signed').val();
-  var supervisor_signed = $('#supervisor_signed').val();
-  if(conversation_topic_id != 0 || team_members != '' || employee_signed != '' || supervisor_signed != ''){
-      var show_collapse = true;
-  }  
-  if(show_collapse){
-      $('#collapse_2').collapse('show');
-      var show_collapse = false;
-  } else {
-      $('#collapse_2').collapse('hide');
-  }
-  
-  $(document).ready(function() {
-        const json_myTeamConversations = <?php echo $json_myTeamConversations;?>;
-        const table = $('#employee_conversations').DataTable({
-            data: json_myTeamConversations,
-            columns: [
-              { title: "ID", data: "id" },
-              { title: "Name", data: "name" },
-              { title: "Participants", data: "participants" },
-              { title: "Employee Signed", data: "employee_signed" },
-              { title: "Supervisor Signed", data: "supervisor_signed" },
-              {
-                title: "",
-                render: function(data, type, row) {
-                  var disallowed = true;
-                  if(row.signoff_user_id != ''|| !row.supervisor_signoff_id != ''){
-                      disallowed = false;
-                  }
-                  return '<button class="btn btn-danger btn-sm float-right ml-2 delete-btn" data-id="' + row.id + '" data-disallowed="'+ disallowed +'"><i class="fa-trash fa"></i></button>';
-                }
-              }
-            ],
-            dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>'
-         });
-         table.column(0).visible(false); 
-         
-
-  });  
+    
+  @if(request()->sub)  
+      $('#collapse_2').slideToggle();
+  @endif    
+    
 </script>
 
 <style>
@@ -347,11 +309,4 @@ i {
 	right:11px;
     }
     
-    #upcoming {
-        font-weight: bold;
-      }
-      
-    #employee_conversations {
-        width: 100%;
-    }  
 </style> 

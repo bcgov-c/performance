@@ -233,19 +233,11 @@ class ConversationController extends Controller
             if ($request->has('team_members') && $request->team_members) {
                 $emp_query .= " AND emp_participants.participant_id = $request->team_members"; 
             }
-            if ($request->has('employee_signed')) {
-                if($request->employee_signed == 0){
-                    $emp_query .= " AND conversations.signoff_user_id IS NULL"; 
-                }else{
-                    $emp_query .= " AND conversations.signoff_user_id IS NOT NULL"; 
-                }
+            if ($request->has('employee_signed') && $request->employee_signed) {
+                $emp_query .= " AND conversations.signoff_user_id IS NOT NULL"; 
             }
-            if ($request->has('supervisor_signed')) {
-                if($request->supervisor_signed == 0){
-                    $emp_query .= " AND conversations.supervisor_signoff_id IS NULL";  
-                }else{
-                    $emp_query .= " AND conversations.supervisor_signoff_id IS NOT NULL";  
-                }
+            if ($request->has('supervisor_signed') && $request->supervisor_signed) {
+                $emp_query .= " AND conversations.supervisor_signoff_id IS NOT NULL";  
             }
             $emp_query .= " ORDER BY conversations.id DESC";
             $myTeamConversations = DB::select($emp_query);
@@ -293,29 +285,9 @@ class ConversationController extends Controller
             $team_members[$i]["name"] = $item->name;
             $i++;
         }
-        
-        $myTeamConversations_arr = array();
-        $i = 0;
-        foreach($myTeamConversations as $item){
-            $myTeamConversations_arr[$i]['id'] = $item->id;
-            $myTeamConversations_arr[$i]['name'] = $item->name;
-            $myTeamConversations_arr[$i]['participants'] = $item->mgrname . ", " . $item->empname;
-            if($item->signoff_user_id != ''){
-                $myTeamConversations_arr[$i]['employee_signed'] = 'Yes';
-            } else {
-                $myTeamConversations_arr[$i]['employee_signed'] = 'No';
-            }
-            if($item->supervisor_signoff_id != ''){
-                $myTeamConversations_arr[$i]['supervisor_signed'] = 'Yes';
-            } else {
-                $myTeamConversations_arr[$i]['supervisor_signed'] = 'No';
-            }
-            $i++;
-        }
-        $json_myTeamConversations = json_encode($myTeamConversations_arr);   
 
         return view($view, compact('type', 'conversations', 'myTeamConversations', 'conversationTopics', 'conversationMessage', 'viewType', 'reportees', 'topics', 'textAboveFilter', 'user', 
-                                    'supervisor_conversations', 'open_modal_id', 'conversationList','team_members', 'sub', 'json_myTeamConversations'));
+                                    'supervisor_conversations', 'open_modal_id', 'conversationList','team_members', 'sub'));
     }
 
     /**
@@ -1052,5 +1024,4 @@ class ConversationController extends Controller
         return view('conversation.partials.template-detail-modal-body', compact('template','allTemplates','participants','reportingManager'));
     }
     
-
 }
