@@ -478,10 +478,10 @@ class GoalController extends Controller
         ->where('is_library', true)
         ->where(function($where) use($authId) {
             return $where->whereRaw("EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud0 WHERE ud0.user_id = {$authId} AND gt.level = 0 AND ud0.organization_key = gt.organization_key)")
-                       ->orWhereRaw("EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud1 WHERE ud1.user_id = {$authId} AND gt.level = 0 AND ud1.organization_key = gt.organization_key AND ud1.level1_key = gt.level1_key)")
-                       ->orWhereRaw("EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud2 WHERE ud2.user_id = {$authId} AND gt.level = 0 AND ud2.organization_key = gt.organization_key AND ud2.level1_key = gt.level1_key AND ud2.level2_key = gt.level2_key)")
-                       ->orWhereRaw("EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud3 WHERE ud3.user_id = {$authId} AND gt.level = 0 AND ud3.organization_key = gt.organization_key AND ud3.level1_key = gt.level1_key AND ud3.level2_key = gt.level2_key AND ud3.level3_key = gt.level3_key)")
-                       ->orWhereRaw("EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud4 WHERE ud4.user_id = {$authId} AND gt.level = 0 AND ud4.organization_key = gt.organization_key AND ud4.level1_key = gt.level1_key AND ud4.level2_key = gt.level2_key AND ud4.level3_key = gt.level3_key AND ud4.level4_key = gt.level4_key)");
+                       ->orWhereRaw("EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud1 WHERE ud1.user_id = {$authId} AND gt.level = 1 AND ud1.organization_key = gt.organization_key AND ud1.level1_key = gt.level1_key)")
+                       ->orWhereRaw("EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud2 WHERE ud2.user_id = {$authId} AND gt.level = 2 AND ud2.organization_key = gt.organization_key AND ud2.level1_key = gt.level1_key AND ud2.level2_key = gt.level2_key)")
+                       ->orWhereRaw("EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud3 WHERE ud3.user_id = {$authId} AND gt.level = 3 AND ud3.organization_key = gt.organization_key AND ud3.level1_key = gt.level1_key AND ud3.level2_key = gt.level2_key AND ud3.level3_key = gt.level3_key)")
+                       ->orWhereRaw("EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud4 WHERE ud4.user_id = {$authId} AND gt.level = 4 AND ud4.organization_key = gt.organization_key AND ud4.level1_key = gt.level1_key AND ud4.level2_key = gt.level2_key AND ud4.level3_key = gt.level3_key AND ud4.level4_key = gt.level4_key)");
         })
         ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
         ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
@@ -609,7 +609,7 @@ class GoalController extends Controller
             $query = $query->orderby($sortby, $sortorder);    
         }
         
-        // $query = $query->groupBy('goals.id');
+        $query = $query->groupBy('goals.id');
         $bankGoals = $query->paginate($perPage=10, $columns = ['*'], $pageName = 'Goal');
         $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goalTypes, $tagsList);
         
