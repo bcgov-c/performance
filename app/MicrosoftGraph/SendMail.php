@@ -7,6 +7,7 @@ use DateInterval;
 use DateTimeZone;
 use App\Models\User;
 use App\Mail\NotifyMail;
+use App\Jobs\NotifyMailJob;
 use App\Models\GenericTemplate;
 use App\Models\NotificationLog;
 use Illuminate\Support\Facades\App;
@@ -171,19 +172,15 @@ class SendMail
         // Send immediately or using Queue
         if ($this->useQueue) {
 
-            
-            // try {
-                Mail::to( $a_toRecipients )
-                    ->cc( $a_ccRecipients )
-                    ->bcc( $a_bccRecipients )   
-                    ->queue(new NotifyMail($from, $this->subject, $this->body ));
+                // Mail::to( $a_toRecipients )
+                //     ->cc( $a_ccRecipients )
+                //     ->bcc( $a_bccRecipients )   
+                //     ->queue(new NotifyMail($from, $this->subject, $this->body ));
 
-                // Log::info( $log_text . ' was successfully sent.' );
+                dispatch(new NotifyMailJob($a_toRecipients, $a_ccRecipients, $a_bccRecipients, $from, $this->subject, $this->body));
+
                 $bResult = true;
-            // } catch (Exception $e) {
-            //     Log::error($e); 
-            //     $bResult = false;
-            // }
+
         } else {
             // try {
                 Mail::to( $a_toRecipients )
