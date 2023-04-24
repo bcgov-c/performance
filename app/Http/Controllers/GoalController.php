@@ -452,6 +452,7 @@ class GoalController extends Controller
         $tags = Tag::all()->sortBy("name")->toArray();
         $tags_input = $request->tag_ids;  
 
+        Log::info('Trace 1');
         $adminGoals = Goal::withoutGlobalScopes()
         ->join('goal_bank_orgs', 'goals.id', '=', 'goal_bank_orgs.goal_id')
         ->join('employee_demo_tree AS gt', 'gt.id', 'goal_bank_orgs.orgid')
@@ -468,6 +469,7 @@ class GoalController extends Controller
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')   
         ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'))
         ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.name', 'goals.is_mandatory');
+        Log::info('Trace 2');
         $adminGoalsInherited = Goal::withoutGlobalScopes()
         ->join('goal_bank_orgs', 'goals.id', '=', 'goal_bank_orgs.goal_id')
         ->join('employee_demo_tree AS gt', 'gt.id', 'goal_bank_orgs.orgid')
@@ -489,6 +491,7 @@ class GoalController extends Controller
         ->distinct() 
         ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'))
         ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.name', 'goals.is_mandatory');
+        Log::info('Trace 3');
         $adminGoals = $adminGoals->union($adminGoalsInherited);
         // Admin List filter below
         if ($request->has('is_mandatory') && $request->is_mandatory !== null) {
@@ -502,6 +505,7 @@ class GoalController extends Controller
                 });
             }
         }
+        Log::info('Trace 4');
         if ($request->has('goal_type') && $request->goal_type) {
             $adminGoals = $adminGoals->whereHas('goalType', function($adminGoals1) use ($request) {
                 return $adminGoals1->where('goal_type_id', $request->goal_type);
