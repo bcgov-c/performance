@@ -469,6 +469,44 @@ class GoalController extends Controller
             ->whereIn('goals.by_admin', [1, 2])
             ->where('goals.is_library', true)
             ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.name', 'goals.is_mandatory');
+        // Admin List filter below
+        if ($request->has('is_mandatory') && $request->is_mandatory !== null) {
+            if ($request->is_mandatory == "1") {
+                $adminGoals = $adminGoals->where('is_mandatory', $request->is_mandatory);
+            }
+            else {
+                $adminGoals = $adminGoals->where(function ($adminGoals1) {
+                    $adminGoals1->whereNull('is_mandatory');
+                    $adminGoals1->orWhere('is_mandatory', 0);
+                });
+            }
+        }
+        if ($request->has('goal_type') && $request->goal_type) {
+            $adminGoals = $adminGoals->whereHas('goalType', function($adminGoals1) use ($request) {
+                return $adminGoals1->where('goal_type_id', $request->goal_type);
+            });
+        }
+        if ($request->has('tag_id') && $request->tag_id) {
+            // $adminGoals = $adminGoals->where('goal_tags.tag_id', "=", "$request->tag_id");
+            $adminGoals = $adminGoals->whereRaw("EXISTS (SELECT 1 FROM goal_tags WHERE goal_tags.goal_id = goals.id AND goal_tags.tag_id = '{$request->tag_id}')");
+        }
+        if ($request->has('title') && $request->title) {
+            $adminGoals = $adminGoals->where('goals.title', "LIKE", "%$request->title%");
+        }
+        if ($request->has('date_added') && $request->date_added && Str::lower($request->date_added) !== 'any') {
+            $dateRange = explode("-",$request->date_added);
+            $dateRange[0] = trim($dateRange[0]);
+            $dateRange[1] = trim($dateRange[1]);
+            $startDate = Carbon::createFromFormat('M d, Y', $dateRange[0]);
+            $endDate = Carbon::createFromFormat('M d, Y', $dateRange[1]);
+            $adminGoals = $adminGoals->whereDate('goals.created_at', '>=', $startDate);
+            $adminGoals = $adminGoals->whereDate('goals.created_at', '<=', $endDate);
+        }
+        if ($request->has('created_by') && $request->created_by) {
+            // $query = $query->where('user_id', $request->created_by);
+            $adminGoals = $adminGoals->where('created_by', $request->created_by);
+        }
+
         $adminGoalsInherited = Goal::withoutGlobalScopes()
             ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator ', ') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
             ->join('goal_bank_orgs', function ($qon) {
@@ -493,30 +531,29 @@ class GoalController extends Controller
                     ");
             })
         ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.name', 'goals.is_mandatory');
-        $adminGoals = $adminGoals->union($adminGoalsInherited);
-
         // Admin List filter below
         if ($request->has('is_mandatory') && $request->is_mandatory !== null) {
             if ($request->is_mandatory == "1") {
-                $adminGoals = $adminGoals->where('is_mandatory', $request->is_mandatory);
+                $adminGoalsInherited = $adminGoalsInherited->where('is_mandatory', $request->is_mandatory);
             }
             else {
-                $adminGoals = $adminGoals->where(function ($adminGoals1) {
+                $adminGoalsInherited = $adminGoalsInherited->where(function ($adminGoals1) {
                     $adminGoals1->whereNull('is_mandatory');
                     $adminGoals1->orWhere('is_mandatory', 0);
                 });
             }
         }
         if ($request->has('goal_type') && $request->goal_type) {
-            $adminGoals = $adminGoals->whereHas('goalType', function($adminGoals1) use ($request) {
+            $adminGoalsInherited = $adminGoalsInherited->whereHas('goalType', function($adminGoals1) use ($request) {
                 return $adminGoals1->where('goal_type_id', $request->goal_type);
             });
         }
         if ($request->has('tag_id') && $request->tag_id) {
-            $adminGoals = $adminGoals->where('goal_tags.tag_id', "=", "$request->tag_id");
+            // $adminGoalsInherited = $adminGoalsInherited->where('goal_tags.tag_id', "=", "$request->tag_id");
+            $adminGoalsInherited = $adminGoalsInherited->whereRaw("EXISTS (SELECT 1 FROM goal_tags WHERE goal_tags.goal_id = goals.id AND goal_tags.tag_id = '{$request->tag_id}')");
         }
         if ($request->has('title') && $request->title) {
-            $adminGoals = $adminGoals->where('goals.title', "LIKE", "%$request->title%");
+            $adminGoalsInherited = $adminGoalsInherited->where('goals.title', "LIKE", "%$request->title%");
         }
         if ($request->has('date_added') && $request->date_added && Str::lower($request->date_added) !== 'any') {
             $dateRange = explode("-",$request->date_added);
@@ -524,13 +561,15 @@ class GoalController extends Controller
             $dateRange[1] = trim($dateRange[1]);
             $startDate = Carbon::createFromFormat('M d, Y', $dateRange[0]);
             $endDate = Carbon::createFromFormat('M d, Y', $dateRange[1]);
-            $adminGoals = $adminGoals->whereDate('goals.created_at', '>=', $startDate);
-            $adminGoals = $adminGoals->whereDate('goals.created_at', '<=', $endDate);
+            $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '>=', $startDate);
+            $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '<=', $endDate);
         }
         if ($request->has('created_by') && $request->created_by) {
             // $query = $query->where('user_id', $request->created_by);
-            $adminGoals = $adminGoals->where('created_by', $request->created_by);
+            $adminGoalsInherited = $adminGoalsInherited->where('created_by', $request->created_by);
         }
+
+        // $adminGoals = $adminGoals->union($adminGoalsInherited);
 
         $query = Goal::withoutGlobalScope(NonLibraryScope::class)
         ->where('is_library', true)
@@ -591,7 +630,7 @@ class GoalController extends Controller
         // $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goalTypes, $tagsList);
         // $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','users.name as username',DB::raw('group_concat(distinct tags.name) as tagnames'));
         $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'));
-        $query = $query->union($adminGoals);
+        $query = $query->union($adminGoals)->union($adminGoalsInherited);
         
         if (!$request->has('sortorder') || $request->sortorder == '') {
             $sortorder = 'DESC';
