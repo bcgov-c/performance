@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\ConversationParticipant;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
 
 
 class EmployeeSharesController extends Controller {
@@ -232,26 +233,60 @@ class EmployeeSharesController extends Controller {
             ->with('success', 'Share user goal/conversation successful.');
     }
 
+    // public function loadOrganizationTree(Request $request) {
+    //     list($sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4) = 
+    //         $this->baseFilteredSQLs($request, "");
+    //         $rows = $sql_level4->groupBy('o.id')->select('o.id')
+    //         ->union( $sql_level3->groupBy('o.id')->select('o.id') )
+    //         ->union( $sql_level2->groupBy('o.id')->select('o.id') )
+    //         ->union( $sql_level1->groupBy('o.id')->select('o.id') )
+    //         ->union( $sql_level0->groupBy('o.id')->select('o.id') )
+    //         ->pluck('o.id'); 
+    //     $orgs = EmployeeDemoTree::whereIn('id', $rows->toArray() )->get()->toTree();
+    //     // Employee Count by Organization
+    //     $countByOrg = $sql_level4->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row"))
+    //     ->union( $sql_level3->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
+    //     ->union( $sql_level2->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
+    //     ->union( $sql_level1->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
+    //     ->union( $sql_level0->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row") ) )
+    //     ->pluck('count_row', 'o.id');  
+    //     // Employee ID by Tree ID
+    //     $empIdsByOrgId = [];
+    //     $demoWhere = $this->baseFilteredWhere($request, "");
+    //     $sql = clone $demoWhere; 
+    //     $rows = $sql->select('orgid AS id', 'employee_id')
+    //         ->groupBy('orgid', 'employee_id')
+    //         ->orderBy('orgid')->orderBy('employee_id')
+    //         ->get();
+    //     $empIdsByOrgId = $rows->groupBy('id')->all();
+    //     if($request->ajax()){
+    //         return view('shared.employeeshares.partials.recipient-tree', compact('orgs','countByOrg','empIdsByOrgId') );
+    //     } 
+    // }
+
     public function loadOrganizationTree(Request $request) {
-        list($sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4) = 
-            $this->baseFilteredSQLs($request, "");
-            $rows = $sql_level4->groupBy('o.id')->select('o.id')
-            ->union( $sql_level3->groupBy('o.id')->select('o.id') )
-            ->union( $sql_level2->groupBy('o.id')->select('o.id') )
-            ->union( $sql_level1->groupBy('o.id')->select('o.id') )
-            ->union( $sql_level0->groupBy('o.id')->select('o.id') )
-            ->pluck('o.id'); 
+        $demoWhere = $this->baseFilteredWhere($request, "");
+        $treeorgs0 = clone $demoWhere; 
+        $treeorgs1 = clone $demoWhere; 
+        $treeorgs2 = clone $demoWhere; 
+        $treeorgs3 = clone $demoWhere; 
+        $treeorgs4 = clone $demoWhere; 
+        $rows = $treeorgs0->groupBy('treeid')->select('organization_key as treeid')
+            ->union( $treeorgs1->groupBy('treeid')->select('level1_key as treeid') )
+            ->union( $treeorgs2->groupBy('treeid')->select('level2_key as treeid') )
+            ->union( $treeorgs3->groupBy('treeid')->select('level3_key as treeid') )
+            ->union( $treeorgs4->groupBy('treeid')->select('level4_key as treeid') )
+            ->pluck('treeid'); 
         $orgs = EmployeeDemoTree::whereIn('id', $rows->toArray() )->get()->toTree();
         // Employee Count by Organization
-        $countByOrg = $sql_level4->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row"))
-        ->union( $sql_level3->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level2->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level1->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level0->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row") ) )
-        ->pluck('count_row', 'o.id');  
+        $countByOrg = $treeorgs0->groupBy('treeid')->select('organization_key as treeid', DB::raw("COUNT(*) as count_row"))
+            ->union( $treeorgs1->groupBy('treeid')->select('level1_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->union( $treeorgs2->groupBy('treeid')->select('level2_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->union( $treeorgs3->groupBy('treeid')->select('level3_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->union( $treeorgs4->groupBy('treeid')->select('level4_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->pluck('count_row', 'treeid');  
         // Employee ID by Tree ID
         $empIdsByOrgId = [];
-        $demoWhere = $this->baseFilteredWhere($request, "");
         $sql = clone $demoWhere; 
         $rows = $sql->select('orgid AS id', 'employee_id')
             ->groupBy('orgid', 'employee_id')
@@ -264,34 +299,68 @@ class EmployeeSharesController extends Controller {
     }
 
     public function eloadOrganizationTree(Request $request) {
-        list($esql_level0, $esql_level1, $esql_level2, $esql_level3, $esql_level4) = 
-            $this->baseFilteredSQLs($request, "e");
-            $rows = $sql_level4->groupBy('o.id')->select('o.id')
-            ->union( $sql_level3->groupBy('o.id')->select('o.id') )
-            ->union( $sql_level2->groupBy('o.id')->select('o.id') )
-            ->union( $sql_level1->groupBy('o.id')->select('o.id') )
-            ->union( $sql_level0->groupBy('o.id')->select('o.id') )
-            ->pluck('o.id'); 
+        $demoWhere = $this->baseFilteredWhere($request, "e");
+        $treeorgs0 = clone $demoWhere; 
+        $treeorgs1 = clone $demoWhere; 
+        $treeorgs2 = clone $demoWhere; 
+        $treeorgs3 = clone $demoWhere; 
+        $treeorgs4 = clone $demoWhere; 
+        $rows = $treeorgs0->groupBy('treeid')->select('organization_key as treeid')
+            ->union( $treeorgs1->groupBy('treeid')->select('level1_key as treeid') )
+            ->union( $treeorgs2->groupBy('treeid')->select('level2_key as treeid') )
+            ->union( $treeorgs3->groupBy('treeid')->select('level3_key as treeid') )
+            ->union( $treeorgs4->groupBy('treeid')->select('level4_key as treeid') )
+            ->pluck('treeid'); 
         $eorgs = EmployeeDemoTree::whereIn('id', $rows->toArray() )->get()->toTree();
         // Employee Count by Organization
-        $ecountByOrg = $sql_level4->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row"))
-        ->union( $sql_level3->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level2->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level1->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level0->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row") ) )
-        ->pluck('count_row', 'o.id');  
+        $ecountByOrg = $treeorgs0->groupBy('treeid')->select('organization_key as treeid', DB::raw("COUNT(*) as count_row"))
+            ->union( $treeorgs1->groupBy('treeid')->select('level1_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->union( $treeorgs2->groupBy('treeid')->select('level2_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->union( $treeorgs3->groupBy('treeid')->select('level3_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->union( $treeorgs4->groupBy('treeid')->select('level4_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->pluck('count_row', 'treeid');  
+        // Employee ID by Tree ID
         $eempIdsByOrgId = [];
-        $demoWhere = $this->baseFilteredWhere($request, "e");
         $sql = clone $demoWhere; 
         $rows = $sql->select('orgid AS id', 'employee_id')
             ->groupBy('orgid', 'employee_id')
             ->orderBy('orgid')->orderBy('employee_id')
             ->get();
-        $eempIdsByOrgId = $rows->groupBy('orgid')->all();
+        $eempIdsByOrgId = $rows->groupBy('id')->all();
         if($request->ajax()){
-            return view('shared.employeeshares.partials.erecipient-tree', compact('eorgs', 'ecountByOrg', 'eempIdsByOrgId') );
+            return view('shared.employeeshares.partials.erecipient-tree', compact('eorgs','ecountByOrg','eempIdsByOrgId') );
         } 
     }
+
+    // public function eloadOrganizationTree(Request $request) {
+    //     list($esql_level0, $esql_level1, $esql_level2, $esql_level3, $esql_level4) = 
+    //         $this->baseFilteredSQLs($request, "e");
+    //         $rows = $sql_level4->groupBy('o.id')->select('o.id')
+    //         ->union( $sql_level3->groupBy('o.id')->select('o.id') )
+    //         ->union( $sql_level2->groupBy('o.id')->select('o.id') )
+    //         ->union( $sql_level1->groupBy('o.id')->select('o.id') )
+    //         ->union( $sql_level0->groupBy('o.id')->select('o.id') )
+    //         ->pluck('o.id'); 
+    //     $eorgs = EmployeeDemoTree::whereIn('id', $rows->toArray() )->get()->toTree();
+    //     // Employee Count by Organization
+    //     $ecountByOrg = $sql_level4->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row"))
+    //     ->union( $sql_level3->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
+    //     ->union( $sql_level2->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
+    //     ->union( $sql_level1->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
+    //     ->union( $sql_level0->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row") ) )
+    //     ->pluck('count_row', 'o.id');  
+    //     $eempIdsByOrgId = [];
+    //     $demoWhere = $this->baseFilteredWhere($request, "e");
+    //     $sql = clone $demoWhere; 
+    //     $rows = $sql->select('orgid AS id', 'employee_id')
+    //         ->groupBy('orgid', 'employee_id')
+    //         ->orderBy('orgid')->orderBy('employee_id')
+    //         ->get();
+    //     $eempIdsByOrgId = $rows->groupBy('orgid')->all();
+    //     if($request->ajax()){
+    //         return view('shared.employeeshares.partials.erecipient-tree', compact('eorgs', 'ecountByOrg', 'eempIdsByOrgId') );
+    //     } 
+    // }
   
     public function getDatatableEmployees(Request $request, $option = null) {
         if($request->ajax()){
@@ -370,7 +439,7 @@ class EmployeeSharesController extends Controller {
     }
 
     protected function baseFilteredSQLs(Request $request, $option = null) {
-        $demoWhere = $this->baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4);
+        $demoWhere = $this->baseFilteredWhere($request, $option);
         $sql_level0 = clone $demoWhere; 
         $sql_level0->join('employee_demo_tree AS o', function($join) {
             $join->on('u.organization_key', 'o.organization_key')
@@ -395,7 +464,7 @@ class EmployeeSharesController extends Controller {
                 ->on('u.level1_key', 'o.level1_key')
                 ->on('u.level2_key', 'o.level2_key')
                 ->on('u.level3_key', 'o.level3_key')
-                ->where('o.level',3);    
+                ->where('o.level', 3);    
             });
         $sql_level4 = clone $demoWhere; 
         $sql_level4->join('employee_demo_tree AS o', function($join) {
@@ -406,6 +475,21 @@ class EmployeeSharesController extends Controller {
                 ->on('u.level4_key', 'o.level4_key')
                 ->where('o.level', 4);
             });
+        return  [$sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4];
+    }
+
+    protected function baseFilteredSQLs2(Request $request, $option = null) {
+        $demoWhere = $this->baseFilteredWhere($request, $option);
+        $sql_level0 = clone $demoWhere; 
+        $sql_level0->where('u.level', 0);
+        $sql_level1 = clone $demoWhere; 
+        $sql_level1->where('u.level', 1);
+        $sql_level2 = clone $demoWhere; 
+        $sql_level2->where('u.level', 2);    
+        $sql_level3 = clone $demoWhere; 
+        $sql_level3->where('u.level', 3);    
+        $sql_level4 = clone $demoWhere; 
+        $sql_level4->where('u.level', 4);
         return  [$sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4];
     }
 
@@ -504,20 +588,25 @@ class EmployeeSharesController extends Controller {
                     'sp.updated_at',
                     'sp.id as shared_profile_id',
                 );
+            Log::info(Carbon::now().' - Before ... return Datatables::of($query)');
             return Datatables::of($query)
                 ->addIndexColumn()
                 ->editColumn('shared_item', function ($row) {
                     $dcode = json_decode ($row->shared_item);
+                    Log::info(Carbon::now().' - $dcode = json_decode ($row->shared_item);');
                     return count($dcode) == 2 ? 'All' : ($dcode[0] == 1 ? 'Goal' : 'Conversation');
                 })
                 ->editColumn('created_at', function ($row) {
+                    Log::info(Carbon::now().' - $row->created_at ? $row->created_at->format(M d, Y H:i:s) : null;');
                     return $row->created_at ? $row->created_at->format('M d, Y H:i:s') : null;
                 })
                 ->editColumn('updated_at', function ($row) {
+                    Log::info(Carbon::now().' - $row->updated_at ? $row->updated_at->format(M d, Y H:i:s) : null;');
                     return $row->updated_at ? $row->updated_at->format('M d, Y H:i:s') : null;
                 })
                 ->addcolumn('action', function($row) {
                     $btn = '<a href="' . route(request()->segment(1) . '.employeeshares.deleteshare', ['id' => $row->shared_profile_id]) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="' . $row->shared_profile_id . '"><i class="fa fa-trash"></i></a>';
+                    Log::info(Carbon::now().' - $btn = <a href= . route(request()->segment(1) ) : null;');
                     return $btn;
                 })
                 ->rawColumns(['created_at', 'updated_at', 'action'])
