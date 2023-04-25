@@ -196,25 +196,30 @@ class EmployeeSharesController extends Controller {
                             'shared_by' => $current_user->id
                         ]
                     );
-                    // Use Class to create DashboardNotification
-                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                    $notification->user_id = $result->shared_id;
-                    $notification->notification_type = 'SP';
-                    $notification->comment = 'Your profile has been shared with ' . $result->sharedWith->name;
-                    $notification->related_id = $result->id;
-                    $notification->notify_user_id = $result->shared_id;
-                    $notification->send(); 
-                     // Send email to person who their profile was shared 
-                     $user = User::where('id', $result->shared_id)
-                     ->with('userPreference')
-                     ->select('id', 'name', 'guid')
-                     ->first();
+
+                    // Send email to person who their profile was shared 
+                    $user = User::where('id', $result->shared_id)
+                            ->with('userPreference')
+                            ->select('id', 'name', 'guid', 'employee_id')
+                            ->first();
+
+                    if ($user && $user->allow_inapp_notification) {
+                        // Use Class to create DashboardNotification
+                        $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                        $notification->user_id = $result->shared_id;
+                        $notification->notification_type = 'SP';
+                        $notification->comment = 'Your profile has been shared with ' . $result->sharedWith->name;
+                        $notification->related_id = $result->id;
+                        $notification->notify_user_id = $result->shared_id;
+                        $notification->send(); 
+                    }
+   
                     if ($user && $user->allow_email_notification && $user->userPreference->share_profile_flag == 'Y') {
                         // Send Out Email Notification to Employee
                         $sendMail = new \App\MicrosoftGraph\SendMail();
                         $sendMail->toRecipients = [ $user->id ];  
                         $sendMail->sender_id = null; 
-                        $sendMail->useQueue = false;
+                        $sendMail->useQueue = true;
                         $sendMail->saveToLog = true;
                         $sendMail->alert_type = 'N';
                         $sendMail->alert_format = 'E';
