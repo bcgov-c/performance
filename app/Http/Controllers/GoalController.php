@@ -938,20 +938,23 @@ class GoalController extends Controller
                     // $newNotify->related_id = $goal->id;
                     // $newNotify->save();
                     // Use Class to create DashboardNotification
-                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                    $notification->user_id = Auth::id();
-                    $notification->notification_type = 'GR';
-                    $notification->comment = $user->name . ' replied to your Goal comment.';
-                    $notification->related_id = $goal->id;
-                    $notification->notify_user_id = Auth::id();
-                    $notification->send(); 
+
+                    if ($user && $user->allow_inapp_notification) {
+                        $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                        $notification->user_id = Auth::id();
+                        $notification->notification_type = 'GR';
+                        $notification->comment = $user->name . ' replied to your Goal comment.';
+                        $notification->related_id = $goal->id;
+                        $notification->notify_user_id = Auth::id();
+                        $notification->send(); 
+                    }
 
                     // Send Out email notification
                     if ($user && $user->allow_email_notification && $user->userPreference->goal_comment_flag == 'Y') {
                         $sendMail = new SendMail();
                         $sendMail->toRecipients = array( $goal->user_id );  
                         $sendMail->sender_id = null;
-                        $sendMail->useQueue = false;
+                        $sendMail->useQueue = true;
                         $sendMail->saveToLog = true;
                         $sendMail->alert_type = 'N';
                         $sendMail->alert_format = 'E';
@@ -980,13 +983,16 @@ class GoalController extends Controller
                     // $newNotify->related_id = $goal->id;
                     // $newNotify->save();
                     // Use Class to create DashboardNotification
-                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                    $notification->user_id = Auth::id();
-                    $notification->notification_type = 'GC';
-                    $notification->comment =  $comment->user->name . ' added a comment to your goal.';
-                    $notification->related_id = $goal->id;
-                    $notification->notify_user_id = Auth::id();
-                    $notification->send(); 
+
+                    if ($user && $user->allow_inapp_notification) {
+                        $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                        $notification->user_id = Auth::id();
+                        $notification->notification_type = 'GC';
+                        $notification->comment =  $comment->user->name . ' added a comment to your goal.';
+                        $notification->related_id = $goal->id;
+                        $notification->notify_user_id = Auth::id();
+                        $notification->send(); 
+                    }
 
                     // Send Out Email Notification to Employee when his supervisor comment his goal
                     if ($user && $user->allow_email_notification && $user->userPreference->goal_comment_flag == 'Y') {
@@ -994,7 +1000,7 @@ class GoalController extends Controller
                         $sendMail = new SendMail();
                         $sendMail->toRecipients = array( $goal->user_id );  
                         $sendMail->sender_id = null;
-                        $sendMail->useQueue = false;
+                        $sendMail->useQueue = true;
                         $sendMail->saveToLog = true;
                         $sendMail->alert_type = 'N';
                         $sendMail->alert_format = 'E';
@@ -1019,13 +1025,16 @@ class GoalController extends Controller
                 // $newNotify->related_id = $goal->id;
                 // $newNotify->save();
                 // Use Class to create DashboardNotification
-                $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                $notification->user_id = $curr_user->reporting_to;
-                $notification->notification_type = 'GC';
-                $notification->comment = $curr_user->name . ' added a comment to your goal.';
-                $notification->related_id = $goal->id;
-                $notification->notify_user_id = Auth::id();
-                $notification->send(); 
+
+                if ($curr_user->reportingManager && $curr_user->reportingManager->allow_inapp_notification) {
+                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                    $notification->user_id = $curr_user->reporting_to;
+                    $notification->notification_type = 'GC';
+                    $notification->comment = $curr_user->name . ' added a comment to your goal.';
+                    $notification->related_id = $goal->id;
+                    $notification->notify_user_id = Auth::id();
+                    $notification->send(); 
+                }
 
                 // Send Out Email Notification to Supervisor when Employee comments his supervisor's goal
                 if ($curr_user->reportingManager && 
@@ -1035,7 +1044,7 @@ class GoalController extends Controller
                 $sendMail = new SendMail();
                 $sendMail->toRecipients = array( $curr_user->reporting_to );  
                 $sendMail->sender_id = null;
-                $sendMail->useQueue = false;
+                $sendMail->useQueue = true;
                     $sendMail->saveToLog = true;
                     $sendMail->alert_type = 'N';
                     $sendMail->alert_format = 'E';

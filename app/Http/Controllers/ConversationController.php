@@ -556,6 +556,13 @@ class ConversationController extends Controller
                 //     'comment' => $conversation->user->name . ' would like to schedule a performance conversation with you.',
                 //     'related_id' => $conversation->id,
                 // ]);
+
+                // Send Out email when the conversation added
+                $user = User::where('id', $value)
+                                ->with('userPreference')
+                                ->first();
+
+                if ($user && $user->allow_inapp_notification) {                                
                 $notification = new \App\MicrosoftGraph\SendDashboardNotification();
                             $notification->user_id = $value;
                             $notification->notification_type = 'CA';
@@ -563,12 +570,7 @@ class ConversationController extends Controller
                             $notification->related_id = $conversation->id;
                 $notification->notify_user_id = $value;
                             $notification->send(); 
-
-
-                // Send Out email when the conversation added
-                $user = User::where('id', $value)
-                                ->with('userPreference')
-                                ->first();
+                }
 
                 if ($user && $user->allow_email_notification && $user->userPreference->conversation_setup_flag == 'Y') {                            
 
@@ -578,7 +580,7 @@ class ConversationController extends Controller
                     $sendMail = new \App\MicrosoftGraph\SendMail();
                     $sendMail->toRecipients = [ $value ];
                     $sendMail->sender_id = null;  // default sender is System
-                    $sendMail->useQueue = false;
+                    $sendMail->useQueue = true;
                     $sendMail->template = 'ADVICE_SCHEDULE_CONVERSATION';
                     array_push($sendMail->bindvariables, $user->name);
                     array_push($sendMail->bindvariables, $conversation->user->name );
@@ -596,6 +598,13 @@ class ConversationController extends Controller
                 //     'comment' => $conversation->user->name . ' would like to schedule a performance conversation with you.',
                 //     'related_id' => $conversation->id,
                 // ]);
+
+                // Send Out email when the conversation added
+                $user = User::where('id', $value)
+                                ->with('userPreference')
+                                ->first();
+
+                if ($user && $user->allow_inapp_notification) {
                 $notification = new \App\MicrosoftGraph\SendDashboardNotification();
                             $notification->user_id = $value;
                             $notification->notification_type = 'CA';
@@ -603,12 +612,7 @@ class ConversationController extends Controller
                             $notification->related_id = $conversation->id;
                 $notification->notify_user_id = $value;
                             $notification->send(); 
-
-
-                // Send Out email when the conversation added
-                $user = User::where('id', $value)
-                                ->with('userPreference')
-                                ->first();
+                }
 
                 if ($user && $user->allow_email_notification && $user->userPreference->conversation_setup_flag == 'Y') {                            
 
@@ -618,7 +622,7 @@ class ConversationController extends Controller
                     $sendMail = new \App\MicrosoftGraph\SendMail();
                     $sendMail->toRecipients = [ $value ];
                     $sendMail->sender_id = null;  // default sender is System
-                    $sendMail->useQueue = false;
+                    $sendMail->useQueue = true;
                     $sendMail->template = 'ADVICE_SCHEDULE_CONVERSATION';
                     array_push($sendMail->bindvariables, $user->name);
                     array_push($sendMail->bindvariables, $conversation->user->name );
@@ -851,7 +855,6 @@ class ConversationController extends Controller
                 $conversation->team_member_agreement = 1;
                 
                 if ($signoff_user && $signoff_user->reporting_to ) {
-                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
                     
                     
                     $conversation_participants = DB::table('conversation_participants')                        
@@ -859,6 +862,14 @@ class ConversationController extends Controller
                             ->where('participant_id', '<>', $authId)
                             ->first();
                     //error_log(print_r($conversation_participants->participant_id,true));
+
+                    $user = User::where('id', $conversation_participants->participant_id)
+                                ->with('userPreference')
+                                ->select('id','name','guid', 'employee_id')
+                                ->first();
+
+                    if ($user && $user->allow_inapp_notification) {                                
+                        $notification = new \App\MicrosoftGraph\SendDashboardNotification();
                     $notification->user_id = $conversation_participants->participant_id;
                     
                     $notification->notification_type = 'CS';
@@ -866,12 +877,9 @@ class ConversationController extends Controller
                     $notification->related_id = $conversation->id;
                     $notification->notify_user_id =  $signoff_user->reporting_to;
                     $notification->send(); 
+                    }
 
                      // Send a email notification to the participants when someone sign the conversation
-                    $user = User::where('id', $conversation_participants->participant_id)
-                                ->with('userPreference')
-                                ->select('id','name','guid')
-                                ->first();
                     //error_log(print_r($user,true));
                     error_log(print_r($conversation->conversation_topic_id,true));
                     if ($user && $user->allow_email_notification && $user->userPreference->conversation_disagree_flag == 'Y') {     
@@ -879,7 +887,7 @@ class ConversationController extends Controller
                         $sendMail = new \App\MicrosoftGraph\SendMail();
                         $sendMail->toRecipients = [ $user->id ];
                         $sendMail->sender_id = null;  // default sender is System
-                        $sendMail->useQueue = false;
+                        $sendMail->useQueue = true;
                         $sendMail->template = 'CONVERSATION_DISAGREED';
                         array_push($sendMail->bindvariables, $user->name);
                         array_push($sendMail->bindvariables, $signoff_user->name );   //Person who signed the conversation 
@@ -952,28 +960,30 @@ class ConversationController extends Controller
             //     'related_id' => $conversation->id,
             // ]);
             // Use Class to create DashboardNotification
-			$notification = new \App\MicrosoftGraph\SendDashboardNotification();
-			$notification->user_id = $value;
-			$notification->notification_type = 'CS';
-			$notification->comment = $current_user->name . ' signed your performance conversation.';
-			$notification->related_id = $conversation->id;
-            $notification->notify_user_id = $value;
-			$notification->send(); 
 
+            $user = User::where('id', $value)
+                        ->with('userPreference')
+                        ->select('id','name','guid', 'employee_id')
+                        ->first();
+
+            if ($user && $user->allow_inapp_notification) {                        
+                $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                $notification->user_id = $value;
+                $notification->notification_type = 'CS';
+                $notification->comment = $current_user->name . ' signed your performance conversation.';
+                $notification->related_id = $conversation->id;
+                $notification->notify_user_id = $value;
+                $notification->send(); 
+            }
 
             // Send a email notification to the participants when someone sign the conversation
-            $user = User::where('id', $value)
-                    ->with('userPreference')
-                    ->select('id','name','guid')
-                    ->first();
-
             if ($user && $user->allow_email_notification && $user->userPreference->conversation_signoff_flag == 'Y') {                            
     
                 $topic = ConversationTopic::find($request->conversation_topic_id);
                 $sendMail = new \App\MicrosoftGraph\SendMail();
                 $sendMail->toRecipients = [ $value ];
                 $sendMail->sender_id = null;  // default sender is System
-                $sendMail->useQueue = false;
+                $sendMail->useQueue = true;
                 $sendMail->template = 'CONVERSATION_SIGN_OFF';
                 array_push($sendMail->bindvariables, $user->name);
                 array_push($sendMail->bindvariables, $current_user->name );   //Person who signed the conversation 
