@@ -1969,7 +1969,7 @@ class SysadminStatisticsReportController extends Controller
                 
                 $conversation = Conversation::selectRaw("conversations.*, conversation_topics.name as topic, users.employee_id, employee_demo.employee_name, users.email,
                 employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4,
-                        users.next_conversation_date as next_due_date, supervisor.name as sign_supervisor_name, employee.name as sign_employee_name")
+                        users.next_conversation_date as next_due_date, supervisor.name as sign_supervisor_name, employee.name as sign_employee_name,GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as latest_update")
                 ->whereNull('deleted_at')                        
                 ->join('conversation_participants','conversations.id','conversation_participants.conversation_id')        
                 ->join('users', 'users.id', 'conversation_participants.participant_id') 
@@ -2081,7 +2081,7 @@ class SysadminStatisticsReportController extends Controller
                 
                 $conversation = Conversation::selectRaw("conversations.*, conversation_topics.name as topic, users.employee_id, employee_demo.employee_name, users.email,
                 employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4,
-                        users.next_conversation_date as next_due_date, supervisor.name as sign_supervisor_name, employee.name as sign_employee_name")
+                        users.next_conversation_date as next_due_date, supervisor.name as sign_supervisor_name, employee.name as sign_employee_name,GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as latest_update")
                 ->whereNull('deleted_at')                        
                 ->join('conversation_participants','conversations.id','conversation_participants.conversation_id')        
                 ->join('users', 'users.id', 'conversation_participants.participant_id') 

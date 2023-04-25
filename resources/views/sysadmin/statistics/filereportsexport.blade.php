@@ -29,6 +29,7 @@
                         <th width="50%">Ministry</th>
                         <th width="10%">Start Date</th>
                         <th width="10%">End Date</th>
+                        <th width="10%">Created At</th>
                     </tr>
                     <tr>
                         <td><?php echo $data["selected_goal"]->title; ?></td>
@@ -48,6 +49,16 @@
                         <td>
                         <?php 
                             $dateTime = $data["selected_goal"]->target_date;
+                            if(strtotime($dateTime)){
+                                $dateTime = new DateTime($dateTime);
+                                $dateTime = $dateTime->format('Y-m-d');
+                            }
+                            echo $dateTime; 
+                            ?>
+                        </td>
+                        <td>
+                        <?php 
+                            $dateTime = $data["selected_goal"]->created_at;
                             if(strtotime($dateTime)){
                                 $dateTime = new DateTime($dateTime);
                                 $dateTime = $dateTime->format('Y-m-d');
@@ -79,12 +90,26 @@
                         <th width="25%">Participants</th>
                         <th width="25%">Supervisor Sign Off</th>
                         <th width="25%">Employee Sign Off</th>
+                        <?php
+                            if($data["selected_conversation"]->sign_supervisor_name != '' && $data["selected_conversation"]->sign_employee_name != ''){
+                                echo "<th>Latest Signoff At</th>";
+                            }else{    
+                                echo "<th>Created At</th>";
+                            }
+                        ?>
                     </tr>
                     <tr>
                         <td><?php echo $data["selected_conversation"]->topic; ?></td>
                         <td><?php echo $data["selected_conversation"]->participants; ?></td>
                         <td><?php echo $data["selected_conversation"]->sign_supervisor_name; ?> <?php if($data["selected_conversation"]->supervisor_signoff_time != ''){?>[<?php echo $data["selected_conversation"]->supervisor_signoff_time; ?>]<?php } ?></td>
                         <td><?php echo $data["selected_conversation"]->sign_employee_name; ?>  <?php if($data["selected_conversation"]->sign_off_time != ''){?>[<?php echo $data["selected_conversation"]->sign_off_time; ?>]<?php } ?></td>
+                        <?php
+                            if($data["selected_conversation"]->sign_supervisor_name != '' && $data["selected_conversation"]->sign_employee_name != ''){
+                                echo "<td>".$data["selected_conversation"]->latest_update."</td>";
+                            }else{    
+                                echo "<td>".$data["selected_conversation"]->created_at."</td>";
+                            }
+                        ?>
                     </tr>
                 </table>  
                 
