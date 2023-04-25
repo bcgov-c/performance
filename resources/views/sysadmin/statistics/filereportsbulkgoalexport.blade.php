@@ -32,6 +32,7 @@
                             <th>Ministry</th>
                             <th>Start Date</th>
                             <th>End Date</th>
+                            <th>Created At</th>
                         </tr>
                         <tr>
                             <td><?php echo $item["selected_goal"]->title; ?></td>
@@ -51,6 +52,16 @@
                             <td>
                                 <?php 
                                 $dateTime = $item["selected_goal"]->target_date;
+                                if(strtotime($dateTime)){
+                                    $dateTime = new DateTime($dateTime);
+                                    $dateTime = $dateTime->format('Y-m-d');
+                                }
+                                echo $dateTime; 
+                                ?>
+                            </td>
+                            <td>
+                                <?php 
+                                $dateTime = $item["selected_goal"]->created_at;
                                 if(strtotime($dateTime)){
                                     $dateTime = new DateTime($dateTime);
                                     $dateTime = $dateTime->format('Y-m-d');

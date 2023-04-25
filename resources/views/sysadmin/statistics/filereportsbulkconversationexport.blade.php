@@ -30,12 +30,26 @@
                             <th>Participants</th>
                             <th>Supervisor Sign Off</th>
                             <th>Employee Sign Off</th>
+                            <?php
+                            if($item["selected_conversation"]->sign_supervisor_name != '' && $item["selected_conversation"]->sign_employee_name != ''){
+                                echo "<th>Latest Signoff At</th>";
+                            }else{    
+                                echo "<th>Created At</th>";
+                            }
+                            ?>
                         </tr>
-                        <tr><td><?php echo $item["selected_conversation"]->topic; ?></td>
+                        <tr>
+                            <td><?php echo $item["selected_conversation"]->topic; ?></td>
                             <td><?php echo $item["selected_conversation"]->participants; ?></td>
                             <td><?php echo $item["selected_conversation"]->sign_supervisor_name; ?> <?php if($item["selected_conversation"]->supervisor_signoff_time != ''){?>[<?php echo $item["selected_conversation"]->supervisor_signoff_time; ?>]<?php } ?></td>
                             <td><?php echo $item["selected_conversation"]->sign_employee_name; ?>  <?php if($item["selected_conversation"]->sign_off_time != ''){?>[<?php echo $item["selected_conversation"]->sign_off_time; ?>]<?php } ?></td>
-                            
+                            <?php
+                            if($item["selected_conversation"]->sign_supervisor_name != '' && $item["selected_conversation"]->sign_employee_name != ''){
+                                echo "<td>".$item["selected_conversation"]->latest_update."</td>";
+                            }else{    
+                                echo "<td>".$item["selected_conversation"]->created_at."</td>";
+                            }
+                            ?>
                         </tr>
                     </table>
                 
