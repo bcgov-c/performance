@@ -187,7 +187,7 @@ class ConversationController extends Controller
             $myTeamQuery->where('signoff_user_id','<>', $authId);
             $type = 'past';
 
-            $conversations = $query->orderBy('id', 'DESC')->paginate(10);                       
+            $conversations = $query->orderBy('id', 'DESC')->paginate(10); 
             $myTeamConversations = $myTeamQuery->orderBy('id', 'DESC')->paginate(10);
         } else { // Upcoming
             //conversations with my supervisor
@@ -273,21 +273,70 @@ class ConversationController extends Controller
             "name" => "Any"
         ]);
         
-        $team_qry = User::select('id', 'name')
-                        ->where('reporting_to',$authId)
-                        ->get();
+        //get current team members
+        $team_query = "SELECT users.id, users.name FROM users where users.id IN (SELECT users.id as id FROM users 
+                        where users.reporting_to = $authId
+                        UNION
+                        select shared_profiles.shared_id as id FROM shared_profiles
+                        WHERE shared_with = $authId)";
+        $myCurrentTeam = DB::select($team_query);
         $team_members = array();
         $team_members[0]["id"] = '';
         $team_members[0]["name"] = 'Any';
         $i = 1;
-        foreach($team_qry as $item){
+        foreach($myCurrentTeam as $item){
             $team_members[$i]["id"] = $item->id;
             $team_members[$i]["name"] = $item->name;
             $i++;
         }
+        
+        $myTeamConversations_arr = array();
+        $i = 0;
+        foreach($myTeamConversations as $item){
+            $myTeamConversations_arr[$i]['id'] = $item->id;
+            $myTeamConversations_arr[$i]['name'] = $item->name;
+            $myTeamConversations_arr[$i]['participants'] = $item->mgrname . ", " . $item->empname;
+            $myTeamConversations_arr[$i]['signoff_user_id'] = $item->signoff_user_id;
+            if($item->signoff_user_id != ''){
+                $myTeamConversations_arr[$i]['employee_signed'] = 'Yes';
+            } else {
+                $myTeamConversations_arr[$i]['employee_signed'] = 'No';
+            }
+            $myTeamConversations_arr[$i]['supervisor_signoff_id'] = $item->supervisor_signoff_id;
+            if($item->supervisor_signoff_id != ''){
+                $myTeamConversations_arr[$i]['supervisor_signed'] = 'Yes';
+            } else {
+                $myTeamConversations_arr[$i]['supervisor_signed'] = 'No';
+            }
+            $i++;
+        }
+        $json_myTeamConversations = json_encode($myTeamConversations_arr);   
+        
+        
+        $conversations_arr = array();
+        $i = 0;
+        foreach($conversations as $item){
+            $conversations_arr[$i]['id'] = $item->id;
+            $conversations_arr[$i]['name'] = $item->name;
+            $conversations_arr[$i]['participants'] = $item->mgrname . ", " . $item->empname;
+            $conversations_arr[$i]['signoff_user_id'] = $item->signoff_user_id;
+            if($item->signoff_user_id != ''){
+                $conversations_arr[$i]['employee_signed'] = 'Yes';
+            } else {
+                $conversations_arr[$i]['employee_signed'] = 'No';
+            }
+            $conversations_arr[$i]['supervisor_signoff_id'] = $item->supervisor_signoff_id;
+            if($item->supervisor_signoff_id != ''){
+                $conversations_arr[$i]['supervisor_signed'] = 'Yes';
+            } else {
+                $conversations_arr[$i]['supervisor_signed'] = 'No';
+            }
+            $i++;
+        }
+        $json_conversations = json_encode($conversations_arr); 
 
         return view($view, compact('type', 'conversations', 'myTeamConversations', 'conversationTopics', 'conversationMessage', 'viewType', 'reportees', 'topics', 'textAboveFilter', 'user', 
-                                    'supervisor_conversations', 'open_modal_id', 'conversationList','team_members', 'sub'));
+                                    'supervisor_conversations', 'open_modal_id', 'conversationList','team_members', 'sub', 'json_myTeamConversations', 'json_conversations'));
     }
 
     /**
