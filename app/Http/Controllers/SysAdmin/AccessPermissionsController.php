@@ -388,7 +388,7 @@ class AccessPermissionsController extends Controller
                 , org_count
             ");
             return Datatables::of($query)
-            ->editColumn('org_count', function ($row) { return $row->org_count > 0 ? $row->org_count : ""; })
+            ->editColumn('org_count', function ($row) { return $row->role_id == 3 ? $row->org_count : NULL; })
             ->addIndexColumn()
             ->addcolumn('action', function($row) {
                 return '<button 
