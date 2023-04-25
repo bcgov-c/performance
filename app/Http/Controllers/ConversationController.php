@@ -187,7 +187,7 @@ class ConversationController extends Controller
             $myTeamQuery->where('signoff_user_id','<>', $authId);
             $type = 'past';
 
-            $conversations = $query->orderBy('id', 'DESC')->paginate(10);                       
+            $conversations = $query->orderBy('id', 'DESC')->paginate(10); 
             $myTeamConversations = $myTeamQuery->orderBy('id', 'DESC')->paginate(10);
         } else { // Upcoming
             //conversations with my supervisor
@@ -233,19 +233,11 @@ class ConversationController extends Controller
             if ($request->has('team_members') && $request->team_members) {
                 $emp_query .= " AND emp_participants.participant_id = $request->team_members"; 
             }
-            if ($request->has('employee_signed')) {
-                if($request->employee_signed == 0){
-                    $emp_query .= " AND conversations.signoff_user_id IS NULL"; 
-                }else{
-                    $emp_query .= " AND conversations.signoff_user_id IS NOT NULL"; 
-                }
+            if ($request->has('employee_signed') && $request->employee_signed) {
+                $emp_query .= " AND conversations.signoff_user_id IS NOT NULL"; 
             }
-            if ($request->has('supervisor_signed')) {
-                if($request->supervisor_signed == 0){
-                    $emp_query .= " AND conversations.supervisor_signoff_id IS NULL";  
-                }else{
-                    $emp_query .= " AND conversations.supervisor_signoff_id IS NOT NULL";  
-                }
+            if ($request->has('supervisor_signed') && $request->supervisor_signed) {
+                $emp_query .= " AND conversations.supervisor_signoff_id IS NOT NULL";  
             }
             $emp_query .= " ORDER BY conversations.id DESC";
             $myTeamConversations = DB::select($emp_query);
@@ -281,14 +273,18 @@ class ConversationController extends Controller
             "name" => "Any"
         ]);
         
-        $team_qry = User::select('id', 'name')
-                        ->where('reporting_to',$authId)
-                        ->get();
+        //get current team members
+        $team_query = "SELECT users.id, users.name FROM users where users.id IN (SELECT users.id as id FROM users 
+                        where users.reporting_to = $authId
+                        UNION
+                        select shared_profiles.shared_id as id FROM shared_profiles
+                        WHERE shared_with = $authId)";
+        $myCurrentTeam = DB::select($team_query);
         $team_members = array();
         $team_members[0]["id"] = '';
         $team_members[0]["name"] = 'Any';
         $i = 1;
-        foreach($team_qry as $item){
+        foreach($myCurrentTeam as $item){
             $team_members[$i]["id"] = $item->id;
             $team_members[$i]["name"] = $item->name;
             $i++;
@@ -337,10 +333,10 @@ class ConversationController extends Controller
             }
             $i++;
         }
-        $json_conversations = json_encode($conversations_arr);         
+        $json_conversations = json_encode($conversations_arr); 
 
         return view($view, compact('type', 'conversations', 'myTeamConversations', 'conversationTopics', 'conversationMessage', 'viewType', 'reportees', 'topics', 'textAboveFilter', 'user', 
-                                    'supervisor_conversations', 'open_modal_id', 'conversationList','team_members', 'sub', 'json_myTeamConversations','json_conversations'));
+                                    'supervisor_conversations', 'open_modal_id', 'conversationList','team_members', 'sub', 'json_myTeamConversations', 'json_conversations'));
     }
 
     /**
