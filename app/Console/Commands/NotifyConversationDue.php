@@ -124,10 +124,6 @@ class NotifyConversationDue extends Command
                 $due = $user->next_conversation_date;
 
                 $dueDate = \Carbon\Carbon::create($due);
-                // To avoid the past email sent out when the sysadmin turn on global flag under system access control
-                if ($dueDate < today()) {
-                    continue;
-                }
                 $now = Carbon::now();
                 $dayDiff = $now->diffInDays($dueDate, false);
     // Override for testing                        
@@ -146,6 +142,11 @@ class NotifyConversationDue extends Command
                 if ($dayDiff < 0) {  
                     $msg = 'OVERDUE - your next conversation is due by ' .  $due ;
                     $dueIndays = 0;
+                }
+
+                // To avoid the past email sent out when the sysadmin turn on global flag under system access control
+                if (!($dayDiff < 0 && $dueDate > today()->subDays(7))) {
+                    $msg = '';
                 }
 
                 if ($msg) {
@@ -290,10 +291,6 @@ class NotifyConversationDue extends Command
                     $due = $user->next_conversation_date;
 
                     $dueDate = \Carbon\Carbon::create($due);
-                    // To avoid the past email sent out when the sysadmin turn on global flag under system access control
-                    if ($dueDate < today()) {
-                        continue;
-                    }
                     $now = Carbon::now();
                     $dayDiff = $now->diffInDays($dueDate, false);
     // Override for testing                        
@@ -312,6 +309,11 @@ class NotifyConversationDue extends Command
                     if ($dayDiff < 0) {  
                         $msg = 'OVERDUE - ' . $user->name . '\'s next conversation is due by ' . $due ;
                         $dueIndays = 0;
+                    }
+
+                    // To avoid the past email sent out when the sysadmin turn on global flag under system access control
+                    if (!($dayDiff < 0 && $dueDate > today()->subDays(7))) {
+                        $msg = '';
                     }
 
                     if ($msg) {
@@ -433,10 +435,6 @@ class NotifyConversationDue extends Command
                 $due = $user->next_conversation_date;
         
                 $dueDate = \Carbon\Carbon::create($due);
-                // To avoid the past email sent out when the sysadmin turn on global flag under system access control
-                if ($dueDate < today()) {
-                    continue;
-                }
                 $now = Carbon::now();
                 $dayDiff = $now->diffInDays($dueDate, false);
     // Override for testing                        
@@ -470,7 +468,12 @@ class NotifyConversationDue extends Command
                         $bSend = true;
                     }
                 }
-        
+
+                // To avoid the past email sent out when the sysadmin turn on global flag under system access control
+                if (!($dayDiff < 0 && $dueDate > today()->subDays(7))) {
+                    $bSend = false;
+                }
+
                 if ($bSend) {
 
                     // check the notification sent or not 
@@ -603,11 +606,6 @@ class NotifyConversationDue extends Command
                     $due = $user->next_conversation_date;
 
                     $dueDate = \Carbon\Carbon::create($due);
-                    // To avoid the past email sent out when the sysadmin turn on global flag under system access control
-                    if ($dueDate < today()) {
-                        continue;
-                    }
-
                     $now = Carbon::now();
                     $dayDiff = $now->diffInDays($dueDate, false);
     // Override for testing                        
@@ -645,6 +643,11 @@ class NotifyConversationDue extends Command
                             $bSend = true;
                         }
                     }
+
+                    // To avoid the past email sent out when the sysadmin turn on global flag under system access control
+                    if (!($dayDiff < 0 && $dueDate > today()->subDays(7))) {
+                        $bSend = false;                        
+                    }                      
             
                     if ($bSend) {
 
