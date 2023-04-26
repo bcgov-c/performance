@@ -88,23 +88,23 @@ class SetNextLevelManager extends Command
                             $user->reporting_to = $reporting_to;
                             $user->last_sync_at = $start_time;
                             $user->save();             
-                            $old_values = [ 
-                                'table' => 'users',                        
-                                'employee_id' => $user->employee_id, 
-                                'reporting_to' => $user->reporting_to, 
-                                'last_sync_at' => $user->last_sync_at
-                            ];
-                            $new_values = [ 
-                                'table' => 'users', 
-                                'employee_id' => $demo->employee_id, 
-                                'reporting_to' => $reporting_to, 
-                                'last_sync_at' => $start_time
-                            ];
-                            $audit = new JobDataAudit;
-                            $audit->job_sched_id = $audit_id;
-                            $audit->old_values = json_encode($old_values);
-                            $audit->new_values = json_encode($new_values);
-                            $audit->save();
+                            // $old_values = [ 
+                            //     'table' => 'users',                        
+                            //     'employee_id' => $user->employee_id, 
+                            //     'reporting_to' => $user->reporting_to, 
+                            //     'last_sync_at' => $user->last_sync_at
+                            // ];
+                            // $new_values = [ 
+                            //     'table' => 'users', 
+                            //     'employee_id' => $demo->employee_id, 
+                            //     'reporting_to' => $reporting_to, 
+                            //     'last_sync_at' => $start_time
+                            // ];
+                            // $audit = new JobDataAudit;
+                            // $audit->job_sched_id = $audit_id;
+                            // $audit->old_values = json_encode($old_values);
+                            // $audit->new_values = json_encode($new_values);
+                            // $audit->save();
                             // Update Reporting Tos
                             if ($reporting_to) {
                                 // $user->reportingTos()->updateOrCreate([ 'reporting_to_id' => $reporting_to ]);
@@ -117,19 +117,19 @@ class SetNextLevelManager extends Command
                                     ]
                                 );
                             }
-                            $old_values = [ 
-                                'table' => 'user_reporting_tos'                        
-                            ];
-                            $new_values = [ 
-                                'table' => 'user_reporting_tos', 
-                                'employee_id' => $demo->employee_id, 
-                                'reporting_to_id' => $reporting_to 
-                            ];
-                            $audit = new JobDataAudit;
-                            $audit->job_sched_id = $audit_id;
-                            $audit->old_values = json_encode($old_values);
-                            $audit->new_values = json_encode($new_values);
-                            $audit->save();
+                            // $old_values = [ 
+                            //     'table' => 'user_reporting_tos'                        
+                            // ];
+                            // $new_values = [ 
+                            //     'table' => 'user_reporting_tos', 
+                            //     'employee_id' => $demo->employee_id, 
+                            //     'reporting_to_id' => $reporting_to 
+                            // ];
+                            // $audit = new JobDataAudit;
+                            // $audit->job_sched_id = $audit_id;
+                            // $audit->old_values = json_encode($old_values);
+                            // $audit->new_values = json_encode($new_values);
+                            // $audit->save();
                             DB::commit();
                             $this->info('EID '.$demo->employee_id.' - '.$demo->employee_name.' updated Manager to UID '.$reporting_to.'.');
                             $updatecounter += 1;
