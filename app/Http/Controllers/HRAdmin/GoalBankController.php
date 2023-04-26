@@ -1316,7 +1316,8 @@ class GoalBankController extends Controller
                                 ->whereIn('user_demo_jr_view.employee_id', $employee_ids)
                                 ->where('access_organizations.allow_email_msg', 'Y')
                                 ->where( function($query) {
-                                    $query->where('user_preferences.goal_bank_flag', 'Y');
+                                    $query->where('user_preferences.goal_bank_flag', 'Y')
+                                          ->orWhereNull('user_preferences.goal_bank_flag');
                                 })
                                 ->pluck('user_demo_jr_view.employee_id')
                                 ->toArray(); 
