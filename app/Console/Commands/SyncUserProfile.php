@@ -314,7 +314,7 @@ class SyncUserProfile extends Command
 
             $reporting_to = $this->getReportingUserId($employee, $exceptions);   
             
-            $user = User::from(\DB::raw('users USE INDEX (idx_users_employeeid_emplrecord)'))
+            $user = User::from('users')
                 ->where('employee_id', $employee->employee_id)
                 ->select('id', 'reporting_to', 'last_sync_at')
                 ->first(); 
@@ -362,8 +362,8 @@ class SyncUserProfile extends Command
         //     $query->select('guid')->from('employee_demo')->whereNotNull('date_deleted');
         //     })->update(['acctlock'=>true, 'last_sync_at' => $new_sync_at]);
 
-        $users = User::from(\DB::raw('users USE INDEX (idx_users_employeeid_emplrecord)'))->whereIn('employee_id',function($query) { 
-            $query->from(\DB::raw('employee_demo USE INDEX(idx_employee_demo_employee_id_date_deleted)'))->select('employee_id')->whereNotNull('date_deleted');
+        $users = User::from('users')->whereIn('employee_id',function($query) { 
+            $query->from('employee_demo')->select('employee_id')->whereNotNull('date_deleted');
             })->update(['acctlock'=>true, 'last_sync_at' => $new_sync_at]);
 
         // // Step 4 : Lock all users except pivot run users
