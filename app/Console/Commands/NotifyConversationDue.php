@@ -145,7 +145,8 @@ class NotifyConversationDue extends Command
                 }
 
                 // To avoid the past email sent out when the sysadmin turn on global flag under system access control
-                if (!($dayDiff < 0 && $dueDate > today()->subDays(7))) {
+                if ( ($dayDiff < 0 && $dueDate < today()->subDays(6)) ||
+                     ($dayDiff >= 0 && $dueDate < today()) ) {
                     $msg = '';
                 }
 
@@ -312,7 +313,8 @@ class NotifyConversationDue extends Command
                     }
 
                     // To avoid the past email sent out when the sysadmin turn on global flag under system access control
-                    if (!($dayDiff < 0 && $dueDate > today()->subDays(7))) {
+                    if ( ($dayDiff < 0 && $dueDate < today()->subDays(6)) ||
+                         ($dayDiff >= 0 && $dueDate < today()) ) {
                         $msg = '';
                     }
 
@@ -470,7 +472,8 @@ class NotifyConversationDue extends Command
                 }
 
                 // To avoid the past email sent out when the sysadmin turn on global flag under system access control
-                if (!($dayDiff < 0 && $dueDate > today()->subDays(7))) {
+                if ( ($dayDiff < 0 && $dueDate < today()->subDays(6)) ||
+                     ($dayDiff >= 0 && $dueDate < today()) ) {                    
                     $bSend = false;
                 }
 
@@ -645,7 +648,8 @@ class NotifyConversationDue extends Command
                     }
 
                     // To avoid the past email sent out when the sysadmin turn on global flag under system access control
-                    if (!($dayDiff < 0 && $dueDate > today()->subDays(7))) {
+                    if ( ($dayDiff < 0 && $dueDate < today()->subDays(6)) ||
+                         ($dayDiff >= 0 && $dueDate < today()) ) {
                         $bSend = false;                        
                     }                      
             
