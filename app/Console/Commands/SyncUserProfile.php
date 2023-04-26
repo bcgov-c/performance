@@ -160,30 +160,30 @@ class SyncUserProfile extends Command
 
                     DB::beginTransaction();
                     try {
-                        $old_values = [ 
-                            'table' => 'users',                        
-                            'id' => $user->id, 
-                            'employee_id' => $user->employee_id, 
-                            'name' => $user->name, 
-                            'email' => $user->email, 
-                            'empl_record' => $user->empl_record, 
-                            'joining_date' => date('Y-m-d',strtotime($user->joining_date)),  
-                            'acctlock' => $user->acctlock, 
-                            'last_sync_at' => $user->last_sync_at
-                        ];
-                        $new_values = [ 
-                            'table' => 'users',                        
-                            'id' => $user->id, 
-                            'employee_id' => $employee->employee_id, 
-                            'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name, 
-                            'email' => $employee->employee_email, 
-                            'empl_record' => $employee->empl_record, 
-                            'joining_date' => date('Y-m-d',strtotime($employee->position_start_date)),  
-                            'acctlock' => $employee->date_deleted ? 1 : 0,  
-                            'last_sync_at' => $user->last_sync_at 
-                        ]; 
+                        // $old_values = [ 
+                        //     'table' => 'users',                        
+                        //     'id' => $user->id, 
+                        //     'employee_id' => $user->employee_id, 
+                        //     'name' => $user->name, 
+                        //     'email' => $user->email, 
+                        //     'empl_record' => $user->empl_record, 
+                        //     'joining_date' => date('Y-m-d',strtotime($user->joining_date)),  
+                        //     'acctlock' => $user->acctlock, 
+                        //     'last_sync_at' => $user->last_sync_at
+                        // ];
+                        // $new_values = [ 
+                        //     'table' => 'users',                        
+                        //     'id' => $user->id, 
+                        //     'employee_id' => $employee->employee_id, 
+                        //     'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name, 
+                        //     'email' => $employee->employee_email, 
+                        //     'empl_record' => $employee->empl_record, 
+                        //     'joining_date' => date('Y-m-d',strtotime($employee->position_start_date)),  
+                        //     'acctlock' => $employee->date_deleted ? 1 : 0,  
+                        //     'last_sync_at' => $user->last_sync_at 
+                        // ]; 
  
-                        if ($old_values != $new_values) { 
+                        // if ($old_values != $new_values) { 
                             $user->name = $employee->employee_first_name . ' ' . $employee->employee_last_name; 
                             $user->email = $employee->employee_email; 
                             $user->employee_id = $employee->employee_id; 
@@ -192,23 +192,23 @@ class SyncUserProfile extends Command
                             $user->acctlock = $employee->date_deleted ? 1 : 0;  
                             $user->last_sync_at = $new_sync_at; 
                             $user->save(); 
-                            $new_values = [  
-                                'table' => 'users',                         
-                                'id' => $user->id,  
-                                'employee_id' => $employee->employee_id,  
-                                'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name,  
-                                'email' => $employee->employee_email,  
-                                'empl_record' => $employee->empl_record,  
-                                'joining_date' => date('Y-m-d',strtotime($employee->position_start_date)),  
-                                'acctlock' => $employee->date_deleted ? 1 : 0,  
-                                'last_sync_at' => $new_sync_at 
-                            ]; 
-                            $audit = new JobDataAudit; 
-                            $audit->job_sched_id = $audit_id; 
-                            $audit->old_values = json_encode($old_values); 
-                            $audit->new_values = json_encode($new_values); 
-                            $audit->save(); 
-                        } 
+                            // $new_values = [  
+                            //     'table' => 'users',                         
+                            //     'id' => $user->id,  
+                            //     'employee_id' => $employee->employee_id,  
+                            //     'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name,  
+                            //     'email' => $employee->employee_email,  
+                            //     'empl_record' => $employee->empl_record,  
+                            //     'joining_date' => date('Y-m-d',strtotime($employee->position_start_date)),  
+                            //     'acctlock' => $employee->date_deleted ? 1 : 0,  
+                            //     'last_sync_at' => $new_sync_at 
+                            // ]; 
+                            // $audit = new JobDataAudit; 
+                            // $audit->job_sched_id = $audit_id; 
+                            // $audit->old_values = json_encode($old_values); 
+                            // $audit->new_values = json_encode($new_values); 
+                            // $audit->save(); 
+                        // } 
 
                         // Grant employee Role
                         if (!$user->hasRole('Employee')) {
@@ -251,9 +251,9 @@ class SyncUserProfile extends Command
 
                     DB::beginTransaction();
                     try {
-                        $old_values = [ 
-                            'table' => 'users'
-                        ];
+                        // $old_values = [ 
+                        //     'table' => 'users'
+                        // ];
                         $user = User::create([
                             'guid' => $employee->guid,
                             'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name,
@@ -265,23 +265,23 @@ class SyncUserProfile extends Command
                             'acctlock' => $employee->date_deleted ? true : false,
                             'last_sync_at' => $new_sync_at,
                         ]);
-                        $new_values = [ 
-                            'table' => 'users',                        
-                            'guid' => $employee->guid,
-                            'employee_id' => $employee->employee_id, 
-                            'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name, 
-                            'email' => $employee->employee_email, 
-                            'empl_record' => $employee->empl_record, 
-                            'joining_date' => $employee->position_start_date, 
-                            'password' => '********',
-                            'acctlock' => $employee->date_deleted ? true : false, 
-                            'last_sync_at' => $new_sync_at
-                        ];
-                        $audit = new JobDataAudit;
-                        $audit->job_sched_id = $audit_id;
-                        $audit->old_values = json_encode($old_values);
-                        $audit->new_values = json_encode($new_values);
-                        $audit->save();
+                        // $new_values = [ 
+                        //     'table' => 'users',                        
+                        //     'guid' => $employee->guid,
+                        //     'employee_id' => $employee->employee_id, 
+                        //     'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name, 
+                        //     'email' => $employee->employee_email, 
+                        //     'empl_record' => $employee->empl_record, 
+                        //     'joining_date' => $employee->position_start_date, 
+                        //     'password' => '********',
+                        //     'acctlock' => $employee->date_deleted ? true : false, 
+                        //     'last_sync_at' => $new_sync_at
+                        // ];
+                        // $audit = new JobDataAudit;
+                        // $audit->job_sched_id = $audit_id;
+                        // $audit->old_values = json_encode($old_values);
+                        // $audit->new_values = json_encode($new_values);
+                        // $audit->save();
         
                         $user->assignRole('Employee');
 
