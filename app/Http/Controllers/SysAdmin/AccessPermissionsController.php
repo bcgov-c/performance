@@ -121,14 +121,19 @@ class AccessPermissionsController extends Controller
 
 
     public function eloadOrganizationTree(Request $request) {
-        list($esql_level0, $esql_level1, $esql_level2, $esql_level3, $esql_level4) = $this->baseFilteredSQLs($request, "e");
-        $rows = $esql_level4->groupBy('o.id')->select('o.id')
-        ->union( $esql_level3->groupBy('o.id')->select('o.id') )
-        ->union( $esql_level2->groupBy('o.id')->select('o.id') )
-        ->union( $esql_level1->groupBy('o.id')->select('o.id') )
-        ->union( $esql_level0->groupBy('o.id')->select('o.id') )
-        ->pluck('o.id'); 
-        $eorgs = EmployeeDemoTree::whereIn('id', $rows->toArray())->get()->toTree();
+        $demoWhere = $this->baseFilteredWhere($request, "e");
+        $treeorgs0 = clone $demoWhere; 
+        $treeorgs1 = clone $demoWhere; 
+        $treeorgs2 = clone $demoWhere; 
+        $treeorgs3 = clone $demoWhere; 
+        $treeorgs4 = clone $demoWhere; 
+        $rows = $treeorgs0->groupBy('treeid')->select('organization_key as treeid')
+            ->union( $treeorgs1->groupBy('treeid')->select('level1_key as treeid') )
+            ->union( $treeorgs2->groupBy('treeid')->select('level2_key as treeid') )
+            ->union( $treeorgs3->groupBy('treeid')->select('level3_key as treeid') )
+            ->union( $treeorgs4->groupBy('treeid')->select('level4_key as treeid') )
+            ->pluck('treeid'); 
+        $eorgs = EmployeeDemoTree::whereIn('id', $rows->toArray() )->get()->toTree();
         $eempIdsByOrgId = [];
         $eempIdsByOrgId = $rows->groupBy('orgid')->all();
         if($request->ajax()) { return view('sysadmin.accesspermissions.partials.recipient-tree2', compact('eorgs', 'eempIdsByOrgId')); } 
