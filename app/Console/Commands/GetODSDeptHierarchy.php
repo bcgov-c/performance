@@ -606,7 +606,7 @@ class GetODSDeptHierarchy extends Command
                     $dept->organization_label = $organization_label;
                     $dept->organization_deptid = $organization_deptid;
                     $dept->organization_key = $organization_key;
-                    if (str_contains(strtolower($dept->name), "unallocated") || str_contains(strtolower($dept->name), "inactive") || str_contains(strtolower($dept->name), "inactivate")) {
+                    if (str_contains(strtolower($dept->name), "unallocated") or str_contains(strtolower($dept->name), "inactive") or str_contains(strtolower($dept->name), "inactivate")) {
                         $dept->unallocated = 1;
                         $dept->level1 = null;
                         $dept->level1_label = null;
@@ -619,13 +619,13 @@ class GetODSDeptHierarchy extends Command
                         }
                     } else {
                         $dept->unallocated = 0;
-                        // $this->AssignToBlankLevel($dept, $parent);
-                        $dept->level1 = $dept->orgid;
-                        $dept->level1_label = $dept->name;
-                        $dept->level1_deptid = $dept->deptid;
-                        $dept->level1_key = $dept->okey;
-                        $dept->duplicate = 0;
-                        $dept->ulevel = 1;
+                        $this->AssignToBlankLevel($dept, $parent);
+                        // $dept->level1 = $dept->orgid;
+                        // $dept->level1_label = $dept->name;
+                        // $dept->level1_deptid = $dept->deptid;
+                        // $dept->level1_key = $dept->okey;
+                        // $dept->duplicate = 0;
+                        // $dept->ulevel = 1;
                         if ($parent) {
                             $org_path = $parent->org_path." > ".$dept->name;
                         } else {
@@ -1018,7 +1018,7 @@ class GetODSDeptHierarchy extends Command
                     $dept->level1_label = $level1_label;
                     $dept->level1_deptid = $level1_deptid;
                     $dept->level1_key = $level1_key;
-                    if (str_contains(strtolower($dept->name), "unallocated") || str_contains(strtolower($dept->name), "inactive") || str_contains(strtolower($dept->name), "inactivate")) {
+                    if (str_contains(strtolower($dept->name), "unallocated") or str_contains(strtolower($dept->name), "inactive") or str_contains(strtolower($dept->name), "inactivate")) {
                         $dept->unallocated = 1;
                         if ($parent) {
                             $org_path = $parent->org_path;
@@ -1027,13 +1027,13 @@ class GetODSDeptHierarchy extends Command
                         }
                     } else {
                         $dept->unallocated = 0;
-                        // $this->AssignToBlankLevel($dept, $parent);
-                        $dept->level2 = $dept->orgid;
-                        $dept->level2_label = $dept->name;
-                        $dept->level2_deptid = $dept->deptid;
-                        $dept->level2_key = $dept->okey;
-                        $dept->duplicate = $parent->duplicate ?? 0;
-                        $dept->ulevel = 2;
+                        $this->AssignToBlankLevel($dept, $parent);
+                        // $dept->level2 = $dept->orgid;
+                        // $dept->level2_label = $dept->name;
+                        // $dept->level2_deptid = $dept->deptid;
+                        // $dept->level2_key = $dept->okey;
+                        // $dept->duplicate = $parent->duplicate ?? 0;
+                        // $dept->ulevel = 2;
                         if ($parent) {
                             $org_path = $parent->org_path." > ".$dept->name;
                         } else {
@@ -1441,7 +1441,7 @@ class GetODSDeptHierarchy extends Command
                     $dept->level2_label = $level2_label;
                     $dept->level2_deptid = $level2_deptid;
                     $dept->level2_key = $level2_key;
-                    if (str_contains(strtolower($dept->name), "unallocated") || str_contains(strtolower($dept->name), "inactive") || str_contains(strtolower($dept->name), "inactivate")) {
+                    if (str_contains(strtolower($dept->name), "unallocated") or str_contains(strtolower($dept->name), "inactive") or str_contains(strtolower($dept->name), "inactivate")) {
                         $dept->unallocated = 1;
                         if ($parent) {
                             $org_path = $parent->org_path;
@@ -1450,13 +1450,13 @@ class GetODSDeptHierarchy extends Command
                         }
                     } else {
                         $dept->unallocated = 0;
-                        // $this->AssignToBlankLevel($dept, $parent);
-                        $dept->level3 = $dept->orgid;
-                        $dept->level3_label = $dept->name;
-                        $dept->level3_deptid = $dept->deptid;
-                        $dept->level3_key = $dept->okey;
-                        $dept->duplicate = $parent->duplicate ?? 0;
-                        $dept->ulevel = 3;
+                        $this->AssignToBlankLevel($dept, $parent);
+                        // $dept->level3 = $dept->orgid;
+                        // $dept->level3_label = $dept->name;
+                        // $dept->level3_deptid = $dept->deptid;
+                        // $dept->level3_key = $dept->okey;
+                        // $dept->duplicate = $parent->duplicate ?? 0;
+                        // $dept->ulevel = 3;
                         if ($parent) {
                             $org_path = $parent->org_path." > ".$dept->name;
                         } else {
@@ -1881,7 +1881,7 @@ class GetODSDeptHierarchy extends Command
                     $dept->level3_label = $level3_label;
                     $dept->level3_deptid = $level3_deptid;
                     $dept->level3_key = $level3_key;
-                    if (str_contains(strtolower($dept->name), "unallocated") || str_contains(strtolower($dept->name), "inactive") || str_contains(strtolower($dept->name), "inactivate")) {
+                    if (str_contains(strtolower($dept->name), "unallocated") or str_contains(strtolower($dept->name), "inactive") or str_contains(strtolower($dept->name), "inactivate")) {
                         $dept->unallocated = 1;
                         if ($parent) {
                             $org_path = $parent->org_path;
@@ -1890,13 +1890,13 @@ class GetODSDeptHierarchy extends Command
                         }
                     } else {
                         $dept->unallocated = 0;
-                        // $this->AssignToBlankLevel($dept, $parent);
-                        $dept->level4 = $dept->orgid;
-                        $dept->level4_label = $dept->name;
-                        $dept->level4_deptid = $dept->deptid;
-                        $dept->level4_key = $dept->okey;
-                        $dept->duplicate = $parent->duplicate ?? 0;
-                        $dept->ulevel = 4;
+                        $this->AssignToBlankLevel($dept, $parent);
+                        // $dept->level4 = $dept->orgid;
+                        // $dept->level4_label = $dept->name;
+                        // $dept->level4_deptid = $dept->deptid;
+                        // $dept->level4_key = $dept->okey;
+                        // $dept->duplicate = $parent->duplicate ?? 0;
+                        // $dept->ulevel = 4;
                         if ($parent) {
                             $org_path = $parent->org_path." > ".$dept->name;
                         } else {
@@ -2337,7 +2337,7 @@ class GetODSDeptHierarchy extends Command
                     $dept->level4_label = $level4_label;
                     $dept->level4_deptid = $level4_deptid;
                     $dept->level4_key = $level4_key;
-                    if (str_contains(strtolower($dept->name), "unallocated") || str_contains(strtolower($dept->name), "inactive") || str_contains(strtolower($dept->name), "inactivate")) {
+                    if (str_contains(strtolower($dept->name), "unallocated") or str_contains(strtolower($dept->name), "inactive") or str_contains(strtolower($dept->name), "inactivate")) {
                         $dept->unallocated = 1;
                         if ($parent) {
                             $org_path = $parent->org_path;
@@ -2346,13 +2346,13 @@ class GetODSDeptHierarchy extends Command
                         }
                     } else {
                         $dept->unallocated = 0;
-                        // $this->AssignToBlankLevel($dept, $parent);
-                        $dept->level5 = $dept->orgid;
-                        $dept->level5_label = $dept->name;
-                        $dept->level5_deptid = $dept->deptid;
-                        $dept->level5_key = $dept->okey;
-                        $dept->duplicate = $parent->duplicate ?? 0;
-                        $dept->ulevel = 5;
+                        $this->AssignToBlankLevel($dept, $parent);
+                        // $dept->level5 = $dept->orgid;
+                        // $dept->level5_label = $dept->name;
+                        // $dept->level5_deptid = $dept->deptid;
+                        // $dept->level5_key = $dept->okey;
+                        // $dept->duplicate = $parent->duplicate ?? 0;
+                        // $dept->ulevel = 5;
                         if ($parent) {
                             $org_path = $parent->org_path." > ".$dept->name;
                         } else {
@@ -2608,77 +2608,77 @@ class GetODSDeptHierarchy extends Command
 
     private function AssignToBlankLevel (&$dept, $parent) {
         if ($dept->level1) {
-            if ($dept->level1_label == $dept->name) {
-                $dept->duplicate = 1;
-                $dept->ulevel = 1;
-            } else {
+            // if ($dept->level1_label == $dept->name) {
+            //     $dept->duplicate = 1;
+            //     $dept->ulevel = 1;
+            // } else {
                 if ($dept->level2) {
-                    if ($dept->level2_label == $dept->name) {
-                        $dept->duplicate = 1;
-                        $dept->ulevel = 2;
-                    } else {
+                    // if ($dept->level2_label == $dept->name) {
+                    //     $dept->duplicate = 1;
+                    //     $dept->ulevel = 2;
+                    // } else {
                         if ($dept->level3) {
-                            if ($dept->level3_label == $dept->name) {
-                                $dept->duplicate = 1;
-                                $dept->ulevel = 3;
-                            } else {
+                            // if ($dept->level3_label == $dept->name) {
+                            //     $dept->duplicate = 1;
+                            //     $dept->ulevel = 3;
+                            // } else {
                                 if ($dept->level4) {
-                                    if ($dept->level4_label == $dept->name) {
-                                        $dept->duplicate = 1;
-                                        $dept->ulevel = 4;
-                                    } else {
+                                    // if ($dept->level4_label == $dept->name) {
+                                    //     $dept->duplicate = 1;
+                                    //     $dept->ulevel = 4;
+                                    // } else {
                                         if ($dept->level5) {
-                                            if ($dept->level5_label == $dept->name) {
-                                                $dept->duplicate = 1;
-                                                $dept->ulevel = 5;
-                                            } else {
+                                            // if ($dept->level5_label == $dept->name) {
+                                            //     $dept->duplicate = 1;
+                                            //     $dept->ulevel = 5;
+                                            // } else {
                                                 $dept->exception = 4;
                                                 $dept->exception_reason = 'Exceeded 5 levels';
-                                                $dept->duplicate = $parent->duplicate ?? 0;
+                                                // $dept->duplicate = $parent->duplicate ?? 0;
                                                 $dept->ulevel = 6;
-                                            }
+                                            // }
                                         } else {
                                             $dept->level5 = $dept->orgid;
                                             $dept->level5_label = $dept->name;
                                             $dept->level5_deptid = $dept->deptid;
                                             $dept->level5_key = $dept->okey;
-                                            $dept->duplicate = $parent->duplicate ?? 0;
+                                            // $dept->duplicate = $parent->duplicate ?? 0;
                                             $dept->ulevel = 5;
                                         }
-                                    }        
+                                    // }        
                                 } else {
                                     $dept->level4 = $dept->orgid;
                                     $dept->level4_label = $dept->name;
                                     $dept->level4_deptid = $dept->deptid;
                                     $dept->level4_key = $dept->okey;
-                                    $dept->duplicate = $parent->duplicate ?? 0;
+                                    // $dept->duplicate = $parent->duplicate ?? 0;
                                     $dept->ulevel = 4;
                                 }
-                            }
+                            // }
                         } else {
                             $dept->level3 = $dept->orgid;
                             $dept->level3_label = $dept->name;
                             $dept->level3_deptid = $dept->deptid;
                             $dept->level3_key = $dept->okey;
-                            $dept->duplicate = $parent->duplicate ?? 0;
+                            // $dept->duplicate = $parent->duplicate ?? 0;
                             $dept->ulevel = 3;
                         }
-                    }
+                    // }
                 } else {
                     $dept->level2 = $dept->orgid;
                     $dept->level2_label = $dept->name;
                     $dept->level2_deptid = $dept->deptid;
                     $dept->level2_key = $dept->okey;
-                    $dept->duplicate = $parent->duplicate ?? 0;
+                    // $dept->duplicate = $parent->duplicate ?? 0;
                     $dept->ulevel = 2;
                 }
-            }
+            // }
         } else {
             $dept->level1 = $dept->orgid;
             $dept->level1_label = $dept->name;
             $dept->level1_deptid = $dept->deptid;
             $dept->level1_key = $dept->okey;
-            $dept->duplicate = 0;
+            // $dept->duplicate = 0;
             $dept->ulevel = 1;
         }
     }
