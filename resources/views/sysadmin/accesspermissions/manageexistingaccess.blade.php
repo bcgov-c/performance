@@ -101,9 +101,7 @@
                 $('#btn_search').click(function(e) {
                     e.preventDefault();
 					$('#filtertable').DataTable().rows().invalidate().draw();
-               } );
-
-                $('#btn_search').click();
+                } );
 
                 $('#editModal').on('show.bs.modal', function(event) {
                     var button = $(event.relatedTarget);
