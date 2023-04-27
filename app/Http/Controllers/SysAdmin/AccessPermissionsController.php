@@ -12,8 +12,8 @@ use App\Models\EmployeeDemo;
 use App\Models\UserListView;
 use Illuminate\Http\Request;
 use App\Models\UserDemoJrView;
-use App\Models\EmployeeDemoTree;
-use Yajra\Datatables\Datatables;
+use App\Models\EmployeeDemoTree; 
+use Yajra\Datatables\Datatables; 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -121,14 +121,26 @@ class AccessPermissionsController extends Controller
 
 
     public function eloadOrganizationTree(Request $request) {
-        list($esql_level0, $esql_level1, $esql_level2, $esql_level3, $esql_level4) = $this->baseFilteredSQLs($request, "e");
-        $rows = $esql_level4->groupBy('o.id')->select('o.id')
-        ->union( $esql_level3->groupBy('o.id')->select('o.id') )
-        ->union( $esql_level2->groupBy('o.id')->select('o.id') )
-        ->union( $esql_level1->groupBy('o.id')->select('o.id') )
-        ->union( $esql_level0->groupBy('o.id')->select('o.id') )
-        ->pluck('o.id'); 
-        $eorgs = EmployeeDemoTree::whereIn('id', $rows->toArray())->get()->toTree();
+        $demoWhere = $this->baseFilteredWhere($request, "e");
+        $treeorgs0 = clone $demoWhere; 
+        $treeorgs1 = clone $demoWhere; 
+        $treeorgs2 = clone $demoWhere; 
+        $treeorgs3 = clone $demoWhere; 
+        $treeorgs4 = clone $demoWhere; 
+        $rows = $treeorgs0->groupBy('treeid')->select('organization_key as treeid')
+            ->union( $treeorgs1->groupBy('treeid')->select('level1_key as treeid') )
+            ->union( $treeorgs2->groupBy('treeid')->select('level2_key as treeid') )
+            ->union( $treeorgs3->groupBy('treeid')->select('level3_key as treeid') )
+            ->union( $treeorgs4->groupBy('treeid')->select('level4_key as treeid') )
+            ->pluck('treeid'); 
+        $eorgs = EmployeeDemoTree::whereIn('id', $rows->toArray())
+            ->orderBy('organization')
+            ->orderBy('level1_program')
+            ->orderBy('level2_division')
+            ->orderBy('level3_branch')
+            ->orderBy('level4')
+            ->get()
+            ->toTree();
         $eempIdsByOrgId = [];
         $eempIdsByOrgId = $rows->groupBy('orgid')->all();
         if($request->ajax()) { return view('sysadmin.accesspermissions.partials.recipient-tree2', compact('eorgs', 'eempIdsByOrgId')); } 
@@ -388,7 +400,7 @@ class AccessPermissionsController extends Controller
                 , org_count
             ");
             return Datatables::of($query)
-            ->editColumn('org_count', function ($row) { return $row->org_count > 0 ? $row->org_count : ""; })
+            ->editColumn('org_count', function ($row) { return $row->role_id == 3 ? $row->org_count : NULL; })
             ->addIndexColumn()
             ->addcolumn('action', function($row) {
                 return '<button 

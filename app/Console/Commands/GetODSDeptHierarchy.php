@@ -95,9 +95,9 @@ class GetODSDeptHierarchy extends Command
 
                 foreach($data as $item){
                     $customKey = "{$item['HierarchyLevel']}-{$item['ParentOrgHierarchyKey']}-{$item['OrgHierarchyKey']}";
-                    $old_values = [ 
-                        'table' => 'ods_dept_org_hierarchy_stg',                        
-                    ];
+                    // $old_values = [ 
+                    //     'table' => 'ods_dept_org_hierarchy_stg',                        
+                    // ];
                     OrganizationHierarchyStaging::create([
                         'OrgID' => $customKey,
                         'HierarchyLevel' => $item['HierarchyLevel'],
@@ -108,22 +108,22 @@ class GetODSDeptHierarchy extends Command
                         'date_deleted' => $item['date_deleted'],
                         'date_updated' => $item['date_updated'],
                     ]);
-                    $new_values = [ 
-                        'table' => 'ods_dept_org_hierarchy_stg',                        
-                        'OrgID' => $customKey, 
-                        'HierarchyLevel' => $item['HierarchyLevel'],
-                        'ParentOrgHierarchyKey' => $item['ParentOrgHierarchyKey'],
-                        'OrgHierarchyKey' => $item['OrgHierarchyKey'],
-                        'DepartmentID' => $item['DepartmentID'],
-                        'BusinessName' => $item['BusinessName'],
-                        'date_deleted' => $item['date_deleted'],
-                        'date_updated' => $item['date_updated'],
-                    ];
-                    $audit = new JobDataAudit;
-                    $audit->job_sched_id = $audit_id;
-                    $audit->old_values = json_encode($old_values);
-                    $audit->new_values = json_encode($new_values);
-                    $audit->save();
+                    // $new_values = [ 
+                    //     'table' => 'ods_dept_org_hierarchy_stg',                        
+                    //     'OrgID' => $customKey, 
+                    //     'HierarchyLevel' => $item['HierarchyLevel'],
+                    //     'ParentOrgHierarchyKey' => $item['ParentOrgHierarchyKey'],
+                    //     'OrgHierarchyKey' => $item['OrgHierarchyKey'],
+                    //     'DepartmentID' => $item['DepartmentID'],
+                    //     'BusinessName' => $item['BusinessName'],
+                    //     'date_deleted' => $item['date_deleted'],
+                    //     'date_updated' => $item['date_updated'],
+                    // ];
+                    // $audit = new JobDataAudit;
+                    // $audit->job_sched_id = $audit_id;
+                    // $audit->old_values = json_encode($old_values);
+                    // $audit->new_values = json_encode($new_values);
+                    // $audit->save();
                 };
 
                 $skip += $top;
@@ -239,47 +239,47 @@ class GetODSDeptHierarchy extends Command
                     ->first();
                     if ($org_old) {
                         if (trim($org) != trim($org_old)) {
-                            $old_values = [ 
-                                'table' => 'ods_dept_org_hierarchy',                        
-                                'orgid' => $org_old->orgid, 
-                                'hlevel' => $org_old->hlevel, 
-                                'pkey' => $org_old->pkey,
-                                'okey' => $org_old->okey,
-                                'deptid' => $org_old->deptid,
-                                'name' => $org_old->name,
-                                'ulevel' => $org_old->ulevel,
-                                'organization' => $org_old->organization,
-                                'organization_label' => $org_old->organization_label,
-                                'organization_deptid' => $org_old->organization_deptid,
-                                'organization_key' => $org_old->organization_key,
-                                'level1' => $org_old->level1,
-                                'level1_label' => $org_old->level1_label,
-                                'level1_deptid' => $org_old->level1_deptid,
-                                'level1_key' => $org_old->level1_key,
-                                'level2' => $org_old->level2,
-                                'level2_label' => $org_old->level2_label,
-                                'level2_deptid' => $org_old->level2_deptid,
-                                'level2_key' => $org_old->level2_key,
-                                'level3' => $org_old->level3,
-                                'level3_label' => $org_old->level3_label,
-                                'level3_deptid' => $org_old->level3_deptid,
-                                'level3_key' => $org_old->level3_key,
-                                'level4' => $org_old->level4,
-                                'level4_label' => $org_old->level4_label,
-                                'level4_deptid' => $org_old->level4_deptid,
-                                'level4_key' => $org_old->level4_key,
-                                'level5' => $org_old->level5,
-                                'level5_label' => $org_old->level5_label,
-                                'level5_deptid' => $org_old->level5_deptid,
-                                'level5_key' => $org_old->level5_key,
-                                'org_path' => $org_old->org_path,
-                                'date_deleted' => $org_old->date_deleted,
-                                'date_updated' => $org_old->date_updated,
-                                'exception' => $org_old->exception,
-                                'exception_reason' => $org_old->exception_reason,
-                                'unallocated' => $org_old->unallocated,
-                                'duplicate' => $org_old->duplicate
-                            ];
+                            // $old_values = [ 
+                            //     'table' => 'ods_dept_org_hierarchy',                        
+                            //     'orgid' => $org_old->orgid, 
+                            //     'hlevel' => $org_old->hlevel, 
+                            //     'pkey' => $org_old->pkey,
+                            //     'okey' => $org_old->okey,
+                            //     'deptid' => $org_old->deptid,
+                            //     'name' => $org_old->name,
+                            //     'ulevel' => $org_old->ulevel,
+                            //     'organization' => $org_old->organization,
+                            //     'organization_label' => $org_old->organization_label,
+                            //     'organization_deptid' => $org_old->organization_deptid,
+                            //     'organization_key' => $org_old->organization_key,
+                            //     'level1' => $org_old->level1,
+                            //     'level1_label' => $org_old->level1_label,
+                            //     'level1_deptid' => $org_old->level1_deptid,
+                            //     'level1_key' => $org_old->level1_key,
+                            //     'level2' => $org_old->level2,
+                            //     'level2_label' => $org_old->level2_label,
+                            //     'level2_deptid' => $org_old->level2_deptid,
+                            //     'level2_key' => $org_old->level2_key,
+                            //     'level3' => $org_old->level3,
+                            //     'level3_label' => $org_old->level3_label,
+                            //     'level3_deptid' => $org_old->level3_deptid,
+                            //     'level3_key' => $org_old->level3_key,
+                            //     'level4' => $org_old->level4,
+                            //     'level4_label' => $org_old->level4_label,
+                            //     'level4_deptid' => $org_old->level4_deptid,
+                            //     'level4_key' => $org_old->level4_key,
+                            //     'level5' => $org_old->level5,
+                            //     'level5_label' => $org_old->level5_label,
+                            //     'level5_deptid' => $org_old->level5_deptid,
+                            //     'level5_key' => $org_old->level5_key,
+                            //     'org_path' => $org_old->org_path,
+                            //     'date_deleted' => $org_old->date_deleted,
+                            //     'date_updated' => $org_old->date_updated,
+                            //     'exception' => $org_old->exception,
+                            //     'exception_reason' => $org_old->exception_reason,
+                            //     'unallocated' => $org_old->unallocated,
+                            //     'duplicate' => $org_old->duplicate
+                            // ];
                             OrganizationHierarchy::whereRaw("orgid = '".$org->orgid."'")
                             ->update([
                                 'hlevel' => $org->hlevel,
@@ -321,57 +321,57 @@ class GetODSDeptHierarchy extends Command
                                 'duplicate' => 0,
                                 'search_key' => "|{$org->organization_key}|"
                             ]);
-                            $new_values = [ 
-                                'table' => 'ods_dept_org_hierarchy',                        
-                                'orgid' => $org->orgid, 
-                                'hlevel' => $org->hlevel,
-                                'pkey' => $org->pkey,
-                                'okey' => $org->okey,
-                                'deptid' => $org->deptid,
-                                'name' => $org->name,
-                                'ulevel' => $org->ulevel,
-                                'organization' => $org->organization,
-                                'organization_label' => $org->organization_label,
-                                'organization_deptid' => $org->organization_deptid,
-                                'organization_key' => $org->organization_key,
-                                'level1' => null,
-                                'level1_label' => null,
-                                'level1_deptid' => null,
-                                'level1_key' => null,
-                                'level2' => null,
-                                'level2_label' => null,
-                                'level2_deptid' => null,
-                                'level2_key' => null,
-                                'level3' => null,
-                                'level3_label' => null,
-                                'level3_deptid' => null,
-                                'level3_key' => null,
-                                'level4' => null,
-                                'level4_label' => null,
-                                'level4_deptid' => null,
-                                'level4_key' => null,
-                                'level5' => null,
-                                'level5_label' => null,
-                                'level5_deptid' => null,
-                                'level5_key' => null,
-                                'org_path' => $org->org_path,
-                                'date_deleted' => $org->date_deleted,
-                                'date_updated' => $org->date_updated,
-                                'exception' => 0,
-                                'exception_reason' => null,
-                                'unallocated' => 0,
-                                'duplicate' => 0
-                            ];
-                            $audit = new JobDataAudit;
-                            $audit->job_sched_id = $audit_id;
-                            $audit->old_values = json_encode($old_values);
-                            $audit->new_values = json_encode($new_values);
-                            $audit->save();
+                            // $new_values = [ 
+                            //     'table' => 'ods_dept_org_hierarchy',                        
+                            //     'orgid' => $org->orgid, 
+                            //     'hlevel' => $org->hlevel,
+                            //     'pkey' => $org->pkey,
+                            //     'okey' => $org->okey,
+                            //     'deptid' => $org->deptid,
+                            //     'name' => $org->name,
+                            //     'ulevel' => $org->ulevel,
+                            //     'organization' => $org->organization,
+                            //     'organization_label' => $org->organization_label,
+                            //     'organization_deptid' => $org->organization_deptid,
+                            //     'organization_key' => $org->organization_key,
+                            //     'level1' => null,
+                            //     'level1_label' => null,
+                            //     'level1_deptid' => null,
+                            //     'level1_key' => null,
+                            //     'level2' => null,
+                            //     'level2_label' => null,
+                            //     'level2_deptid' => null,
+                            //     'level2_key' => null,
+                            //     'level3' => null,
+                            //     'level3_label' => null,
+                            //     'level3_deptid' => null,
+                            //     'level3_key' => null,
+                            //     'level4' => null,
+                            //     'level4_label' => null,
+                            //     'level4_deptid' => null,
+                            //     'level4_key' => null,
+                            //     'level5' => null,
+                            //     'level5_label' => null,
+                            //     'level5_deptid' => null,
+                            //     'level5_key' => null,
+                            //     'org_path' => $org->org_path,
+                            //     'date_deleted' => $org->date_deleted,
+                            //     'date_updated' => $org->date_updated,
+                            //     'exception' => 0,
+                            //     'exception_reason' => null,
+                            //     'unallocated' => 0,
+                            //     'duplicate' => 0
+                            // ];
+                            // $audit = new JobDataAudit;
+                            // $audit->job_sched_id = $audit_id;
+                            // $audit->old_values = json_encode($old_values);
+                            // $audit->new_values = json_encode($new_values);
+                            // $audit->save();
                         }
                     } else {
-                        $old_values = [ 
-                            'table' => 'ods_dept_org_hierarchy'
-                        ];
+                        // $old_values = [ 
+                        //     'table' => 'ods_dept_org_hierarchy'
+                        // ];
                         OrganizationHierarchy::create([
                             'orgid' => $org->orgid,
                             'hlevel' => $org->hlevel,
@@ -413,52 +413,52 @@ class GetODSDeptHierarchy extends Command
                             'duplicate' => 0,
                             'search_key' => "|{$org->organization_key}|"
                         ]);
-                        $new_values = [ 
-                            'table' => 'ods_dept_org_hierarchy',                        
-                            'orgid' => $org->orgid, 
-                            'hlevel' => $org->hlevel,
-                            'pkey' => $org->pkey,
-                            'okey' => $org->okey,
-                            'deptid' => $org->deptid,
-                            'name' => $org->name,
-                            'ulevel' => $org->ulevel,
-                            'organization' => $org->organization,
-                            'organization_label' => $org->organization_label,
-                            'organization_key' => $org->organization_key,
-                            'level1' => null,
-                            'level1_label' => null,
-                            'level1_deptid' => null,
-                            'level1_key' => null,
-                            'level2' => null,
-                            'level2_label' => null,
-                            'level2_deptid' => null,
-                            'level2_key' => null,
-                            'level3' => null,
-                            'level3_label' => null,
-                            'level3_deptid' => null,
-                            'level3_key' => null,
-                            'level4' => null,
-                            'level4_label' => null,
-                            'level4_deptid' => null,
-                            'level4_key' => null,
-                            'level5' => null,
-                            'level5_label' => null,
-                            'level5_deptid' => null,
-                            'level5_key' => null,
-                            'search_key' => "|{$org->organization_key}|",
-                            'org_path' => $org->org_path,
-                            'date_deleted' => $org->date_deleted,
-                            'date_updated' => $org->date_updated,
-                            'exception' => 0,
-                            'exception_reason' => null,
-                            'unallocated' => 0,
-                            'duplicate' => 0
-                        ];
-                        $audit = new JobDataAudit;
-                        $audit->job_sched_id = $audit_id;
-                        $audit->old_values = json_encode($old_values);
-                        $audit->new_values = json_encode($new_values);
-                        $audit->save();
+                        // $new_values = [ 
+                        //     'table' => 'ods_dept_org_hierarchy',                        
+                        //     'orgid' => $org->orgid, 
+                        //     'hlevel' => $org->hlevel,
+                        //     'pkey' => $org->pkey,
+                        //     'okey' => $org->okey,
+                        //     'deptid' => $org->deptid,
+                        //     'name' => $org->name,
+                        //     'ulevel' => $org->ulevel,
+                        //     'organization' => $org->organization,
+                        //     'organization_label' => $org->organization_label,
+                        //     'organization_key' => $org->organization_key,
+                        //     'level1' => null,
+                        //     'level1_label' => null,
+                        //     'level1_deptid' => null,
+                        //     'level1_key' => null,
+                        //     'level2' => null,
+                        //     'level2_label' => null,
+                        //     'level2_deptid' => null,
+                        //     'level2_key' => null,
+                        //     'level3' => null,
+                        //     'level3_label' => null,
+                        //     'level3_deptid' => null,
+                        //     'level3_key' => null,
+                        //     'level4' => null,
+                        //     'level4_label' => null,
+                        //     'level4_deptid' => null,
+                        //     'level4_key' => null,
+                        //     'level5' => null,
+                        //     'level5_label' => null,
+                        //     'level5_deptid' => null,
+                        //     'level5_key' => null,
+                        //     'search_key' => "|{$org->organization_key}|",
+                        //     'org_path' => $org->org_path,
+                        //     'date_deleted' => $org->date_deleted,
+                        //     'date_updated' => $org->date_updated,
+                        //     'exception' => 0,
+                        //     'exception_reason' => null,
+                        //     'unallocated' => 0,
+                        //     'duplicate' => 0
+                        // ];
+                        // $audit = new JobDataAudit;
+                        // $audit->job_sched_id = $audit_id;
+                        // $audit->old_values = json_encode($old_values);
+                        // $audit->new_values = json_encode($new_values);
+                        // $audit->save();
                     }
                 };
 
@@ -606,7 +606,7 @@ class GetODSDeptHierarchy extends Command
                     $dept->organization_label = $organization_label;
                     $dept->organization_deptid = $organization_deptid;
                     $dept->organization_key = $organization_key;
-                    if (str_contains(strtolower($dept->name), "unallocated") || str_contains(strtolower($dept->name), "inactive") || str_contains(strtolower($dept->name), "inactivate")) {
+                    if (str_contains(strtolower($dept->name), "unallocated") or str_contains(strtolower($dept->name), "inactive") or str_contains(strtolower($dept->name), "inactivate")) {
                         $dept->unallocated = 1;
                         $dept->level1 = null;
                         $dept->level1_label = null;
@@ -619,13 +619,13 @@ class GetODSDeptHierarchy extends Command
                         }
                     } else {
                         $dept->unallocated = 0;
-                        // $this->AssignToBlankLevel($dept, $parent);
-                        $dept->level1 = $dept->orgid;
-                        $dept->level1_label = $dept->name;
-                        $dept->level1_deptid = $dept->deptid;
-                        $dept->level1_key = $dept->okey;
-                        $dept->duplicate = 0;
-                        $dept->ulevel = 1;
+                        $this->AssignToBlankLevel($dept, $parent);
+                        // $dept->level1 = $dept->orgid;
+                        // $dept->level1_label = $dept->name;
+                        // $dept->level1_deptid = $dept->deptid;
+                        // $dept->level1_key = $dept->okey;
+                        // $dept->duplicate = 0;
+                        // $dept->ulevel = 1;
                         if ($parent) {
                             $org_path = $parent->org_path." > ".$dept->name;
                         } else {
@@ -635,47 +635,47 @@ class GetODSDeptHierarchy extends Command
                     $dept->org_path = $org_path;
                     if ($dept_old) {
                         if (trim($dept) != trim($dept_old)) {
-                            $old_values = [ 
-                                'table' => 'ods_dept_org_hierarchy',                        
-                                'orgid' => $dept_old->orgid, 
-                                'hlevel' => $dept_old->hlevel, 
-                                'pkey' => $dept_old->pkey,
-                                'okey' => $dept_old->okey,
-                                'deptid' => $dept_old->deptid,
-                                'name' => $dept_old->name,
-                                'ulevel' => $dept_old->ulevel,
-                                'organization' => $dept_old->organization,
-                                'organization_label' => $dept_old->organization_label,
-                                'organization_deptid' => $dept_old->organization_deptid,
-                                'organization_key' => $dept_old->organization_key,
-                                'level1' => $dept_old->level1,
-                                'level1_label' => $dept_old->level1_label,
-                                'level1_deptid' => $dept_old->level1_deptid,
-                                'level1_key' => $dept_old->level1_key,
-                                'level2' => $dept_old->level2,
-                                'level2_label' => $dept_old->level2_label,
-                                'level2_deptid' => $dept_old->level2_deptid,
-                                'level2_key' => $dept_old->level2_key,
-                                'level3' => $dept_old->level3,
-                                'level3_label' => $dept_old->level3_label,
-                                'level3_deptid' => $dept_old->level3_deptid,
-                                'level3_key' => $dept_old->level3_key,
-                                'level4' => $dept_old->level4,
-                                'level4_label' => $dept_old->level4_label,
-                                'level4_deptid' => $dept_old->level4_deptid,
-                                'level4_key' => $dept_old->level4_key,
-                                'level5' => $dept_old->level5,
-                                'level5_label' => $dept_old->level5_label,
-                                'level5_deptid' => $dept_old->level5_deptid,
-                                'level5_key' => $dept_old->level5_key,
-                                'org_path' => $dept_old->org_path,
-                                'date_deleted' => $dept_old->date_deleted,
-                                'date_updated' => $dept_old->date_updated,
-                                'exception' => $dept_old->exception,
-                                'exception_reason' => $dept_old->exception_reason,
-                                'unallocated' => $dept_old->unallocated,
-                                'duplicate' => $dept_old->duplicate
-                            ];
+                            // $old_values = [ 
+                            //     'table' => 'ods_dept_org_hierarchy',                        
+                            //     'orgid' => $dept_old->orgid, 
+                            //     'hlevel' => $dept_old->hlevel, 
+                            //     'pkey' => $dept_old->pkey,
+                            //     'okey' => $dept_old->okey,
+                            //     'deptid' => $dept_old->deptid,
+                            //     'name' => $dept_old->name,
+                            //     'ulevel' => $dept_old->ulevel,
+                            //     'organization' => $dept_old->organization,
+                            //     'organization_label' => $dept_old->organization_label,
+                            //     'organization_deptid' => $dept_old->organization_deptid,
+                            //     'organization_key' => $dept_old->organization_key,
+                            //     'level1' => $dept_old->level1,
+                            //     'level1_label' => $dept_old->level1_label,
+                            //     'level1_deptid' => $dept_old->level1_deptid,
+                            //     'level1_key' => $dept_old->level1_key,
+                            //     'level2' => $dept_old->level2,
+                            //     'level2_label' => $dept_old->level2_label,
+                            //     'level2_deptid' => $dept_old->level2_deptid,
+                            //     'level2_key' => $dept_old->level2_key,
+                            //     'level3' => $dept_old->level3,
+                            //     'level3_label' => $dept_old->level3_label,
+                            //     'level3_deptid' => $dept_old->level3_deptid,
+                            //     'level3_key' => $dept_old->level3_key,
+                            //     'level4' => $dept_old->level4,
+                            //     'level4_label' => $dept_old->level4_label,
+                            //     'level4_deptid' => $dept_old->level4_deptid,
+                            //     'level4_key' => $dept_old->level4_key,
+                            //     'level5' => $dept_old->level5,
+                            //     'level5_label' => $dept_old->level5_label,
+                            //     'level5_deptid' => $dept_old->level5_deptid,
+                            //     'level5_key' => $dept_old->level5_key,
+                            //     'org_path' => $dept_old->org_path,
+                            //     'date_deleted' => $dept_old->date_deleted,
+                            //     'date_updated' => $dept_old->date_updated,
+                            //     'exception' => $dept_old->exception,
+                            //     'exception_reason' => $dept_old->exception_reason,
+                            //     'unallocated' => $dept_old->unallocated,
+                            //     'duplicate' => $dept_old->duplicate
+                            // ];
                             OrganizationHierarchy::whereRaw("orgid = '".$dept->orgid."'")
                             ->update([
                                 'hlevel' => $dept->hlevel,
@@ -717,57 +717,57 @@ class GetODSDeptHierarchy extends Command
                                 'duplicate' => $dept->duplicate,
                                 'search_key' => "|{$dept->organization_key}|{$dept->level1_key}|"
                             ]);
-                            $new_values = [ 
-                                'table' => 'ods_dept_org_hierarchy',                        
-                                'orgid' => $dept->orgid, 
-                                'hlevel' => $dept->hlevel,
-                                'pkey' => $dept->pkey,
-                                'okey' => $dept->okey,
-                                'deptid' => $dept->deptid,
-                                'name' => $dept->name,
-                                'ulevel' => $dept->ulevel,
-                                'organization' => $dept->organization,
-                                'organization_label' => $dept->organization_label,
-                                'organization_deptid' => $dept->organization_deptid,
-                                'organization_key' => $dept->organization_key,
-                                'level1' => $dept->level1,
-                                'level1_label' => $dept->level1_label,
-                                'level1_deptid' => $dept->level1_deptid,
-                                'level1_key' => $dept->level1_key,
-                                'level2' => null,
-                                'level2_label' => null,
-                                'level2_deptid' => null,
-                                'level2_key' => null,
-                                'level3' => null,
-                                'level3_label' => null,
-                                'level3_deptid' => null,
-                                'level3_key' => null,
-                                'level4' => null,
-                                'level4_label' => null,
-                                'level4_deptid' => null,
-                                'level4_key' => null,
-                                'level5' => null,
-                                'level5_label' => null,
-                                'level5_deptid' => null,
-                                'level5_key' => null,
-                                'org_path' => $org_path,
-                                'date_deleted' => $dept->date_deleted,
-                                'date_updated' => $dept->date_updated,
-                                'exception' => $dept->exception,
-                                'exception_reason' => $dept->exception_reason,
-                                'unallocated' => $dept->unallocated,
-                                'duplicate' => $dept->duplicate
-                            ];
-                            $audit = new JobDataAudit;
-                            $audit->job_sched_id = $audit_id;
-                            $audit->old_values = json_encode($old_values);
-                            $audit->new_values = json_encode($new_values);
-                            $audit->save();
+                            // $new_values = [ 
+                            //     'table' => 'ods_dept_org_hierarchy',                        
+                            //     'orgid' => $dept->orgid, 
+                            //     'hlevel' => $dept->hlevel,
+                            //     'pkey' => $dept->pkey,
+                            //     'okey' => $dept->okey,
+                            //     'deptid' => $dept->deptid,
+                            //     'name' => $dept->name,
+                            //     'ulevel' => $dept->ulevel,
+                            //     'organization' => $dept->organization,
+                            //     'organization_label' => $dept->organization_label,
+                            //     'organization_deptid' => $dept->organization_deptid,
+                            //     'organization_key' => $dept->organization_key,
+                            //     'level1' => $dept->level1,
+                            //     'level1_label' => $dept->level1_label,
+                            //     'level1_deptid' => $dept->level1_deptid,
+                            //     'level1_key' => $dept->level1_key,
+                            //     'level2' => null,
+                            //     'level2_label' => null,
+                            //     'level2_deptid' => null,
+                            //     'level2_key' => null,
+                            //     'level3' => null,
+                            //     'level3_label' => null,
+                            //     'level3_deptid' => null,
+                            //     'level3_key' => null,
+                            //     'level4' => null,
+                            //     'level4_label' => null,
+                            //     'level4_deptid' => null,
+                            //     'level4_key' => null,
+                            //     'level5' => null,
+                            //     'level5_label' => null,
+                            //     'level5_deptid' => null,
+                            //     'level5_key' => null,
+                            //     'org_path' => $org_path,
+                            //     'date_deleted' => $dept->date_deleted,
+                            //     'date_updated' => $dept->date_updated,
+                            //     'exception' => $dept->exception,
+                            //     'exception_reason' => $dept->exception_reason,
+                            //     'unallocated' => $dept->unallocated,
+                            //     'duplicate' => $dept->duplicate
+                            // ];
+                            // $audit = new JobDataAudit;
+                            // $audit->job_sched_id = $audit_id;
+                            // $audit->old_values = json_encode($old_values);
+                            // $audit->new_values = json_encode($new_values);
+                            // $audit->save();
                         }
                     } else {
-                        $old_values = [ 
-                            'table' => 'ods_dept_org_hierarchy'
-                        ];
+                        // $old_values = [ 
+                        //     'table' => 'ods_dept_org_hierarchy'
+                        // ];
                         OrganizationHierarchy::create([
                             'orgid' => $dept->orgid,
                             'hlevel' => $dept->hlevel,
@@ -809,52 +809,52 @@ class GetODSDeptHierarchy extends Command
                             'duplicate' => $dept->duplicate,
                             'search_key' => "|{$dept->organization_key}|{$dept->level1_key}|"
                         ]);
-                        $new_values = [ 
-                            'table' => 'ods_dept_org_hierarchy',                        
-                            'orgid' => $dept->orgid, 
-                            'hlevel' => $dept->hlevel,
-                            'pkey' => $dept->pkey,
-                            'okey' => $dept->okey,
-                            'deptid' => $dept->deptid,
-                            'name' => $dept->name,
-                            'ulevel' => $dept->ulevel,
-                            'organization' => $organization,
-                            'organization_label' => $organization_label,
-                            'organization_deptid' => $organization_deptid,
-                            'organization_key' => $dept->organization_key,
-                            'level1' => $dept->level1,
-                            'level1_label' => $dept->level1_label,
-                            'level1_deptid' => $dept->level1_deptid,
-                            'level1_key' => $dept->level1_key,
-                            'level2' => null,
-                            'level2_label' => null,
-                            'level2_deptid' => null,
-                            'level2_key' => null,
-                            'level3' => null,
-                            'level3_label' => null,
-                            'level3_deptid' => null,
-                            'level3_key' => null,
-                            'level4' => null,
-                            'level4_label' => null,
-                            'level4_deptid' => null,
-                            'level4_key' => null,
-                            'level5' => null,
-                            'level5_label' => null,
-                            'level5_deptid' => null,
-                            'level5_key' => null,
-                            'org_path' => $org_path,
-                            'date_deleted' => $dept->date_deleted,
-                            'date_updated' => $dept->date_updated,
-                            'exception' => $dept->exception,
-                            'exception_reason' => $dept->exception_reason,
-                            'unallocated' => $dept->unallocated,
-                            'duplicate' => $dept->duplicate
-                        ];
-                        $audit = new JobDataAudit;
-                        $audit->job_sched_id = $audit_id;
-                        $audit->old_values = json_encode($old_values);
-                        $audit->new_values = json_encode($new_values);
-                        $audit->save();
+                        // $new_values = [ 
+                        //     'table' => 'ods_dept_org_hierarchy',                        
+                        //     'orgid' => $dept->orgid, 
+                        //     'hlevel' => $dept->hlevel,
+                        //     'pkey' => $dept->pkey,
+                        //     'okey' => $dept->okey,
+                        //     'deptid' => $dept->deptid,
+                        //     'name' => $dept->name,
+                        //     'ulevel' => $dept->ulevel,
+                        //     'organization' => $organization,
+                        //     'organization_label' => $organization_label,
+                        //     'organization_deptid' => $organization_deptid,
+                        //     'organization_key' => $dept->organization_key,
+                        //     'level1' => $dept->level1,
+                        //     'level1_label' => $dept->level1_label,
+                        //     'level1_deptid' => $dept->level1_deptid,
+                        //     'level1_key' => $dept->level1_key,
+                        //     'level2' => null,
+                        //     'level2_label' => null,
+                        //     'level2_deptid' => null,
+                        //     'level2_key' => null,
+                        //     'level3' => null,
+                        //     'level3_label' => null,
+                        //     'level3_deptid' => null,
+                        //     'level3_key' => null,
+                        //     'level4' => null,
+                        //     'level4_label' => null,
+                        //     'level4_deptid' => null,
+                        //     'level4_key' => null,
+                        //     'level5' => null,
+                        //     'level5_label' => null,
+                        //     'level5_deptid' => null,
+                        //     'level5_key' => null,
+                        //     'org_path' => $org_path,
+                        //     'date_deleted' => $dept->date_deleted,
+                        //     'date_updated' => $dept->date_updated,
+                        //     'exception' => $dept->exception,
+                        //     'exception_reason' => $dept->exception_reason,
+                        //     'unallocated' => $dept->unallocated,
+                        //     'duplicate' => $dept->duplicate
+                        // ];
+                        // $audit = new JobDataAudit;
+                        // $audit->job_sched_id = $audit_id;
+                        // $audit->old_values = json_encode($old_values);
+                        // $audit->new_values = json_encode($new_values);
+                        // $audit->save();
                     }
                 };
 
@@ -1018,7 +1018,7 @@ class GetODSDeptHierarchy extends Command
                     $dept->level1_label = $level1_label;
                     $dept->level1_deptid = $level1_deptid;
                     $dept->level1_key = $level1_key;
-                    if (str_contains(strtolower($dept->name), "unallocated") || str_contains(strtolower($dept->name), "inactive") || str_contains(strtolower($dept->name), "inactivate")) {
+                    if (str_contains(strtolower($dept->name), "unallocated") or str_contains(strtolower($dept->name), "inactive") or str_contains(strtolower($dept->name), "inactivate")) {
                         $dept->unallocated = 1;
                         if ($parent) {
                             $org_path = $parent->org_path;
@@ -1027,13 +1027,13 @@ class GetODSDeptHierarchy extends Command
                         }
                     } else {
                         $dept->unallocated = 0;
-                        // $this->AssignToBlankLevel($dept, $parent);
-                        $dept->level2 = $dept->orgid;
-                        $dept->level2_label = $dept->name;
-                        $dept->level2_deptid = $dept->deptid;
-                        $dept->level2_key = $dept->okey;
-                        $dept->duplicate = $parent->duplicate ?? 0;
-                        $dept->ulevel = 2;
+                        $this->AssignToBlankLevel($dept, $parent);
+                        // $dept->level2 = $dept->orgid;
+                        // $dept->level2_label = $dept->name;
+                        // $dept->level2_deptid = $dept->deptid;
+                        // $dept->level2_key = $dept->okey;
+                        // $dept->duplicate = $parent->duplicate ?? 0;
+                        // $dept->ulevel = 2;
                         if ($parent) {
                             $org_path = $parent->org_path." > ".$dept->name;
                         } else {
@@ -1043,47 +1043,47 @@ class GetODSDeptHierarchy extends Command
                     $dept->org_path = $org_path;
                     if ($dept_old) {
                         if (trim($dept) != trim($dept_old)) {
-                            $old_values = [ 
-                                'table' => 'ods_dept_org_hierarchy',                        
-                                'orgid' => $dept_old->orgid, 
-                                'hlevel' => $dept_old->hlevel, 
-                                'pkey' => $dept_old->pkey,
-                                'okey' => $dept_old->okey,
-                                'deptid' => $dept_old->deptid,
-                                'name' => $dept_old->name,
-                                'ulevel' => $dept_old->ulevel,
-                                'organization' => $dept_old->organization,
-                                'organization_label' => $dept_old->organization_label,
-                                'organization_deptid' => $dept_old->organization_deptid,
-                                'organization_key' => $dept_old->organization_key,
-                                'level1' => $dept_old->level1,
-                                'level1_label' => $dept_old->level1_label,
-                                'level1_deptid' => $dept_old->level1_deptid,
-                                'level1_key' => $dept_old->level1_key,
-                                'level2' => $dept_old->level2,
-                                'level2_label' => $dept_old->level2_label,
-                                'level2_deptid' => $dept_old->level2_deptid,
-                                'level2_key' => $dept_old->level2_key,
-                                'level3' => $dept_old->level3,
-                                'level3_label' => $dept_old->level3_label,
-                                'level3_deptid' => $dept_old->level3_deptid,
-                                'level3_key' => $dept_old->level3_key,
-                                'level4' => $dept_old->level4,
-                                'level4_label' => $dept_old->level4_label,
-                                'level4_deptid' => $dept_old->level4_deptid,
-                                'level4_key' => $dept_old->level4_key,
-                                'level5' => $dept_old->level5,
-                                'level5_label' => $dept_old->level5_label,
-                                'level5_deptid' => $dept_old->level5_deptid,
-                                'level5_key' => $dept_old->level5_key,
-                                'org_path' => $dept_old->org_path,
-                                'date_deleted' => $dept_old->date_deleted,
-                                'date_updated' => $dept_old->date_updated,
-                                'exception' => $dept_old->exception,
-                                'exception_reason' => $dept_old->exception_reason,
-                                'unallocated' => $dept_old->unallocated,
-                                'duplicate' => $dept_old->duplicate
-                            ];
+                            // $old_values = [ 
+                            //     'table' => 'ods_dept_org_hierarchy',                        
+                            //     'orgid' => $dept_old->orgid, 
+                            //     'hlevel' => $dept_old->hlevel, 
+                            //     'pkey' => $dept_old->pkey,
+                            //     'okey' => $dept_old->okey,
+                            //     'deptid' => $dept_old->deptid,
+                            //     'name' => $dept_old->name,
+                            //     'ulevel' => $dept_old->ulevel,
+                            //     'organization' => $dept_old->organization,
+                            //     'organization_label' => $dept_old->organization_label,
+                            //     'organization_deptid' => $dept_old->organization_deptid,
+                            //     'organization_key' => $dept_old->organization_key,
+                            //     'level1' => $dept_old->level1,
+                            //     'level1_label' => $dept_old->level1_label,
+                            //     'level1_deptid' => $dept_old->level1_deptid,
+                            //     'level1_key' => $dept_old->level1_key,
+                            //     'level2' => $dept_old->level2,
+                            //     'level2_label' => $dept_old->level2_label,
+                            //     'level2_deptid' => $dept_old->level2_deptid,
+                            //     'level2_key' => $dept_old->level2_key,
+                            //     'level3' => $dept_old->level3,
+                            //     'level3_label' => $dept_old->level3_label,
+                            //     'level3_deptid' => $dept_old->level3_deptid,
+                            //     'level3_key' => $dept_old->level3_key,
+                            //     'level4' => $dept_old->level4,
+                            //     'level4_label' => $dept_old->level4_label,
+                            //     'level4_deptid' => $dept_old->level4_deptid,
+                            //     'level4_key' => $dept_old->level4_key,
+                            //     'level5' => $dept_old->level5,
+                            //     'level5_label' => $dept_old->level5_label,
+                            //     'level5_deptid' => $dept_old->level5_deptid,
+                            //     'level5_key' => $dept_old->level5_key,
+                            //     'org_path' => $dept_old->org_path,
+                            //     'date_deleted' => $dept_old->date_deleted,
+                            //     'date_updated' => $dept_old->date_updated,
+                            //     'exception' => $dept_old->exception,
+                            //     'exception_reason' => $dept_old->exception_reason,
+                            //     'unallocated' => $dept_old->unallocated,
+                            //     'duplicate' => $dept_old->duplicate
+                            // ];
                             OrganizationHierarchy::whereRaw("orgid = '".$dept->orgid."'")
                             ->update([
                                 'hlevel' => $dept->hlevel,
@@ -1125,57 +1125,57 @@ class GetODSDeptHierarchy extends Command
                                 'duplicate' => $dept->duplicate,
                                 'search_key' => "|{$dept->organization_key}|{$dept->level1_key}|{$dept->level2_key}|"
                             ]);
-                            $new_values = [ 
-                                'table' => 'ods_dept_org_hierarchy',                        
-                                'orgid' => $dept->orgid, 
-                                'hlevel' => $dept->hlevel,
-                                'pkey' => $dept->pkey,
-                                'okey' => $dept->okey,
-                                'deptid' => $dept->deptid,
-                                'name' => $dept->name,
-                                'ulevel' => $dept->ulevel,
-                                'organization' => $dept->organization,
-                                'organization_label' => $dept->organization_label,
-                                'organization_deptid' => $dept->organization_deptid,
-                                'organization_key' => $dept->organization_key,
-                                'level1' => $dept->level1,
-                                'level1_label' => $dept->level1_label,
-                                'level1_deptid' => $dept->level1_deptid,
-                                'level1_key' => $dept->level1_key,
-                                'level2' => $dept->level2,
-                                'level2_label' => $dept->level2_label,
-                                'level2_deptid' => $dept->level2_deptid,
-                                'level2_key' => $dept->level2_key,
-                                'level3' => null,
-                                'level3_label' => null,
-                                'level3_deptid' => null,
-                                'level3_key' => null,
-                                'level4' => null,
-                                'level4_label' => null,
-                                'level4_deptid' => null,
-                                'level4_key' => null,
-                                'level5' => null,
-                                'level5_label' => null,
-                                'level5_deptid' => null,
-                                'level5_key' => null,
-                                'org_path' => $org_path,
-                                'date_deleted' => $dept->date_deleted,
-                                'date_updated' => $dept->date_updated,
-                                'exception' => $dept->exception,
-                                'exception_reason' => $dept->exception_reason,
-                                'unallocated' => $dept->unallocated,
-                                'duplicate' => $dept->duplicate
-                            ];
-                            $audit = new JobDataAudit;
-                            $audit->job_sched_id = $audit_id;
-                            $audit->old_values = json_encode($old_values);
-                            $audit->new_values = json_encode($new_values);
-                            $audit->save();
+                            // $new_values = [ 
+                            //     'table' => 'ods_dept_org_hierarchy',                        
+                            //     'orgid' => $dept->orgid, 
+                            //     'hlevel' => $dept->hlevel,
+                            //     'pkey' => $dept->pkey,
+                            //     'okey' => $dept->okey,
+                            //     'deptid' => $dept->deptid,
+                            //     'name' => $dept->name,
+                            //     'ulevel' => $dept->ulevel,
+                            //     'organization' => $dept->organization,
+                            //     'organization_label' => $dept->organization_label,
+                            //     'organization_deptid' => $dept->organization_deptid,
+                            //     'organization_key' => $dept->organization_key,
+                            //     'level1' => $dept->level1,
+                            //     'level1_label' => $dept->level1_label,
+                            //     'level1_deptid' => $dept->level1_deptid,
+                            //     'level1_key' => $dept->level1_key,
+                            //     'level2' => $dept->level2,
+                            //     'level2_label' => $dept->level2_label,
+                            //     'level2_deptid' => $dept->level2_deptid,
+                            //     'level2_key' => $dept->level2_key,
+                            //     'level3' => null,
+                            //     'level3_label' => null,
+                            //     'level3_deptid' => null,
+                            //     'level3_key' => null,
+                            //     'level4' => null,
+                            //     'level4_label' => null,
+                            //     'level4_deptid' => null,
+                            //     'level4_key' => null,
+                            //     'level5' => null,
+                            //     'level5_label' => null,
+                            //     'level5_deptid' => null,
+                            //     'level5_key' => null,
+                            //     'org_path' => $org_path,
+                            //     'date_deleted' => $dept->date_deleted,
+                            //     'date_updated' => $dept->date_updated,
+                            //     'exception' => $dept->exception,
+                            //     'exception_reason' => $dept->exception_reason,
+                            //     'unallocated' => $dept->unallocated,
+                            //     'duplicate' => $dept->duplicate
+                            // ];
+                            // $audit = new JobDataAudit;
+                            // $audit->job_sched_id = $audit_id;
+                            // $audit->old_values = json_encode($old_values);
+                            // $audit->new_values = json_encode($new_values);
+                            // $audit->save();
                         }
                     } else {
-                        $old_values = [ 
-                            'table' => 'ods_dept_org_hierarchy'
-                        ];
+                        // $old_values = [ 
+                        //     'table' => 'ods_dept_org_hierarchy'
+                        // ];
                         OrganizationHierarchy::create([
                             'orgid' => $dept->orgid,
                             'hlevel' => $dept->hlevel,
@@ -1217,52 +1217,52 @@ class GetODSDeptHierarchy extends Command
                             'duplicate' => $dept->duplicate,
                             'search_key' => "|{$dept->organization_key}|{$dept->level1_key}|{$dept->level2_key}|"
                         ]);
-                        $new_values = [ 
-                            'table' => 'ods_dept_org_hierarchy',                        
-                            'orgid' => $dept->orgid, 
-                            'hlevel' => $dept->hlevel,
-                            'pkey' => $dept->pkey,
-                            'okey' => $dept->okey,
-                            'deptid' => $dept->deptid,
-                            'name' => $dept->name,
-                            'ulevel' => $dept->ulevel,
-                            'organization' => $dept->organization,
-                            'organization_label' => $dept->organization_label,
-                            'organization_deptid' => $dept->organization_deptid,
-                            'organization_key' => $dept->organization_key,
-                            'level1' => $dept->level1,
-                            'level1_label' => $dept->level1_label,
-                            'level1_deptid' => $dept->level1_deptid,
-                            'level1_key' => $dept->level1_key,
-                            'level2' => $dept->level2,
-                            'level2_label' => $dept->level2_label,
-                            'level2_deptid' => $dept->level2_deptid,
-                            'level2_key' => $dept->level2_key,
-                            'level3' => null,
-                            'level3_label' => null,
-                            'level3_deptid' => null,
-                            'level3_key' => null,
-                            'level4' => null,
-                            'level4_label' => null,
-                            'level4_deptid' => null,
-                            'level4_key' => null,
-                            'level5' => null,
-                            'level5_label' => null,
-                            'level5_deptid' => null,
-                            'level5_key' => null,
-                            'org_path' => $org_path,
-                            'date_deleted' => $dept->date_deleted,
-                            'date_updated' => $dept->date_updated,
-                            'exception' => $dept->exception,
-                            'exception_reason' => $dept->exception_reason,
-                            'unallocated' => $dept->unallocated,
-                            'duplicate' => $dept->duplicate
-                        ];
-                        $audit = new JobDataAudit;
-                        $audit->job_sched_id = $audit_id;
-                        $audit->old_values = json_encode($old_values);
-                        $audit->new_values = json_encode($new_values);
-                        $audit->save();
+                        // $new_values = [ 
+                        //     'table' => 'ods_dept_org_hierarchy',                        
+                        //     'orgid' => $dept->orgid, 
+                        //     'hlevel' => $dept->hlevel,
+                        //     'pkey' => $dept->pkey,
+                        //     'okey' => $dept->okey,
+                        //     'deptid' => $dept->deptid,
+                        //     'name' => $dept->name,
+                        //     'ulevel' => $dept->ulevel,
+                        //     'organization' => $dept->organization,
+                        //     'organization_label' => $dept->organization_label,
+                        //     'organization_deptid' => $dept->organization_deptid,
+                        //     'organization_key' => $dept->organization_key,
+                        //     'level1' => $dept->level1,
+                        //     'level1_label' => $dept->level1_label,
+                        //     'level1_deptid' => $dept->level1_deptid,
+                        //     'level1_key' => $dept->level1_key,
+                        //     'level2' => $dept->level2,
+                        //     'level2_label' => $dept->level2_label,
+                        //     'level2_deptid' => $dept->level2_deptid,
+                        //     'level2_key' => $dept->level2_key,
+                        //     'level3' => null,
+                        //     'level3_label' => null,
+                        //     'level3_deptid' => null,
+                        //     'level3_key' => null,
+                        //     'level4' => null,
+                        //     'level4_label' => null,
+                        //     'level4_deptid' => null,
+                        //     'level4_key' => null,
+                        //     'level5' => null,
+                        //     'level5_label' => null,
+                        //     'level5_deptid' => null,
+                        //     'level5_key' => null,
+                        //     'org_path' => $org_path,
+                        //     'date_deleted' => $dept->date_deleted,
+                        //     'date_updated' => $dept->date_updated,
+                        //     'exception' => $dept->exception,
+                        //     'exception_reason' => $dept->exception_reason,
+                        //     'unallocated' => $dept->unallocated,
+                        //     'duplicate' => $dept->duplicate
+                        // ];
+                        // $audit = new JobDataAudit;
+                        // $audit->job_sched_id = $audit_id;
+                        // $audit->old_values = json_encode($old_values);
+                        // $audit->new_values = json_encode($new_values);
+                        // $audit->save();
                     }
                 };
 
@@ -1441,7 +1441,7 @@ class GetODSDeptHierarchy extends Command
                     $dept->level2_label = $level2_label;
                     $dept->level2_deptid = $level2_deptid;
                     $dept->level2_key = $level2_key;
-                    if (str_contains(strtolower($dept->name), "unallocated") || str_contains(strtolower($dept->name), "inactive") || str_contains(strtolower($dept->name), "inactivate")) {
+                    if (str_contains(strtolower($dept->name), "unallocated") or str_contains(strtolower($dept->name), "inactive") or str_contains(strtolower($dept->name), "inactivate")) {
                         $dept->unallocated = 1;
                         if ($parent) {
                             $org_path = $parent->org_path;
@@ -1450,13 +1450,13 @@ class GetODSDeptHierarchy extends Command
                         }
                     } else {
                         $dept->unallocated = 0;
-                        // $this->AssignToBlankLevel($dept, $parent);
-                        $dept->level3 = $dept->orgid;
-                        $dept->level3_label = $dept->name;
-                        $dept->level3_deptid = $dept->deptid;
-                        $dept->level3_key = $dept->okey;
-                        $dept->duplicate = $parent->duplicate ?? 0;
-                        $dept->ulevel = 3;
+                        $this->AssignToBlankLevel($dept, $parent);
+                        // $dept->level3 = $dept->orgid;
+                        // $dept->level3_label = $dept->name;
+                        // $dept->level3_deptid = $dept->deptid;
+                        // $dept->level3_key = $dept->okey;
+                        // $dept->duplicate = $parent->duplicate ?? 0;
+                        // $dept->ulevel = 3;
                         if ($parent) {
                             $org_path = $parent->org_path." > ".$dept->name;
                         } else {
@@ -1466,47 +1466,47 @@ class GetODSDeptHierarchy extends Command
                     $dept->org_path = $org_path;
                     if ($dept_old) {
                         if (trim($dept) != trim($dept_old)) {
-                            $old_values = [ 
-                                'table' => 'ods_dept_org_hierarchy',                        
-                                'orgid' => $dept_old->orgid, 
-                                'hlevel' => $dept_old->hlevel, 
-                                'pkey' => $dept_old->pkey,
-                                'okey' => $dept_old->okey,
-                                'deptid' => $dept_old->deptid,
-                                'name' => $dept_old->name,
-                                'ulevel' => $dept_old->ulevel,
-                                'organization' => $dept_old->organization,
-                                'organization_label' => $dept_old->organization_label,
-                                'organization_deptid' => $dept_old->organization_deptid,
-                                'organization_key' => $dept_old->organization_key,
-                                'level1' => $dept_old->level1,
-                                'level1_label' => $dept_old->level1_label,
-                                'level1_deptid' => $dept_old->level1_deptid,
-                                'level1_key' => $dept_old->level1_key,
-                                'level2' => $dept_old->level2,
-                                'level2_label' => $dept_old->level2_label,
-                                'level2_deptid' => $dept_old->level2_deptid,
-                                'level2_key' => $dept_old->level2_key,
-                                'level3' => $dept_old->level3,
-                                'level3_label' => $dept_old->level3_label,
-                                'level3_deptid' => $dept_old->level3_deptid,
-                                'level3_key' => $dept_old->level3_key,
-                                'level4' => $dept_old->level4,
-                                'level4_label' => $dept_old->level4_label,
-                                'level4_deptid' => $dept_old->level4_deptid,
-                                'level4_key' => $dept_old->level4_key,
-                                'level5' => $dept_old->level5,
-                                'level5_label' => $dept_old->level5_label,
-                                'level5_deptid' => $dept_old->level5_deptid,
-                                'level5_key' => $dept_old->level5_key,
-                                'org_path' => $dept_old->org_path,
-                                'date_deleted' => $dept_old->date_deleted,
-                                'date_updated' => $dept_old->date_updated,
-                                'exception' => $dept_old->exception,
-                                'exception_reason' => $dept_old->exception_reason,
-                                'unallocated' => $dept_old->unallocated,
-                                'duplicate' => $dept_old->duplicate
-                            ];
+                            // $old_values = [ 
+                            //     'table' => 'ods_dept_org_hierarchy',                        
+                            //     'orgid' => $dept_old->orgid, 
+                            //     'hlevel' => $dept_old->hlevel, 
+                            //     'pkey' => $dept_old->pkey,
+                            //     'okey' => $dept_old->okey,
+                            //     'deptid' => $dept_old->deptid,
+                            //     'name' => $dept_old->name,
+                            //     'ulevel' => $dept_old->ulevel,
+                            //     'organization' => $dept_old->organization,
+                            //     'organization_label' => $dept_old->organization_label,
+                            //     'organization_deptid' => $dept_old->organization_deptid,
+                            //     'organization_key' => $dept_old->organization_key,
+                            //     'level1' => $dept_old->level1,
+                            //     'level1_label' => $dept_old->level1_label,
+                            //     'level1_deptid' => $dept_old->level1_deptid,
+                            //     'level1_key' => $dept_old->level1_key,
+                            //     'level2' => $dept_old->level2,
+                            //     'level2_label' => $dept_old->level2_label,
+                            //     'level2_deptid' => $dept_old->level2_deptid,
+                            //     'level2_key' => $dept_old->level2_key,
+                            //     'level3' => $dept_old->level3,
+                            //     'level3_label' => $dept_old->level3_label,
+                            //     'level3_deptid' => $dept_old->level3_deptid,
+                            //     'level3_key' => $dept_old->level3_key,
+                            //     'level4' => $dept_old->level4,
+                            //     'level4_label' => $dept_old->level4_label,
+                            //     'level4_deptid' => $dept_old->level4_deptid,
+                            //     'level4_key' => $dept_old->level4_key,
+                            //     'level5' => $dept_old->level5,
+                            //     'level5_label' => $dept_old->level5_label,
+                            //     'level5_deptid' => $dept_old->level5_deptid,
+                            //     'level5_key' => $dept_old->level5_key,
+                            //     'org_path' => $dept_old->org_path,
+                            //     'date_deleted' => $dept_old->date_deleted,
+                            //     'date_updated' => $dept_old->date_updated,
+                            //     'exception' => $dept_old->exception,
+                            //     'exception_reason' => $dept_old->exception_reason,
+                            //     'unallocated' => $dept_old->unallocated,
+                            //     'duplicate' => $dept_old->duplicate
+                            // ];
                             OrganizationHierarchy::whereRaw("orgid = '".$dept->orgid."'")
                             ->update([
                                 'hlevel' => $dept->hlevel,
@@ -1548,57 +1548,57 @@ class GetODSDeptHierarchy extends Command
                                 'duplicate' => $dept->duplicate,
                                 'search_key' => "|{$dept->organization_key}|{$dept->level1_key}|{$dept->level2_key}|{$dept->level3_key}|"
                             ]);
-                            $new_values = [ 
-                                'table' => 'ods_dept_org_hierarchy',                        
-                                'orgid' => $dept->orgid, 
-                                'hlevel' => $dept->hlevel,
-                                'pkey' => $dept->pkey,
-                                'okey' => $dept->okey,
-                                'deptid' => $dept->deptid,
-                                'name' => $dept->name,
-                                'ulevel' => $dept->ulevel,
-                                'organization' => $dept->organization,
-                                'organization_label' => $dept->organization_label,
-                                'organization_deptid' => $dept->organization_deptid,
-                                'organization_key' => $dept->organization_key,
-                                'level1' => $dept->level1,
-                                'level1_label' => $dept->level1_label,
-                                'level1_deptid' => $dept->level1_deptid,
-                                'level1_key' => $dept->level1_key,
-                                'level2' => $dept->level2,
-                                'level2_label' => $dept->level2_label,
-                                'level2_deptid' => $dept->level2_deptid,
-                                'level2_key' => $dept->level2_key,
-                                'level3' => $dept->level3,
-                                'level3_label' => $dept->level3_label,
-                                'level3_deptid' => $dept->level3_deptid,
-                                'level3_key' => $dept->level3_key,
-                                'level4' => null,
-                                'level4_label' => null,
-                                'level4_deptid' => null,
-                                'level4_key' => null,
-                                'level5' => null,
-                                'level5_label' => null,
-                                'level5_deptid' => null,
-                                'level5_key' => null,
-                                'org_path' => $org_path,
-                                'date_deleted' => $dept->date_deleted,
-                                'date_updated' => $dept->date_updated,
-                                'exception' => $dept->exception,
-                                'exception_reason' => $dept->exception_reason,
-                                'unallocated' => $dept->unallocated,
-                                'duplicate' => $dept->duplicate
-                            ];
-                            $audit = new JobDataAudit;
-                            $audit->job_sched_id = $audit_id;
-                            $audit->old_values = json_encode($old_values);
-                            $audit->new_values = json_encode($new_values);
-                            $audit->save();
+                            // $new_values = [ 
+                            //     'table' => 'ods_dept_org_hierarchy',                        
+                            //     'orgid' => $dept->orgid, 
+                            //     'hlevel' => $dept->hlevel,
+                            //     'pkey' => $dept->pkey,
+                            //     'okey' => $dept->okey,
+                            //     'deptid' => $dept->deptid,
+                            //     'name' => $dept->name,
+                            //     'ulevel' => $dept->ulevel,
+                            //     'organization' => $dept->organization,
+                            //     'organization_label' => $dept->organization_label,
+                            //     'organization_deptid' => $dept->organization_deptid,
+                            //     'organization_key' => $dept->organization_key,
+                            //     'level1' => $dept->level1,
+                            //     'level1_label' => $dept->level1_label,
+                            //     'level1_deptid' => $dept->level1_deptid,
+                            //     'level1_key' => $dept->level1_key,
+                            //     'level2' => $dept->level2,
+                            //     'level2_label' => $dept->level2_label,
+                            //     'level2_deptid' => $dept->level2_deptid,
+                            //     'level2_key' => $dept->level2_key,
+                            //     'level3' => $dept->level3,
+                            //     'level3_label' => $dept->level3_label,
+                            //     'level3_deptid' => $dept->level3_deptid,
+                            //     'level3_key' => $dept->level3_key,
+                            //     'level4' => null,
+                            //     'level4_label' => null,
+                            //     'level4_deptid' => null,
+                            //     'level4_key' => null,
+                            //     'level5' => null,
+                            //     'level5_label' => null,
+                            //     'level5_deptid' => null,
+                            //     'level5_key' => null,
+                            //     'org_path' => $org_path,
+                            //     'date_deleted' => $dept->date_deleted,
+                            //     'date_updated' => $dept->date_updated,
+                            //     'exception' => $dept->exception,
+                            //     'exception_reason' => $dept->exception_reason,
+                            //     'unallocated' => $dept->unallocated,
+                            //     'duplicate' => $dept->duplicate
+                            // ];
+                            // $audit = new JobDataAudit;
+                            // $audit->job_sched_id = $audit_id;
+                            // $audit->old_values = json_encode($old_values);
+                            // $audit->new_values = json_encode($new_values);
+                            // $audit->save();
                         }
                     } else {
-                        $old_values = [ 
-                            'table' => 'ods_dept_org_hierarchy'
-                        ];
+                        // $old_values = [ 
+                        //     'table' => 'ods_dept_org_hierarchy'
+                        // ];
                         OrganizationHierarchy::create([
                             'orgid' => $dept->orgid,
                             'hlevel' => $dept->hlevel,
@@ -1640,52 +1640,52 @@ class GetODSDeptHierarchy extends Command
                             'duplicate' => $dept->duplicate,
                             'search_key' => "|{$dept->organization_key}|{$dept->level1_key}|{$dept->level2_key}|{$dept->level3_key}|"
                         ]);
-                        $new_values = [ 
-                            'table' => 'ods_dept_org_hierarchy',                        
-                            'orgid' => $dept->orgid, 
-                            'hlevel' => $dept->hlevel,
-                            'pkey' => $dept->pkey,
-                            'okey' => $dept->okey,
-                            'deptid' => $dept->deptid,
-                            'name' => $dept->name,
-                            'ulevel' => $dept->ulevel,
-                            'organization' => $dept->organization,
-                            'organization_label' => $dept->organization_label,
-                            'organization_deptid' => $dept->organization_deptid,
-                            'organization_key' => $dept->organization_key,
-                            'level1' => $dept->level1,
-                            'level1_label' => $dept->level1_label,
-                            'level1_deptid' => $dept->level1_deptid,
-                            'level1_key' => $dept->level1_key,
-                            'level2' => $dept->level2,
-                            'level2_label' => $dept->level2_label,
-                            'level2_deptid' => $dept->level2_deptid,
-                            'level2_key' => $dept->level2_key,
-                            'level3' => $dept->level3,
-                            'level3_label' => $dept->level3_label,
-                            'level3_deptid' => $dept->level3_deptid,
-                            'level3_key' => $dept->level3_key,
-                            'level4' => null,
-                            'level4_label' => null,
-                            'level4_deptid' => null,
-                            'level4_key' => null,
-                            'level5' => null,
-                            'level5_label' => null,
-                            'level5_deptid' => null,
-                            'level5_key' => null,
-                            'org_path' => $org_path,
-                            'date_deleted' => $dept->date_deleted,
-                            'date_updated' => $dept->date_updated,
-                            'exception' => $dept->exception,
-                            'exception_reason' => $dept->exception_reason,
-                            'unallocated' => $dept->unallocated,
-                            'duplicate' => $dept->duplicate
-                        ];
-                        $audit = new JobDataAudit;
-                        $audit->job_sched_id = $audit_id;
-                        $audit->old_values = json_encode($old_values);
-                        $audit->new_values = json_encode($new_values);
-                        $audit->save();
+                        // $new_values = [ 
+                        //     'table' => 'ods_dept_org_hierarchy',                        
+                        //     'orgid' => $dept->orgid, 
+                        //     'hlevel' => $dept->hlevel,
+                        //     'pkey' => $dept->pkey,
+                        //     'okey' => $dept->okey,
+                        //     'deptid' => $dept->deptid,
+                        //     'name' => $dept->name,
+                        //     'ulevel' => $dept->ulevel,
+                        //     'organization' => $dept->organization,
+                        //     'organization_label' => $dept->organization_label,
+                        //     'organization_deptid' => $dept->organization_deptid,
+                        //     'organization_key' => $dept->organization_key,
+                        //     'level1' => $dept->level1,
+                        //     'level1_label' => $dept->level1_label,
+                        //     'level1_deptid' => $dept->level1_deptid,
+                        //     'level1_key' => $dept->level1_key,
+                        //     'level2' => $dept->level2,
+                        //     'level2_label' => $dept->level2_label,
+                        //     'level2_deptid' => $dept->level2_deptid,
+                        //     'level2_key' => $dept->level2_key,
+                        //     'level3' => $dept->level3,
+                        //     'level3_label' => $dept->level3_label,
+                        //     'level3_deptid' => $dept->level3_deptid,
+                        //     'level3_key' => $dept->level3_key,
+                        //     'level4' => null,
+                        //     'level4_label' => null,
+                        //     'level4_deptid' => null,
+                        //     'level4_key' => null,
+                        //     'level5' => null,
+                        //     'level5_label' => null,
+                        //     'level5_deptid' => null,
+                        //     'level5_key' => null,
+                        //     'org_path' => $org_path,
+                        //     'date_deleted' => $dept->date_deleted,
+                        //     'date_updated' => $dept->date_updated,
+                        //     'exception' => $dept->exception,
+                        //     'exception_reason' => $dept->exception_reason,
+                        //     'unallocated' => $dept->unallocated,
+                        //     'duplicate' => $dept->duplicate
+                        // ];
+                        // $audit = new JobDataAudit;
+                        // $audit->job_sched_id = $audit_id;
+                        // $audit->old_values = json_encode($old_values);
+                        // $audit->new_values = json_encode($new_values);
+                        // $audit->save();
                     }
                 };
 
@@ -1881,7 +1881,7 @@ class GetODSDeptHierarchy extends Command
                     $dept->level3_label = $level3_label;
                     $dept->level3_deptid = $level3_deptid;
                     $dept->level3_key = $level3_key;
-                    if (str_contains(strtolower($dept->name), "unallocated") || str_contains(strtolower($dept->name), "inactive") || str_contains(strtolower($dept->name), "inactivate")) {
+                    if (str_contains(strtolower($dept->name), "unallocated") or str_contains(strtolower($dept->name), "inactive") or str_contains(strtolower($dept->name), "inactivate")) {
                         $dept->unallocated = 1;
                         if ($parent) {
                             $org_path = $parent->org_path;
@@ -1890,13 +1890,13 @@ class GetODSDeptHierarchy extends Command
                         }
                     } else {
                         $dept->unallocated = 0;
-                        // $this->AssignToBlankLevel($dept, $parent);
-                        $dept->level4 = $dept->orgid;
-                        $dept->level4_label = $dept->name;
-                        $dept->level4_deptid = $dept->deptid;
-                        $dept->level4_key = $dept->okey;
-                        $dept->duplicate = $parent->duplicate ?? 0;
-                        $dept->ulevel = 4;
+                        $this->AssignToBlankLevel($dept, $parent);
+                        // $dept->level4 = $dept->orgid;
+                        // $dept->level4_label = $dept->name;
+                        // $dept->level4_deptid = $dept->deptid;
+                        // $dept->level4_key = $dept->okey;
+                        // $dept->duplicate = $parent->duplicate ?? 0;
+                        // $dept->ulevel = 4;
                         if ($parent) {
                             $org_path = $parent->org_path." > ".$dept->name;
                         } else {
@@ -1906,47 +1906,47 @@ class GetODSDeptHierarchy extends Command
                     $dept->org_path = $org_path;
                     if ($dept_old) {
                         if (trim($dept) != trim($dept_old)) {
-                            $old_values = [ 
-                                'table' => 'ods_dept_org_hierarchy',                        
-                                'orgid' => $dept_old->orgid, 
-                                'hlevel' => $dept_old->hlevel, 
-                                'pkey' => $dept_old->pkey,
-                                'okey' => $dept_old->okey,
-                                'deptid' => $dept_old->deptid,
-                                'name' => $dept_old->name,
-                                'ulevel' => $dept_old->ulevel,
-                                'organization' => $dept_old->organization,
-                                'organization_label' => $dept_old->organization_label,
-                                'organization_deptid' => $dept_old->organization_deptid,
-                                'organization_key' => $dept_old->organization_key,
-                                'level1' => $dept_old->level1,
-                                'level1_label' => $dept_old->level1_label,
-                                'level1_deptid' => $dept_old->level1_deptid,
-                                'level1_key' => $dept_old->level1_key,
-                                'level2' => $dept_old->level2,
-                                'level2_label' => $dept_old->level2_label,
-                                'level2_deptid' => $dept_old->level2_deptid,
-                                'level2_key' => $dept_old->level2_key,
-                                'level3' => $dept_old->level3,
-                                'level3_label' => $dept_old->level3_label,
-                                'level3_deptid' => $dept_old->level3_deptid,
-                                'level3_key' => $dept_old->level3_key,
-                                'level4' => $dept_old->level4,
-                                'level4_label' => $dept_old->level4_label,
-                                'level4_deptid' => $dept_old->level4_deptid,
-                                'level4_key' => $dept_old->level4_key,
-                                'level5' => $dept_old->level5,
-                                'level5_label' => $dept_old->level5_label,
-                                'level5_deptid' => $dept_old->level5_deptid,
-                                'level5_key' => $dept_old->level5_key,
-                                'org_path' => $dept_old->org_path,
-                                'date_deleted' => $dept_old->date_deleted,
-                                'date_updated' => $dept_old->date_updated,
-                                'exception' => $dept_old->exception,
-                                'exception_reason' => $dept_old->exception_reason,
-                                'unallocated' => $dept_old->unallocated,
-                                'duplicate' => $dept_old->duplicate
-                            ];
+                            // $old_values = [ 
+                            //     'table' => 'ods_dept_org_hierarchy',                        
+                            //     'orgid' => $dept_old->orgid, 
+                            //     'hlevel' => $dept_old->hlevel, 
+                            //     'pkey' => $dept_old->pkey,
+                            //     'okey' => $dept_old->okey,
+                            //     'deptid' => $dept_old->deptid,
+                            //     'name' => $dept_old->name,
+                            //     'ulevel' => $dept_old->ulevel,
+                            //     'organization' => $dept_old->organization,
+                            //     'organization_label' => $dept_old->organization_label,
+                            //     'organization_deptid' => $dept_old->organization_deptid,
+                            //     'organization_key' => $dept_old->organization_key,
+                            //     'level1' => $dept_old->level1,
+                            //     'level1_label' => $dept_old->level1_label,
+                            //     'level1_deptid' => $dept_old->level1_deptid,
+                            //     'level1_key' => $dept_old->level1_key,
+                            //     'level2' => $dept_old->level2,
+                            //     'level2_label' => $dept_old->level2_label,
+                            //     'level2_deptid' => $dept_old->level2_deptid,
+                            //     'level2_key' => $dept_old->level2_key,
+                            //     'level3' => $dept_old->level3,
+                            //     'level3_label' => $dept_old->level3_label,
+                            //     'level3_deptid' => $dept_old->level3_deptid,
+                            //     'level3_key' => $dept_old->level3_key,
+                            //     'level4' => $dept_old->level4,
+                            //     'level4_label' => $dept_old->level4_label,
+                            //     'level4_deptid' => $dept_old->level4_deptid,
+                            //     'level4_key' => $dept_old->level4_key,
+                            //     'level5' => $dept_old->level5,
+                            //     'level5_label' => $dept_old->level5_label,
+                            //     'level5_deptid' => $dept_old->level5_deptid,
+                            //     'level5_key' => $dept_old->level5_key,
+                            //     'org_path' => $dept_old->org_path,
+                            //     'date_deleted' => $dept_old->date_deleted,
+                            //     'date_updated' => $dept_old->date_updated,
+                            //     'exception' => $dept_old->exception,
+                            //     'exception_reason' => $dept_old->exception_reason,
+                            //     'unallocated' => $dept_old->unallocated,
+                            //     'duplicate' => $dept_old->duplicate
+                            // ];
                             OrganizationHierarchy::whereRaw("orgid = '".$dept->orgid."'")
                             ->update([
                                 'hlevel' => $dept->hlevel,
@@ -1988,57 +1988,57 @@ class GetODSDeptHierarchy extends Command
                                 'duplicate' => $dept->duplicate,
                                 'search_key' => "|{$dept->organization_key}|{$dept->level1_key}|{$dept->level2_key}|{$dept->level3_key}|{$dept->level4_key}|"
                             ]);
-                            $new_values = [ 
-                                'table' => 'ods_dept_org_hierarchy',                        
-                                'orgid' => $dept->orgid, 
-                                'hlevel' => $dept->hlevel,
-                                'pkey' => $dept->pkey,
-                                'okey' => $dept->okey,
-                                'deptid' => $dept->deptid,
-                                'name' => $dept->name,
-                                'ulevel' => $dept->ulevel,
-                                'organization' => $dept->organization,
-                                'organization_label' => $dept->organization_label,
-                                'organization_deptid' => $dept->organization_deptid,
-                                'organization_key' => $dept->organization_key,
-                                'level1' => $dept->level1,
-                                'level1_label' => $dept->level1_label,
-                                'level1_deptid' => $dept->level1_deptid,
-                                'level1_key' => $dept->level1_key,
-                                'level2' => $dept->level2,
-                                'level2_label' => $dept->level2_label,
-                                'level2_deptid' => $dept->level2_deptid,
-                                'level2_key' => $dept->level2_key,
-                                'level3' => $dept->level3,
-                                'level3_label' => $dept->level3_label,
-                                'level3_deptid' => $dept->level3_deptid,
-                                'level3_key' => $dept->level3_key,
-                                'level4' => $dept->level4,
-                                'level4_label' => $dept->level4_label,
-                                'level4_deptid' => $dept->level4_deptid,
-                                'level4_key' => $dept->level4_key,
-                                'level5' => null,
-                                'level5_label' => null,
-                                'level5_deptid' => null,
-                                'level5_key' => null,
-                                'org_path' => $org_path,
-                                'date_deleted' => $dept->date_deleted,
-                                'date_updated' => $dept->date_updated,
-                                'exception' => $dept->exception,
-                                'exception_reason' => $dept->exception_reason,
-                                'unallocated' => $dept->unallocated,
-                                'duplicate' => $dept->duplicate
-                            ];
-                            $audit = new JobDataAudit;
-                            $audit->job_sched_id = $audit_id;
-                            $audit->old_values = json_encode($old_values);
-                            $audit->new_values = json_encode($new_values);
-                            $audit->save();
+                            // $new_values = [ 
+                            //     'table' => 'ods_dept_org_hierarchy',                        
+                            //     'orgid' => $dept->orgid, 
+                            //     'hlevel' => $dept->hlevel,
+                            //     'pkey' => $dept->pkey,
+                            //     'okey' => $dept->okey,
+                            //     'deptid' => $dept->deptid,
+                            //     'name' => $dept->name,
+                            //     'ulevel' => $dept->ulevel,
+                            //     'organization' => $dept->organization,
+                            //     'organization_label' => $dept->organization_label,
+                            //     'organization_deptid' => $dept->organization_deptid,
+                            //     'organization_key' => $dept->organization_key,
+                            //     'level1' => $dept->level1,
+                            //     'level1_label' => $dept->level1_label,
+                            //     'level1_deptid' => $dept->level1_deptid,
+                            //     'level1_key' => $dept->level1_key,
+                            //     'level2' => $dept->level2,
+                            //     'level2_label' => $dept->level2_label,
+                            //     'level2_deptid' => $dept->level2_deptid,
+                            //     'level2_key' => $dept->level2_key,
+                            //     'level3' => $dept->level3,
+                            //     'level3_label' => $dept->level3_label,
+                            //     'level3_deptid' => $dept->level3_deptid,
+                            //     'level3_key' => $dept->level3_key,
+                            //     'level4' => $dept->level4,
+                            //     'level4_label' => $dept->level4_label,
+                            //     'level4_deptid' => $dept->level4_deptid,
+                            //     'level4_key' => $dept->level4_key,
+                            //     'level5' => null,
+                            //     'level5_label' => null,
+                            //     'level5_deptid' => null,
+                            //     'level5_key' => null,
+                            //     'org_path' => $org_path,
+                            //     'date_deleted' => $dept->date_deleted,
+                            //     'date_updated' => $dept->date_updated,
+                            //     'exception' => $dept->exception,
+                            //     'exception_reason' => $dept->exception_reason,
+                            //     'unallocated' => $dept->unallocated,
+                            //     'duplicate' => $dept->duplicate
+                            // ];
+                            // $audit = new JobDataAudit;
+                            // $audit->job_sched_id = $audit_id;
+                            // $audit->old_values = json_encode($old_values);
+                            // $audit->new_values = json_encode($new_values);
+                            // $audit->save();
                         }
                     } else {
-                        $old_values = [ 
-                            'table' => 'ods_dept_org_hierarchy'
-                        ];
+                        // $old_values = [ 
+                        //     'table' => 'ods_dept_org_hierarchy'
+                        // ];
                         OrganizationHierarchy::create([
                             'orgid' => $dept->orgid,
                             'hlevel' => $dept->hlevel,
@@ -2080,52 +2080,52 @@ class GetODSDeptHierarchy extends Command
                             'duplicate' => $dept->duplicate,
                             'search_key' => "|{$dept->organization_key}|{$dept->level1_key}|{$dept->level2_key}|{$dept->level3_key}|{$dept->level4_key}|"
                         ]);
-                        $new_values = [ 
-                            'table' => 'ods_dept_org_hierarchy',                        
-                            'orgid' => $dept->orgid, 
-                            'hlevel' => $dept->hlevel,
-                            'pkey' => $dept->pkey,
-                            'okey' => $dept->okey,
-                            'deptid' => $dept->deptid,
-                            'name' => $dept->name,
-                            'ulevel' => $dept->ulevel,
-                            'organization' => $dept->organization,
-                            'organization_label' => $dept->organization_label,
-                            'organization_deptid' => $dept->organization_deptid,
-                            'organization_key' => $dept->organization_key,
-                            'level1' => $dept->level1,
-                            'level1_label' => $dept->level1_label,
-                            'level1_deptid' => $dept->level1_deptid,
-                            'level1_key' => $dept->level1_key,
-                            'level2' => $dept->level2,
-                            'level2_label' => $dept->level2_label,
-                            'level2_deptid' => $dept->level2_deptid,
-                            'level2_key' => $dept->level2_key,
-                            'level3' => $dept->level3,
-                            'level3_label' => $dept->level3_label,
-                            'level3_deptid' => $dept->level3_deptid,
-                            'level3_key' => $dept->level3_key,
-                            'level4' => $dept->level4,
-                            'level4_label' => $dept->level4_label,
-                            'level4_deptid' => $dept->level4_deptid,
-                            'level4_key' => $dept->level4_key,
-                            'level5' => null,
-                            'level5_label' => null,
-                            'level5_deptid' => null,
-                            'level5_key' => null,
-                            'org_path' => $org_path,
-                            'date_deleted' => $dept->date_deleted,
-                            'date_updated' => $dept->date_updated,
-                            'exception' => $dept->exception,
-                            'exception_reason' => $dept->exception_reason,
-                            'unallocated' => $dept->unallocated,
-                            'duplicate' => $dept->duplicate
-                        ];
-                        $audit = new JobDataAudit;
-                        $audit->job_sched_id = $audit_id;
-                        $audit->old_values = json_encode($old_values);
-                        $audit->new_values = json_encode($new_values);
-                        $audit->save();
+                        // $new_values = [ 
+                        //     'table' => 'ods_dept_org_hierarchy',                        
+                        //     'orgid' => $dept->orgid, 
+                        //     'hlevel' => $dept->hlevel,
+                        //     'pkey' => $dept->pkey,
+                        //     'okey' => $dept->okey,
+                        //     'deptid' => $dept->deptid,
+                        //     'name' => $dept->name,
+                        //     'ulevel' => $dept->ulevel,
+                        //     'organization' => $dept->organization,
+                        //     'organization_label' => $dept->organization_label,
+                        //     'organization_deptid' => $dept->organization_deptid,
+                        //     'organization_key' => $dept->organization_key,
+                        //     'level1' => $dept->level1,
+                        //     'level1_label' => $dept->level1_label,
+                        //     'level1_deptid' => $dept->level1_deptid,
+                        //     'level1_key' => $dept->level1_key,
+                        //     'level2' => $dept->level2,
+                        //     'level2_label' => $dept->level2_label,
+                        //     'level2_deptid' => $dept->level2_deptid,
+                        //     'level2_key' => $dept->level2_key,
+                        //     'level3' => $dept->level3,
+                        //     'level3_label' => $dept->level3_label,
+                        //     'level3_deptid' => $dept->level3_deptid,
+                        //     'level3_key' => $dept->level3_key,
+                        //     'level4' => $dept->level4,
+                        //     'level4_label' => $dept->level4_label,
+                        //     'level4_deptid' => $dept->level4_deptid,
+                        //     'level4_key' => $dept->level4_key,
+                        //     'level5' => null,
+                        //     'level5_label' => null,
+                        //     'level5_deptid' => null,
+                        //     'level5_key' => null,
+                        //     'org_path' => $org_path,
+                        //     'date_deleted' => $dept->date_deleted,
+                        //     'date_updated' => $dept->date_updated,
+                        //     'exception' => $dept->exception,
+                        //     'exception_reason' => $dept->exception_reason,
+                        //     'unallocated' => $dept->unallocated,
+                        //     'duplicate' => $dept->duplicate
+                        // ];
+                        // $audit = new JobDataAudit;
+                        // $audit->job_sched_id = $audit_id;
+                        // $audit->old_values = json_encode($old_values);
+                        // $audit->new_values = json_encode($new_values);
+                        // $audit->save();
                     }
                 };
 
@@ -2337,7 +2337,7 @@ class GetODSDeptHierarchy extends Command
                     $dept->level4_label = $level4_label;
                     $dept->level4_deptid = $level4_deptid;
                     $dept->level4_key = $level4_key;
-                    if (str_contains(strtolower($dept->name), "unallocated") || str_contains(strtolower($dept->name), "inactive") || str_contains(strtolower($dept->name), "inactivate")) {
+                    if (str_contains(strtolower($dept->name), "unallocated") or str_contains(strtolower($dept->name), "inactive") or str_contains(strtolower($dept->name), "inactivate")) {
                         $dept->unallocated = 1;
                         if ($parent) {
                             $org_path = $parent->org_path;
@@ -2346,13 +2346,13 @@ class GetODSDeptHierarchy extends Command
                         }
                     } else {
                         $dept->unallocated = 0;
-                        // $this->AssignToBlankLevel($dept, $parent);
-                        $dept->level5 = $dept->orgid;
-                        $dept->level5_label = $dept->name;
-                        $dept->level5_deptid = $dept->deptid;
-                        $dept->level5_key = $dept->okey;
-                        $dept->duplicate = $parent->duplicate ?? 0;
-                        $dept->ulevel = 5;
+                        $this->AssignToBlankLevel($dept, $parent);
+                        // $dept->level5 = $dept->orgid;
+                        // $dept->level5_label = $dept->name;
+                        // $dept->level5_deptid = $dept->deptid;
+                        // $dept->level5_key = $dept->okey;
+                        // $dept->duplicate = $parent->duplicate ?? 0;
+                        // $dept->ulevel = 5;
                         if ($parent) {
                             $org_path = $parent->org_path." > ".$dept->name;
                         } else {
@@ -2362,47 +2362,47 @@ class GetODSDeptHierarchy extends Command
                     $dept->org_path = $org_path;
                     if ($dept_old) {
                         if (trim($dept) != trim($dept_old)) {
-                            $old_values = [ 
-                                'table' => 'ods_dept_org_hierarchy',                        
-                                'orgid' => $dept_old->orgid, 
-                                'hlevel' => $dept_old->hlevel, 
-                                'pkey' => $dept_old->pkey,
-                                'okey' => $dept_old->okey,
-                                'deptid' => $dept_old->deptid,
-                                'name' => $dept_old->name,
-                                'ulevel' => $dept_old->ulevel,
-                                'organization' => $dept_old->organization,
-                                'organization_label' => $dept_old->organization_label,
-                                'organization_deptid' => $dept_old->organization_deptid,
-                                'organization_key' => $dept_old->organization_key,
-                                'level1' => $dept_old->level1,
-                                'level1_label' => $dept_old->level1_label,
-                                'level1_deptid' => $dept_old->level1_deptid,
-                                'level1_key' => $dept_old->level1_key,
-                                'level2' => $dept_old->level2,
-                                'level2_label' => $dept_old->level2_label,
-                                'level2_deptid' => $dept_old->level2_deptid,
-                                'level2_key' => $dept_old->level2_key,
-                                'level3' => $dept_old->level3,
-                                'level3_label' => $dept_old->level3_label,
-                                'level3_deptid' => $dept_old->level3_deptid,
-                                'level3_key' => $dept_old->level3_key,
-                                'level4' => $dept_old->level4,
-                                'level4_label' => $dept_old->level4_label,
-                                'level4_deptid' => $dept_old->level4_deptid,
-                                'level4_key' => $dept_old->level4_key,
-                                'level5' => $dept_old->level5,
-                                'level5_label' => $dept_old->level5_label,
-                                'level5_deptid' => $dept_old->level5_deptid,
-                                'level5_key' => $dept_old->level5_key,
-                                'org_path' => $dept_old->org_path,
-                                'date_deleted' => $dept_old->date_deleted,
-                                'date_updated' => $dept_old->date_updated,
-                                'exception' => $dept_old->exception,
-                                'exception_reason' => $dept_old->exception_reason,
-                                'unallocated' => $dept_old->unallocated,
-                                'duplicate' => $dept_old->duplicate
-                            ];
+                            // $old_values = [ 
+                            //     'table' => 'ods_dept_org_hierarchy',                        
+                            //     'orgid' => $dept_old->orgid, 
+                            //     'hlevel' => $dept_old->hlevel, 
+                            //     'pkey' => $dept_old->pkey,
+                            //     'okey' => $dept_old->okey,
+                            //     'deptid' => $dept_old->deptid,
+                            //     'name' => $dept_old->name,
+                            //     'ulevel' => $dept_old->ulevel,
+                            //     'organization' => $dept_old->organization,
+                            //     'organization_label' => $dept_old->organization_label,
+                            //     'organization_deptid' => $dept_old->organization_deptid,
+                            //     'organization_key' => $dept_old->organization_key,
+                            //     'level1' => $dept_old->level1,
+                            //     'level1_label' => $dept_old->level1_label,
+                            //     'level1_deptid' => $dept_old->level1_deptid,
+                            //     'level1_key' => $dept_old->level1_key,
+                            //     'level2' => $dept_old->level2,
+                            //     'level2_label' => $dept_old->level2_label,
+                            //     'level2_deptid' => $dept_old->level2_deptid,
+                            //     'level2_key' => $dept_old->level2_key,
+                            //     'level3' => $dept_old->level3,
+                            //     'level3_label' => $dept_old->level3_label,
+                            //     'level3_deptid' => $dept_old->level3_deptid,
+                            //     'level3_key' => $dept_old->level3_key,
+                            //     'level4' => $dept_old->level4,
+                            //     'level4_label' => $dept_old->level4_label,
+                            //     'level4_deptid' => $dept_old->level4_deptid,
+                            //     'level4_key' => $dept_old->level4_key,
+                            //     'level5' => $dept_old->level5,
+                            //     'level5_label' => $dept_old->level5_label,
+                            //     'level5_deptid' => $dept_old->level5_deptid,
+                            //     'level5_key' => $dept_old->level5_key,
+                            //     'org_path' => $dept_old->org_path,
+                            //     'date_deleted' => $dept_old->date_deleted,
+                            //     'date_updated' => $dept_old->date_updated,
+                            //     'exception' => $dept_old->exception,
+                            //     'exception_reason' => $dept_old->exception_reason,
+                            //     'unallocated' => $dept_old->unallocated,
+                            //     'duplicate' => $dept_old->duplicate
+                            // ];
                             OrganizationHierarchy::whereRaw("orgid = '".$dept->orgid."'")
                             ->update([
                                 'hlevel' => $dept->hlevel,
@@ -2444,57 +2444,57 @@ class GetODSDeptHierarchy extends Command
                                 'duplicate' => $dept->duplicate,
                                 'search_key' => "|{$dept->organization_key}|{$dept->level1_key}|{$dept->level2_key}|{$dept->level3_key}|{$dept->level4_key}|{$dept->level5_key}|"
                             ]);
-                            $new_values = [ 
-                                'table' => 'ods_dept_org_hierarchy',                        
-                                'orgid' => $dept->orgid, 
-                                'hlevel' => $dept->hlevel,
-                                'pkey' => $dept->pkey,
-                                'okey' => $dept->okey,
-                                'deptid' => $dept->deptid,
-                                'name' => $dept->name,
-                                'ulevel' => $dept->ulevel,
-                                'organization' => $dept->organization,
-                                'organization_label' => $dept->organization_label,
-                                'organization_deptid' => $dept->organization_deptid,
-                                'organization_key' => $dept->organization_key,
-                                'level1' => $dept->level1,
-                                'level1_label' => $dept->level1_label,
-                                'level1_deptid' => $dept->level1_deptid,
-                                'level1_key' => $dept->level1_key,
-                                'level2' => $dept->level2,
-                                'level2_label' => $dept->level2_label,
-                                'level2_deptid' => $dept->level2_deptid,
-                                'level2_key' => $dept->level2_key,
-                                'level3' => $dept->level3,
-                                'level3_label' => $dept->level3_label,
-                                'level3_deptid' => $dept->level3_deptid,
-                                'level3_key' => $dept->level3_key,
-                                'level4' => $dept->level4,
-                                'level4_label' => $dept->level4_label,
-                                'level4_deptid' => $dept->level4_deptid,
-                                'level4_key' => $dept->level4_key,
-                                'level5' => $dept->level5,
-                                'level5_label' => $dept->level5_label,
-                                'level5_deptid' => $dept->level5_deptid,
-                                'level5_key' => $dept->level5_key,
-                                'org_path' => $org_path,
-                                'date_deleted' => $dept->date_deleted,
-                                'date_updated' => $dept->date_updated,
-                                'exception' => $dept->exception,
-                                'exception_reason' => $dept->exception_reason,
-                                'unallocated' => $dept->unallocated,
-                                'duplicate' => $dept->duplicate
-                            ];
-                            $audit = new JobDataAudit;
-                            $audit->job_sched_id = $audit_id;
-                            $audit->old_values = json_encode($old_values);
-                            $audit->new_values = json_encode($new_values);
-                            $audit->save();
+                            // $new_values = [ 
+                            //     'table' => 'ods_dept_org_hierarchy',                        
+                            //     'orgid' => $dept->orgid, 
+                            //     'hlevel' => $dept->hlevel,
+                            //     'pkey' => $dept->pkey,
+                            //     'okey' => $dept->okey,
+                            //     'deptid' => $dept->deptid,
+                            //     'name' => $dept->name,
+                            //     'ulevel' => $dept->ulevel,
+                            //     'organization' => $dept->organization,
+                            //     'organization_label' => $dept->organization_label,
+                            //     'organization_deptid' => $dept->organization_deptid,
+                            //     'organization_key' => $dept->organization_key,
+                            //     'level1' => $dept->level1,
+                            //     'level1_label' => $dept->level1_label,
+                            //     'level1_deptid' => $dept->level1_deptid,
+                            //     'level1_key' => $dept->level1_key,
+                            //     'level2' => $dept->level2,
+                            //     'level2_label' => $dept->level2_label,
+                            //     'level2_deptid' => $dept->level2_deptid,
+                            //     'level2_key' => $dept->level2_key,
+                            //     'level3' => $dept->level3,
+                            //     'level3_label' => $dept->level3_label,
+                            //     'level3_deptid' => $dept->level3_deptid,
+                            //     'level3_key' => $dept->level3_key,
+                            //     'level4' => $dept->level4,
+                            //     'level4_label' => $dept->level4_label,
+                            //     'level4_deptid' => $dept->level4_deptid,
+                            //     'level4_key' => $dept->level4_key,
+                            //     'level5' => $dept->level5,
+                            //     'level5_label' => $dept->level5_label,
+                            //     'level5_deptid' => $dept->level5_deptid,
+                            //     'level5_key' => $dept->level5_key,
+                            //     'org_path' => $org_path,
+                            //     'date_deleted' => $dept->date_deleted,
+                            //     'date_updated' => $dept->date_updated,
+                            //     'exception' => $dept->exception,
+                            //     'exception_reason' => $dept->exception_reason,
+                            //     'unallocated' => $dept->unallocated,
+                            //     'duplicate' => $dept->duplicate
+                            // ];
+                            // $audit = new JobDataAudit;
+                            // $audit->job_sched_id = $audit_id;
+                            // $audit->old_values = json_encode($old_values);
+                            // $audit->new_values = json_encode($new_values);
+                            // $audit->save();
                         }
                     } else {
-                        $old_values = [ 
-                            'table' => 'ods_dept_org_hierarchy'
-                        ];
+                        // $old_values = [ 
+                        //     'table' => 'ods_dept_org_hierarchy'
+                        // ];
                         OrganizationHierarchy::create([
                             'orgid' => $dept->orgid,
                             'hlevel' => $dept->hlevel,
@@ -2536,52 +2536,52 @@ class GetODSDeptHierarchy extends Command
                             'duplicate' => $dept->duplicate,
                             'search_key' => "|{$dept->organization_key}|{$dept->level1_key}|{$dept->level2_key}|{$dept->level3_key}|{$dept->level4_key}|{$dept->level5_key}|"
                         ]);
-                        $new_values = [ 
-                            'table' => 'ods_dept_org_hierarchy',                        
-                            'orgid' => $dept->orgid, 
-                            'hlevel' => $dept->hlevel,
-                            'pkey' => $dept->pkey,
-                            'okey' => $dept->okey,
-                            'deptid' => $dept->deptid,
-                            'name' => $dept->name,
-                            'ulevel' => $dept->ulevel,
-                            'organization' => $dept->organization,
-                            'organization_label' => $dept->organization_label,
-                            'organization_deptid' => $dept->organization_deptid,
-                            'organization_key' => $dept->organization_key,
-                            'level1' => $dept->level1,
-                            'level1_label' => $dept->level1_label,
-                            'level1_deptid' => $dept->level1_deptid,
-                            'level1_key' => $dept->level1_key,
-                            'level2' => $dept->level2,
-                            'level2_label' => $dept->level2_label,
-                            'level2_deptid' => $dept->level2_deptid,
-                            'level2_key' => $dept->level2_key,
-                            'level3' => $dept->level3,
-                            'level3_label' => $dept->level3_label,
-                            'level3_deptid' => $dept->level3_deptid,
-                            'level3_key' => $dept->level3_key,
-                            'level4' => $dept->level4,
-                            'level4_label' => $dept->level4_label,
-                            'level4_deptid' => $dept->level4_deptid,
-                            'level4_key' => $dept->level4_key,
-                            'level5' => $dept->level5,
-                            'level5_label' => $dept->level5_label,
-                            'level5_deptid' => $dept->level5_deptid,
-                            'level5_key' => $dept->level5_key,
-                            'org_path' => $org_path,
-                            'date_deleted' => $dept->date_deleted,
-                            'date_updated' => $dept->date_updated,
-                            'exception' => $dept->exception,
-                            'exception_reason' => $dept->exception_reason,
-                            'unallocated' => $dept->unallocated,
-                            'duplicate' => $dept->duplicate
-                        ];
-                        $audit = new JobDataAudit;
-                        $audit->job_sched_id = $audit_id;
-                        $audit->old_values = json_encode($old_values);
-                        $audit->new_values = json_encode($new_values);
-                        $audit->save();
+                        // $new_values = [ 
+                        //     'table' => 'ods_dept_org_hierarchy',                        
+                        //     'orgid' => $dept->orgid, 
+                        //     'hlevel' => $dept->hlevel,
+                        //     'pkey' => $dept->pkey,
+                        //     'okey' => $dept->okey,
+                        //     'deptid' => $dept->deptid,
+                        //     'name' => $dept->name,
+                        //     'ulevel' => $dept->ulevel,
+                        //     'organization' => $dept->organization,
+                        //     'organization_label' => $dept->organization_label,
+                        //     'organization_deptid' => $dept->organization_deptid,
+                        //     'organization_key' => $dept->organization_key,
+                        //     'level1' => $dept->level1,
+                        //     'level1_label' => $dept->level1_label,
+                        //     'level1_deptid' => $dept->level1_deptid,
+                        //     'level1_key' => $dept->level1_key,
+                        //     'level2' => $dept->level2,
+                        //     'level2_label' => $dept->level2_label,
+                        //     'level2_deptid' => $dept->level2_deptid,
+                        //     'level2_key' => $dept->level2_key,
+                        //     'level3' => $dept->level3,
+                        //     'level3_label' => $dept->level3_label,
+                        //     'level3_deptid' => $dept->level3_deptid,
+                        //     'level3_key' => $dept->level3_key,
+                        //     'level4' => $dept->level4,
+                        //     'level4_label' => $dept->level4_label,
+                        //     'level4_deptid' => $dept->level4_deptid,
+                        //     'level4_key' => $dept->level4_key,
+                        //     'level5' => $dept->level5,
+                        //     'level5_label' => $dept->level5_label,
+                        //     'level5_deptid' => $dept->level5_deptid,
+                        //     'level5_key' => $dept->level5_key,
+                        //     'org_path' => $org_path,
+                        //     'date_deleted' => $dept->date_deleted,
+                        //     'date_updated' => $dept->date_updated,
+                        //     'exception' => $dept->exception,
+                        //     'exception_reason' => $dept->exception_reason,
+                        //     'unallocated' => $dept->unallocated,
+                        //     'duplicate' => $dept->duplicate
+                        // ];
+                        // $audit = new JobDataAudit;
+                        // $audit->job_sched_id = $audit_id;
+                        // $audit->old_values = json_encode($old_values);
+                        // $audit->new_values = json_encode($new_values);
+                        // $audit->save();
                     }
                 };
             }
@@ -2608,77 +2608,77 @@ class GetODSDeptHierarchy extends Command
 
     private function AssignToBlankLevel (&$dept, $parent) {
         if ($dept->level1) {
-            if ($dept->level1_label == $dept->name) {
-                $dept->duplicate = 1;
-                $dept->ulevel = 1;
-            } else {
+            // if ($dept->level1_label == $dept->name) {
+            //     $dept->duplicate = 1;
+            //     $dept->ulevel = 1;
+            // } else {
                 if ($dept->level2) {
-                    if ($dept->level2_label == $dept->name) {
-                        $dept->duplicate = 1;
-                        $dept->ulevel = 2;
-                    } else {
+                    // if ($dept->level2_label == $dept->name) {
+                    //     $dept->duplicate = 1;
+                    //     $dept->ulevel = 2;
+                    // } else {
                         if ($dept->level3) {
-                            if ($dept->level3_label == $dept->name) {
-                                $dept->duplicate = 1;
-                                $dept->ulevel = 3;
-                            } else {
+                            // if ($dept->level3_label == $dept->name) {
+                            //     $dept->duplicate = 1;
+                            //     $dept->ulevel = 3;
+                            // } else {
                                 if ($dept->level4) {
-                                    if ($dept->level4_label == $dept->name) {
-                                        $dept->duplicate = 1;
-                                        $dept->ulevel = 4;
-                                    } else {
+                                    // if ($dept->level4_label == $dept->name) {
+                                    //     $dept->duplicate = 1;
+                                    //     $dept->ulevel = 4;
+                                    // } else {
                                         if ($dept->level5) {
-                                            if ($dept->level5_label == $dept->name) {
-                                                $dept->duplicate = 1;
-                                                $dept->ulevel = 5;
-                                            } else {
+                                            // if ($dept->level5_label == $dept->name) {
+                                            //     $dept->duplicate = 1;
+                                            //     $dept->ulevel = 5;
+                                            // } else {
                                                 $dept->exception = 4;
                                                 $dept->exception_reason = 'Exceeded 5 levels';
-                                                $dept->duplicate = $parent->duplicate ?? 0;
+                                                // $dept->duplicate = $parent->duplicate ?? 0;
                                                 $dept->ulevel = 6;
-                                            }
+                                            // }
                                         } else {
                                             $dept->level5 = $dept->orgid;
                                             $dept->level5_label = $dept->name;
                                             $dept->level5_deptid = $dept->deptid;
                                             $dept->level5_key = $dept->okey;
-                                            $dept->duplicate = $parent->duplicate ?? 0;
+                                            // $dept->duplicate = $parent->duplicate ?? 0;
                                             $dept->ulevel = 5;
                                         }
-                                    }        
+                                    // }        
                                 } else {
                                     $dept->level4 = $dept->orgid;
                                     $dept->level4_label = $dept->name;
                                     $dept->level4_deptid = $dept->deptid;
                                     $dept->level4_key = $dept->okey;
-                                    $dept->duplicate = $parent->duplicate ?? 0;
+                                    // $dept->duplicate = $parent->duplicate ?? 0;
                                     $dept->ulevel = 4;
                                 }
-                            }
+                            // }
                         } else {
                             $dept->level3 = $dept->orgid;
                             $dept->level3_label = $dept->name;
                             $dept->level3_deptid = $dept->deptid;
                             $dept->level3_key = $dept->okey;
-                            $dept->duplicate = $parent->duplicate ?? 0;
+                            // $dept->duplicate = $parent->duplicate ?? 0;
                             $dept->ulevel = 3;
                         }
-                    }
+                    // }
                 } else {
                     $dept->level2 = $dept->orgid;
                     $dept->level2_label = $dept->name;
                     $dept->level2_deptid = $dept->deptid;
                     $dept->level2_key = $dept->okey;
-                    $dept->duplicate = $parent->duplicate ?? 0;
+                    // $dept->duplicate = $parent->duplicate ?? 0;
                     $dept->ulevel = 2;
                 }
-            }
+            // }
         } else {
             $dept->level1 = $dept->orgid;
             $dept->level1_label = $dept->name;
             $dept->level1_deptid = $dept->deptid;
             $dept->level1_key = $dept->okey;
-            $dept->duplicate = 0;
+            // $dept->duplicate = 0;
             $dept->ulevel = 1;
         }
     }

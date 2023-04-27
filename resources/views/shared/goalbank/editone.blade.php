@@ -329,18 +329,18 @@
                                     type: 'GET',
                                     data: $("#notify-form").serialize(),
                                     dataType: 'html',
-                                    // beforeSend: function() {
-                                    //     $("#tree-loading-spinner").show();                    
-                                    // },
+                                    beforeSend: function() {
+                                        $("#atree-loading-spinner").show();                    
+                                    },
                                     success: function (result) {
                                         $(target).html(''); 
                                         $(target).html(result);
 
                                         $('#nav-tree').attr('loaded','loaded');
                                     },
-                                    // complete: function() {
-                                    //     $(".tree-loading-spinner").hide();
-                                    // },
+                                    complete: function() {
+                                        $("#atree-loading-spinner").hide();
+                                    },
                                     error: function () {
                                         alert("error");
                                         $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
@@ -523,7 +523,7 @@
 								data: $("#notify-form").serialize(),
 								dataType: 'html',
 								beforeSend: function() {
-									$("#etree-loading-spinner").show();                    
+									$("#atree-loading-spinner").show();                    
 								},
 								success: function (result) {
 									$('#anav-tree').html(''); 
@@ -531,7 +531,7 @@
 									$('#anav-tree').attr('loaded','loaded');
 								},
 								complete: function() {
-									$("#etree-loading-spinner").hide();
+									$("#atree-loading-spinner").hide();
 								},
 								error: function () {
 									alert("error");
@@ -660,6 +660,11 @@
 				$(window).on('beforeunload', function(){
 					$('#pageLoader').show();
 				});
+
+				$(window).resize(function(){
+					location.reload();
+					return;
+				}); 
 
 			});
 			// Model -- Confirmation Box

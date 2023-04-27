@@ -65,7 +65,6 @@ class ConversationController extends Controller
         foreach($history_supervisors as $history_supervisor){
             $supervisor_ids[] = $history_supervisor->participant_id;
         }
-        Log::info('historic supervisors: '. print_r($supervisor_ids,true));
         
         //get historic team members
         $history_teams = DB::table('conversation_participants')
@@ -79,8 +78,7 @@ class ConversationController extends Controller
         foreach($history_teams as $history_team){
             $team_ids[] = $history_team->participant_id;
         }
-        
-        
+                
         //get current team members
         $team_query = "SELECT users.id as id FROM users 
                         where users.reporting_to = $authId
@@ -99,6 +97,8 @@ class ConversationController extends Controller
         }
                 
         $type = 'upcoming';
+        $sub = false;
+        
         if ($request->is('conversation/past') || $request->is('my-team/conversations/past')) {
             $sharedSupervisorIds = SharedProfile::where('shared_id', Auth::id())->with('sharedWithUser')->get()->pluck('shared_with')->toArray();
             array_push($sharedSupervisorIds, $supervisorId);
@@ -107,7 +107,6 @@ class ConversationController extends Controller
                     array_push($sharedSupervisorIds, $supervisor_id);
                 }
             }
-            Log::info('full supervisors: '. print_r($sharedSupervisorIds,true));
             
             $query->where(function($query) use ($authId, $supervisorId, $sharedSupervisorIds, $viewType) {
                 $query->where('user_id', $authId)->
@@ -176,9 +175,6 @@ class ConversationController extends Controller
             })
             ->WhereIn('supervisor_signoff_id', $sharedSupervisorIds);
             
-            Log::info(print_r($query->toSql(),true)); 
-            Log::info(print_r($query->getBindings(),true)); 
-            
              // With My Team
              if ($sharedSupervisorIds && $sharedSupervisorIds[0]) {
                 $myTeamQuery->where(function($query) use ($sharedSupervisorIds,$myCurrentTeam_array) {
@@ -191,7 +187,7 @@ class ConversationController extends Controller
             $myTeamQuery->where('signoff_user_id','<>', $authId);
             $type = 'past';
 
-            $conversations = $query->orderBy('id', 'DESC')->paginate(10);                       
+            $conversations = $query->orderBy('id', 'DESC')->paginate(10); 
             $myTeamConversations = $myTeamQuery->orderBy('id', 'DESC')->paginate(10);
         } else { // Upcoming
             //conversations with my supervisor
@@ -234,17 +230,32 @@ class ConversationController extends Controller
             if ($request->has('user_name') && $request->user_name) {
                 $emp_query .= " AND (empusers.name LIKE '%$request->user_name%' OR mgrusers.name LIKE '%$request->user_name%')"; 
             }
+            if ($request->has('team_members') && $request->team_members) {
+                $emp_query .= " AND emp_participants.participant_id = $request->team_members"; 
+            }
+            if ($request->has('employee_signed') && $request->employee_signed) {
+                $emp_query .= " AND conversations.signoff_user_id IS NOT NULL"; 
+            }
+            if ($request->has('supervisor_signed') && $request->supervisor_signed) {
+                $emp_query .= " AND conversations.supervisor_signoff_id IS NOT NULL";  
+            }
             $emp_query .= " ORDER BY conversations.id DESC";
             $myTeamConversations = DB::select($emp_query);
             
+            if ($request->has('sub') && $request->sub) {
+                $sub = true;
+            }
         }
         
         $supervisor_conversations = array();
         foreach ($conversations as $conversation) {
             array_push($supervisor_conversations, $conversation->id);
         }
-
-        $view = 'conversation.index';
+        
+        $view = 'conversation.upcoming';
+        if($type == 'past'){        
+            $view = 'conversation.past';
+        }
         $reportees = $user->reportees()->get();
         $topics = ConversationTopic::all();
         if ($type === 'past') {
@@ -255,9 +266,77 @@ class ConversationController extends Controller
           
         // redirect from DashboardController with the related id, then open modal box
         $open_modal_id = (session('open_modal_id'));
+        
+        $conversationList = ConversationTopic::all()->sortBy("name")->toArray();
+        array_unshift($conversationList, [
+            "id" => "0",
+            "name" => "Any"
+        ]);
+        
+        //get current team members
+        $team_query = "SELECT users.id, users.name FROM users where users.id IN (SELECT users.id as id FROM users 
+                        where users.reporting_to = $authId
+                        UNION
+                        select shared_profiles.shared_id as id FROM shared_profiles
+                        WHERE shared_with = $authId)";
+        $myCurrentTeam = DB::select($team_query);
+        $team_members = array();
+        $team_members[0]["id"] = '';
+        $team_members[0]["name"] = 'Any';
+        $i = 1;
+        foreach($myCurrentTeam as $item){
+            $team_members[$i]["id"] = $item->id;
+            $team_members[$i]["name"] = $item->name;
+            $i++;
+        }
+        
+        $myTeamConversations_arr = array();
+        $i = 0;
+        foreach($myTeamConversations as $item){
+            $myTeamConversations_arr[$i]['id'] = $item->id;
+            $myTeamConversations_arr[$i]['name'] = $item->name;
+            $myTeamConversations_arr[$i]['participants'] = $item->mgrname . ", " . $item->empname;
+            $myTeamConversations_arr[$i]['signoff_user_id'] = $item->signoff_user_id;
+            if($item->signoff_user_id != ''){
+                $myTeamConversations_arr[$i]['employee_signed'] = 'Yes';
+            } else {
+                $myTeamConversations_arr[$i]['employee_signed'] = 'No';
+            }
+            $myTeamConversations_arr[$i]['supervisor_signoff_id'] = $item->supervisor_signoff_id;
+            if($item->supervisor_signoff_id != ''){
+                $myTeamConversations_arr[$i]['supervisor_signed'] = 'Yes';
+            } else {
+                $myTeamConversations_arr[$i]['supervisor_signed'] = 'No';
+            }
+            $i++;
+        }
+        $json_myTeamConversations = json_encode($myTeamConversations_arr);   
+        
+        
+        $conversations_arr = array();
+        $i = 0;
+        foreach($conversations as $item){
+            $conversations_arr[$i]['id'] = $item->id;
+            $conversations_arr[$i]['name'] = $item->name;
+            $conversations_arr[$i]['participants'] = $item->mgrname . ", " . $item->empname;
+            $conversations_arr[$i]['signoff_user_id'] = $item->signoff_user_id;
+            if($item->signoff_user_id != ''){
+                $conversations_arr[$i]['employee_signed'] = 'Yes';
+            } else {
+                $conversations_arr[$i]['employee_signed'] = 'No';
+            }
+            $conversations_arr[$i]['supervisor_signoff_id'] = $item->supervisor_signoff_id;
+            if($item->supervisor_signoff_id != ''){
+                $conversations_arr[$i]['supervisor_signed'] = 'Yes';
+            } else {
+                $conversations_arr[$i]['supervisor_signed'] = 'No';
+            }
+            $i++;
+        }
+        $json_conversations = json_encode($conversations_arr); 
 
         return view($view, compact('type', 'conversations', 'myTeamConversations', 'conversationTopics', 'conversationMessage', 'viewType', 'reportees', 'topics', 'textAboveFilter', 'user', 
-                                    'supervisor_conversations', 'open_modal_id'));
+                                    'supervisor_conversations', 'open_modal_id', 'conversationList','team_members', 'sub', 'json_myTeamConversations', 'json_conversations'));
     }
 
     /**
@@ -278,7 +357,6 @@ class ConversationController extends Controller
      */
     public function store(ConversationRequest $request)
     {
-
         //DB::beginTransaction();
         $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
         $isDirectRequest = true;
@@ -478,6 +556,13 @@ class ConversationController extends Controller
                 //     'comment' => $conversation->user->name . ' would like to schedule a performance conversation with you.',
                 //     'related_id' => $conversation->id,
                 // ]);
+
+                // Send Out email when the conversation added
+                $user = User::where('id', $value)
+                                ->with('userPreference')
+                                ->first();
+
+                if ($user && $user->allow_inapp_notification) {                                
                 $notification = new \App\MicrosoftGraph\SendDashboardNotification();
                             $notification->user_id = $value;
                             $notification->notification_type = 'CA';
@@ -485,12 +570,7 @@ class ConversationController extends Controller
                             $notification->related_id = $conversation->id;
                 $notification->notify_user_id = $value;
                             $notification->send(); 
-
-
-                // Send Out email when the conversation added
-                $user = User::where('id', $value)
-                                ->with('userPreference')
-                                ->first();
+                }
 
                 if ($user && $user->allow_email_notification && $user->userPreference->conversation_setup_flag == 'Y') {                            
 
@@ -500,7 +580,7 @@ class ConversationController extends Controller
                     $sendMail = new \App\MicrosoftGraph\SendMail();
                     $sendMail->toRecipients = [ $value ];
                     $sendMail->sender_id = null;  // default sender is System
-                    $sendMail->useQueue = false;
+                    $sendMail->useQueue = true;
                     $sendMail->template = 'ADVICE_SCHEDULE_CONVERSATION';
                     array_push($sendMail->bindvariables, $user->name);
                     array_push($sendMail->bindvariables, $conversation->user->name );
@@ -518,6 +598,13 @@ class ConversationController extends Controller
                 //     'comment' => $conversation->user->name . ' would like to schedule a performance conversation with you.',
                 //     'related_id' => $conversation->id,
                 // ]);
+
+                // Send Out email when the conversation added
+                $user = User::where('id', $value)
+                                ->with('userPreference')
+                                ->first();
+
+                if ($user && $user->allow_inapp_notification) {
                 $notification = new \App\MicrosoftGraph\SendDashboardNotification();
                             $notification->user_id = $value;
                             $notification->notification_type = 'CA';
@@ -525,12 +612,7 @@ class ConversationController extends Controller
                             $notification->related_id = $conversation->id;
                 $notification->notify_user_id = $value;
                             $notification->send(); 
-
-
-                // Send Out email when the conversation added
-                $user = User::where('id', $value)
-                                ->with('userPreference')
-                                ->first();
+                }
 
                 if ($user && $user->allow_email_notification && $user->userPreference->conversation_setup_flag == 'Y') {                            
 
@@ -540,7 +622,7 @@ class ConversationController extends Controller
                     $sendMail = new \App\MicrosoftGraph\SendMail();
                     $sendMail->toRecipients = [ $value ];
                     $sendMail->sender_id = null;  // default sender is System
-                    $sendMail->useQueue = false;
+                    $sendMail->useQueue = true;
                     $sendMail->template = 'ADVICE_SCHEDULE_CONVERSATION';
                     array_push($sendMail->bindvariables, $user->name);
                     array_push($sendMail->bindvariables, $conversation->user->name );
@@ -773,7 +855,6 @@ class ConversationController extends Controller
                 $conversation->team_member_agreement = 1;
                 
                 if ($signoff_user && $signoff_user->reporting_to ) {
-                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
                     
                     
                     $conversation_participants = DB::table('conversation_participants')                        
@@ -781,6 +862,14 @@ class ConversationController extends Controller
                             ->where('participant_id', '<>', $authId)
                             ->first();
                     //error_log(print_r($conversation_participants->participant_id,true));
+
+                    $user = User::where('id', $conversation_participants->participant_id)
+                                ->with('userPreference')
+                                ->select('id','name','guid', 'employee_id')
+                                ->first();
+
+                    if ($user && $user->allow_inapp_notification) {                                
+                        $notification = new \App\MicrosoftGraph\SendDashboardNotification();
                     $notification->user_id = $conversation_participants->participant_id;
                     
                     $notification->notification_type = 'CS';
@@ -788,12 +877,9 @@ class ConversationController extends Controller
                     $notification->related_id = $conversation->id;
                     $notification->notify_user_id =  $signoff_user->reporting_to;
                     $notification->send(); 
+                    }
 
                      // Send a email notification to the participants when someone sign the conversation
-                    $user = User::where('id', $conversation_participants->participant_id)
-                                ->with('userPreference')
-                                ->select('id','name','guid')
-                                ->first();
                     //error_log(print_r($user,true));
                     error_log(print_r($conversation->conversation_topic_id,true));
                     if ($user && $user->allow_email_notification && $user->userPreference->conversation_disagree_flag == 'Y') {     
@@ -801,7 +887,7 @@ class ConversationController extends Controller
                         $sendMail = new \App\MicrosoftGraph\SendMail();
                         $sendMail->toRecipients = [ $user->id ];
                         $sendMail->sender_id = null;  // default sender is System
-                        $sendMail->useQueue = false;
+                        $sendMail->useQueue = true;
                         $sendMail->template = 'CONVERSATION_DISAGREED';
                         array_push($sendMail->bindvariables, $user->name);
                         array_push($sendMail->bindvariables, $signoff_user->name );   //Person who signed the conversation 
@@ -874,28 +960,30 @@ class ConversationController extends Controller
             //     'related_id' => $conversation->id,
             // ]);
             // Use Class to create DashboardNotification
-			$notification = new \App\MicrosoftGraph\SendDashboardNotification();
-			$notification->user_id = $value;
-			$notification->notification_type = 'CS';
-			$notification->comment = $current_user->name . ' signed your performance conversation.';
-			$notification->related_id = $conversation->id;
-            $notification->notify_user_id = $value;
-			$notification->send(); 
 
+            $user = User::where('id', $value)
+                        ->with('userPreference')
+                        ->select('id','name','guid', 'employee_id')
+                        ->first();
+
+            if ($user && $user->allow_inapp_notification) {                        
+                $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                $notification->user_id = $value;
+                $notification->notification_type = 'CS';
+                $notification->comment = $current_user->name . ' signed your performance conversation.';
+                $notification->related_id = $conversation->id;
+                $notification->notify_user_id = $value;
+                $notification->send(); 
+            }
 
             // Send a email notification to the participants when someone sign the conversation
-            $user = User::where('id', $value)
-                    ->with('userPreference')
-                    ->select('id','name','guid')
-                    ->first();
-
             if ($user && $user->allow_email_notification && $user->userPreference->conversation_signoff_flag == 'Y') {                            
     
                 $topic = ConversationTopic::find($request->conversation_topic_id);
                 $sendMail = new \App\MicrosoftGraph\SendMail();
                 $sendMail->toRecipients = [ $value ];
                 $sendMail->sender_id = null;  // default sender is System
-                $sendMail->useQueue = false;
+                $sendMail->useQueue = true;
                 $sendMail->template = 'CONVERSATION_SIGN_OFF';
                 array_push($sendMail->bindvariables, $user->name);
                 array_push($sendMail->bindvariables, $current_user->name );   //Person who signed the conversation 
@@ -995,5 +1083,4 @@ class ConversationController extends Controller
         return view('conversation.partials.template-detail-modal-body', compact('template','allTemplates','participants','reportingManager'));
     }
     
-
 }

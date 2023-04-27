@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AlterHrUserDemoJrView8 extends Migration
+class AlterHrUserDemoJrView13 extends Migration
 {
     /**
      * Run the migrations.
@@ -14,12 +14,10 @@ class AlterHrUserDemoJrView8 extends Migration
     public function up()
     {
 
-        DB::statement('DROP VIEW IF EXISTS hr_user_demo_jr_view');
-        
         \DB::statement("
-            CREATE VIEW hr_user_demo_jr_view
+            ALTER VIEW hr_user_demo_jr_view
             AS
-            SELECT DISTINCT
+            SELECT 
                 au.auth_id,
                 u.id AS user_id,
                 u.name AS user_name,
@@ -98,6 +96,7 @@ class AlterHrUserDemoJrView8 extends Migration
 					AS au
 				INNER JOIN users 
 					AS u 
+					USE INDEX (idx_users_id)
 					ON u.id = au.user_id
 				INNER JOIN employee_demo 
 					AS d 
@@ -105,7 +104,6 @@ class AlterHrUserDemoJrView8 extends Migration
                     ON d.employee_id = u.employee_id
 				INNER JOIN users_annex 
 					AS ua 
-					USE INDEX (idx_users_annex_userid_orgid)
                     ON ua.user_id = u.id AND ua.orgid = d.orgid
         ");
     }

@@ -313,6 +313,7 @@ class NotificationController extends Controller
         $sendMail = new \App\MicrosoftGraph\SendMail();
         $sendMail->toRecipients = $toRecipients->toArray();
         $sendMail->sender_id = $request->sender_id;
+        $sendMail->useQueue = true;
         $sendMail->subject = $request->subject;
         $sendMail->body = $request->body;
         $sendMail->alertFormat = $request->alert_format;

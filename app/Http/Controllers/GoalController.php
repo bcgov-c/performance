@@ -453,43 +453,22 @@ class GoalController extends Controller
         $tags_input = $request->tag_ids;  
 
         $adminGoals = Goal::withoutGlobalScopes()
-        ->join('goal_bank_orgs', 'goals.id', '=', 'goal_bank_orgs.goal_id')
-        ->join('employee_demo_tree AS gt', 'gt.id', 'goal_bank_orgs.orgid')
-        ->join('employee_demo', 'employee_demo.deptid', 'gt.deptid')
-        ->join('users', 'users.employee_id', '=', 'employee_demo.employee_id')
-        ->leftjoin('users as u2', 'u2.id', '=', 'goals.created_by')
-        ->where('users.id', '=', Auth::id())
-        ->whereIn('goals.by_admin', [1, 2])
-        ->where('goal_bank_orgs.version', 2)
-        ->where('goal_bank_orgs.inherited', 0)
-        ->where('is_library', true)
-        ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
-        ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
-        ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')   
-        ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'))
-        ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.name', 'goals.is_mandatory');
-        $adminGoalsInherited = Goal::withoutGlobalScopes()
-        ->join('goal_bank_orgs', 'goals.id', '=', 'goal_bank_orgs.goal_id')
-        ->join('employee_demo_tree AS gt', 'gt.id', 'goal_bank_orgs.orgid')
-        ->where('goal_bank_orgs.version', 2)
-        ->where('goal_bank_orgs.inherited', 1)
-        ->leftjoin('users as u2', 'u2.id', '=', 'goals.created_by')
-        ->whereIn('goals.by_admin', [1, 2])
-        ->where('is_library', true)
-        ->where(function($where) use($authId) {
-            return $where->whereRaw("EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud0 WHERE ud0.user_id = {$authId} AND gt.level = 0 AND ud0.organization_key = gt.organization_key)")
-                       ->orWhereRaw("EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud1 WHERE ud1.user_id = {$authId} AND gt.level = 0 AND ud1.organization_key = gt.organization_key AND ud1.level1_key = gt.level1_key)")
-                       ->orWhereRaw("EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud2 WHERE ud2.user_id = {$authId} AND gt.level = 0 AND ud2.organization_key = gt.organization_key AND ud2.level1_key = gt.level1_key AND ud2.level2_key = gt.level2_key)")
-                       ->orWhereRaw("EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud3 WHERE ud3.user_id = {$authId} AND gt.level = 0 AND ud3.organization_key = gt.organization_key AND ud3.level1_key = gt.level1_key AND ud3.level2_key = gt.level2_key AND ud3.level3_key = gt.level3_key)")
-                       ->orWhereRaw("EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud4 WHERE ud4.user_id = {$authId} AND gt.level = 0 AND ud4.organization_key = gt.organization_key AND ud4.level1_key = gt.level1_key AND ud4.level2_key = gt.level2_key AND ud4.level3_key = gt.level3_key AND ud4.level4_key = gt.level4_key)");
-        })
-        ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
-        ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
-        ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')  
-        ->distinct() 
-        ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'))
-        ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.name', 'goals.is_mandatory');
-        $adminGoals = $adminGoals->union($adminGoalsInherited);
+            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator ', ') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
+            ->join('goal_bank_orgs', function ($qon) {
+                return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
+                    ->on('goal_bank_orgs.version', \DB::raw(2))
+                    ->on('goal_bank_orgs.inherited', \DB::raw(0));
+            })
+            ->join('employee_demo', 'employee_demo.orgid', 'goal_bank_orgs.orgid')
+            ->join('users', function ($qon) use ($authId) {
+                return $qon->on('users.employee_id', 'employee_demo.employee_id')
+                    ->on('users.id', \DB::raw($authId));
+            })
+            ->leftjoin('users as u2', 'u2.id', 'goals.created_by')
+            ->leftjoin('goal_types', 'goal_types.id', 'goals.goal_type_id')   
+            ->whereIn('goals.by_admin', [1, 2])
+            ->where('goals.is_library', true)
+            ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.name', 'goals.is_mandatory');
         // Admin List filter below
         if ($request->has('is_mandatory') && $request->is_mandatory !== null) {
             if ($request->is_mandatory == "1") {
@@ -508,7 +487,8 @@ class GoalController extends Controller
             });
         }
         if ($request->has('tag_id') && $request->tag_id) {
-            $adminGoals = $adminGoals->where('goal_tags.tag_id', "=", "$request->tag_id");
+            // $adminGoals = $adminGoals->where('goal_tags.tag_id', "=", "$request->tag_id");
+            $adminGoals = $adminGoals->whereRaw("EXISTS (SELECT 1 FROM goal_tags WHERE goal_tags.goal_id = goals.id AND goal_tags.tag_id = '{$request->tag_id}')");
         }
         if ($request->has('title') && $request->title) {
             $adminGoals = $adminGoals->where('goals.title', "LIKE", "%$request->title%");
@@ -526,6 +506,70 @@ class GoalController extends Controller
             // $query = $query->where('user_id', $request->created_by);
             $adminGoals = $adminGoals->where('created_by', $request->created_by);
         }
+
+        $adminGoalsInherited = Goal::withoutGlobalScopes()
+            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator ', ') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
+            ->join('goal_bank_orgs', function ($qon) {
+                return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
+                    ->on('goal_bank_orgs.version', \DB::raw(2))
+                    ->on('goal_bank_orgs.inherited', \DB::raw(1));
+            })
+            ->join('employee_demo_tree', 'employee_demo_tree.id', 'goal_bank_orgs.orgid')
+            ->leftjoin('users as u2', 'u2.id', 'goals.created_by')
+            ->leftjoin('goal_types', 'goal_types.id', 'goals.goal_type_id')   
+            ->whereIn('goals.by_admin', [1, 2])
+            ->where('goals.is_library', true)
+            ->where(function ($where) use ($authId) {
+                return $where->whereRaw("
+                        (
+                            EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud0 WHERE ud0.user_id = {$authId} AND employee_demo_tree.level = 0 AND ud0.organization_key = employee_demo_tree.organization_key)
+                            OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud1 WHERE ud1.user_id = {$authId} AND employee_demo_tree.level = 1 AND ud1.organization_key = employee_demo_tree.organization_key AND ud1.level1_key = employee_demo_tree.level1_key)
+                            OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud2 WHERE ud2.user_id = {$authId} AND employee_demo_tree.level = 2 AND ud2.organization_key = employee_demo_tree.organization_key AND ud2.level1_key = employee_demo_tree.level1_key AND ud2.level2_key = employee_demo_tree.level2_key)
+                            OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud3 WHERE ud3.user_id = {$authId} AND employee_demo_tree.level = 3 AND ud3.organization_key = employee_demo_tree.organization_key AND ud3.level1_key = employee_demo_tree.level1_key AND ud3.level2_key = employee_demo_tree.level2_key AND ud3.level3_key = employee_demo_tree.level3_key)
+                            OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud4 WHERE ud4.user_id = {$authId} AND employee_demo_tree.level = 4 AND ud4.organization_key = employee_demo_tree.organization_key AND ud4.level1_key = employee_demo_tree.level1_key AND ud4.level2_key = employee_demo_tree.level2_key AND ud4.level3_key = employee_demo_tree.level3_key AND ud4.level4_key = employee_demo_tree.level4_key)
+                        )
+                    ");
+            })
+        ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.name', 'goals.is_mandatory');
+        // Admin List filter below
+        if ($request->has('is_mandatory') && $request->is_mandatory !== null) {
+            if ($request->is_mandatory == "1") {
+                $adminGoalsInherited = $adminGoalsInherited->where('is_mandatory', $request->is_mandatory);
+            }
+            else {
+                $adminGoalsInherited = $adminGoalsInherited->where(function ($adminGoals1) {
+                    $adminGoals1->whereNull('is_mandatory');
+                    $adminGoals1->orWhere('is_mandatory', 0);
+                });
+            }
+        }
+        if ($request->has('goal_type') && $request->goal_type) {
+            $adminGoalsInherited = $adminGoalsInherited->whereHas('goalType', function($adminGoals1) use ($request) {
+                return $adminGoals1->where('goal_type_id', $request->goal_type);
+            });
+        }
+        if ($request->has('tag_id') && $request->tag_id) {
+            // $adminGoalsInherited = $adminGoalsInherited->where('goal_tags.tag_id', "=", "$request->tag_id");
+            $adminGoalsInherited = $adminGoalsInherited->whereRaw("EXISTS (SELECT 1 FROM goal_tags WHERE goal_tags.goal_id = goals.id AND goal_tags.tag_id = '{$request->tag_id}')");
+        }
+        if ($request->has('title') && $request->title) {
+            $adminGoalsInherited = $adminGoalsInherited->where('goals.title', "LIKE", "%$request->title%");
+        }
+        if ($request->has('date_added') && $request->date_added && Str::lower($request->date_added) !== 'any') {
+            $dateRange = explode("-",$request->date_added);
+            $dateRange[0] = trim($dateRange[0]);
+            $dateRange[1] = trim($dateRange[1]);
+            $startDate = Carbon::createFromFormat('M d, Y', $dateRange[0]);
+            $endDate = Carbon::createFromFormat('M d, Y', $dateRange[1]);
+            $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '>=', $startDate);
+            $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '<=', $endDate);
+        }
+        if ($request->has('created_by') && $request->created_by) {
+            // $query = $query->where('user_id', $request->created_by);
+            $adminGoalsInherited = $adminGoalsInherited->where('created_by', $request->created_by);
+        }
+
+        // $adminGoals = $adminGoals->union($adminGoalsInherited);
 
         $query = Goal::withoutGlobalScope(NonLibraryScope::class)
         ->where('is_library', true)
@@ -586,7 +630,7 @@ class GoalController extends Controller
         // $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goalTypes, $tagsList);
         // $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','users.name as username',DB::raw('group_concat(distinct tags.name) as tagnames'));
         $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'));
-        $query = $query->union($adminGoals);
+        $query = $query->union($adminGoals)->union($adminGoalsInherited);
         
         if (!$request->has('sortorder') || $request->sortorder == '') {
             $sortorder = 'DESC';
@@ -894,20 +938,23 @@ class GoalController extends Controller
                     // $newNotify->related_id = $goal->id;
                     // $newNotify->save();
                     // Use Class to create DashboardNotification
-                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                    $notification->user_id = Auth::id();
-                    $notification->notification_type = 'GR';
-                    $notification->comment = $user->name . ' replied to your Goal comment.';
-                    $notification->related_id = $goal->id;
-                    $notification->notify_user_id = Auth::id();
-                    $notification->send(); 
+
+                    if ($user && $user->allow_inapp_notification) {
+                        $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                        $notification->user_id = Auth::id();
+                        $notification->notification_type = 'GR';
+                        $notification->comment = $user->name . ' replied to your Goal comment.';
+                        $notification->related_id = $goal->id;
+                        $notification->notify_user_id = Auth::id();
+                        $notification->send(); 
+                    }
 
                     // Send Out email notification
                     if ($user && $user->allow_email_notification && $user->userPreference->goal_comment_flag == 'Y') {
                         $sendMail = new SendMail();
                         $sendMail->toRecipients = array( $goal->user_id );  
                         $sendMail->sender_id = null;
-                        $sendMail->useQueue = false;
+                        $sendMail->useQueue = true;
                         $sendMail->saveToLog = true;
                         $sendMail->alert_type = 'N';
                         $sendMail->alert_format = 'E';
@@ -936,13 +983,16 @@ class GoalController extends Controller
                     // $newNotify->related_id = $goal->id;
                     // $newNotify->save();
                     // Use Class to create DashboardNotification
-                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                    $notification->user_id = Auth::id();
-                    $notification->notification_type = 'GC';
-                    $notification->comment =  $comment->user->name . ' added a comment to your goal.';
-                    $notification->related_id = $goal->id;
-                    $notification->notify_user_id = Auth::id();
-                    $notification->send(); 
+
+                    if ($user && $user->allow_inapp_notification) {
+                        $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                        $notification->user_id = Auth::id();
+                        $notification->notification_type = 'GC';
+                        $notification->comment =  $comment->user->name . ' added a comment to your goal.';
+                        $notification->related_id = $goal->id;
+                        $notification->notify_user_id = Auth::id();
+                        $notification->send(); 
+                    }
 
                     // Send Out Email Notification to Employee when his supervisor comment his goal
                     if ($user && $user->allow_email_notification && $user->userPreference->goal_comment_flag == 'Y') {
@@ -950,7 +1000,7 @@ class GoalController extends Controller
                         $sendMail = new SendMail();
                         $sendMail->toRecipients = array( $goal->user_id );  
                         $sendMail->sender_id = null;
-                        $sendMail->useQueue = false;
+                        $sendMail->useQueue = true;
                         $sendMail->saveToLog = true;
                         $sendMail->alert_type = 'N';
                         $sendMail->alert_format = 'E';
@@ -975,13 +1025,16 @@ class GoalController extends Controller
                 // $newNotify->related_id = $goal->id;
                 // $newNotify->save();
                 // Use Class to create DashboardNotification
-                $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                $notification->user_id = $curr_user->reporting_to;
-                $notification->notification_type = 'GC';
-                $notification->comment = $curr_user->name . ' added a comment to your goal.';
-                $notification->related_id = $goal->id;
-                $notification->notify_user_id = Auth::id();
-                $notification->send(); 
+
+                if ($curr_user->reportingManager && $curr_user->reportingManager->allow_inapp_notification) {
+                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                    $notification->user_id = $curr_user->reporting_to;
+                    $notification->notification_type = 'GC';
+                    $notification->comment = $curr_user->name . ' added a comment to your goal.';
+                    $notification->related_id = $goal->id;
+                    $notification->notify_user_id = Auth::id();
+                    $notification->send(); 
+                }
 
                 // Send Out Email Notification to Supervisor when Employee comments his supervisor's goal
                 if ($curr_user->reportingManager && 
@@ -991,7 +1044,7 @@ class GoalController extends Controller
                 $sendMail = new SendMail();
                 $sendMail->toRecipients = array( $curr_user->reporting_to );  
                 $sendMail->sender_id = null;
-                $sendMail->useQueue = false;
+                $sendMail->useQueue = true;
                     $sendMail->saveToLog = true;
                     $sendMail->alert_type = 'N';
                     $sendMail->alert_format = 'E';

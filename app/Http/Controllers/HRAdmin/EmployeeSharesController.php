@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\ConversationParticipant;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
 
 
 class EmployeeSharesController extends Controller {
@@ -185,25 +186,30 @@ class EmployeeSharesController extends Controller {
                             'shared_by' => $current_user->id
                         ]
                     );
-                    // Use Class to create DashboardNotification
-                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                    $notification->user_id = $result->shared_id;
-                    $notification->notification_type = 'SP';
-                    $notification->comment = 'Your profile has been shared with ' . $result->sharedWith->name;
-                    $notification->related_id = $result->id;
-                    $notification->notify_user_id = $result->shared_id;
-                    $notification->send(); 
-                    // Send email to person who their profile was shared 
+
                     $user = User::where('id', $result->shared_id)
-                        ->with('userPreference')
-                        ->select('id', 'name', 'guid')
-                        ->first();
+                                    ->with('userPreference')
+                                    ->select('id', 'name', 'guid', 'employee_id')
+                                    ->first();
+
+                    // Use Class to create DashboardNotification
+                    if ($user && $user->allow_inapp_notification) {                                                        
+                        $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                        $notification->user_id = $result->shared_id;
+                        $notification->notification_type = 'SP';
+                        $notification->comment = 'Your profile has been shared with ' . $result->sharedWith->name;
+                        $notification->related_id = $result->id;
+                        $notification->notify_user_id = $result->shared_id;
+                        $notification->send(); 
+                    }
+
+                    // Send email to person who their profile was shared 
                     if ($user && $user->allow_email_notification && $user->userPreference->share_profile_flag == 'Y') {
                         // Send Out Email Notification to Employee
                         $sendMail = new \App\MicrosoftGraph\SendMail();
                         $sendMail->toRecipients = [ $user->id ];  
                         $sendMail->sender_id = null; 
-                        $sendMail->useQueue = false;
+                        $sendMail->useQueue = true;
                         $sendMail->saveToLog = true;
                         $sendMail->alert_type = 'N';
                         $sendMail->alert_format = 'E';
@@ -450,11 +456,6 @@ class EmployeeSharesController extends Controller {
                         return $u2where->whereRaw('u2.user_id = sp.shared_with AND u2.date_deleted IS NULL');
                     });
                 })
-                // ->leftjoin('user_demo_jr_view AS cc', function($ccon) {
-                //     return $ccon->on(function($ccwhere) {
-                //         return $ccwhere->whereRaw('cc.user_id = sp.shared_by AND cc.date_deleted IS NULL');
-                //     });
-                // })
                 ->leftjoin('users as u3', 'u3.id', 'sp.shared_by')
                 ->leftjoin('employee_demo as cc', 'cc.employee_id', 'u3.employee_id' )
                 ->where('u.auth_id', \DB::raw($authId))
@@ -489,42 +490,24 @@ class EmployeeSharesController extends Controller {
                         ->orWhereRaw("u.jobcode_desc LIKE '%{$request->search_text}%'")
                         ->orWhereRaw("u.deptid LIKE '%{$request->search_text}%'");
                 })
-                ->distinct()
-                ->selectRaw("
-                    u.employee_id,
-                    u.employee_name, 
-                    '' as delegate_ee_id,
-                    '' as delegate_ee_name,
-                    '' as alternate_delegate_name,
-                    sp.shared_item,
-                    u.jobcode_desc,
-                    u.organization,
-                    u.level1_program,
-                    u.level2_division,
-                    u.level3_branch,
-                    u.level4,
-                    u.deptid,
-                    cc.employee_name as created_name,
-                    sp.created_at,
-                    sp.updated_at,
-                    sp.id as shared_profile_id"
-
-
-                    // // 'u2.employee_id as delegate_ee_id',
-                    // // 'u2.employee_name as delegate_ee_name',
-                    // // 'u2.employee_name as alternate_delegate_name',
-                    // 'sp.shared_item',
-                    // 'u.jobcode_desc',
-                    // 'u.organization',
-                    // 'u.level1_program',
-                    // 'u.level2_division',
-                    // 'u.level3_branch',
-                    // 'u.level4',
-                    // 'u.deptid',
-                    // 'cc.employee_name as created_name',
-                    // 'sp.created_at',
-                    // 'sp.updated_at',
-                    // 'sp.id as shared_profile_id',
+                ->select (
+                    'u.employee_id',
+                    'u.employee_name', 
+                    'u2.employee_id as delegate_ee_id',
+                    'u2.employee_name as delegate_ee_name',
+                    'u2.employee_name as alternate_delegate_name',
+                    'sp.shared_item',
+                    'u.jobcode_desc',
+                    'u.organization',
+                    'u.level1_program',
+                    'u.level2_division',
+                    'u.level3_branch',
+                    'u.level4',
+                    'u.deptid',
+                    'cc.employee_name as created_name',
+                    'sp.created_at',
+                    'sp.updated_at',
+                    'sp.id as shared_profile_id',
                 );
             return Datatables::of($query)
                 ->addIndexColumn()

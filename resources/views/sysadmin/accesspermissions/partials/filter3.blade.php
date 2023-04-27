@@ -373,13 +373,8 @@
             $('#dd_level2').val(null).trigger('change');
             $('#dd_level3').val(null).trigger('change');
             $('#dd_level4').val(null).trigger('change');
-            // $('#btn_search').click();
         });
 
-        $('#btn_search').click(function(e) {
-            e.preventDefault();
-            $('#filtertable').DataTable().ajax.reload();
-        });
 
 
 
