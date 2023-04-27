@@ -255,14 +255,13 @@ class AccessPermissionsController extends Controller
     }
 
     public function getEmployees(Request $request,  $id) {
-        list($sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4) = 
-            $this->baseFilteredSQLs($request, "");
-        $rows = $sql_level4->where('o.id', $id)
-            ->union( $sql_level3->where('o.id', $id) )
-            ->union( $sql_level2->where('o.id', $id) )
-            ->union( $sql_level1->where('o.id', $id) )
-            ->union( $sql_level0->where('o.id', $id) );
-        $employees = $rows->get();
+        $employees = \DB::select("
+                SELECT employee_id, employee_name, employee_email, jobcode_desc
+                FROM employee_demo USE INDEX (idx_employee_demo_orgid_employeeid_emplrecord) 
+                WHERE orgid = {$id}
+                    AND date_deleted IS NULL
+                ORDER BY employee_name
+            ");
         $parent_id = $id;
         return view('sysadmin.accesspermissions.partials.employee', compact('parent_id', 'employees') ); 
     }

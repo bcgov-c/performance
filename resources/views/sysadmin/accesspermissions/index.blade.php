@@ -224,7 +224,7 @@
                                         $('#nav-tree').attr('loaded','loaded');
                                     },
                                     complete: function() {
-                                        $(".tree-loading-spinner").hide();
+                                        $("#tree-loading-spinner").hide();
                                     },
                                     error: function () {
                                         alert("error");

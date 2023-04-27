@@ -394,7 +394,7 @@
                     dataType: 'html',
                     beforeSend: function() {
                         //$('#pageLoader').show();  
-                        $(".loading-spinner").show();                    
+                        $("#tree-loading-spinner").show();                    
                     },
                     success: function (result) {
                         $(target).html(''); 
@@ -410,7 +410,7 @@
                     },
                     complete: function() {
                         //$('#pageLoader').hide();  
-                        $(".loading-spinner").hide();
+                        $("#tree-loading-spinner").hide();
                     },
                     error: function () {
                         alert("error");
