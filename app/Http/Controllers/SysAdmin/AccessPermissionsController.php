@@ -133,7 +133,14 @@ class AccessPermissionsController extends Controller
             ->union( $treeorgs3->groupBy('treeid')->select('level3_key as treeid') )
             ->union( $treeorgs4->groupBy('treeid')->select('level4_key as treeid') )
             ->pluck('treeid'); 
-        $eorgs = EmployeeDemoTree::whereIn('id', $rows->toArray() )->get()->toTree();
+        $eorgs = EmployeeDemoTree::whereIn('id', $rows->toArray())
+            ->orderBy('organization')
+            ->orderBy('level1_program')
+            ->orderBy('level2_division')
+            ->orderBy('level3_branch')
+            ->orderBy('level4')
+            ->get()
+            ->toTree();
         $eempIdsByOrgId = [];
         $eempIdsByOrgId = $rows->groupBy('orgid')->all();
         if($request->ajax()) { return view('sysadmin.accesspermissions.partials.recipient-tree2', compact('eorgs', 'eempIdsByOrgId')); } 

@@ -55,9 +55,9 @@ class BuildEmployeeDemoTree extends Command
         $status = (($switch == 'on' || $manualoverride) ? 'Initiated' : 'Disabled');
         $audit_id = JobSchedAudit::insertGetId(
             [
-            'job_name' => $job_name,
-            'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
-            'status' => $status
+                'job_name' => $job_name,
+                'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
+                'status' => $status
             ]
         );
 
@@ -71,11 +71,11 @@ class BuildEmployeeDemoTree extends Command
             do {
                 $this->info(Carbon::now()->format('c')." - Processing Level {$level}...");
                 $allDepts = OrganizationHierarchy::distinct()
-                ->select("odoh.*")
-                ->selectRaw("(SELECT COUNT(e.employee_id) FROM employee_demo AS e WHERE e.deptid = odoh.deptid AND e.date_deleted IS NULL) AS headcount")
-                ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM employee_demo AS d WHERE d.deptid = ods_dept_org_hierarchy.deptid)")
-                ->orderBy("odoh.name")
-                ->orderBy("odoh.okey");
+                    ->select("odoh.*")
+                    ->selectRaw("(SELECT COUNT(e.employee_id) FROM employee_demo AS e WHERE e.deptid = odoh.deptid AND e.date_deleted IS NULL) AS headcount")
+                    ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM employee_demo AS d WHERE d.deptid = ods_dept_org_hierarchy.deptid)")
+                    ->orderBy("odoh.name")
+                    ->orderBy("odoh.okey");
                 switch ($level) {
                     case 0:
                         $allDepts = $allDepts->join("ods_dept_org_hierarchy AS odoh", "odoh.okey", "ods_dept_org_hierarchy.organization_key");
@@ -138,8 +138,7 @@ class BuildEmployeeDemoTree extends Command
                                 $node->saveAsRoot(); 
                                 break;
                             case 1:
-                                $field = "organization_key";
-                                $node->parent_id = $dept->{$field};     
+                                $node->parent_id = $dept->organization_key;     
                                 $node->save();
                                 break;              
                             case 2:
@@ -148,7 +147,9 @@ class BuildEmployeeDemoTree extends Command
                             case 5:
                                 $level2 = $level - 1;
                                 $field = "level{$level2}_key";
-                                $node->parent_id = $dept->{$field};     
+                                if ($dept->okey != $dept->{$field}) {
+                                    $node->parent_id = $dept->{$field};     
+                                }
                                 $node->save();
                                 break;              
                             default:
@@ -159,6 +160,7 @@ class BuildEmployeeDemoTree extends Command
                     } else {
                         $node->name = $dept->name;
                         $node->deptid = $dept->deptid;
+                        $node->level = $dept->ulevel;
                         $node->headcount = $dept->headcount;
                         $node->groupcount = $groupcount;
                         $node->organization = $dept->organization_label;
@@ -173,6 +175,26 @@ class BuildEmployeeDemoTree extends Command
                         $node->level3_deptid = $dept->level3_deptid;
                         $node->level4_deptid = $dept->level4_deptid;
                         $node->level5_deptid = $dept->level5_deptid;
+                        switch ($level) {
+                            case 0:
+                                $node->parent_id = null;     
+                                break;
+                            case 1:
+                                $node->parent_id = $dept->organization_key;     
+                                break;              
+                            case 2:
+                            case 3:
+                            case 4:
+                            case 5:
+                                $level2 = $level - 1;
+                                $field = "level{$level2}_key";
+                                if ($dept->okey != $dept->{$field}) {
+                                    $node->parent_id = $dept->{$field};     
+                                }
+                                break;              
+                            default:
+                                break;
+                        }
                         $node->save();
                         $this->info(Carbon::now()->format('c')." -   updated {$level} - {$dept->okey} - {$dept->name}");
                         $count_update++;
@@ -185,32 +207,32 @@ class BuildEmployeeDemoTree extends Command
             // Update OrgId in employee_demo table
             $this->info(Carbon::now()->format('c').' - Updating Org Ids in employee_demo...');
             EmployeeDemo::whereRaw("deptid IS NULL OR TRIM(deptid) = ''")
-            ->update(['orgid' => null]);
+                ->update(['orgid' => null]);
             $demoDepts = EmployeeDemo::distinct()
-            ->whereNotNull('deptid')
-            ->select('deptid')
-            ->orderBy('deptid')
-            ->get();
+                ->whereNotNull('deptid')
+                ->select('deptid')
+                ->orderBy('deptid')
+                ->get();
             foreach($demoDepts as $dept){
-            $org = EmployeeDemoTree::where('deptid', $dept->deptid)
-                ->select('id')
-                ->first();
-            EmployeeDemo::where('deptid', $dept->deptid)
-                ->update(['orgid' => $org ? $org->id : null]);
+                $org = EmployeeDemoTree::where('deptid', $dept->deptid)
+                    ->select('id')
+                    ->first();
+                EmployeeDemo::where('deptid', $dept->deptid)
+                    ->update(['orgid' => $org ? $org->id : null]);
             }
             $this->info(Carbon::now()->format('c').' - Org Ids updated in employee_demo.');
 
             $end_time = Carbon::now()->format('c');
             DB::table('job_sched_audit')->updateOrInsert(
-              [
-                'id' => $audit_id
-              ],
-              [
-                'job_name' => $job_name,
-                'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
-                'end_time' => date('Y-m-d H:i:s', strtotime($end_time)),
-                'status' => 'Completed',
-                'details' => 'Processed '.$total.' rows. Inserted '.$count_insert.' rows. Updated '.$count_update.' rows. Deleted '.$count_delete.' rows. ',
+                [
+                    'id' => $audit_id
+                ],
+                [
+                    'job_name' => $job_name,
+                    'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
+                    'end_time' => date('Y-m-d H:i:s', strtotime($end_time)),
+                    'status' => 'Completed',
+                    'details' => 'Processed '.$total.' rows. Inserted '.$count_insert.' rows. Updated '.$count_update.' rows. Deleted '.$count_delete.' rows. ',
                 ]
             );
 
