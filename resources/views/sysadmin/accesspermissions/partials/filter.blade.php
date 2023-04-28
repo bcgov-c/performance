@@ -290,6 +290,10 @@
             $('#dd_level4').val(null).trigger('change');
         });
 
+        $('#dd_level4').on('select2:select', function (e) {
+            e.preventDefault();
+        });
+
         $('#dd_level0').on('select2:unselect', function (e) {
             e.preventDefault();
             $('#dd_level0').val(null).trigger('change');

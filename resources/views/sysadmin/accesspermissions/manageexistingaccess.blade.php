@@ -8,16 +8,13 @@
 
     <div class="card">
         <div class="card-body">
-            {{-- <div class="h4">{{__('Manage Existing Access')}}</div> --}}
             @include('sysadmin.accesspermissions.partials.filter3')
-            {{-- <p></p> --}}
             <div class="p-3">  
                 <table class="table table-bordered filtertable table-striped" id="filtertable" style="width: 100%; overflow-x: auto; "></table>
             </div>
         </div>    
     </div>   
     @include('sysadmin/accesspermissions/partials/access-edit-modal')
-    {{-- @endsection --}}
 
 
     @push('css')

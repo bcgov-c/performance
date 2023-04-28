@@ -111,26 +111,30 @@ class AccessPermissionsController extends Controller
             ->get()
             ->toTree();
         // Employee Count by Organization
-        $countByOrg = $treeorgs0->groupBy('treeid')->select('organization_key as treeid', DB::raw("COUNT(*) as count_row"))
-            ->union( $treeorgs1->groupBy('treeid')->select('level1_key as treeid', DB::raw("COUNT(*) as count_row")) )
-            ->union( $treeorgs2->groupBy('treeid')->select('level2_key as treeid', DB::raw("COUNT(*) as count_row")) )
-            ->union( $treeorgs3->groupBy('treeid')->select('level3_key as treeid', DB::raw("COUNT(*) as count_row")) )
-            ->union( $treeorgs4->groupBy('treeid')->select('level4_key as treeid', DB::raw("COUNT(*) as count_row")) )
+        $treecount0 = clone $demoWhere; 
+        $treecount1 = clone $demoWhere; 
+        $treecount2 = clone $demoWhere; 
+        $treecount3 = clone $demoWhere; 
+        $treecount4 = clone $demoWhere; 
+        $countByOrg = $treecount0->groupBy('treeid')->select('organization_key as treeid', DB::raw("COUNT(*) as count_row"))
+            ->union( $treecount1->groupBy('treeid')->select('level1_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->union( $treecount2->groupBy('treeid')->select('level2_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->union( $treecount3->groupBy('treeid')->select('level3_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->union( $treecount4->groupBy('treeid')->select('level4_key as treeid', DB::raw("COUNT(*) as count_row")) )
             ->pluck('count_row', 'treeid'); 
         // Employee ID by Tree ID
         $empIdsByOrgId = [];
-        // $demoWhere = $this->baseFilteredWhere($request, "");
         $sql = clone $demoWhere; 
         $rows = $sql->select('orgid AS id', 'employee_id')
             ->groupBy('orgid', 'employee_id')
-            ->orderBy('orgid')->orderBy('employee_id')
+            ->orderBy('orgid')
+            ->orderBy('employee_id')
             ->get();
-        $empIdsByOrgId = $rows->groupBy('id')->all();
+        $empIdsByOrgId = $rows->groupBy('orgid')->all();
         if($request->ajax()){
             return view('sysadmin.accesspermissions.partials.recipient-tree', compact('orgs','countByOrg','empIdsByOrgId') );
         } 
     }
-
 
     public function eloadOrganizationTree(Request $request) {
         $demoWhere = $this->baseFilteredWhere($request, "e");
@@ -154,6 +158,12 @@ class AccessPermissionsController extends Controller
             ->get()
             ->toTree();
         $eempIdsByOrgId = [];
+        $sql = clone $demoWhere; 
+        $rows = $sql->select('orgid AS id', 'employee_id')
+            ->groupBy('orgid', 'employee_id')
+            ->orderBy('orgid')
+            ->orderBy('employee_id')
+            ->get();
         $eempIdsByOrgId = $rows->groupBy('orgid')->all();
         if($request->ajax()) { return view('sysadmin.accesspermissions.partials.recipient-tree2', compact('eorgs', 'eempIdsByOrgId')); } 
     }

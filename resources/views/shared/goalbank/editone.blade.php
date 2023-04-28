@@ -237,46 +237,46 @@
 					//List
 					$('#currenttable').DataTable().rows().invalidate().draw();
                                         	
-					//Tree
-					target = $('#nav-tree'); 
-					ddnotempty = $('#dd_level0').val() + $('#dd_level1').val() + $('#dd_level2').val() + $('#dd_level3').val() + $('#dd_level4').val();
-					if(ddnotempty) {
-						// To do -- ajax called to load the tree
-						$.when( 
-							$.ajax({
-                				url: '{{ "/" . request()->segment(1) . "/goalbank/org-tree" }}',
-								type: 'GET',
-								data: $("#notify-form").serialize(),
-								dataType: 'html',
+					// //Tree
+					// target = $('#nav-tree'); 
+					// ddnotempty = $('#dd_level0').val() + $('#dd_level1').val() + $('#dd_level2').val() + $('#dd_level3').val() + $('#dd_level4').val();
+					// if(ddnotempty) {
+					// 	// To do -- ajax called to load the tree
+					// 	$.when( 
+					// 		$.ajax({
+                	// 			url: '{{ "/" . request()->segment(1) . "/goalbank/org-tree" }}',
+					// 			type: 'GET',
+					// 			data: $("#notify-form").serialize(),
+					// 			dataType: 'html',
 
-								beforeSend: function() {
-									$("#tree-loading-spinner").show();                    
-								},
+					// 			beforeSend: function() {
+					// 				$("#tree-loading-spinner").show();                    
+					// 			},
 
-								success: function (result) {
-									$('#nav-tree').html(''); 
-									$('#nav-tree').html(result);
-									$('#nav-tree').attr('loaded','loaded');
-								},
+					// 			success: function (result) {
+					// 				$('#nav-tree').html(''); 
+					// 				$('#nav-tree').html(result);
+					// 				$('#nav-tree').attr('loaded','loaded');
+					// 			},
 
-								complete: function() {
-									$("#tree-loading-spinner").hide();
-								},
+					// 			complete: function() {
+					// 				$("#tree-loading-spinner").hide();
+					// 			},
 
-								error: function () {
-									alert("error");
-									$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
-								}
-							})
+					// 			error: function () {
+					// 				alert("error");
+					// 				$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
+					// 			}
+					// 		})
 							
-						).then(function( data, textStatus, jqXHR ) {
-							//alert( jqXHR.status ); // Alerts 200
-							enodes = $('#accordion-level0 input:checkbox');
-							redrawTreeCheckboxes();	
-						}); 
-					} else {
-						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
-					}
+					// 	).then(function( data, textStatus, jqXHR ) {
+					// 		//alert( jqXHR.status ); // Alerts 200
+					// 		enodes = $('#accordion-level0 input:checkbox');
+					// 		redrawTreeCheckboxes();	
+					// 	}); 
+					// } else {
+					// 	$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
+					// }
 
 				});
 
@@ -284,6 +284,7 @@
                 	enableFiltering: true,
                 	enableCaseInsensitiveFiltering: true
             	});
+				
 				$('#pageLoader').hide();
 
 				$('#notify-form').keydown(function (e) {
@@ -586,18 +587,6 @@
 					}
 				});
 
-				$('#btn_search_reset').click(function (e){
-					e.preventDefault();
-					$('#criteria').val('all');
-					$('#search_text').val(null);
-					$('#dd_superv').val('all');
-					$('#dd_level0').val(null).trigger('change');
-					$('#dd_level1').val(null).trigger('change');
-					$('#dd_level2').val(null).trigger('change');
-					$('#dd_level3').val(null).trigger('change');
-					$('#dd_level4').val(null).trigger('change');
-				});
-
 				$('#dd_superv').change(function (e){
 					e.preventDefault();
 					$('#btn_search').click();
@@ -642,9 +631,9 @@
 
 				$('#abtn_search_reset').click(function(e) {
 					e.preventDefault();
+					$('#add_superv').val('all');
 					$('#acriteria').val('all');
 					$('#asearch_text').val(null);
-					$('#add_superv').val('all');
 					$('#add_level0').val(null);
 					$('#add_level1').val(null);
 					$('#add_level2').val(null);
@@ -652,6 +641,7 @@
 					$('#add_level4').val(null);
 					$('#abtn_search').click();
 				});
+
 				$('#add_superv').change(function (e){
 					e.preventDefault();
 					$('#abtn_search').click();

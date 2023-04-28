@@ -250,6 +250,36 @@
                 }
             });
             
+            $('#edd_level0').on('select2:select', function (e) {
+                // Do something
+                $('#edd_level1').val(null).trigger('change');
+                $('#edd_level2').val(null).trigger('change');
+                $('#edd_level3').val(null).trigger('change');
+                $('#edd_level4').val(null).trigger('change');
+            });
+
+            $('#edd_level1').on('select2:select', function (e) {
+                // Do something
+                $('#edd_level2').val(null).trigger('change');
+                $('#edd_level3').val(null).trigger('change');
+                $('#edd_level4').val(null).trigger('change');
+            });
+
+            $('#edd_level2').on('select2:select', function (e) {
+                // Do something
+                $('#edd_level3').val(null).trigger('change');
+                $('#edd_level4').val(null).trigger('change');
+            });
+
+            $('#edd_level3').on('select2:select', function (e) {
+                // Do something
+                $('#edd_level4').val(null).trigger('change');
+            });
+
+            $('#edd_level4').on('select2:select', function (e) {
+                e.preventDefault();
+            });
+
             $('#edd_level0').on('select2:unselect', function (e) {
                 e.preventDefault();
                 $('#edd_level0').val(null).trigger('change');
@@ -307,20 +337,20 @@
                 $('#ebtn_search').click();
             });
 
-            $('#criteria').change(function (e){
+            $('#ecriteria').change(function (e){
                 e.preventDefault();
-                $('#btn_search').click(e);
+                $('#ebtn_search').click(e);
             });
 
-            $('#search_text').change(function (e){
+            $('#esearch_text').change(function (e){
                 e.preventDefault();
-                $('#btn_search').click(e);
+                $('#ebtn_search').click(e);
             });
 
-            $('#search_text').keydown(function (e){
+            $('#esearch_text').keydown(function (e){
                 if (e.keyCode == 13) {
                     e.preventDefault();
-                    $('#btn_search').click(e);
+                    $('#ebtn_search').click(e);
                 }
             });
 

@@ -593,25 +593,20 @@ class EmployeeSharesController extends Controller {
                     'sp.updated_at',
                     'sp.id as shared_profile_id',
                 );
-            Log::info(Carbon::now().' - Before ... return Datatables::of($query)');
             return Datatables::of($query)
                 ->addIndexColumn()
                 ->editColumn('shared_item', function ($row) {
                     $dcode = json_decode ($row->shared_item);
-                    Log::info(Carbon::now().' - $dcode = json_decode ($row->shared_item);');
                     return count($dcode) == 2 ? 'All' : ($dcode[0] == 1 ? 'Goal' : 'Conversation');
                 })
                 ->editColumn('created_at', function ($row) {
-                    Log::info(Carbon::now().' - $row->created_at ? $row->created_at->format(M d, Y H:i:s) : null;');
                     return $row->created_at ? $row->created_at->format('M d, Y H:i:s') : null;
                 })
                 ->editColumn('updated_at', function ($row) {
-                    Log::info(Carbon::now().' - $row->updated_at ? $row->updated_at->format(M d, Y H:i:s) : null;');
                     return $row->updated_at ? $row->updated_at->format('M d, Y H:i:s') : null;
                 })
                 ->addcolumn('action', function($row) {
                     $btn = '<a href="' . route(request()->segment(1) . '.employeeshares.deleteshare', ['id' => $row->shared_profile_id]) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="' . $row->shared_profile_id . '"><i class="fa fa-trash"></i></a>';
-                    Log::info(Carbon::now().' - $btn = <a href= . route(request()->segment(1) ) : null;');
                     return $btn;
                 })
                 ->rawColumns(['created_at', 'updated_at', 'action'])
