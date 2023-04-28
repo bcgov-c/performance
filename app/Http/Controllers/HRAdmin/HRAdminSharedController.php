@@ -21,6 +21,8 @@ class HRAdminSharedController extends Controller
                 ->on('auth_users.user_id', 'users_annex.user_id');
             })
             ->distinct()
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
             ->select('users_annex.organization_key AS id', 'users_annex.organization AS text')
             ->orderBy('users_annex.organization', 'ASC')
             ->limit(300)
@@ -36,6 +38,8 @@ class HRAdminSharedController extends Controller
                 ->on('auth_users.user_id', 'users_annex.user_id');
             })
             ->distinct()
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
             ->select('users_annex.level1_key AS id', 'users_annex.level1_program AS text')
             ->orderBy('users_annex.level1_program', 'ASC')
             ->limit(300)
@@ -51,6 +55,9 @@ class HRAdminSharedController extends Controller
                 ->on('auth_users.user_id', 'users_annex.user_id');
             })
             ->distinct()
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
+            ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); })
             ->select('users_annex.level2_key AS id', 'users_annex.level2_division AS text')
             ->orderBy('users_annex.level2_division', 'ASC')
             ->limit(300)
@@ -66,6 +73,10 @@ class HRAdminSharedController extends Controller
                 ->on('auth_users.user_id', 'users_annex.user_id');
             })
             ->distinct()
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
+            ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); })
+            ->when($request->level2, function ($q) use($request) { return $q->where('level2_key', $request->level2); })
             ->select('users_annex.level3_key AS id', 'users_annex.level3_branch AS text')
             ->orderBy('users_annex.level3_branch', 'ASC')
             ->limit(300)
@@ -81,6 +92,11 @@ class HRAdminSharedController extends Controller
                 ->on('auth_users.user_id', 'users_annex.user_id');
             })
             ->distinct()
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
+            ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); })
+            ->when($request->level2, function ($q) use($request) { return $q->where('level2_key', $request->level2); })
+            ->when($request->level3, function ($q) use($request) { return $q->where('level3_key', $request->level3); })
             ->select('users_annex.level4_key AS id', 'users_annex.level4 AS text')
             ->orderBy('users_annex.level4', 'ASC')
             ->limit(300)
@@ -96,6 +112,12 @@ class HRAdminSharedController extends Controller
                 ->on('auth_users.user_id', 'users_annex.user_id');
             })
             ->distinct()
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
+            ->when($request->level1, function ($q) use($request) { return $q->where('level1_key', $request->level1); })
+            ->when($request->level2, function ($q) use($request) { return $q->where('level2_key', $request->level2); })
+            ->when($request->level3, function ($q) use($request) { return $q->where('level3_key', $request->level3); })
+            ->when($request->level4, function ($q) use($request) { return $q->where('level4_key', $request->level4); })
             ->select('users_annex.level5_key AS id', 'users_annex.level5 AS text')
             ->orderBy('users_annex.level5', 'ASC')
             ->limit(300)
@@ -170,35 +192,35 @@ class HRAdminSharedController extends Controller
     //     ->when($request->q, function ($q) use($request) { return $q->whereRaw("employee_demo_tree.name LIKE '%{$request->q}%'"); })
     //     ->when($request->elevel0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->elevel0); })
     //     ->get();
-    //     $formatted_orgs = [];
+    //     $formatted_orgs =             ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
+//             ->when($request->elevel0, function ($q) use($request) { return $q->where('organization_key', $request->elevel0); })
+//             ->when($request->elevel1, function ($q) use($request) { return $q->where('level1_key', $request->elevel1); });
+// [];
     //     foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name]; }
     //     return response()->json($formatted_orgs);
     // } 
 
-    public function egetDivisionsV2(Request $request) {
-        $authId = Auth::id();
-        $orgs = AdminOrgTreeView::select('orgid', 'name')
-            ->where('version', \DB::raw(2))
-            ->where('inherited', \DB::raw(0))
-            ->where('user_id', \DB::raw($authId))
-            ->where('level', \DB::raw(2))
-            ->when($request->q, function ($q) use($request) { return $q->whereRaw("name LIKE '%{$request->q}%'"); })
-            ->when($request->elevel0, function ($q) use($request) { return $q->where('organization_key', $request->elevel0); })
-            ->when($request->elevel1, function ($q) use($request) { return $q->where('level1_key', $request->elevel1); });
-        $orgsInherited = EmployeeDemoTree::select('level2_key AS orgid', 'level2_division AS name')
-            ->when($request->q, function ($q) use($request) { return $q->whereRaw("level2_division LIKE '%{$request->q}%'"); })
-            ->when($request->elevel0, function ($q) use($request) { return $q->where('organization_key', $request->elevel0); })
-            ->when($request->elevel1, function ($q) use($request) { return $q->where('level1_key', $request->elevel1); })
-            ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs WHERE (orgid = organization_key OR orgid = level1_key OR orgid = level2_key OR orgid = level3_key OR orgid = level4_key) AND version = 2 AND inherited = 1 AND user_id = {$authId})");
-        $orgs = $orgs->union($orgsInherited)
-            ->distinct()
-            ->orderby('name', 'asc')
-            ->limit(300)
-            ->get();
-        $formatted_orgs = [];
-        foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->orgid, 'text' => $org->name]; }
-        return response()->json($formatted_orgs);
-    } 
+    // public function egetDivisionsV2(Request $request) {
+    //     $authId = Auth::id();
+    //     $orgs = AdminOrgTreeView::select('orgid', 'name')
+    //         ->where('version', \DB::raw(2))
+    //         ->where('inherited', \DB::raw(0))
+    //         ->where('user_id', \DB::raw($authId))
+    //         ->where('level', \DB::raw(2))
+    //     $orgsInherited = EmployeeDemoTree::select('level2_key AS orgid', 'level2_division AS name')
+    //         ->when($request->q, function ($q) use($request) { return $q->whereRaw("level2_division LIKE '%{$request->q}%'"); })
+    //         ->when($request->elevel0, function ($q) use($request) { return $q->where('organization_key', $request->elevel0); })
+    //         ->when($request->elevel1, function ($q) use($request) { return $q->where('level1_key', $request->elevel1); })
+    //         ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM admin_orgs WHERE (orgid = organization_key OR orgid = level1_key OR orgid = level2_key OR orgid = level3_key OR orgid = level4_key) AND version = 2 AND inherited = 1 AND user_id = {$authId})");
+    //     $orgs = $orgs->union($orgsInherited)
+    //         ->distinct()
+    //         ->orderby('name', 'asc')
+    //         ->limit(300)
+    //         ->get();
+    //     $formatted_orgs = [];
+    //     foreach ($orgs as $org) { $formatted_orgs[] = ['id' => $org->orgid, 'text' => $org->name]; }
+    //     return response()->json($formatted_orgs);
+    // } 
 
     // public function egetDivisionsV2(Request $request) {
     //     $orgs = EmployeeDemoTree::join('admin_orgs', 'admin_orgs.orgid', 'employee_demo_tree.id')
