@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Model;
 
-class UsersAnnex extends Authenticatable
+class UsersAnnex extends Model
 {
 
     public $table = 'users_annex';
     public $timestamps = true;
     public $incrementing = false;
-
 
 }
