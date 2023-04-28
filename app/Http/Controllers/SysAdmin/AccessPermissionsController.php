@@ -90,24 +90,36 @@ class AccessPermissionsController extends Controller
     }
 
     public function loadOrganizationTree(Request $request) {
-        list($sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4) = $this->baseFilteredSQLs($request, "");
-        $rows = $sql_level4->groupBy('o.id')->select('o.id')
-            ->union( $sql_level3->groupBy('o.id')->select('o.id') )
-            ->union( $sql_level2->groupBy('o.id')->select('o.id') )
-            ->union( $sql_level1->groupBy('o.id')->select('o.id') )
-            ->union( $sql_level0->groupBy('o.id')->select('o.id') )
-            ->pluck('o.id'); 
-        $orgs = EmployeeDemoTree::whereIn('id', $rows->toArray() )->get()->toTree();
+        $demoWhere = $this->baseFilteredWhere($request, "");
+        $treeorgs0 = clone $demoWhere; 
+        $treeorgs1 = clone $demoWhere; 
+        $treeorgs2 = clone $demoWhere; 
+        $treeorgs3 = clone $demoWhere; 
+        $treeorgs4 = clone $demoWhere; 
+        $rows = $treeorgs0->groupBy('treeid')->select('organization_key as treeid')
+            ->union( $treeorgs1->groupBy('treeid')->select('level1_key as treeid') )
+            ->union( $treeorgs2->groupBy('treeid')->select('level2_key as treeid') )
+            ->union( $treeorgs3->groupBy('treeid')->select('level3_key as treeid') )
+            ->union( $treeorgs4->groupBy('treeid')->select('level4_key as treeid') )
+            ->pluck('treeid'); 
+        $orgs = EmployeeDemoTree::whereIn('id', $rows->toArray())
+            ->orderBy('organization')
+            ->orderBy('level1_program')
+            ->orderBy('level2_division')
+            ->orderBy('level3_branch')
+            ->orderBy('level4')
+            ->get()
+            ->toTree();
         // Employee Count by Organization
-        $countByOrg = $sql_level4->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row"))
-        ->union( $sql_level3->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level2->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level1->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level0->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row") ) )
-        ->pluck('count_row', 'o.id');  
+        $countByOrg = $treeorgs0->groupBy('treeid')->select('organization_key as treeid', DB::raw("COUNT(*) as count_row"))
+            ->union( $treeorgs1->groupBy('treeid')->select('level1_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->union( $treeorgs2->groupBy('treeid')->select('level2_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->union( $treeorgs3->groupBy('treeid')->select('level3_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->union( $treeorgs4->groupBy('treeid')->select('level4_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->pluck('count_row', 'treeid'); 
         // Employee ID by Tree ID
         $empIdsByOrgId = [];
-        $demoWhere = $this->baseFilteredWhere($request, "");
+        // $demoWhere = $this->baseFilteredWhere($request, "");
         $sql = clone $demoWhere; 
         $rows = $sql->select('orgid AS id', 'employee_id')
             ->groupBy('orgid', 'employee_id')
