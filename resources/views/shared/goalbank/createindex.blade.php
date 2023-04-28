@@ -631,62 +631,6 @@
 					}    
 				});
 
-				$('#dd_level0').change(function (e){
-					e.preventDefault();
-				});
-
-				$('#dd_level1').change(function (e){
-					e.preventDefault();
-				});
-
-				$('#dd_level2').change(function (e){
-					e.preventDefault();
-				});
-
-				$('#dd_level3').change(function (e){
-					e.preventDefault();
-				});
-
-				$('#criteria').change(function (e){
-					e.preventDefault();
-					$('#btn_search').click();
-				});
-
-				$('#dd_superv').change(function (e){
-					e.preventDefault();
-					$('#btn_search').click();
-				});
-
-				$('#search_text').change(function (e){
-					e.preventDefault();
-					$('#btn_search').click();
-				});
-
-				$('#search_text').keydown(function (e){
-					if (e.keyCode == 13) {
-						e.preventDefault();
-						$('#btn_search').click();
-					}
-				});
-
-				$('#btn_search_reset').click(function (e){
-					e.preventDefault();
-					$('#dd_superv').val('all');
-					$('#criteria').val('all');
-					$('#search_text').val(null);
-					$('#dd_level0').val(null).trigger('change');
-					$('#dd_level1').val(null).trigger('change');
-					$('#dd_level2').val(null).trigger('change');
-					$('#dd_level3').val(null).trigger('change');
-					$('#dd_level4').val(null).trigger('change');
-					$('#btn_search').click();
-				});
-
-				$('#dd_level4').change(function (e){
-					e.preventDefault();
-					$('#btn_search').click();
-				});
-
 				$('#edd_level0').change(function (e) {
 					e.preventDefault();
 				});

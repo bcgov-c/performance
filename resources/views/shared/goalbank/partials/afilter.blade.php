@@ -247,12 +247,16 @@
             $('#add_level4').val(null).trigger('change');
         });
 
-        $('#abtn_search_reset').click(function() {
-            $('#add_level0').val(null).trigger('change');
-            $('#add_level1').val(null).trigger('change');
-            $('#add_level2').val(null).trigger('change');
-            $('#add_level3').val(null).trigger('change');
-            $('#add_level4').val(null).trigger('change');
+        $('#abtn_search_reset').click(function(e) {
+        	e.preventDefault();
+        	$('#acriteria').val('all');
+        	$('#asearch_text').val(null);
+        	$('#add_superv').val('all');
+        	$('#add_level0').val(null);
+        	$('#add_level1').val(null);
+        	$('#add_level2').val(null);
+        	$('#add_level3').val(null);
+        	$('#add_level4').val(null);
         });
 
     </script>

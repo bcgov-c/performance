@@ -138,16 +138,6 @@
 
             $('#btn_search').click();
 
-            $('#criteria').change(function (e){
-                e.preventDefault();
-                $('#btn_search').click();
-            });
-
-            $('#search_text').change(function (e){
-                e.preventDefault();
-                $('#btn_search').click();
-            });
-
             $('#search_text').keydown(function (e){
                 if (e.keyCode == 13) {
                     e.preventDefault();
@@ -155,12 +145,12 @@
                 }
             });
 
-            $('#btn_search_reset').click(function(e) {
-                e.preventDefault();
-                $('#criteria').val('all');
-                $('#search_text').val(null);
-                $('#btn_search').click();
-            });
+            // $('#btn_search_reset').click(function(e) {
+            //     e.preventDefault();
+            //     $('#criteria').val('all');
+            //     $('#search_text').val(null);
+            //     // $('#btn_search').click();
+            // });
         });
 
         $(window).on('beforeunload', function(){
