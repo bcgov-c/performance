@@ -54,12 +54,23 @@ class ConversationController extends Controller
         }
         //get historic supervisors
         $history_supervisors = DB::table('conversation_participants')
-                                    ->select('participant_id')
+                                    ->select('conversation_participants.participant_id', 'users.name')
+                                    ->join('users','users.id','=','conversation_participants.participant_id')
                                     ->whereIn('conversation_id', $consersation_ids)
                                     ->where('role', '=', 'mgr')
                                     ->where('participant_id', '<>', $authId)
                                     ->distinct()
                                     ->get();
+        
+        //get historic team members
+        $history_teammembers = DB::table('conversation_participants')
+                                    ->select('conversation_participants.participant_id', 'users.name')
+                                    ->join('users','users.id','=','conversation_participants.participant_id')
+                                    ->whereIn('conversation_id', $consersation_ids)
+                                    ->where('role', '=', 'emp')
+                                    ->where('participant_id', '<>', $authId)
+                                    ->distinct()
+                                    ->get();            
         
         $supervisor_ids = array();
         foreach($history_supervisors as $history_supervisor){
@@ -141,15 +152,15 @@ class ConversationController extends Controller
                         });
                 });
             }
-            if ($request->has('user_name') && $request->user_name) {
-                $user_name = $request->user_name;
+            if ($request->has('team_members') && $request->team_members) {
+                $user_name = $request->team_members;
                 $query->where(function ($query) use ($user_name) {
                     $query->whereHas('user', function ($query) use ($user_name) {
-                        $query->where('name', 'like', "%$user_name%");
+                        $query->where('id', '=', $user_name);
                     })
                     ->orWhereHas('conversationParticipants', function($query) use ($user_name) {
                         $query->whereHas('participant', function($query) use ($user_name) {
-                            $query->where('name', 'like', "%$user_name%");
+                            $query->where('participant_id', '=', $user_name);
                         });
                     });
                 });
@@ -157,13 +168,34 @@ class ConversationController extends Controller
             if ($request->has('conversation_topic_id') && $request->conversation_topic_id) {
                 $query->where('conversation_topic_id', $request->conversation_topic_id);
             }
-
+            if ($request->has('sup_conversation_topic_id') && $request->sup_conversation_topic_id) {
+                $query->where('conversation_topic_id', $request->sup_conversation_topic_id);
+            }
+            
+            if ($request->has('supervisors') && $request->supervisors) {
+                $query->where('supervisor_signoff_id', $request->supervisors);
+            }
+            if ($request->has('sup_signoff_date') && $request->sup_signoff_date) {
+                $query->where(function($query) use ($request) {
+                    $query->where('sign_off_time', '>=', $request->sup_signoff_date.' 00:00:00')
+                        ->orWhere('supervisor_signoff_time', '>=', $request->sup_signoff_date.' 00:00:00');
+                });
+                $query->where(function($query) use ($request) {
+                    $query->where('sign_off_time', '<=', $request->sup_signoff_date.' 23:59:59')
+                        ->orWhere('supervisor_signoff_time', '<=', $request->sup_signoff_date.' 23:59:59');
+                });
+            }
             if ($request->has('start_date') && $request->start_date) {
                 $query->whereRaw("IF(`sign_off_time` > `supervisor_signoff_time`, `sign_off_time`, `supervisor_signoff_time`) >= '$request->start_date'");
             }
             if ($request->has('end_date') && $request->end_date) {
                 $query->whereRaw("IF(`sign_off_time` > `supervisor_signoff_time`, `sign_off_time`, `supervisor_signoff_time`) <= '$request->end_date'");
             }
+            if ($request->has('signoff_date') && $request->signoff_date) {
+                $query->whereRaw("(supervisor_signoff_time>= '$request->signoff_date"." 00:00:00' and supervisor_signoff_time<= '$request->signoff_date"." 23:59:59')"
+                        . "OR (sign_off_time>= '$request->signoff_date"." 00:00:00' and sign_off_time<= '$request->signoff_date"." 23:59:59')");
+            }
+            
             $myTeamQuery = clone $query;
 
             // With my Supervisor            
@@ -184,9 +216,8 @@ class ConversationController extends Controller
                     });
                 });
             }
-            $myTeamQuery->where('signoff_user_id','<>', $authId);
+            $myTeamQuery->where('signoff_user_id','<>', $authId);            
             $type = 'past';
-
             $conversations = $query->orderBy('id', 'DESC')->paginate(10); 
             $myTeamConversations = $myTeamQuery->orderBy('id', 'DESC')->paginate(10);
         } else { // Upcoming
@@ -273,29 +304,42 @@ class ConversationController extends Controller
             "name" => "Any"
         ]);
         
-        //get current team members
-        $team_query = "SELECT users.id, users.name FROM users where users.id IN (SELECT users.id as id FROM users 
-                        where users.reporting_to = $authId
-                        UNION
-                        select shared_profiles.shared_id as id FROM shared_profiles
-                        WHERE shared_with = $authId)";
-        $myCurrentTeam = DB::select($team_query);
+        //prepare participants list
         $team_members = array();
         $team_members[0]["id"] = '';
         $team_members[0]["name"] = 'Any';
         $i = 1;
-        foreach($myCurrentTeam as $item){
-            $team_members[$i]["id"] = $item->id;
+        foreach($history_teammembers as $item){
+            $team_members[$i]["id"] = $item->participant_id;
             $team_members[$i]["name"] = $item->name;
             $i++;
         }
+        
+        $supervisor_members = array();
+        $supervisor_members[0]["id"] = '';
+        $supervisor_members[0]["name"] = 'Any';
+        $i = 1;
+        foreach($history_supervisors as $item){
+            $supervisor_members[$i]["id"] = $item->participant_id;
+            $supervisor_members[$i]["name"] = $item->name;
+            $i++;
+        }
+        
         
         $myTeamConversations_arr = array();
         $i = 0;
         foreach($myTeamConversations as $item){
             $myTeamConversations_arr[$i]['id'] = $item->id;
-            $myTeamConversations_arr[$i]['name'] = $item->name;
-            $myTeamConversations_arr[$i]['participants'] = $item->mgrname . ", " . $item->empname;
+            if(isset($item->name)){
+                $myTeamConversations_arr[$i]['name'] = $item->name;
+            }else{
+                $myTeamConversations_arr[$i]['name'] = $item->topic->name;
+            }
+            if(isset($item->mgrname) && isset($item->empname)){
+                $myTeamConversations_arr[$i]['participants'] = $item->mgrname . ", " . $item->empname;
+            } else {
+                $myTeamConversations_arr[$i]['participants'] = $item->conversationParticipants[0]->participant->name . ", " . $item->conversationParticipants[1]->participant->name;
+            }            
             $myTeamConversations_arr[$i]['signoff_user_id'] = $item->signoff_user_id;
             if($item->signoff_user_id != ''){
                 $myTeamConversations_arr[$i]['employee_signed'] = 'Yes';
@@ -308,8 +352,35 @@ class ConversationController extends Controller
             } else {
                 $myTeamConversations_arr[$i]['supervisor_signed'] = 'No';
             }
+            if(isset($item->is_locked)){
+                if($item->is_locked){
+                    $myTeamConversations_arr[$i]['is_locked'] = 'Locked';
+                    $myTeamConversations_arr[$i]['status'] = '<i class="fa fa-lock"></i>';                    
+                } else {
+                    $myTeamConversations_arr[$i]['is_locked'] = 'Unlocked';
+                    $myTeamConversations_arr[$i]['status'] = '<i class="fa fa-unlock"></i>';     
+                }
+            }
+            if(isset($item->last_sign_off_date)){
+                $sign_datetime = Carbon::parse($item->last_sign_off_date);
+                $sign_date = $sign_datetime->toDateString();
+                $myTeamConversations_arr[$i]['date'] = $sign_date;
+            }
             $i++;
         }
+        
+        if($request->has('status')){
+            if($request->status == 'locked'){
+                $myTeamConversations_arr = array_filter($myTeamConversations_arr, function($item) {
+                    return $item['is_locked'] == "Locked";
+                });
+            } elseif($request->status == 'unlocked'){
+                $myTeamConversations_arr = array_filter($myTeamConversations_arr, function($item) {
+                    return $item['is_locked'] === "Unlocked";
+                });
+            }         
+        }
+        
         $json_myTeamConversations = json_encode($myTeamConversations_arr);   
         
         
@@ -317,8 +388,17 @@ class ConversationController extends Controller
         $i = 0;
         foreach($conversations as $item){
             $conversations_arr[$i]['id'] = $item->id;
-            $conversations_arr[$i]['name'] = $item->name;
-            $conversations_arr[$i]['participants'] = $item->mgrname . ", " . $item->empname;
+            //$conversations_arr[$i]['conversation_topic_id'] = $item->conversation_topic_id;            
+            if(isset($item->name)){
+                $conversations_arr[$i]['name'] = $item->name;
+            }else{
+                $conversations_arr[$i]['name'] = $item->topic->name;
+            }
+            if(isset($item->mgrname) && isset($item->empname)){
+                $conversations_arr[$i]['participants'] = $item->mgrname . ", " . $item->empname;
+            } else {
+                $conversations_arr[$i]['participants'] = $item->conversationParticipants[0]->participant->name . ", " . $item->conversationParticipants[1]->participant->name;
+            }
             $conversations_arr[$i]['signoff_user_id'] = $item->signoff_user_id;
             if($item->signoff_user_id != ''){
                 $conversations_arr[$i]['employee_signed'] = 'Yes';
@@ -331,12 +411,38 @@ class ConversationController extends Controller
             } else {
                 $conversations_arr[$i]['supervisor_signed'] = 'No';
             }
+            if(isset($item->is_locked)){
+                if($item->is_locked){
+                    $conversations_arr[$i]['is_locked'] = 'Locked';
+                    $conversations_arr[$i]['status'] = '<i class="fa fa-lock"></i>';      
+                } else {
+                    $conversations_arr[$i]['is_locked'] = 'Unlocked';
+                    $conversations_arr[$i]['status'] = '<i class="fa fa-unlock"></i>';      
+                }
+            }
+            if(isset($item->last_sign_off_date)){
+                $sign_datetime = Carbon::parse($item->last_sign_off_date);
+                $sign_date = $sign_datetime->toDateString();
+                $conversations_arr[$i]['date'] = $sign_date;
+            }
             $i++;
         }
-        $json_conversations = json_encode($conversations_arr); 
+        
+        if($request->has('sup_status')){
+            if($request->sup_status == 'locked'){
+                $conversations_arr = array_filter($conversations_arr, function($item) {
+                    return $item['is_locked'] == "Locked";
+                });
+            } elseif($request->sup_status == 'unlocked'){
+                $conversations_arr = array_filter($conversations_arr, function($item) {
+                    return $item['is_locked'] === "Unlocked";
+                });
+            }         
+        }
+        $json_conversations = json_encode($conversations_arr);            
 
         return view($view, compact('type', 'conversations', 'myTeamConversations', 'conversationTopics', 'conversationMessage', 'viewType', 'reportees', 'topics', 'textAboveFilter', 'user', 
-                                    'supervisor_conversations', 'open_modal_id', 'conversationList','team_members', 'sub', 'json_myTeamConversations', 'json_conversations'));
+                                    'supervisor_conversations', 'open_modal_id', 'conversationList','team_members', 'supervisor_members', 'sub', 'json_myTeamConversations', 'json_conversations'));
     }
 
     /**
