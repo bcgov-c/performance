@@ -67,7 +67,7 @@ class HRAdminSharedController extends Controller
             })
             ->distinct()
             ->select('users_annex.level3_key AS id', 'users_annex.level3_branch AS text')
-            ->orderBy('users_annex.level3_key', 'ASC')
+            ->orderBy('users_annex.level3_branch', 'ASC')
             ->limit(300)
             ->get('id', 'text')
             ->toArray();
@@ -82,7 +82,7 @@ class HRAdminSharedController extends Controller
             })
             ->distinct()
             ->select('users_annex.level4_key AS id', 'users_annex.level4 AS text')
-            ->orderBy('users_annex.level4_key', 'ASC')
+            ->orderBy('users_annex.level4', 'ASC')
             ->limit(300)
             ->get('id', 'text')
             ->toArray();
@@ -97,7 +97,7 @@ class HRAdminSharedController extends Controller
             })
             ->distinct()
             ->select('users_annex.level5_key AS id', 'users_annex.level5 AS text')
-            ->orderBy('users_annex.level5_key', 'ASC')
+            ->orderBy('users_annex.level5', 'ASC')
             ->limit(300)
             ->get('id', 'text')
             ->toArray();
