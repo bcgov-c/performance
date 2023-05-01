@@ -76,20 +76,7 @@ class ConversationController extends Controller
         foreach($history_supervisors as $history_supervisor){
             $supervisor_ids[] = $history_supervisor->participant_id;
         }
-        
-        //get historic team members
-        $history_teams = DB::table('conversation_participants')
-                                    ->select('participant_id')
-                                    ->whereIn('conversation_id', $consersation_ids)
-                                    ->where('role', '=', 'emp')
-                                    ->where('participant_id', '<>', $authId)
-                                    ->distinct()
-                                    ->get();
-        $team_ids = array();
-        foreach($history_teams as $history_team){
-            $team_ids[] = $history_team->participant_id;
-        }
-                
+                        
         //get current team members
         $team_query = "SELECT users.id as id FROM users 
                         where users.reporting_to = $authId
@@ -262,24 +249,42 @@ class ConversationController extends Controller
             if ($request->has('team_members') && $request->team_members) {
                 $emp_query .= " AND emp_participants.participant_id = $request->team_members"; 
             }
-            if ($request->has('employee_signed')) {
-                if($request->employee_signed == 1){
-                    $emp_query .= " AND conversations.signoff_user_id IS NOT NULL "; 
-                } else if($request->employee_signed == 0){
-                    $emp_query .= "  AND conversations.signoff_user_id IS NULL"; 
+            if (!$request->has('employee_signed') && !$request->has('supervisor_signed')) {
+                $emp_query .= "  AND (conversations.signoff_user_id IS NULL OR conversations.supervisor_signoff_id IS NULL)";             
+            }else{
+                if($request->employee_signed == 'any' && $request->supervisor_signed == 'any'){
+                    $emp_query .= "  AND (conversations.signoff_user_id IS NULL OR conversations.supervisor_signoff_id IS NULL)";
+                } else {
+                    if($request->employee_signed == 'any'){
+                        if($request->supervisor_signed == 0){
+                            $emp_query .= "  AND (conversations.supervisor_signoff_id IS NULL)";   
+                        }else{
+                            $emp_query .= "  AND (conversations.signoff_user_id IS NULL AND conversations.supervisor_signoff_id IS NOT NULL)";  
+                        }                        
+                    }
+                    if($request->supervisor_signed == 'any'){
+                        if($request->employee_signed == 0){
+                            $emp_query .= "  AND (conversations.signoff_user_id IS NULL)";   
+                        }else{
+                            $emp_query .= "  AND (conversations.supervisor_signoff_id IS NULL AND conversations.signoff_user_id IS NOT NULL)";  
+                        }                        
+                    }
+                }   
+                if ($request->employee_signed == 0 && $request->supervisor_signed == 0){
+                    $emp_query .= "  AND (conversations.signoff_user_id IS NULL AND conversations.supervisor_signoff_id IS NULL)";   
                 }
-            }
-            if ($request->has('supervisor_signed')) {
-                if($request->supervisor_signed == 1){
-                    $emp_query .= " AND conversations.supervisor_signoff_id IS NOT NULL"; 
-                } else if($request->supervisor_signed == 0){
-                    $emp_query .= " AND conversations.supervisor_signoff_id IS NULL"; 
+                if ($request->employee_signed == 0 && $request->supervisor_signed == 1){
+                    $emp_query .= "  AND (conversations.signoff_user_id IS NULL AND conversations.supervisor_signoff_id IS NOT NULL)";   
+                } 
+                if ($request->employee_signed == 1 && $request->supervisor_signed == 0){
+                    $emp_query .= "  AND (conversations.signoff_user_id IS NOT NULL AND conversations.supervisor_signoff_id IS NULL)";   
                 }
-            }
-            if(!$request->has('employee_signed') && !$request->has('supervisor_signed')){
-                $emp_query .= " and ((`signoff_user_id` is null or `supervisor_signoff_id` is null))";
-            }
+                if ($request->employee_signed == 1 && $request->supervisor_signed == 1){
+                    $emp_query .= "  AND (1 = 0)";   
+                }  
+            }            
             $emp_query .= " ORDER BY conversations.id DESC";
+            Log::info(print_r($emp_query,true));
             $myTeamConversations = DB::select($emp_query);
             
             if ($request->has('sub') && $request->sub) {
