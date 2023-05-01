@@ -262,22 +262,30 @@ class ConversationController extends Controller
             if ($request->has('team_members') && $request->team_members) {
                 $emp_query .= " AND emp_participants.participant_id = $request->team_members"; 
             }
-            if ($request->has('employee_signed')) {
+            if ($request->has('employee_signed') || $request->has('supervisor_signed')) {
                 if($request->employee_signed == 1){
                     $emp_query .= " AND (conversations.signoff_user_id IS NOT NULL  AND conversations.supervisor_signoff_id IS NULL)"; 
-                } else if($request->employee_signed == 0){
+                }
+                if($request->employee_signed == 0){
                     $emp_query .= "  AND conversations.signoff_user_id IS NULL"; 
                 }
-            } else if ($request->has('supervisor_signed')) {
+                if($request->employee_signed == 'any'){
+                    $emp_query .= "  AND conversations.supervisor_signoff_id IS NULL"; 
+                }
                 if($request->supervisor_signed == 1){
                     $emp_query .= " AND (conversations.supervisor_signoff_id IS NOT NULL  AND conversations.signoff_user_id IS NULL)"; 
-                } else if($request->supervisor_signed == 0){
+                }
+                if($request->supervisor_signed == 0){
                     $emp_query .= " AND conversations.supervisor_signoff_id IS NULL"; 
                 }
-            } else {
-                $emp_query .= " and ((`signoff_user_id` is null or `supervisor_signoff_id` is null))";
+                if($request->supervisor_signed == 'any'){
+                    $emp_query .= "  AND conversations.signoff_user_id IS NULL"; 
+                }
+            } else{
+                $emp_query .= "  AND (conversations.signoff_user_id IS NULL OR conversations.supervisor_signoff_id IS NULL)"; 
             }
             $emp_query .= " ORDER BY conversations.id DESC";
+            Log::info(print_r($emp_query,true));
             $myTeamConversations = DB::select($emp_query);
             
             if ($request->has('sub') && $request->sub) {

@@ -154,7 +154,7 @@ i {
                                     <label>
                                         Employee Signed
                                         <select name="employee_signed" id="employee_signed" class="filtersub form-control">
-                                            <option value="">Any</option>
+                                            <option value="any">Any</option>
                                             <option value="1"
                                                     @if(request()->employee_signed == '1')    
                                                     selected
@@ -172,7 +172,7 @@ i {
                                     <label>
                                         Supervisor Signed
                                         <select name="supervisor_signed" id="supervisor_signed" class="filtersub form-control">
-                                            <option value="">Any</option>
+                                            <option value="any">Any</option>
                                             <option value="1"
                                                     @if(request()->supervisor_signed == '1')    
                                                     selected
@@ -236,7 +236,7 @@ i {
   var team_members = $('#team_members').val();
   var employee_signed = $('#employee_signed').val();
   var supervisor_signed = $('#supervisor_signed').val();
-  if(conversation_topic_id != 0 || team_members != '' || employee_signed != '' || supervisor_signed != ''){
+  if(conversation_topic_id != 0 || team_members != '' || employee_signed != 'any' || supervisor_signed != 'any'){
       var show_collapse = true;
   }  
   if(show_collapse){
