@@ -264,19 +264,17 @@ class ConversationController extends Controller
             }
             if ($request->has('employee_signed')) {
                 if($request->employee_signed == 1){
-                    $emp_query .= " AND conversations.signoff_user_id IS NOT NULL "; 
+                    $emp_query .= " AND (conversations.signoff_user_id IS NOT NULL  AND conversations.supervisor_signoff_id IS NULL)"; 
                 } else if($request->employee_signed == 0){
                     $emp_query .= "  AND conversations.signoff_user_id IS NULL"; 
                 }
-            }
-            if ($request->has('supervisor_signed')) {
+            } else if ($request->has('supervisor_signed')) {
                 if($request->supervisor_signed == 1){
-                    $emp_query .= " AND conversations.supervisor_signoff_id IS NOT NULL"; 
+                    $emp_query .= " AND (conversations.supervisor_signoff_id IS NOT NULL  AND conversations.signoff_user_id IS NULL)"; 
                 } else if($request->supervisor_signed == 0){
                     $emp_query .= " AND conversations.supervisor_signoff_id IS NULL"; 
                 }
-            }
-            if(!$request->has('employee_signed') && !$request->has('supervisor_signed')){
+            } else {
                 $emp_query .= " and ((`signoff_user_id` is null or `supervisor_signoff_id` is null))";
             }
             $emp_query .= " ORDER BY conversations.id DESC";
