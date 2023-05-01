@@ -44,7 +44,10 @@
         </div>
         @if ($currentView == "editone" || $currentView == "goalbank")
             <div class="form-group col-md-2" id="superv_group">
-                <label for="dd_superv">Supervisor Status</label>
+                <div class="mb-2">
+                    <b> Supervisor Status </b> 
+                    <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='This filter includes direct reports from PeopleSoft and delegated reports in the PDP.'> </i> 
+                </div>
                 <select id="dd_superv" name="dd_superv" class="form-control select2">
                     @foreach( $supervisorList as $key => $value )
                         <option value="{{ $key }}" {{  old('dd_superv') == $key ? 'selected' : '' }} >{{ $value }}</option>
@@ -102,6 +105,7 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
+
         $(document).ready(function() {
 
             $('#dd_level0').select2({
