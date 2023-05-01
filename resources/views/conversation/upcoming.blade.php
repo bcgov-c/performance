@@ -154,8 +154,7 @@ i {
                                     <label>
                                         Employee Signed
                                         <select name="employee_signed" id="employee_signed" class="filtersub form-control">
-                                            <option value="any">Any</option>
-                                            <option value="1"
+                                                <option value="any">Any</option><option value="1"
                                                     @if(request()->employee_signed == '1')    
                                                     selected
                                                     @endif
@@ -172,8 +171,7 @@ i {
                                     <label>
                                         Supervisor Signed
                                         <select name="supervisor_signed" id="supervisor_signed" class="filtersub form-control">
-                                            <option value="any">Any</option>
-                                            <option value="1"
+                                                <option value="any">Any</option><option value="1"
                                                     @if(request()->supervisor_signed == '1')    
                                                     selected
                                                     @endif
