@@ -44,7 +44,10 @@
         </div>
         @if ($currentView == "editone")
             <div class="form-group col-md-2" id="asuperv_group">
-                <label for="add_superv">Supervisor Status</label>
+                <div class="mb-2">
+                    <b> Supervisor Status </b> 
+                    <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='This filter includes direct reports from PeopleSoft and delegated reports in the PDP.'> </i> 
+                </div>
                 <select id="add_superv" name="add_superv" class="form-control select2">
                     @foreach( $supervisorList as $key => $value )
                         <option value="{{ $key }}" {{  old('add_superv') == $key ? 'selected' : '' }} >{{ $value }}</option>

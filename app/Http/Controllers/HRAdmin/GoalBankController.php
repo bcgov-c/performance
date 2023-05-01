@@ -1023,8 +1023,8 @@ class GoalBankController extends Controller
     protected function supervisor_list() {
         return [
             'all' => 'All',
-            'sup' => 'Supervisors Only', 
-            'non'=> 'Non-Supervisors Only',
+            'sup' => 'Has Reports in PDP', 
+            'non'=> 'Does Not Have Reports',
         ];
     }
  
