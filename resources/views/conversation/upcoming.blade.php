@@ -52,9 +52,9 @@ i {
     
     <div class="mt-4">
         <div class="card">
-                <div class="card-header" id="heading_0">
-                <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_0" aria-expanded="1" aria-controls="collapse_0">
-                    <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_0" aria-expanded="false" aria-controls="collapse_0">
+                <div class="card-header" id="heading_ins">
+                <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_ins" aria-expanded="1" aria-controls="collapse_ins">
+                    <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_ins" aria-expanded="false" aria-controls="collapse_ins">
                             <button class="btn btn-link" >
                                 <h4>Instructions</h4> 
                             </button>                        
@@ -63,7 +63,7 @@ i {
                 </h5>
                 </div>
 
-                <div id="collapse_0" class="collapse" aria-labelledby="heading_0">
+                <div id="collapse_ins" class="collapse" aria-labelledby="heading_ins">
                     <div class="card-body">
                             <p>
                                 The list below contains all planned conversations that have yet to be signed-off by both employee and supervisor. 
@@ -76,9 +76,9 @@ i {
        
             
         <div class="card">            
-                <div class="card-header" id="heading_1" style="border-bottom-width: 0px;">
-                    <h5 class="mb-1"data-toggle="collapse" data-target="#collapse_1" aria-expanded="1" aria-controls="collapse_1">
-                        <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_1" aria-expanded="false" aria-controls="collapse_1">
+                <div class="card-header" id="heading_sup" style="border-bottom-width: 0px;">
+                    <h5 class="mb-1"data-toggle="collapse" data-target="#collapse_sup" aria-expanded="1" aria-controls="collapse_sup">
+                        <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_sup" aria-expanded="false" aria-controls="collapse_sup">
 
                                 <button class="btn btn-link text-left">
                                     <h4>Conversations with My Supervisor</h4>
@@ -92,7 +92,7 @@ i {
                     </h5>
                 </div>
 
-                <div id="collapse_1" class="collapse" aria-labelledby="heading_1">
+                <div id="collapse_sup" class="collapse" aria-labelledby="heading_sup">
                     <div class="card-body">
                         <table style="width:100%" id='supervisor_conversations' class="table table-striped"> </table>
                     </div>
@@ -101,9 +101,9 @@ i {
             
         @if($user->hasRole('Supervisor'))
         <div class="card">            
-                <div class="card-header" id="heading_2" style="border-bottom-width: 0px;">
-                    <h5 class="mb-1"data-toggle="collapse" data-target="#collapse_2" aria-expanded="1" aria-controls="collapse_2">
-                        <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_2" aria-expanded="false" aria-controls="collapse_2">
+                <div class="card-header" id="heading_emp" style="border-bottom-width: 0px;">
+                    <h5 class="mb-1"data-toggle="collapse" data-target="#collapse_emp" aria-expanded="1" aria-controls="collapse_emp">
+                        <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_emp" aria-expanded="false" aria-controls="collapse_emp">
 
                                 <button class="btn btn-link text-left">
                                     <h4>Conversations with My Team</h4>
@@ -117,7 +117,7 @@ i {
                     </h5>
                 </div>
 
-                <div id="collapse_2" class="accordion-collapse collapse" aria-labelledby="heading_2">
+                <div id="collapse_emp" class="accordion-collapse collapse" aria-labelledby="heading_emp">
                     <div class="card-body">
                         <form action="" method="post" id="filter-menu">
                             <input name="sub" id="sub" value="1" type="hidden">
@@ -240,13 +240,13 @@ i {
       var show_collapse = true;
   }  
   if(show_collapse){
-      $('#collapse_2').collapse('show');
+      $('#collapse_emp').collapse('show');
       var show_collapse = false;
-      $('#heading_2').click(function() {
-         $('#caret_2').css('transform', 'rotate(180deg)');
+      $('#heading_emp').click(function() {
+         $('#caret_emp').css('transform', 'rotate(180deg)');
       });
   } else {
-      $('#collapse_2').collapse('hide');
+      $('#collapse_emp').collapse('hide');
   }
   
   $(document).ready(function() {
