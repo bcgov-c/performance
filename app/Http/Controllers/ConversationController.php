@@ -77,16 +77,10 @@ class ConversationController extends Controller
             $supervisor_ids[] = $history_supervisor->participant_id;
         }
                         
-        //get current team members
-        $team_query = "SELECT users.id as id FROM users 
-                        where users.reporting_to = $authId
-                        UNION
-                        select shared_profiles.shared_id as id FROM shared_profiles
-                        WHERE shared_with = $authId";
-        $myCurrentTeam = DB::select($team_query);
+        
         $myCurrentTeam_array = array();
-        foreach($myCurrentTeam as $item){
-            $myCurrentTeam_array[] = $item->id;
+        foreach($history_teammembers as $item){
+            $myCurrentTeam_array[] = $item->participant_id;
         }
         if(count($myCurrentTeam_array) > 0) {
             $myCurrentTeam_list = implode( ',', $myCurrentTeam_array );
