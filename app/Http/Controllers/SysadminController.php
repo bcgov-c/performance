@@ -1089,22 +1089,16 @@ class SysadminController extends Controller
         $get_data = 0;
         if ($request->ajax()) 
         {
-            $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-            $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-            $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-            $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-            $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
-
-
             $query = User::withoutGlobalScopes()
             ->leftjoin('employee_demo', 'users.employee_id', '=', 'employee_demo.employee_id')
+            ->leftjoin('employee_demo_tree', 'employee_demo_tree.id', '=', 'employee_demo.orgid')
             // ->wherein('employee_demo.employee_status', ['A', 'L', 'P', 'S'])
             ->whereNull('employee_demo.date_deleted')
-            ->when($level0, function($q) use($level0) {return $q->where('employee_demo.organization', $level0->name);})
-            ->when($level1, function($q) use($level1) {return $q->where('employee_demo.level1_program', $level1->name);})
-            ->when($level2, function($q) use($level2) {return $q->where('employee_demo.level2_division', $level2->name);})
-            ->when($level3, function($q) use($level3) {return $q->where('employee_demo.level3_branch', $level3->name);})
-            ->when($level4, function($q) use($level4) {return $q->where('employee_demo.level4', $level4->name);})
+            ->when($request->dd_level0, function($q) use($request) {return $q->where('employee_demo_tree.organization_key', $request->dd_level0);})
+            ->when($request->dd_level1, function($q) use($request) {return $q->where('employee_demo_tree.level1_key', $request->dd_level1);})
+            ->when($request->dd_level2, function($q) use($request) {return $q->where('employee_demo_tree.level2_key', $request->dd_level2);})
+            ->when($request->dd_level3, function($q) use($request) {return $q->where('employee_demo_tree.level3_key', $request->dd_level3);})
+            ->when($request->dd_level4, function($q) use($request) {return $q->where('employee_demo_tree.level4_key', $request->dd_level4);})
             ->when($request->criteria == 'name', function($q) use($request){return $q->where('users.name', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
             ->when($request->criteria == 'job', function($q) use($request){return $q->where('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%");})
