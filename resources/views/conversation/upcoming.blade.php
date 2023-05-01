@@ -108,7 +108,7 @@ i {
                                 <button class="btn btn-link text-left">
                                     <h4>Conversations with My Team</h4>
                                 </button> 
-                                <span class="float-right"  style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
+                                <span class="float-right" id="caret_2"  style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
                                 <br/>
                                 <button class="btn btn-link text-left" style="color:black">
                                     <p>The list enclosed contains all open conversations between you and your direct reports.</p>
@@ -226,20 +226,6 @@ i {
 @endpush    
 
 <script>
-  $('#collapse_1').on('show.bs.collapse', function () {
-    $('#caret_1').html('<i class="fas fa-caret-up"></i>');
-  });
-  $('#collapse_1').on('hide.bs.collapse', function () {
-    $('#caret_1').html('<i class="fas fa-caret-down"></i>');
-  });
-
-  $('#collapse_2').on('show.bs.collapse', function () {
-    $('#caret_2').html('<i class="fas fa-caret-up"></i>');
-  });  
-  $('#collapse_2').on('hide.bs.collapse', function () {
-    $('#caret_2').html('<i class="fas fa-caret-down"></i>');
-  }); 
-    
     
   $('.filtersub').on('change', function() {
     $('#filter-menu').submit();
@@ -256,6 +242,9 @@ i {
   if(show_collapse){
       $('#collapse_2').collapse('show');
       var show_collapse = false;
+      $('#heading_2').click(function() {
+         $('#caret_2').css('transform', 'rotate(180deg)');
+      });
   } else {
       $('#collapse_2').collapse('hide');
   }
@@ -268,7 +257,12 @@ i {
               { title: "ID", data: "id" },
               { title: "Employee ID", data: "signoff_user_id" },
               { title: "Supervisor ID", data: "supervisor_signoff_id" },
-              { title: "Name", data: "name" },
+              {
+                title: "Name",
+                render: function(data, type, row) {
+                  return '<a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</button>';
+                }
+              },
               { title: "Participants", data: "participants" },
               { title: "Employee Signed", data: "employee_signed" },
               { title: "Supervisor Signed", data: "supervisor_signed" },
@@ -297,8 +291,13 @@ i {
             columns: [
               { title: "ID", data: "id" },
               { title: "Employee ID", data: "signoff_user_id" },
-              { title: "Supervisor ID", data: "supervisor_signoff_id" },
-              { title: "Name", data: "name" },
+              { title: "Supervisor ID", data: "supervisor_signoff_id" },              
+              {
+                title: "Name",
+                render: function(data, type, row) {
+                  return '<a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</button>';
+                }
+              },
               { title: "Participants", data: "participants" },
               { title: "Employee Signed", data: "employee_signed" },
               { title: "Supervisor Signed", data: "supervisor_signed" },
@@ -319,6 +318,8 @@ i {
          supervisor_table.column(0).visible(false); 
          supervisor_table.column(1).visible(false); 
          supervisor_table.column(2).visible(false); 
+         
+         $(".upcoming-border").addClass('border-primary');
          
   });  
 </script>
@@ -345,8 +346,8 @@ i {
     
     #upcoming {
         font-weight: bold;
-      }
-      
+    }
+    
     #employee_conversations {
         width: 100%;
     }  
