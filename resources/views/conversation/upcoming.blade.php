@@ -353,4 +353,9 @@ i {
     table.dataTable thead th {
         border-bottom: solid #FCBA19;
     }
+    
+    .dataTable > thead > tr > th:nth-child(5)[class*="sort"]:before,
+    .dataTable > thead > tr > th:nth-child(5)[class*="sort"]:after {
+        content: "" !important;
+    }
 </style> 
