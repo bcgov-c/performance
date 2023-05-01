@@ -87,7 +87,7 @@ i {
                                 <button class="btn btn-link text-left">
                                     <h4>Conversations with My Supervisor</h4>
                                 </button> 
-                                <span class="float-right"  style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
+                                <span class="float-right" id="caret_1"    style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
                                 <br/>
                                 <button class="btn btn-link text-left" style="color:black">
                                     <p>The list enclosed contains all open conversations between you and your supervisor(s).</p>
@@ -169,7 +169,7 @@ i {
                                 <button class="btn btn-link text-left">
                                     <h4>Conversations with My Team</h4>
                                 </button> 
-                                <span class="float-right"  style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
+                                <span class="float-right" id="caret_2" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
                                 <br/>
                                 <button class="btn btn-link text-left" style="color:black">
                                     <p>The list enclosed contains all open conversations between you and your direct reports.</p>
@@ -275,21 +275,6 @@ i {
 @endpush    
 
 <script>
-  $('#collapse_1').on('show.bs.collapse', function () {
-    $('#caret_1').html('<i class="fas fa-caret-up"></i>');
-  });
-  $('#collapse_1').on('hide.bs.collapse', function () {
-    $('#caret_1').html('<i class="fas fa-caret-down"></i>');
-  });
-
-  $('#collapse_2').on('show.bs.collapse', function () {
-    $('#caret_2').html('<i class="fas fa-caret-up"></i>');
-  });  
-  $('#collapse_2').on('hide.bs.collapse', function () {
-    $('#caret_2').html('<i class="fas fa-caret-down"></i>');
-  }); 
-    
-    
   $('.filtersub').on('change', function() {
     $('#filter-menu').submit();
   });
@@ -310,6 +295,9 @@ i {
   if(show_collapse){
       $('#collapse_2').collapse('show');
       var show_collapse = false;
+      $('#heading_2').click(function() {
+         $('#caret_2').css('transform', 'rotate(180deg)');
+      });
   } else {
       $('#collapse_2').collapse('hide');
   }
@@ -326,6 +314,9 @@ i {
   if(show_collapse_1){
       $('#collapse_1').collapse('show');
       var show_collapse_1 = false;
+      $('#heading_1').click(function() {
+         $('#caret_1').css('transform', 'rotate(180deg)');
+      });
   } else {
       $('#collapse_1').collapse('hide');
   }
@@ -342,7 +333,12 @@ i {
               { title: "Supervisor ID", data: "supervisor_signoff_id" },
               { title: "Is Locked", data: "is_locked" },
               { title: "Status", data: "status" },
-              { title: "Name", data: "name" },
+              {
+                title: "Name",
+                render: function(data, type, row) {
+                  return '<a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</button>';
+                }
+              },
               { title: "Participants", data: "participants" },
               { title: "Latest Signed Off Date", data: "date" }
             ],
@@ -364,7 +360,12 @@ i {
               { title: "Supervisor ID", data: "supervisor_signoff_id" },
               { title: "Is Locked", data: "is_locked" },
               { title: "Status", data: "status" },
-              { title: "Name", data: "name" },
+              {
+                title: "Name",
+                render: function(data, type, row) {
+                  return '<a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</button>';
+                }
+              },
               { title: "Participants", data: "participants" },
               { title: "Latest Signed Off Date", data: "date" }
             ],
@@ -377,7 +378,7 @@ i {
          employee_table.column(3).visible(false);
 
         
-         
+         $(".complete-border").addClass('border-primary');
   });  
 </script>
 

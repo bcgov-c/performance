@@ -4,12 +4,12 @@
             Conversation Templates
         </x-button>
     </div>
-    <div class="px-4 py-1 mr-2 border-bottom  {{Route::current()->getName() == 'conversation.upcoming' || Route::current()->getName() == 'my-team.conversations.upcoming' || Route::current()->getName() == 'my-team.conversations.upcoming.filter' ? 'border-primary' : ''}}">
+    <div class="px-4 py-1 mr-2 border-bottom upcoming-border  {{Route::current()->getName() == 'conversation.upcoming' || Route::current()->getName() == 'my-team.conversations.upcoming' || Route::current()->getName() == 'my-team.conversations.upcoming.filter' ? 'border-primary' : ''}}">
         <x-button :href="request()->routeIs('my-team*') ?  route('my-team.conversations.upcoming') : route('conversation.upcoming')" style="" id='upcoming'>
             Open Conversations
         </x-button>
     </div>
-    <div class="px-4 py-1 border-bottom  {{Route::current()->getName() == 'conversation.past' || Route::current()->getName() == 'my-team.conversations.past' || Route::current()->getName() == 'my-team.conversations.past.filter' ? 'border-primary' : ''}}">
+    <div class="px-4 py-1 border-bottom complete-border  {{Route::current()->getName() == 'conversation.past' || Route::current()->getName() == 'my-team.conversations.past' || Route::current()->getName() == 'my-team.conversations.past.filter' ? 'border-primary' : ''}}">
         <x-button :href="request()->routeIs('my-team*') ?  route('my-team.conversations.past') : route('conversation.past')" style="" id='past'>
             Completed Conversations
         </x-button>
