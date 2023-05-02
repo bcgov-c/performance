@@ -493,6 +493,12 @@ class SysadminStatisticsReportController extends Controller
                     ->orWhereNull('supervisor_signoff_id');
             });
         })
+        ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('users.excused_flag', '<>', '1')
+                            ->orWhereNull('users.excused_flag');
+                    });
+                }) 
         ->where('conversation_participants.role','<>','mgr')
         ->whereNull('employee_demo.date_deleted')        
         ->whereNull('conversations.deleted_at');

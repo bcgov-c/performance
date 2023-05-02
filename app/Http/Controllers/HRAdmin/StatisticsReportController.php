@@ -515,8 +515,7 @@ class StatisticsReportController extends Controller
         }) 
         ->join('employee_demo', function($join) {
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-        })
-       
+        })       
         ->where(function($query) {
                     $query->where(function($query) {
                         $query->where('users.due_date_paused', 'N')
@@ -544,10 +543,14 @@ class StatisticsReportController extends Controller
                     ->whereIn('admin_org_users.access_type', [0,2])
                     ->where('admin_org_users.granted_to_id', '=', Auth::id());
         })
-        ->where('conversation_participants.role','<>','mgr');
-        
-        $conversations = $sql->get();
-             
+        ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('users.excused_flag', '<>', '1')
+                            ->orWhereNull('users.excused_flag');
+                    });
+                })
+        ->where('conversation_participants.role','<>','mgr');        
+        $conversations = $sql->get();             
 
         // Chart2 -- Open Conversation
         $topics = ConversationTopic::select('id','name')->get();
