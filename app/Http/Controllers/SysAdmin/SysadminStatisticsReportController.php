@@ -2207,7 +2207,8 @@ class SysadminStatisticsReportController extends Controller
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
                 ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                 ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
-                ->where('conversation_participants.role','emp')   
+                ->where('conversation_participants.role','emp') 
+                ->whereNull('conversations.deleted_at')          
                 ->where(function($query) {
                     $query->where(function($query) {
                         $query->where('due_date_paused', 'N')
@@ -2272,6 +2273,7 @@ class SysadminStatisticsReportController extends Controller
                 ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                 ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
                 ->where('conversation_participants.role','emp')   
+                ->whereNull('conversations.deleted_at')          
                 ->where(function($query) {
                     $query->where(function($query) {
                         $query->where('due_date_paused', 'N')
@@ -2337,7 +2339,8 @@ class SysadminStatisticsReportController extends Controller
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
                 ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                 ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
-                ->where('conversation_participants.role','emp')   
+                ->where('conversation_participants.role','emp') 
+                ->whereNull('conversations.deleted_at')          
                 ->where(function($query) {
                     $query->where(function($query) {
                         $query->where('due_date_paused', 'N')
@@ -2375,7 +2378,8 @@ class SysadminStatisticsReportController extends Controller
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
                 ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                 ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
-                ->where('conversation_participants.role','emp')   
+                ->where('conversation_participants.role','emp')  
+                ->whereNull('conversations.deleted_at')          
                 ->where(function($query) {
                     $query->where(function($query) {
                         $query->where('due_date_paused', 'N')
