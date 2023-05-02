@@ -152,13 +152,13 @@ class EmployeeSharesController extends Controller {
             ->whereIn('employee_demo.employee_id', $eselected_emp_ids )
             ->distinct()
             ->get() ;
-        if ($request->input_elements == 0) {
+        // if ($request->input_elements == 0) {
             $elements = array("1", "2");
-        } else if ($request->input_elements == 1) {
-            $elements = array("1");
-        } else {
-            $elements = array("2");
-        }
+        // } else if ($request->input_elements == 1) {
+        //     $elements = array("1");
+        // } else {
+        //     $elements = array("2");
+        // }
         $reason = $request->input_reason;
         foreach ($eeToShare as $eeOne) {
             foreach ($shareTo as $toOne) {                
