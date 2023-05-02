@@ -323,6 +323,12 @@ i {
 </script>
 
 <style>
+    
+    .dataTable > thead > tr > th:nth-child(5)[class*="sort"]:before,
+    .dataTable > thead > tr > th:nth-child(5)[class*="sort"]:after {
+        content: "" !important;
+    }
+    
     .panel-heading{
         opacity: 0.5;
     }
