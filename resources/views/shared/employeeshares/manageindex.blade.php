@@ -81,7 +81,7 @@
                         {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Delegate ID', ariaTitle: 'Delegate ID', target: 0, type: 'string', data: 'delegate_ee_id', name: 'delegate_ee_id', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Delegate Name', ariaTitle: 'Delegate Name', target: 0, type: 'string', data: 'delegate_ee_name', name: 'delegate_ee_name', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Shared Item', ariaTitle: 'Shared Item', target: 0, type: 'string', data: 'shared_item', name: 'shared_item', searchable: true, className: 'dt-nowrap show-modal'},
+                        // {title: 'Shared Item', ariaTitle: 'Shared Item', target: 0, type: 'string', data: 'shared_item', name: 'shared_item', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', searchable: true, className: 'dt-nowrap show-modal'},

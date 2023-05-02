@@ -79,7 +79,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <div class="col col-2">
+                        <!-- <div class="col col-2">
                            <label for='elements' title='Items to Share Tooltip'>Items to Share
                                 <select name="input_elements" class="form-control" id="input_elements" >
                                     <option value = 0 > Both </option>
@@ -88,8 +88,8 @@
                                 </select>
  					            <small  class="text-danger error-target_date"></small>
                             </label>
-                       </div>
-                        <div class="col col-10">
+                       </div> -->
+                        <div class="col col-12">
                             <!-- <x-input id="reason" name="input_reason" label="Reason for sharing" data-toggle="tooltip" data-placement="top" data-trigger="manual" tooltip="Reason tooltip"/> -->
                             <b>Reason for sharing</b>
                             <i class="fa fa-info-circle" label="Reason for sharing" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Provide a brief explanation of why the profile elements are being shared. For example: <br><br><ul><li> Sharing profile with co-supervisor </li><li>Sharing goals section with project team lead</li><li>Sharing conversations section with hiring manager per employee request</li></ul>"> </i> 
