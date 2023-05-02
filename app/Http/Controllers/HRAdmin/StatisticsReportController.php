@@ -787,6 +787,167 @@ class StatisticsReportController extends Controller
                     'topic_id' => $topic->id, 
                 ]);
         }
+        
+        //get all employee number
+        $employees = UserDemoJrView::distinct('employee_id')
+                ->where(function($query) {
+                                $query->where(function($query) {
+                                    $query->where('excused_flag', '<>', '1')
+                                        ->orWhereNull('excused_flag');
+                                });
+                            })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                                  
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('admin_org_users')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'user_id')
+                            ->whereIn('admin_org_users.access_type', [0,2])
+                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                })->count();
+
+        // Chart6 -- Employee Has Open Conversation
+        $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, 
+                            organization, level1_program, level2_division, level3_branch, level4
+                 ")
+                ->join('conversation_participants', function($join) {
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                })
+                ->join('conversations', function($join) {
+                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
+                })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
+                ->where('conversation_participants.role','emp')   
+                ->whereNull('conversations.deleted_at')           
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
+                    });
+                })
+		->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('excused_flag', '<>', '1')
+                            ->orWhereNull('excused_flag');
+                    });
+                }) 
+                ->whereNull('date_deleted')
+                ->whereNotNull('conversation_id')      
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereNull('signoff_user_id')
+                              ->orWhereNull('supervisor_signoff_id');
+                    });
+                }) 
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('admin_org_users')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'conversation_participants.participant_id')
+                            ->whereIn('admin_org_users.access_type', [0,2])
+                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                });      
+        
+        $users = $sql_6->get();
+        $users = $users->unique('employee_id');
+        
+        $has_conversation = $users->count();
+        $no_conversation = $employees - $has_conversation;
+        // Chart 6 
+        $legends = ['Yes', 'No'];
+        $data['chart6']['chart_id'] = 6;
+        $data['chart6']['title'] = 'Employee Has Open Conversation';
+        $data['chart6']['legend'] = $legends;
+        $data['chart6']['groups'] = array();
+        
+        foreach($legends as $legend)
+        {            
+            if($legend == 'No') {
+                $subset = $no_conversation;
+            } else {
+                $subset = $has_conversation;
+            }
+            
+            array_push( $data['chart6']['groups'],  [ 'name' => $legend, 'value' => $subset,
+                            'legend' => $legend, 
+                        ]);
+        } 
+        
+        
+        // Chart7 -- Employee Has Completed Conversation
+        $sql_7 = UserDemoJrView::selectRaw("employee_id, employee_name, 
+                            organization, level1_program, level2_division, level3_branch, level4
+                 ")
+                ->join('conversation_participants', function($join) {
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                })
+                ->join('conversations', function($join) {
+                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
+                })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
+                ->where('conversation_participants.role','emp') 
+                ->whereNull('conversations.deleted_at')          
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
+                    });
+                })
+		->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('excused_flag', '<>', '1')
+                            ->orWhereNull('excused_flag');
+                    });
+                }) 
+                ->whereNull('date_deleted')
+                ->whereNotNull('conversation_id')       
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereNotNull('signoff_user_id')
+                              ->WhereNotNull('supervisor_signoff_id');
+                    });
+                }) 
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('admin_org_users')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'conversation_participants.participant_id')
+                            ->whereIn('admin_org_users.access_type', [0,2])
+                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                });
+                            
+        $users = $sql_7->get();
+        $users = $users->unique('employee_id');
+        
+        $has_conversation = $users->count();
+        $no_conversation = $employees - $has_conversation;
+        // Chart 7 
+        $legends = ['Yes', 'No'];
+        $data['chart7']['chart_id'] = 7;
+        $data['chart7']['title'] = 'Employee Has Completed Conversation';
+        $data['chart7']['legend'] = $legends;
+        $data['chart7']['groups'] = array();
+
+        foreach($legends as $legend)
+        {
+            if($legend == 'No') {
+                $subset = $no_conversation;
+            } else {
+                $subset = $has_conversation;
+            }
+            array_push( $data['chart7']['groups'],  [ 'name' => $legend, 'value' => $subset,
+                            'legend' => $legend, 
+                        ]);
+        } 
                
 
         return view('hradmin.statistics.conversationsummary',compact('data'));
@@ -1828,7 +1989,6 @@ class StatisticsReportController extends Controller
         $request->session()->flash('dd_level3', $request->dd_level3);
         $request->session()->flash('dd_level4', $request->dd_level4);
         
-        //get all employee number
         //get all employee number
         $employees = UserDemoJrView::distinct('employee_id')
                 ->where(function($query) {
