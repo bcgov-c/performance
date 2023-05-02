@@ -141,6 +141,7 @@ $(function() {
         
 	var allCharts = [];
 	var export_url = '{{ route('hradmin.statistics.conversationsummary.export') }}';  
+        var export_url_1 = '{{ route('hradmin.statistics.conversationstatus.export') }}';  
 
 	function createChart(divId, myData) {
 
@@ -361,7 +362,7 @@ $(function() {
 							ids =  myChart.getModel().option.ids;
 							chart_id = myChart.getModel().option.chart_id;
 							filter = $('input[name=filter_params').val();
-							let _url = export_url + '?chart=' + chart_id + filter; // + '&ids=' + ids;
+							let _url = export_url_1 + '?chart=' + chart_id + filter; // + '&ids=' + ids;
 							window.location.href = _url;
 						}
 					},
@@ -478,7 +479,7 @@ $(function() {
 			// prepare the parameters for calling export on difference segments
 			chart_id = myChart.getModel().option.chart_id;
 			filter = $('input[name=filter_params').val();
-			let _url = export_url + '?chart=' + chart_id + '&legend=' + params.data.legend + filter;
+			let _url = export_url_1 + '?chart=' + chart_id + '&legend=' + params.data.legend + filter;
 			window.location.href = _url;
 
 		});
