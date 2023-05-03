@@ -820,7 +820,7 @@ class GoalBankController extends Controller
         // Get the old employees listing 
         $old_ee_ids =  GoalSharedWith::join('users', 'goals_shared_with.user_id', 'users.id')
                                 ->where('goal_id', $request->goal_id)->distinct()->pluck('users.employee_id')->toArray();
-        $old_org_ee_ids = UserDemoJrForGoalBankView::from('user_demo_jr_for_goalbank_view AS u')
+        $old_org_ee_ids = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
                                 ->join('goal_bank_orgs', 'u.orgid', 'goal_bank_orgs.orgid')
                                 ->where('goal_bank_orgs.goal_id', $request->goal_id)
                                 ->pluck('u.employee_id')
@@ -885,7 +885,7 @@ class GoalBankController extends Controller
         // Get the old employees listing 
         $old_ee_ids =  GoalSharedWith::join('users', 'goals_shared_with.user_id', 'users.id')
                                 ->where('goal_id', $id)->distinct()->pluck('users.employee_id')->toArray();
-        $old_org_ee_ids = UserDemoJrForGoalBankView::from('user_demo_jr_for_goalbank_view AS u')
+        $old_org_ee_ids = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
                                 ->join('goal_bank_orgs', 'u.orgid', 'goal_bank_orgs.orgid')
                                 ->where('goal_bank_orgs.goal_id', $id)
                                 ->pluck('u.employee_id')
@@ -1258,7 +1258,7 @@ class GoalBankController extends Controller
     }
 
     protected function get_employees_by_selected_org_nodes($selected_org_nodes) {
-        $employees = UserDemoJrForGoalBankView::from('user_demo_jr_for_goalbank_view AS u')
+        $employees = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
             ->whereIn('u.orgid', $selected_org_nodes)
             ->pluck('employee_id'); 
         return ($employees ? $employees->toArray() : []); 
@@ -1268,7 +1268,7 @@ class GoalBankController extends Controller
     protected function notify_on_dashboard($goalBank, $employee_ids) {
 
         // Filter out the employee based on the Organization level and individual user preferences. 
-        $filtered_ee_ids = UserDemoJrForGoalBankView::join('access_organizations', 'user_demo_jr_for_goalbank_view.organization', 'access_organizations.organization')
+        $filtered_ee_ids = UserDemoJrForGoalbankView::join('access_organizations', 'user_demo_jr_for_goalbank_view.organization', 'access_organizations.organization')
                                 ->leftjoin('user_preferences', 'user_demo_jr_for_goalbank_view.user_id', 'user_preferences.user_id')
                                 ->whereIn('user_demo_jr_for_goalbank_view.employee_id', $employee_ids)
                                 ->where('access_organizations.allow_inapp_msg', 'Y')
@@ -1302,7 +1302,7 @@ class GoalBankController extends Controller
     protected function notify_employees($goalBank, $employee_ids) {
 
          // Filter out the employee based on the Organization level and individual user preferences. 
-         $filtered_ee_ids = UserDemoJrForGoalBankView::join('access_organizations', 'user_demo_jr_for_goalbank_view.organization', 'access_organizations.organization')
+         $filtered_ee_ids = UserDemoJrForGoalbankView::join('access_organizations', 'user_demo_jr_for_goalbank_view.organization', 'access_organizations.organization')
                                     ->leftjoin('user_preferences', 'user_demo_jr_for_goalbank_view.user_id', 'user_preferences.user_id')
                                     ->whereIn('user_demo_jr_for_goalbank_view.employee_id', $employee_ids)
                                     ->where('access_organizations.allow_email_msg', 'Y')
