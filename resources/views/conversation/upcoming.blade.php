@@ -94,6 +94,72 @@ i {
 
                 <div id="collapse_sup" class="collapse" aria-labelledby="heading_sup">
                     <div class="card-body">
+                        <form action="" method="post" id="sup-filter-menu">
+                            <div class="row">
+                                <div class="col">
+                                    <label>
+                                        Conversation Type
+                                        <select name="sup_conversation_topic_id" id="sup_conversation_topic_id" class="sup_filtersub form-control">
+                                            @foreach($conversationList as $item)
+                                            <option value="{{$item['id']}}"
+                                                    @if($item['id'] == request()->sup_conversation_topic_id)    
+                                                    selected
+                                                    @endif
+                                                >{{$item['name']}}</option>
+                                            @endforeach
+                                        </select>
+                                    </label>
+                                </div>
+                                <div class="col">
+                                    <label>
+                                        Supervisors
+                                        <select name="supervisors" id="supervisors" class="sup_filtersub form-control">
+                                            @foreach($supervisor_members as $item)
+                                            <option value="{{$item['id']}}"
+                                                    @if($item['id'] == request()->supervisors)    
+                                                    selected
+                                                    @endif
+                                                >{{$item['name']}}</option>
+                                            @endforeach
+                                        </select>
+                                    </label>
+                                </div>
+                                <div class="col">
+                                    <label>
+                                        Employee Signed
+                                        <select name="sup_employee_signed" id="sup_employee_signed" class="sup_filtersub form-control">
+                                                <option value="any">Any</option><option value="1"
+                                                    @if(request()->sup_employee_signed == '1')    
+                                                    selected
+                                                    @endif
+                                                >Yes</option>
+                                            <option value="0"
+                                                    @if(request()->sup_employee_signed == '0')    
+                                                    selected
+                                                    @endif
+                                                >No</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <div class="col">
+                                    <label>
+                                        Supervisor Signed
+                                        <select name="sup_supervisor_signed" id="sup_supervisor_signed" class="sup_filtersub form-control">
+                                                <option value="any">Any</option><option value="1"
+                                                    @if(request()->sup_supervisor_signed == '1')    
+                                                    selected
+                                                    @endif
+                                                >Yes</option>
+                                            <option value="0"
+                                                    @if(request()->sup_supervisor_signed == '0')    
+                                                    selected
+                                                    @endif
+                                                >No</option>
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>
+                        </form>
                         <table style="width:100%" id='supervisor_conversations' class="table table-striped"> </table>
                     </div>
                 </div>   
@@ -227,7 +293,11 @@ i {
     
   $('.filtersub').on('change', function() {
     $('#filter-menu').submit();
-  });  
+  });
+  
+  $('.sup_filtersub').on('change', function() {
+    $('#sup-filter-menu').submit();
+  }); 
 
   var show_collapse = false;
   var conversation_topic_id = $('#conversation_topic_id').val();
