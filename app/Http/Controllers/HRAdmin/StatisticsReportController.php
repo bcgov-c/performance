@@ -1826,7 +1826,7 @@ class StatisticsReportController extends Controller
                         $query->select(DB::raw(1))
                                 ->from('admin_org_users')
                                 ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
-                                ->whereIn('admin_org_users.access_type', [0])
+                                ->whereIn('admin_org_users.access_type', [0,2])
                                 ->where('admin_org_users.granted_to_id', '=', Auth::id());
                     });
                  

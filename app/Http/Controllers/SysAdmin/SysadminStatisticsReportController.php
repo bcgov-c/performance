@@ -1488,18 +1488,19 @@ class SysadminStatisticsReportController extends Controller
         $request->session()->flash('dd_level4', $request->dd_level4);
 
         $sql = User::selectRaw("users.employee_id, users.empl_record, 
-                    employee_name, employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4,
-                    case when ( users.due_date_paused = 'N')
+                    employee_name, employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division,
+                    employee_demo_tree.level3_branch, employee_demo_tree.level4,
+                    case when users.due_date_paused = 'N'
                         then 'No' else 'Yes' end as excused")
                     ->join('employee_demo', function($join) {
-                        $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                         $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     })
                     ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                     ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-                    ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-                    ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-                    ->when( $request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-                    ->when( $request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); });
+                    ->when($request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
+                    ->when($request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
+                    ->when($request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
+                    ->when($request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); });
 
         $users = $sql->get();
 
@@ -1533,24 +1534,24 @@ class SysadminStatisticsReportController extends Controller
 
       $sql = User::selectRaw("users.employee_id, users.email, users.excused_start_date, users.excused_end_date,
                             users.excused_reason_id, users.reporting_to,
-                    employee_name, employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4,
-                    case when (users.due_date_paused = 'N')
+                    employee_demo.employee_name, employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4,
+                    case when users.due_date_paused = 'N'
                         then 'No' else 'Yes' end as excused")
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 })
                 ->when( $request->legend == 'Yes', function($q) use($request) {
-                    $q->where('users.due_date_paused', 'N');
+                    $q->whereRaw(" users.due_date_paused = 'Y' ");
                 }) 
                 ->when( $request->legend == 'No', function($q) use($request) {
-                    $q->where('users.due_date_paused', 'Y');
+                    $q->whereRaw(" users.due_date_paused = 'N' ");
                 })
                 ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
+                ->when($request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
+                ->when($request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
+                ->when($request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
+                ->when($request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
                 ->with('excuseReason') ;
 
         $users = $sql->get();
