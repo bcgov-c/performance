@@ -86,7 +86,7 @@
                                                     <tr style="border-bottom: solid #FCBA19">
                                                         <th width="20%" style="border-bottom: solid #FCBA19">Name</th>
                                                         <th width="45%" style="border-bottom: solid #FCBA19">When to use</th>
-                                                        <th width="15%" style="border-bottom: solid #FCBA19"Participants</th>
+                                                        <th width="15%" style="border-bottom: solid #FCBA19">Participants</th>
                                                         <th width="20%" style="border-bottom: solid #FCBA19">&nbsp;</th>
                                                     </tr>
                                                 </tdhead>
