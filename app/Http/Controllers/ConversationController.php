@@ -347,9 +347,9 @@ class ConversationController extends Controller
             if(isset($item->mgrname) && isset($item->empname)){
                 $myTeamConversations_arr[$i]['participants'] = $item->mgrname . ", " . $item->empname;
             } else {
-                if($item->conversationParticipants[0]->participant->role == 'emp'){
+                if($item->conversationParticipants[1]->participant->id == $authId){                    
                     $myTeamConversations_arr[$i]['participants'] = $item->conversationParticipants[1]->participant->name . ", " . $item->conversationParticipants[0]->participant->name;
-                } else {
+                }else{
                     $myTeamConversations_arr[$i]['participants'] = $item->conversationParticipants[0]->participant->name . ", " . $item->conversationParticipants[1]->participant->name;
                 }                
             }            
@@ -410,11 +410,11 @@ class ConversationController extends Controller
             if(isset($item->mgrname) && isset($item->empname)){
                 $conversations_arr[$i]['participants'] = $item->mgrname . ", " . $item->empname;
             } else {
-                if($item->conversationParticipants[0]->participant->role == 'emp'){
+                if($item->conversationParticipants[0]->participant->id == $authId){                    
                     $conversations_arr[$i]['participants'] = $item->conversationParticipants[1]->participant->name . ", " . $item->conversationParticipants[0]->participant->name;
-                } else {
+                }else{
                     $conversations_arr[$i]['participants'] = $item->conversationParticipants[0]->participant->name . ", " . $item->conversationParticipants[1]->participant->name;
-                } 
+                }
             }
             $conversations_arr[$i]['signoff_user_id'] = $item->signoff_user_id;
             if($item->signoff_user_id != ''){
