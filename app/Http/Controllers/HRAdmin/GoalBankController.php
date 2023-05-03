@@ -786,22 +786,22 @@ class GoalBankController extends Controller
         if($request->ajax()){
             $demoWhere = $this->baseFilteredWhere($request, $option);
             $sql = clone $demoWhere; 
-            $employees = $sql->select([ 
-                    'u.employee_id', 
-                    'u.employee_name', 
-                    'u.jobcode_desc', 
-                    'u.employee_email', 
-                    'u.organization', 
-                    'u.level1_program', 
-                    'u.level2_division', 
-                    'u.level3_branch', 
-                    'u.level4', 
-                    'u.deptid',
-                    'u.isSupervisor',
-                    'u.isDelegate'
-                ])
-                ->when($request->{$option.'dd_superv'} == 'sup', function($q) { return $q->whereRaw("(u.isSupervisor = 'Yes' OR u.isDelegate = 'Yes')"); }) 
-                ->when($request->{$option.'dd_superv'} == 'non', function($q) { return $q->whereRaw("NOT u.isSupervisor = 'Yes' AND NOT u.isDelegate = 'Yes'"); }); 
+            $employees = $sql->selectRaw("
+                    u.employee_id, 
+                    u.employee_name, 
+                    u.jobcode_desc, 
+                    u.employee_email, 
+                    u.organization, 
+                    u.level1_program, 
+                    u.level2_division, 
+                    u.level3_branch, 
+                    u.level4, 
+                    u.deptid,
+                    CASE WHEN u.isSupervisor = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor,
+                    CASE WHEN u.isDelegate = 1 THEN 'Yes' ELSE 'No' END AS isDelegate
+                ")
+                ->when($request->{$option.'dd_superv'} == 'sup', function($q) { return $q->whereRaw("(u.isSupervisor = 1 OR u.isDelegate = 1)"); }) 
+                ->when($request->{$option.'dd_superv'} == 'non', function($q) { return $q->whereRaw("NOT u.isSupervisor = 1 AND NOT u.isDelegate = 1"); }); 
             return Datatables::of($employees)
                 ->addColumn($option.'select_users', static function ($employee) use ($option) {
                     return '<input pid="1335" type="checkbox" id="'.$option.'userCheck'. 
@@ -1221,27 +1221,27 @@ class GoalBankController extends Controller
                 ->when($request->dd_level2, function($q) use($request) {return $q->where('u.level2_key', $request->dd_level2);})
                 ->when($request->dd_level3, function($q) use($request) {return $q->where('u.level3_key', $request->dd_level3);})
                 ->when($request->dd_level4, function($q) use($request) {return $q->where('u.level4_key', $request->dd_level4);})
-                ->when($request->dd_superv == 'sup', function($q) use($request) { return $q->whereRaw("(u.isSupervisor = 'Yes' OR u.isDelegate = 'Yes')"); })
-                ->when($request->dd_superv == 'non', function($q) use($request) { return $q->whereRaw("NOT u.isSupervisor = 'Yes' AND NOT u.isDelegate = 'Yes'"); })
+                ->when($request->dd_superv == 'sup', function($q) use($request) { return $q->whereRaw("(u.isSupervisor = 1 OR u.isDelegate = 1)"); })
+                ->when($request->dd_superv == 'non', function($q) use($request) { return $q->whereRaw("NOT u.isSupervisor = 1 AND NOT u.isDelegate = 1"); })
                 ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { return $q->whereRaw("u.{$request->criteria} like '%{$request->search_text}%'"); })
                 ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(u.employee_id LIKE '%{$request->search_text}%' OR u.employee_name LIKE '%{$request->search_text}%' OR u.jobcode_desc LIKE '%{$request->search_text}%' OR u.deptid LIKE '%{$request->search_text}%')"); })
-                ->select ([
-                    'u.employee_id',
-                    'u.employee_name',
-                    'u.jobcode_desc',
-                    'u.organization AS organization',
-                    'u.level1_program AS level1_program',
-                    'u.level2_division AS level2_division',
-                    'u.level3_branch AS level3_branch',
-                    'u.level4 AS level4',
-                    'u.deptid',
-                    'g.id as goal_id',
-                    's.id as share_id',
-                    'u.user_id',
-                    'g.display_name',
-                    'u.isSupervisor',
-                    'u.isDelegate'
-                ]);
+                ->selectRaw ("
+                    u.employee_id,
+                    u.employee_name,
+                    u.jobcode_desc,
+                    u.organization AS organization,
+                    u.level1_program AS level1_program,
+                    u.level2_division AS level2_division,
+                    u.level3_branch AS level3_branch,
+                    u.level4 AS level4,
+                    u.deptid,
+                    g.id as goal_id,
+                    s.id as share_id,
+                    u.user_id,
+                    g.display_name,
+                    CASE WHEN u.isSupervisor = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor,
+                    CASE WHEN u.isDelegate = 1 THEN 'Yes' ELSE 'No' END AS isDelegate
+                ");
             return Datatables::of($query)
                 ->addIndexColumn()
                 ->addcolumn('action', function($row) {
