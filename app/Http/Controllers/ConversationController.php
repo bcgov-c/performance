@@ -197,7 +197,11 @@ class ConversationController extends Controller
                     });
                 });
             }
-            $myTeamQuery->where('signoff_user_id','<>', $authId);            
+            $myTeamQuery->where('signoff_user_id','<>', $authId);          
+            $team_sql_test = $myTeamQuery->toSql();
+            $team_sql_par = $myTeamQuery->getBindings();
+            Log::info(print_r($team_sql_test,true));
+            Log::info(print_r($team_sql_par,true));
             $type = 'past';
             $conversations = $query->orderBy('id', 'DESC')->paginate(10); 
             $myTeamConversations = $myTeamQuery->orderBy('id', 'DESC')->paginate(10);
