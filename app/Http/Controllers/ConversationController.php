@@ -200,11 +200,9 @@ class ConversationController extends Controller
             $myTeamQuery->where('signoff_user_id','<>', $authId);          
             $team_sql_test = $myTeamQuery->toSql();
             $team_sql_par = $myTeamQuery->getBindings();
-            Log::info(print_r($team_sql_test,true));
-            Log::info(print_r($team_sql_par,true));
             $type = 'past';
-            $conversations = $query->orderBy('id', 'DESC')->paginate(10); 
-            $myTeamConversations = $myTeamQuery->orderBy('id', 'DESC')->paginate(10);
+            $conversations = $query->orderBy('id', 'DESC')->get(); 
+            $myTeamConversations = $myTeamQuery->orderBy('id', 'DESC')->get();
         } else { // Upcoming
             //conversations with my supervisor
             $sup_query = "SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as last_sign_off_date, conversations.unlock_until, conversation_topics.name, empusers.name as empname, mgrusers.name as mgrname 
@@ -282,7 +280,6 @@ class ConversationController extends Controller
                 }  
             }            
             $emp_query .= " ORDER BY conversations.id DESC";
-            Log::info(print_r($emp_query,true));
             $myTeamConversations = DB::select($emp_query);
             
             if ($request->has('sub') && $request->sub) {
@@ -350,7 +347,11 @@ class ConversationController extends Controller
             if(isset($item->mgrname) && isset($item->empname)){
                 $myTeamConversations_arr[$i]['participants'] = $item->mgrname . ", " . $item->empname;
             } else {
-                $myTeamConversations_arr[$i]['participants'] = $item->conversationParticipants[0]->participant->name . ", " . $item->conversationParticipants[1]->participant->name;
+                if($item->conversationParticipants[0]->participant->role == 'emp'){
+                    $myTeamConversations_arr[$i]['participants'] = $item->conversationParticipants[1]->participant->name . ", " . $item->conversationParticipants[0]->participant->name;
+                } else {
+                    $myTeamConversations_arr[$i]['participants'] = $item->conversationParticipants[0]->participant->name . ", " . $item->conversationParticipants[1]->participant->name;
+                }                
             }            
             $myTeamConversations_arr[$i]['signoff_user_id'] = $item->signoff_user_id;
             if($item->signoff_user_id != ''){
@@ -409,7 +410,11 @@ class ConversationController extends Controller
             if(isset($item->mgrname) && isset($item->empname)){
                 $conversations_arr[$i]['participants'] = $item->mgrname . ", " . $item->empname;
             } else {
-                $conversations_arr[$i]['participants'] = $item->conversationParticipants[0]->participant->name . ", " . $item->conversationParticipants[1]->participant->name;
+                if($item->conversationParticipants[0]->participant->role == 'emp'){
+                    $myTeamConversations_arr[$i]['participants'] = $item->conversationParticipants[1]->participant->name . ", " . $item->conversationParticipants[0]->participant->name;
+                } else {
+                    $myTeamConversations_arr[$i]['participants'] = $item->conversationParticipants[0]->participant->name . ", " . $item->conversationParticipants[1]->participant->name;
+                } 
             }
             $conversations_arr[$i]['signoff_user_id'] = $item->signoff_user_id;
             if($item->signoff_user_id != ''){
