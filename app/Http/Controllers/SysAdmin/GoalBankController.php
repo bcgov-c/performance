@@ -12,7 +12,7 @@ use App\Models\GoalBankOrg;
 use App\Models\EmployeeDemo;
 use Illuminate\Http\Request;
 use App\Models\GoalSharedWith;
-use App\Models\UserDemoJrView;
+use App\Models\UserDemoJrForGoalBankView;
 use App\MicrosoftGraph\SendMail;
 use App\Models\EmployeeDemoTree;
 use Yajra\Datatables\Datatables;
@@ -743,21 +743,22 @@ class GoalBankController extends Controller
         if($request->ajax()){
             $demoWhere = $this->baseFilteredWhere($request, $option);
             $sql = clone $demoWhere; 
-            $employees = $sql->select([ 
-                    'u.employee_id', 
-                    'u.employee_name', 
-                    'u.jobcode_desc', 
-                    'u.employee_email', 
-                    'u.organization', 
-                    'u.level1_program', 
-                    'u.level2_division', 
-                    'u.level3_branch', 
-                    'u.level4', 
-                    'u.deptid'
-                ])
-                ->when($request->{$option.'dd_superv'} == 'sup', function($q) { return $q->whereRaw("(EXISTS (SELECT DISTINCT 1 FROM users AS u1, users AS su WHERE su.reporting_to = u1.id AND u1.employee_id = u.employee_id) OR sp.shared_with <> '')"); }) 
-                ->when($request->{$option.'dd_superv'} == 'non', function($q) { return $q->whereRaw("NOT EXISTS (SELECT DISTINCT 1 FROM users AS u2, users AS su WHERE su.reporting_to = u2.id AND u2.employee_id = u.employee_id) AND sp.shared_with IS NULL"); }) 
-                ->selectRaw("CASE WHEN (SELECT DISTINCT 1 FROM users AS u3, users AS su WHERE su.reporting_to = u3.id AND u3.employee_id = u.employee_id) = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor");
+            $employees = $sql->selectRaw(" 
+                    u.employee_id, 
+                    u.employee_name, 
+                    u.jobcode_desc, 
+                    u.employee_email, 
+                    u.organization, 
+                    u.level1_program, 
+                    u.level2_division, 
+                    u.level3_branch, 
+                    u.level4, 
+                    u.deptid,
+                    CASE WHEN u.isSupervisor = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor,
+                    CASE WHEN u.isDelegate = 1 THEN 'Yes' ELSE 'No' END AS isDelegate
+                ")
+                ->when($request->{$option.'dd_superv'} == 'sup', function($q) { return $q->whereRaw("(u.isSupervisor = 1 OR u.isDelegate = 1)"); }) 
+                ->when($request->{$option.'dd_superv'} == 'non', function($q) { return $q->whereRaw("NOT u.isSupervisor = 1 AND NOT u.isDelegate = 1"); }); 
             return Datatables::of($employees)
                 ->addColumn($option.'select_users', static function ($employee) use ($option) { 
                     return '<input pid="1335" type="checkbox" id="'.$option.'userCheck'.  
@@ -816,14 +817,10 @@ class GoalBankController extends Controller
     public function updategoal(Request $request) {
         $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
         $selected_inherited = $request->selected_inherited ? json_decode($request->selected_inherited) : [];
-        Log::info('$selected_org_nodes');
-        Log::info($selected_org_nodes);
-        Log::info('$selected_inherited');
-        Log::info($selected_inherited);
         // Get the old employees listing 
         $old_ee_ids =  GoalSharedWith::join('users', 'goals_shared_with.user_id', 'users.id')
                                 ->where('goal_id', $request->goal_id)->distinct()->pluck('users.employee_id')->toArray();
-        $old_org_ee_ids = UserDemoJrView::from('user_demo_jr_view AS u')
+        $old_org_ee_ids = UserDemoJrForGoalBankView::from('user_demo_jr_for_goalbank_view AS u')
                                 ->join('goal_bank_orgs', 'u.orgid', 'goal_bank_orgs.orgid')
                                 ->where('goal_bank_orgs.goal_id', $request->goal_id)
                                 ->pluck('u.employee_id')
@@ -888,7 +885,7 @@ class GoalBankController extends Controller
         // Get the old employees listing 
         $old_ee_ids =  GoalSharedWith::join('users', 'goals_shared_with.user_id', 'users.id')
                                 ->where('goal_id', $id)->distinct()->pluck('users.employee_id')->toArray();
-        $old_org_ee_ids = UserDemoJrView::from('user_demo_jr_view AS u')
+        $old_org_ee_ids = UserDemoJrForGoalBankView::from('user_demo_jr_for_goalbank_view AS u')
                                 ->join('goal_bank_orgs', 'u.orgid', 'goal_bank_orgs.orgid')
                                 ->where('goal_bank_orgs.goal_id', $id)
                                 ->pluck('u.employee_id')
@@ -996,13 +993,7 @@ class GoalBankController extends Controller
  
     protected function baseFilteredWhere($request, $option = null) { 
         $authId = Auth::id(); 
-        return UserDemoJrView::from('user_demo_jr_view AS u') 
-            ->leftjoin('shared_profiles AS sp', function($j) {
-                return $j->on(function($jon){
-                    return $jon->whereRaw("sp.shared_with = u.user_id AND sp.shared_item LIKE '%1%'");
-                });
-            })
-            // ->distinct()
+        return UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u') 
             ->whereNull('u.date_deleted') 
             ->when("{$request->{$option.'dd_level0'}}", function($q) use($request, $option) { return $q->whereRaw("u.organization_key = {$request->{$option.'dd_level0'}}"); }) 
             ->when("{$request->{$option.'dd_level1'}}", function($q) use($request, $option) { return $q->whereRaw("u.level1_key = {$request->{$option.'dd_level1'}}"); }) 
@@ -1179,33 +1170,34 @@ class GoalBankController extends Controller
                 ->from('goals AS g')
                 ->where('g.id', $goal_id)
                 ->join('goals_shared_with AS s', 'g.id', 's.goal_id')
-                ->join('user_demo_jr_view AS u', 'u.user_id', 's.user_id')
+                ->join('user_demo_jr_for_goalbank_view AS u', 'u.user_id', 's.user_id')
                 // ->distinct()
                 ->when($request->dd_level0, function($q) use($request) {return $q->where('u.organization_key', $request->dd_level0);})
                 ->when($request->dd_level1, function($q) use($request) {return $q->where('u.level1_key', $request->dd_level1);})
                 ->when($request->dd_level2, function($q) use($request) {return $q->where('u.level2_key', $request->dd_level2);})
                 ->when($request->dd_level3, function($q) use($request) {return $q->where('u.level3_key', $request->dd_level3);})
                 ->when($request->dd_level4, function($q) use($request) {return $q->where('u.level4_key', $request->dd_level4);})
-                ->when($request->dd_superv == 'sup', function($q) use($request) { return $q->whereRaw("EXISTS (SELECT DISTINCT 1 FROM users AS su WHERE su.reporting_to = u.user_id)"); })
-                ->when($request->dd_superv == 'non', function($q) use($request) { return $q->whereRaw("NOT EXISTS (SELECT DISTINCT 1 FROM users AS su WHERE su.reporting_to = u.user_id)"); })
+                ->when($request->dd_superv == 'sup', function($q) use($request) { return $q->whereRaw("(u.isSupervisor = 1 OR u.isDelegate = 1)"); })
+                ->when($request->dd_superv == 'non', function($q) use($request) { return $q->whereRaw("NOT u.isSupervisor = 1 AND NOT u.isDelegate = 1"); })
                 ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { return $q->whereRaw("u.{$request->criteria} like '%{$request->search_text}%'"); })
                 ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(u.employee_id LIKE '%{$request->search_text}%' OR u.employee_name LIKE '%{$request->search_text}%' OR u.jobcode_desc LIKE '%{$request->search_text}%' OR u.deptid LIKE '%{$request->search_text}%')"); })
-                ->select ([
-                    'u.employee_id',
-                    'u.employee_name',
-                    'u.jobcode_desc',
-                    'u.organization AS organization',
-                    'u.level1_program AS level1_program',
-                    'u.level2_division AS level2_division',
-                    'u.level3_branch AS level3_branch',
-                    'u.level4 AS level4',
-                    'u.deptid',
-                    'g.id as goal_id',
-                    's.id as share_id',
-                    'u.user_id',
-                    'g.display_name'
-                ])
-                ->selectRaw("CASE WHEN (SELECT DISTINCT 1 FROM users AS su WHERE su.reporting_to = u.user_id) = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor");
+                ->selectRaw ("
+                    u.employee_id,
+                    u.employee_name,
+                    u.jobcode_desc,
+                    u.organization AS organization,
+                    u.level1_program AS level1_program,
+                    u.level2_division AS level2_division,
+                    u.level3_branch AS level3_branch,
+                    u.level4 AS level4,
+                    u.deptid,
+                    g.id as goal_id,
+                    s.id as share_id,
+                    u.user_id,
+                    g.display_name,
+                    CASE WHEN u.isSupervisor = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor,
+                    CASE WHEN u.isDelegate = 1 THEN 'Yes' ELSE 'No' END AS isDelegate
+                ");
             return Datatables::of($query)
                 ->addIndexColumn()
                 ->addcolumn('action', function($row) {
@@ -1266,7 +1258,7 @@ class GoalBankController extends Controller
     }
 
     protected function get_employees_by_selected_org_nodes($selected_org_nodes) {
-        $employees = UserDemoJrView::from('user_demo_jr_view AS u')
+        $employees = UserDemoJrForGoalBankView::from('user_demo_jr_for_goalbank_view AS u')
             ->whereIn('u.orgid', $selected_org_nodes)
             ->pluck('employee_id'); 
         return ($employees ? $employees->toArray() : []); 
@@ -1276,14 +1268,14 @@ class GoalBankController extends Controller
     protected function notify_on_dashboard($goalBank, $employee_ids) {
 
         // Filter out the employee based on the Organization level and individual user preferences. 
-        $filtered_ee_ids = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization', 'access_organizations.organization')
-                                ->leftjoin('user_preferences', 'user_demo_jr_view.user_id', 'user_preferences.user_id')
-                                ->whereIn('user_demo_jr_view.employee_id', $employee_ids)
+        $filtered_ee_ids = UserDemoJrForGoalBankView::join('access_organizations', 'user_demo_jr_for_goalbank_view.organization', 'access_organizations.organization')
+                                ->leftjoin('user_preferences', 'user_demo_jr_for_goalbank_view.user_id', 'user_preferences.user_id')
+                                ->whereIn('user_demo_jr_for_goalbank_view.employee_id', $employee_ids)
                                 ->where('access_organizations.allow_inapp_msg', 'Y')
                                 ->where( function($query) {
                                     $query->where('user_preferences.goal_bank_flag', 'Y');
                                 })
-                                ->pluck('user_demo_jr_view.employee_id')
+                                ->pluck('user_demo_jr_for_goalbank_view.employee_id')
                                 ->toArray(); 
 
         if (count($filtered_ee_ids)) {
@@ -1309,15 +1301,15 @@ class GoalBankController extends Controller
     protected function notify_employees($goalBank, $employee_ids) {
 
          // Filter out the employee based on the Organization level and individual user preferences. 
-         $filtered_ee_ids = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization', 'access_organizations.organization')
-                                    ->leftjoin('user_preferences', 'user_demo_jr_view.user_id', 'user_preferences.user_id')
-                                    ->whereIn('user_demo_jr_view.employee_id', $employee_ids)
+         $filtered_ee_ids = UserDemoJrForGoalBankView::join('access_organizations', 'user_demo_jr_for_goalbank_view.organization', 'access_organizations.organization')
+                                    ->leftjoin('user_preferences', 'user_demo_jr_for_goalbank_view.user_id', 'user_preferences.user_id')
+                                    ->whereIn('user_demo_jr_for_goalbank_view.employee_id', $employee_ids)
                                     ->where('access_organizations.allow_email_msg', 'Y')
                                     ->where( function($query) {
                                         $query->where('user_preferences.goal_bank_flag', 'Y')
                                             ->orWhereNull('user_preferences.goal_bank_flag');
                                     })
-                                    ->pluck('user_demo_jr_view.employee_id')
+                                    ->pluck('user_demo_jr_for_goalbank_view.employee_id')
                                     ->toArray(); 
 
         if (count($filtered_ee_ids)) {
