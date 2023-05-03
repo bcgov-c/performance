@@ -89,8 +89,8 @@ class CreateUserDemoJrForGoalbankView extends Migration
                 ua.created_at_string,
                 u.employee_id AS employee_id_search,
                 d.employee_name AS employee_name_search,
-                CASE WHEN (SELECT DISTINCT 1 FROM users AS su WHERE su.reporting_to = u.id) = 1 THEN 'Yes' ELSE 'No' END AS isSupervisor,
-                CASE WHEN (SELECT DISTINCT 1 FROM shared_profiles AS sp WHERE sp.shared_with = u.id) = 1 THEN 'Yes' ELSE 'No' END AS isDelegate
+                ua.isSupervisor,
+                ua.isDelegate
             FROM
                 users 
                     AS u
