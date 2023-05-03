@@ -1,11 +1,11 @@
-<?php
+<?php 
 
-namespace App\Models;
+namespace App\Models; 
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model; 
 
-class UserDemoJrForGoalbankView extends Model {
+class UserDemoJrForGoalbankView extends Model { 
 
-    protected $table = 'user_demo_jr_for_goalbank_view';
+    protected $table = 'user_demo_jr_for_goalbank_view'; 
 
-}
+} 
