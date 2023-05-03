@@ -411,9 +411,9 @@ class ConversationController extends Controller
                 $conversations_arr[$i]['participants'] = $item->mgrname . ", " . $item->empname;
             } else {
                 if($item->conversationParticipants[0]->participant->role == 'emp'){
-                    $myTeamConversations_arr[$i]['participants'] = $item->conversationParticipants[1]->participant->name . ", " . $item->conversationParticipants[0]->participant->name;
+                    $conversations_arr[$i]['participants'] = $item->conversationParticipants[1]->participant->name . ", " . $item->conversationParticipants[0]->participant->name;
                 } else {
-                    $myTeamConversations_arr[$i]['participants'] = $item->conversationParticipants[0]->participant->name . ", " . $item->conversationParticipants[1]->participant->name;
+                    $conversations_arr[$i]['participants'] = $item->conversationParticipants[0]->participant->name . ", " . $item->conversationParticipants[1]->participant->name;
                 } 
             }
             $conversations_arr[$i]['signoff_user_id'] = $item->signoff_user_id;
