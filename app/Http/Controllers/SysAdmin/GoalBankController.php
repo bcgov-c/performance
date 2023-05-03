@@ -12,7 +12,7 @@ use App\Models\GoalBankOrg;
 use App\Models\EmployeeDemo;
 use Illuminate\Http\Request;
 use App\Models\GoalSharedWith;
-use App\Models\UserDemoJrForGoalBankView;
+use App\Models\UserDemoJrForGoalbankView;
 use App\MicrosoftGraph\SendMail;
 use App\Models\EmployeeDemoTree;
 use Yajra\Datatables\Datatables;
