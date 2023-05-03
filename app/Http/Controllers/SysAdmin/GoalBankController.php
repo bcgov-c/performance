@@ -70,7 +70,7 @@ class GoalBankController extends Controller
             $request->euserCheck = isset($old['euserCheck']) ? $old['euserCheck'] : null;
             $eold_selected_emp_ids = isset($old['eselected_emp_ids']) ? json_decode($old['eselected_emp_ids']) : [];
             $eold_selected_org_nodes = isset($old['eselected_org_nodes']) ? json_decode($old['eselected_org_nodes']) : [];
-            $eold_selected_inherited = isset($old['eselected_inherited']) ? json_decode($old['eselected_inherited']) : [];
+            $eold_selected_inherited = isset($old['eselected_org_nodes']) ? json_decode($old['eselected_inherited']) : [];
         } 
         // no validation and move filter variable to old 
         if ($request->btn_search) {

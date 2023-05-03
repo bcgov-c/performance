@@ -17,10 +17,10 @@
     </div>   
 
     @push('css')
-        <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" >
-        <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-        <link href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/buttons/2.3.2/css/buttons.dataTables.min.css" rel="stylesheet">
         <x-slot name="css">
             <style>
                 .text-truncate-30 {
@@ -50,10 +50,10 @@
     @endpush
 
     @push('js')
-        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
-        <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
-        <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap4.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.3.2/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.html5.min.js"></script>
         <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
         <script type="text/javascript">
             $(document).ready(function() {
@@ -63,7 +63,7 @@
                         buttons: [
                             {
                                 extend: "csv",
-                                text: "Export",
+                                text: "Export Displayed",
                                 exportOptions:  {
                                     columns: ':visible',
                                     modifier: {
@@ -103,7 +103,6 @@
                     [
                         {title: 'Employee ID', ariaTitle: 'Employee ID', target: 0, type: 'string', data: 'employee_id', name: 'u.employee_id', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'u.employee_name', searchable: true, className: 'dt-nowrap show-modal'},
-                        {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'user_name', name: 'u.user_name', searchable: false, visible: false, className: 'dt-nowrap show-modal'},
                         {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'u.employee_email', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Position #', ariaTitle: 'Position #', target: 0, type: 'string', data: 'position_number', name: 'u.position_number', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Reports To Name', ariaTitle: 'Reports To Name', target: 0, type: 'string', data: 'reporting_to_name', name: 'u.reporting_to_name', searchable: true, className: 'dt-nowrap show-modal'},
@@ -127,14 +126,14 @@
                     ],
                 } );
 
-                // // add export button on right
-                // $("#listtable_filter").append('<button id="export-btn" value="export" class="dt-button buttons-csv buttons-html5">Export</button> ');
+                // add export button on right
+                $("#listtable_filter").append('<button id="export-btn" value="export" class="dt-button buttons-csv buttons-html5">Export All Rows</button> ');
 
-                // $('#export-btn').on('click', function() {
-                //     export_url = '{{ route("sysadmin.employeelists.export-past") }}';
-                //     let _url = export_url;
-                //     window.location.href = _url;
-                // });
+                $('#export-btn').on('click', function() {
+                    export_url = '{{ route("sysadmin.employeelists.export-past") }}';
+                    let _url = export_url;
+                    window.location.href = _url;
+                });
 
             } );
         </script>
