@@ -317,6 +317,25 @@ i {
       $('#collapse_emp').collapse('hide');
   }
   
+  var show_collapse_1 = false;
+  var sup_conversation_topic_id = $('#sup_conversation_topic_id').val();
+  var supervisors = $('#supervisors').val();
+  var sup_employee_signed = $('#sup_employee_signed').val();
+  var sup_supervisor_signed = $('#sup_supervisor_signed').val();
+  
+  if(sup_conversation_topic_id != 0 || supervisors != '' || sup_employee_signed != 'any' || sup_supervisor_signed != 'any'){
+      var show_collapse_1 = true;
+  }  
+  if(show_collapse_1){
+      $('#collapse_sup').collapse('show');
+      var show_collapse_1 = false;
+      $('#heading_sup').click(function() {
+         $('#caret_sup').css('transform', 'rotate(180deg)');
+      });
+  } else {
+      $('#collapse_sup').collapse('hide');
+  }
+  
   $(document).ready(function() {
         const json_myTeamConversations = <?php echo $json_myTeamConversations;?>;
         const employee_table = $('#employee_conversations').DataTable({
