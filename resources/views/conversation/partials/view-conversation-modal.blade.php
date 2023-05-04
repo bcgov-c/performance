@@ -285,7 +285,7 @@
                                                 <div id="signoff-emp-id-input"></div>                                            
                                             </div> 
                                             <div class="mt-3 alert alert-default-warning alert-dismissible" id="employee-signoff-message">
-                                                    <span class="h5"><i class="icon fas fa-exclamation-circle"></i><b class="name"></b> has <b class="not d-none">not</b> signed this record of conversation <span class="time"></span></span>
+                                                    <span class="h5"><i class="icon fas fa-exclamation-circle"></i><b class="name"></b> has <b class="not d-none">not</b> signed this record of conversation <span class="emp-time"></span></span>
                                             </div>
                                     </div>
                                 </div>
@@ -311,7 +311,7 @@
                                                 <div id="signoff-sup-id-input"></div>
                                             </div>      
                                             <div class="mt-3 alert alert-default-warning alert-dismissible" id="supervisor-signoff-message">
-                                                <span class="h5"><i class="icon fas fa-exclamation-circle"></i><b class="name"></b> has <b class="not d-none">not</b> signed this record of conversation <span class="time"></span></span>
+                                                <span class="h5"><i class="icon fas fa-exclamation-circle"></i><b class="name"></b> has <b class="not d-none">not</b> signed this record of conversation <span class="sup-time"></span></span>
                                             </div>                                               
                                         </div> 
                                     </div>                                    
@@ -353,7 +353,7 @@
                                                 <div id="unsignoff-emp-id-input"></div>                                            
                                             </div> 
                                             <div class="mt-3 alert alert-default-warning alert-dismissible" id="employee-unsignoff-message">
-                                                    <span class="h5"><i class="icon fas fa-exclamation-circle"></i><b class="name"></b> has <b class="not d-none">not</b> signed this record of conversation <span class="time"></span></span>
+                                                    <span class="h5"><i class="icon fas fa-exclamation-circle"></i><b class="name"></b> has <b class="not d-none">not</b> signed this record of conversation <span class="emp-time"></span></span>
                                             </div>
                                     </div>
                                 </div>
@@ -379,7 +379,7 @@
                                                 <div id="unsignoff-sup-id-input"></div>
                                             </div>      
                                             <div class="mt-3 alert alert-default-warning alert-dismissible" id="supervisor-unsignoff-message">
-                                                <span class="h5"><i class="icon fas fa-exclamation-circle"></i><b class="name"></b> has <b class="not d-none">not</b> signed this record of conversation <span class="time"></span></span>
+                                                <span class="h5"><i class="icon fas fa-exclamation-circle"></i><b class="name"></b> has <b class="not d-none">not</b> signed this record of conversation <span class="sup-time"></span></span>
                                             </div>                                               
                                         </div> 
                                     </div>                                    
