@@ -98,7 +98,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/eorg-organizations2'
+                    url: '/sysadmin/org-list/2/0'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -129,7 +129,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/eorg-programs2' 
+                    url: '/sysadmin/org-list/2/1' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -161,7 +161,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/eorg-divisions2' 
+                    url: '/sysadmin/org-list/2/2' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -194,7 +194,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/eorg-branches2' 
+                    url: '/sysadmin/org-list/2/3' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -228,7 +228,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/eorg-level42' 
+                    url: '/sysadmin/org-list/2/4' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {

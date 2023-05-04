@@ -22,6 +22,9 @@ use Illuminate\Http\Request;
 
 Route::group(['middleware' => ['role:Sys Admin']], function () 
 {
+    //Shared functions v3.0
+    Route::get('/sysadmin/org-list/{copy}/{level}', [SysAdminSharedController::class,'getOrganizationList']);
+
     //Shared functions v2.0
     Route::get('/sysadmin/org-organizations2', [SysAdminSharedController::class,'getOrganizationsV2']);
     Route::get('/sysadmin/org-programs2', [SysAdminSharedController::class,'getProgramsV2']);

@@ -15,6 +15,9 @@ use App\Http\Controllers\HRAdmin\HRAdminSharedController;
 
 Route::group(['middleware' => ['role:HR Admin']], function () 
 {
+    //Shared functions v3.0
+    Route::get('/hradmin/org-list/{copy}/{level}', [HRAdminSharedController::class,'getOrganizationList']);
+
     //Shared functions v2.0
     Route::get('/hradmin/org-organizations2', [HRAdminSharedController::class,'getOrganizationsV2']);
     Route::get('/hradmin/org-programs2', [HRAdminSharedController::class,'getProgramsV2']);

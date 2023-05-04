@@ -62,6 +62,10 @@ class Kernel extends ConsoleKernel
         ->timezone('America/Vancouver')
         ->dailyAt('01:00');
   
+        $schedule->command('command:PopulateAuthOrgs')
+        ->timezone('America/Vancouver')
+        ->dailyAt('01:05');
+  
         $schedule->command('command:SetNextLevelManager')
         ->timezone('America/Vancouver')
         ->dailyAt('01:15');

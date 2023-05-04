@@ -11,6 +11,33 @@ use Illuminate\Support\Facades\DB;
 
 class SysAdminSharedController extends Controller
 {
+    public function getOrganizationList(Request $request, $copy, $level) 
+    {
+        switch ($copy) {
+            case 2:
+                $option = 'e';
+                break;
+            case 3:
+                $option = 'a';
+                break;
+            default:
+                $option = '';
+                break;
+        } 
+        return response()->json(EmployeeDemoTree::where('employee_demo_tree.level', \DB::raw($level))
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("employee_demo_tree.name LIKE '%{$request->q}%'"); })
+            ->when($level > 0 && "{$request->{$option.'level0'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.organization_key = '."{$request->{$option.'level0'}}"); })
+            ->when($level > 1 && "{$request->{$option.'level1'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level1_key = '."{$request->{$option.'level1'}}"); })
+            ->when($level > 2 && "{$request->{$option.'level2'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level2_key = '."{$request->{$option.'level2'}}"); })
+            ->when($level > 3 && "{$request->{$option.'level3'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level3_key = '."{$request->{$option.'level3'}}"); })
+            ->when($level > 4 && "{$request->{$option.'level4'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level4_key = '."{$request->{$option.'level4'}}"); })
+            ->select('employee_demo_tree.id AS id', 'employee_demo_tree.name AS text')
+            ->orderBy('employee_demo_tree.name', 'ASC')
+            ->limit(300)
+            ->get('id', 'text')
+            ->toArray());
+    } 
+
     public function getOrganizationsV2(Request $request) {
         $orgs = EmployeeDemoTree::from('employee_demo_tree AS t')
             ->orderBy('t.name', 'asc')

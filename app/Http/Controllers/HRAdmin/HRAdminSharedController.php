@@ -7,13 +7,42 @@ use Illuminate\Http\Request;
 use App\Models\EmployeeDemoTree;
 use App\Models\OrganizationTree;
 use App\Models\AdminOrgTreeView;
-use App\Models\AdminOrgs;
+use App\Models\AdminOrg;
 use App\Models\UsersAnnex;
+use App\Models\AuthOrg;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class HRAdminSharedController extends Controller
 {
+    public function getOrganizationList(Request $request, $copy, $level) 
+    {
+        switch ($copy) {
+            case 2:
+                $option = 'e';
+                break;
+            case 3:
+                $option = 'a';
+                break;
+            default:
+                $option = '';
+                break;
+        } 
+        return response()->json(EmployeeDemoTree::whereRaw("EXISTS (SELECT 1 FROM auth_orgs WHERE auth_orgs.type = 'HR' AND auth_orgs.auth_id = ".Auth::id()." AND auth_orgs.orgid = employee_demo_tree.id)")
+            ->where('employee_demo_tree.level', \DB::raw($level))
+            ->when($request->q, function ($q) use($request) { return $q->whereRaw("employee_demo_tree.name LIKE '%{$request->q}%'"); })
+            ->when($level > 0 && "{$request->{$option.'level0'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.organization_key = '."{$request->{$option.'level0'}}"); })
+            ->when($level > 1 && "{$request->{$option.'level1'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level1_key = '."{$request->{$option.'level1'}}"); })
+            ->when($level > 2 && "{$request->{$option.'level2'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level2_key = '."{$request->{$option.'level2'}}"); })
+            ->when($level > 3 && "{$request->{$option.'level3'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level3_key = '."{$request->{$option.'level3'}}"); })
+            ->when($level > 4 && "{$request->{$option.'level4'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level4_key = '."{$request->{$option.'level4'}}"); })
+            ->select('employee_demo_tree.id AS id', 'employee_demo_tree.name AS text')
+            ->orderBy('employee_demo_tree.name', 'ASC')
+            ->limit(300)
+            ->get('id', 'text')
+            ->toArray());
+    } 
+
     public function getOrganizationsV2(Request $request) {
         $formatted_orgs = UsersAnnex::join('auth_users', function ($qon) {
             return $qon->on('type', \DB::raw("'HR'"))

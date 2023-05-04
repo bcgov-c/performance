@@ -97,7 +97,7 @@
         placeholder: 'select organization',
         allowClear: true,
         ajax: {
-            url: '/hradmin/org-organizations2'
+            url: '/hradmin/org-list/1/0'
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -119,7 +119,7 @@
         placeholder: 'select level 1',
         allowClear: true,
         ajax: {
-            url: '/hradmin/org-programs2' 
+            url: '/hradmin/org-list/1/1' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -142,7 +142,7 @@
         placeholder: 'select level 2',
         allowClear: true,
         ajax: {
-            url: '/hradmin/org-divisions2' 
+            url: '/hradmin/org-list/1/2' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -166,7 +166,7 @@
         placeholder: 'select level 3',
         allowClear: true,
         ajax: {
-            url: '/hradmin/org-branches2' 
+            url: '/hradmin/org-list/1/3' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -191,7 +191,7 @@
         placeholder: 'select level 4',
         allowClear: true,
         ajax: {
-            url: '/hradmin/org-level42' 
+            url: '/hradmin/org-list/1/4' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
