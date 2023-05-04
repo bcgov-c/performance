@@ -539,6 +539,14 @@ function updateConversation(conversation_id) {
                             $("#signoff-form-block").hide();
                         }
                         */
+                        
+                        //sign off time's
+                        if(result.signoff_user_id && result.sign_off_time){
+                            $(".emp-time").html(" at " + result.sign_off_time);
+                        }
+                        if(result.supervisor_signoff_id && result.supervisor_signoff_time){
+                            $(".sup-time").html(" at " + result.supervisor_signoff_time);
+                        }
 
                         //Additional Info to Capture
                         if (result.conversation_topic_id == 1) {
