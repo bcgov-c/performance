@@ -351,10 +351,10 @@
                         confirmMessage = "Signing off will move this record to the Completed Conversations tab. You can click there to access it again at any time. Continue?";
                     }
                     else if (isSupervisor && !employeeSignOffDone) {
-                        confirmMessage = "Signing off will lock the content of this record. Employee signature is still required.";
+                        confirmMessage = "ATTENTION: Make sure both supervisor and employee have entered their comments before you sign-off. Signing off will 'lock' both sides of this conversation and prevent additional edits by either participant.";
                     }
                     else if (!isSupervisor && !supervisorSignOffDone) {
-                        confirmMessage = "Signing off will lock the content of this record. Supervisor signature is still required.";
+                        confirmMessage = "ATTENTION: Make sure both supervisor and employee have entered their comments before you sign-off. Signing off will 'lock' both sides of this conversation and prevent additional edits by either participant.";
                     }
                 }
 
