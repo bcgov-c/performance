@@ -209,7 +209,7 @@ class ConversationController extends Controller
                 $sup_query .= " AND (empusers.name LIKE '%$request->user_name%' OR mgrusers.name LIKE '%$request->user_name%')"; 
             }
             if ($request->has('supervisors') && $request->supervisors) {
-                $sup_query .= " AND (mgrusers.participant_id = '".$request->supervisors."')";
+                $sup_query .= " AND (mgr_participants.participant_id = '".$request->supervisors."')";
             }            
             if (!$request->has('sup_employee_signed') && !$request->has('sup_supervisor_signed')) {
                 $sup_query .= "  AND (conversations.signoff_user_id IS NULL OR conversations.supervisor_signoff_id IS NULL)";             
