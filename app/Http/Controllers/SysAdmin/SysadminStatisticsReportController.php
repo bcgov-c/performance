@@ -1932,7 +1932,7 @@ class SysadminStatisticsReportController extends Controller
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 })
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                 ->leftJoin('users as supervisor', 'supervisor.id', '=', 'conversations.supervisor_signoff_id')
                 ->leftJoin('users as employee', 'employee.id', '=', 'conversations.signoff_user_id')   
                 ->where('conversation_participants.role','=','emp')
@@ -2019,7 +2019,7 @@ class SysadminStatisticsReportController extends Controller
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 })
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                 ->leftJoin('users as supervisor', 'supervisor.id', '=', 'conversations.supervisor_signoff_id')
                 ->leftJoin('users as employee', 'employee.id', '=', 'conversations.signoff_user_id')   
                 ->where('conversation_participants.role','=','emp')
@@ -2132,7 +2132,7 @@ class SysadminStatisticsReportController extends Controller
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 })
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                 ->leftJoin('users as supervisor', 'supervisor.id', '=', 'conversations.supervisor_signoff_id')
                 ->leftJoin('users as employee', 'employee.id', '=', 'conversations.signoff_user_id')   
                 ->where('conversation_participants.role','=','emp')
