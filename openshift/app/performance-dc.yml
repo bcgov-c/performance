@@ -111,7 +111,7 @@ objects:
                   cpu: 1500m
                 requests:
                   memory: 2Gi
-                  cpu: 750m
+                  cpu: 250m
               env:
                 - name: APP_NAME
                   value: '${APP_NAME}'
