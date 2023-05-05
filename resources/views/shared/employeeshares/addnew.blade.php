@@ -205,7 +205,7 @@
                     select: true,
                     order: [[1, 'asc']],
                     ajax: {
-                        url: '{{ route(request()->segment(1).'.employeeshares.employee.list') }}',
+                        url: "{{ '/' . request()->segment(1) . '/employeeshares/employee-list/1' }}",
                         data: function (d) {
                             d.dd_level0 = $('#dd_level0').val();
                             d.dd_level1 = $('#dd_level1').val();
@@ -264,7 +264,7 @@
                     select: true,
                     order: [[1, 'asc']],
                     ajax: {
-                        url: '{{ route(request()->segment(1).'.employeeshares.employee.list', 'e') }}',
+                        url: "{{ '/' . request()->segment(1) . '/employeeshares/employee-list/2' }}",
                         data: function (d) {
                             d.edd_level0 = $('#edd_level0').val();
                             d.edd_level1 = $('#edd_level1').val();

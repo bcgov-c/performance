@@ -114,8 +114,8 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('/hradmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('hradmin.employeeshares.deleteitemget');
         Route::delete('/hradmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('hradmin.employeeshares.deleteitem');
         Route::get('/hradmin/employeeshares/org-tree/{index}', [EmployeeSharesController::class,'loadOrganizationTree']);
-        Route::get('/hradmin/employeeshares/employee-list/{option?}', [EmployeeSharesController::class, 'getDatatableEmployees'])->name('hradmin.employeeshares.employee.list');
-        Route::get('/hradmin/employeeshares/employees/{id}/{option?}', [EmployeeSharesController::class,'getEmployees'])->name('hradmin.employeeshares.getEmployees');
+        Route::get('/hradmin/employeeshares/employee-list/{index}', [EmployeeSharesController::class, 'getDatatableEmployees']);
+        Route::get('/hradmin/employeeshares/employees/{id}/{index}', [EmployeeSharesController::class,'getEmployees']);
     });
 
     //Excuse Employees
