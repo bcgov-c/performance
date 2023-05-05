@@ -15,9 +15,9 @@ use Illuminate\Support\Facades\DB;
 
 class HRAdminSharedController extends Controller
 {
-    public function getOrganizationList(Request $request, $copy, $level) 
+    public function getOrganizationList(Request $request, $index, $level) 
     {
-        switch ($copy) {
+        switch ($index) {
             case 2:
                 $option = 'e';
                 break;

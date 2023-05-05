@@ -434,7 +434,7 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                                    url: "{{ '/' . request()->segment(1) . '/employeeshares/org-tree' }}",
+                                    url: "{{ '/' . request()->segment(1) . '/employeeshares/org-tree/1' }}",
                                     type: 'GET',
                                     data: $("#notify-form").serialize(),
                                     dataType: 'html',
@@ -479,7 +479,7 @@
                         if($.trim($(etarget).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                                    url: "{{ '/' . request()->segment(1) . '/employeeshares/eorg-tree' }}",
+                                    url: "{{ '/' . request()->segment(1) . '/employeeshares/org-tree/2' }}",
                                     type: 'GET',
                                     data: $("notify-form").serialize(),
                                     dataType: 'html',

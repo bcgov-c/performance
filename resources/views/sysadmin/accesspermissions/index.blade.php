@@ -210,7 +210,7 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                                    url: '/sysadmin/accesspermissions/org-tree',
+                                    url: '/sysadmin/accesspermissions/org-tree/1',
                                     type: 'GET',
                                     data: $("#notify-form").serialize(),
                                     dataType: 'html',
@@ -412,7 +412,7 @@
 						// To do -- ajax called to load the tree
 						$.when( 
 							$.ajax({
-								url: '/sysadmin/accesspermissions/eorg-tree',
+								url: '/sysadmin/accesspermissions/org-tree/2',
 								type: 'GET',
 								data: $("#notify-form").serialize(),
 								dataType: 'html',
