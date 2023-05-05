@@ -122,6 +122,7 @@
                             <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment8;?></li>
                         </ul>
                     </li>
+                    <br/>
                     <li><b>Employee Attestation</b>
                         <ul>
                             <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
@@ -140,6 +141,7 @@
                             </li>
                         </ul>
                     </li>
+                    <br/>
                     <li><b>Supervisor Comments</b>
                         <ul>
                             <li><b>Appreciation: </b><?php echo $data["selected_conversation"]->info_comment1;?></li>
@@ -149,6 +151,7 @@
                             <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment6;?></li>
                         </ul>
                     </li>
+                    <br/>
                     <li><b>Supervisor Attestation</b>
                         <ul>
                             <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
@@ -178,6 +181,7 @@
                             <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment7;?></li>
                         </ul>
                     </li>
+                    <br/>
                     <li><b>Employee Attestation</b>
                         <ul>
                             <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
@@ -196,12 +200,14 @@
                             </li>
                         </ul>
                     </li>
+                    <br/>
                     <li><b>Supervisor Comments</b>
                         <ul>
                             <li><b>Comments : </b><?php echo $data["selected_conversation"]->info_comment1;?></li>
                             <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment2;?></li>
                         </ul>
                     </li>
+                    <br/>
                     <li><b>Supervisor Attestation</b>
                         <ul>
                             <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
@@ -234,6 +240,7 @@
                             <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment10;?></li>
                         </ul>
                     </li>
+                    <br/>
                     <li><b>Employee Attestation</b>
                         <ul>
                             <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
@@ -252,6 +259,7 @@
                             </li>
                         </ul>
                     </li>
+                    <br/>
                     <li><b>Supervisor Comments</b>
                         <ul>
                             <li><b>Employee Strengths : </b><?php echo $data["selected_conversation"]->info_comment1;?></li>
@@ -260,6 +268,7 @@
                             <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment5;?></li>                            
                         </ul>
                     </li>
+                    <br/>
                     <li><b>Supervisor Attestation</b>
                         <ul>
                             <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
@@ -290,6 +299,7 @@
                             <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment8;?></li>
                         </ul>
                     </li>
+                    <br/>
                     <li><b>Employee Attestation</b>
                         <ul>
                             <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
@@ -308,6 +318,7 @@
                             </li>
                         </ul>
                     </li>
+                    <br/>
                     <li><b>Supervisor Comments</b>
                         <ul>
                             <li><b>Evaluation: </b><?php echo $data["selected_conversation"]->info_comment1;?></li>
@@ -316,6 +327,7 @@
                             <li><b>When will a follow up meeting occur? </b><?php echo $data["selected_conversation"]->info_comment11;?></li>                            
                         </ul>
                     </li>
+                    <br/>
                     <li><b>Supervisor Attestation</b>
                         <ul>
                             <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
@@ -345,7 +357,9 @@
                             <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment7;?></li>
                         </ul>
                     </li>
+                    <br/>
                     <li><b>Employee Attestation</b>
+                        <ul>
                             <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
                                 <?php if($data["selected_conversation"]->empl_agree1 == 1){?>
                                     Yes
@@ -362,6 +376,7 @@
                             </li>
                         </ul>
                     </li>
+                    <br/>
                     <li><b>Supervisor Comments</b>
                         <ul>
                             <li><b>Comments: </b><?php echo $data["selected_conversation"]->info_comment1;?></li>

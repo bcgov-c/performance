@@ -62,6 +62,7 @@
                                 <li><b>Action Items: </b><?php echo $item->info_comment8;?></li>
                             </ul>
                         </li>
+                        <br/>
                         <li><b>Employee Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
@@ -80,6 +81,7 @@
                                 </li>
                             </ul>
                         </li>
+                        <br/>
                         <li><b>Supervisor Comments</b>
                             <ul>
                                 <li><b>Appreciation: </b><?php echo $item->info_comment1;?></li>
@@ -89,6 +91,7 @@
                                 <li><b>Action Items: </b><?php echo $item->info_comment6;?></li>
                             </ul>
                         </li>
+                        <br/>
                         <li><b>Supervisor Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
@@ -118,6 +121,7 @@
                                 <li><b>Action Items: </b><?php echo $item->info_comment7;?></li>
                             </ul>
                         </li>
+                        <br/>
                         <li><b>Employee Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
@@ -136,12 +140,14 @@
                                 </li>
                             </ul>
                         </li>
+                        <br/>
                         <li><b>Supervisor Comments</b>
                             <ul>
                                 <li><b>Comments : </b><?php echo $item->info_comment1;?></li>
                                 <li><b>Action Items: </b><?php echo $item->info_comment2;?></li>
                             </ul>
                         </li>
+                        <br/>
                         <li><b>Supervisor Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
@@ -174,6 +180,7 @@
                                 <li><b>Action Items: </b><?php echo $item->info_comment10;?></li>
                             </ul>
                         </li>
+                        <br/>
                         <li><b>Employee Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
@@ -192,6 +199,7 @@
                                 </li>
                             </ul>
                         </li>
+                        <br/>
                         <li><b>Supervisor Comments</b>
                             <ul>
                                 <li><b>Employee Strengths : </b><?php echo $item->info_comment1;?></li>
@@ -200,6 +208,7 @@
                                 <li><b>Action Items: </b><?php echo $item->info_comment5;?></li>                            
                             </ul>
                         </li>
+                        <br/>
                         <li><b>Supervisor Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
@@ -230,6 +239,7 @@
                                 <li><b>Action Items: </b><?php echo $item->info_comment8;?></li>
                             </ul>
                         </li>
+                        <br/>
                         <li><b>Employee Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
@@ -248,6 +258,7 @@
                                 </li>
                             </ul>
                         </li>
+                        <br/>
                         <li><b>Supervisor Comments</b>
                             <ul>
                                 <li><b>Evaluation: </b><?php echo $item->info_comment1;?></li>
@@ -256,6 +267,7 @@
                                 <li><b>When will a follow up meeting occur? </b><?php echo $item->info_comment11;?></li>                            
                             </ul>
                         </li>
+                        <br/>
                         <li><b>Supervisor Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
@@ -285,6 +297,7 @@
                                 <li><b>Action Items: </b><?php echo $item->info_comment7;?></li>
                             </ul>
                         </li>
+                        <br/>
                         <li><b>Employee Attestation</b>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
                                     <?php if($item->empl_agree1 == 1){?>
@@ -302,12 +315,14 @@
                                 </li>
                             </ul>
                         </li>
+                        <br/>
                         <li><b>Supervisor Comments</b>
                             <ul>
                                 <li><b>Comments: </b><?php echo $item->info_comment1;?></li>
                                 <li><b>Action Items: </b><?php echo $item->info_comment2;?></li>                  
                             </ul>
                         </li>
+                        <br/>
                         <li><b>Supervisor Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
