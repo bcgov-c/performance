@@ -121,18 +121,10 @@ class ConversationController extends Controller
                 //           ->whereNotNull('supervisor_signoff_id')
                 //           ->whereDate('unlock_until', '<', Carbon::today() );
                 // });
-            });       
+            });   
+            
+            $myTeamQuery = clone $query;
 
-            if ($request->has('user_id') && $request->user_id) {
-                $user_id = $request->user_id;
-                $query->where(function($query) use($user_id) {
-                    $query->where('user_id', $user_id)->
-                        orWhereHas('conversationParticipants', function($query) use ($user_id) {
-                            $query->where('participant_id', $user_id);
-                            return $query;
-                        });
-                });
-            }      
             if ($request->has('sup_conversation_topic_id') && $request->sup_conversation_topic_id) {
                 $query->where('conversation_topic_id', $request->sup_conversation_topic_id);
             }
@@ -150,11 +142,6 @@ class ConversationController extends Controller
                         ->orWhere('supervisor_signoff_time', '<=', $request->sup_signoff_date.' 23:59:59');
                 });
             }
-            if ($request->has('start_date') && $request->start_date) {
-                $query->whereRaw("IF(`sign_off_time` > `supervisor_signoff_time`, `sign_off_time`, `supervisor_signoff_time`) >= '$request->start_date'");
-            }
-            
-            $myTeamQuery = clone $query;
             
             if ($request->has('team_members') && $request->team_members) {
                 $user_name = $request->team_members;
@@ -169,9 +156,6 @@ class ConversationController extends Controller
                     });
                 });
             } 
-            if ($request->has('end_date') && $request->end_date) {
-                $myTeamQuery->whereRaw("IF(`sign_off_time` > `supervisor_signoff_time`, `sign_off_time`, `supervisor_signoff_time`) <= '$request->end_date'");
-            }
             if ($request->has('signoff_date') && $request->signoff_date) {
                 $myTeamQuery->whereRaw("(supervisor_signoff_time>= '$request->signoff_date"." 00:00:00' and supervisor_signoff_time<= '$request->signoff_date"." 23:59:59')"
                         . "OR (sign_off_time>= '$request->signoff_date"." 00:00:00' and sign_off_time<= '$request->signoff_date"." 23:59:59')");
@@ -225,7 +209,7 @@ class ConversationController extends Controller
                 $sup_query .= " AND (empusers.name LIKE '%$request->user_name%' OR mgrusers.name LIKE '%$request->user_name%')"; 
             }
             if ($request->has('supervisors') && $request->supervisors) {
-                $sup_query .= " AND (conversations.supervisor_signoff_id = '".$request->supervisors."')";
+                $sup_query .= " AND (mgrusers.participant_id = '".$request->supervisors."')";
             }            
             if (!$request->has('sup_employee_signed') && !$request->has('sup_supervisor_signed')) {
                 $sup_query .= "  AND (conversations.signoff_user_id IS NULL OR conversations.supervisor_signoff_id IS NULL)";             
