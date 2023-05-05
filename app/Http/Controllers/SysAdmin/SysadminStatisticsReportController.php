@@ -91,7 +91,7 @@ class SysadminStatisticsReportController extends Controller
                             $join->on('employee_demo.employee_id', '=', 'A.employee_id');
                         })
                         ->where('A.due_date_paused', 'N')
-                        ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                        ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                         ->whereNull('employee_demo.date_deleted')        
                         ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
                         ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
@@ -121,7 +121,7 @@ class SysadminStatisticsReportController extends Controller
                         $join->on('employee_demo.employee_id', '=', 'A.employee_id');
                     })
                     ->where('A.due_date_paused', 'N')                    
-                    ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                    ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                     ->whereNull('employee_demo.date_deleted')        
                     ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
                     ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
@@ -170,7 +170,7 @@ class SysadminStatisticsReportController extends Controller
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 })
                 ->where('users.due_date_paused', 'N')                
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
                 ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
@@ -218,7 +218,7 @@ class SysadminStatisticsReportController extends Controller
                 })
                 ->where('A.due_date_paused', 'N')
                 ->whereNotNull('A.guid')
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                 ->whereNull('employee_demo.date_deleted')        
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
                 ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
@@ -319,7 +319,7 @@ class SysadminStatisticsReportController extends Controller
                         $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     })
                     ->where('users.due_date_paused', 'N')                    
-                    ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                    ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                     ->whereNull('employee_demo.date_deleted')        
                     ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
                     ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
@@ -441,7 +441,7 @@ class SysadminStatisticsReportController extends Controller
                             ->orWhereNull('users.due_date_paused');
                     });
                 })
-                ->leftJoin('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                ->leftJoin('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
                 ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
@@ -488,7 +488,7 @@ class SysadminStatisticsReportController extends Controller
                     });
                 })
         ->where('conversation_participants.role', 'emp')        
-        ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+        ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
         ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
         ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
         ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
@@ -562,7 +562,7 @@ class SysadminStatisticsReportController extends Controller
                     });
                 })
         ->where('conversation_participants.role', 'emp')             
-        ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+        ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
         ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
         ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
         ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
@@ -767,7 +767,7 @@ class SysadminStatisticsReportController extends Controller
                             ->orWhereNull('users.due_date_paused');
                     });
                 })
-                ->leftJoin('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                ->leftJoin('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
                 ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
@@ -803,7 +803,7 @@ class SysadminStatisticsReportController extends Controller
                             ->orWhereNull('users.due_date_paused');
                     });
                 })
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
                 ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
@@ -830,7 +830,7 @@ class SysadminStatisticsReportController extends Controller
                             ->orWhereNull('users.due_date_paused');
                     });
                 })
-            ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+            ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
             ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
             ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
             ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
@@ -880,7 +880,7 @@ class SysadminStatisticsReportController extends Controller
                 })
                 ->where('conversation_participants.role','emp')        
                 ->whereNull('employee_demo.date_deleted')        
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
                 ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
@@ -907,7 +907,7 @@ class SysadminStatisticsReportController extends Controller
                     });
                 })
             ->where('conversation_participants.role','emp')           
-            ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+            ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
             ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
             ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
             ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
@@ -1268,7 +1268,7 @@ class SysadminStatisticsReportController extends Controller
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 })
                 ->where('users.due_date_paused', 'N')                
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                 ->whereNull('employee_demo.date_deleted')        
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
                 ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
@@ -1315,7 +1315,7 @@ class SysadminStatisticsReportController extends Controller
             ->when( $request->legend == 'No', function($q) use($request) {
                 $q->whereRaw(" (select count(*) from shared_profiles A where A.shared_id = users.id) = 0 ");
             }) 
-            ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+            ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
             ->whereNull('employee_demo.date_deleted')        
             ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
             ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
@@ -1390,7 +1390,7 @@ class SysadminStatisticsReportController extends Controller
                     ->join('employee_demo', function($join) {
                          $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     })
-                    ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                    ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                     ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
                     ->when($request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
                     ->when($request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
@@ -1441,7 +1441,7 @@ class SysadminStatisticsReportController extends Controller
                 ->when( $request->legend == 'No', function($q) use($request) {
                     $q->whereRaw(" users.due_date_paused = 'N' ");
                 })
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                ->join('employee_demo_tree', 'employee_demo_tree.deptid', 'employee_demo.deptid')
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
                 ->when($request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
                 ->when($request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
