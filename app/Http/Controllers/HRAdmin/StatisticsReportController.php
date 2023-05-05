@@ -2152,6 +2152,13 @@ class StatisticsReportController extends Controller
                     //get has conversation users employee_id list
                     $excludedIds = $users->pluck('employee_id');
                     $sql = UserDemoJrView::whereNotIn('employee_id', $excludedIds)
+                            ->whereNull('date_deleted')
+                            ->where(function($query) {
+                                $query->where(function($query) {
+                                    $query->where('due_date_paused', 'N')
+                                        ->orWhereNull('due_date_paused');
+                                });
+                            })
                             ->where(function($query) {
                                 $query->where(function($query) {
                                     $query->where('excused_flag', '<>', '1')
@@ -2230,6 +2237,13 @@ class StatisticsReportController extends Controller
                     //get has conversation users employee_id list
                     $excludedIds = $users->pluck('employee_id');
                     $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)
+                            ->whereNull('date_deleted')
+                            ->where(function($query) {
+                                $query->where(function($query) {
+                                    $query->where('due_date_paused', 'N')
+                                        ->orWhereNull('due_date_paused');
+                                });
+                            })
                             ->where(function($query) {
                                 $query->where(function($query) {
                                     $query->where('excused_flag', '<>', '1')
