@@ -133,14 +133,9 @@ class ConversationController extends Controller
                 $query->where('supervisor_signoff_id', $request->supervisors);
             }
             if ($request->has('sup_signoff_date') && $request->sup_signoff_date) {
-                $query->where(function($query) use ($request) {
-                    $query->where('sign_off_time', '>=', $request->sup_signoff_date.' 00:00:00')
-                        ->orWhere('supervisor_signoff_time', '>=', $request->sup_signoff_date.' 00:00:00');
-                });
-                $query->where(function($query) use ($request) {
-                    $query->where('sign_off_time', '<=', $request->sup_signoff_date.' 23:59:59')
-                        ->orWhere('supervisor_signoff_time', '<=', $request->sup_signoff_date.' 23:59:59');
-                });
+                $query->whereRaw("GREATEST(sign_off_time, supervisor_signoff_time)>= '$request->sup_signoff_date"." 00:00:00' and
+                                GREATEST(sign_off_time, supervisor_signoff_time)<= '$request->sup_signoff_date"." 23:59:59'
+                                ");
             }
             
             if ($request->has('team_members') && $request->team_members) {
@@ -157,8 +152,9 @@ class ConversationController extends Controller
                 });
             } 
             if ($request->has('signoff_date') && $request->signoff_date) {
-                $myTeamQuery->whereRaw("(supervisor_signoff_time>= '$request->signoff_date"." 00:00:00' and supervisor_signoff_time<= '$request->signoff_date"." 23:59:59')"
-                        . "OR (sign_off_time>= '$request->signoff_date"." 00:00:00' and sign_off_time<= '$request->signoff_date"." 23:59:59')");
+                $myTeamQuery->whereRaw("GREATEST(sign_off_time, supervisor_signoff_time)>= '$request->signoff_date"." 00:00:00' and
+                                GREATEST(sign_off_time, supervisor_signoff_time)<= '$request->signoff_date"." 23:59:59'
+                                ");
             }
             if ($request->has('conversation_topic_id') && $request->conversation_topic_id) {
                 $myTeamQuery->where('conversation_topic_id', $request->conversation_topic_id);
