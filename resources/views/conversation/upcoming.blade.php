@@ -345,7 +345,7 @@ i {
               { title: "Employee ID", data: "signoff_user_id" },
               { title: "Supervisor ID", data: "supervisor_signoff_id" },
               {
-                title: "Name",
+                title: '<div style="padding-left: 20px;">Name</div>', // add left padding to header cell
                 render: function(data, type, row) {
                   return '<a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</button>';
                 }
@@ -380,7 +380,7 @@ i {
               { title: "Employee ID", data: "signoff_user_id" },
               { title: "Supervisor ID", data: "supervisor_signoff_id" },              
               {
-                title: "Name",
+                title: '<div style="padding-left: 20px;">Name</div>', // add left padding to header cell
                 render: function(data, type, row) {
                   return '<a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</button>';
                 }

@@ -334,7 +334,7 @@ i {
               { title: "Is Locked", data: "is_locked" },
               { title: "Status", data: "status" },
               {
-                title: "Name",
+                title: '<div style="padding-left: 20px;">Name</div>', // add left padding to header cell
                 render: function(data, type, row) {
                   return '<a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</button>';
                 }
@@ -355,23 +355,27 @@ i {
         const employee_table = $('#employee_conversations').DataTable({
             data: json_myTeamConversations,
             columns: [
-              { title: "ID", data: "id" },
-              { title: "Employee ID", data: "signoff_user_id" },
-              { title: "Supervisor ID", data: "supervisor_signoff_id" },
-              { title: "Is Locked", data: "is_locked" },
-              { title: "Status", data: "status" },
-              {
-                title: "Name",
-                render: function(data, type, row) {
-                  return '<a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</button>';
-                }
-              },
-              { title: "Participants", data: "participants" },
-              { title: "Latest Signed Off Date", data: "date" }
+                { title: "ID", data: "id" },
+                { title: "Employee ID", data: "signoff_user_id" },
+                { title: "Supervisor ID", data: "supervisor_signoff_id" },
+                { title: "Is Locked", data: "is_locked" },
+                { title: "Status", data: "status" },
+                {
+                    title: '<div style="padding-left: 20px;">Name</div>', // add left padding to header cell
+                    data: "name",
+                    render: function(data, type, row) {
+                        return '<a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+data+'</a>';
+                    }
+                },
+                { title: "Participants", data: "participants" },
+                { title: "Latest Signed Off Date", data: "date" }
             ],
             "order": [[0, "desc"]],
             dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>'
-         });
+        });
+
+         
+         
          employee_table.column(0).visible(false); 
          employee_table.column(1).visible(false);
          employee_table.column(2).visible(false);
