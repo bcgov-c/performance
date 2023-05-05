@@ -226,8 +226,8 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::delete('/sysadmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('sysadmin.employeeshares.deleteitem');
 
         Route::get('/sysadmin/employeeshares/org-tree/{index}', [EmployeeSharesController::class,'loadOrganizationTree']);
-        Route::get('/sysadmin/employeeshares/employee-list/{option?}', [EmployeeSharesController::class, 'getDatatableEmployees'])->name('sysadmin.employeeshares.employee.list');
-        Route::get('/sysadmin/employeeshares/employees/{id}/{option?}', [EmployeeSharesController::class,'getEmployees']);
+        Route::get('/sysadmin/employeeshares/employee-list/{index}', [EmployeeSharesController::class, 'getDatatableEmployees']);
+        Route::get('/sysadmin/employeeshares/employees/{id}/{index}', [EmployeeSharesController::class,'getEmployees']);
     });
 
     //Access and Permissions
