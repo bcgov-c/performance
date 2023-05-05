@@ -16,7 +16,7 @@ use App\Http\Controllers\HRAdmin\HRAdminSharedController;
 Route::group(['middleware' => ['role:HR Admin']], function () 
 {
     //Shared functions v3.0
-    Route::get('/hradmin/org-list/{copy}/{level}', [HRAdminSharedController::class,'getOrganizationList']);
+    Route::get('/hradmin/org-list/{index}/{level}', [HRAdminSharedController::class,'getOrganizationList']);
 
     //Shared functions v2.0
     Route::get('/hradmin/org-organizations2', [HRAdminSharedController::class,'getOrganizationsV2']);
@@ -57,8 +57,6 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('hradmin/myorg', [MyOrganizationController::class, 'index'])->name('hradmin.myorg');
         Route::get('hradmin/myorg/myorganization', [MyOrganizationController::class, 'getList'])->name('hradmin.myorg.myorganization');
         Route::post('hradmin/myorg/myorganization', [MyOrganizationController::class, 'index'])->name('hradmin.myorg.myorganization');
-
-        Route::get('/hradmin/myorg/org-tree', [MyOrganizationController::class,'loadOrganizationTree']);
     });
 
     //Goal Bank
@@ -89,9 +87,7 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('/hradmin/goalbank/savenewgoal', [GoalBankController::class, 'savenewgoal'])->name('hradmin.goalbank.savenewgoalget');
         Route::post('/hradmin/goalbank/savenewgoal', [GoalBankController::class, 'savenewgoal'])->name('hradmin.goalbank.savenewgoal');
         
-        Route::get('/hradmin/goalbank/org-tree', [GoalBankController::class,'loadOrganizationTree'])->name('hradmin.goalbank.org-tree');
-        Route::get('/hradmin/goalbank/eorg-tree', [GoalBankController::class,'eloadOrganizationTree'])->name('hradmin.goalbank.eorg-tree');
-        Route::get('/hradmin/goalbank/aorg-tree', [GoalBankController::class,'aloadOrganizationTree'])->name('hradmin.goalbank.aorg-tree');
+        Route::get('/hradmin/goalbank/org-tree/{index}', [GoalBankController::class,'loadOrganizationTree']);
         Route::get('/hradmin/goalbank/employees/{id}/{option?}', [GoalBankController::class,'getEmployees'])->name('hradmin.goalbank.getEmployees');
         Route::get('/hradmin/goalbank/employee-list/{option?}', [GoalBankController::class, 'getDatatableEmployees'])->name('hradmin.goalbank.employee.list');
 
@@ -117,11 +113,9 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('hradmin/employeeshares/manageindexviewshares/{id}', [EmployeeSharesController::class, 'manageindexviewshares']);
         Route::get('/hradmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('hradmin.employeeshares.deleteitemget');
         Route::delete('/hradmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('hradmin.employeeshares.deleteitem');
-        Route::get('/hradmin/employeeshares/org-tree', [EmployeeSharesController::class,'loadOrganizationTree']);
+        Route::get('/hradmin/employeeshares/org-tree/{index}', [EmployeeSharesController::class,'loadOrganizationTree']);
         Route::get('/hradmin/employeeshares/employee-list/{option?}', [EmployeeSharesController::class, 'getDatatableEmployees'])->name('hradmin.employeeshares.employee.list');
         Route::get('/hradmin/employeeshares/employees/{id}/{option?}', [EmployeeSharesController::class,'getEmployees'])->name('hradmin.employeeshares.getEmployees');
-
-        Route::get('/hradmin/employeeshares/eorg-tree', [EmployeeSharesController::class,'eloadOrganizationTree']);
     });
 
     //Excuse Employees
@@ -139,7 +133,7 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::post('/hradmin/excuseemployees/manageindexupdate', [ExcuseEmployeesController::class, 'manageindexupdate']);
         Route::get('/hradmin/excuseemployees/manageindexclear/{id}', [ExcuseEmployeesController::class, 'manageindexclear']);
 
-        Route::get('/hradmin/excuseemployees/org-tree', [ExcuseEmployeesController::class,'loadOrganizationTree']);
+        Route::get('/hradmin/excuseemployees/org-tree/{index}', [ExcuseEmployeesController::class,'loadOrganizationTree']);
         Route::get('/hradmin/excuseemployees/employees/{id}', [ExcuseEmployeesController::class,'getEmployees']);
     });
 

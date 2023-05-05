@@ -141,13 +141,7 @@ class EmployeeSharesController extends Controller {
             ->whereIn('employee_demo.employee_id', $eselected_emp_ids )
             ->distinct()
             ->get() ;
-        // if ($request->input_elements == 0) {
-            $elements = array("1", "2");
-        // } else if ($request->input_elements == 1) {
-        //     $elements = array("1");
-        // } else {
-        //     $elements = array("2");
-        // }
+        $elements = array("1", "2");
         $reason = $request->input_reason;
         foreach ($eeToShare as $eeOne) {
             foreach ($shareTo as $toOne) {                
@@ -227,65 +221,57 @@ class EmployeeSharesController extends Controller {
             ->with('success', 'Share user goal/conversation successful.');
     }
 
-    public function loadOrganizationTree(Request $request) {
-        list($sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4) = 
-            $this->baseFilteredSQLs($request, "");
-        $rows = $sql_level4->groupBy('o.id')->select('o.id')
-            ->union( $sql_level3->groupBy('o.id')->select('o.id') )
-            ->union( $sql_level2->groupBy('o.id')->select('o.id') )
-            ->union( $sql_level1->groupBy('o.id')->select('o.id') )
-            ->union( $sql_level0->groupBy('o.id')->select('o.id') )
-            ->pluck('o.id'); 
-        $orgs = EmployeeDemoTree::whereIn('id', $rows->toArray() )->get()->toTree();
+    public function loadOrganizationTree(Request $request, $index) {
+        switch ($index) {
+            case 2:
+                $option = 'e';
+                break;
+            default:
+                $option = '';
+                break;
+        }
+        $demoWhere = $this->baseFilteredWhere($request, $option);
         // Employee Count by Organization
-        $countByOrg = $sql_level4->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row"))
-        ->union( $sql_level3->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level2->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level1->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level0->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row") ) )
-        ->pluck('count_row', 'o.id');  
+        $treecount0 = clone $demoWhere; 
+        $treecount1 = clone $demoWhere; 
+        $treecount2 = clone $demoWhere; 
+        $treecount3 = clone $demoWhere; 
+        $treecount4 = clone $demoWhere; 
+        $countByOrg = $treecount0->groupBy('treeid')->select('organization_key as treeid', DB::raw("COUNT(*) as count_row"))
+            ->union( $treecount1->groupBy('treeid')->select('level1_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->union( $treecount2->groupBy('treeid')->select('level2_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->union( $treecount3->groupBy('treeid')->select('level3_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->union( $treecount4->groupBy('treeid')->select('level4_key as treeid', DB::raw("COUNT(*) as count_row")) )
+            ->pluck('count_row', 'treeid'); 
+        $orgs = EmployeeDemoTree::whereIn('id', array_keys($countByOrg->toArray()))
+            ->orderBy('organization')
+            ->orderBy('level1_program')
+            ->orderBy('level2_division')
+            ->orderBy('level3_branch')
+            ->orderBy('level4')
+            ->get()
+            ->toTree();
         // Employee ID by Tree ID
         $empIdsByOrgId = [];
-        $demoWhere = $this->baseFilteredWhere($request, "");
         $sql = clone $demoWhere; 
         $rows = $sql->select('orgid AS id', 'employee_id')
             ->groupBy('orgid', 'employee_id')
             ->orderBy('orgid')->orderBy('employee_id')
             ->get();
-        $empIdsByOrgId = $rows->groupBy('id')->all();
+        $empIdsByOrgId = $rows->groupBy('orgid')->all();
         if($request->ajax()){
-            return view('shared.employeeshares.partials.recipient-tree', compact('orgs','countByOrg','empIdsByOrgId') );
-        } 
-    }
-
-    public function eloadOrganizationTree(Request $request) {
-        list($sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4) = 
-            $this->baseFilteredSQLs($request, "e");
-        $rows = $sql_level4->groupBy('o.id')->select('o.id')
-            ->union( $sql_level3->groupBy('o.id')->select('o.id') )
-            ->union( $sql_level2->groupBy('o.id')->select('o.id') )
-            ->union( $sql_level1->groupBy('o.id')->select('o.id') )
-            ->union( $sql_level0->groupBy('o.id')->select('o.id') )
-            ->pluck('o.id'); 
-        $eorgs = EmployeeDemoTree::whereIn('id', $rows->toArray() )->get()->toTree();
-        // Employee Count by Organization
-        $ecountByOrg = $sql_level4->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row"))
-        ->union( $sql_level3->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level2->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level1->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row")) )
-        ->union( $sql_level0->groupBy('o.id')->select('o.id', DB::raw("COUNT(*) as count_row") ) )
-        ->pluck('count_row', 'o.id');  
-        $eempIdsByOrgId = [];
-        $demoWhere = $this->baseFilteredWhere($request, "e");
-        $sql = clone $demoWhere; 
-        $rows = $sql->select('orgid AS id', 'employee_id')
-            ->groupBy('orgid', 'employee_id')
-            ->orderBy('orgid')->orderBy('employee_id')
-            ->get();
-        $eempIdsByOrgId = $rows->groupBy('orgid')->all();
-        if($request->ajax()){
-            return view('shared.employeeshares.partials.erecipient-tree', compact('eorgs', 'ecountByOrg', 'eempIdsByOrgId') );
-        } 
+            switch ($index) {
+                case 2:
+                    $eorgs = $orgs;
+                    $ecountByOrg = $countByOrg;
+                    $eempIdsByOrgId = $empIdsByOrgId;
+                    return view('shared.employeeshares.partials.erecipient-tree', compact('eorgs', 'ecountByOrg', 'eempIdsByOrgId') );
+                    break;
+                default:
+                    return view('shared.employeeshares.partials.recipient-tree', compact('orgs','countByOrg','empIdsByOrgId') );
+                    break;
+            }
+        }
     }
   
     public function getDatatableEmployees(Request $request, $option = null) {
