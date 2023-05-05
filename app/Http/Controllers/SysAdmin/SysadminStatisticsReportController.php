@@ -1951,7 +1951,7 @@ class SysadminStatisticsReportController extends Controller
                 }
                 $conversation[0]->participants = implode(', ', $participants_arr );
                 
-                $item["selected_conversation"] = $conversation[0];
+                $item = $conversation[0];
                 array_push($data, $item);
             }               
             
@@ -2038,7 +2038,7 @@ class SysadminStatisticsReportController extends Controller
                 }
                 $conversation[0]->participants = implode(', ', $participants_arr );
                 
-                $item["selected_conversation"] = $conversation[0];
+                $item = $conversation[0];
                 array_push($data, $item);
             }               
             
