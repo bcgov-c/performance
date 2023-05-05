@@ -274,7 +274,18 @@ class EmployeeSharesController extends Controller {
         }
     }
   
-    public function getDatatableEmployees(Request $request, $option = null) {
+    public function getDatatableEmployees(Request $request, $index) {
+        switch ($index) {
+            case 2:
+                $option = 'e';
+                break;
+            case 3:
+                $option = 'a';
+                break;
+            default:
+                $option = '';
+                break;
+        }
         if($request->ajax()){
             $demoWhere = $this->baseFilteredWhere($request, $option);
             $sql = clone $demoWhere; 
@@ -306,7 +317,18 @@ class EmployeeSharesController extends Controller {
         return ['data' => $users];
     }
 
-    public function getEmployees(Request $request, $id, $option = null) {
+    public function getEmployees(Request $request, $id, $index) {
+        switch ($index) {
+            case 2:
+                $option = 'e';
+                break;
+            case 3:
+                $option = 'a';
+                break;
+            default:
+                $option = '';
+                break;
+        }
         list($sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4) = $this->baseFilteredSQLs($request, $option);
         $rows = $sql_level4->where('id', $id)
             ->union( $sql_level3->where('id', $id) )
@@ -437,15 +459,11 @@ class EmployeeSharesController extends Controller {
             $authId = Auth::id();
             $query = HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
                 ->join('shared_profiles AS sp', 'sp.shared_id', 'u.user_id')
-                ->leftjoin('hr_user_demo_jr_view AS u2', function($u2on) {
-                    return $u2on->on(function($u2where) {
-                        return $u2where->whereRaw('u2.user_id = sp.shared_with AND u2.date_deleted IS NULL');
-                    });
-                })
-                ->leftjoin('users as u3', 'u3.id', 'sp.shared_by')
-                ->leftjoin('employee_demo as cc', 'cc.employee_id', 'u3.employee_id' )
+                ->leftjoin('users AS u2', 'u2.id', 'sp.shared_with')
+                ->leftjoin('employee_demo as d2', 'd2.employee_id', 'u2.employee_id' )
+                ->leftjoin('users as cc', 'cc.id', 'sp.shared_by')
+                ->leftjoin('employee_demo as cd', 'cd.employee_id', 'cc.employee_id' )
                 ->where('u.auth_id', \DB::raw($authId))
-                ->where('u2.auth_id', \DB::raw($authId))
                 ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
                 ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
                 ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
@@ -480,8 +498,8 @@ class EmployeeSharesController extends Controller {
                     'u.employee_id',
                     'u.employee_name', 
                     'u2.employee_id as delegate_ee_id',
-                    'u2.employee_name as delegate_ee_name',
-                    'u2.employee_name as alternate_delegate_name',
+                    'd2.employee_name as delegate_ee_name',
+                    'd2.employee_name as alternate_delegate_name',
                     'sp.shared_item',
                     'u.jobcode_desc',
                     'u.organization',
@@ -490,7 +508,7 @@ class EmployeeSharesController extends Controller {
                     'u.level3_branch',
                     'u.level4',
                     'u.deptid',
-                    'cc.employee_name as created_name',
+                    'cd.employee_name as created_name',
                     'sp.created_at',
                     'sp.updated_at',
                     'sp.id as shared_profile_id',
