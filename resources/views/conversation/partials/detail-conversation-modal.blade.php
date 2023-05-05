@@ -363,13 +363,13 @@ function updateConversation(conversation_id) {
                         <?php if ($type == 'past'){ ?>
                         if(is_locked) {
                             $('#emp-signoff-row').hide();
-                            $('#employee-signoff-message').hide();
+                            $('#employee-signoff-message').show();
                             $('#sup-signoff-row').hide();
-                            $('#supervisor-signoff-message').hide();
+                            $('#supervisor-signoff-message').show();
                             $('#emp-unsignoff-row').hide();
-                            $('#employee-unsignoff-message').hide();
+                            $('#employee-unsignoff-message').show();
                             $('#sup-unsignoff-row').hide();
-                            $('#supervisor-unsignoff-message').hide();
+                            $('#supervisor-unsignoff-message').show();
                         }
                         <?php } ?>
                         
