@@ -31,7 +31,7 @@
                             <th>Supervisor Sign Off</th>
                             <th>Employee Sign Off</th>
                             <?php
-                            if($item["selected_conversation"]->sign_supervisor_name != '' && $item["selected_conversation"]->sign_employee_name != ''){
+                            if($item->sign_supervisor_name != '' && $item->sign_employee_name != ''){
                                 echo "<th>Latest Signoff At</th>";
                             }else{    
                                 echo "<th>Created At</th>";
@@ -39,40 +39,40 @@
                             ?>
                         </tr>
                         <tr>
-                            <td><?php echo $item["selected_conversation"]->topic; ?></td>
-                            <td><?php echo $item["selected_conversation"]->participants; ?></td>
-                            <td><?php echo $item["selected_conversation"]->sign_supervisor_name; ?> <?php if($item["selected_conversation"]->supervisor_signoff_time != ''){?>[<?php echo $item["selected_conversation"]->supervisor_signoff_time; ?>]<?php } ?></td>
-                            <td><?php echo $item["selected_conversation"]->sign_employee_name; ?>  <?php if($item["selected_conversation"]->sign_off_time != ''){?>[<?php echo $item["selected_conversation"]->sign_off_time; ?>]<?php } ?></td>
+                            <td><?php echo $item->topic; ?></td>
+                            <td><?php echo $item->participants; ?></td>
+                            <td><?php echo $item->sign_supervisor_name; ?> <?php if($item->supervisor_signoff_time != ''){?>[<?php echo $item->supervisor_signoff_time; ?>]<?php } ?></td>
+                            <td><?php echo $item->sign_employee_name; ?>  <?php if($item->sign_off_time != ''){?>[<?php echo $item->sign_off_time; ?>]<?php } ?></td>
                             <?php
-                            if($item["selected_conversation"]->sign_supervisor_name != '' && $item["selected_conversation"]->sign_employee_name != ''){
-                                echo "<td>".$item["selected_conversation"]->latest_update."</td>";
+                            if($item->sign_supervisor_name != '' && $item->sign_employee_name != ''){
+                                echo "<td>".$item->latest_update."</td>";
                             }else{    
-                                echo "<td>".$item["selected_conversation"]->created_at."</td>";
+                                echo "<td>".$item->created_at."</td>";
                             }
                             ?>
                         </tr>
                     </table>
                 
-                    <?php if ($item["selected_conversation"]->topic == 'Performance Check-In') { ?>
+                    <?php if ($item->topic == 'Performance Check-In') { ?>
                     <ul>
                         <li><b>Employee Comments</b>
                             <ul>
-                                <li><b>Self Summary: </b><?php echo $data["selected_conversation"]->info_comment4;?></li>
-                                <li><b>Additional Comments: </b><?php echo $data["selected_conversation"]->info_comment7;?></li>
-                                <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment8;?></li>
+                                <li><b>Self Summary: </b><?php echo $item->info_comment4;?></li>
+                                <li><b>Additional Comments: </b><?php echo $item->info_comment7;?></li>
+                                <li><b>Action Items: </b><?php echo $item->info_comment8;?></li>
                             </ul>
                         </li>
                         <li><b>Employee Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if($data["selected_conversation"]->empl_agree1 == 1){?>
+                                    <?php if($item->empl_agree1 == 1){?>
                                         <p>Yes</p>
                                     <?php }else{ ?>
                                         <p>No</p>    
                                     <?php } ?>    
                                 </li>
                                 <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if($data["selected_conversation"]->empl_agree2 == 1){?>
+                                    <?php if($item->empl_agree2 == 1){?>
                                         <p>Yes</p>
                                     <?php }else{ ?>
                                         <p>No</p>    
@@ -82,24 +82,24 @@
                         </li>
                         <li><b>Supervisor Comments</b>
                             <ul>
-                                <li><b>Appreciation: </b><?php echo $data["selected_conversation"]->info_comment1;?></li>
-                                <li><b>Coaching: </b><?php echo $data["selected_conversation"]->info_comment2;?></li>
-                                <li><b>Evaluation : </b><?php echo $data["selected_conversation"]->info_comment3;?></li>
-                                <li><b>Additional Comments : </b><?php echo $data["selected_conversation"]->info_comment5;?></li>
-                                <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment6;?></li>
+                                <li><b>Appreciation: </b><?php echo $item->info_comment1;?></li>
+                                <li><b>Coaching: </b><?php echo $item->info_comment2;?></li>
+                                <li><b>Evaluation : </b><?php echo $item->info_comment3;?></li>
+                                <li><b>Additional Comments : </b><?php echo $item->info_comment5;?></li>
+                                <li><b>Action Items: </b><?php echo $item->info_comment6;?></li>
                             </ul>
                         </li>
                         <li><b>Supervisor Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if($data["selected_conversation"]->supv_agree1 == 1){?>
+                                    <?php if($item->supv_agree1 == 1){?>
                                         <p>Yes</p>
                                     <?php }else{ ?>
                                         <p>No</p>
                                     <?php } ?>    
                                 </li>
                                 <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if($data["selected_conversation"]->supv_agree2 == 1){?>
+                                    <?php if($item->supv_agree2 == 1){?>
                                         <p>Yes</p>
                                     <?php }else{ ?>
                                         <p>No</p>
@@ -110,25 +110,25 @@
                     </ul>
                     <?php } ?>
 
-                    <?php if ($item["selected_conversation"]->topic == 'Goal Setting') { ?>
+                    <?php if ($item->topic == 'Goal Setting') { ?>
                     <ul>
                         <li><b>Employee Comments</b>
                             <ul>
-                                <li><b>Comments: </b><?php echo $data["selected_conversation"]->info_comment4;?></li>
-                                <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment7;?></li>
+                                <li><b>Comments: </b><?php echo $item->info_comment4;?></li>
+                                <li><b>Action Items: </b><?php echo $item->info_comment7;?></li>
                             </ul>
                         </li>
                         <li><b>Employee Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if($data["selected_conversation"]->empl_agree1 == 1){?>
+                                    <?php if($item->empl_agree1 == 1){?>
                                         <p>Yes</p>
                                     <?php }else{ ?>
                                         <p>No</p>   
                                     <?php } ?>    
                                 </li>
                                 <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if($data["selected_conversation"]->empl_agree2 == 1){?>
+                                    <?php if($item->empl_agree2 == 1){?>
                                         <p>Yes</p>
                                     <?php }else{ ?>
                                         <p>No</p>       
@@ -138,21 +138,21 @@
                         </li>
                         <li><b>Supervisor Comments</b>
                             <ul>
-                                <li><b>Comments : </b><?php echo $data["selected_conversation"]->info_comment1;?></li>
-                                <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment2;?></li>
+                                <li><b>Comments : </b><?php echo $item->info_comment1;?></li>
+                                <li><b>Action Items: </b><?php echo $item->info_comment2;?></li>
                             </ul>
                         </li>
                         <li><b>Supervisor Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if($data["selected_conversation"]->supv_agree1 == 1){?>
+                                    <?php if($item->supv_agree1 == 1){?>
                                         <p>Yes</p>
                                     <?php }else{ ?>
                                         <p>No</p>    
                                     <?php } ?>    
                                 </li>
                                 <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if($data["selected_conversation"]->supv_agree2 == 1){?>
+                                    <?php if($item->supv_agree2 == 1){?>
                                         <p>Yes</p>
                                     <?php }else{ ?>
                                         <p>No</p>       
@@ -163,28 +163,28 @@
                     </ul>
                     <?php } ?>
 
-                    <?php if ($item["selected_conversation"]->topic == 'Career Development') { ?>
+                    <?php if ($item->topic == 'Career Development') { ?>
                     <ul>
                         <li><b>Employee Comments</b>
                             <ul>
-                                <li><b>Career Goal Statement: </b><?php echo $data["selected_conversation"]->info_comment4;?></li>
-                                <li><b>Strengths: </b><?php echo $data["selected_conversation"]->info_comment7;?></li>
-                                <li><b>Areas for Growth: </b><?php echo $data["selected_conversation"]->info_comment8;?></li>
-                                <li><b>Additional Comments: </b><?php echo $data["selected_conversation"]->info_comment9;?></li>
-                                <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment10;?></li>
+                                <li><b>Career Goal Statement: </b><?php echo $item->info_comment4;?></li>
+                                <li><b>Strengths: </b><?php echo $item->info_comment7;?></li>
+                                <li><b>Areas for Growth: </b><?php echo $item->info_comment8;?></li>
+                                <li><b>Additional Comments: </b><?php echo $item->info_comment9;?></li>
+                                <li><b>Action Items: </b><?php echo $item->info_comment10;?></li>
                             </ul>
                         </li>
                         <li><b>Employee Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if($data["selected_conversation"]->empl_agree1 == 1){?>
+                                    <?php if($item->empl_agree1 == 1){?>
                                         <p>Yes</p>
                                     <?php }else{ ?>
                                         <p>No</p>      
                                     <?php } ?>    
                                 </li>
                                 <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if($data["selected_conversation"]->empl_agree2 == 1){?>
+                                    <?php if($item->empl_agree2 == 1){?>
                                         <p>Yes</p>
                                     <?php }else{ ?>
                                         <p>No</p>     
@@ -194,23 +194,23 @@
                         </li>
                         <li><b>Supervisor Comments</b>
                             <ul>
-                                <li><b>Employee Strengths : </b><?php echo $data["selected_conversation"]->info_comment1;?></li>
-                                <li><b>Employee Growth: </b><?php echo $data["selected_conversation"]->info_comment2;?></li>
-                                <li><b>Additional Comments: </b><?php echo $data["selected_conversation"]->info_comment3;?></li>
-                                <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment5;?></li>                            
+                                <li><b>Employee Strengths : </b><?php echo $item->info_comment1;?></li>
+                                <li><b>Employee Growth: </b><?php echo $item->info_comment2;?></li>
+                                <li><b>Additional Comments: </b><?php echo $item->info_comment3;?></li>
+                                <li><b>Action Items: </b><?php echo $item->info_comment5;?></li>                            
                             </ul>
                         </li>
                         <li><b>Supervisor Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if($data["selected_conversation"]->supv_agree1 == 1){?>
+                                    <?php if($item->supv_agree1 == 1){?>
                                         <p>Yes</p>
                                     <?php }else{ ?>
                                         <p>No</p>    
                                     <?php } ?>    
                                 </li>
                                 <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if($data["selected_conversation"]->supv_agree2 == 1){?>
+                                    <?php if($item->supv_agree2 == 1){?>
                                         <p>Yes</p>
                                     <?php }else{ ?>
                                         <p>No</p>    
@@ -221,26 +221,26 @@
                     </ul>
                     <?php } ?>
 
-                    <?php if ($item["selected_conversation"]->topic == 'Performance Improvement') { ?>
+                    <?php if ($item->topic == 'Performance Improvement') { ?>
                     <ul>
                         <li><b>Employee Comments</b>
                             <ul>
-                                <li><b>Self Summary: </b><?php echo $data["selected_conversation"]->info_comment4;?></li>
-                                <li><b>Additional Comments: </b><?php echo $data["selected_conversation"]->info_comment7;?></li>
-                                <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment8;?></li>
+                                <li><b>Self Summary: </b><?php echo $item->info_comment4;?></li>
+                                <li><b>Additional Comments: </b><?php echo $item->info_comment7;?></li>
+                                <li><b>Action Items: </b><?php echo $item->info_comment8;?></li>
                             </ul>
                         </li>
                         <li><b>Employee Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if($data["selected_conversation"]->empl_agree1 == 1){?>
+                                    <?php if($item->empl_agree1 == 1){?>
                                         <p>Yes</p>
                                     <?php }else{ ?>
                                         <p>No</p>     
                                     <?php } ?>    
                                 </li>
                                 <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if($data["selected_conversation"]->empl_agree2 == 1){?>
+                                    <?php if($item->empl_agree2 == 1){?>
                                         <p>Yes</p>
                                     <?php }else{ ?>
                                         <p>No</p>      
@@ -250,23 +250,23 @@
                         </li>
                         <li><b>Supervisor Comments</b>
                             <ul>
-                                <li><b>Evaluation: </b><?php echo $data["selected_conversation"]->info_comment1;?></li>
-                                <li><b>What must the employee accomplish? By when? </b><?php echo $data["selected_conversation"]->info_comment2;?></li>
-                                <li><b>What support will the supervisor (and others) provide? By When? </b><?php echo $data["selected_conversation"]->info_comment3;?></li>
-                                <li><b>When will a follow up meeting occur? </b><?php echo $data["selected_conversation"]->info_comment11;?></li>                            
+                                <li><b>Evaluation: </b><?php echo $item->info_comment1;?></li>
+                                <li><b>What must the employee accomplish? By when? </b><?php echo $item->info_comment2;?></li>
+                                <li><b>What support will the supervisor (and others) provide? By When? </b><?php echo $item->info_comment3;?></li>
+                                <li><b>When will a follow up meeting occur? </b><?php echo $item->info_comment11;?></li>                            
                             </ul>
                         </li>
                         <li><b>Supervisor Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if($data["selected_conversation"]->supv_agree1 == 1){?>
+                                    <?php if($item->supv_agree1 == 1){?>
                                         <p>Yes</p>
                                     <?php }else{ ?>
                                         <p>No</p>       
                                     <?php } ?>    
                                 </li>
                                 <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if($data["selected_conversation"]->supv_agree2 == 1){?>
+                                    <?php if($item->supv_agree2 == 1){?>
                                         <p>Yes</p>
                                     <?php }else{ ?>
                                         <p>No</p>       
@@ -277,24 +277,24 @@
                     </ul>
                     <?php } ?>
 
-                    <?php if ($item["selected_conversation"]->topic == 'Onboarding') { ?>
+                    <?php if ($item->topic == 'Onboarding') { ?>
                     <ul>
                         <li><b>Employee Comments</b>
                             <ul>
-                                <li><b>Comments: </b><?php echo $data["selected_conversation"]->info_comment4;?></li>
-                                <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment7;?></li>
+                                <li><b>Comments: </b><?php echo $item->info_comment4;?></li>
+                                <li><b>Action Items: </b><?php echo $item->info_comment7;?></li>
                             </ul>
                         </li>
                         <li><b>Employee Attestation</b>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if($data["selected_conversation"]->empl_agree1 == 1){?>
+                                    <?php if($item->empl_agree1 == 1){?>
                                         Yes
                                     <?php }else{ ?>
                                         No    
                                     <?php } ?>    
                                 </li>
                                 <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if($data["selected_conversation"]->empl_agree2 == 1){?>
+                                    <?php if($item->empl_agree2 == 1){?>
                                         Yes
                                     <?php }else{ ?>
                                         No    
@@ -304,21 +304,21 @@
                         </li>
                         <li><b>Supervisor Comments</b>
                             <ul>
-                                <li><b>Comments: </b><?php echo $data["selected_conversation"]->info_comment1;?></li>
-                                <li><b>Action Items: </b><?php echo $data["selected_conversation"]->info_comment2;?></li>                  
+                                <li><b>Comments: </b><?php echo $item->info_comment1;?></li>
+                                <li><b>Action Items: </b><?php echo $item->info_comment2;?></li>                  
                             </ul>
                         </li>
                         <li><b>Supervisor Attestation</b>
                             <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if($data["selected_conversation"]->supv_agree1 == 1){?>
+                                    <?php if($item->supv_agree1 == 1){?>
                                         Yes
                                     <?php }else{ ?>
                                         No    
                                     <?php } ?>    
                                 </li>
                                 <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if($data["selected_conversation"]->supv_agree2 == 1){?>
+                                    <?php if($item->supv_agree2 == 1){?>
                                         Yes
                                     <?php }else{ ?>
                                         No    
@@ -332,7 +332,7 @@
                     <?php if($i>0){?>
                     </div>
                     <?php } ?>
-                 <?php } ?>
+                <?php }?> 
             </div>    
         </div>
     </div>
