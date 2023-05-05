@@ -492,7 +492,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->where('auth_users.user_id', 'users.id')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 });
                 
@@ -545,7 +545,7 @@ class StatisticsReportController extends Controller
         ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
+                            ->where('auth_users.user_id', 'conversation_participants.participant_id')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 });
         
@@ -620,7 +620,7 @@ class StatisticsReportController extends Controller
         ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
+                            ->where('auth_users.user_id', 'conversation_participants.participant_id')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 })
         ->get();
@@ -722,7 +722,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
+                            ->where('auth_users.user_id', 'conversation_participants.participant_id')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 });      
         
@@ -792,7 +792,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
+                            ->where('auth_users.user_id', 'conversation_participants.participant_id')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 });
                             
@@ -856,7 +856,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->where('auth_users.user_id', 'users.id')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 });
                 
@@ -891,7 +891,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->where('auth_users.user_id', 'users.id')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 })
                 ->where('conversation_participants.role','<>','mgr')
@@ -936,7 +936,7 @@ class StatisticsReportController extends Controller
             ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->where('auth_users.user_id', 'users.id')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 })
             ->with('topic:id,name')
@@ -985,7 +985,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
+                            ->where('auth_users.user_id', 'conversation_participants.participant_id')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 });
                 
@@ -1028,7 +1028,7 @@ class StatisticsReportController extends Controller
             ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
+                            ->where('auth_users.user_id', 'conversation_participants.participant_id')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 });
             
@@ -1069,7 +1069,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
+                            ->where('auth_users.user_id', 'conversation_participants.participant_id')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 });    
                 
@@ -1111,7 +1111,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
+                            ->where('auth_users.user_id', 'conversation_participants.participant_id')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 });       
             
@@ -1553,7 +1553,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->where('auth_users.user_id', 'users.id')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 })
                 ;
@@ -1607,7 +1607,7 @@ class StatisticsReportController extends Controller
             ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->where('auth_users.user_id', 'users.id')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 })
             ->with('sharedWith');
@@ -1690,7 +1690,7 @@ class StatisticsReportController extends Controller
                     ->whereExists(function ($query) {
                         $query->select(DB::raw(1))
                                 ->from('auth_users')
-                                ->whereColumn('auth_users.user_id', 'users.id')
+                                ->where('auth_users.user_id', 'users.id')
                                 ->where('auth_users.auth_id', '=', Auth::id());
                     });
                  
@@ -1747,7 +1747,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                         $query->select(DB::raw(1))
                                 ->from('auth_users')
-                                ->whereColumn('auth_users.user_id', 'users.id')
+                                ->where('auth_users.user_id', 'users.id')
                                 ->where('auth_users.auth_id', '=', Auth::id());
                     })
                 ->with('excuseReason') ;
@@ -1877,7 +1877,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                         $query->select(DB::raw(1))
                                 ->from('auth_users')
-                                ->whereColumn('auth_users.user_id', 'users.id')
+                                ->where('auth_users.user_id', 'users.id')
                                 ->where('auth_users.auth_id', '=', Auth::id());
                     })->count();
 
@@ -1921,7 +1921,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                         $query->select(DB::raw(1))
                                 ->from('auth_users')
-                                ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
+                                ->where('auth_users.user_id', 'conversation_participants.participant_id')
                                 ->where('auth_users.auth_id', '=', Auth::id());
                     });      
         
@@ -1991,7 +1991,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                         $query->select(DB::raw(1))
                                 ->from('auth_users')
-                                ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
+                                ->where('auth_users.user_id', 'conversation_participants.participant_id')
                                 ->where('auth_users.auth_id', '=', Auth::id());
                     });
                             
@@ -2066,7 +2066,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                         $query->select(DB::raw(1))
                                 ->from('auth_users')
-                                ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
+                                ->where('auth_users.user_id', 'conversation_participants.participant_id')
                                 ->where('auth_users.auth_id', '=', Auth::id());
                     });
                 
@@ -2111,7 +2111,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                         $query->select(DB::raw(1))
                                 ->from('auth_users')
-                                ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
+                                ->where('auth_users.user_id', 'conversation_participants.participant_id')
                                 ->where('auth_users.auth_id', '=', Auth::id());
                     });      
             
