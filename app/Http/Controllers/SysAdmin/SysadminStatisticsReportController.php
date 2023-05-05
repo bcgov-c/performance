@@ -597,7 +597,20 @@ class SysadminStatisticsReportController extends Controller
         // Chart6 -- Employee Has Open Conversation
          
         //get all employee number
-        $employees = UserDemoJrView::distinct('employee_id')                
+        $employees = UserDemoJrView::distinct('employee_id')         
+                ->whereNull('date_deleted')
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('excused_flag', '<>', '1')
+                            ->orWhereNull('excused_flag');
+                    });
+                })
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
+                    });
+                })  
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
                 ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
@@ -2206,16 +2219,30 @@ class SysadminStatisticsReportController extends Controller
         $request->session()->flash('dd_level3', $request->dd_level3);
         $request->session()->flash('dd_level4', $request->dd_level4);
         
+        
         // Chart6 -- Employee Has Open Conversation
-         //get all employee number
-        $employees = UserDemoJrView::distinct('employee_id')                
+         
+        //get all employee number
+        $employees = UserDemoJrView::distinct('employee_id')  
+                ->whereNull('date_deleted')
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('excused_flag', '<>', '1')
+                            ->orWhereNull('excused_flag');
+                    });
+                })
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
+                    });
+                })  
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
                 ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
                 ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                 ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })   
                 ->count();
-        
          
         //get employees has open conversations
         $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, 
