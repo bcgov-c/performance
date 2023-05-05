@@ -674,7 +674,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('admin_org_users')
-                            ->whereColumn('admin_org_users.allowed_user_id', 'user_id')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'user_demo_jr_view.user_id')
                             ->whereIn('admin_org_users.access_type', [0,2])
                             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 })        
@@ -720,7 +720,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('admin_org_users')
-                            ->whereColumn('admin_org_users.allowed_user_id', 'user_id')
+                            ->whereColumn('admin_org_users.allowed_user_id', 'user_demo_jr_view.user_id')
                             ->whereIn('admin_org_users.access_type', [0,2])
                             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 });      
