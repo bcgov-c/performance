@@ -142,7 +142,7 @@ $(function() {
 
 	var allCharts = [];
 	var export_url = '{{ route('sysadmin.statistics.conversationsummary.export') }}'; 
-        var export_url_1 = '{{ route('hradmin.statistics.conversationstatus.export') }}';  
+        var export_url_1 = '{{ route('sysadmin.statistics.conversationstatus.export') }}';  
 
 	function createChart(divId, myData) {
 

@@ -12,6 +12,9 @@ use App\Models\GoalType;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
 use App\Models\UserDemoJrView;
+use App\Models\EmployeeDemo;
+use App\Models\EmployeeDemoTree;
+use App\Models\EmployeeDemoJunior;
 use Illuminate\Http\Request;
 use App\Models\ConversationTopic;
 use Illuminate\Support\Facades\DB;
@@ -599,7 +602,9 @@ class SysadminStatisticsReportController extends Controller
         // Chart6 -- Employee Has Open Conversation
          
         //get all employee number
-        $employees = UserDemoJrView::distinct('employee_id')
+        $employees = User::distinct('employee_demo.employee_id')
+                ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
+                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
                 ->where(function($query) {
                                 $query->where(function($query) {
                                     $query->where('excused_flag', '<>', '1')
@@ -621,11 +626,13 @@ class SysadminStatisticsReportController extends Controller
                 ->count();
          
         //get employees has open conversations
-        $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, 
-                            organization, level1_program, level2_division, level3_branch, level4
+        $sql_6 = User::selectRaw("employee_demo.employee_id, employee_name, 
+                            employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4
                  ")
+                ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
+                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
                 ->join('conversation_participants', function($join) {
-                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                    $join->on('conversation_participants.participant_id', '=', 'users.id');
                 })
                 ->join('conversations', function($join) {
                     $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
@@ -686,11 +693,13 @@ class SysadminStatisticsReportController extends Controller
         
         // Chart7 -- Employee Has Completed Conversation
         //get employees has Completed conversations
-        $sql_7 = UserDemoJrView::selectRaw("employee_id, employee_name, 
-                            organization, level1_program, level2_division, level3_branch, level4
+        $sql_7 = User::selectRaw("employee_demo.employee_id, employee_name, 
+                            employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4
                  ")
+                ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
+                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
                 ->join('conversation_participants', function($join) {
-                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                    $join->on('conversation_participants.participant_id', '=', 'users.id');
                 })
                 ->join('conversations', function($join) {
                     $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
