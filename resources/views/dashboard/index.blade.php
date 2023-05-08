@@ -81,6 +81,15 @@
     @if(!empty($message))
     @include('dashboard.partials.message-modal', ['content' => $message->message])
     @endif
+
+    <div class="container-fluid">
+        <div class="pt-5">
+            <div class="col-12">
+                Your personal information is collected by the BC Public Service Agency and your Ministry pursuant to section 26(c)and 27(1)(f) of the <i>Freedom of Information and Protection of Privacy Act</i> for the purpose of managing and developing, staff training, educational and career development.
+            </div>
+        </div>
+    </div>
+
     
     @push('js')
         {{-- <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
