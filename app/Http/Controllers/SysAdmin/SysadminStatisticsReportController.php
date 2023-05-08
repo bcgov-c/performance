@@ -430,7 +430,7 @@ class SysadminStatisticsReportController extends Controller
         $request->session()->flash('dd_level4', $request->dd_level4);
         
         //get all employee number
-        $all_employees = User::selectRaw("users.employee_id, users.empl_record, employee_name, 
+        $query = User::selectRaw("users.employee_id, users.empl_record, employee_name, 
                                 employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division,
                                 employee_demo_tree.level3_branch, employee_demo_tree.level4,conversation_participants.role,
                                 conversations.deleted_at,conversation_participants.conversation_id,
@@ -464,9 +464,9 @@ class SysadminStatisticsReportController extends Controller
                         $query->where('users.excused_flag', '<>', '1')
                             ->orWhereNull('users.excused_flag');
                     });
-                })  
-                ->get();
-
+                });  
+        $all_employees = $query->get();
+        
         // Chart1 -- Overdue
         $data = array();
         $data['chart1']['chart_id'] = 1;
@@ -636,7 +636,7 @@ class SysadminStatisticsReportController extends Controller
                             'legend' => $legend, 
                         ]);
         } 
-        
+        exit;
         
         return view('sysadmin.statistics.conversationsummary',compact('data'));
 
