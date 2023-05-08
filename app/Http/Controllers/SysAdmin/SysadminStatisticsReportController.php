@@ -468,7 +468,7 @@ class SysadminStatisticsReportController extends Controller
                     });
                 });  
         $all_employees = $query->get();
-        
+    exit;    
         // Chart1 -- Overdue
         $data = array();
         $data['chart1']['chart_id'] = 1;
