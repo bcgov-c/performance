@@ -5,9 +5,9 @@
             @include('shared.employeeshares.partials.tabs')
         </div>
     </div>	
-    <p class="px-3">Supervisors and administrators may share all or part of an employee's PDP profile with another supervisor or staff for a legitimate business reason. The full profile or the Conversations section should only be shared with people who normally handle employees' permanent personnel records (i.e. Public Service Agency or co-supervisors). The Goals section can be shared more broadly (i.e. with project team leads) to encourage collaboration and feedback on specific goals.</p>
-    <p class="px-3">An employee may also wish to share their profile with someone other than a direct supervisor (for example, a hiring manager). In order to do this - the employee's consent is required.</p>
-    <p class="px-3">To continue, please use the functions below to select the employee profiles that you would like to share, the person you would like to share the profiles with, which elements you would like to share, and your reason for sharing the profile.</p>
+    <p class="px-3">Supervisors and administrators may share an employee's PDP profile with another supervisor or staff for a legitimate business reason. The profile should only be shared with people who normally handle employees' permanent personnel records (i.e. Public Service Agency or co-supervisors). An employee may also wish to share their profile with someone other than a direct supervisor (for example, a hiring manager). In order to do this - the employee's consent is required.</p>
+    <!-- <p class="px-3">An employee may also wish to share their profile with someone other than a direct supervisor (for example, a hiring manager). In order to do this - the employee's consent is required.</p>
+    <p class="px-3">To continue, please use the functions below to select the employee profiles that you would like to share, the person you would like to share the profiles with, which elements you would like to share, and your reason for sharing the profile.</p> -->
 	
 
     <form id="notify-form" action="{{ route(request()->segment(1).'.employeeshares.saveall') }}" method="post">
@@ -92,7 +92,7 @@
                         <div class="col col-12">
                             <!-- <x-input id="reason" name="input_reason" label="Reason for sharing" data-toggle="tooltip" data-placement="top" data-trigger="manual" tooltip="Reason tooltip"/> -->
                             <b>Reason for sharing</b>
-                            <i class="fa fa-info-circle" label="Reason for sharing" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Provide a brief explanation of why the profile elements are being shared. For example: <br><br><ul><li> Sharing profile with co-supervisor </li><li>Sharing goals section with project team lead</li><li>Sharing conversations section with hiring manager per employee request</li></ul>"> </i> 
+                            <i class="fa fa-info-circle" label="Reason for sharing" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Provide a brief explanation of why the profile is being shared. For example: <br><br><ul><li> Sharing profile with co-supervisor </li><li>Sharing profile because of inaccurate data in PeopleSoft</li><li>Sharing with hiring manager per employee request</li></ul>"> </i> 
                             <x-input id="reason" name="input_reason"/>                            
                             @error('input_reason')
                                 {{-- <div class="alert alert-danger alert-dismissable fade show"> "Reason for sharing" is required. </div> --}}
