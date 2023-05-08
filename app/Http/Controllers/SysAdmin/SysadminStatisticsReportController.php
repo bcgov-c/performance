@@ -434,6 +434,8 @@ class SysadminStatisticsReportController extends Controller
                                 employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division,
                                 employee_demo_tree.level3_branch, employee_demo_tree.level4,conversation_participants.role,
                                 conversations.deleted_at,conversation_participants.conversation_id,
+                                conversations.signoff_user_id,conversations.supervisor_signoff_id,
+                                conversation_participants.participant_id,conversations.conversation_topic_id,
                         DATEDIFF ( users.next_conversation_date
                             , curdate() )
                     as overdue_in_days")
@@ -479,37 +481,14 @@ class SysadminStatisticsReportController extends Controller
             $subset = $subset->unique('employee_id');
             array_push( $data['chart1']['groups'],  [ 'name' => $key, 'value' => $subset->count(), 
                         ]);
-        }
-   
+        }        
+        $conversations = $all_employees->filter(function ($all_employee) {
+            return $all_employee->role == 'emp';
+        });      
         
-        // SQL for Chart 4
-        $conversations = ConversationParticipant::join('users', 'users.id', 'conversation_participants.participant_id') 
-        ->join('employee_demo', function($join) {
-            $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-        })
-        ->join('conversations', function($join) {
-            $join->on('conversations.id', '=', 'conversation_participants.conversation_id');  
-        })
-        ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('users.due_date_paused', 'N')
-                            ->orWhereNull('users.due_date_paused');
-                    });
-                })
-        ->where('conversation_participants.role', 'emp')
-        ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-        ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-        ->when($request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-        ->when($request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-        ->when($request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-        ->when($request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
-        ->whereNull('employee_demo.date_deleted')
-        ->whereNull('conversations.deleted_at')
-        ->get();       
-                            
         $open_conversations = $conversations->filter(function ($conversation) {
             return $conversation->signoff_user_id === null || $conversation->supervisor_signoff_id === null;
-        });                
+        }); 
         
         // Chart4 -- Open Conversation employees
         $topics = ConversationTopic::select('id','name')->get();
@@ -521,6 +500,7 @@ class SysadminStatisticsReportController extends Controller
         $total_unique_emp = 0;
         foreach($topics as $topic)
         {
+            
             $subset = $open_conversations->where('conversation_topic_id', $topic->id );
             $unique_emp = $subset->unique('participant_id')->count();            
             $total_unique_emp = $total_unique_emp + $unique_emp;
@@ -636,7 +616,6 @@ class SysadminStatisticsReportController extends Controller
                             'legend' => $legend, 
                         ]);
         } 
-        exit;
         
         return view('sysadmin.statistics.conversationsummary',compact('data'));
 
