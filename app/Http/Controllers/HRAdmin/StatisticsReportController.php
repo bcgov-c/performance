@@ -796,10 +796,10 @@ class StatisticsReportController extends Controller
                 })
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
-                            ->from('admin_org_users')
-                            ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
-                            ->whereIn('admin_org_users.access_type', [0,2])
-                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                            ->from('auth_users')
+                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->where('auth_users.type', '=', 'HR')
+                            ->where('auth_users.auth_id', '=', Auth::id());
                 });
                             
         $users = $sql_7->get();
@@ -1076,13 +1076,13 @@ class StatisticsReportController extends Controller
                                 });
                             });
                         });
-                })     
+                })  
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
-                            ->from('admin_org_users')
-                            ->whereColumn('admin_org_users.allowed_user_id', 'user_demo_jr_view.id')
-                            ->whereIn('admin_org_users.access_type', [0,2])
-                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                            ->from('auth_users')
+                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.id')
+                            ->where('auth_users.type', '=', 'HR')
+                            ->where('auth_users.auth_id', '=', Auth::id());
                 });
                 
                 
@@ -1122,11 +1122,11 @@ class StatisticsReportController extends Controller
                 })           
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
-                            ->from('admin_org_users')
-                            ->whereColumn('admin_org_users.allowed_user_id', 'user_demo_jr_view.id')
-                            ->whereIn('admin_org_users.access_type', [0,2])
-                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
-                });      
+                            ->from('auth_users')
+                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.id')
+                            ->where('auth_users.type', '=', 'HR')
+                            ->where('auth_users.auth_id', '=', Auth::id());
+                });     
             
         // Generating Output file 
         $filename = 'Conversations.xlsx';
