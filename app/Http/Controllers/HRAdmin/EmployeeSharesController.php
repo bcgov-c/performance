@@ -317,7 +317,7 @@ class EmployeeSharesController extends Controller {
         return ['data' => $users];
     }
 
-    public function getEmployees(Request $request, $id, $index) {
+    public function getEmployees(Request $request, $id, $index) { 
         switch ($index) {
             case 2:
                 $option = 'e';
@@ -329,27 +329,25 @@ class EmployeeSharesController extends Controller {
                 $option = '';
                 break;
         }
-        list($sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4) = $this->baseFilteredSQLs($request, $option);
-        $rows = $sql_level4->where('id', $id)
-            ->union( $sql_level3->where('id', $id) )
-            ->union( $sql_level2->where('id', $id) )
-            ->union( $sql_level1->where('id', $id) )
-            ->union( $sql_level0->where('id', $id) );
-        $employees = $rows->get();
-        $parent_id = $id;
-        $page = 'shared.employeeshares.partials.employee';
-        if($option == 'e'){
-            $eparent_id = $parent_id;
-            $eemployees = $employees;
-            $page = 'shared.employeeshares.partials.'.$option.'employee';
-        } 
-        if($option == 'a'){
-            $aparent_id = $parent_id;
-            $aemployees = $employees;
-            $page = 'shared.employeeshares.partials.'.$option.'employee';
-        } 
-        return view($page, compact($option.'parent_id', $option.'employees') ); 
-    }
+        $employees = \DB::select("
+                SELECT employee_id, employee_name, employee_email, jobcode_desc
+                FROM employee_demo USE INDEX (idx_employee_demo_orgid_employeeid_emplrecord) 
+                WHERE orgid = {$id}
+                    AND date_deleted IS NULL
+                ORDER BY employee_name
+            ");
+        $parent_id = $id; 
+        $page = 'shared.employeeshares.partials.'.$option.'employee'; 
+        if($option == 'e') { 
+            $eparent_id = $parent_id; 
+            $eemployees = $employees; 
+        }  
+        if($option == 'a') {
+            $aparent_id = $parent_id; 
+            $aemployees = $employees; 
+        }  
+        return view($page, compact($option.'parent_id', $option.'employees') );  
+    } 
 
     protected function search_criteria_list() {
         return [
@@ -363,9 +361,8 @@ class EmployeeSharesController extends Controller {
 
     protected function baseFilteredWhere($request, $option = null) {
         $authId = Auth::id();
-        return HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
-            ->selectRaw('u.*')
-            ->where('u.auth_id', \DB::raw($authId))
+        return UserDemoJrView::from('user_demo_jr_view AS u')
+            ->whereRaw("EXISTS (SELECT 1 FROM auth_users AS au WHERE au.type = 'HR' AND au.auth_id = {$authId} AND au.user_id = u.user_id)")
             ->whereNull('u.date_deleted')
             ->when("{$request->{$option.'dd_level0'}}", function($q) use($request, $option) { return $q->whereRaw("u.organization_key = {$request->{$option.'dd_level0'}}"); })
             ->when("{$request->{$option.'dd_level1'}}", function($q) use($request, $option) { return $q->whereRaw("u.level1_key = {$request->{$option.'dd_level1'}}"); })
@@ -457,13 +454,14 @@ class EmployeeSharesController extends Controller {
     public function manageindexlist(Request $request) {
         if ($request->ajax()) {
             $authId = Auth::id();
-            $query = HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
+            $query = UserDemoJrView::from('user_demo_jr_view AS u')
+                ->whereRaw("EXISTS (SELECT 1 FROM auth_users AS au WHERE au.type = 'HR' AND au.auth_id = {$authId} AND au.user_id = u.user_id)")
+                ->whereNull('u.date_deleted')
                 ->join('shared_profiles AS sp', 'sp.shared_id', 'u.user_id')
                 ->leftjoin('users AS u2', 'u2.id', 'sp.shared_with')
                 ->leftjoin('employee_demo as d2', 'd2.employee_id', 'u2.employee_id' )
                 ->leftjoin('users as cc', 'cc.id', 'sp.shared_by')
                 ->leftjoin('employee_demo as cd', 'cd.employee_id', 'cc.employee_id' )
-                ->where('u.auth_id', \DB::raw($authId))
                 ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
                 ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
                 ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
@@ -536,11 +534,12 @@ class EmployeeSharesController extends Controller {
 
     public function manageindexviewshares(Request $request, $id) {
         if ($request->ajax()) {
-            $query = HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
+            $query = UserDemoJrView::from('user_demo_jr_view AS u')
+                ->whereRaw("EXISTS (SELECT 1 FROM auth_users AS au WHERE au.type = 'HR' AND au.auth_id = {$id} AND au.user_id = u.user_id)")
+                ->whereNull('u.date_deleted')
                 ->join('employee_shares AS s', 's.user_id', 'u.user_id')
                 ->leftjoin('user_demo_jr_view AS u2', 'u2.user_id', 's.shared_with_id')
                 ->leftjoin('shared_elements AS e', 'e.id', 's.shared_element_id')
-                ->where('u.auth_id', $id)
                 ->select (
                     'u2.employee_id',
                     'u2.employee_name', 

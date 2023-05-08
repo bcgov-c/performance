@@ -481,6 +481,7 @@ class EmployeeSharesController extends Controller {
     public function manageindexlist(Request $request) {
         if ($request->ajax()) {
             $query = UserDemoJrView::from('user_demo_jr_view AS u')
+                ->whereNull('u.date_deleted')
                 ->join('shared_profiles AS sp', 'sp.shared_id', '=', 'u.user_id')
                 ->leftjoin('users as u2', 'u2.id', '=', 'sp.shared_with')
                 ->leftjoin('employee_demo as d2', 'd2.employee_id', '=', 'u2.employee_id')
