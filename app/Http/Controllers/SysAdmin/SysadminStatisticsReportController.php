@@ -484,32 +484,27 @@ class SysadminStatisticsReportController extends Controller
         }        
         $conversations = $all_employees->filter(function ($all_employee) {
             return $all_employee->role == 'emp';
-        });      
+        });
+        $total_unique_emp = count($conversations);      
         
+        
+        
+        
+        // Chart4 -- Open Conversation employees
         $open_conversations = $conversations->filter(function ($conversation) {
             return $conversation->signoff_user_id === null || $conversation->supervisor_signoff_id === null;
         }); 
-        
-        // Chart4 -- Open Conversation employees
         $topics = ConversationTopic::select('id','name')->get();
         $data['chart4']['chart_id'] = 4;
         $data['chart4']['title'] = 'Employees: Open Conversations';
         $data['chart4']['legend'] = $topics->pluck('name')->toArray();
         $data['chart4']['groups'] = array();
-        
-        $total_unique_emp = 0;
         foreach($topics as $topic)
         {
-            
-            $subset = $open_conversations->where('conversation_topic_id', $topic->id );
-            $unique_emp = $subset->unique('participant_id')->count();            
-            $total_unique_emp = $total_unique_emp + $unique_emp;
-        } 
-        
-        foreach($topics as $topic)
-        {
-            $subset = $open_conversations->where('conversation_topic_id', $topic->id );
-            $unique_emp = $subset->unique('participant_id')->count();
+            $subset =$open_conversations->filter(function ($conversation) use($topic) {
+                return $conversation->conversation_topic_id == $topic->id;
+            }); 
+            $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
                 $per_emp = ($unique_emp / $total_unique_emp) * 100;
@@ -518,34 +513,26 @@ class SysadminStatisticsReportController extends Controller
                         'topic_id' => $topic->id, 
                         ]);
         } 
+        
+        
         // Chart 5 -- Completed Conversation by employees
+        $completed_conversations = $conversations->filter(function ($conversation) {
+            return $conversation->signoff_user_id != null && $conversation->supervisor_signoff_id != null;
+        }); 
         $data['chart5']['chart_id'] = 5;
         $data['chart5']['title'] = 'Employees: Completed Conversations';
         $data['chart5']['legend'] = $topics->pluck('name')->toArray();
         $data['chart5']['groups'] = array();
-
-        // SQL for Chart 5      
-        $completed_conversations = $conversations->filter(function ($conversation) {
-            return $conversation->signoff_user_id != null && $conversation->supervisor_signoff_id != null;
-        });                   
-        
-        $total_unique_emp = 0;
         foreach($topics as $topic)
         {
-            $subset = $completed_conversations->where('conversation_topic_id', $topic->id );
-            $unique_emp = $subset->unique('participant_id')->count();            
-            $total_unique_emp = $total_unique_emp + $unique_emp;
-        }
-
-        foreach($topics as $topic)
-        {
-            $subset = $completed_conversations->where('conversation_topic_id', $topic->id );
-            $unique_emp = $subset->unique('participant_id')->count();
+            $subset =$completed_conversations->filter(function ($conversation) use($topic) {
+                return $conversation->conversation_topic_id == $topic->id;
+            }); 
+            $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
                 $per_emp = ($unique_emp / $total_unique_emp) * 100;
             }
-            
             array_push( $data['chart5']['groups'],  [ 'name' => $topic->name, 'value' => $unique_emp, 
                     'topic_id' => $topic->id, 
                 ]);
