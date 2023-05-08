@@ -430,7 +430,7 @@ class SysadminStatisticsReportController extends Controller
         $request->session()->flash('dd_level4', $request->dd_level4);
         
         //get all employee number
-        $employees = User::selectRaw("users.employee_id, users.empl_record, employee_name, 
+        $next_due_users = User::selectRaw("users.employee_id, users.empl_record, employee_name, 
                                 employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division,
                                 employee_demo_tree.level3_branch, employee_demo_tree.level4,
                         DATEDIFF ( users.next_conversation_date
@@ -460,8 +460,7 @@ class SysadminStatisticsReportController extends Controller
                 })
                 ->get();
 
-        // Chart1 -- Overdue                
-        $next_due_users = clone($employees);
+        // Chart1 -- Overdue   
         $data = array();
 
         // Chart1 -- Overdue
@@ -479,7 +478,7 @@ class SysadminStatisticsReportController extends Controller
    
         
         // SQL for Chart 4
-        $sql_4 = ConversationParticipant::join('users', 'users.id', 'conversation_participants.participant_id') 
+        $conversations = ConversationParticipant::join('users', 'users.id', 'conversation_participants.participant_id') 
         ->join('employee_demo', function($join) {
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
         })
@@ -500,15 +499,12 @@ class SysadminStatisticsReportController extends Controller
         ->when($request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
         ->when($request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
         ->whereNull('employee_demo.date_deleted')
-        ->whereNull('conversations.deleted_at');        
-        $sql_5 = clone($sql_4);
-        
-        $conversations = $sql_4->where(function($query) {
-                            $query->where(function($query) {
-                                $query->whereNull('signoff_user_id')
-                                    ->orWhereNull('supervisor_signoff_id');
-                            });
-                        })->get();
+        ->whereNull('conversations.deleted_at')
+        ->get();       
+                            
+        $open_conversations = $conversations->filter(function ($conversation) {
+            return $conversation->signoff_user_id === null || $conversation->supervisor_signoff_id === null;
+        });                
         
         // Chart4 -- Open Conversation employees
         $topics = ConversationTopic::select('id','name')->get();
@@ -516,8 +512,6 @@ class SysadminStatisticsReportController extends Controller
         $data['chart4']['title'] = 'Employees: Open Conversations';
         $data['chart4']['legend'] = $topics->pluck('name')->toArray();
         $data['chart4']['groups'] = array();
-
-        $open_conversations = $conversations;
         
         $total_unique_emp = 0;
         foreach($topics as $topic)
@@ -539,20 +533,16 @@ class SysadminStatisticsReportController extends Controller
                         'topic_id' => $topic->id, 
                         ]);
         } 
-     
         // Chart 5 -- Completed Conversation by employees
         $data['chart5']['chart_id'] = 5;
         $data['chart5']['title'] = 'Employees: Completed Conversations';
         $data['chart5']['legend'] = $topics->pluck('name')->toArray();
         $data['chart5']['groups'] = array();
 
-        // SQL for Chart 5
-        $completed_conversations = $sql_5->where(function($query) {
-                            $query->where(function($query) {
-                                $query->whereNotNull('signoff_user_id')
-                                      ->whereNotNull('supervisor_signoff_id');                          
-                            });
-                        })->get();
+        // SQL for Chart 5      
+        $completed_conversations = $conversations->filter(function ($conversation) {
+            return $conversation->signoff_user_id != null && $conversation->supervisor_signoff_id != null;
+        });                   
         
         $total_unique_emp = 0;
         foreach($topics as $topic)
@@ -578,11 +568,11 @@ class SysadminStatisticsReportController extends Controller
         
         
         // Chart6 -- Employee Has Open Conversation
-        $employees = $employees->unique('employee_id');
+        $employees = $next_due_users->unique('employee_id');
         $employees = count($employees);
         
         //employees with conversations
-        $sql_employee_conversation  = User::selectRaw("employee_demo.employee_id, employee_name, 
+        $employee_conversations  = User::selectRaw("employee_demo.employee_id, employee_name, 
                             employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4
                  ")
                 ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
@@ -613,18 +603,13 @@ class SysadminStatisticsReportController extends Controller
                     });
                 }) 
                 ->whereNull('date_deleted')
-                ->whereNotNull('conversation_id');     
-        $sql_employee_com_conversation = clone($sql_employee_conversation);         
-         
-        //get employees has open conversations
-        $users = $sql_employee_conversation
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->whereNull('signoff_user_id')
-                              ->orWhereNull('supervisor_signoff_id');
-                    });
-                })
+                ->whereNotNull('conversation_id')
                 ->get();
+        
+        //get employees has open conversations
+        $users = $employee_conversations->filter(function ($employee_conversation) {
+            return $employee_conversation->signoff_user_id === null || $employee_conversation->supervisor_signoff_id === null;
+        });     
         $users = $users->unique('employee_id');
         
         $has_conversation = $users->count();
@@ -647,20 +632,16 @@ class SysadminStatisticsReportController extends Controller
             array_push( $data['chart6']['groups'],  [ 'name' => $legend, 'value' => $subset,
                             'legend' => $legend, 
                         ]);
-        } 
-        
+        }         
         
         // Chart7 -- Employee Has Completed Conversation
         //get employees has Completed conversations
-        $users = $sql_employee_com_conversation->where(function($query) {
-                    $query->where(function($query) {
-                        $query->whereNotNull('signoff_user_id')
-                              ->WhereNotNull('supervisor_signoff_id');
-                    });
-                })->get();
-        $users = $users->unique('employee_id');
+        $users2 = $employee_conversations->filter(function ($employee_conversation) {
+            return $employee_conversation->signoff_user_id != null && $employee_conversation->supervisor_signoff_id != null;
+        }); 
+        $users2 = $users->unique('employee_id');
         
-        $has_conversation = $users->count();
+        $has_conversation = $users2->count();
         $no_conversation = $employees - $has_conversation;
         // Chart 7 
         $legends = ['Yes', 'No'];
