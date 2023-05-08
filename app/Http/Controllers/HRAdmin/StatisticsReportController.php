@@ -725,7 +725,7 @@ class StatisticsReportController extends Controller
                     $query->select(DB::raw(1))
                             ->from('auth_users')
                             ->whereColumn('auth_users.allowed_user_id', 'users.id')
-                            ->whereIn('auth_users.type', 'HR')
+                            ->where('auth_users.type', '=', 'HR')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 });    
         
