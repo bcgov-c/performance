@@ -537,7 +537,7 @@ class SysadminStatisticsReportController extends Controller
                         'topic_id' => $topic->id, 
                         ]);
         } 
-        
+     
         // Chart 5 -- Completed Conversation by employees
         $data['chart5']['chart_id'] = 5;
         $data['chart5']['title'] = 'Employees: Completed Conversations';
@@ -602,7 +602,7 @@ class SysadminStatisticsReportController extends Controller
         // Chart6 -- Employee Has Open Conversation
          
         //get all employee number
-        $employees = User::distinct('employee_demo.employee_id')
+        $employees = User::select('employee_demo.employee_id')
                 ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
                 ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
                 ->where(function($query) {
@@ -623,7 +623,9 @@ class SysadminStatisticsReportController extends Controller
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
                 ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                 ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                                  
-                ->count();
+                ->get();
+        $employees = $employees->unique('employee_id');
+        $employees = count($employees);
          
         //get employees has open conversations
         $sql_6 = User::selectRaw("employee_demo.employee_id, employee_name, 
