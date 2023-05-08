@@ -603,7 +603,7 @@ class SysadminStatisticsReportController extends Controller
                             'legend' => $legend, 
                         ]);
         } 
-        exit;
+        
         return view('sysadmin.statistics.conversationsummary',compact('data'));
 
     }
