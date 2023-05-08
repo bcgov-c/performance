@@ -428,9 +428,9 @@ class SysadminStatisticsReportController extends Controller
         $request->session()->flash('dd_level2', $request->dd_level2);
         $request->session()->flash('dd_level3', $request->dd_level3);
         $request->session()->flash('dd_level4', $request->dd_level4);
-
-        // Chart1 -- Overdue
-        $sql_2 = User::selectRaw("users.employee_id, users.empl_record, employee_name, 
+        
+        //get all employee number
+        $employees = User::selectRaw("users.employee_id, users.empl_record, employee_name, 
                                 employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division,
                                 employee_demo_tree.level3_branch, employee_demo_tree.level4,
                         DATEDIFF ( users.next_conversation_date
@@ -457,10 +457,11 @@ class SysadminStatisticsReportController extends Controller
                         $query->where('users.excused_flag', '<>', '1')
                             ->orWhereNull('users.excused_flag');
                     });
-                }) ;
-                
-                
-        $next_due_users = $sql_2->get();
+                })
+                ->get();
+
+        // Chart1 -- Overdue                
+        $next_due_users = clone($employees);
         $data = array();
 
         // Chart1 -- Overdue
@@ -478,7 +479,7 @@ class SysadminStatisticsReportController extends Controller
    
         
         // SQL for Chart 4
-        $sql = ConversationParticipant::join('users', 'users.id', 'conversation_participants.participant_id') 
+        $sql_4 = ConversationParticipant::join('users', 'users.id', 'conversation_participants.participant_id') 
         ->join('employee_demo', function($join) {
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
         })
@@ -498,15 +499,16 @@ class SysadminStatisticsReportController extends Controller
         ->when($request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
         ->when($request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
         ->when($request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
-        ->where(function($query) {
-            $query->where(function($query) {
-                $query->whereNull('signoff_user_id')
-                    ->orWhereNull('supervisor_signoff_id');
-            });
-        })
         ->whereNull('employee_demo.date_deleted')
-        ->whereNull('conversations.deleted_at');
-        $conversations = $sql->get();
+        ->whereNull('conversations.deleted_at');        
+        $sql_5 = clone($sql_4);
+        
+        $conversations = $sql_4->where(function($query) {
+                            $query->where(function($query) {
+                                $query->whereNull('signoff_user_id')
+                                    ->orWhereNull('supervisor_signoff_id');
+                            });
+                        })->get();
         
         // Chart4 -- Open Conversation employees
         $topics = ConversationTopic::select('id','name')->get();
@@ -545,36 +547,12 @@ class SysadminStatisticsReportController extends Controller
         $data['chart5']['groups'] = array();
 
         // SQL for Chart 5
-        $completed_conversations = ConversationParticipant::join('users', 'users.id', 'conversation_participants.participant_id') 
-        ->join('employee_demo', function($join) {
-            $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-        })
-        ->join('conversations', function($join) {
-            $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
-        })
-        ->where(function($query) {
-            $query->where(function($query) {
-                $query->whereNotNull('signoff_user_id')
-                      ->whereNotNull('supervisor_signoff_id');                          
-            });
-        })
-        ->whereNull('conversations.deleted_at')   
-        ->whereNull('employee_demo.date_deleted')
-        ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('users.due_date_paused', 'N')
-                            ->orWhereNull('users.due_date_paused');
-                    });
-                })
-        ->where('conversation_participants.role', 'emp')     
-        ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-        ->whereNull('employee_demo.date_deleted')                
-        ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-        ->when($request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-        ->when($request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-        ->when($request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-        ->when($request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
-        ->get();
+        $completed_conversations = $sql_5->where(function($query) {
+                            $query->where(function($query) {
+                                $query->whereNotNull('signoff_user_id')
+                                      ->whereNotNull('supervisor_signoff_id');                          
+                            });
+                        })->get();
         
         $total_unique_emp = 0;
         foreach($topics as $topic)
@@ -600,35 +578,11 @@ class SysadminStatisticsReportController extends Controller
         
         
         // Chart6 -- Employee Has Open Conversation
-         
-        //get all employee number
-        $employees = User::select('employee_demo.employee_id')
-                ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-                ->where(function($query) {
-                                $query->where(function($query) {
-                                    $query->where('excused_flag', '<>', '1')
-                                        ->orWhereNull('excused_flag');
-                                });
-                            })
-                ->whereNull('date_deleted')
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('due_date_paused', 'N')
-                            ->orWhereNull('due_date_paused');
-                    });
-                })              
-                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
-                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
-                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
-                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
-                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                                  
-                ->get();
         $employees = $employees->unique('employee_id');
         $employees = count($employees);
-         
-        //get employees has open conversations
-        $sql_6 = User::selectRaw("employee_demo.employee_id, employee_name, 
+        
+        //employees with conversations
+        $sql_employee_conversation  = User::selectRaw("employee_demo.employee_id, employee_name, 
                             employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4
                  ")
                 ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
@@ -659,15 +613,18 @@ class SysadminStatisticsReportController extends Controller
                     });
                 }) 
                 ->whereNull('date_deleted')
-                ->whereNotNull('conversation_id')      
+                ->whereNotNull('conversation_id');     
+        $sql_employee_com_conversation = clone($sql_employee_conversation);         
+         
+        //get employees has open conversations
+        $users = $sql_employee_conversation
                 ->where(function($query) {
                     $query->where(function($query) {
                         $query->whereNull('signoff_user_id')
                               ->orWhereNull('supervisor_signoff_id');
                     });
-                });       
- 
-        $users = $sql_6->get();
+                })
+                ->get();
         $users = $users->unique('employee_id');
         
         $has_conversation = $users->count();
@@ -695,46 +652,12 @@ class SysadminStatisticsReportController extends Controller
         
         // Chart7 -- Employee Has Completed Conversation
         //get employees has Completed conversations
-        $sql_7 = User::selectRaw("employee_demo.employee_id, employee_name, 
-                            employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4
-                 ")
-                ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-                ->join('conversation_participants', function($join) {
-                    $join->on('conversation_participants.participant_id', '=', 'users.id');
-                })
-                ->join('conversations', function($join) {
-                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
-                })
-                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
-                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
-                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
-                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
-                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
-                ->where('conversation_participants.role','emp') 
-                ->whereNull('conversations.deleted_at')          
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('due_date_paused', 'N')
-                            ->orWhereNull('due_date_paused');
-                    });
-                })
-		->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('excused_flag', '<>', '1')
-                            ->orWhereNull('excused_flag');
-                    });
-                }) 
-                ->whereNull('date_deleted')
-                ->whereNotNull('conversation_id')       
-                ->where(function($query) {
+        $users = $sql_employee_com_conversation->where(function($query) {
                     $query->where(function($query) {
                         $query->whereNotNull('signoff_user_id')
                               ->WhereNotNull('supervisor_signoff_id');
                     });
-                });     
-        
-        $users = $sql_7->get();
+                })->get();
         $users = $users->unique('employee_id');
         
         $has_conversation = $users->count();
