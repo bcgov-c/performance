@@ -27,8 +27,8 @@ class ShareProfileRequest extends FormRequest
             'share_with_users' => 'required|array',
             'share_with_users.*' => 'required|exists:users,id',
             'shared_id' => 'required|exists:users,id',
-            // 'items_to_share' => 'required|array',
-            // 'items_to_share.*' => 'required|in:1,2',
+            'items_to_share' => 'required|array',
+            'items_to_share.*' => 'required|in:1,2',
             'reason' => 'required',
             'accepted' => 'accepted'
         ];
