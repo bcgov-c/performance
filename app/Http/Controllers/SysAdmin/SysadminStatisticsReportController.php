@@ -101,7 +101,7 @@ class SysadminStatisticsReportController extends Controller
                         ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
                         ->when( $request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
                         ->when( $request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); });
-                        
+            
             $goals_average = $sql->get()->first()->goals_average;
 
             $data[$goal_id] = [ 
@@ -131,7 +131,8 @@ class SysadminStatisticsReportController extends Controller
                     ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
                     ->when( $request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
                     ->when( $request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); });
-
+           
+                    
             $goals_count_array = $sql->pluck( 'goals_count','group_key' )->toArray();
 
             foreach($this->groups as $key => $range) {
@@ -186,7 +187,7 @@ class SysadminStatisticsReportController extends Controller
                           ->whereColumn('goals.id', 'goal_tags.goal_id');
                 })
                 ->where('employee_demo.guid', '<>', '');
-
+                
         $tags = $sql->get();
         $blank_count = $sql2->count();
         
@@ -430,43 +431,39 @@ class SysadminStatisticsReportController extends Controller
         $request->session()->flash('dd_level4', $request->dd_level4);
         
         //get all employee number
-        $query = User::selectRaw("users.employee_id, users.empl_record, employee_name, 
-                                employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division,
-                                employee_demo_tree.level3_branch, employee_demo_tree.level4,conversation_participants.role,
+        $query = UserDemoJrView::selectRaw("employee_id, empl_record, employee_name, 
+                                organization, level1_program, level2_division,
+                                level3_branch, level4,conversation_participants.role,
                                 conversations.deleted_at,conversation_participants.conversation_id,
                                 conversations.signoff_user_id,conversations.supervisor_signoff_id,
                                 conversation_participants.participant_id,conversations.conversation_topic_id,
-                        DATEDIFF ( users.next_conversation_date
+                        DATEDIFF ( next_conversation_date
                             , curdate() )
                     as overdue_in_days")
-                ->join('employee_demo', function($join) {
-                    $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-                })        
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
                 ->leftJoin('conversation_participants', function($join) {
-                    $join->on('conversation_participants.participant_id', '=', 'users.id');
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
                 })
                 ->leftJoin('conversations', function($join) {
                     $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
                 })        
                 ->where(function($query) {
                     $query->where(function($query) {
-                        $query->where('users.due_date_paused', 'N')
-                            ->orWhereNull('users.due_date_paused');
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
                     });
                 })
-                ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-                ->when($request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-                ->when($request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-                ->when($request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-                ->when($request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
-                ->whereNull('employee_demo.date_deleted')
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when($request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when($request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when($request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when($request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
+                ->whereNull('date_deleted')
                 ->where(function($query) {
                     $query->where(function($query) {
-                        $query->where('users.excused_flag', '<>', '1')
-                            ->orWhereNull('users.excused_flag');
+                        $query->where('excused_flag', '<>', '1')
+                            ->orWhereNull('excused_flag');
                     });
-                });  
+                });                
         $all_employees = $query->get();
         
         // Chart1 -- Overdue
