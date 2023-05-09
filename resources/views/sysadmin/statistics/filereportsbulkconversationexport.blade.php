@@ -372,6 +372,7 @@
                         <br/>
                         
                         <li><b>Employee Attestation</b>
+                            <ul>
                                 <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
                                     <?php if ($item->empl_agree1 != '') {?>
                                     <?php if($item->empl_agree1 == 1){?>
