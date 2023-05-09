@@ -1628,7 +1628,7 @@ class SysadminStatisticsReportController extends Controller
                                     ->join('employee_demo', function($join) {
                                             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                         })
-                                    ->where('goal_comments.goal_id','=',$goal_id)           
+                                    ->where('goal_comments.goal_id','=',$goal_id)   
                                     ->get(); 
                 $comments = array();
                 $i = 0;
