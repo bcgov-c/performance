@@ -463,9 +463,11 @@ class SysadminStatisticsReportController extends Controller
                         $query->where('excused_flag', '<>', '1')
                             ->orWhereNull('excused_flag');
                     });
-                });                
+                });
         $all_employees = $query->get();
-        
+        $timer = Carbon::now();
+        Log::info("Query timer " . $timer);
+      
         // Chart1 -- Overdue
         $data = array();
         $data['chart1']['chart_id'] = 1;
@@ -483,6 +485,9 @@ class SysadminStatisticsReportController extends Controller
             return $all_employee->role == 'emp';
         });
         $total_unique_emp = count($conversations);   
+        
+        $timer = Carbon::now();
+        Log::info("Chart1 " . $timer);
         
         // Chart4 -- Open Conversation employees
         $open_conversations = $conversations->filter(function ($conversation) {
@@ -507,8 +512,10 @@ class SysadminStatisticsReportController extends Controller
             array_push( $data['chart4']['groups'],  [ 'name' => $topic->name, 'value' => $unique_emp,
                         'topic_id' => $topic->id, 
                         ]);
-        } 
+        }   
         
+        $timer = Carbon::now();
+        Log::info("Chart4 " . $timer);
         
         // Chart 5 -- Completed Conversation by employees
         $completed_conversations = $conversations->filter(function ($conversation) {
@@ -532,8 +539,11 @@ class SysadminStatisticsReportController extends Controller
             array_push( $data['chart5']['groups'],  [ 'name' => $topic->name, 'value' => $unique_emp, 
                     'topic_id' => $topic->id, 
                 ]);
-        } 
-                
+        }  
+        
+        $timer = Carbon::now();
+        Log::info("Chart5 " . $timer);
+        
         // Chart6 -- Employee Has Open Conversation
         $employees = $all_employees->unique('employee_id');
         $employees = count($employees);
@@ -569,7 +579,10 @@ class SysadminStatisticsReportController extends Controller
             array_push( $data['chart6']['groups'],  [ 'name' => $legend, 'value' => $subset,
                             'legend' => $legend, 
                         ]);
-        }         
+        }
+        
+        $timer = Carbon::now();
+        Log::info("Chart6 " . $timer);
         
         // Chart7 -- Employee Has Completed Conversation
         //get employees has Completed conversations
@@ -597,6 +610,9 @@ class SysadminStatisticsReportController extends Controller
                             'legend' => $legend, 
                         ]);
         } 
+        
+        $timer = Carbon::now();
+        Log::info("Chart7 " . $timer);
         
         return view('sysadmin.statistics.conversationsummary',compact('data'));
 
