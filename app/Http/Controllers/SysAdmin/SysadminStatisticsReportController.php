@@ -473,16 +473,16 @@ class SysadminStatisticsReportController extends Controller
         $data['chart1']['legend'] = array_keys($this->overdue_groups);
         $data['chart1']['groups'] = array();
         foreach($this->overdue_groups as $key => $range)
-        {
+        {            
             $subset = $all_employees->whereBetween('overdue_in_days', $range );
-            $subset = $subset->unique('employee_id');
-            array_push( $data['chart1']['groups'],  [ 'name' => $key, 'value' => $subset->count(), 
+            $subset = array_unique(array_column($subset->toArray(), 'employee_id'));
+            array_push( $data['chart1']['groups'],  [ 'name' => $key, 'value' => count($subset), 
                         ]);
         }        
         $conversations = $all_employees->filter(function ($all_employee) {
             return $all_employee->role == 'emp';
         });
-        $total_unique_emp = count($conversations);   
+        $total_unique_emp = count($conversations);  
         
         // Chart4 -- Open Conversation employees
         $open_conversations = $conversations->filter(function ($conversation) {
@@ -498,7 +498,7 @@ class SysadminStatisticsReportController extends Controller
             $subset =$open_conversations->filter(function ($conversation) use($topic) {
                 return $conversation->conversation_topic_id == $topic->id;
             }); 
-            $subset = $subset->unique('employee_id');
+            $subset = array_unique(array_column($subset->toArray(), 'employee_id'));
             $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
@@ -523,7 +523,7 @@ class SysadminStatisticsReportController extends Controller
             $subset =$completed_conversations->filter(function ($conversation) use($topic) {
                 return $conversation->conversation_topic_id == $topic->id;
             }); 
-            $subset = $subset->unique('employee_id');
+            $subset = array_unique(array_column($subset->toArray(), 'employee_id'));
             $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
@@ -548,8 +548,8 @@ class SysadminStatisticsReportController extends Controller
         $users = $employee_conversations->filter(function ($employee_conversation) {
             return $employee_conversation->signoff_user_id === null || $employee_conversation->supervisor_signoff_id === null;
         });     
-        $users = $users->unique('employee_id');        
-        $has_conversation = $users->count();
+        $users = array_unique(array_column($users->toArray(), 'employee_id'));
+        $has_conversation = count($users);
         $no_conversation = $employees - $has_conversation;
         // Chart 6 
         $legends = ['Yes', 'No'];
@@ -576,8 +576,8 @@ class SysadminStatisticsReportController extends Controller
         $users2 = $employee_conversations->filter(function ($employee_conversation) {
             return $employee_conversation->signoff_user_id != null && $employee_conversation->supervisor_signoff_id != null;
         }); 
-        $users2 = $users2->unique('employee_id');        
-        $has_conversation = $users2->count();
+        $users2 = array_unique(array_column($users2->toArray(), 'employee_id'));
+        $has_conversation =  count($users2);
         $no_conversation = $employees - $has_conversation;
         // Chart 7 
         $legends = ['Yes', 'No'];
