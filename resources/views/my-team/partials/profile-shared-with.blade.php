@@ -7,10 +7,11 @@
         @csrf
         <table class="table table-sm">
             <tr style="background-color: #ccc">
-                <th style="width:35%">Reason</th>
+                <th style="width:70%">Reason</th>
                 <th style="width:30%">Action</th>
             </tr>
             <tr>
+                </form>
                 <td>
                     <div class="view-mode">
                         {{$shared->comment}}
