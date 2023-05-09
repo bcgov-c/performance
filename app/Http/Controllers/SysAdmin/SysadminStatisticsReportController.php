@@ -535,7 +535,7 @@ class SysadminStatisticsReportController extends Controller
         } 
                 
         // Chart6 -- Employee Has Open Conversation
-        $employees = $all_employees->unique('employee_id');
+        $employees = array_unique(array_column($all_employees->toArray(), 'employee_id'));
         $employees = count($employees);
         
         //employees with conversations      
