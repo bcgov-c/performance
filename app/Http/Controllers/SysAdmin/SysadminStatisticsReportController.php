@@ -1539,38 +1539,6 @@ class SysadminStatisticsReportController extends Controller
                                                   ->orderBy('conversations.id', 'DESC')              
                                                   ->get();
                             $data["completed_conversations"] = $completed_conversations;  
-                            
-                            $sql = ConversationParticipant::selectRaw("conversation_participants.conversation_id, users.name, conversation_topics.name as topic, employee_demo.organization, employee_demo.business_unit,GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as latest_update")
-                                                  ->join('conversations', function($join) {
-                                                        $join->on('conversations.id', '=', 'conversation_participants.conversation_id');   
-                                                  })
-                                                  ->join('conversation_topics', function($join) {
-                                                        $join->on('conversations.conversation_topic_id', '=', 'conversation_topics.id');   
-                                                  }) 
-                                                  ->join('users', function($join) {
-                                                        $join->on('users.id', '=', 'conversation_participants.participant_id');   
-                                                  }) 
-                                                  ->join('employee_demo', function($join) {
-                                                        $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-                                                  })
-                                                  ->where([
-                                                        ['conversations.sign_off_time','>=',$request->start_date . ' 00:00:00'],
-                                                        ['conversations.supervisor_signoff_time','>=',$request->start_date . ' 00:00:00'],
-                                                  ])
-                                                  ->where([
-                                                        ['conversations.sign_off_time','<=',$request->end_date . ' 23:59:59'],
-                                                        ['conversations.supervisor_signoff_time','<=',$request->end_date . ' 23:59:59'],
-                                                  ])        
-                                                  ->where(function($query) {
-                                                        $query->where(function($query) {
-                                                            $query->whereNotNull('signoff_user_id')
-                                                                  ->whereNotNull('supervisor_signoff_id');
-                                                        });
-                                                    })
-                                                  ->whereNull('conversations.deleted_at')
-                                                  ->where('conversation_participants.role', '=', 'emp')             
-                                                  ->where('employee_demo.employee_id', '=', $request->employee_id)  
-                                                  ->orderBy('conversations.id', 'DESC');
                         }
                     }
                 } 
@@ -1776,7 +1744,7 @@ class SysadminStatisticsReportController extends Controller
                                                   ->where('employee_demo.employee_id', '=', $request->employee_id)   
                                                   ->orderBy('conversations.created_at', 'DESC')                
                                                   ->get();
-                                                    
+            $i = 0;                                        
             foreach($open_conversations as $item){
                 $conversation_id = $item->conversation_id;                
                 
@@ -1810,7 +1778,8 @@ class SysadminStatisticsReportController extends Controller
                 $conversation[0]->participants = implode(', ', $participants_arr );
                 
                 $item = $conversation[0];
-                array_push($data, $item);
+                $data[$i] = $item;
+                $i++;
             }               
             
             $options = new Options();
@@ -1863,7 +1832,8 @@ class SysadminStatisticsReportController extends Controller
                                                   ->where('employee_demo.employee_id', '=', $request->employee_id)  
                                                   ->orderBy('conversations.id', 'DESC')              
                                                   ->get();
-                                                    
+            
+            $i = 0;                                        
             foreach($completed_conversations as $item){
                 $conversation_id = $item->conversation_id;                
                 
@@ -1897,7 +1867,8 @@ class SysadminStatisticsReportController extends Controller
                 $conversation[0]->participants = implode(', ', $participants_arr );
                 
                 $item = $conversation[0];
-                array_push($data, $item);
+                $data[$i] = $item;
+                $i++;
             }               
             
             $options = new Options();
