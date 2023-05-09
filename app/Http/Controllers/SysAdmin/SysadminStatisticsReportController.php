@@ -1744,6 +1744,7 @@ class SysadminStatisticsReportController extends Controller
                                                   ->where('employee_demo.employee_id', '=', $request->employee_id)   
                                                   ->orderBy('conversations.created_at', 'DESC')                
                                                   ->get();
+            Log::info(print_r($open_conversations,true));                                        
             $i = 0;                                        
             foreach($open_conversations as $item){
                 $conversation_id = $item->conversation_id;                
