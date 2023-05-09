@@ -485,7 +485,10 @@ class SysadminStatisticsReportController extends Controller
         $conversations = $all_employees->filter(function ($all_employee) {
             return $all_employee->role == 'emp';
         });
-        $total_unique_emp = count($conversations);   
+        $total_unique_emp = count($conversations);      
+        
+        
+        
         
         // Chart4 -- Open Conversation employees
         $open_conversations = $conversations->filter(function ($conversation) {
@@ -501,7 +504,6 @@ class SysadminStatisticsReportController extends Controller
             $subset =$open_conversations->filter(function ($conversation) use($topic) {
                 return $conversation->conversation_topic_id == $topic->id;
             }); 
-            $subset = $subset->unique('employee_id');
             $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
@@ -526,7 +528,6 @@ class SysadminStatisticsReportController extends Controller
             $subset =$completed_conversations->filter(function ($conversation) use($topic) {
                 return $conversation->conversation_topic_id == $topic->id;
             }); 
-            $subset = $subset->unique('employee_id');
             $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
@@ -551,7 +552,8 @@ class SysadminStatisticsReportController extends Controller
         $users = $employee_conversations->filter(function ($employee_conversation) {
             return $employee_conversation->signoff_user_id === null || $employee_conversation->supervisor_signoff_id === null;
         });     
-        $users = $users->unique('employee_id');        
+        $users = $users->unique('employee_id');
+        
         $has_conversation = $users->count();
         $no_conversation = $employees - $has_conversation;
         // Chart 6 
@@ -579,7 +581,8 @@ class SysadminStatisticsReportController extends Controller
         $users2 = $employee_conversations->filter(function ($employee_conversation) {
             return $employee_conversation->signoff_user_id != null && $employee_conversation->supervisor_signoff_id != null;
         }); 
-        $users2 = $users2->unique('employee_id');        
+        $users2 = $users->unique('employee_id');
+        
         $has_conversation = $users2->count();
         $no_conversation = $employees - $has_conversation;
         // Chart 7 
