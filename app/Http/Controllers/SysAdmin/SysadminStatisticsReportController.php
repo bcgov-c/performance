@@ -58,13 +58,18 @@ class SysadminStatisticsReportController extends Controller
 
     Public function goalSummary_from_statement($goal_type_id)
     {
-        $from_stmt = "(select users.id, users.email, users.employee_id, users.empl_record, users.guid, users.reporting_to, 
-                        users.excused_start_date, users.excused_end_date, users.due_date_paused,
-                        (select count(*) from goals where user_id = users.id
-                        and status = 'active' and deleted_at is null and is_library = 0 ";
+        // $from_stmt = "(select users.id, users.email, users.employee_id, users.empl_record, users.guid, users.reporting_to, 
+        //                 users.excused_start_date, users.excused_end_date, users.due_date_paused,
+        //                 (select count(*) from goals where user_id = users.id
+        //                 and status = 'active' and deleted_at is null and is_library = 0 ";
+        $from_stmt = "(select user_demo_jr_view.user_id AS id, user_demo_jr_view.employee_email AS email, user_demo_jr_view.employee_id, user_demo_jr_view.empl_record, user_demo_jr_view.guid, user_demo_jr_view.reporting_to,
+                        users.excused_start_date, users.excused_end_date, user_demo_jr_view.due_date_paused,
+                        user_demo_jr_view.employee_name, user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4,
+                        user_demo_jr_view.organization_key, user_demo_jr_view.level1_key, user_demo_jr_view.level2_key, user_demo_jr_view.level3_key, user_demo_jr_view.level4_key,
+                        (select count(goals.id) from goals where goals.user_id = user_demo_jr_view.user_id and goals.status = 'active' and goals.deleted_at is null and goals.is_library = 0 ";
         if ($goal_type_id)                        
-            $from_stmt .= " and goal_type_id =".  $goal_type_id ;
-        $from_stmt .= ") as goals_count from users ) AS A";
+            $from_stmt .= " and goals.goal_type_id =".  $goal_type_id ;
+        $from_stmt .= ") as goals_count from user_demo_jr_view, users USE INDEX (IDX_USERS_ID) where user_demo_jr_view.user_id = users.id and user_demo_jr_view.`due_date_paused` = 'N' and user_demo_jr_view.`date_deleted` is null) AS A";
 
         return $from_stmt;
     }
@@ -82,7 +87,7 @@ class SysadminStatisticsReportController extends Controller
         $types = GoalType::orderBy('id')->get();
         $types->prepend( new GoalType()  ) ;
         
-        $total_goals = UserDemoJrView::selectRaw('count(*) as goal_count, goals.goal_type_id')
+        $total_goals = UserDemoJrView::selectRaw('count(*) as goal_count, goals.goal_type_id, organization_key, level1_key, level2_key, level3_key, level4_key')
                         ->join('goals', 'goals.user_id', 'user_demo_jr_view.user_id') 
                         ->where(function($query) {
                             $query->where(function($query) {
@@ -131,28 +136,28 @@ class SysadminStatisticsReportController extends Controller
 
             $from_stmt = $this->goalSummary_from_statement($type->id);   
             // $sql = User::selectRaw('count(goals_count) as goals_count')
-            $sql = User::selectRaw("case when goals_count between 0 and 0  then '0'  
+            // $sql = User::selectRaw("case when goals_count between 0 and 0  then '0'  
+            $sql = UserDemojrView::selectRaw("case when goals_count between 0 and 0  then '0'  
                                         when goals_count between 1 and 5  then '1-5'
                                         when goals_count between 6 and 10 then '6-10'
                                         when goals_count  > 10            then '>10'
-                                end AS group_key, count(*) as goals_count")
+                                end AS group_key, count(A.id) as goals_count")
                     ->from(DB::raw( $from_stmt ))
                     ->groupBy('group_key')
-                    ->join('employee_demo', function($join) {
-                        $join->on('employee_demo.employee_id', '=', 'A.employee_id');
-                    })
-                    ->where('A.due_date_paused', 'N')                    
-                    ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-                    ->whereNull('employee_demo.date_deleted')        
-                    ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-                    ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-                    ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-                    ->when( $request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-                    ->when( $request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); });
+                    // ->join('employee_demo', function($join) {
+                    //     $join->on('employee_demo.employee_id', '=', 'A.employee_id');
+                    // })
+                    // ->where('A.due_date_paused', 'N')                    
+                    // ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                    // ->whereNull('employee_demo.date_deleted')        
+                    ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                    ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                    ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                    ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                    ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); });
            
                     
             $goals_count_array = $sql->pluck( 'goals_count','group_key' )->toArray();
-
             foreach($this->groups as $key => $range) {
                 $goals_count = 0;
                 if (array_key_exists( $key, $goals_count_array)) {
@@ -170,7 +175,7 @@ class SysadminStatisticsReportController extends Controller
         $count_raw = "id, name, ";
         $count_raw .= " (select count(*) from goal_tags, goals, users, employee_demo, employee_demo_tree ";
         $count_raw .= "   where goals.id = goal_tags.goal_id "; 
-	    $count_raw .= "     and tag_id = tags.id ";  
+        $count_raw .= "     and tag_id = tags.id ";  
         $count_raw .= "     and users.id = goals.user_id ";
         $count_raw .= "     and users.employee_id = employee_demo.employee_id ";
         $count_raw .= "     and employee_demo.orgid = employee_demo_tree.id ";
@@ -226,6 +231,7 @@ class SysadminStatisticsReportController extends Controller
 
         return view('sysadmin.statistics.goalsummary',compact('data', 'data_tag'));
     }
+
 
 
     public function goalSummaryExport(Request $request) {
