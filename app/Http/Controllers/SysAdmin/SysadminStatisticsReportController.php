@@ -1826,13 +1826,13 @@ class SysadminStatisticsReportController extends Controller
                                                         $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                                   })
                                                   ->where([
-                                                        ['conversations.sign_off_time','>=',$request->start_date],
-                                                        ['conversations.supervisor_signoff_time','>=',$request->start_date . ' 00:00:00']
+                                                        ['conversations.sign_off_time','>=',$request->start_date . ' 00:00:00'],
+                                                        ['conversations.supervisor_signoff_time','>=',$request->start_date . ' 00:00:00'],
                                                   ])
                                                   ->where([
-                                                        ['conversations.sign_off_time','<=',$request->end_date],
-                                                        ['conversations.supervisor_signoff_time','<=',$request->end_date . ' 23:59:59']
-                                                  ])        
+                                                        ['conversations.sign_off_time','<=',$request->end_date . ' 23:59:59'],
+                                                        ['conversations.supervisor_signoff_time','<=',$request->end_date . ' 23:59:59'],
+                                                  ])       
                                                   ->where(function($query) {
                                                         $query->where(function($query) {
                                                             $query->whereNotNull('signoff_user_id')
