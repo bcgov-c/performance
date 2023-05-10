@@ -1820,7 +1820,7 @@ class SysadminStatisticsReportController extends Controller
                                                         $join->on('conversations.conversation_topic_id', '=', 'conversation_topics.id');   
                                                   }) 
                                                   ->join('users', function($join) {
-                                                        $join->on('users.id', '=', 'conversations.user_id');   
+                                                        $join->on('users.id', '=', 'conversation_participants.participant_id');
                                                   }) 
                                                   ->join('employee_demo', function($join) {
                                                         $join->on('employee_demo.employee_id', '=', 'users.employee_id');
@@ -1832,7 +1832,7 @@ class SysadminStatisticsReportController extends Controller
                                                   ->where([
                                                         ['conversations.sign_off_time','<=',$request->end_date . ' 23:59:59'],
                                                         ['conversations.supervisor_signoff_time','<=',$request->end_date . ' 23:59:59'],
-                                                  ])       
+                                                  ])        
                                                   ->where(function($query) {
                                                         $query->where(function($query) {
                                                             $query->whereNotNull('signoff_user_id')
