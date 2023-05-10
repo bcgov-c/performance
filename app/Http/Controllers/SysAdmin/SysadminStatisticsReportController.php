@@ -97,6 +97,8 @@ class SysadminStatisticsReportController extends Controller
                             });
                         })
                         ->whereNull('deleted_at')
+                        ->where('goals.status','active')
+                        ->where('goals.is_library','0')        
                         ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
                         ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
                         ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
