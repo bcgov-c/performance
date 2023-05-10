@@ -81,29 +81,47 @@ class SysadminStatisticsReportController extends Controller
 
         $types = GoalType::orderBy('id')->get();
         $types->prepend( new GoalType()  ) ;
-
+        
+        $total_goals = UserDemoJrView::selectRaw('count(*) as goal_count, goals.goal_type_id')
+                        ->join('goals', 'goals.user_id', 'user_demo_jr_view.user_id') 
+                        ->where(function($query) {
+                            $query->where(function($query) {
+                                $query->where('due_date_paused', 'N')
+                                    ->orWhereNull('due_date_paused');
+                            });
+                        })
+                        ->where(function($query) {
+                            $query->where(function($query) {
+                                $query->where('excused_flag', '<>', '1')
+                                    ->orWhereNull('excused_flag');
+                            });
+                        })
+                        ->whereNull('deleted_at')
+                        ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                        ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                        ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                        ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                        ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
+                        ->groupBy('goals.goal_type_id')
+                        ->get();
+                        
         foreach($types as $type)
         {
             $goal_id = $type->id ? $type->id : '';
-
-            $from_stmt = $this->goalSummary_from_statement($type->id);
-
-            $sql = User::selectRaw('AVG(goals_count) as goals_average')
-                        ->from(DB::raw( $from_stmt ))
-                        ->join('employee_demo', function($join) {
-                            $join->on('employee_demo.employee_id', '=', 'A.employee_id');
-                        })
-                        ->where('A.due_date_paused', 'N')
-                        ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-                        ->whereNull('employee_demo.date_deleted')        
-                        ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-                        ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-                        ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-                        ->when( $request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-                        ->when( $request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); });
-            
-            $goals_average = $sql->get()->first()->goals_average;
-
+            if($goal_id != '') {
+                $goals = $total_goals->filter(function ($type_goals) use($goal_id){
+                    return $type_goals->goal_type_id == $goal_id;
+                });
+            } else {
+                $goals = $total_goals;
+            }
+            $total_count = 0;
+            $total_item = 0;
+            if ($total_item != 0){
+                $goals_average = $total_count / $total_item;
+            }else{
+                $goals_average = 0;
+            }
             $data[$goal_id] = [ 
                 'name' => $type->name ? ' ' . $type->name : '',
                 'goal_type_id' => $goal_id,
@@ -111,7 +129,7 @@ class SysadminStatisticsReportController extends Controller
                 'groups' => []
             ];
 
-                
+            $from_stmt = $this->goalSummary_from_statement($type->id);   
             // $sql = User::selectRaw('count(goals_count) as goals_count')
             $sql = User::selectRaw("case when goals_count between 0 and 0  then '0'  
                                         when goals_count between 1 and 5  then '1-5'
