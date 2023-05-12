@@ -75,7 +75,8 @@ class GoalController extends Controller
         ]);
 
         $myTeamController = new MyTeamController(); 
-        $employees = $myTeamController->myEmployeesAjax();
+        // $employees = $myTeamController->myEmployeesAjax();
+        $employees = User::join('employee_demo', 'users.employee_id', 'employee_demo.employee_id')->whereNull('employee_demo.date_deleted')->paginate(10);
         
 
         $query = Goal::where('user_id', $authId)

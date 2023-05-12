@@ -13,6 +13,7 @@
     @endif
          
     <select multiple class="form-control search-users ml-1" id="search-users-{{$goal->id}}" name="share_with[{{$goal->id}}][]" data-goal-id="{{$goal->id}}">
+    <!-- <x-dropdown multiple class="form-control search-users ml-1" id="search-users-{{$goal->id}}" name="share_with[{{$goal->id}}][]" data-goal-id="{{$goal->id}}"> -->
         @php
             $alreadyAdded = [];
         @endphp      
@@ -62,6 +63,7 @@
         @endforeach
         
     </select>
+    <!-- </x-dropdown> -->
     
 <!-- </label>   -->
 </span>
