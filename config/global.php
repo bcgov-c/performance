@@ -10,14 +10,19 @@ return [
             'color' => 'success',
             'tooltip' => 'Supervisor and employee agree objectives met',
         ],
-        'not met' => [
-            'color' => 'red',
-            'tooltip' => 'Substantial portion incomplete by end date',
-        ],
-        'cancelled or deferred' => [
+        // 'not met' => [
+        //     'color' => 'red',
+        //     'tooltip' => 'Substantial portion incomplete by end date',
+        // ],
+        // 'cancelled or deferred' => [
+        //     'color' => 'warning',
+        //     'tooltip' =>
+        //         'Shift in plans but want to archive goal for future reference',
+        // ],
+        'archived' => [
             'color' => 'warning',
             'tooltip' =>
-                'Shift in plans but want to archive goal for future reference',
+                'Cancelled, deferred or no longer relevant to your work but you want to save for future reference',
         ],
     ],
 
