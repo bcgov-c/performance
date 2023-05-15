@@ -16,7 +16,9 @@
       @endif
       @endif
       @endif
-      <th scope="col"><a href="javascript:sort('status');">Status</a></th>
+      <th scope="col"><a href="javascript:sort('status');">Status</a>
+      <i class="fa fa-info-circle" id="status_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="<ul><li><b>Active</b>: currently in progress or scheduled for a future date</li><li><b>Achieved</b>: supervisor and employee agree objectives met</li><li><b>Archived</b>: cancelled, deferred or no longer relevant to your work but you want to save for future reference</li></ul>You can delete goals that do not meet any of the above criteria"></i>				
+      </th>
       <th> </th>
     </tr>
   </thead>
