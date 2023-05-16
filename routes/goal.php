@@ -15,6 +15,7 @@ Route::post('goal/supervisor/{id}/copy', [GoalController::class, 'copyGoal'])->n
 Route::post('goal/goalbank/copy-multiple', [GoalController::class, 'saveFromLibraryMultiple'])->name('goal.library.save-multiple');
 Route::delete('goal/comment/{id}', [GoalCommentController::class, 'delete'])->name('goal.comment.delete');
 Route::put('goal/comment/{id}', [GoalCommentController::class, 'edit'])->name('goal.comment.edit');
+Route::post('goal/sync', [GoalController::class, 'syncGoals'])->name('goal.sync-goals');
 
 Route::get('goal', function () {
     return redirect()->route('goal.current');
