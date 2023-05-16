@@ -457,7 +457,8 @@ class EmployeeSharesController extends Controller {
             $query = UserDemoJrView::from('user_demo_jr_view AS u')
                 ->whereRaw("EXISTS (SELECT 1 FROM auth_users AS au WHERE au.type = 'HR' AND au.auth_id = {$authId} AND au.user_id = u.user_id)")
                 ->whereNull('u.date_deleted')
-                ->join('shared_profiles AS sp', 'sp.shared_id', 'u.user_id')
+                ->join(\DB::raw("(SELECT DISTINCT sp1.id, sp1.shared_id, sp1.shared_with FROM shared_profiles AS sp1) AS sp2"), 'sp2.shared_id', 'u.user_id')
+                ->join('shared_profiles AS sp', 'sp.id', 'sp2.id')
                 ->leftjoin('users AS u2', 'u2.id', 'sp.shared_with')
                 ->leftjoin('employee_demo as d2', 'd2.employee_id', 'u2.employee_id' )
                 ->leftjoin('users as cc', 'cc.id', 'sp.shared_by')
@@ -487,36 +488,32 @@ class EmployeeSharesController extends Controller {
                     return $q->whereRaw("u.employee_id LIKE '%{$request->search_text}%'")
                         ->orWhereRaw("u.employee_name LIKE '%{$request->search_text}%'")
                         ->orWhereRaw("u2.employee_id LIKE '%{$request->search_text}%'")
-                        ->orWhereRaw("u2.employee_name LIKE '%{$request->search_text}%'")
-                        ->orWhereRaw("cc.employee_name LIKE '%{$request->search_text}%'")
+                        ->orWhereRaw("d2.employee_name LIKE '%{$request->search_text}%'")
+                        ->orWhereRaw("cd.employee_name LIKE '%{$request->search_text}%'")
                         ->orWhereRaw("u.jobcode_desc LIKE '%{$request->search_text}%'")
                         ->orWhereRaw("u.deptid LIKE '%{$request->search_text}%'");
                 })
-                ->select (
-                    'u.employee_id',
-                    'u.employee_name', 
-                    'u2.employee_id as delegate_ee_id',
-                    'd2.employee_name as delegate_ee_name',
-                    'd2.employee_name as alternate_delegate_name',
-                    'sp.shared_item',
-                    'u.jobcode_desc',
-                    'u.organization',
-                    'u.level1_program',
-                    'u.level2_division',
-                    'u.level3_branch',
-                    'u.level4',
-                    'u.deptid',
-                    'cd.employee_name as created_name',
-                    'sp.created_at',
-                    'sp.updated_at',
-                    'sp.id as shared_profile_id',
-                );
+                ->selectRaw ("
+                    u.employee_id,
+                    u.employee_name,
+                    u2.employee_id as delegate_ee_id,
+                    d2.employee_name as delegate_ee_name,
+                    d2.employee_name as alternate_delegate_name,
+                    'All' as shared_item,
+                    u.jobcode_desc,
+                    u.organization,
+                    u.level1_program,
+                    u.level2_division,
+                    u.level3_branch,
+                    u.level4,
+                    u.deptid,
+                    cd.employee_name as created_name,
+                    sp.created_at,
+                    sp.updated_at,
+                    sp.id as shared_profile_id
+                ");
             return Datatables::of($query)
                 ->addIndexColumn()
-                ->editColumn('shared_item', function ($row) {
-                    $dcode = json_decode ($row->shared_item);
-                    return count($dcode) == 2 ? 'All' : ($dcode[0] == 1 ? 'Goal' : 'Conversation');
-                })
                 ->editColumn('created_at', function ($row) {
                     return $row->created_at ? $row->created_at->format('M d, Y H:i:s') : null;
                 })
