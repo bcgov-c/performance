@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SysAdmin;
 
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\AdminOrg;
 use App\Models\AdminOrgUser;
@@ -545,6 +546,124 @@ class AccessPermissionsController extends Controller
                 ->select('admin_orgs.user_id', 'user_demo_jr_view.user_id', 'admin_orgs.orgid')
                 ->distinct()
         );
+        // Populate auth_users tables
+        \DB::statement("
+            DELETE 
+            FROM auth_users 
+            WHERE type = 'HR'
+                AND auth_id = {$user_id}
+        ");
+        $now = date('Y-m-d H:i:s', strtotime(Carbon::now()->format('c')));
+        \DB::statement("
+            INSERT IGNORE INTO auth_users (type, auth_id, user_id, created_at, updated_at) (
+                SELECT DISTINCT
+                    'HR',
+                    ao.user_id AS auth_id,
+                    u.id AS user_id,
+                    '{$now}',
+                    '{$now}'
+                FROM 
+                    users 
+                        AS u 
+                    INNER JOIN employee_demo 
+                        AS ed 
+                        USE INDEX(idx_employee_demo_employee_id_date_deleted)
+                        ON ed.employee_id = u.employee_id 
+                            AND ed.date_deleted IS NULL
+                    INNER JOIN admin_orgs 
+                        AS ao
+                        ON ao.user_id = {$user_id}
+                            AND ao.version = 2
+                            AND inherited = 0
+                            AND ao.orgid = ed.orgid
+            )
+        ");
+        \DB::statement("
+            INSERT IGNORE INTO auth_users (type, auth_id, user_id, created_at, updated_at) (
+                SELECT DISTINCT
+                    'HR',
+                    aotv.user_id AS auth_id,
+                    u.id AS user_id,
+                    '{$now}',
+                    '{$now}'
+                FROM 
+                    users 
+                        AS u 
+                    INNER JOIN employee_demo 
+                        AS ed 
+                        USE INDEX(idx_employee_demo_employee_id_date_deleted)
+                        ON ed.employee_id = u.employee_id 
+                            AND ed.date_deleted IS NULL
+                    INNER JOIN employee_demo_tree
+                        AS edt
+                        ON edt.id = ed.orgid
+                    INNER JOIN admin_org_tree_view 
+                        AS aotv 
+                        ON aotv.user_id = {$user_id}
+                            AND aotv.version = 2 
+                            AND aotv.inherited = 1
+                            AND (
+                                (aotv.level = 0 AND aotv.organization_key = edt.organization_key)  OR
+                                (aotv.level = 1 AND aotv.level1_key = edt.level1_key) OR
+                                (aotv.level = 2 AND aotv.level2_key = edt.level2_key) OR
+                                (aotv.level = 3 AND aotv.level3_key = edt.level3_key) OR
+                                (aotv.level = 4 AND aotv.level4_key = edt.level4_key)
+                              )
+                WHERE 
+                    NOT EXISTS (SELECT DISTINCT 1 FROM auth_users WHERE type = 'HR' AND auth_id = aotv.user_id AND user_id = u.id)
+            )
+        ");
+        // Populate auth_org table
+        \DB::statement("
+            DELETE 
+            FROM auth_orgs 
+            WHERE type = 'HR'
+                AND auth_id = {$user_id}
+        ");
+        \DB::statement("
+            INSERT IGNORE INTO auth_orgs (type, auth_id, orgid, created_at, updated_at) (
+                SELECT DISTINCT
+                    'HR',
+                    ao.user_id AS auth_id,
+                    ao.orgid AS orgid,
+                    '{$now}',
+                    '{$now}'
+                FROM 
+                    admin_orgs 
+                        AS ao
+                WHERE ao.user_id = {$user_id}
+                    AND ao.version = 2
+                    AND inherited = 0
+            )
+        ");
+        \DB::statement("
+            INSERT IGNORE INTO auth_orgs (type, auth_id, orgid, created_at, updated_at) (
+                SELECT DISTINCT
+                    'HR',
+                    aotv.user_id AS auth_id,
+                    edt.id AS orgid,
+                    '{$now}',
+                    '{$now}'
+                FROM 
+                    employee_demo_tree
+                        AS edt
+                    INNER JOIN admin_org_tree_view 
+                        AS aotv 
+                        ON aotv.user_id = {$user_id}
+                            AND aotv.version = 2 
+                            AND aotv.inherited = 1
+                            AND (
+                                (aotv.level = 0 AND aotv.organization_key = edt.organization_key)  OR
+                                (aotv.level = 1 AND aotv.level1_key = edt.level1_key) OR
+                                (aotv.level = 2 AND aotv.level2_key = edt.level2_key) OR
+                                (aotv.level = 3 AND aotv.level3_key = edt.level3_key) OR
+                                (aotv.level = 4 AND aotv.level4_key = edt.level4_key)
+                            )
+                WHERE 
+                    NOT EXISTS (SELECT DISTINCT 1 FROM auth_orgs WHERE type = 'HR' AND auth_id = aotv.user_id AND orgid = edt.id)
+            )
+        ");
+
     }
 
 }
