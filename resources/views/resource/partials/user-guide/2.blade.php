@@ -7,7 +7,8 @@
 <p>This is the area for all the goals you are currently working on. You can add goals to this area in three different ways.</p>
 
 <ol>    
-    <li>Click “Create New Goal”. This will launch a form that walks you through the process of creating a goal from the very beginning. There are helpful tips and examples available right in the form itself. You may also want to read the <a href='/resource/goal-setting' target=\'_blank\'>Goal Setting</a> resource to make your goals as strong as possible.</li>         
+<!-- <li>Click “Create New Goal”. This will launch a form that walks you through the process of creating a goal from the very beginning. There are helpful tips and examples available right in the form itself. You may also want to read the <a href='/resource/goal-setting' target=\'_blank\'>Goal Setting</a> resource to make your goals as strong as possible.</li>          -->
+<li>Click “Create New Goal”. This will launch a form that walks you through the process of creating a goal from the very beginning. There are helpful tips and examples available right in the form itself. You may also want to read the <a href='/resources/goal-setting' target=\'_blank\'>Goal Setting</a> resource to make your goals as strong as possible.</li>         
     <br>
     <li>Click “Add Goal from Goal Bank”. This takes you to a list of goals created for you by your supervisor or organization. Some goals will be marked as mandatory, but most are suggested starting points for you to consider. This is a good place to start if you want to search for goal ideas on a certain topic. You will receive a notification when a new goal is added to your Goal Bank. <br><br> Click on a goal to view it and add it to your own profile. If needed, you can edit the goal to personalize it once it is in your own profile. </li> 
     <br>
