@@ -410,9 +410,11 @@ return [
         [
             'role' => 'listitem',
             'text' => 'Resources',
-            'url'  => 'resource/user-guide',
+            // 'url'  => 'resource/user-guide',
+            'url'  => 'resources',
             'icon' => 'fas fa-fw fa-book',
-            'active' => ['resource/*']
+            // 'active' => ['resource/*']
+            'active' => ['resources/*']
         ],
     ],
 
