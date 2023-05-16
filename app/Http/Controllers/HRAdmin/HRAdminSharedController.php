@@ -28,19 +28,23 @@ class HRAdminSharedController extends Controller
                 $option = '';
                 break;
         } 
-        return response()->json(EmployeeDemoTree::whereRaw("EXISTS (SELECT 1 FROM auth_orgs WHERE auth_orgs.type = 'HR' AND auth_orgs.auth_id = ".Auth::id()." AND auth_orgs.orgid = employee_demo_tree.id)")
-            ->where('employee_demo_tree.level', \DB::raw($level))
-            ->when($request->q, function ($q) use($request) { return $q->whereRaw("employee_demo_tree.name LIKE '%{$request->q}%'"); })
-            ->when($level > 0 && "{$request->{$option.'level0'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.organization_key = '."{$request->{$option.'level0'}}"); })
-            ->when($level > 1 && "{$request->{$option.'level1'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level1_key = '."{$request->{$option.'level1'}}"); })
-            ->when($level > 2 && "{$request->{$option.'level2'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level2_key = '."{$request->{$option.'level2'}}"); })
-            ->when($level > 3 && "{$request->{$option.'level3'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level3_key = '."{$request->{$option.'level3'}}"); })
-            ->when($level > 4 && "{$request->{$option.'level4'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level4_key = '."{$request->{$option.'level4'}}"); })
-            ->select('employee_demo_tree.id AS id', 'employee_demo_tree.name AS text')
-            ->orderBy('employee_demo_tree.name', 'ASC')
-            ->limit(300)
-            ->get('id', 'text')
-            ->toArray());
+        return response()->json(EmployeeDemoTree::join('auth_orgs', function($on){
+            return $on->on(function($on1){
+                return $on1->whereRaw("auth_orgs.type = 'HR' AND auth_orgs.auth_id = ".Auth::id()." AND auth_orgs.orgid = employee_demo_tree.id");
+            });
+        })
+        ->where('employee_demo_tree.level', \DB::raw($level))
+        ->when($request->q, function ($q) use($request) { return $q->whereRaw("employee_demo_tree.name LIKE '%{$request->q}%'"); })
+        ->when($level > 0 && "{$request->{$option.'level0'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.organization_key = '."{$request->{$option.'level0'}}"); })
+        ->when($level > 1 && "{$request->{$option.'level1'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level1_key = '."{$request->{$option.'level1'}}"); })
+        ->when($level > 2 && "{$request->{$option.'level2'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level2_key = '."{$request->{$option.'level2'}}"); })
+        ->when($level > 3 && "{$request->{$option.'level3'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level3_key = '."{$request->{$option.'level3'}}"); })
+        ->when($level > 4 && "{$request->{$option.'level4'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level4_key = '."{$request->{$option.'level4'}}"); })
+        ->select('employee_demo_tree.id AS id', 'employee_demo_tree.name AS text')
+        ->orderBy('employee_demo_tree.name', 'ASC')
+        ->limit(300)
+        ->get('id', 'text')
+        ->toArray());
     } 
 
     public function getOrganizationsV2(Request $request) {
@@ -51,7 +55,6 @@ class HRAdminSharedController extends Controller
             })
             ->distinct()
             ->when($request->q, function ($q) use($request) { return $q->whereRaw("users_annex.organization LIKE '%{$request->q}%'"); })
-            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
             ->select('users_annex.organization_key AS id', 'users_annex.organization AS text')
             ->orderBy('users_annex.organization', 'ASC')
             ->limit(300)
@@ -68,6 +71,7 @@ class HRAdminSharedController extends Controller
             })
             ->distinct()
             ->when($request->q, function ($q) use($request) { return $q->whereRaw("users_annex.level1_program LIKE '%{$request->q}%'"); })
+            ->when($request->level0, function ($q) use($request) { return $q->where('organization_key', $request->level0); })
             ->select('users_annex.level1_key AS id', 'users_annex.level1_program AS text')
             ->orderBy('users_annex.level1_program', 'ASC')
             ->limit(300)
