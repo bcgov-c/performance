@@ -463,7 +463,7 @@ function updateConversation(conversation_id) {
                            $('#tip-info-comment4').html('<b>Career Goal Statement (Optional)</b>');
                            $('#desc-info-comment4').html('Your personal vision for the future of your career.');
                            $('#tip-info-comment7').html('<b>Strengths (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate areas of strength to build on for career advancement."> </i>');
-                           $('#desc-info-comment7').html('Identity your top 1 to 3 strengths.');
+                           $('#desc-info-comment7').html('Identify your top 1 to 3 strengths.');
                            $('#tip-info-comment8').html('<b>Areas for Growth (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate areas for growth in the short to medium term to assist with career advancement."> </i>');
                            $('#desc-info-comment8').html('Identity 1 to 3 areas you\'d most like to grow.');
                            $('#tip-info-comment9').html('<b>Additional Comments (optional)</b>');
