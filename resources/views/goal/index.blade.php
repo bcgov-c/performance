@@ -160,7 +160,6 @@
                        <div class="col-12">
                             <b>Measures of Success</b>
                             <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"'> </i>                        
-                            <!-- <x-textarea-modal id="measure_of_success" label="Measures of Success" name="measure_of_success" tooltip='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"'  /> -->
                             <x-textarea-modal id="measure_of_success" name="measure_of_success" />
                             <small class="text-danger error-measure_of_success"></small>
                         </div>
