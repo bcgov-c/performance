@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class UpdateConversationTopicTypos816 extends Migration
+class UpdateConversationTopicTypos816a extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,12 @@ class UpdateConversationTopicTypos816 extends Migration
      */
     public function up()
     {
+        ");
         \DB::statement("
             UPDATE conversation_topics 
-            SET preparing_for_conversation = REPLACE(preparing_for_conversation, '(how we accomplish things).s', '(how we accomplish things)')
+            SET question_html = REPLACE(question_html, 'control and/or influence).', 'control and/or influence)')
             WHERE id = 2 
-                AND preparing_for_conversation LIKE '%(how we accomplish things).s%'
+                AND question_html LIKE '%control and/or influence).%'
         ");
     }
 
