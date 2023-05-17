@@ -13,6 +13,11 @@ class UpdateConversationTopicTypos816a extends Migration
      */
     public function up()
     {
+        \DB::statement("
+            UPDATE conversation_topics 
+            SET preparing_for_conversation = REPLACE(preparing_for_conversation, '(how we accomplish things).', '(how we accomplish things)')
+            WHERE id = 2 
+                AND preparing_for_conversation LIKE '%(how we accomplish things).%'
         ");
         \DB::statement("
             UPDATE conversation_topics 
