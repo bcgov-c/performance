@@ -206,20 +206,7 @@ class BuildEmployeeDemoTree extends Command
 
             // Update OrgId in employee_demo table
             $this->info(Carbon::now()->format('c').' - Updating Org Ids in employee_demo...');
-            EmployeeDemo::whereRaw("deptid IS NULL OR TRIM(deptid) = ''")
-                ->update(['orgid' => null]);
-            $demoDepts = EmployeeDemo::distinct()
-                ->whereNotNull('deptid')
-                ->select('deptid')
-                ->orderBy('deptid')
-                ->get();
-            foreach($demoDepts as $dept){
-                $org = EmployeeDemoTree::where('deptid', $dept->deptid)
-                    ->select('id')
-                    ->first();
-                EmployeeDemo::where('deptid', $dept->deptid)
-                    ->update(['orgid' => $org ? $org->id : null]);
-            }
+            \DB::statement("UPDATE employee_demo SET employee_demo.orgid = (SELECT employee_demo_tree.id FROM employee_demo_tree WHERE employee_demo_tree.deptid = employee_demo.deptid LIMIT 1)");
             $this->info(Carbon::now()->format('c').' - Org Ids updated in employee_demo.');
 
             $end_time = Carbon::now()->format('c');
