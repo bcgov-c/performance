@@ -491,10 +491,10 @@ class StatisticsReportController extends Controller
                 }) 
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
-                            ->from('admin_org_users')
-                            ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
-                            ->whereIn('admin_org_users.access_type', [0,2])
-                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                            ->from('auth_users')
+                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->where('auth_users.type', 'HR')
+                            ->where('auth_users.auth_id', '=', Auth::id());
                 });
                 
         $next_due_users = $sql_2->get();
@@ -545,10 +545,10 @@ class StatisticsReportController extends Controller
         ->whereNull('conversations.deleted_at')
         ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
-                            ->from('admin_org_users')
-                            ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
-                            ->whereIn('admin_org_users.access_type', [0,2])
-                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                            ->from('auth_users')
+                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->where('auth_users.type', 'HR')
+                            ->where('auth_users.auth_id', '=', Auth::id());
                 });         
         
         $emp_conversations = $sql->get();
@@ -621,10 +621,10 @@ class StatisticsReportController extends Controller
         ->when($request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
         ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
-                            ->from('admin_org_users')
-                            ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
-                            ->whereIn('admin_org_users.access_type', [0,2])
-                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                            ->from('auth_users')
+                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->where('auth_users.type', 'HR')
+                            ->where('auth_users.auth_id', '=', Auth::id());
                 })
         ->get();
         
@@ -675,10 +675,10 @@ class StatisticsReportController extends Controller
                 ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                                  
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
-                            ->from('admin_org_users')
-                            ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
-                            ->whereIn('admin_org_users.access_type', [0,2])
-                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                            ->from('auth_users')
+                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->where('auth_users.type', 'HR')
+                            ->where('auth_users.auth_id', '=', Auth::id());
                 })       
                 ->count();
 
@@ -861,10 +861,10 @@ class StatisticsReportController extends Controller
                 }) 
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
-                            ->from('admin_org_users')
-                            ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
-                            ->whereIn('admin_org_users.access_type', [0,2])
-                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                            ->from('auth_users')
+                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->where('auth_users.type', 'HR')
+                            ->where('auth_users.auth_id', '=', Auth::id());
                 });  
                 
         // SQL - Chart 4
@@ -906,10 +906,10 @@ class StatisticsReportController extends Controller
                 })
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
-                            ->from('admin_org_users')
-                            ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
-                            ->whereIn('admin_org_users.access_type', [0,2])
-                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                            ->from('auth_users')
+                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->where('auth_users.type', 'HR')
+                            ->where('auth_users.auth_id', '=', Auth::id());
                 }); 
                 
         // SQL for Chart 5
@@ -950,10 +950,10 @@ class StatisticsReportController extends Controller
             })
             ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
-                            ->from('admin_org_users')
-                            ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
-                            ->whereIn('admin_org_users.access_type', [0,2])
-                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                            ->from('auth_users')
+                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->where('auth_users.type', 'HR')
+                            ->where('auth_users.auth_id', '=', Auth::id());
                 }); 
             
         // Generating Output file 
@@ -2002,10 +2002,10 @@ class StatisticsReportController extends Controller
                             ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
                             ->whereExists(function ($query) {
                                     $query->select(DB::raw(1))
-                                            ->from('admin_org_users')
-                                            ->whereColumn('admin_org_users.allowed_user_id', 'user_demo_jr_view.id')
-                                            ->whereIn('admin_org_users.access_type', [0,2])
-                                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                                            ->from('auth_users')
+                                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.id')
+                                            ->where('auth_users.type', 'HR')
+                                            ->where('auth_users.auth_id', '=', Auth::id());
                                 });
                     
                     $users = $sql->get();
@@ -2083,10 +2083,10 @@ class StatisticsReportController extends Controller
                             ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                            
                             ->whereExists(function ($query) {
                                 $query->select(DB::raw(1))
-                                        ->from('admin_org_users')
-                                        ->whereColumn('admin_org_users.allowed_user_id', 'user_demo_jr_view.id')
-                                        ->whereIn('admin_org_users.access_type', [0,2])
-                                        ->where('admin_org_users.granted_to_id', '=', Auth::id());
+                                            ->from('auth_users')
+                                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.id')
+                                            ->where('auth_users.type', 'HR')
+                                            ->where('auth_users.auth_id', '=', Auth::id());
                             })
                             ->get();
                     $users = $users->unique('employee_id');       
