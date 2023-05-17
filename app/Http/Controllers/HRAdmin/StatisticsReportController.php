@@ -449,7 +449,8 @@ class StatisticsReportController extends Controller
         
     }
 
-    public function conversationSummary(Request $request) {
+    public function conversationSummary(Request $request) 
+    {
 
         // send back the input parameters
         $this->preservedInputParams($request);
@@ -459,280 +460,134 @@ class StatisticsReportController extends Controller
         $request->session()->flash('dd_level2', $request->dd_level2);
         $request->session()->flash('dd_level3', $request->dd_level3);
         $request->session()->flash('dd_level4', $request->dd_level4);
-
-        // Chart1 -- Overdue
-        $sql_2 = User::selectRaw("users.employee_id, users.empl_record, employee_name, 
-                                employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division,
-                                employee_demo_tree.level3_branch, employee_demo_tree.level4,
-                        DATEDIFF ( users.next_conversation_date
+        
+        //get all employee number
+        $query = UserDemoJrView::selectRaw("employee_id, empl_record, employee_name, 
+                                organization, level1_program, level2_division,
+                                level3_branch, level4,conversation_participants.role,
+                                conversations.deleted_at,conversation_participants.conversation_id,
+                                conversations.signoff_user_id,conversations.supervisor_signoff_id,
+                                conversation_participants.participant_id,conversations.conversation_topic_id,
+                        DATEDIFF ( next_conversation_date
                             , curdate() )
                     as overdue_in_days")
-                ->leftJoin('employee_demo', function($join) {
-                    $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                ->leftJoin('conversation_participants', function($join) {
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
                 })
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('users.due_date_paused', 'N')
-                            ->orWhereNull('users.due_date_paused');
-                    });
+                ->leftJoin('conversations', function($join) {
+                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
                 })        
-                ->leftJoin('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-                ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-                ->when($request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-                ->when($request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-                ->when($request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-                ->when($request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
-                ->whereNull('employee_demo.date_deleted')
                 ->where(function($query) {
                     $query->where(function($query) {
-                        $query->where('users.excused_flag', '<>', '1')
-                            ->orWhereNull('users.excused_flag');
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
                     });
-                }) 
+                })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when($request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when($request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when($request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when($request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
+                ->whereNull('date_deleted')
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('excused_flag', '<>', '1')
+                            ->orWhereNull('excused_flag');
+                    });
+                })
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
-                            ->where('auth_users.type', 'HR')
+                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
+                            ->where('auth_users.type', '=', 'HR')
                             ->where('auth_users.auth_id', '=', Auth::id());
-                });
-                
-        $next_due_users = $sql_2->get();
-        $data = array();
-
+                });;                
+        $all_employees = $query->get();
+        
         // Chart1 -- Overdue
+        $data = array();
         $data['chart1']['chart_id'] = 1;
         $data['chart1']['title'] = 'Next Conversation Due';
         $data['chart1']['legend'] = array_keys($this->overdue_groups);
         $data['chart1']['groups'] = array();
         foreach($this->overdue_groups as $key => $range)
-        {
-            $subset = $next_due_users->whereBetween('overdue_in_days', $range );
-            $subset = $subset->unique('employee_id');
-            array_push( $data['chart1']['groups'],  [ 'name' => $key, 'value' => $subset->count(), 
+        {            
+            $subset = $all_employees->whereBetween('overdue_in_days', $range );
+            $subset = array_unique(array_column($subset->toArray(), 'employee_id'));
+            array_push( $data['chart1']['groups'],  [ 'name' => $key, 'value' => count($subset), 
                         ]);
-        }
+        }        
+        $conversations = $all_employees->filter(function ($all_employee) {
+            return $all_employee->role == 'emp';
+        });
+        $total_unique_emp = count($conversations);  
         
-        
-        // SQL for Chart 4
-        $sql = ConversationParticipant::join('users', 'users.id', 'conversation_participants.participant_id') 
-        ->join('employee_demo', function($join) {
-            $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-        })
-        ->join('conversations', function($join) {
-            $join->on('conversations.id', '=', 'conversation_participants.conversation_id');  
-        })
-        ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('users.due_date_paused', 'N')
-                            ->orWhereNull('users.due_date_paused');
-                    });
-                })
-        ->where('conversation_participants.role', 'emp')
-        ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-        ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-        ->when($request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-        ->when($request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-        ->when($request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-        ->when($request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
-        ->where(function($query) {
-            $query->where(function($query) {
-                $query->whereNull('signoff_user_id')
-                    ->orWhereNull('supervisor_signoff_id');
-            });
-        })
-        ->whereNull('employee_demo.date_deleted')
-        ->whereNull('conversations.deleted_at')
-        ->whereExists(function ($query) {
-                    $query->select(DB::raw(1))
-                            ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
-                            ->where('auth_users.type', 'HR')
-                            ->where('auth_users.auth_id', '=', Auth::id());
-                });         
-        
-        $emp_conversations = $sql->get();
-        
-        // Chart4 -- Open Conversation for employees
+        // Chart4 -- Open Conversation employees
+        $open_conversations = $conversations->filter(function ($conversation) {
+            return $conversation->signoff_user_id === null || $conversation->supervisor_signoff_id === null;
+        }); 
         $topics = ConversationTopic::select('id','name')->get();
         $data['chart4']['chart_id'] = 4;
         $data['chart4']['title'] = 'Employees: Open Conversations';
         $data['chart4']['legend'] = $topics->pluck('name')->toArray();
-        $data['chart4']['groups'] = array();        
-        
-        $total_unique_emp = 0;
+        $data['chart4']['groups'] = array();
         foreach($topics as $topic)
         {
-            $subset = $emp_conversations->where('conversation_topic_id', $topic->id );
-            $unique_emp = $subset->unique('participant_id')->count();            
-            $total_unique_emp = $total_unique_emp + $unique_emp;
-        } 
-        
-        
-        foreach($topics as $topic)
-        {
-            $subset = $emp_conversations->where('conversation_topic_id', $topic->id );
-            $unique_emp = $subset->unique('participant_id')->count();
+            $subset =$open_conversations->filter(function ($conversation) use($topic) {
+                return $conversation->conversation_topic_id == $topic->id;
+            }); 
+            $subset = array_unique(array_column($subset->toArray(), 'employee_id'));
+            $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
                 $per_emp = ($unique_emp / $total_unique_emp) * 100;
             }
             array_push( $data['chart4']['groups'],  [ 'name' => $topic->name, 'value' => $unique_emp,
-                        'topic_id' => $topic->id,
-                            // 'ids' => $subset ? $subset->pluck('id')->toArray() : []
+                        'topic_id' => $topic->id, 
                         ]);
         } 
         
-        // Chart 5 -- Completed Conversation by Employees
+        
+        // Chart 5 -- Completed Conversation by employees
+        $completed_conversations = $conversations->filter(function ($conversation) {
+            return $conversation->signoff_user_id != null && $conversation->supervisor_signoff_id != null;
+        }); 
         $data['chart5']['chart_id'] = 5;
         $data['chart5']['title'] = 'Employees: Completed Conversations';
         $data['chart5']['legend'] = $topics->pluck('name')->toArray();
         $data['chart5']['groups'] = array();
-
-        // SQL for Chart 5
-        $completed_conversations = ConversationParticipant::join('users', 'users.id', 'conversation_participants.participant_id') 
-        ->join('employee_demo', function($join) {
-            $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-        })
-        ->join('conversations', function($join) {
-            $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
-        })
-        ->where(function($query) {
-            $query->where(function($query) {
-                $query->whereNotNull('signoff_user_id')
-                      ->whereNotNull('supervisor_signoff_id');                          
-            });
-        })
-        ->whereNull('conversations.deleted_at')   
-        ->whereNull('employee_demo.date_deleted')
-        ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('users.due_date_paused', 'N')
-                            ->orWhereNull('users.due_date_paused');
-                    });
-                })
-        ->where('conversation_participants.role', 'emp')     
-        ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-        ->whereNull('employee_demo.date_deleted')                
-        ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-        ->when($request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-        ->when($request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-        ->when($request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-        ->when($request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
-        ->whereExists(function ($query) {
-                    $query->select(DB::raw(1))
-                            ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
-                            ->where('auth_users.type', 'HR')
-                            ->where('auth_users.auth_id', '=', Auth::id());
-                })
-        ->get();
-        
-        $total_unique_emp = 0;
         foreach($topics as $topic)
         {
-            $subset = $completed_conversations->where('conversation_topic_id', $topic->id );
-            $unique_emp = $subset->unique('participant_id')->count();            
-            $total_unique_emp = $total_unique_emp + $unique_emp;
-        } 
-        
-
-        foreach($topics as $topic)
-        {
-            $subset = $completed_conversations->where('conversation_topic_id', $topic->id );
-            $unique_emp = $subset->unique('participant_id')->count();
+            $subset =$completed_conversations->filter(function ($conversation) use($topic) {
+                return $conversation->conversation_topic_id == $topic->id;
+            }); 
+            $subset = array_unique(array_column($subset->toArray(), 'employee_id'));
+            $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
                 $per_emp = ($unique_emp / $total_unique_emp) * 100;
             }
-            
             array_push( $data['chart5']['groups'],  [ 'name' => $topic->name, 'value' => $unique_emp, 
                     'topic_id' => $topic->id, 
                 ]);
-        }
-        
-        //get all employee number
-       $employees = User::distinct('employee_demo.employee_id')
-                ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-                ->where(function($query) {
-                                $query->where(function($query) {
-                                    $query->where('excused_flag', '<>', '1')
-                                        ->orWhereNull('excused_flag');
-                                });
-                            })
-                ->whereNull('date_deleted')
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('due_date_paused', 'N')
-                            ->orWhereNull('due_date_paused');
-                    });
-                })              
-                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
-                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
-                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
-                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
-                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                                  
-                ->whereExists(function ($query) {
-                    $query->select(DB::raw(1))
-                            ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
-                            ->where('auth_users.type', 'HR')
-                            ->where('auth_users.auth_id', '=', Auth::id());
-                })       
-                ->count();
-
+        } 
+                
         // Chart6 -- Employee Has Open Conversation
-        $sql_6 = User::selectRaw("employee_demo.employee_id, employee_name, 
-                            employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4
-                 ")
-                ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-                ->join('conversation_participants', function($join) {
-                    $join->on('conversation_participants.participant_id', '=', 'users.id');
-                })
-                ->join('conversations', function($join) {
-                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
-                })
-                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
-                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
-                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
-                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
-                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
-                ->where('conversation_participants.role','emp')   
-                ->whereNull('conversations.deleted_at')           
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('due_date_paused', 'N')
-                            ->orWhereNull('due_date_paused');
-                    });
-                })
-		->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('excused_flag', '<>', '1')
-                            ->orWhereNull('excused_flag');
-                    });
-                }) 
-                ->whereNull('date_deleted')
-                ->whereNotNull('conversation_id')      
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->whereNull('signoff_user_id')
-                              ->orWhereNull('supervisor_signoff_id');
-                    });
-                })
-                ->whereExists(function ($query) {
-                    $query->select(DB::raw(1))
-                            ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
-                            ->where('auth_users.type', '=', 'HR')
-                            ->where('auth_users.auth_id', '=', Auth::id());
-                });    
+        $employees = array_unique(array_column($all_employees->toArray(), 'employee_id'));
+        $employees = count($employees);
         
-        $users = $sql_6->get();
-        $users = $users->unique('employee_id');
+        //employees with conversations      
+        $employee_conversations = $all_employees->filter(function ($employee) {
+            // Filter out if role is 'emp', deleted_at is null, and conversation_id is not null
+            return $employee->role === 'emp' && $employee->deleted_at === null && $employee->conversation_id !== null;
+        });
         
-        $has_conversation = $users->count();
+        //get employees has open conversations
+        $users = $employee_conversations->filter(function ($employee_conversation) {
+            return $employee_conversation->signoff_user_id === null || $employee_conversation->supervisor_signoff_id === null;
+        });     
+        $users = array_unique(array_column($users->toArray(), 'employee_id'));
+        $has_conversation = count($users);
         $no_conversation = $employees - $has_conversation;
         // Chart 6 
         $legends = ['Yes', 'No'];
@@ -752,60 +607,15 @@ class StatisticsReportController extends Controller
             array_push( $data['chart6']['groups'],  [ 'name' => $legend, 'value' => $subset,
                             'legend' => $legend, 
                         ]);
-        } 
-        
+        }         
         
         // Chart7 -- Employee Has Completed Conversation
-        $sql_7 = User::selectRaw("employee_demo.employee_id, employee_name, 
-                            employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4
-                 ")
-                ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-                ->join('conversation_participants', function($join) {
-                    $join->on('conversation_participants.participant_id', '=', 'users.id');
-                })
-                ->join('conversations', function($join) {
-                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
-                })
-                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
-                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
-                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
-                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
-                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
-                ->where('conversation_participants.role','emp') 
-                ->whereNull('conversations.deleted_at')          
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('due_date_paused', 'N')
-                            ->orWhereNull('due_date_paused');
-                    });
-                })
-		->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('excused_flag', '<>', '1')
-                            ->orWhereNull('excused_flag');
-                    });
-                }) 
-                ->whereNull('date_deleted')
-                ->whereNotNull('conversation_id')       
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->whereNotNull('signoff_user_id')
-                              ->WhereNotNull('supervisor_signoff_id');
-                    });
-                })
-                ->whereExists(function ($query) {
-                    $query->select(DB::raw(1))
-                            ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
-                            ->where('auth_users.type', '=', 'HR')
-                            ->where('auth_users.auth_id', '=', Auth::id());
-                });
-                            
-        $users = $sql_7->get();
-        $users = $users->unique('employee_id');
-        
-        $has_conversation = $users->count();
+        //get employees has Completed conversations
+        $users2 = $employee_conversations->filter(function ($employee_conversation) {
+            return $employee_conversation->signoff_user_id != null && $employee_conversation->supervisor_signoff_id != null;
+        }); 
+        $users2 = array_unique(array_column($users2->toArray(), 'employee_id'));
+        $has_conversation =  count($users2);
         $no_conversation = $employees - $has_conversation;
         // Chart 7 
         $legends = ['Yes', 'No'];
@@ -824,7 +634,7 @@ class StatisticsReportController extends Controller
             array_push( $data['chart7']['groups'],  [ 'name' => $legend, 'value' => $subset,
                             'legend' => $legend, 
                         ]);
-        } 
+        }
                
 
         return view('hradmin.statistics.conversationsummary',compact('data'));
