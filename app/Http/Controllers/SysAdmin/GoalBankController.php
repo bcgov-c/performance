@@ -508,7 +508,6 @@ class GoalBankController extends Controller
     }
 
     public function savenewgoal(Request $request) {
-        Log::info(Carbon::now().'-Tracer 1');
         if ($request->input('title') == '' || $request->input('what') == '' || $request->input('tag_ids') == '') {
             if($request->input('title') == '') {
                 $request->session()->flash('title_miss', 'The title field is required');
@@ -519,7 +518,6 @@ class GoalBankController extends Controller
             }               
             return \Redirect::route('sysadmin.goalbank')->with('message', " There are one or more errors on the page. Please review and try again.");
         }  
-        Log::info(Carbon::now().'-Tracer 2');
         $current_user = User::find(Auth::id());
         $resultrec = Goal::withoutGlobalScopes()
         ->create(
@@ -538,11 +536,9 @@ class GoalBankController extends Controller
             , 'display_name' => $request->input('display_name')
             ]
         );
-        Log::info(Carbon::now().'-Tracer 3');
         $resultrec->tags()->sync($request->tag_ids);
         $employee_ids = ($request->userCheck) ? $request->userCheck : [];
         $notify_audiences = [];
-        Log::info(Carbon::now().'-Tracer 4');
         if($request->opt_audience == "byEmp") {
             $selected_emp_ids = $request->userCheck ? $request->userCheck : [];
             $toRecipients = EmployeeDemo::from('employee_demo AS d')
@@ -564,7 +560,6 @@ class GoalBankController extends Controller
             }
             $notify_audiences = $selected_emp_ids;
         }
-        Log::info(Carbon::now().'-Tracer 5');
         if($request->opt_audience == "byOrg") {
             $selected_org_nodes = $request->eorgCheck ? $request->eorgCheck : [];
             $selected_inherited = $request->selected_inherited ? json_decode($request->selected_inherited) : [];
@@ -611,10 +606,8 @@ class GoalBankController extends Controller
             }
             $notify_audiences = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
         }
-        Log::info(Carbon::now().'-Tracer 6');
         // notify_on_dashboard when new goal added
         $this->notify_on_dashboard($resultrec, $notify_audiences);
-        Log::info(Carbon::now().'-Tracer 7');
         return redirect()->route(request()->segment(1).'.goalbank')
             ->with('success', 'Create new goal bank successful.');
     }
@@ -1069,6 +1062,7 @@ class GoalBankController extends Controller
                         ->selectRAW('count(distinct goal_bank_orgs.id)')
                 ] )
                 ->addSelect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
+                // Log::info($query->toSQL()); 
             return Datatables::of($query)
                 ->addIndexColumn()
                 ->addcolumn('click_title', function ($row) {
