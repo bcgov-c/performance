@@ -870,7 +870,16 @@ class GoalController extends Controller
                     ->distinct()
                     ->pluck('display_name')
                     ->toArray();
-
+        $i = count($createdBy) + 1;
+        foreach($display_names as $display_name){
+            if($display_name != ''){
+                $createdBy[$i]['id'] = $display_name;
+                $createdBy[$i]['name'] = $display_name;
+            }
+            $i++;
+        }
+       
+        
         array_unshift($createdBy , [
             "id" => "0",
             "name" => "Any"
