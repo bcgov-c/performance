@@ -512,7 +512,7 @@
 $(".share-with-users").select2({
     width: '100%',
     ajax: {
-        url: '/users',
+        url: '{{ route("goal.get-all-users") }}',
         dataType: 'json',
         data: function (params) {
             const query = {
