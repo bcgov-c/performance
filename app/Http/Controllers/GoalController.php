@@ -634,7 +634,7 @@ class GoalController extends Controller
             $query->where('user_id', Auth::id());
         });
         $query->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory');
-        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'));
+        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name separator "<br/> ") as tagnames'));
         $query = $query->union($adminGoals)->union($adminGoalsInherited);
                 
         $sortby = 'created_at';
@@ -680,7 +680,7 @@ class GoalController extends Controller
         $suggestedGoalsData = DB::table('goals')
             ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id'
                     , 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.name as username'
-                    ,DB::raw('group_concat(distinct tags.name separator ",") as tagnames')
+                    ,DB::raw('group_concat(distinct tags.name separator "<br/>") as tagnames')
                     ,DB::raw('group_concat(distinct goals_shared_with.user_id separator ",") as shared_user_id')
                     ,DB::raw('group_concat(distinct shared_users.name separator ",") as shared_user_name'))         
             ->leftJoin('users as u2', 'u2.id', '=', 'goals.created_by')
@@ -864,6 +864,12 @@ class GoalController extends Controller
             ->get()
             ->pluck('user')
             ->toArray();
+            
+        $display_names = DB::table('goals')
+                    ->select('display_name')
+                    ->distinct()
+                    ->pluck('display_name')
+                    ->toArray();
 
         array_unshift($createdBy , [
             "id" => "0",
