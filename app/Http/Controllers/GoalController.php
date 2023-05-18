@@ -79,7 +79,7 @@ class GoalController extends Controller
         $employees = $myTeamController->myEmployeesAjax();
         
 
-        $query = Goal::where('goals.user_id', $authId)
+        $query = Goal::where('user_id', $authId)
         ->with('user')
         ->with('goalType');
         $type = 'past';
@@ -116,6 +116,24 @@ class GoalController extends Controller
         }
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
         $goal_types_modal = $goaltypes;
+        
+        /*
+        if ($request->is("goal/current")) {
+            $goals = $query->where('status', 'active')
+            ->paginate(8);
+            $type = 'current';
+            return view('goal.index', compact('goals', 'type', 'goaltypes', 'user','employees', 'tags', 'tagsList', 'statusList', 'type_desc_str'));
+        } else if ($request->is("goal/supervisor")) {
+            //$user = Auth::user();
+            // TO remove already copied goals.
+            // $referencedGoals = Goal::where('user_id', $authId)->whereNotNull('referenced_from')->pluck('referenced_from');
+            $goals = $user->sharedGoals()
+            // ->whereNotIn('goals.id', $referencedGoals ) 
+            ->paginate(8);
+            $type = 'supervisor';
+            return view('goal.index', compact('goals', 'type', 'goaltypes', 'user', 'tags', 'type_desc_str'));
+        } 
+        */
 
         array_unshift($goaltypes, [
             "id" => "0",
@@ -125,17 +143,10 @@ class GoalController extends Controller
 
         $query = $query->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
         ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
-        ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')
-        ->leftJoin('goals_shared_with', 'goals_shared_with.goal_id', 'goals.id')
-        ->leftJoin('users as shared_users', 'shared_users.id', 'goals_shared_with.user_id');
-        
+        ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id');
         if ($request->is("goal/current")) {
             $type = 'current';
-            $query = $query->where('status', '=', 'active')
-                    ->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames')
-                            ,DB::raw('group_concat(distinct goals_shared_with.user_id separator ",") as shared_user_id')
-                            ,DB::raw('group_concat(distinct shared_users.name separator ",") as shared_user_name')
-                            ,'goal_types.name as typename');            
+            $query = $query->where('status', '=', 'active')->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'), 'goal_types.name as typename');            
         } else if($request->is("goal/supervisor")){
             $type = 'supervisor';
             $goals = $user->sharedGoals()->paginate(8);
@@ -1269,40 +1280,24 @@ class GoalController extends Controller
     }
     
     public function syncGoals(Request $request) {
+        error_log(print_r($request->sync_goal_id,true));
+        error_log(print_r($request->sync_users,true));
+        
         if ($request->has("sync_goal_id") && $request->sync_goal_id) {
             $goal_id = $request->sync_goal_id;
+            GoalSharedWith::where('goal_id', $goal_id)->delete();
+            
             if ($request->has("sync_users") && $request->sync_users) {
-                if(!is_array($request->sync_users)){                    
-                    GoalSharedWith::where('goal_id', $goal_id)->delete();
-                    $users_arr = explode(',', $request->sync_users);
-                } else {
-                    $users_arr = $request->sync_users;
-                }   
+                $users_arr = explode(',', $request->sync_users);
                 if(count($users_arr)>0){
-                    if(is_numeric($users_arr[0])){
-                        GoalSharedWith::where('goal_id', $goal_id)->delete();
-                        foreach($users_arr as $userId){
-                            $goalSharedWith = GoalSharedWith::create([
-                                'goal_id' => $goal_id,
-                                'user_id' => $userId,
-                            ]);
-                        }
-                    } else {
-                        foreach($users_arr as $userId){
-                            if (is_numeric($userId)){
-                                $goalSharedWith = GoalSharedWith::create([
-                                    'goal_id' => $goal_id,
-                                    'user_id' => $userId,
-                                ]);
-                            }
-                        }
+                    foreach($users_arr as $userId) {
+                        $goalSharedWith = GoalSharedWith::create([
+                            'goal_id' => $goal_id,
+                            'user_id' => $userId,
+                        ]);
                     }
-                } else {
-                    GoalSharedWith::where('goal_id', $goal_id)->delete();
                 }
                 
-            } else {
-                GoalSharedWith::where('goal_id', $goal_id)->delete();
             }
             
         }

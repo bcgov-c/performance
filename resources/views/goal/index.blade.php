@@ -123,17 +123,21 @@
                     <div>
                         <b>Goal Type</b>
                         <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="{{$type_desc_str}}"> </i>
+                        <!-- <x-tooltip-dropdown-outside name="goal_type_id" :options="$goaltypes" label="Goal Type" popoverstr="{{$type_desc_str}}" tooltipField="description" displayField="name" />                         -->
                         <x-dropdown :list="$goal_types_modal" name="goal_type_id" />
                     </div>
                     </div>
                        <div class="col-6">
                        <b>Goal Title</b>
                         <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>                        
+                        <!-- <x-input-modal label="Goal Title" id="goal_title" name="title" tooltip='A short title (1-3 words) used to reference the goal throughout the Performance Development Platform.' /> -->
                         <x-input-modal id="goal_title" name="title" />
                     </div>
                     <div class="col-sm-6">
                         <b>Tags</b>
+                        <!-- <i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resource/goal-setting?t=5' target=\'_blank\'><u>View full list of tag descriptions.</u></a><br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>."></i>				 -->
                         <i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resources/goal-setting?t=5' target=\'_blank\'><u>View full list of tag descriptions.</u></a><br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>."></i>				
+                        <!-- <x-xdropdown :list="$tags" label="Tags" name="tag_ids[]"  class="tags" tooltipField="description" displayField="name" multiple/> -->
                         <x-xdropdown :list="$tags" name="tag_ids[]"  class="tags" displayField="name" multiple/>
                         <small  class="text-danger error-tag_ids"></small>
                     </div>
@@ -183,11 +187,9 @@
                 </div>
             </div>
         </form>
-        <form action="{{ route('goal.sync-goals')}}" method="POST" id="share-my-goals-form">
+        <form action="{{ route('my-team.sync-goals')}}" method="POST" id="share-my-goals-form">
             @csrf
             <div class="d-none" id="syncGoalSharingData"></div>
-            <input type="hidden" name="sync_goal_id" id="sync_goal_id" value=""> 
-            <input type="hidden" name="sync_users" id="sync_users" value=""> 
         </form>
       </div>
 
@@ -236,6 +238,7 @@
         });
     </script>
     
+    <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
     <script>
         var modal_open = false;
         var need_fresh = false;
@@ -507,37 +510,6 @@
             
         });        
     </script>
-    
-    
-<script>
-$(".share-with-users").select2({
-    width: '100%',
-    ajax: {
-        url: '/users',
-        dataType: 'json',
-        data: function (params) {
-            const query = {
-                search: params.term,
-                page: params.page || 1
-            };
-            return query;
-        },
-        processResults: function (response, params) {
-            return {
-                results: $.map(response.data.data, function (item) {
-                    return {
-                        text: item.name+(item.employee_id ? ' - '+item.employee_id : ''),
-                        id: item.id
-                    }
-                }),
-                pagination: {
-                    more: response.data.current_page !== response.data.last_page
-                }
-            }
-        }
-    }
-});
-</script>
     </x-slot>
 
     
@@ -664,49 +636,6 @@ $(".share-with-users").select2({
                     }    
                 }, SessionTime);                
             }
-            
-            $(document).ready(function() {
-                // Event handler for dropdown list change
-                $(document).on('change', '.share-with-users', function() {
-                  // Get the selected value
-                  var selectedValue = $(this).val();
-
-                  // Get the corresponding goal ID in the row
-                  var goalId = $(this).closest('tr').data('goal-id');
-
-                  // Perform desired actions with the selected value and goal ID
-                  console.log('Selected value:', selectedValue);
-                  console.log('Goal ID:', goalId);
-
-                  console.log('Goal ID:', goalId);
-                  console.log('Selected Values:', selectedValue);
-                  $('#sync_goal_id').val(goalId);
-                  $('#sync_users').val(selectedValue);
-                  
-                  // Prepare the data to be sent
-                    var formData = {
-                      sync_goal_id: goalId,
-                      sync_users: selectedValue
-                    };
-
-                    $.ajax({
-                      url: '{{ route("goal.sync-goals") }}',
-                      type: 'POST',
-                      data: formData,
-                      success: function(response) {
-                        // Handle success response
-                        console.log('Data submitted successfully');
-                        // Optionally, you can perform additional actions here
-                      },
-                      error: function(xhr, status, error) {
-                        // Handle error response
-                        console.error('Error submitting data:', error);
-                        // Optionally, you can display an error message or perform additional actions here
-                      }
-                    });
-                  });
-
-            });
 </script>    
 
 <style>
@@ -726,10 +655,6 @@ $(".share-with-users").select2({
     .multiselect-container{
         height: 350px; 
         overflow-y: scroll;
-    }
-    
-    .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        background-color: 000;
     }
 </style>    
  
