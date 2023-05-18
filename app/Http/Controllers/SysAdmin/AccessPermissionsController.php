@@ -578,41 +578,39 @@ class AccessPermissionsController extends Controller
                             AND ao.orgid = ed.orgid
             )
         ");
-        \DB::statement("
-            INSERT IGNORE INTO auth_users (type, auth_id, user_id, created_at, updated_at) (
-                SELECT DISTINCT
-                    'HR',
-                    aotv.user_id AS auth_id,
-                    u.id AS user_id,
-                    '{$now}',
-                    '{$now}'
-                FROM 
-                    users 
-                        AS u 
-                    INNER JOIN employee_demo 
-                        AS ed 
-                        USE INDEX(idx_employee_demo_employee_id_date_deleted)
-                        ON ed.employee_id = u.employee_id 
-                            AND ed.date_deleted IS NULL
-                    INNER JOIN employee_demo_tree
-                        AS edt
-                        ON edt.id = ed.orgid
-                    INNER JOIN admin_org_tree_view 
-                        AS aotv 
-                        ON aotv.user_id = {$user_id}
-                            AND aotv.version = 2 
-                            AND aotv.inherited = 1
-                            AND (
-                                (aotv.level = 0 AND aotv.organization_key = edt.organization_key)  OR
-                                (aotv.level = 1 AND aotv.level1_key = edt.level1_key) OR
-                                (aotv.level = 2 AND aotv.level2_key = edt.level2_key) OR
-                                (aotv.level = 3 AND aotv.level3_key = edt.level3_key) OR
-                                (aotv.level = 4 AND aotv.level4_key = edt.level4_key)
-                              )
-                WHERE 
-                    NOT EXISTS (SELECT DISTINCT 1 FROM auth_users WHERE type = 'HR' AND auth_id = aotv.user_id AND user_id = u.id)
-            )
-        ");
+        $level = 0;
+        do {
+            $level += 1;
+            \DB::statement("
+                INSERT IGNORE INTO auth_users (type, auth_id, user_id, created_at, updated_at) (
+                    SELECT DISTINCT
+                        'HR',
+                        aotv.user_id AS auth_id,
+                        u.id AS user_id,
+                        '{$now}',
+                        '{$now}'
+                    FROM 
+                        users 
+                            AS u 
+                        INNER JOIN employee_demo 
+                            AS ed 
+                            USE INDEX(idx_employee_demo_employee_id_date_deleted)
+                            ON ed.employee_id = u.employee_id 
+                                AND ed.date_deleted IS NULL
+                        INNER JOIN employee_demo_tree
+                            AS edt
+                            ON edt.id = ed.orgid
+                        INNER JOIN admin_org_tree_view 
+                            AS aotv 
+                            ON aotv.user_id = {$user_id}
+                                AND aotv.version = 2 
+                                AND aotv.inherited = 1
+                                AND aotv.level = {$level} AND aotv.level{$level}_key = edt.level{$level}_key
+                    WHERE 
+                        NOT EXISTS (SELECT DISTINCT 1 FROM auth_users WHERE type = 'HR' AND auth_users.auth_id = aotv.user_id AND auth_users.user_id = u.id)
+                )
+            ");
+        } while ($level < 4);
         // Populate auth_org table
         \DB::statement("
             DELETE 
@@ -636,34 +634,31 @@ class AccessPermissionsController extends Controller
                     AND inherited = 0
             )
         ");
-        \DB::statement("
-            INSERT IGNORE INTO auth_orgs (type, auth_id, orgid, created_at, updated_at) (
-                SELECT DISTINCT
-                    'HR',
-                    aotv.user_id AS auth_id,
-                    edt.id AS orgid,
-                    '{$now}',
-                    '{$now}'
-                FROM 
-                    employee_demo_tree
-                        AS edt
-                    INNER JOIN admin_org_tree_view 
-                        AS aotv 
-                        ON aotv.user_id = {$user_id}
-                            AND aotv.version = 2 
-                            AND aotv.inherited = 1
-                            AND (
-                                (aotv.level = 0 AND aotv.organization_key = edt.organization_key)  OR
-                                (aotv.level = 1 AND aotv.level1_key = edt.level1_key) OR
-                                (aotv.level = 2 AND aotv.level2_key = edt.level2_key) OR
-                                (aotv.level = 3 AND aotv.level3_key = edt.level3_key) OR
-                                (aotv.level = 4 AND aotv.level4_key = edt.level4_key)
-                            )
-                WHERE 
-                    NOT EXISTS (SELECT DISTINCT 1 FROM auth_orgs WHERE type = 'HR' AND auth_id = aotv.user_id AND orgid = edt.id)
-            )
-        ");
-
+        $level = 0;
+        do {
+            $level += 1;
+            \DB::statement("
+                INSERT IGNORE INTO auth_orgs (type, auth_id, orgid, created_at, updated_at) (
+                    SELECT DISTINCT
+                        'HR',
+                        aotv.user_id AS auth_id,
+                        edt.id AS orgid,
+                        '{$now}',
+                        '{$now}'
+                    FROM 
+                        employee_demo_tree
+                            AS edt
+                        INNER JOIN admin_org_tree_view 
+                            AS aotv 
+                            ON aotv.user_id = {$user_id}
+                                AND aotv.version = 2 
+                                AND aotv.inherited = 1
+                                AND aotv.level = {$level} AND aotv.level{$level}_key = edt.level{$level}_key
+                    WHERE 
+                        NOT EXISTS (SELECT DISTINCT 1 FROM auth_orgs WHERE auth_orgs.type = 'HR' AND auth_orgs.auth_id = aotv.user_id AND auth_orgs.orgid = edt.id)
+                )
+            ");
+        } while ($level < 4);
     }
 
 }
