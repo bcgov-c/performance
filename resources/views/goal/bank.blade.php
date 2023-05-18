@@ -23,11 +23,12 @@
                             <h4>My Goal Bank</h4> 
                         </button>                        
                         <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span>    
+                        <br/>                                
+                        <button class="btn btn-link text-left" style="color:black">
+                            <p>The goals below have been created for you by your supervisor or organization. Click on a goal to view it and add it to your own profile. 
+                        If needed, you can edit the goal to personalize it once it is in your profile. </p>
+                        </button>  
                     </h5>
-                    <p>
-                        The goals below have been created for you by your supervisor or organization. Click on a goal to view it and add it to your own profile. 
-                        If needed, you can edit the goal to personalize it once it is in your profile. 
-                    </p>
 		</div>
 
 		<div id="collapse_0" class="collapse" aria-labelledby="heading_0">
@@ -103,13 +104,14 @@
                         <h4>Team Goal Bank</h4> 
                     </button>                        
                     <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span>  
-                </h5>
-                <p>
-                    Create a goal for your employees to use in their own profile. Goals can be suggested (for example, 
+                    <br/>                                
+                    <button class="btn btn-link text-left" style="color:black">
+                        <p>Create a goal for your employees to use in their own profile. Goals can be suggested (for example, 
                     a learning goal to help increase team skill or capacity in a relevant area) or mandatory 
                     (for example, a work goal detailing a new priority that all employees are responsible for). 
-                    Employees will e notified when a new goal has been added to their Goal Bank. 
-                </p>
+                    Employees will be notified when a new goal has been added to their Goal Bank.  </p>
+                    </button> 
+                </h5>
 		</div>
             
 		<div id="collapse_1" class="collapse" aria-labelledby="heading_1">
@@ -513,21 +515,43 @@
       
       // Add event listener for "check all" checkbox
       $('#checkAll').on('change', function() {
-        $('.goal_ids').prop('checked', this.checked);
-        if (this.checked) {
-          $('#addMultipleGoalButton').prop('disabled',false);
-          dataTable.page.len(-1).draw(); // Disable paging temporarily
-          dataTable.rows().select(); // Select all rows
-        } else {
-          $('#addMultipleGoalButton').prop('disabled',true);  
-          dataTable.rows().deselect(); // Deselect all rows
-          dataTable.page.len(10).draw(); // Set the original page length and redraw
-        }
+          $('.goal_ids').prop('checked', this.checked);
+          if (this.checked) {
+            $('#addMultipleGoalButton').prop('disabled', false);
+            dataTable.page.len(-1).draw(); // Disable paging temporarily
+            dataTable.rows().select(); // Select all rows
+          } else {
+            $('#addMultipleGoalButton').prop('disabled', true);
+            dataTable.rows().deselect(); // Deselect all rows
+            dataTable.page.len(10).draw(); // Set the original page length and redraw
+          }
       });
+
+        // Get the checkbox elements
+      var checkboxes = $('.goal_ids');
+        // Get the button element
+      var addButton = $('#addMultipleGoalButton');
+        // Attach an event listener to the checkboxes
+      var anyChecked = false;  
+      checkboxes.on('change', function() {
+            // Check if any checkbox is checked
+            var anyChecked = checkboxes.is(':checked');
+            // Enable or disable the button based on checkbox state
+            addButton.prop('disabled', !anyChecked);
+            // Check if none of the checkboxes are checked
+            if (!anyChecked) {
+                 $('#checkAll').prop('checked', false);
+            }
+      });
+      
+      
+      
         // Add event listener for row checkboxes
       $('#goalbanks').on('change', '.goal_ids', function() {
         if ($('.goal_ids:checked').length === $('.goalcheck').length) {
-            $('#checkAll').prop('checked', true);
+            if(anyChecked){
+                $('#checkAll').prop('checked', true);
+            } 
         } else {
             $('#checkAll').prop('checked', false);
         }
@@ -553,7 +577,6 @@
             { title: "Goal Type", data: "typename" },
             { title: "Tags", data: "tagnames" },
             { title: "Date Added", data: "created_at" },
-            { title: "Created by", data: "username" },
             { title: "Mandatory/Suggested", data: "is_mandatory" },
             {
               title: "Audience",
@@ -619,8 +642,8 @@
                 const selectDropdown = this;
                 let valueBeforeChange = [];
                 $(this).multiselect({
-                    allSelectedText: 'All Team Members',
-                    selectAllText: 'All Team Members',
+                    allSelectedText: 'All',
+                    selectAllText: 'All',
                     nonSelectedText: 'No one',
                     // nonSelectedText: null,
                     includeSelectAllOption: true,
@@ -931,13 +954,6 @@
        var date_added = $('#date_added').val();
        var created_by = $('#created_by').val();
        var is_mandatory = $('#is_mandatory').val();
-       
-       console.log(title);
-       console.log(goal_type);
-       console.log(tag_id);
-       console.log(date_added);
-       console.log(created_by);
-       console.log(is_mandatory);
        
        if(title != '' || goal_type != 0 || tag_id != 0 || date_added != '' || created_by != 0  || is_mandatory != '' ){
            $('#collapse_1').collapse('show');
