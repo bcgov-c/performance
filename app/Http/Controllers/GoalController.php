@@ -1323,4 +1323,27 @@ class GoalController extends Controller
             return redirect()->back();
         }
     }
+    
+    public function getAllUsers(Request $request)
+    {
+        $current_user = '';
+        if(session()->has('checking_user') && session()->get('checking_user') != '') {
+            $current_user = session()->get('checking_user');
+        }
+        
+        
+        $search = $request->search;
+        
+        if ($current_user == '') {
+            $user_query = User::where('name', 'LIKE', "%{$search}%")->paginate();
+        } else {
+            $user_query = User::where('name', 'LIKE', "%{$search}%")
+                          ->where('id', '<>', $current_user)
+                          ->paginate();
+        }
+        
+        return $this->respondeWith($user_query);
+    }
+    
+    
 }

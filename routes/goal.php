@@ -4,6 +4,8 @@ use App\Http\Controllers\GoalCommentController;
 use App\Http\Controllers\GoalController;
 use Illuminate\Support\Facades\Route;
 
+
+Route::get('goal/get_allusers', [GoalController::class, 'getAllUsers'])->name('goal.get-all-users');
 Route::get('goal/current', [GoalController::class, 'index'])->name('goal.current');
 Route::get('goal/past', [GoalController::class, 'index'])->name('goal.past');
 Route::get('goal/supervisor', [GoalController::class, 'index'])->name('goal.my-supervisor');
