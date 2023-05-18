@@ -798,6 +798,11 @@ class GoalController extends Controller
         $adminemps = User::select('users.*')
         ->whereIn('users.id', $adminShared)->get();
         $employees = $employees->merge($adminemps);
+        
+        $self = User::select('users.*')
+                    ->where('users.id', Auth::id())->get();
+        $employees = $employees->merge($self);
+        
         $employees_list = array();
         $i = 0;
         if(count($employees)>0) {
@@ -807,6 +812,9 @@ class GoalController extends Controller
                 $i++;
             }
         }
+        usort($employees_list, function($a, $b) {
+            return strcmp($a["name"], $b["name"]);
+        });
         
         $shared_employees = DB::table('shared_profiles')
                     ->select('shared_profiles.shared_id', 'users.name')
