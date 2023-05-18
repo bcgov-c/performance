@@ -729,7 +729,7 @@ $(".share-with-users").select2({
     }
     
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        background-color: 000;
+        background-color: #1A5A96;
     }
 </style>    
  
