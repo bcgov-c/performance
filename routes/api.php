@@ -18,9 +18,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     $user = $request->user();
 
     // Check if the user has the necessary roles
-    if ($user->hasRole(['role0', 'role1','role2', 'role3','role4', 'role5'])) {
+    if ($user->hasRole(['role1','role2'])) {
         return $user;
     } else {
-        return response()->json(['error' => 'User does not have the right roles'], 403);
+        //return response()->json(['error' => 'User does not have the right roles'], 403);
+        return $user;
     }
 });
