@@ -4,97 +4,96 @@
         <h3>
         @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
               My Goals
-          @else
-              {{ $user->name }}'s Goals
-          @endif
+        @else
+            {{ $user->name }}'s Goals
+        @endif
         </h3>
         @include('goal.partials.tabs')
     </x-slot>
     @if($type != 'supervisor' && !$disableEdit)
-    @if(request()->is('goal/current'))
-    <x-button icon="plus-circle" data-toggle="modal" data-target="#addGoalModal">
-        Create New Goal
-    </x-button>
-    <x-button icon="clone" href="{{ route('goal.library') }}">
-        Add Goal from Goal Bank
-    </x-button>
-    <x-button icon="question" href="{{ route('resource.user-guide','t=1') }} " target="_blank" tooltip='Click here to access goal setting resources and examples (opens in new window).'>    
-        Need Help?
-    </x-button>
-    @endif
+        @if(request()->is('goal/current'))
+            <x-button icon="plus-circle" data-toggle="modal" data-target="#addGoalModal">
+                Create New Goal
+            </x-button>
+            <x-button icon="clone" href="{{ route('goal.library') }}">
+                Add Goal from Goal Bank
+            </x-button>
+            <x-button icon="question" href="{{ route('resource.user-guide','t=1') }} " target="_blank" tooltip='Click here to access goal setting resources and examples (opens in new window).'>    
+                Need Help?
+            </x-button>
+        @endif
 
     @endif
     <div class="mt-4">
         {{-- {{$dataTable->table()}} --}}
 
         <div class="row">
-         @if ($type != 'supervisor')   
-         <form action="" method="get" id="filter-menu">
-            <div class="row">
-                
-                <div class="col-12"  id="msgdiv"></div>
-                
-                <div class="col">
-                    <label>
-                        Title
-                        <input type="text" name="title" class="form-control" value="{{request()->title}}">
-                    </label>
-                </div>
-                <div class="col">
-                    <x-dropdown :list="$goaltypes" label="Goal Type" name="goal_type" :selected="request()->goal_type"></x-dropdown>
-                </div>
-                @if ($type == 'past')
-                <div class="col">
-                    <x-dropdown :list="$statusList" label="Status" name="status" :selected="request()->status"></x-dropdown>                      
-                </div>
-                @endif
-                <div class="col">
-                    <x-dropdown :list="$tagsList" label="Tags" name="tag_id" :selected="request()->tag_id"></x-dropdown>
-                </div>
-                <div class="col">
-                    <label>
-                        Start Date
-                        <input type="text" class="form-control" name="filter_start_date" value="{{request()->filter_start_date ?? 'Any'}}">
-                    </label>
-                </div>
-                <div class="col">
-                    <label>
-                        End Date
-                        <input type="text" class="form-control" name="filter_target_date" value="{{request()->filter_target_date ?? 'Any'}}">
-                    </label>
-                </div>
-            </div>
-            <input name="sortby" id="sortby" value="{{$sortby}}" type="hidden">
-            <input name="sortorder" id="sortorder" value="{{$sortorder}}" type="hidden">
-        </form>    
-        @endif    
-        @if ($type == 'current' || $type == 'supervisor')
-            @if($type == 'supervisor')
-                <div class="col-12 mb-4">
-                    @if($goals->count() != 0)
-                        <!-- These goals have been shared with you by your supervisor and reflect current priorities. Consider these goals when creating your own. -->
-                        These goals have been shared with you by your supervisor. You can view them to see what your supervisor is working on and use this information to align your own goals where possible. You can also copy your supervisor&rsquo;s goal to your own profile and modify or personalize it without having any impact on your supervisor's original goal.
-                    @else
-                        <div class="alert alert-warning alert-dismissible no-border"  style="border-color:#d5e6f6; background-color:#d5e6f6" role="alert">
-                        <span class="h5" aria-hidden="true"><i class="icon fa fa-info-circle"></i><b>Your supervisor is not currently sharing any goals with you.</b></span>
+            @if ($type != 'supervisor')   
+                <form action="" method="get" id="filter-menu">
+                    <div class="row">
+                        
+                        <div class="col-12"  id="msgdiv"></div>
+                        
+                        <div class="col">
+                            <label>
+                                Title
+                                <input type="text" name="title" class="form-control" value="{{request()->title}}">
+                            </label>
                         </div>
-                    @endif
-                </div>
-                @foreach ($goals as $goal)
-                    <div class="col-12 col-lg-6 col-xl-4">
-                        @include('goal.partials.card')
+                        <div class="col">
+                            <x-dropdown :list="$goaltypes" label="Goal Type" name="goal_type" :selected="request()->goal_type"></x-dropdown>
+                        </div>
+                        @if ($type == 'past')
+                            <div class="col">
+                                <x-dropdown :list="$statusList" label="Status" name="status" :selected="request()->status"></x-dropdown>                      
+                            </div>
+                        @endif
+                        <div class="col">
+                            <x-dropdown :list="$tagsList" label="Tags" name="tag_id" :selected="request()->tag_id"></x-dropdown>
+                        </div>
+                        <div class="col">
+                            <label>
+                                Start Date
+                                <input type="text" class="form-control" name="filter_start_date" value="{{request()->filter_start_date ?? 'Any'}}">
+                            </label>
+                        </div>
+                        <div class="col">
+                            <label>
+                                End Date
+                                <input type="text" class="form-control" name="filter_target_date" value="{{request()->filter_target_date ?? 'Any'}}">
+                            </label>
+                        </div>
                     </div>
-                @endforeach
+                    <input name="sortby" id="sortby" value="{{$sortby}}" type="hidden">
+                    <input name="sortorder" id="sortorder" value="{{$sortorder}}" type="hidden">
+                </form>    
+            @endif    
+            @if ($type == 'current' || $type == 'supervisor')
+                @if($type == 'supervisor')
+                    <div class="col-12 mb-4">
+                        @if($goals->count() != 0)
+                            These goals have been shared with you by your supervisor. You can view them to see what your supervisor is working on and use this information to align your own goals where possible. You can also copy your supervisor&rsquo;s goal to your own profile and modify or personalize it without having any impact on your supervisor's original goal.
+                        @else
+                            <div class="alert alert-warning alert-dismissible no-border"  style="border-color:#d5e6f6; background-color:#d5e6f6" role="alert">
+                            <span class="h5" aria-hidden="true"><i class="icon fa fa-info-circle"></i><b>No goals are currently being shared with you.</b></span>
+                            </div>
+                        @endif
+                    </div>
+                    @foreach ($goals as $goal)
+                        <div class="col-12 col-lg-6 col-xl-4">
+                            @include('goal.partials.card')
+                        </div>
+                    @endforeach
+                @else
+                    <div class="col-12 col-sm-12">
+                        @include('goal.partials.target-table',['goals'=>$goals])
+                    </div>
+                @endif            
             @else
-                <div class="col-12 col-sm-12">
+                <div class="col-12 col-sm-12">                 
                     @include('goal.partials.target-table',['goals'=>$goals])
                 </div>
-            @endif            
-        @else
-             <div class="col-12 col-sm-12">                 
-                @include('goal.partials.target-table',['goals'=>$goals])
-            </div>
-        @endif
+            @endif
         </div>
         {{ $goals->links() }}
     </div>
