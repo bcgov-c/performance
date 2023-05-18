@@ -142,9 +142,6 @@
                                     </label>
                                 </div>
                                 <div class="col">
-                                    <x-dropdown :list="$createdBy" id="created_by" name="created_by" :selected="request()->created_by" label="Created by"></x-dropdown>
-                                </div>
-                                <div class="col">
                                     <x-dropdown :list="$mandatoryOrSuggested" label="Mandatory/Suggested" id="is_mandatory" name="is_mandatory" :selected="request()->is_mandatory"></x-dropdown>
                                 </div><!-- 
                                 <div class="col">
@@ -504,7 +501,17 @@
           { title: "Goal Type", data: "typename" },
           { title: "Tags", data: "tagnames" },
           { title: "Date Added", data: "created_at" },
-          { title: "Created by", data: "username" },
+          {
+            title: "Created by",
+            data: null,
+            render: function(data, type, row) {
+              if (row.display_name) {
+                return row.display_name;
+              } else {
+                return row.username;
+              }
+            }
+          },
           { title: "Mandatory/Suggested", data: "is_mandatory" }
         ],
         "order": [[0, "desc"]],
@@ -604,7 +611,7 @@
                   
                 }
                 // Generate the multiselect dropdown HTML
-                var dropdownHtml = '<select multiple class="form-control search-users ml-1"  id="search-users-' + row.id + '" name="share_with[' + row.id + '][]"  data-goal-id="' + row.id + '">' +
+                var dropdownHtml = '<select multiple class="form-control search-users ml-1"  id="search-users-' + row.id + '" name="share_with[' + row.id + '][]"  data-goal-id="' + row.id + '" >' +
                   options +
                   '</select>';
 
@@ -952,10 +959,9 @@
        var goal_type = $('#goal_type').val();
        var tag_id = $('#tag_id').val();
        var date_added = $('#date_added').val();
-       var created_by = $('#created_by').val();
        var is_mandatory = $('#is_mandatory').val();
        
-       if(title != '' || goal_type != 0 || tag_id != 0 || date_added != '' || created_by != 0  || is_mandatory != '' ){
+       if(title != '' || goal_type != 0 || tag_id != 0 || date_added != ''  || is_mandatory != '' ){
            $('#collapse_1').collapse('show');
        } else {
            $('#collapse_1').collapse('hide');
