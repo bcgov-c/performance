@@ -15,5 +15,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+    $user = $request->user();
+
+    // Check if the user has the necessary roles
+    if ($user->hasRole(['role1','role2'])) {
+        return $user;
+    } else {
+        return response()->json(['error' => 'User does not have the right roles'], 403);
+    }
 });
+

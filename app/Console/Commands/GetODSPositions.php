@@ -122,14 +122,14 @@ class GetODSPositions extends Command
             if ($stagingCount > 0) {
                 $insertRows = PositionStaging::select('position_nbr', 'descr', 'descrshort', 'reports_to')
                 ->whereNotExists(function ($q) {
-                    $q->select(DB::raw(1))
+                    $q->select(\DB::raw(1))
                     ->from('positions')
                     ->whereRaw('positions_stg.position_nbr = positions.position_nbr');
                 })
                 ->orderBy('position_nbr')
                 ->get();
                 foreach($insertRows as $ins){
-                    DB::beginTransaction();
+                    \DB::beginTransaction();
                     try {
                         Position::create([
                             'position_nbr' => $ins['position_nbr'],
@@ -138,60 +138,60 @@ class GetODSPositions extends Command
                             'reports_to' => $ins['reports_to'],
                             'date_deleted' => NULL
                         ]);
-                        $old_values = [ 
-                            'table' => 'positions'                        
-                        ];
-                        $new_values = [ 
-                            'table' => 'positions', 
-                            'position_nbr' => $ins->position_nbr, 
-                            'descr' => $ins->descr, 
-                            'descrshort' => $ins->descrshort, 
-                            'reports_to' => $ins->reports_to, 
-                            'date_deleted' => NULL
-                        ];
-                        $audit = new JobDataAudit;
-                        $audit->job_sched_id = $audit_id;
-                        $audit->old_values = json_encode($old_values);
-                        $audit->new_values = json_encode($new_values);
-                        $audit->save();
+                        // $old_values = [ 
+                        //     'table' => 'positions'                        
+                        // ];
+                        // $new_values = [ 
+                        //     'table' => 'positions', 
+                        //     'position_nbr' => $ins->position_nbr, 
+                        //     'descr' => $ins->descr, 
+                        //     'descrshort' => $ins->descrshort, 
+                        //     'reports_to' => $ins->reports_to, 
+                        //     'date_deleted' => NULL
+                        // ];
+                        // $audit = new JobDataAudit;
+                        // $audit->job_sched_id = $audit_id;
+                        // $audit->old_values = json_encode($old_values);
+                        // $audit->new_values = json_encode($new_values);
+                        // $audit->save();
                         DB::commit();
                         $count_insert += 1;
                     } catch (Exception $e) {
                         echo 'Unable to insert for Posn # '.$ins->position_nbr.'.'; echo "\r\n";
-                        DB::rollback();
+                        \DB::rollback();
                     }
                 }
 
                 $updateRows = PositionStaging::select('position_nbr', 'descr', 'descrshort', 'reports_to')
                 ->whereExists(function ($q) {
-                    $q->select(DB::raw(1))
+                    $q->select(\DB::raw(1))
                     ->from('positions')
                     ->whereRaw('positions_stg.position_nbr = positions.position_nbr AND (positions_stg.descr <> positions.descr OR positions_stg.descrshort <> positions.descrshort OR positions_stg.reports_to <> positions.reports_to OR NOT positions.date_deleted IS NULL)');
                 })
                 ->orderBy('position_nbr')
                 ->get();
                 foreach($updateRows as $upd){
-                    DB::beginTransaction();
+                    \DB::beginTransaction();
                     try {
                         $row = DB::table('positions')
                         ->whereRaw("position_nbr = '".$upd->position_nbr."'")
                         ->first();
-                        $old_values = [ 
-                            'table' => 'positions',                        
-                            'position_nbr' => $row->position_nbr, 
-                            'descr' => $row->descr, 
-                            'descrshort' => $row->descrshort, 
-                            'reports_to' => $row->reports_to, 
-                            'date_deleted' => $row->date_deleted
-                        ];
-                        $new_values = [ 
-                            'table' => 'positions', 
-                            'position_nbr' => $upd->position_nbr, 
-                            'descr' => $upd->descr, 
-                            'descrshort' => $upd->descrshort, 
-                            'reports_to' => $upd->reports_to, 
-                            'date_deleted' => NULL
-                        ];
+                        // $old_values = [ 
+                        //     'table' => 'positions',                        
+                        //     'position_nbr' => $row->position_nbr, 
+                        //     'descr' => $row->descr, 
+                        //     'descrshort' => $row->descrshort, 
+                        //     'reports_to' => $row->reports_to, 
+                        //     'date_deleted' => $row->date_deleted
+                        // ];
+                        // $new_values = [ 
+                        //     'table' => 'positions', 
+                        //     'position_nbr' => $upd->position_nbr, 
+                        //     'descr' => $upd->descr, 
+                        //     'descrshort' => $upd->descrshort, 
+                        //     'reports_to' => $upd->reports_to, 
+                        //     'date_deleted' => NULL
+                        // ];
                         Position::whereRaw("position_nbr = '".$upd->position_nbr."'")
                         ->update([
                             'descr' => $upd->descr,
@@ -199,11 +199,11 @@ class GetODSPositions extends Command
                             'reports_to' => $upd->reports_to,
                             'date_deleted' => NULL
                         ]);
-                        $audit = new JobDataAudit;
-                        $audit->job_sched_id = $audit_id;
-                        $audit->old_values = json_encode($old_values);
-                        $audit->new_values = json_encode($new_values);
-                        $audit->save();
+                        // $audit = new JobDataAudit;
+                        // $audit->job_sched_id = $audit_id;
+                        // $audit->old_values = json_encode($old_values);
+                        // $audit->new_values = json_encode($new_values);
+                        // $audit->save();
                         DB::commit();
                         $count_update += 1;
                     } catch (Exception $e) {
@@ -214,7 +214,7 @@ class GetODSPositions extends Command
 
                 $deletedRows = Position::select('position_nbr')
                 ->whereNotExists(function ($q) {
-                    $q->select(DB::raw(1))
+                    $q->select(\DB::raw(1))
                     ->from('positions_stg')
                     ->whereRaw('positions_stg.position_nbr = positions.position_nbr');
                 })
@@ -223,39 +223,39 @@ class GetODSPositions extends Command
                 ->get();
                 foreach($deletedRows as $del){
                     $now = Carbon::now();
-                    DB::beginTransaction();
+                    \DB::beginTransaction();
                     try {
                         $row = Position::whereRaw("position_nbr = '".$del->position_nbr."'")->first();
-                        $old_values = [ 
-                            'table' => 'positions',                        
-                            'position_nbr' => $row->position_nbr, 
-                            'date_deleted' => $row->date_deleted
-                        ];
-                        $new_values = [ 
-                            'table' => 'positions', 
-                            'position_nbr' => $del->position_nbr, 
-                            'date_deleted' => date('Y-m-d H:i:s', strtotime($now))
-                        ];
+                        // $old_values = [ 
+                        //     'table' => 'positions',                        
+                        //     'position_nbr' => $row->position_nbr, 
+                        //     'date_deleted' => $row->date_deleted
+                        // ];
+                        // $new_values = [ 
+                        //     'table' => 'positions', 
+                        //     'position_nbr' => $del->position_nbr, 
+                        //     'date_deleted' => date('Y-m-d H:i:s', strtotime($now))
+                        // ];
                         Position::whereRaw("position_nbr = '".$del->position_nbr."'")
                         ->update([
                             'date_deleted' => date('Y-m-d H:i:s', strtotime($now))
                         ]);
-                        $audit = new JobDataAudit;
-                        $audit->job_sched_id = $audit_id;
-                        $audit->old_values = json_encode($old_values);
-                        $audit->new_values = json_encode($new_values);
-                        $audit->save();
-                        DB::commit();
+                        // $audit = new JobDataAudit;
+                        // $audit->job_sched_id = $audit_id;
+                        // $audit->old_values = json_encode($old_values);
+                        // $audit->new_values = json_encode($new_values);
+                        // $audit->save();
+                        \DB::commit();
                         $count_delete += 1;
                     } catch (Exception $e) {
                         echo 'Unable to update (delete) for Posn # '.$del->position_nbr.'.'; echo "\r\n";
-                        DB::rollback();
+                        \DB::rollback();
                     }
                 }
             }
 
             $end_time = Carbon::now();
-            DB::table('job_sched_audit')->updateOrInsert(
+            \DB::table('job_sched_audit')->updateOrInsert(
                 [
                 'id' => $audit_id
                 ],

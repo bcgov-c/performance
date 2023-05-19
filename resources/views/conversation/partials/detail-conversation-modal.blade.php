@@ -363,13 +363,13 @@ function updateConversation(conversation_id) {
                         <?php if ($type == 'past'){ ?>
                         if(is_locked) {
                             $('#emp-signoff-row').hide();
-                            $('#employee-signoff-message').hide();
+                            $('#employee-signoff-message').show();
                             $('#sup-signoff-row').hide();
-                            $('#supervisor-signoff-message').hide();
+                            $('#supervisor-signoff-message').show();
                             $('#emp-unsignoff-row').hide();
-                            $('#employee-unsignoff-message').hide();
+                            $('#employee-unsignoff-message').show();
                             $('#sup-unsignoff-row').hide();
-                            $('#supervisor-unsignoff-message').hide();
+                            $('#supervisor-unsignoff-message').show();
                         }
                         <?php } ?>
                         
@@ -463,9 +463,9 @@ function updateConversation(conversation_id) {
                            $('#tip-info-comment4').html('<b>Career Goal Statement (Optional)</b>');
                            $('#desc-info-comment4').html('Your personal vision for the future of your career.');
                            $('#tip-info-comment7').html('<b>Strengths (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate areas of strength to build on for career advancement."> </i>');
-                           $('#desc-info-comment7').html('Identity your top 1 to 3 strengths.');
+                           $('#desc-info-comment7').html('Identify your top 1 to 3 strengths.');
                            $('#tip-info-comment8').html('<b>Areas for Growth (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate areas for growth in the short to medium term to assist with career advancement."> </i>');
-                           $('#desc-info-comment8').html('Identity 1 to 3 areas you\'d most like to grow.');
+                           $('#desc-info-comment8').html('Identify 1 to 3 areas you\'d most like to grow.');
                            $('#tip-info-comment9').html('<b>Additional Comments (optional)</b>');
                            $('#tip-info-comment10').html('<b>Action Items (optional)</b> <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="Indicate follow-up activities and areas for further discussion. Consider creating a goal in My Goals to track progress."> </i>');
                            $('#desc-info-comment10').html('Caputre actions to take as a result of this conversation.');
@@ -539,6 +539,14 @@ function updateConversation(conversation_id) {
                             $("#signoff-form-block").hide();
                         }
                         */
+                        
+                        //sign off time's
+                        if(result.signoff_user_id && result.sign_off_time){
+                            $(".emp-time").html(" at " + result.sign_off_time);
+                        }
+                        if(result.supervisor_signoff_id && result.supervisor_signoff_time){
+                            $(".sup-time").html(" at " + result.supervisor_signoff_time);
+                        }
 
                         //Additional Info to Capture
                         if (result.conversation_topic_id == 1) {
