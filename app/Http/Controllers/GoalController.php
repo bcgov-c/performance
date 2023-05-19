@@ -860,16 +860,18 @@ class GoalController extends Controller
                 $query->where('user_id', Auth::id());
             })
             ->with('user')
+            ->whereNull('display_name')        
             ->groupBy('user_id')
             ->get()
             ->pluck('user')
             ->toArray();
-            
+       
         $display_names = DB::table('goals')
                     ->select('display_name')
                     ->distinct()
                     ->pluck('display_name')
                     ->toArray();
+        
         $i = count($createdBy) + 1;
         foreach($display_names as $display_name){
             if($display_name != ''){
@@ -878,7 +880,9 @@ class GoalController extends Controller
             }
             $i++;
         }
-       
+        usort($createdBy, function($a, $b) {
+            return strcmp($a["name"], $b["name"]);
+        });
         
         array_unshift($createdBy , [
             "id" => "0",
