@@ -870,11 +870,9 @@ class GoalController extends Controller
             ]
         ];
         $createdBy = Goal::withoutGlobalScope(NonLibraryScope::class)
-            //->where('is_library', true)
-            ->whereHas('sharedWith', function($query) {
-                $query->where('user_id', Auth::id());
-            })
+            ->where('is_library', true)
             ->with('user')
+            ->where('user_id', Auth::id())    
             ->whereNull('display_name')
             ->whereNull('deleted_at')        
             ->groupBy('user_id')
