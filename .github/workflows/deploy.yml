@@ -347,11 +347,11 @@ jobs:
                 -p DB_SERVICE_NAME=mysql-training-0.mysql-training-h \
                 -p PERFORMANCE_VOLUME_CAPACITY=4Gi \
                 -p DB_NAME=performance-db-training \
-                -p DB_USER=root\
+                -p DB_USER=performance-training\
                 -p HTTP_PORT=8000 \
                 -p DB_PORT=3306 \
                 -p SITE_NAME=Performance-Training \
-                -p DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+                -p DB_PASSWORD="${{ secrets.DB_PASSWORD_TRAINING }}" \
                 -p GIT_PROJECT=performance-training \
                 -p BUILD_NAMESPACE="332842-tools" \
                 -p IMAGE_STREAM_TAG="performance:training" \
