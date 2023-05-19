@@ -55,7 +55,6 @@
 		<br>
 
 		<input type="hidden" id="selected_org_nodes" name="selected_org_nodes" value="">
-		<input type="hidden" id="selected_inherited" name="selected_inherited" value="">
 
 		@include('shared.goalbank.partials.filter2')
 
@@ -161,7 +160,6 @@
 			let g_matched_employees = {!!json_encode($matched_emp_ids)!!};
 			let g_selected_employees = {!!json_encode($old_selected_emp_ids)!!};
 			let g_selected_orgnodes = {!!json_encode($old_selected_org_nodes)!!};
-			let g_selected_inherited = {!! json_encode($old_selected_inherited) !!};
 			let g_employees_by_org = [];
 
 			function confirmSaveChangesModal(){
@@ -204,15 +202,22 @@
 							}
 						},
 						columns: [
-							{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', searchable: true, className: 'dt-nowrap'},
-							{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', searchable: true, className: 'dt-nowrap'},
-							{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', searchable: true, className: 'dt-nowrap'},
-							{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', searchable: true, className: 'dt-nowrap'},
-							{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true, className: 'dt-nowrap'},
-							{title: 'Inherited', ariaTitle: 'Inherited', target: 0, type: 'string', data: 'inherited', name: 'inherited', searchable: false},
-							{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false, className: 'dt-nowrap'},
-							{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id', name: 'goal_id', searchable: false, visible: false, className: 'dt-nowrap'},
-							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'num', data: 'id', name: 'id', searchable: false, visible: false, className: 'dt-nowrap'},
+							{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization'
+								, name: 'organization', searchable: true, className: 'dt-nowrap'},
+							{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program'
+								, name: 'level1_program', searchable: true, className: 'dt-nowrap'},
+							{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division'
+								, name: 'level2_division', searchable: true, className: 'dt-nowrap'},
+							{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch'
+								, name: 'level3_branch', searchable: true, className: 'dt-nowrap'},
+							{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4'
+								, name: 'level4', searchable: true, className: 'dt-nowrap'},
+							{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action'
+								, name: 'action', orderable: false, searchable: false, className: 'dt-nowrap'},
+							{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id'
+								, name: 'goal_id', searchable: false, visible: false, className: 'dt-nowrap'},
+							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'num', data: 'id'
+								, name: 'id', searchable: false, visible: false, className: 'dt-nowrap'},
 						]
 					}
 				);
@@ -253,7 +258,6 @@
 								{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', searchable: true},
 								{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', searchable: true},
 								{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true},
-								{title: 'Inherited', ariaTitle: 'Inherited', target: 0, type: 'string', data: 'inherited', name: 'inherited', searchable: false},
 								{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},
 								{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id', name: 'goal_id', searchable: false, visible: false},
 							]
@@ -312,17 +316,22 @@
 				});
 
 				$('#notify-form').submit(function() {
+					// console.log('Search Button Clicked');			
 					// assign back the selected employees to server
 					var text = JSON.stringify(g_selected_employees);
 					$('#selected_emp_ids').val( text );
 					var text2 = JSON.stringify(g_selected_orgnodes);
 					$('#selected_org_nodes').val( text2 );
-					var text3 = JSON.stringify(g_selected_inherited);
-					$('#selected_inherited').val( text3 );
 					return true; // return false to cancel form action
 				});
 
-				// Tab  -- LIST Page  activate
+				// CKEDITOR.replace('what', {
+				// 	toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ],disableNativeSpellChecker: false});
+
+				// CKEDITOR.replace('measure_of_success', {
+				// 	toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ],disableNativeSpellChecker: false});
+
+			// Tab  -- LIST Page  activate
 				$("#nav-list-tab").on("click", function(e) {
 					table  = $('#employee-list-table').DataTable();
 					table.rows().invalidate().draw();
@@ -337,7 +346,7 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                					url: '{{ "/".request()->segment(1)."/goalbank/org-tree/1" }}',
+                					url: '{{ "/" . request()->segment(1) . "/goalbank/org-tree" }}',
                                     type: 'GET',
                                     data: $("#notify-form").serialize(),
                                     dataType: 'html',
@@ -348,7 +357,7 @@
                                         $(target).html(''); 
                                         $(target).html(result);
 
-                                        $('#nav-tree').attr('loaded', 'loaded');
+                                        $('#nav-tree').attr('loaded','loaded');
                                     },
                                     complete: function() {
                                         $(".tree-loading-spinner").hide();
@@ -410,6 +419,7 @@
 
 				function eredrawTreeCheckboxes() {
 					// redraw the selection 
+					//console.log('eredraw triggered');
 					enodes = $('#eaccordion-level0 input:checkbox');
 					$.each( enodes, function( index, chkbox ) {
 						if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
@@ -557,8 +567,7 @@
 						// To do -- ajax called to load the tree
 						$.when( 
 							$.ajax({
-								url: '{{ "/".request()->segment(1)."/goalbank/org-tree/2" }}',
-                				// url: '{{ "/".request()->segment(1)."/goalbank/eorg-tree" }}',
+                				url: '{{ "/" . request()->segment(1) . "/goalbank/eorg-tree" }}',
 								type: 'GET',
 								data: $("#notify-form").serialize(),
 								dataType: 'html',
@@ -566,19 +575,23 @@
 								beforeSend: function() {
 									$("#etree-loading-spinner").show();                    
 								},
+
 								success: function (result) {
 									$('#enav-tree').html(''); 
 									$('#enav-tree').html(result);
 									$('#enav-tree').attr('loaded','loaded');
 								},
+
 								complete: function() {
 									$("#etree-loading-spinner").hide();
 								},
+
 								error: function () {
 									alert("error");
 									$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
 								}
 							})
+							
 						).then(function( data, textStatus, jqXHR ) {
 							//alert( jqXHR.status ); // Alerts 200
 							enodes = $('#eaccordion-level0 input:checkbox');
@@ -588,6 +601,7 @@
 						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
 					}
 				});
+
 			});
 
 			$(window).on('beforeunload', function(){

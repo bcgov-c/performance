@@ -52,80 +52,35 @@ class PopulateAuthUsers extends Command
             'status' => $status
           ]
         );
-
-        $now = date('Y-m-d H:i:s', strtotime($start_time));
-
-        $count_del = \DB::table('auth_users AS au')->whereRaw("type = 'HR'")->count();
-        \DB::statement("
+          \DB::statement("
             DELETE 
             FROM auth_users 
             WHERE type = 'HR'
         ");
-        $this->info(Carbon::now()->format('c')." - Deleted {$count_del} HR entries.");
 
         \DB::statement("
-            INSERT INTO auth_users (type, auth_id, user_id, created_at, updated_at) (
+            INSERT INTO auth_users (
                 SELECT DISTINCT
                     'HR',
-                    ao.user_id AS auth_id,
-                    u.id AS user_id,
-                    '{$now}',
-                    '{$now}'
+                    o.user_id as auth_id,
+                    u.id as user_id,
+                    now()
                 FROM 
-                    users 
-                        AS u 
-                    INNER JOIN employee_demo 
-                        AS ed 
-                        USE INDEX(idx_employee_demo_employee_id_date_deleted)
-                        ON ed.employee_id = u.employee_id 
-                            AND ed.date_deleted IS NULL
-                    INNER JOIN admin_orgs 
-                        AS ao
-                        ON ao.version = 2
-                            AND inherited = 0
-                            AND ao.orgid = ed.orgid
-            )
-        ");
-        $count_direct = \DB::table('auth_users AS au')->whereRaw("type = 'HR'")->count();
-        $this->info(Carbon::now()->format('c')." - Inserted {$count_direct} HR Admin explicitly assigned users.");
-
-        \DB::statement("
-            INSERT INTO auth_users (type, auth_id, user_id, created_at, updated_at) (
-                SELECT DISTINCT
-                    'HR',
-                    aotv.user_id AS auth_id,
-                    u.id AS user_id,
-                    '{$now}',
-                    '{$now}'
-                FROM 
-                    users 
-                        AS u 
-                    INNER JOIN employee_demo 
-                        AS ed 
-                        USE INDEX(idx_employee_demo_employee_id_date_deleted)
-                        ON ed.employee_id = u.employee_id 
-                            AND ed.date_deleted IS NULL
-                    INNER JOIN employee_demo_tree
-                        AS edt
-                        ON edt.id = ed.orgid
-                    INNER JOIN admin_org_tree_view 
-                        AS aotv 
-                        ON aotv.version = 2 
-                            AND aotv.inherited = 1
-                            AND (
-                                (aotv.level = 0 AND aotv.organization_key = edt.organization_key)  OR
-                                (aotv.level = 1 AND aotv.level1_key = edt.level1_key) OR
-                                (aotv.level = 2 AND aotv.level2_key = edt.level2_key) OR
-                                (aotv.level = 3 AND aotv.level3_key = edt.level3_key) OR
-                                (aotv.level = 4 AND aotv.level4_key = edt.level4_key)
-                              )
+                    users as u,
+                    employee_demo d,
+                    admin_orgs o
                 WHERE 
-                    NOT EXISTS (SELECT DISTINCT 1 FROM auth_users WHERE type = 'HR' AND auth_id = aotv.user_id AND user_id = u.id)
+                    u.employee_id = d.employee_id
+                    AND (o.organization = d.organization OR ((TRIM(o.organization) = '' OR o.organization IS NULL) AND (d.organization = '' OR d.organization IS NULL))) 
+                    AND (o.level1_program = d.level1_program OR ((TRIM(o.level1_program) = '' OR o.level1_program IS NULL) AND (d.level1_program = '' OR d.level1_program IS NULL))) 
+                    AND (o.level2_division = d.level2_division OR ((TRIM(o.level2_division) = '' OR o.level2_division IS NULL) AND (d.level2_division = '' OR d.level2_division IS NULL))) 
+                    AND (o.level3_branch = d.level3_branch OR ((TRIM(o.level3_branch) = '' OR o.level3_branch IS NULL) AND (d.level3_branch = '' OR d.level3_branch IS NULL)))
+                    AND (o.level4 = d.level4 OR ((TRIM(o.level4) = '' OR o.level4 IS NULL) AND (d.level4 = '' OR d.level4 IS NULL)))
+                ORDER BY 
+                    o.id, 
+                    u.id
             )
         ");
-        $count_total = \DB::table('auth_users AS au')->whereRaw("type = 'HR'")->count();
-        $count_inherited = $count_total - $count_direct;
-        $this->info(Carbon::now()->format('c')." - Inserted {$count_inherited} HR Admin inherited users.");
 
         $end_time = Carbon::now()->format('c');
         DB::table('job_sched_audit')->updateOrInsert(
@@ -137,7 +92,6 @@ class PopulateAuthUsers extends Command
             'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
             'end_time' => date('Y-m-d H:i:s', strtotime($end_time)),
             'status' => 'Completed',
-            'details' => "Deleted {$count_del} rows.  Inserted {$count_total} ({$count_direct} + {$count_inherited}) rows."
           ]
         );
   

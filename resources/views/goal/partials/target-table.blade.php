@@ -4,23 +4,25 @@
 
   <thead>
     <tr>
-      <th scope="col"><a href="javascript:sort('title');">Title</a></th>
+        <th scope="col"><a href="javascript:sort('title');">Title</a></th>
       <th scope="col"><a href="javascript:sort('goal_type_id');">Goal Type</a></th>
       <th scope="col"><a href="javascript:sort('tagnames');">Tags</a></th>
       <th scope="col"><a href="javascript:sort('start_date');">Start Date</a></th>
       <th scope="col"><a href="javascript:sort('target_date');">End Date</a></th>
       @if ($type == 'current')
+      @if(!session()->has('view-profile-as')) 
+      @if(session()->has('has_employees') > 0 && (request()->is('goal/current') || request()->is('goal/goalbank')))
       <th scope="col">Shared With</th>
       @endif
-      <th scope="col"><a href="javascript:sort('status');">Status</a>
-      <i class="fa fa-info-circle" id="status_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="<ul><li><b>Active</b>: currently in progress or scheduled for a future date</li><li><b>Achieved</b>: supervisor and employee agree objectives met</li><li><b>Archived</b>: cancelled, deferred or no longer relevant to your work but you want to save for future reference</li></ul>You can delete goals that do not meet any of the above criteria"></i>				
-      </th>
+      @endif
+      @endif
+      <th scope="col"><a href="javascript:sort('status');">Status</a></th>
       <th> </th>
     </tr>
   </thead>
   <tbody>
    @foreach ($goals as $goal)
-   <tr  data-goal-id="{{$goal->id}}">
+   <tr>
       <th scope="row"  onclick="window.location.href = '{{route("goal.show", $goal->id)}}';" style="cursor: pointer">
         <a href="{{route("goal.show", $goal->id)}}">
           {{ $goal->title }}
@@ -48,18 +50,16 @@
       </td>
       <td >{{ $goal->target_date_human }}</td>
       @if ($type == 'current')
-      <td>  
-        <select multiple class="form-control share-with-users"  name="share_with_users[]">
-            <?php if($goal->shared_user_id != '' && $goal->shared_user_name != ''){
-                $share_user_id_arr = explode(',', $goal->shared_user_id);
-                $share_user_name_arr = explode(',', $goal->shared_user_name);
-                for ($i=0; $i<count($share_user_id_arr); $i++){
-                    echo "<option value='".$share_user_id_arr[$i]."'  selected>".$share_user_name_arr[$i]."</option>";                    
-                }
-            }?>
-            
-        </select>
+      @if(!session()->has('view-profile-as')) 
+      @if(session()->has('has_employees') > 0 && (request()->is('goal/current') || request()->is('goal/goalbank')))
+      <td>       
+                <div>
+                @php $noLabel = true @endphp    
+                @include('goal.partials.goal-share-with-dropdown')
+                </div>    
       </td>
+      @endif      
+      @endif
       @endif
       <td>
         @include('goal.partials.status-change')

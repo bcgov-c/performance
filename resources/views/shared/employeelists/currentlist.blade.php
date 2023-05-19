@@ -17,10 +17,10 @@
     </div>   
 
     @push('css')
-        <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
-        <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-        <link href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" >
+        <link href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/buttons/2.3.2/css/buttons.dataTables.min.css" rel="stylesheet">
         <x-slot name="css">
             <style>
                 .text-truncate-30 {
@@ -51,43 +51,42 @@
 
     @push('js')
         <!-- <script src="https://code.jquery.com/jquery-3.5.1.js"></script> -->
-        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
-        <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
-        <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap4.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.3.2/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.html5.min.js"></script>
         <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
         <script type="text/javascript">
             $(document).ready(function() {
                 $('#listtable').DataTable ( {
-                    dom: 'lfrtip',
-                    // buttons: {
-                    //     buttons: [
-                    //         // {
-                    //         //     extend: "copy",
-                    //         //     text: "Copy to Clipboard",
-                    //         //     exportOptions:  {
-                    //         //         columns: ':visible',
-                    //         //         modifier: {
-                    //         //             page: 'all',
-                    //         //             search: 'none',
-                    //         //         },
-                    //         //     },
-                    //         // },
-                    //         {
-                    //             extend: "csv",
-                    //             text: "Export Displayed",
-                    //             exportOptions:  {
-                    //                 columns: ':visible',
-                    //                 modifier: {
-                    //                     page: 'all',
-                    //                     search: 'none',
-                    //                 },
-                    //             },
-                    //         },
-                    //         'colvis'
-                    //     ],
-                    // },
-
+                    dom: 'lfBrtip',
+                    buttons: {
+                        buttons: [
+                            // {
+                            //     extend: "copy",
+                            //     text: "Copy to Clipboard",
+                            //     exportOptions:  {
+                            //         columns: ':visible',
+                            //         modifier: {
+                            //             page: 'all',
+                            //             search: 'none',
+                            //         },
+                            //     },
+                            // },
+                            {
+                                extend: "csv",
+                                text: "Export Displayed",
+                                exportOptions:  {
+                                    columns: ':visible',
+                                    modifier: {
+                                        page: 'all',
+                                        search: 'none',
+                                    },
+                                },
+                            },
+                            'colvis'
+                        ],
+                    },
                     serverSide: true,
                     searching: true,
                     processing: true,
@@ -98,7 +97,6 @@
                     scroller: true,
                     scrollX: true,
                     stateSave: true,
-
                     ajax: 
                     {
                         url: "{{ route(request()->segment(1).'.employeelists.getcurrentlist') }}",
@@ -117,7 +115,6 @@
                     [
                         {title: 'Employee ID', ariaTitle: 'Employee ID', target: 0, type: 'string', data: 'employee_id', name: 'u.employee_id', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'u.employee_name', searchable: false, className: 'dt-nowrap show-modal'},
-                        {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'user_name', name: 'u.user_name', searchable: false, visible: false, className: 'dt-nowrap show-modal'},
                         {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'u.employee_email', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'Position #', ariaTitle: 'Position #', target: 0, type: 'string', data: 'position_number', name: 'u.position_number', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'Reports To Name', ariaTitle: 'Reports To Name', target: 0, type: 'string', data: 'reporting_to_name', name: 'u.reporting_to_name', searchable: false, className: 'dt-nowrap show-modal'},
@@ -141,22 +138,10 @@
                 } );
 
                 // add export button on right
-                $("#listtable_filter").append("<button id='export-btn' value='export' class='dt-button buttons-csv buttons-html5'>Export</button> ");
+                $("#listtable_filter").append('<button id="export-btn" value="export" class="dt-button buttons-csv buttons-html5">Export All Rows</button> ');
 
                 $('#export-btn').on('click', function() {
-                    let parray = [
-                        ['dd_level0', $('#dd_level0').val()], 
-                        ['dd_level1', $('#dd_level1').val()],
-                        ['dd_level2', $('#dd_level2').val()],
-                        ['dd_level3', $('#dd_level3').val()],
-                        ['dd_level4', $('#dd_level4').val()],
-                        ['criteria', $('#criteria').val()],
-                        ['search_text', $('#search_text').val()],
-                    ];
-                    // export_url = '{{ route("sysadmin.employeelists.export-current") }}';
-                    // export_url = "{{ route('sysadmin.employeelists.export-current', ':parray') }}";
-                    // export_url = export_url.replace(':parray', parray);
-                    var export_url = "{{ route('sysadmin.employeelists.export-current') }}";
+                    export_url = '{{ route("sysadmin.employeelists.export-current") }}';
                     let _url = export_url;
                     window.location.href = _url;
                 });

@@ -197,7 +197,7 @@
 
 <x-slot name="css">
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 
 <style>
 .select2-selection--multiple{
@@ -219,8 +219,8 @@
 
 <x-slot name="js">
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
 <script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
 
 <script>            
@@ -391,7 +391,7 @@ $(function() {
 		placeholder: 'select organization',
 		allowClear: true,
 		ajax: {
-			url: '/sysadmin/org-list/1/0'
+			url: '/hradmin/notifications/org-organizations'
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -413,7 +413,7 @@ $(function() {
 		placeholder: 'select level 1',
 		allowClear: true,
 		ajax: {
-			url: '/sysadmin/org-list/1/1' 
+			url: '/hradmin/notifications/org-programs' 
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -436,7 +436,7 @@ $(function() {
 		placeholder: 'select level 2',
 		allowClear: true,
 		ajax: {
-			url: '/sysadmin/org-list/1/2' 
+			url: '/hradmin/notifications/org-divisions' 
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -460,7 +460,7 @@ $(function() {
 		placeholder: 'select level 3',
 		allowClear: true,
 		ajax: {
-			url: '/sysadmin/org-list/1/3' 
+			url: '/hradmin/notifications/org-branches' 
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -485,7 +485,7 @@ $(function() {
 		placeholder: 'select level 4',
 		allowClear: true,
 		ajax: {
-			url: '/sysadmin/org-list/1/4' 
+			url: '/hradmin/notifications/org-level4' 
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {

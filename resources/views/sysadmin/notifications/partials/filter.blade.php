@@ -123,7 +123,7 @@
         placeholder: 'select organization',
         allowClear: true,
         ajax: {
-            url: '/sysadmin/org-list/1/0'
+            url: '/sysadmin/notifications/org-organizations'
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -145,7 +145,7 @@
         placeholder: 'select program',
         allowClear: true,
         ajax: {
-            url: '/sysadmin/org-list/1/1' 
+            url: '/sysadmin/notifications/org-programs' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -168,7 +168,7 @@
         placeholder: 'select division',
         allowClear: true,
         ajax: {
-            url: '/sysadmin/org-list/1/2' 
+            url: '/sysadmin/notifications/org-divisions' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -192,7 +192,7 @@
         placeholder: 'select branch',
         allowClear: true,
         ajax: {
-            url: '/sysadmin/org-list/1/3' 
+            url: '/sysadmin/notifications/org-branches' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -217,7 +217,7 @@
         placeholder: 'select level 4',
         allowClear: true,
         ajax: {
-            url: '/sysadmin/org-list/1/4' 
+            url: '/sysadmin/notifications/org-level4' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {

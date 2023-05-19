@@ -340,7 +340,7 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                					url: '{{ "/" . request()->segment(1) . "/excuseemployees/org-tree/1" }}'
+                					url: '{{ "/" . request()->segment(1) . "/excuseemployees/org-tree" }}'
 									, type: 'GET'
 									, data: $("#notify-form").serialize()
 									, dataType: 'html'
@@ -532,7 +532,7 @@
 					// To do -- ajax called to load the tree
 					$.when( 
 						$.ajax({
-                			url: '{{ "/" . request()->segment(1) . "/excuseemployees/org-tree/2" }}',
+                			url: '{{ "/" . request()->segment(1) . "/excuseemployees/org-tree" }}',
 							, type: 'GET'
 							, data: $("#notify-form").serialize()
 							, dataType: 'html'

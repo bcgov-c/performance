@@ -62,10 +62,6 @@ class Kernel extends ConsoleKernel
         ->timezone('America/Vancouver')
         ->dailyAt('01:00');
   
-        $schedule->command('command:PopulateAuthOrgs')
-        ->timezone('America/Vancouver')
-        ->dailyAt('01:05');
-  
         $schedule->command('command:SetNextLevelManager')
         ->timezone('America/Vancouver')
         ->dailyAt('01:15');
@@ -87,17 +83,9 @@ class Kernel extends ConsoleKernel
         ->timezone('America/Vancouver')
         ->dailyAt('03:00');
   
-        $schedule->command('command:PopulateUsersAnnexTable')
-        ->timezone('America/Vancouver')
-        ->dailyAt('04:00');
-  
         $schedule->command('command:CleanShareProfile')
         ->timezone('America/Vancouver')    
         ->dailyAt('05:00');
-        
-        $schedule->command('command:MaintainLogs')
-        ->timezone('America/Vancouver')    
-        ->dailyAt('06:00');
         
         $schedule->command('notify:daily')
         ->dailyAt('08:00')

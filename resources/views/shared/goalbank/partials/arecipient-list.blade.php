@@ -21,7 +21,7 @@
 
 @push('css')
 
-    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 	<style>
 	#aemployee-list-table_filter label {
 		text-align: right !important;
@@ -31,8 +31,8 @@
 @endpush
 
 @push('js')
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
@@ -49,8 +49,7 @@
                 select: true,
                 order: [[1, 'asc']],
                 ajax: {
-                    url: '/'+'{{ request()->segment(1) }}'+'/goalbank/employee-list/a',
-
+                    url: '{{ route(request()->segment(1).'.goalbank.aemployee.list') }}',
                     data: function (d) {
                         d.add_level0 = $('#add_level0').val();
                         d.add_level1 = $('#add_level1').val();

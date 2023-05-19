@@ -1,4 +1,5 @@
 <div class="card p-3">
+       
         <div class="form-row">
           <div class="form-group col-md-4">
             <label for="dd_level0">Organization</label>
@@ -97,7 +98,7 @@
         placeholder: 'select organization',
         allowClear: true,
         ajax: {
-            url: '/hradmin/org-list/1/0'
+            url: '/hradmin/statistics/org-organizations'
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -119,7 +120,7 @@
         placeholder: 'select level 1',
         allowClear: true,
         ajax: {
-            url: '/hradmin/org-list/1/1' 
+            url: '/hradmin/statistics/org-programs' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -142,7 +143,7 @@
         placeholder: 'select level 2',
         allowClear: true,
         ajax: {
-            url: '/hradmin/org-list/1/2' 
+            url: '/hradmin/statistics/org-divisions' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -166,7 +167,7 @@
         placeholder: 'select level 3',
         allowClear: true,
         ajax: {
-            url: '/hradmin/org-list/1/3' 
+            url: '/hradmin/statistics/org-branches' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -191,7 +192,7 @@
         placeholder: 'select level 4',
         allowClear: true,
         ajax: {
-            url: '/hradmin/org-list/1/4' 
+            url: '/hradmin/statistics/org-level4' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -247,6 +248,9 @@
         $('#dd_level2').val(null).trigger('change');
         $('#dd_level3').val(null).trigger('change');
         $('#dd_level4').val(null).trigger('change');
+        // $('#job_titles').val(null).trigger('change');
+        // $('#active_since').val(null);
+        // $('#search_text').val(null);
         
         $( "#filter-form" ).submit();
     });

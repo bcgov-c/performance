@@ -15,25 +15,22 @@ use App\Http\Controllers\HRAdmin\HRAdminSharedController;
 
 Route::group(['middleware' => ['role:HR Admin']], function () 
 {
-    //Shared functions v3.0
-    Route::get('/hradmin/org-list/{index}/{level}', [HRAdminSharedController::class,'getOrganizationList']);
-
     //Shared functions v2.0
     Route::get('/hradmin/org-organizations2', [HRAdminSharedController::class,'getOrganizationsV2']);
     Route::get('/hradmin/org-programs2', [HRAdminSharedController::class,'getProgramsV2']);
     Route::get('/hradmin/org-divisions2', [HRAdminSharedController::class,'getDivisionsV2']);
     Route::get('/hradmin/org-branches2', [HRAdminSharedController::class,'getBranchesV2']);
     Route::get('/hradmin/org-level42', [HRAdminSharedController::class,'getLevel4V2']);
-    Route::get('/hradmin/eorg-organizations2', [HRAdminSharedController::class,'egetOrganizationsV2']);
-    Route::get('/hradmin/eorg-programs2', [HRAdminSharedController::class,'egetProgramsV2']);
-    Route::get('/hradmin/eorg-divisions2', [HRAdminSharedController::class,'egetDivisionsV2']);
-    Route::get('/hradmin/eorg-branches2', [HRAdminSharedController::class,'egetBranchesV2']);
-    Route::get('/hradmin/eorg-level42', [HRAdminSharedController::class,'egetLevel4V2']);
-    Route::get('/hradmin/aorg-organizations2', [HRAdminSharedController::class,'agetOrganizationsV2']);
-    Route::get('/hradmin/aorg-programs2', [HRAdminSharedController::class,'agetProgramsV2']);
-    Route::get('/hradmin/aorg-divisions2', [HRAdminSharedController::class,'agetDivisionsV2']);
-    Route::get('/hradmin/aorg-branches2', [HRAdminSharedController::class,'agetBranchesV2']);
-    Route::get('/hradmin/aorg-level42', [HRAdminSharedController::class,'agetLevel4V2']);
+    // Route::get('/hradmin/eorg-organizations2', [HRAdminSharedController::class,'egetOrganizationsV2']);
+    // Route::get('/hradmin/eorg-programs2', [HRAdminSharedController::class,'egetProgramsV2']);
+    // Route::get('/hradmin/eorg-divisions2', [HRAdminSharedController::class,'egetDivisionsV2']);
+    // Route::get('/hradmin/eorg-branches2', [HRAdminSharedController::class,'egetBranchesV2']);
+    // Route::get('/hradmin/eorg-level42', [HRAdminSharedController::class,'egetLevel4V2']);
+    // Route::get('/hradmin/aorg-organizations2', [HRAdminSharedController::class,'agetOrganizationsV2']);
+    // Route::get('/hradmin/aorg-programs2', [HRAdminSharedController::class,'agetProgramsV2']);
+    // Route::get('/hradmin/aorg-divisions2', [HRAdminSharedController::class,'agetDivisionsV2']);
+    // Route::get('/hradmin/aorg-branches2', [HRAdminSharedController::class,'agetBranchesV2']);
+    // Route::get('/hradmin/aorg-level42', [HRAdminSharedController::class,'agetLevel4V2']);
     
     //Shared functions
     Route::get('/hradmin/org-organizations', [HRAdminSharedController::class,'getOrganizations']);
@@ -57,6 +54,8 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('hradmin/myorg', [MyOrganizationController::class, 'index'])->name('hradmin.myorg');
         Route::get('hradmin/myorg/myorganization', [MyOrganizationController::class, 'getList'])->name('hradmin.myorg.myorganization');
         Route::post('hradmin/myorg/myorganization', [MyOrganizationController::class, 'index'])->name('hradmin.myorg.myorganization');
+
+        Route::get('/hradmin/myorg/org-tree', [MyOrganizationController::class,'loadOrganizationTree']);
     });
 
     //Goal Bank
@@ -87,9 +86,17 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('/hradmin/goalbank/savenewgoal', [GoalBankController::class, 'savenewgoal'])->name('hradmin.goalbank.savenewgoalget');
         Route::post('/hradmin/goalbank/savenewgoal', [GoalBankController::class, 'savenewgoal'])->name('hradmin.goalbank.savenewgoal');
         
-        Route::get('/hradmin/goalbank/org-tree/{index}', [GoalBankController::class,'loadOrganizationTree']);
-        Route::get('/hradmin/goalbank/employees/{id}/{option?}', [GoalBankController::class,'getEmployees'])->name('hradmin.goalbank.getEmployees');
-        Route::get('/hradmin/goalbank/employee-list/{option?}', [GoalBankController::class, 'getDatatableEmployees'])->name('hradmin.goalbank.employee.list');
+        Route::get('/hradmin/goalbank/org-tree', [GoalBankController::class,'loadOrganizationTree']);
+        Route::get('/hradmin/goalbank/employees/{id}', [GoalBankController::class,'getEmployees']);
+        Route::get('/hradmin/goalbank/employee-list', [GoalBankController::class, 'getDatatableEmployees'])->name('hradmin.goalbank.employee.list');
+
+        Route::get('/hradmin/goalbank/aorg-tree', [GoalBankController::class,'aloadOrganizationTree']);
+        Route::get('/hradmin/goalbank/aemployees/{id}', [GoalBankController::class,'agetEmployees']);
+        Route::get('/hradmin/goalbank/aemployee-list', [GoalBankController::class, 'agetDatatableEmployees'])->name('hradmin.goalbank.aemployee.list');
+
+        Route::get('/hradmin/goalbank/eorg-tree', [GoalBankController::class,'eloadOrganizationTree']);
+        Route::get('/hradmin/goalbank/eemployees/{id}', [GoalBankController::class,'egetEmployees']);
+        Route::get('/hradmin/goalbank/eemployee-list', [GoalBankController::class, 'egetDatatableEmployees'])->name('hradmin.goalbank.eemployee.list');
 
         Route::get('/hradmin/goalbank/managegoals', [GoalBankController::class, 'manageindex'])->name('hradmin.goalbank.manageindex');
         Route::get('/hradmin/goalbank/managegetlist', [GoalBankController::class, 'managegetList'])->name('hradmin.goalbank.managegetlist');
@@ -113,9 +120,12 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('hradmin/employeeshares/manageindexviewshares/{id}', [EmployeeSharesController::class, 'manageindexviewshares']);
         Route::get('/hradmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('hradmin.employeeshares.deleteitemget');
         Route::delete('/hradmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('hradmin.employeeshares.deleteitem');
-        Route::get('/hradmin/employeeshares/org-tree/{index}', [EmployeeSharesController::class,'loadOrganizationTree']);
-        Route::get('/hradmin/employeeshares/employee-list/{index}', [EmployeeSharesController::class, 'getDatatableEmployees']);
-        Route::get('/hradmin/employeeshares/employees/{id}/{index}', [EmployeeSharesController::class,'getEmployees']);
+        Route::get('/hradmin/employeeshares/org-tree', [EmployeeSharesController::class,'loadOrganizationTree']);
+        Route::get('/hradmin/employeeshares/employee-list', [EmployeeSharesController::class, 'getDatatableEmployees'])->name('hradmin.employeeshares.employee.list');
+        Route::get('/hradmin/employeeshares/employees/{id}', [EmployeeSharesController::class,'getEmployees']);
+
+        Route::get('/hradmin/employeeshares/eorg-tree', [EmployeeSharesController::class,'eloadOrganizationTree']);
+        Route::get('/hradmin/employeeshares/eemployee-list', [EmployeeSharesController::class, 'egetDatatableEmployees'])->name('hradmin.employeeshares.eemployee.list');
     });
 
     //Excuse Employees
@@ -129,11 +139,14 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('/hradmin/excuseemployees/managehistory', [ExcuseEmployeesController::class, 'managehistory'])->name('hradmin.excuseemployees.managehistory');
         Route::get('/hradmin/excuseemployees/managehistorylist', [ExcuseEmployeesController::class, 'managehistorylist'])->name('hradmin.excuseemployees.managehistorylist');
 
+        Route::get('/hradmin/excuseemployees/manageindex', [ExcuseEmployeesController::class, 'manageindex'])->name('hradmin.excuseemployees.manageindex');
+        Route::get('/hradmin/excuseemployees/manageindexlist', [ExcuseEmployeesController::class, 'manageindexlist'])->name('hradmin.excuseemployees.manageindexlist');
+        Route::get('/hradmin/excuseemployees/manageindexedit/{id}', [ExcuseEmployeesController::class, 'manageindexedit'])->name('hradmin.excuseemployees.manageindexedit');
         Route::get('/hradmin/excuseemployees/manageindexupdate', [ExcuseEmployeesController::class, 'manageindexupdate'])->name('hradmin.excuseemployees.manageindexupdate');
         Route::post('/hradmin/excuseemployees/manageindexupdate', [ExcuseEmployeesController::class, 'manageindexupdate']);
         Route::get('/hradmin/excuseemployees/manageindexclear/{id}', [ExcuseEmployeesController::class, 'manageindexclear']);
 
-        Route::get('/hradmin/excuseemployees/org-tree/{index}', [ExcuseEmployeesController::class,'loadOrganizationTree']);
+        Route::get('/hradmin/excuseemployees/org-tree', [ExcuseEmployeesController::class,'loadOrganizationTree']);
         Route::get('/hradmin/excuseemployees/employees/{id}', [ExcuseEmployeesController::class,'getEmployees']);
     });
 
@@ -152,9 +165,7 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
     Route::get('/hradmin/statistics/goalsummary-export', [StatisticsReportController::class, 'goalSummaryExport'])->name('hradmin.statistics.goalsummary.export');
     Route::get('/hradmin/statistics/goalsummary-tag-export', [StatisticsReportController::class, 'goalSummaryTagExport'])->name('hradmin.statistics.goalsummary.tag.export');
     Route::get('/hradmin/statistics/conversationsummary', [StatisticsReportController::class, 'conversationsummary'])->name('hradmin.statistics.conversationsummary');
-    Route::get('/hradmin/statistics/conversationstatus', [StatisticsReportController::class, 'conversationstatus'])->name('hradmin.statistics.conversationstatus');
     Route::get('/hradmin/statistics/conversationsummary-export', [StatisticsReportController::class, 'conversationSummaryExport'])->name('hradmin.statistics.conversationsummary.export');
-    Route::get('/hradmin/statistics/conversationstatus-export', [StatisticsReportController::class, 'conversationStatusExport'])->name('hradmin.statistics.conversationstatus.export');
     Route::get('/hradmin/statistics/sharedsummary', [StatisticsReportController::class, 'sharedsummary'])->name('hradmin.statistics.sharedsummary');
     Route::get('/hradmin/statistics/sharedsummary-export', [StatisticsReportController::class, 'sharedSummaryExport'])->name('hradmin.statistics.sharedsummary.export');
     Route::get('/hradmin/statistics/excusedsummary', [StatisticsReportController::class, 'excusedsummary'])->name('hradmin.statistics.excusedsummary');

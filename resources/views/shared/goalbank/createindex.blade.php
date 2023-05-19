@@ -60,7 +60,7 @@
 					<p>
 						Each goal should include a description of <b>WHAT</b>  
 						<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".'> </i> you will accomplish, <b>WHY</b> 
-						<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important, and <b>HOW</b> 
+						<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important,, and <b>HOW</b> 
 						<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> you will achieve it. 
 					</p>
 					<x-textarea id="what" name="what"/>
@@ -245,8 +245,8 @@
 	<x-slot name="js">
 		<script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
 		<script src="//cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
-		<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-		<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+		<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+		<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
 		
 
 		<script>				
@@ -324,17 +324,9 @@
 				switchTree();
                                 
                                 
-				$( "#btn_send" ).click(function() {
-					$('#saveGoalModal').modal('toggle');
-				});
-
-				function navTreeActive() {
-					return $('#nav-tree').attr('class').search(/active/i) > 0 ?? false;
-				}
-
-				function navListActive() {
-					return $('#nav-list').attr('class').search(/active/i) > 0 ?? false;
-				}
+                                $( "#btn_send" ).click(function() {
+                                    $('#saveGoalModal').modal('toggle');
+                                });
 
 				function switchTree(){
 					if($('#opt_audience2').prop('checked')) {
@@ -392,8 +384,6 @@
 					$('#selected_emp_ids').val( text );
 					var text2 = JSON.stringify(g_selected_orgnodes);
 					$('#selected_org_nodes').val( text2 );
-					var text3 = JSON.stringify(g_selected_inherited);
-					$('#selected_inherited').val( text3 );
 					return true; // return false to cancel form action
 				});
 
@@ -418,49 +408,36 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                					url: '{{ "/".request()->segment(1)."/goalbank/org-tree/1" }}',
+                					url: '{{ "/" . request()->segment(1) . "/goalbank/org-tree" }}',
                                     type: 'GET',
                                     data: $("#notify-form").serialize(),
                                     dataType: 'html',
-									beforeSend: function() {
-                                        $("#tree-loading-spinner").show();                    
-                                    },
                                     success: function (result) {
                                         $(target).html(''); 
                                         $(target).html(result);
-                                        $('#nav-tree').attr('loaded', 'loaded');
-                                    },
-									complete: function() {
-                                        $("#tree-loading-spinner").hide();
+
+                                        $('#nav-tree').attr('loaded','loaded');
                                     },
                                     error: function () {
                                         alert("error");
                                         $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
                                     }
                                 })
+                                
                             ).then(function( data, textStatus, jqXHR ) {
+                                //alert( jqXHR.status ); // Alerts 200
                                 nodes = $('#accordion-level0 input:checkbox');
                                 redrawTreeCheckboxes();	
                             }); 
+                        
                         } else {
-							$(target).removeAttr('loaded');
-							$("#nav-tree-tab").click();
+                            redrawTreeCheckboxes();
                         }
                     } else {
-						$(target).removeAttr('loaded');
+						// alert("error");
                         $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
 					}
 				});
-
-				$('#btn_search').click(function(e) {
-					e.preventDefault();
-					if (navListActive()) {
-						$('#employee-list-table').DataTable().rows().invalidate().draw();
-					}
-					if (navTreeActive()) {
-						$("#nav-tree-tab").click();
-					}
-				} );
 
 				function redrawTreeCheckboxes() {
 					// redraw the selection 
@@ -616,6 +593,12 @@
 					}
 				}
 
+				$('#btn_search').click(function(e) {
+					e.preventDefault();
+					user_selected = [];
+					$('#employee-list-table').DataTable().rows().invalidate().draw();
+				});
+
 				// Handle click on "Select all" control
 				$('#employee-list-select-all').on('click', function() {
 					// Check/uncheck all checkboxes in the table
@@ -629,6 +612,62 @@
 						$('#employee-list-select-all').prop("checked", false);
 						$('#employee-list-select-all').prop("indeterminate", false);    
 					}    
+				});
+
+				$('#dd_level0').change(function (e){
+					e.preventDefault();
+				});
+
+				$('#dd_level1').change(function (e){
+					e.preventDefault();
+				});
+
+				$('#dd_level2').change(function (e){
+					e.preventDefault();
+				});
+
+				$('#dd_level3').change(function (e){
+					e.preventDefault();
+				});
+
+				$('#criteria').change(function (e){
+					e.preventDefault();
+					$('#btn_search').click();
+				});
+
+				$('#dd_superv').change(function (e){
+					e.preventDefault();
+					$('#btn_search').click();
+				});
+
+				$('#search_text').change(function (e){
+					e.preventDefault();
+					$('#btn_search').click();
+				});
+
+				$('#search_text').keydown(function (e){
+					if (e.keyCode == 13) {
+						e.preventDefault();
+						$('#btn_search').click();
+					}
+				});
+
+				$('#btn_search_reset').click(function (e){
+					e.preventDefault();
+					$('#dd_superv').val('all');
+					$('#criteria').val('all');
+					$('#search_text').val(null);
+					$('#dd_level0').val(null).trigger('change');
+					$('#dd_level1').val(null).trigger('change');
+					$('#dd_level2').val(null).trigger('change');
+					$('#dd_level3').val(null).trigger('change');
+					$('#dd_level4').val(null).trigger('change');
+					$('#btn_search').click();
+				});
+
+				$('#dd_level4').change(function (e){
+					e.preventDefault();
+					$('#btn_search').click();
 				});
 
 				$('#edd_level0').change(function (e) {
@@ -680,14 +719,14 @@
 						// To do -- ajax called to load the tree
 						$.when( 
 							$.ajax({
-                				url: '{{ "/".request()->segment(1)."/goalbank/org-tree/2" }}'
+                				url: '{{ "/" . request()->segment(1) . "/goalbank/eorg-tree" }}'
 								, type: 'GET'
 								, data: $("#notify-form").serialize()
 								, dataType: 'html'
 								, success: function (result) {
 									$('#enav-tree').html(''); 
 									$('#enav-tree').html(result);
-									$('#enav-tree').attr('loaded', 'loaded');
+									$('#enav-tree').attr('loaded','loaded');
 								},
 
 
@@ -735,6 +774,7 @@
                     }
                 	});
             	});							
+
 
 			});
 

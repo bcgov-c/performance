@@ -85,19 +85,19 @@ class UpdateGUIDByEmployeeId extends Command
                 ->update(['guid' => $new_guid]);
                 $update->guid = $new_guid;
                 $update->save(); 
-                // $old_values = [ 
-                //     'table' => 'users', 
-                //     'guid' => $old_guid 
-                // ];
-                // $new_values = [ 
-                //     'table' => 'users', 
-                //     'guid' => $new_guid 
-                // ];
-                // $audit = new JobDataAudit;
-                // $audit->job_sched_id = $audit_id;
-                // $audit->old_values = json_encode($old_values);
-                // $audit->new_values = json_encode($new_values);
-                // $audit->save();
+                $old_values = [ 
+                    'table' => 'users', 
+                    'guid' => $old_guid 
+                ];
+                $new_values = [ 
+                    'table' => 'users', 
+                    'guid' => $new_guid 
+                ];
+                $audit = new JobDataAudit;
+                $audit->job_sched_id = $audit_id;
+                $audit->old_values = json_encode($old_values);
+                $audit->new_values = json_encode($new_values);
+                $audit->save();
                 DB::commit();
                 $updatecounter += 1;
                 echo 'Processed UID '.$item->id.'. Updated GUID '.$old_guid.' to '.$new_guid.'.'; echo "\r\n";

@@ -7,6 +7,7 @@
     </div>
 
 	<p class="px-3">Follow the steps below to select an employee and assign them additional functions within the Performance platform.</p>
+	<!-- <p class="px-3">Cras quis augue quis risus auctor facilisis quis ac ligula. Fusce vehicula consequat dui, et egestas augue sodales aliquam. In hac habitasse platea dictumst. Curabitur sit amet nulla nibh. Morbi mollis malesuada diam ut egestas. Pellentesque blandit placerat nisi ac facilisis. Vivamus consequat, nisl a lacinia ultricies, velit leo consequat magna, sit amet condimentum justo nibh id nisl. Quisque mattis condimentum cursus. Nullam eget congue augue, a molestie leo. Aenean sollicitudin convallis arcu non maximus. Curabitur ut lacinia nisi. Nam cursus venenatis lacus aliquet dapibus. Nulla facilisi.</p> -->
 
 
 	<br>
@@ -85,7 +86,6 @@
 		<br>
 
 		<input type="hidden" id="selected_org_nodes" name="selected_org_nodes" value="">
-		<input type="hidden" id="selected_inherited" name="selected_inherited" value="">
 
 		@include('sysadmin.accesspermissions.partials.filter2')
 
@@ -138,6 +138,8 @@
 				position: fixed;
 				top: 25%;
 				left: 47%;
+				/* height: 100%;
+				width: 100%; */
 				width: 10em;
 				height: 10em;
 				z-index: 9000000;
@@ -152,7 +154,6 @@
 			g_matched_employees = {!! json_encode($matched_emp_ids) !!};
 			g_selected_employees = {!! json_encode($old_selected_emp_ids) !!};
 			g_selected_orgnodes = {!! json_encode($old_selected_org_nodes) !!};
-			g_selected_inherited = {!! json_encode($old_selected_inherited) !!};
 			g_employees_by_org = [];
 
 			function confirmSaveAccessModal(){
@@ -169,14 +170,6 @@
 
 				$('#pageLoader').hide();
 
-				function navTreeActive() {
-					return $('#nav-tree').attr('class').search(/active/i) > 0 ?? false;
-				}
-
-				function navListActive() {
-					return $('#nav-list').attr('class').search(/active/i) > 0 ?? false;
-				}
-
 				$('#notify-form').keydown(function (e) {
 					if (e.keyCode == 13) {
 						e.preventDefault();
@@ -185,21 +178,23 @@
 				});
 
 				$('#notify-form').submit(function() {
+					// console.log('Search Button Clicked');			
+
 					// assign back the selected employees to server
 					var text = JSON.stringify(g_selected_employees);
 					$('#selected_emp_ids').val( text );
 					var text2 = JSON.stringify(g_selected_orgnodes);
 					$('#selected_org_nodes').val( text2 );
-					var text3 = JSON.stringify(g_selected_inherited);
-					$('#selected_inherited').val( text3 );
 					return true; // return false to cancel form action
 				});
+
 
 				// Tab  -- LIST Page  activate
 				$("#nav-list-tab").on("click", function(e) {
 					table  = $('#employee-list-table').DataTable();
 					table.rows().invalidate().draw();
 				});
+
 
 				// Tab  -- TREE activate
 				$("#nav-tree-tab").on("click", function(e) {
@@ -210,7 +205,7 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                                    url: '/sysadmin/accesspermissions/org-tree/1',
+                                    url: '/sysadmin/accesspermissions/org-tree',
                                     type: 'GET',
                                     data: $("#notify-form").serialize(),
                                     dataType: 'html',
@@ -224,7 +219,7 @@
                                         $('#nav-tree').attr('loaded','loaded');
                                     },
                                     complete: function() {
-                                        $("#tree-loading-spinner").hide();
+                                        $(".tree-loading-spinner").hide();
                                     },
                                     error: function () {
                                         alert("error");
@@ -233,29 +228,18 @@
                                 })
                                 
                             ).then(function( data, textStatus, jqXHR ) {
+                                //alert( jqXHR.status ); // Alerts 200
                                 nodes = $('#accordion-level0 input:checkbox');
                                 redrawTreeCheckboxes();	
                             }); 
                         
                         } else {
-							$(target).removeAttr('loaded');
-							$("#nav-tree-tab").click();
+                            redrawTreeCheckboxes();
                         }
                     } else {
-						$(target).removeAttr('loaded');
 						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
 					}
 				});
-
-				$('#btn_search').click(function(e) {
-					e.preventDefault();
-					if (navListActive()) {
-						$('#employee-list-table').DataTable().rows().invalidate().draw();
-					}
-					if (navTreeActive()) {
-						$("#nav-tree-tab").click();
-					}
-				}); 
 
 				function redrawTreeCheckboxes() {
 					// redraw the selection 
@@ -294,6 +278,7 @@
 
 				function eredrawTreeCheckboxes() {
 					// redraw the selection 
+					//console.log('eredraw triggered');
 					enodes = $('#eaccordion-level0 input:checkbox');
 					$.each( enodes, function( index, chkbox ) {
 						if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
@@ -311,7 +296,7 @@
 								$(chkbox).prop("indeterminate", false);
 							}
 						} else {
-							if ( $(chkbox).attr('name') == 'euserCheck[]') {
+							if ( $(chkbox).attr('name') == 'userCheck[]') {
 								if (g_selected_orgnodes.includes(chkbox.value)) {
 									$(chkbox).prop('checked', true);
 								} else {
@@ -404,15 +389,14 @@
 				}
 
 				$('#ebtn_search').click(function(e) {
-					g_selected_orgnodes = [];
-					g_selected_inherited = [];
 					target = $('#enav-tree'); 
 					ddnotempty = $('#edd_level0').val() + $('#edd_level1').val() + $('#edd_level2').val() + $('#edd_level3').val() + $('#edd_level4').val();
 					if(ddnotempty) {
 						// To do -- ajax called to load the tree
 						$.when( 
 							$.ajax({
-								url: '/sysadmin/accesspermissions/org-tree/2',
+								url: '/sysadmin/accesspermissions/eorg-tree',
+								// url: $url,
 								type: 'GET',
 								data: $("#notify-form").serialize(),
 								dataType: 'html',
@@ -433,7 +417,6 @@
 
 								error: function () {
 									// Create New Access Page, Step 3
-									$(target).removeAttr('loaded');
 									alert("error");
 									$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
 								}
@@ -445,19 +428,40 @@
 							eredrawTreeCheckboxes();	
 						}); 
 					} else {
-						$(target).removeAttr('loaded');
 						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
 					};
 				});
+
+				$('#btn_search').click(function(e) {
+					e.preventDefault();
+					$('#employee-list-table').DataTable().rows().invalidate().draw();
+				}); 
 
 				$(window).on('beforeunload', function(){
 					$('#pageLoader').show();
 				});
 
-				// $(window).resize(function(){
-				// 	location.reload();
-				// 	return;
-				// });
+				$(window).resize(function(){
+					location.reload();
+					return;
+				});
+
+				// Model -- Confirmation Box
+
+				// var modalConfirm = function(callback) {
+				// 	$("#btn-confirm").on("click", function(){
+				// 		$("#mi-modal").modal('show');
+				// 	});
+				// 	$("#modal-btn-si").on("click", function(){
+				// 		callback(true);
+				// 		$("#mi-modal").modal('hide');
+				// 	});
+					
+				// 	$("#modal-btn-no").on("click", function(){
+				// 		callback(false);
+				// 		$("#mi-modal").modal('hide');
+				// 	});
+				// };
 
 			});
 

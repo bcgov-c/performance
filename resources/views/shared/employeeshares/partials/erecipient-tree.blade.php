@@ -383,7 +383,9 @@ $(document).ready(function() {
     }
 
     function load_employees_on_node( tree_id ) {
+
         var target = '#eemployees-' + tree_id;
+        
         if($.trim($(target).html())=='') {
             $.ajax({
                 url: '/'+'{{ request()->segment(1) }}'+'/employeeshares/eemployees/'+tree_id,
@@ -391,19 +393,23 @@ $(document).ready(function() {
                 data: $("#notify-form").serialize(),
                 dataType: 'html',
                 beforeSend: function() {
+                    //$('#pageLoader').show();  
                     $(".loading-spinner").show();                    
                 },
                 success: function (result) {
                     $(target).html(''); 
                     $(target).html(result);
+
                     nodes = $(target).find('input:checkbox');
                     $.each( nodes, function( index, chkbox ) {
 						if (eg_selected_employees.includes(chkbox.value)) {
 							$(chkbox).prop('checked', true);
                         } 
                     });
+
                 },
                 complete: function() {
+                    //$('#pageLoader').hide();  
                     $(".loading-spinner").hide();
                 },
                 error: function () {

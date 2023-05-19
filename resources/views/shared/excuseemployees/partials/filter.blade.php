@@ -1,6 +1,6 @@
-<div class="card pt-3 pl-3" id="filter1">
+<div class="card pt-3 pl-3">
     <div class="form-row">
-        <div class="form-group col-md-2" id="lvlgroup0">
+        <div class="form-group col-md-2">
             <label for="dd_level0">Organization</label>
             <select id="dd_level0" name="dd_level0" class="form-control select2">
                 @if ( old('dd_level0') && session()->get('level0') )
@@ -8,7 +8,7 @@
                 @endif
             </select>
         </div>
-        <div class="form-group col-md-2" id="lvlgroup1">
+        <div class="form-group col-md-2">
             <label for="dd_level1">Level 1</label>
             <select id="dd_level1" name="dd_level1" class="form-control select2">
                 @if ( old('dd_level1') && session()->get('level1') )
@@ -16,7 +16,7 @@
                 @endif
             </select>
         </div>
-        <div class="form-group col-md-2" id="lvlgroup2">
+        <div class="form-group col-md-2">
             <label for="dd_level2">Level 2</label>
             <select id="dd_level2" name="dd_level2" class="form-control select2">
                 @if ( old('dd_level2') && session()->get('level2') )
@@ -24,7 +24,7 @@
                 @endif
             </select>
         </div>
-        <div class="form-group col-md-2" id="lvlgroup3">
+        <div class="form-group col-md-2">
             <label for="dd_level3">Level 3</label>
             <select id="dd_level3" name="dd_level3" class="form-control select2">
                 @if ( old('dd_level3') && session()->get('level3') )
@@ -32,7 +32,7 @@
                 @endif
             </select>
         </div>
-        <div class="form-group col-md-2" id="lvlgroup4">
+        <div class="form-group col-md-2">
             <label for="dd_level4">Level 4</label>
             <select id="dd_level4" name="dd_level4" class="form-control select2">
                 @if ( old('dd_level4') && session()->get('level4') )
@@ -40,9 +40,9 @@
                 @endif
             </select>
         </div>
-        <div class="form-group col-md-2" id="blank5th">
+        <div class="form-group col-md-2">
         </div>
-        <div class="form-group col-md-2" id="criteria_group">
+        <div class="form-group col-md-2">
             <label for="criteria">Search Criteria</label>
             <select id="criteria" name="criteria" class="form-control">
                 @foreach( $criteriaList as $key => $value )
@@ -50,7 +50,7 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-md-2" id="search_text_group">
+        <div class="form-group col-md-2">
             <label for="search_text">Search Text</label>
             <input type="text" id="search_text" name="search_text" class="form-control" 
                     value="{{ old('search_text') }}" placeholder="Search Text">
@@ -109,7 +109,7 @@
                 placeholder: 'Select Organization',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/".request()->segment(1)."/org-list/1/0" }}'
+                    url: '{{ "/" . request()->segment(1) . "/org-organizations" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -140,7 +140,7 @@
                 placeholder: 'Select Level 1',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/".request()->segment(1)."/org-list/1/1" }}'
+                    url: '{{ "/" . request()->segment(1) . "/org-programs" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -172,7 +172,7 @@
                 placeholder: 'Select Level 2',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/".request()->segment(1)."/org-list/1/2" }}'
+                    url: '{{ "/" . request()->segment(1) . "/org-divisions" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -205,7 +205,7 @@
                 placeholder: 'Select Level 3',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/".request()->segment(1)."/org-list/1/3" }}'
+                    url: '{{ "/" . request()->segment(1) . "/org-branches" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -239,7 +239,7 @@
                 placeholder: 'Select level 4',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/".request()->segment(1)."/org-list/1/4" }}'
+                    url: '{{ "/" . request()->segment(1) . "/org-level4" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -377,7 +377,7 @@
                 $('#btn_search').click();
             });
 
-        });
+        } );
 
     </script>
 

@@ -353,7 +353,9 @@ $.each(list, function( index, item ) {
 
     do {
         value = '#orgCheck' + pid;
+        //console.log(  value );
         toggle_indeterminate( value );
+        //console.log("parent : " + pid);                
         pid = $('#orgCheck' + pid).attr('pid');    
     } 
     while (pid);
@@ -364,6 +366,7 @@ $.each(list, function( index, item ) {
 
 // Set parent checkbox
 function toggle_indeterminate( prev_input ) {
+
     prev_location = $(prev_input).parent().attr('href');
     total = $(prev_location).find('input').length;
     selected = $(prev_location).find('input:checked').length;
@@ -378,10 +381,13 @@ function toggle_indeterminate( prev_input ) {
     } else {
         $(prev_input).prop("indeterminate", false);
     }
+
 }
 
 function load_employees_on_node( tree_id ) {
+
     var target = '#employees-' + tree_id;
+    
     if($.trim($(target).html())=='') {
         $.ajax({
             url: '/'+'{{ request()->segment(1) }}'+'/goalbank/employees/'+tree_id,
@@ -389,6 +395,7 @@ function load_employees_on_node( tree_id ) {
             data: $("#notify-form").serialize(),
             dataType: 'html',
             beforeSend: function() {
+                //$('#pageLoader').show();  
                 $(".loading-spinner").show();                    
             },
             success: function (result) {
@@ -397,12 +404,15 @@ function load_employees_on_node( tree_id ) {
 
                 nodes = $(target).find('input:checkbox');
                 $.each( nodes, function( index, chkbox ) {
+                    console.log( chkbox.value )
                     if (g_selected_employees.includes(chkbox.value)) {
                         $(chkbox).prop('checked', true);
                     } 
                 });
+
             },
             complete: function() {
+                //$('#pageLoader').hide();  
                 $(".loading-spinner").hide();
             },
             error: function () {
@@ -413,31 +423,38 @@ function load_employees_on_node( tree_id ) {
     }
 }
 
-$("#accordion-level0 .card-header.employees").on("click", "a", function(e) {
+$("#accordion-level0 .card-header.employees").on("click","a", function(e) 
+{
     var tree_id = $(this).attr('data');
     load_employees_on_node(tree_id);
 });
 
 $("#accordion-level0 .card-header").on("click","a", function(e) {
     //e.preventDefault(); 	
+
     if (e.target.tagName != "INPUT") {
         // do link
         //alert("Doing link functionality");
     } else {
         e.stopPropagation();
+
         //var location  = '#collapse-' + $(e.target).val();
         var location = $(this).attr('href') ;
+
         if (e.target.checked) {
             // expand itself
             $(location).collapse();
+
             // to-do : checked all the following 
             items = $(location).find('input:checkbox');
             $.each(items, function(index, item) {
                 $(item).prop('checked', true);
                 $(item).prop("indeterminate", false);
             })  
+
             // TODO : add to selected listed
             //if no employee class, then have to add all 
+            
             // User level checkbox 
             if ( $(e.target).attr('name') == 'userCheck[]') {
                 emp_id = $(e.target).val();  
@@ -445,6 +462,7 @@ $("#accordion-level0 .card-header").on("click","a", function(e) {
                         g_selected_employees.push( emp_id );    
                 } 
             }
+
             node  = $(e.target).val();
             if (g_employees_by_org.hasOwnProperty( node )) {
                 $.each(g_employees_by_org[ node  ], function(index, emp) {
@@ -453,6 +471,7 @@ $("#accordion-level0 .card-header").on("click","a", function(e) {
                     } 
                 })  
             }
+
             nodes = $(location).find('input:checkbox')
             $.each( nodes, function( index, chkbox ) {
                 if (g_employees_by_org.hasOwnProperty(chkbox.value)) {
@@ -469,13 +488,19 @@ $("#accordion-level0 .card-header").on("click","a", function(e) {
                     }
                 }
             });
+
         } else {
+
+            //$(location).collapse('hide');
+
             // unchecked the children 
             items = $(location).find('input:checkbox');
             $.each(items, function(index, item) {
                 $(item).prop('checked', false);
                 $(item).prop("indeterminate", false);
             })  
+
+
             // User level checkbox 
             if ( $(e.target).attr('name') == 'userCheck[]') {
                 emp_id = $(e.target).val();  
@@ -484,6 +509,7 @@ $("#accordion-level0 .card-header").on("click","a", function(e) {
                     g_selected_employees.splice( index, 1 );
                 }
             }
+
             node = $(e.target).val();
             if (g_employees_by_org.hasOwnProperty( node )) {
                 $.each(g_employees_by_org[ node  ], function(index, emp) {
@@ -492,6 +518,7 @@ $("#accordion-level0 .card-header").on("click","a", function(e) {
                     } 
                 })  
             }
+
             nodes = $(location).find('input:checkbox');
             $.each( nodes, function( index, chkbox ) {
                 if (g_employees_by_org.hasOwnProperty(chkbox.value)) {
@@ -510,15 +537,23 @@ $("#accordion-level0 .card-header").on("click","a", function(e) {
                     }
                 }
             });
+            
         }      
+
+        //console.log( g_selected_employees);     
+
         pid = $(this).find('input:first').attr('pid');
         do {
             value = '#orgCheck' + pid;
+            //console.log(  value );
             toggle_indeterminate( value );
+            //console.log("parent : " + pid);                
             pid = $('#orgCheck' + pid).attr('pid');    
         } 
         while (pid);
+
     }
+
 });
 
 $("#accordion-level0").on('shown.bs.collapse', function () {

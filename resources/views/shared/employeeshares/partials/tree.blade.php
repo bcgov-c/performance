@@ -388,7 +388,7 @@ $(document).ready(function() {
         
         if($.trim($(target).html())=='') {
             $.ajax({
-                url: 'employeeshares/employees/'+tree_id+'/1',
+                url: 'employeeshares/employees/'+tree_id,
                 type: 'GET',
                 data: $("#notify-form").serialize(),
                 dataType: 'html',

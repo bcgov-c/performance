@@ -5,9 +5,9 @@
             @include('shared.employeeshares.partials.tabs')
         </div>
     </div>	
-    <p class="px-3">Supervisors and administrators may share an employee's PDP profile with another supervisor or staff for a legitimate business reason. The profile should only be shared with people who normally handle employees' permanent personnel records (i.e. Public Service Agency or co-supervisors). An employee may also wish to share their profile with someone other than a direct supervisor (for example, a hiring manager). In order to do this - the employee's consent is required.</p>
-    <!-- <p class="px-3">An employee may also wish to share their profile with someone other than a direct supervisor (for example, a hiring manager). In order to do this - the employee's consent is required.</p>
-    <p class="px-3">To continue, please use the functions below to select the employee profiles that you would like to share, the person you would like to share the profiles with, which elements you would like to share, and your reason for sharing the profile.</p> -->
+    <p class="px-3">Supervisors and administrators may share all or part of an employee's PDP profile with another supervisor or staff for a legitimate business reason. The full profile or the Conversations section should only be shared with people who normally handle employees' permanent personnel records (i.e. Public Service Agency or co-supervisors). The Goals section can be shared more broadly (i.e. with project team leads) to encourage collaboration and feedback on specific goals.</p>
+    <p class="px-3">An employee may also wish to share their profile with someone other than a direct supervisor (for example, a hiring manager). In order to do this - the employee's consent is required.</p>
+    <p class="px-3">To continue, please use the functions below to select the employee profiles that you would like to share, the person you would like to share the profiles with, which elements you would like to share, and your reason for sharing the profile.</p>
 	
 
     <form id="notify-form" action="{{ route(request()->segment(1).'.employeeshares.saveall') }}" method="post">
@@ -79,7 +79,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <!-- <div class="col col-2">
+                        <div class="col col-2">
                            <label for='elements' title='Items to Share Tooltip'>Items to Share
                                 <select name="input_elements" class="form-control" id="input_elements" >
                                     <option value = 0 > Both </option>
@@ -88,11 +88,11 @@
                                 </select>
  					            <small  class="text-danger error-target_date"></small>
                             </label>
-                       </div> -->
-                        <div class="col col-12">
+                       </div>
+                        <div class="col col-10">
                             <!-- <x-input id="reason" name="input_reason" label="Reason for sharing" data-toggle="tooltip" data-placement="top" data-trigger="manual" tooltip="Reason tooltip"/> -->
                             <b>Reason for sharing</b>
-                            <i class="fa fa-info-circle" label="Reason for sharing" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Provide a brief explanation of why the profile is being shared. For example: <br><br><ul><li> Sharing profile with co-supervisor </li><li>Sharing profile because of inaccurate data in PeopleSoft</li><li>Sharing with hiring manager per employee request</li></ul>"> </i> 
+                            <i class="fa fa-info-circle" label="Reason for sharing" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Provide a brief explanation of why the profile elements are being shared. For example: <br><br><ul><li> Sharing profile with co-supervisor </li><li>Sharing goals section with project team lead</li><li>Sharing conversations section with hiring manager per employee request</li></ul>"> </i> 
                             <x-input id="reason" name="input_reason"/>                            
                             @error('input_reason')
                                 {{-- <div class="alert alert-danger alert-dismissable fade show"> "Reason for sharing" is required. </div> --}}
@@ -125,11 +125,11 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <p class="msg">Are you sure to send out this message ?</p>
+                        <p>Are you sure to send out this message ?</p>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-primary mt-2 sharebtn" type="button" name="btn_send" value="btn_send">Share</button>
-                        <button type="button" class="btn btn-secondary cancelbtn" data-dismiss="modal">Cancel</button>
+                        <button class="btn btn-primary mt-2" type="submit" name="btn_send" value="btn_send">Share</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     </div>
                     
                 </div>
@@ -151,8 +151,8 @@
     <x-slot name="js">
 	
         <script src="//cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
-        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+        <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
         <script>				
@@ -196,6 +196,12 @@
 
             $(document).ready(function(){
 
+                // $(".items-to-share-edit").multiselect({
+                //     allSelectedText: 'All',
+                //     selectAllText: 'All',
+                //     includeSelectAllOption: true
+                // });
+
                 $('#employee-list-table').DataTable( {
                     scrollX: true,
                     retrieve: true,
@@ -205,7 +211,7 @@
                     select: true,
                     order: [[1, 'asc']],
                     ajax: {
-                        url: "{{ '/' . request()->segment(1) . '/employeeshares/employee-list/1' }}",
+                        url: '{{ route(request()->segment(1).'.employeeshares.employee.list') }}',
                         data: function (d) {
                             d.dd_level0 = $('#dd_level0').val();
                             d.dd_level1 = $('#dd_level1').val();
@@ -264,12 +270,12 @@
                     select: true,
                     order: [[1, 'asc']],
                     ajax: {
-                        url: "{{ '/' . request()->segment(1) . '/employeeshares/employee-list/2' }}",
+                        url: '{{ route(request()->segment(1).'.employeeshares.eemployee.list') }}',
                         data: function (d) {
                             d.edd_level0 = $('#edd_level0').val();
                             d.edd_level1 = $('#edd_level1').val();
                             d.edd_level2 = $('#edd_level2').val();
-                            d.edd_level3 = $('#edd_level3').val();
+                            d.edd_level3 = $('e#dd_level3').val();
                             d.edd_level4 = $('#edd_level4').val();
                             d.ecriteria = $('#ecriteria').val();
                             d.esearch_text = $('#esearch_text').val();
@@ -301,16 +307,16 @@
                     },
                     columns: [
                         {title: '<input name="eselect_all" value="1" id="eemployee-list-select-all" type="checkbox" />', ariaTitle: 'eemployee-list-select-all', target: 0, type: 'string', data: 'eselect_users', name: 'eselect_users', orderable: false, searchable: false},
-                        {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', className: 'dt-nowrap'},
-                        {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', className: 'dt-nowrap'},
-                        {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', className: 'dt-nowrap'},
+                        {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'eemployee_id', name: 'eemployee_id', className: 'dt-nowrap'},
+                        {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'eemployee_name', name: 'eemployee_name', className: 'dt-nowrap'},
+                        {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'ejobcode_desc', name: 'ejobcode_desc', className: 'dt-nowrap'},
                         // {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'eemployee_email', name: 'eemployee_email', className: 'dt-nowrap'},
-                        {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', className: 'dt-nowrap'},
-                        {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', className: 'dt-nowrap'},
-                        {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', className: 'dt-nowrap'},
-                        {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', className: 'dt-nowrap'},
-                        {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', className: 'dt-nowrap'},
-                        {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', name: 'deptid', className: 'dt-nowrap'},
+                        {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'eorganization', name: 'eorganization', className: 'dt-nowrap'},
+                        {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'elevel1_program', name: 'elevel1_program', className: 'dt-nowrap'},
+                        {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'elevel2_division', name: 'elevel2_division', className: 'dt-nowrap'},
+                        {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'elevel3_branch', name: 'elevel3_branch', className: 'dt-nowrap'},
+                        {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'elevel4', name: 'elevel4', className: 'dt-nowrap'},
+                        {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'edeptid', name: 'edeptid', className: 'dt-nowrap'},
                     ],
                 });
 
@@ -434,7 +440,7 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                                    url: "{{ '/' . request()->segment(1) . '/employeeshares/org-tree/1' }}",
+                                    url: "{{ '/' . request()->segment(1) . '/employeeshares/org-tree' }}",
                                     type: 'GET',
                                     data: $("#notify-form").serialize(),
                                     dataType: 'html',
@@ -479,7 +485,7 @@
                         if($.trim($(etarget).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                                    url: "{{ '/' . request()->segment(1) . '/employeeshares/org-tree/2' }}",
+                                    url: "{{ '/' . request()->segment(1) . '/employeeshares/eorg-tree' }}",
                                     type: 'GET',
                                     data: $("notify-form").serialize(),
                                     dataType: 'html',
@@ -688,15 +694,6 @@
             @error('input_reason')
                 $('input[name=input_reason]').addClass('is-invalid');
             @enderror
-            
-            $(".sharebtn").click(function(){
-                $(".sharebtn").hide();
-                $(".cancelbtn").hide();
-                $(".msg").html("Processing request. Please do not close this window.");
-                
-                $("#notify-form").submit();
-            });
-            
 
         </script>
 

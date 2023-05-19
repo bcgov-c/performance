@@ -98,7 +98,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/org-list/2/0'
+                    url: '/sysadmin/eorg-organizations2'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -129,7 +129,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/org-list/2/1' 
+                    url: '/sysadmin/eorg-programs2' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -161,7 +161,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/org-list/2/2' 
+                    url: '/sysadmin/eorg-divisions2' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -194,7 +194,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/org-list/2/3' 
+                    url: '/sysadmin/eorg-branches2' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -228,7 +228,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/org-list/2/4' 
+                    url: '/sysadmin/eorg-level42' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -250,36 +250,6 @@
                 }
             });
             
-            $('#edd_level0').on('select2:select', function (e) {
-                // Do something
-                $('#edd_level1').val(null).trigger('change');
-                $('#edd_level2').val(null).trigger('change');
-                $('#edd_level3').val(null).trigger('change');
-                $('#edd_level4').val(null).trigger('change');
-            });
-
-            $('#edd_level1').on('select2:select', function (e) {
-                // Do something
-                $('#edd_level2').val(null).trigger('change');
-                $('#edd_level3').val(null).trigger('change');
-                $('#edd_level4').val(null).trigger('change');
-            });
-
-            $('#edd_level2').on('select2:select', function (e) {
-                // Do something
-                $('#edd_level3').val(null).trigger('change');
-                $('#edd_level4').val(null).trigger('change');
-            });
-
-            $('#edd_level3').on('select2:select', function (e) {
-                // Do something
-                $('#edd_level4').val(null).trigger('change');
-            });
-
-            $('#edd_level4').on('select2:select', function (e) {
-                e.preventDefault();
-            });
-
             $('#edd_level0').on('select2:unselect', function (e) {
                 e.preventDefault();
                 $('#edd_level0').val(null).trigger('change');
@@ -337,20 +307,20 @@
                 $('#ebtn_search').click();
             });
 
-            $('#ecriteria').change(function (e){
+            $('#criteria').change(function (e){
                 e.preventDefault();
-                $('#ebtn_search').click(e);
+                $('#btn_search').click(e);
             });
 
-            $('#esearch_text').change(function (e){
+            $('#search_text').change(function (e){
                 e.preventDefault();
-                $('#ebtn_search').click(e);
+                $('#btn_search').click(e);
             });
 
-            $('#esearch_text').keydown(function (e){
+            $('#search_text').keydown(function (e){
                 if (e.keyCode == 13) {
                     e.preventDefault();
-                    $('#ebtn_search').click(e);
+                    $('#btn_search').click(e);
                 }
             });
 

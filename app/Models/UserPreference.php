@@ -19,9 +19,9 @@ class UserPreference extends Model
 
     protected $attributes = [
 
-        'goal_comment_flag' => 'Y', 
-        'goal_bank_flag' => 'Y', 
-        'share_profile_flag' => 'Y',
+        'goal_comment_flag' => 'N', 
+        'goal_bank_flag' => 'N', 
+        'share_profile_flag' => 'N',
         'conversation_setup_flag' => 'Y', 
         'conversation_signoff_flag' => 'Y', 
         'conversation_disagree_flag' => 'Y', 
@@ -30,8 +30,8 @@ class UserPreference extends Model
         'conversation_due_week' => 'Y', 
         'conversation_due_past' => 'Y',
 
-        'team_conversation_due_month' => 'N', 
-        'team_conversation_due_week' => 'N', 
+        'team_conversation_due_month' => 'Y', 
+        'team_conversation_due_week' => 'Y', 
         'team_conversation_due_past' => 'Y',
     ];
 

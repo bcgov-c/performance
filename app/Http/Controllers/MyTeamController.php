@@ -216,7 +216,7 @@ class MyTeamController extends Controller
                            ->count();                 
             if($get_direct > 0){
                 $skip_sharing = true;   
-                $error_msg = 'The employee already reports directly to that supervisor. Employees cannot be shared with their direct supervisor.';
+                $error_msg = 'The employee has already been shared with that supervisor. They cannot be shared with the same supervisor more than once.';
             }    
             //not allow exsiting shared team members be shared to the same 
             $get_shared = sharedProfile::select('id')
@@ -225,7 +225,7 @@ class MyTeamController extends Controller
                            ->count(); 
             if($get_shared > 0){
                 $skip_sharing = true;  
-                $error_msg = 'The employee has already been shared with that supervisor. They cannot be shared with the same supervisor more than once.';
+                $error_msg = 'The employee already reports directly to that supervisor. Employees cannot be shared with their direct supervisor.';
             }      
         }
         
@@ -253,41 +253,31 @@ class MyTeamController extends Controller
                 array_push($sharedProfile, SharedProfile::updateOrCreate($insert));
             }
 
-            // foreach ($sharedProfile as $result) {
-            //     // Dashboard message added when an shared employee's profile (goals, conversations, or both)
-            //     // DashboardNotification::create([
-            //     //     'user_id' => $result->shared_id,
-            //     //     'notification_type' => 'SP',         
-            //     //     'comment' => 'Your profile has been shared with ' . $result->sharedWith->name,
-            //     //     'related_id' => $result->id,
-            //     // ]);
-            //     // Use Class to create DashboardNotification
-            //                 $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-            //                 $notification->user_id = $result->shared_id;
-            //                 $notification->notification_type = 'SP';
-            //                 $notification->comment = 'Your profile has been shared with ' . $result->sharedWith->name;
-            //                 $notification->related_id =  $result->id;
-            //     $notification->notify_user_id = $result->shared_id;
-            //                 $notification->send(); 
-            // }
+            foreach ($sharedProfile as $result) {
+                // Dashboard message added when an shared employee's profile (goals, conversations, or both)
+                // DashboardNotification::create([
+                //     'user_id' => $result->shared_id,
+                //     'notification_type' => 'SP',         
+                //     'comment' => 'Your profile has been shared with ' . $result->sharedWith->name,
+                //     'related_id' => $result->id,
+                // ]);
+                // Use Class to create DashboardNotification
+                            $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                            $notification->user_id = $result->shared_id;
+                            $notification->notification_type = 'SP';
+                            $notification->comment = 'Your profile has been shared with ' . $result->sharedWith->name;
+                            $notification->related_id =  $result->id;
+                $notification->notify_user_id = $result->shared_id;
+                            $notification->send(); 
+            }
 
             // Send out email to the user when his profile was shared
             foreach ($sharedProfile as $result) {
 
                 $user = User::where('id', $result->shared_id)
                                 ->with('userPreference')
-                                ->select('id','name','guid', 'employee_id')
+                                ->select('id','name','guid')
                                 ->first();
-
-                if ($user && $user->allow_inapp_notification) {
-                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                    $notification->user_id = $result->shared_id;
-                    $notification->notification_type = 'SP';
-                    $notification->comment = 'Your profile has been shared with ' . $result->sharedWith->name;
-                    $notification->related_id =  $result->id;
-                    $notification->notify_user_id = $result->shared_id;
-                    $notification->send();                                 
-                }
 
                 if ($user && $user->allow_email_notification && $user->userPreference->share_profile_flag == 'Y') {
 
@@ -478,41 +468,30 @@ class MyTeamController extends Controller
         }
 
         // create Dashboard Notification displayed on Home page
-        // foreach ($request->itemsToShare as $user_id) {
-        //     // DashboardNotification::create([
-        //     //     'user_id' => $user_id,
-        //     //     'notification_type' => 'GB',        // Goal Bank
-        //     //     'comment' => $goal->user->name . ' added a new goal to your goal bank.',
-        //     //     'related_id' => $goal->id,
-        //     // ]);
-        //     // Use Class to create DashboardNotification
-		// 	$notification = new \App\MicrosoftGraph\SendDashboardNotification();
-		// 	$notification->user_id =  $user_id;
-		// 	$notification->notification_type = 'GB';
-		// 	$notification->comment = ($goal->display_name ? $goal->display_name : $goal->user->name) . ' added a new goal to your goal bank.';
-		// 	$notification->related_id = $goal->id;
-        //     $notification->notify_user_id = $user_id;
-		// 	$notification->send(); 
-        // }
+        foreach ($request->itemsToShare as $user_id) {
+            // DashboardNotification::create([
+            //     'user_id' => $user_id,
+            //     'notification_type' => 'GB',        // Goal Bank
+            //     'comment' => $goal->user->name . ' added a new goal to your goal bank.',
+            //     'related_id' => $goal->id,
+            // ]);
+            // Use Class to create DashboardNotification
+			$notification = new \App\MicrosoftGraph\SendDashboardNotification();
+			$notification->user_id =  $user_id;
+			$notification->notification_type = 'GB';
+			$notification->comment = $goal->user->name . ' added a new goal to your goal bank.';
+			$notification->related_id = $goal->id;
+            $notification->notify_user_id = $user_id;
+			$notification->send(); 
+        }
 
         // Send out email to the user when the Goal Bank added
         foreach ($request->itemsToShare as $user_id) {
 
             $user = User::where('id', $user_id)
                             ->with('userPreference')
-                            ->select('id','name','guid', 'employee_id')
+                            ->select('id','name','guid')
                             ->first();
-
-            if ($user && $user->allow_inapp_notification) {
-                 // Use Class to create DashboardNotification
-                $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                $notification->user_id =  $user_id;
-                $notification->notification_type = 'GB';
-                $notification->comment = ($goal->display_name ? $goal->display_name : $goal->user->name) . ' added a new goal to your goal bank.';
-                $notification->related_id = $goal->id;
-                $notification->notify_user_id = $user_id;
-                $notification->send();
-            }
 
             if ($user && $user->allow_email_notification && $user->userPreference->goal_bank_flag == 'Y') {
 
@@ -527,7 +506,7 @@ class MyTeamController extends Controller
 
                 $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
                 array_push($sendMail->bindvariables, $user->name);                            // Recipient of the email
-                array_push($sendMail->bindvariables, $goal->user ? ($goal->display_name ? $goal->display_name : $goal->user->name) : '');   // Person who added goal to goal bank
+                array_push($sendMail->bindvariables, $goal->user ? $goal->user->name : '');   // Person who added goal to goal bank
                 array_push($sendMail->bindvariables, $goal->title);                           // goal title
                 array_push($sendMail->bindvariables, $goal->mandatory_status_descr);          // Mandatory or suggested status
                 $response = $sendMail->sendMailWithGenericTemplate();

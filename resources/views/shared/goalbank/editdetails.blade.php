@@ -56,7 +56,7 @@
 				<p>
 					Each goal should include a description of <b>WHAT</b>  
 					<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".'> </i> you will accomplish, <b>WHY</b> 
-					<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important, and <b>HOW</b> 
+					<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important,, and <b>HOW</b> 
 					<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> you will achieve it. 
 				</p>
 				<x-textarea id="what" name="what" :value="$goaldetail->what" />
@@ -205,6 +205,17 @@
 					}
 				});
 
+				// $('#notify-form').submit(function() {
+				// 	// console.log('Search Button Clicked');			
+				// 	// assign back the selected employees to server
+				// 	var text = JSON.stringify(ag_selected_employees);
+				// 	$('#aselected_emp_ids').val( text );
+				// 	var text2 = JSON.stringify(ag_selected_orgnodes);
+				// 	$('#aselected_org_nodes').val( text2 );
+				// 	// dd(g_selected_orgnodes);
+				// 	return true; // return false to cancel form action
+				// });
+
 				CKEDITOR.replace('what', {
 					toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent", "Link"] ],disableNativeSpellChecker: false});
 
@@ -215,6 +226,11 @@
 					$('#pageLoader').show();
 				});
 
+				// $(window).resize(function(){
+				// 	location.reload();
+				// 	return;
+				// });
+ 
 			});
 
 		</script>

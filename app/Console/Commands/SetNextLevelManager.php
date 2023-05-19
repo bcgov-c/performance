@@ -71,7 +71,7 @@ class SetNextLevelManager extends Command
         $updatecounter = 0;
 
         EmployeeDemo::whereNull('employee_demo.date_deleted')
-        ->join(\DB::raw('users USE INDEX (idx_users_employeeid_emplrecord)'), 'users.employee_id', 'employee_demo.employee_id')
+        ->join('users', 'users.employee_id', 'employee_demo.employee_id')
         ->whereRaw("users.reporting_to IS NULL OR TRIM(users.reporting_to) = ''")
         ->whereRaw("trim(employee_demo.guid) <> ''")
         ->whereNotNull('employee_demo.guid')
@@ -80,7 +80,7 @@ class SetNextLevelManager extends Command
         ->chunk(10000, function($employeeDemo) use (&$counter, &$updatecounter, $start_time, $audit_id) {
             foreach ($employeeDemo as $demo) {
                 $reporting_to = $this->getReportingUserId($demo);  
-                $user = User::from(\DB::raw('users USE INDEX (idx_users_employeeid_emplrecord)'))->whereRaw("employee_id = '".$demo->employee_id."'")->first();
+                $user = User::whereRaw("employee_id = '".$demo->employee_id."'")->first();
                 if ($user) {
                     if ($user->reporting_to != $reporting_to) {
                         DB::beginTransaction();
@@ -88,23 +88,23 @@ class SetNextLevelManager extends Command
                             $user->reporting_to = $reporting_to;
                             $user->last_sync_at = $start_time;
                             $user->save();             
-                            // $old_values = [ 
-                            //     'table' => 'users',                        
-                            //     'employee_id' => $user->employee_id, 
-                            //     'reporting_to' => $user->reporting_to, 
-                            //     'last_sync_at' => $user->last_sync_at
-                            // ];
-                            // $new_values = [ 
-                            //     'table' => 'users', 
-                            //     'employee_id' => $demo->employee_id, 
-                            //     'reporting_to' => $reporting_to, 
-                            //     'last_sync_at' => $start_time
-                            // ];
-                            // $audit = new JobDataAudit;
-                            // $audit->job_sched_id = $audit_id;
-                            // $audit->old_values = json_encode($old_values);
-                            // $audit->new_values = json_encode($new_values);
-                            // $audit->save();
+                            $old_values = [ 
+                                'table' => 'users',                        
+                                'employee_id' => $user->employee_id, 
+                                'reporting_to' => $user->reporting_to, 
+                                'last_sync_at' => $user->last_sync_at
+                            ];
+                            $new_values = [ 
+                                'table' => 'users', 
+                                'employee_id' => $demo->employee_id, 
+                                'reporting_to' => $reporting_to, 
+                                'last_sync_at' => $start_time
+                            ];
+                            $audit = new JobDataAudit;
+                            $audit->job_sched_id = $audit_id;
+                            $audit->old_values = json_encode($old_values);
+                            $audit->new_values = json_encode($new_values);
+                            $audit->save();
                             // Update Reporting Tos
                             if ($reporting_to) {
                                 // $user->reportingTos()->updateOrCreate([ 'reporting_to_id' => $reporting_to ]);
@@ -117,19 +117,19 @@ class SetNextLevelManager extends Command
                                     ]
                                 );
                             }
-                            // $old_values = [ 
-                            //     'table' => 'user_reporting_tos'                        
-                            // ];
-                            // $new_values = [ 
-                            //     'table' => 'user_reporting_tos', 
-                            //     'employee_id' => $demo->employee_id, 
-                            //     'reporting_to_id' => $reporting_to 
-                            // ];
-                            // $audit = new JobDataAudit;
-                            // $audit->job_sched_id = $audit_id;
-                            // $audit->old_values = json_encode($old_values);
-                            // $audit->new_values = json_encode($new_values);
-                            // $audit->save();
+                            $old_values = [ 
+                                'table' => 'user_reporting_tos'                        
+                            ];
+                            $new_values = [ 
+                                'table' => 'user_reporting_tos', 
+                                'employee_id' => $demo->employee_id, 
+                                'reporting_to_id' => $reporting_to 
+                            ];
+                            $audit = new JobDataAudit;
+                            $audit->job_sched_id = $audit_id;
+                            $audit->old_values = json_encode($old_values);
+                            $audit->new_values = json_encode($new_values);
+                            $audit->save();
                             DB::commit();
                             $this->info('EID '.$demo->employee_id.' - '.$demo->employee_name.' updated Manager to UID '.$reporting_to.'.');
                             $updatecounter += 1;

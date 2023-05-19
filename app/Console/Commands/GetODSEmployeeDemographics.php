@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use Carbon\Carbon;
 use App\Models\EmployeeDemo;
-use App\Models\EmployeeDemoTree;
 use App\Models\JobSchedAudit;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -46,7 +45,7 @@ class GetODSEmployeeDemographics extends Command
     {
 
       $start_time = Carbon::now()->format('c');
-      $this->info(Carbon::now()->format('c').' - Employee Demographic Data pull from ODS, Started: '. $start_time);
+      $this->info( 'Employee Demographic Data pull from ODS, Started: '. $start_time);
 
       $job_name = 'command:GetODSEmployeeDemographics';
       $switch = strtolower(env('PRCS_PULL_ODS_DATA'));
@@ -68,7 +67,7 @@ class GetODSEmployeeDemographics extends Command
 
         if(is_null($stored)){
           $last_cutoff_time = Carbon::create(1900, 1, 1, 0, 0, 0, 'PDT')->format('c');
-          $this->info(Carbon::now()->format('c').' - Last Pull Date not found.  Using ' . $last_cutoff_time);
+          $this->info( 'Last Pull Date not found.  Using ' . $last_cutoff_time);
           $stored = DB::table('stored_dates')->updateOrInsert(
             [
               'name' => 'ODS Employee Demo Last Pull',
@@ -80,10 +79,10 @@ class GetODSEmployeeDemographics extends Command
         } else {  
           if($stored->value){
             $last_cutoff_time = $stored->value;
-            $this->info(Carbon::now()->format('c').' - Last Pull Date:  ' . $last_cutoff_time);
+            $this->info( 'Last Pull Date:  ' . $last_cutoff_time);
           }else{
             $last_cutoff_time = Carbon::create(1900, 1, 1, 0, 0, 0, 'PDT')->format('c');
-            $this->info(Carbon::now()->format('c').' - Last Pull Date not found.  Using ' . $last_cutoff_time);
+            $this->info( 'Last Pull Date not found.  Using ' . $last_cutoff_time);
           }
         }
 
@@ -203,58 +202,40 @@ class GetODSEmployeeDemographics extends Command
             '$orderby' => 'EMPLID,EMPL_RCD,EFFDT,EFFSEQ',
           ], 
           ])
-          ->get( env('ODS_EMPLOYEE_DEMO_URI') . '?$top=' . $top . '&$skip=' . $skip );
+    ->get( env('ODS_EMPLOYEE_DEMO_URI') . '?$top=' . $top . '&$skip=' . $skip );
           $data = $demodata['value'];
     
-        } while(count($data)!=0);
+      } while(count($data)!=0);
 
-        // Update OrgId in employee_demo table
-        $this->info(Carbon::now()->format('c').' - Updating Org Ids...');
-        EmployeeDemo::whereRaw("deptid IS NULL OR TRIM(deptid) = ''")
-          ->update(['orgid' => null]);
-        $demoDepts = EmployeeDemo::distinct()
-          ->whereNotNull('deptid')
-          ->select('deptid')
-          ->orderBy('deptid')
-          ->get();
-        foreach($demoDepts as $dept){
-          $org = EmployeeDemoTree::where('deptid', $dept->deptid)
-            ->select('id')
-            ->first();
-          EmployeeDemo::where('deptid', $dept->deptid)
-            ->update(['orgid' => $org ? $org->id : null]);
-        }
-        $this->info(Carbon::now()->format('c').' - Org Ids updated.');
+      DB::table('stored_dates')->updateOrInsert(
+        [
+          'name' => 'ODS Employee Demo Last Pull',
+        ],
+        [
+          'value' => $start_time,
+        ]
+      );
+      $this->info( 'Last Pull Date Updated to: ' . $start_time);
 
-        DB::table('stored_dates')->updateOrInsert(
-          [
-            'name' => 'ODS Employee Demo Last Pull',
-          ],
-          [
-            'value' => $start_time,
-          ]
-        );
-        $this->info(Carbon::now()->format('c').' - Last Pull Date Updated to: ' . $start_time);
+      $end_time = Carbon::now();
+      DB::table('job_sched_audit')->updateOrInsert(
+        [
+          'id' => $audit_id
+        ],
+        [
+          'job_name' => $job_name,
+          'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
+          'end_time' => date('Y-m-d H:i:s', strtotime($end_time)),
+          'cutoff_time' => date('Y-m-d H:i:s', strtotime($last_cutoff_time)),
+          'status' => 'Completed',
+          'details' => 'Processed ' . $total . ' rows from ' . $last_cutoff_time . '.',
+        ]
+      );
 
-        $end_time = Carbon::now();
-        DB::table('job_sched_audit')->updateOrInsert(
-          [
-            'id' => $audit_id
-          ],
-          [
-            'job_name' => $job_name,
-            'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
-            'end_time' => date('Y-m-d H:i:s', strtotime($end_time)),
-            'cutoff_time' => date('Y-m-d H:i:s', strtotime($last_cutoff_time)),
-            'status' => 'Completed',
-            'details' => 'Processed ' . $total . ' rows from ' . $last_cutoff_time . '.',
-          ]
-        );
-
-        $this->info(Carbon::now()->format('c').' - Employee Demographic Data pull from ODS, Completed: ' . $end_time);
-      } else {
-          $this->info(Carbon::now()->format('c').' - Process is currently disabled; or "PRCS_PULL_ODS_DATA=on" is currently missing in the .env file.');
-      }
+      $this->info( 'Employee Demographic Data pull from ODS, Completed: ' . $end_time);
+    } else {
+        $this->info( 'Process is currently disabled; or "PRCS_PULL_ODS_DATA=on" is currently missing in the .env file.');
+    }
 
   }
     
