@@ -607,7 +607,9 @@ class GoalBankController extends Controller
             $notify_audiences = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
         }
         // notify_on_dashboard when new goal added
+        Log::info('Tracer 1');
         $this->notify_on_dashboard($resultrec, $notify_audiences);
+        Log::info('Tracer 2');
         return redirect()->route(request()->segment(1).'.goalbank')
             ->with('success', 'Create new goal bank successful.');
     }
@@ -1201,6 +1203,7 @@ class GoalBankController extends Controller
 
 
     protected function notify_on_dashboard($goalBank, $employee_ids) {
+        Log::info('Tracer 1a');
 
         // Filter out the employee based on the Organization level and individual user preferences. 
         $filtered_ee_ids = UserDemoJrForGoalbankView::join('access_organizations', 'user_demo_jr_for_goalbank_view.organization', 'access_organizations.organization')
@@ -1214,11 +1217,17 @@ class GoalBankController extends Controller
                                 ->pluck('user_demo_jr_for_goalbank_view.employee_id')
                                 ->toArray(); 
 
+        Log::info('Tracer 1b');
+
+
         if (count($filtered_ee_ids)) {
+            Log::info('Tracer 1c');
             // find user id based on the employee_id
             $notify_users_ids = User::whereIn('employee_id', $employee_ids)->pluck('id');
+            Log::info('Tracer 1d');
             // Add dasboard message to each participant_id
             foreach ($notify_users_ids as $key => $value) {
+                Log::info('Tracer 1d1 - '.$value);
                 // Use Class to create DashboardNotification
                 $notification = new \App\MicrosoftGraph\SendDashboardNotification();
                 $notification->user_id = $value;
@@ -1227,7 +1236,9 @@ class GoalBankController extends Controller
                 $notification->related_id = $goalBank->id;
                 $notification->notify_user_id =  $value;
                 $notification->send(); 
+                Log::info('Tracer 1d2');
             }
+            Log::info('Tracer 1e');
         }
 
         // Additional Step -- sent out email message if required
