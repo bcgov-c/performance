@@ -445,7 +445,7 @@ class GoalController extends Controller
         $goaltypes = GoalType::all()->toArray();
 
         $adminGoals = Goal::withoutGlobalScopes()
-            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator ', ') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
+            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator ', ') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
             ->join('goal_bank_orgs', function ($qon) {
                 return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
                     ->on('goal_bank_orgs.version', \DB::raw(2))
@@ -460,7 +460,8 @@ class GoalController extends Controller
             ->leftjoin('goal_types', 'goal_types.id', 'goals.goal_type_id')   
             ->whereIn('goals.by_admin', [1, 2])
             ->where('goals.is_library', true)
-            ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.name', 'goals.is_mandatory');
+            ->whereNull('goals.deleted_at')        
+            ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.id', 'u2.name', 'goals.is_mandatory');
         // Admin List filter below
         if ($request->has('goal_bank_mandatory') && $request->goal_bank_mandatory !== null) {
             if ($request->goal_bank_mandatory == "1") {
@@ -502,11 +503,15 @@ class GoalController extends Controller
         }
         if ($request->has('goal_bank_createdby') && $request->goal_bank_createdby) {
             // $query = $query->where('user_id', $request->created_by);
-            $adminGoals = $adminGoals->where('created_by', $request->goal_bank_createdby);
+            if(is_numeric($request->goal_bank_createdby)) {
+                $adminGoals = $adminGoals->where('created_by', $request->goal_bank_createdby)->whereNull('display_name');
+            } else {
+                $adminGoals = $adminGoals->where('display_name', 'like',$request->goal_bank_createdby);
+            }
         }
 
         $adminGoalsInherited = Goal::withoutGlobalScopes()
-            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator ', ') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
+            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator ', ') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
             ->join('goal_bank_orgs', function ($qon) {
                 return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
                     ->on('goal_bank_orgs.version', \DB::raw(2))
@@ -517,6 +522,7 @@ class GoalController extends Controller
             ->leftjoin('goal_types', 'goal_types.id', 'goals.goal_type_id')   
             ->whereIn('goals.by_admin', [1, 2])
             ->where('goals.is_library', true)
+            ->whereNull('goals.deleted_at')        
             ->where(function ($where) use ($authId) {
                 return $where->whereRaw("
                         (
@@ -528,7 +534,7 @@ class GoalController extends Controller
                         )
                     ");
             })
-        ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.name', 'goals.is_mandatory');
+        ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.id', 'u2.name', 'goals.is_mandatory');
         // Admin List filter below
         if ($request->has('goal_bank_mandatory') && $request->goal_bank_mandatory !== null) {
             if ($request->goal_bank_mandatory == "1") {
@@ -570,13 +576,18 @@ class GoalController extends Controller
         }
         if ($request->has('goal_bank_createdby') && $request->goal_bank_createdby) {
             // $query = $query->where('user_id', $request->created_by);
-            $adminGoalsInherited = $adminGoalsInherited->where('created_by', $request->goal_bank_createdby);
+            if(is_numeric($request->goal_bank_createdby)) {
+                $adminGoalsInherited = $adminGoalsInherited->where('created_by', $request->goal_bank_createdby)->whereNull('display_name');
+            } else {
+                $adminGoalsInherited = $adminGoalsInherited->where('display_name', 'like',$request->goal_bank_createdby);
+            }
         }
 
         // $adminGoals = $adminGoals->union($adminGoalsInherited);
 
         $query = Goal::withoutGlobalScope(NonLibraryScope::class)
         ->where('is_library', true)
+        ->whereNull('goals.deleted_at')        
         ->join('users', 'goals.user_id', '=', 'users.id')          
         ->leftjoin('users as u2', 'u2.id', '=', 'goals.created_by')
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')    
@@ -628,14 +639,18 @@ class GoalController extends Controller
 
         if ($request->has('goal_bank_createdby') && $request->goal_bank_createdby) {
             // $query = $query->where('user_id', $request->created_by);
-            $query = $query->where('created_by', $request->goal_bank_createdby);
+            if(is_numeric($request->goal_bank_createdby)) {
+                $query = $query->where('created_by', $request->goal_bank_createdby)->whereNull('display_name');
+            } else {
+                $query = $query->where('display_name', 'like',$request->goal_bank_createdby);
+            }
         }
 
         $query->whereHas('sharedWith', function($query) {
             $query->where('user_id', Auth::id());
         });
         $query->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory');
-        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name separator "<br/> ") as tagnames'));
+        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.id as creator_id','u2.name as username',DB::raw('group_concat(distinct tags.name separator "<br/> ") as tagnames'));
         $query = $query->union($adminGoals)->union($adminGoalsInherited);
                 
         $sortby = 'created_at';
@@ -647,8 +662,9 @@ class GoalController extends Controller
         $bankGoals = $query->get();
         $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goaltypes, $tagsList);
         $bankGoals_arr = array();
-        
+        $goalCreatedBy = array();
         $i = 0;
+        
         foreach($bankGoals as $item){
             $bankGoals_arr[$i]['id'] = $item->id;
             $bankGoals_arr[$i]['title'] = $item->title;
@@ -665,12 +681,31 @@ class GoalController extends Controller
                 $bankGoals_arr[$i]['is_mandatory'] = 'Suggested';
             }
             $bankGoals_arr[$i]['display_name'] = $item->display_name;
+            if($item->display_name != '' ){
+                $goalCreatedBy[$i]['id'] = $item->display_name; 
+                $goalCreatedBy[$i]['name'] = $item->display_name;
+            } else {
+                $goalCreatedBy[$i]['id'] = $item->creator_id;
+                $goalCreatedBy[$i]['name'] = $item->username; 
+            }
+            
+            
             $bankGoals_arr[$i]['typename'] = $item->typename;
             $bankGoals_arr[$i]['username'] = $item->username;
             $bankGoals_arr[$i]['tagnames'] = $item->tagnames;
             $i++;
         }
         $json_goalbanks = json_encode($bankGoals_arr);   
+        
+        
+        usort($goalCreatedBy, function($a, $b) {
+            return strcmp($a["name"], $b["name"]);
+        });
+        $createdBy = collect($goalCreatedBy)->unique('name')->values()->all();
+        array_unshift($createdBy , [
+            "id" => "0",
+            "name" => "Any"
+        ]);
         
         //no need private in goalbank module
         unset($goaltypes[4]);
@@ -857,20 +892,38 @@ class GoalController extends Controller
         ];
         $createdBy = Goal::withoutGlobalScope(NonLibraryScope::class)
             ->where('is_library', true)
-            ->whereHas('sharedWith', function($query) {
-                $query->where('user_id', Auth::id());
-            })
             ->with('user')
+            ->where('user_id', Auth::id())    
+            ->whereNull('display_name')
+            ->whereNull('deleted_at')        
             ->groupBy('user_id')
             ->get()
             ->pluck('user')
             ->toArray();
-            
+       
         $display_names = DB::table('goals')
                     ->select('display_name')
+                    ->Join('goals_shared_with', 'goals_shared_with.goal_id', 'goals.id')
+                    ->where('goals_shared_with.user_id', Auth::id())
+                    ->whereNull('deleted_at')
                     ->distinct()
                     ->pluck('display_name')
                     ->toArray();
+        $display_names_by_self = DB::table('goals')
+                    ->select('display_name')
+                    ->where('user_id', Auth::id())
+                    ->whereNull('deleted_at')
+                    ->distinct()
+                    ->pluck('display_name')
+                    ->toArray();
+        if(count($display_names_by_self)>0){
+            foreach($display_names_by_self as $name){
+                if($name != "" && !in_array($name, $display_names)){
+                    array_push($display_names, $name);
+                }
+            }
+        }
+        
         $i = count($createdBy) + 1;
         foreach($display_names as $display_name){
             if($display_name != ''){
@@ -879,7 +932,9 @@ class GoalController extends Controller
             }
             $i++;
         }
-       
+        usort($createdBy, function($a, $b) {
+            return strcmp($a["name"], $b["name"]);
+        });
         
         array_unshift($createdBy , [
             "id" => "0",
