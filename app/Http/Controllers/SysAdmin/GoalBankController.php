@@ -1235,7 +1235,6 @@ class GoalBankController extends Controller
     }
 
     protected function notify_employees($goalBank, $employee_ids) {
-
          // Filter out the employee based on the Organization level and individual user preferences. 
          $filtered_ee_ids = UserDemoJrForGoalbankView::join('access_organizations', 'user_demo_jr_for_goalbank_view.organization', 'access_organizations.organization')
                                     ->leftjoin('user_preferences', 'user_demo_jr_for_goalbank_view.user_id', 'user_preferences.user_id')
@@ -1245,12 +1244,13 @@ class GoalBankController extends Controller
                                         $query->where('user_preferences.goal_bank_flag', 'Y')
                                             ->orWhereNull('user_preferences.goal_bank_flag');
                                     })
-                                    ->pluck('user_demo_jr_for_goalbank_view.employee_id')
+                                    // ->pluck('user_demo_jr_for_goalbank_view.employee_id')
+                                    ->pluck('user_demo_jr_for_goalbank_view.user_id')
                                     ->toArray(); 
-
         if (count($filtered_ee_ids)) {
             // find user id based on the employee_id
-            $bcc_user_ids = User::whereIn('employee_id', $filtered_ee_ids)->pluck('id');
+            // $bcc_user_ids = User::whereIn('employee_id', $filtered_ee_ids)->pluck('id');
+            $bcc_user_ids = $filtered_ee_ids;
 
             // Send Out Email Notification to Employee
             $sendMail = new SendMail();
