@@ -607,7 +607,9 @@ class GoalBankController extends Controller
             $notify_audiences = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
         }
         // notify_on_dashboard when new goal added
+        Log::info('Tracer 1');
         $this->notify_on_dashboard($resultrec, $notify_audiences);
+        Log::info('Tracer 2');
         return redirect()->route(request()->segment(1).'.goalbank')
             ->with('success', 'Create new goal bank successful.');
     }
