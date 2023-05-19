@@ -7,26 +7,11 @@
         @csrf
         <table class="table table-sm">
             <tr style="background-color: #ccc">
-                <th style="width:35%">Shared Elements</th>
-                <th style="width:35%">Reason</th>
+                <th style="width:70%">Reason</th>
                 <th style="width:30%">Action</th>
             </tr>
             <tr>
-                <td>
-                    <div class="view-mode">
-                        {{count($shared->shared_item) == 2 ? 'All' : ($shared->shared_item[0] == 1 ? 'Goal' : 'Conversation')}}
-                        <x-button class="edit-field" type="button" style="link" size="sm" icon="edit" data-action="item-edit"></x-button>
-                    </div>
-                    <div class="edit-mode item-edit d-none">
-                        <div class="d-flex">
-                            <x-dropdown name="shared_item[]" :list="[['id'=>1, 'name'=> 'Goals', 'selected'=>in_array(1, $shared->shared_item)], ['id'=>2, 'name'=> 'Conversations',  'selected'=>in_array(2, $shared->shared_item)]]" multiple class="items-to-share-edit"></x-dropdown>
-                            <span class="pl-1">
-                                <x-button onclick="this.form.submitted=this.value;" value="items" size="sm" name="action" type="submit">Save</x-button>
-                            </span>
-                        </div>
-                    </div>
-                    </form>
-                </td>
+                </form>
                 <td>
                     <div class="view-mode">
                         {{$shared->comment}}

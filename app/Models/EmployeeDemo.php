@@ -41,6 +41,7 @@ class EmployeeDemo extends Model
         'date_deleted',
         'date_updated',
         'date_created',
+        'orgid'
     ];
 
     public function users() {

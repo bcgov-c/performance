@@ -25,8 +25,8 @@ class UpdateProfileSharedWithRequest extends FormRequest
     {
         return [
             'comment' => 'required',
-            'shared_item' => 'required|array',
-            'shared_item.*' => 'required|in:1,2',
+            // 'shared_item' => 'required|array',
+            // 'shared_item.*' => 'required|in:1,2',
             'action' => 'required|in:items,comment,stop'
         ];
     }

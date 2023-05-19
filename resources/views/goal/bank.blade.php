@@ -1,144 +1,212 @@
-<x-side-layout title="{{ __('My Goals - Performance Development Platform') }}">
-    <div class="container-fluid">
-        <div class="row ">
-            <div class="col-md-6 col-6">
-                <x-slot name="header">                    
-                    <h1>Goal Bank</h1>
-                    @include('goal.partials.tabs')
-                </x-slot>
-            </div>
-        </div>
-        <div>
-            <h3>My Goal Bank</h3>
-            <!-- <b>My Goal Bank</b> <br> -->
-            The goals below have been created for you by your supervisor or organization. Click on a goal to view it and add it to your own profile. If needed, you can edit the goal to personalize it once it is in your profile. 
-            <br>
-            <br>
-        </div>
-        <form action="" method="get" id="filter-menu">
-            <div class="row">
-                <div class="col">
-                    <label>
-                        Title
-                        <input type="text" name="title" class="form-control" value="{{request()->title}}">
-                    </label>
-                </div>
-                <div class="col">
-                    <x-dropdown :list="$goalTypes" label="Goal Type" name="goal_type" :selected="request()->goal_type"></x-dropdown>
-                </div>
-                <div class="col">
-                    <x-dropdown :list="$tagsList" label="Tags" name="tag_id" :selected="request()->tag_id"></x-dropdown>
-                </div>
-                <div class="col">
-                    <label>
-                        Date Added
-                        <input type="text" class="form-control" name="date_added" value="{{request()->date_added ?? 'Any'}}">
-                    </label>
-                </div>
-                <div class="col">
-                    <x-dropdown :list="$createdBy" name="created_by" :selected="request()->created_by" label="Created by"></x-dropdown>
-                </div>
-                <div class="col">
-                    <x-dropdown :list="$mandatoryOrSuggested" label="Mandatory/Suggested" name="is_mandatory" :selected="request()->is_mandatory"></x-dropdown>
-                </div><!-- 
-                <div class="col">
-                    <button class="btn btn-primary mt-4 px-5">Filter</button>
-                </div> -->
-            </div>
-            <input name="sortby" id="sortby" value="{{$sortby}}" type="hidden">
-            <input name="sortorder" id="sortorder" value="{{$sortorder}}" type="hidden">
-        </form>
+<style>
+    th{
+        padding:20px;
+    }
+    td{
+        padding:20px;
+    }
+    .float-right {
+        float: right;
+    }
+</style>    
 
-        <form action="{{ route('goal.library.save-multiple') }}" method="post">
-            @csrf
-            <div class="row">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                            <input name="total_count" id="total_count" type="hidden" value="{{$goals_count}}">
-                            <table class="table table-borderless">
-                                <thead>
-                                    <tr class="border-bottom">
-                                        <th>
-                                            @if ($bankGoals->isEmpty()) 
-                                            @php    $no_box = 'disabled' @endphp
-                                            @else 
-                                            @php    $no_box = ''  @endphp
-                                            @endif
-                                            <input type="checkbox" id="select_all"  {{$no_box}}>
-                                        </th>
-                                        <th style="width:35%"> <a href='javascript:sort("title")'>Goal Title <i class="sorttitle fas fa-sort" style="display:none"></i></a> </th>
-                                        <th style="width:20%"> <a href='javascript:sort("typename")'>Goal Type <i class="sorttype fas fa-sort"  style="display:none"></i></a></th>
-                                        <th style="width:15%"> <a href='javascript:sort("tagnames")'>Tags <i class="sorttag fas fa-sort"  style="display:none"></i></a></th>
-                                        <th style="width:15%"> <a href='javascript:sort("created_at")'>Date Added <i class="sortdate fas fa-sort"  style="display:none"></i></a></th>
-                                        <th style="width:15%"> <a href='javascript:sort("username")'>Created By <i class="sortuser fas fa-sort"  style="display:none"></i></a></th>
-                                        <th style="width:15%"> <a href='javascript:sort("is_mandatory")'>Mandatory/ Suggested <i class="sortmandatory fas fa-sort"  style="display:none"></i></a></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($bankGoals as $goal)
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox" class="goal_ids" name="goal_ids[]" value="{{$goal->id}}">
-                                        </td>
-                                        <td style="width:25%">
-                                            <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->title }}</a>
-                                        </td>
-                                        <td style="width:15%">
-                                            <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->typename }}</a>
-                                        </td>
-                                        <td style="width:15%">
-                                            <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->tagnames }}</a>
-                                        </td>
-                                        <td style="width:15%">
-                                            <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->created_at == null ?: $goal->created_at->format('M d, Y') }}</a>
-                                        </td>
-                                        <td style="width:15%">
-                                            @if ($goal->display_name) 
-                                                <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->display_name }}</a>
-                                            @else
-                                                <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->username }}</a>
-                                            @endif
-                                        </td>
-                                        <td style="width:15%">
-                                            <a href="#" class="show-goal-detail highlighter" data-id="{{$goal->id}}">{{ $goal->is_mandatory ? 'Mandatory' : 'Suggested' }}</a>
-                                        </td>
-                                        <td>
-                                        <button class="btn btn-primary btn-sm float-right ml-2 btn-view-goal show-goal-detail highlighter" data-id="{{$goal->id}}" data-toggle="modal" data-target="#viewGoal">
-                                            View
-                                        </button>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                                {{ $bankGoals->links() }}
-                            </table>
-                        </div>
+<x-side-layout title="{{ __('My Goals - Performance Development Platform') }}">
+    <h3>Goal Bank</h3>
+    <div class="row">        
+        @include('goal.partials.tabs')
+    </div>
+    <div class="mt-4">
+        <div class="card">
+		<div class="card-header" id="heading_0">
+                    <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_0" aria-expanded="1" aria-controls="collapse_0">
+                        <button class="btn btn-link" >
+                            <h4>My Goal Bank</h4> 
+                        </button>                        
+                        <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span>    
+                        <br/>                                
+                        <button class="btn btn-link text-left" style="color:black">
+                            <p>The goals below have been created for you by your supervisor or organization. Click on a goal to view it and add it to your own profile. 
+                        If needed, you can edit the goal to personalize it once it is in your profile. </p>
+                        </button>  
+                    </h5>
+		</div>
+
+		<div id="collapse_0" class="collapse" aria-labelledby="heading_0">
+                    <div class="card-body">
+                        
+                        <form action="" method="get" id="filter-menu">
+                            <div class="row">
+                                <div class="col">
+                                    <label>
+                                        Title
+                                        <input type="text" id="goal_bank_title" name="goal_bank_title" class="form-control" value="{{request()->goal_bank_title}}">
+                                    </label>
+                                </div>
+                                <div class="col">
+                                    <x-dropdown :list="$goaltypes" id="goal_bank_types" label="Goal Type" name="goal_bank_types" :selected="request()->goal_bank_types"></x-dropdown>
+                                </div>
+                                <div class="col">
+                                    <x-dropdown :list="$tagsList" label="Tags" id="goal_bank_tags" name="goal_bank_tags" :selected="request()->goal_bank_tags"></x-dropdown>
+                                </div>
+                                <div class="col">
+                                    <label>
+                                        Date Added
+                                        <input class="sup_filtersub form-control form-control-md" id="goal_bank_dateadd" type="date" name="goal_bank_dateadd" id="date_added" value="{{request()->goal_bank_dateadd}}" autocomplete="off">
+                                    </label>
+                                </div>
+                                <div class="col">
+                                    <x-dropdown :list="$createdBy" id="goal_bank_createdby" name="goal_bank_createdby" :selected="request()->goal_bank_createdby" label="Created by"></x-dropdown>
+                                </div>
+                                <div class="col">
+                                    <x-dropdown :list="$mandatoryOrSuggested" id="goal_bank_mandatory" label="Mandatory/Suggested" name="goal_bank_mandatory" :selected="request()->goal_bank_mandatory"></x-dropdown>
+                                </div><!-- 
+                                <div class="col">
+                                    <button class="btn btn-primary mt-4 px-5">Filter</button>
+                                </div> -->
+                            </div>
+                        </form>
+
+                        <form action="{{ route('goal.library.save-multiple') }}" method="post">
+                            @csrf
+                            <div class="row">
+                                <div class="col">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <input name="total_count" id="total_count" type="hidden" value="{{$goals_count}}">                                            
+                                            <table style="width:100%" id='goalbanks' class="table table-striped"> </table>
+                                        </div>
+                                    </div>
+                                    @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
+                                    <div class="text-center">
+                                        <x-button id="addMultipleGoalButton" disabled>Add Selected Goals to Your Profile</x-button>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </form>
+                        
+                        
+                        
                     </div>
-                    @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
-                    <div class="text-center">
-                        <x-button id="addMultipleGoalButton" disabled>Add Selected Goals to Your Profile <span class="selected_count">(0)</span></x-button>
-                    </div>
-                    @endif
-                </div>
-            </div>
-        </form>
+		</div>
+	</div>
+        
         @if(Auth::user()->hasRole('Supervisor'))
         @php $shareWithLabel = 'Audience' @endphp
         @php $doNotShowInfo = true @endphp
-        <div>
-            <h3>Team Goal Bank</h3>
-        </div>
-        <form action="{{ route('my-team.sync-goals-sharing')}}" method="POST" id="share-my-goals-form">
-            @csrf
-            <div class="d-none" id="syncGoalSharingData"></div>
-        </form>
         @push('css')
         <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}">
         @endpush
+        <div class="card">
+		<div class="card-header" id="heading_1">
+		<h5 class="mb-1"data-toggle="collapse" data-target="#collapse_1" aria-expanded="1" aria-controls="collapse_1">
+                    <button class="btn btn-link" >
+                        <h4>Team Goal Bank</h4> 
+                    </button>                        
+                    <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span>  
+                    <br/>                                
+                    <button class="btn btn-link text-left" style="color:black">
+                        <p>Create a goal for your employees to use in their own profile. Goals can be suggested (for example, 
+                    a learning goal to help increase team skill or capacity in a relevant area) or mandatory 
+                    (for example, a work goal detailing a new priority that all employees are responsible for). 
+                    Employees will be notified when a new goal has been added to their Goal Bank.  </p>
+                    </button> 
+                </h5>
+		</div>
+            
+		<div id="collapse_1" class="collapse" aria-labelledby="heading_1">
+                    <div class="card-body">                        
+                        <p>
+                            <x-button id="add-goal-to-library-btn" class="my-2">
+                                <i class="fas fa-plus-square"></i> Add Goal to Bank
+                            </x-button>
+                        </p>
+                         <form action="" method="get" id="filter-lib-menu">
+                            <div class="row">
+                                <div class="col">
+                                    <label>
+                                        Title
+                                        <input type="text" name="title" id="title" class="form-control" value="{{request()->title}}">
+                                    </label>
+                                </div>
+                                <div class="col">
+                                    <x-dropdown :list="$goaltypes" label="Goal Type" id="goal_type"  name="goal_type" :selected="request()->goal_type"></x-dropdown>
+                                </div>
+                                <div class="col">
+                                    <x-dropdown :list="$tagsList" label="Tags" id="tag_id" name="tag_id" :selected="request()->tag_id"></x-dropdown>
+                                </div>
+                                <div class="col">
+                                    <label>
+                                        Date Added
+                                        <input class="form-control form-control-md" type="date" name="date_added" id="date_added" value="{{request()->date_added}}" autocomplete="off">
+                                    </label>
+                                </div>
+                                <div class="col">
+                                    <x-dropdown :list="$mandatoryOrSuggested" label="Mandatory/Suggested" id="is_mandatory" name="is_mandatory" :selected="request()->is_mandatory"></x-dropdown>
+                                </div><!-- 
+                                <div class="col">
+                                    <button class="btn btn-primary mt-4 px-5">Filter</button>
+                                </div> -->
+                            </div>
+                            <input name="sortby" id="sortby" value="{{$sortby}}" type="hidden">
+                            <input name="sortorder" id="sortorder" value="{{$sortorder}}" type="hidden">
+                        </form>
+                        <br/>
+                        <table style="width:100%" id='team_goalbanks' class="table table-striped">  </table>
+                        <form action="{{ route('goal.sync-goals')}}" method="POST" id="share-my-goals-form">
+                            @csrf
+                            <div class="d-none" id="syncGoalSharingData"></div>
+                            <input type="hidden" name="sync_goal_id" id="sync_goal_id" value=""> 
+                            <input type="hidden" name="sync_users" id="sync_users" value=""> 
+                        </form>
+                    </div>
+		</div>
+	</div>
+        
+        
+        @include('goal.partials.goal-detail-modal')
+        <div class="modal fade" id="addGoalModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary">
+                        <h5 class="modal-title" id="addGoalModalLabel">Select Date</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body p-4">
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <x-input label="Start Date" class="error-start" type="date" id="start_date" />
+                                <small class="text-danger error-start_date"></small>
+                            </div>
+                            <div class="col-sm-6">
+                                <x-input label="End Date " class="error-target" type="date" id="target_date" />
+                                <small class="text-danger error-target_date"></small>
+                            </div>
+
+                            <div class="col-12 text-left pb-5 mt-3">
+                                <x-button type="button" class="btn-md btn-submit"> Save Changes</x-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         @push('js')
             <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
         <script>
+            $(document).on('change', '.search-users', function() {
+                var goalId = $(this).data('goal-id');
+                var selectedValues = $(this).val();
+                console.log('Goal ID:', goalId);
+                console.log('Selected Values:', selectedValues);
+                $('#sync_goal_id').val(goalId);
+                $('#sync_users').val(selectedValues);
+            });
+            
             $(document).on('click', '[data-action="delete-goal"]', function () {
                 if (confirm($(this).data('confirmation'))) {
                     let action = $("#delete-goal-form").attr('action');
@@ -192,40 +260,10 @@
                 });
             });
         </script>
-        @endpush
-        @include('my-team.goals.partials.bank')
+        @endpush       
         @endif
-    </div>
-
-    @include('goal.partials.goal-detail-modal')
-    <div class="modal fade" id="addGoalModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header bg-primary">
-                    <h5 class="modal-title" id="addGoalModalLabel">Select Date</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body p-4">
-
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <x-input label="Start Date" class="error-start" type="date" id="start_date" />
-                            <small class="text-danger error-start_date"></small>
-                        </div>
-                        <div class="col-sm-6">
-                            <x-input label="End Date " class="error-target" type="date" id="target_date" />
-                            <small class="text-danger error-target_date"></small>
-                        </div>
-
-                        <div class="col-12 text-left pb-5 mt-3">
-                            <x-button type="button" class="btn-md btn-submit"> Save Changes</x-button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
+        
     </div>
     
     @push('css')
@@ -247,100 +285,11 @@
                 $("#filter-menu").submit();
             }
             
-            
-            
-            $( document ).ready(function() {
-                var sortby = $('#sortby').val();
-                $('.sorttitle').hide();
-                $('.sorttype').hide();
-                $('.sorttag').hide();
-                $('.sortdate').hide();
-                $('.sortuser').hide();
-                $('.sortmandatory').hide();
-                if (sortby == 'title') {
-                    $('.sorttitle').show();
-                    $('.sorttype').hide();
-                    $('.sorttag').hide();
-                    $('.sortdate').hide();
-                    $('.sortuser').hide();
-                    $('.sortmandatory').hide();
-                }
-                if (sortby == 'typename') {
-                    $('.sorttitle').hide();
-                    $('.sorttype').show();
-                    $('.sorttag').hide();
-                    $('.sortdate').hide();
-                    $('.sortuser').hide();
-                    $('.sortmandatory').hide();                    
-                }
-                if (sortby == 'tagnames') {
-                    $('.sorttitle').hide();
-                    $('.sorttype').hide();
-                    $('.sorttag').show();
-                    $('.sortdate').hide();
-                    $('.sortuser').hide();
-                    $('.sortmandatory').hide();    
-                }
-                if (sortby == 'created_at') {
-                    $('.sorttitle').hide();
-                    $('.sorttype').hide();
-                    $('.sorttag').hide();
-                    $('.sortdate').show();
-                    $('.sortuser').hide();
-                    $('.sortmandatory').hide();    
-                }
-                if (sortby == 'username') {
-                    $('.sorttitle').hide();
-                    $('.sorttype').hide();
-                    $('.sorttag').hide();
-                    $('.sortdate').hide();
-                    $('.sortuser').show();
-                    $('.sortmandatory').hide();    
-                }
-                if (sortby == 'is_mandatory') {
-                    $('.sorttitle').hide();
-                    $('.sorttype').hide();
-                    $('.sorttag').hide();
-                    $('.sortdate').hide();
-                    $('.sortuser').hide();
-                    $('.sortmandatory').show();    
-                }
-            });
-            
-            $('input[name="date_added"]').daterangepicker({
-                autoUpdateInput: false,
-                locale: {
-                    cancelLabel: 'Any',
-                    format: 'MMM DD, YYYY'
-                }
-            }).on('apply.daterangepicker', function(ev, picker) {
-                $(this).val(picker.startDate.format('MMM DD, YYYY') + ' - ' + picker.endDate.format('MMM DD, YYYY'));
-                $("#filter-menu").submit();
-            }).on('cancel.daterangepicker', function(ev, picker) {
-                $('input[name="date_added"]').val('Any');
+            $('#filter-lib-menu select, #filter-lib-menu input').change(function () {
+                $("#filter-lib-menu").submit();
             });
         </script>
         <script>
-            $(document).on('click', '#select_all', function (e) {
-                $('.goal_ids').prop('checked', this.checked);
-                let total_count = $('#total_count').val();  
-                let isChecked = $('#select_all')[0].checked
-                if (isChecked === false) {
-                    total_count = 0;
-                    $('#addMultipleGoalButton').prop('disabled', true);
-                } else {
-                    $('#addMultipleGoalButton').prop('disabled', false);
-                }
-                $('#addMultipleGoalButton').find('span.selected_count').html("("+total_count+")");
-            });
-            $(document).on('click', '.goal_ids', function (e) {
-                let count = $('.goal_ids:checked').length;
-                if (count == 0) {
-                    $('#select_all').prop('checked', false); 
-                }
-                $('#addMultipleGoalButton').find('span.selected_count').html("("+count+")");
-                $('#addMultipleGoalButton').prop('disabled', count === 0);    
-            });
             $(document).on('click', '.show-goal-detail', function(e) {
                 e.preventDefault();
                 $("#goal_form").find('input[name=selected_goal]').val($(this).data('id'));
@@ -403,6 +352,39 @@
 
         </script>
     @endpush
+    
+    
+    
+    <x-slot name="js">
+
+    </x-slot>
+    <x-slot name="css">
+        <style>
+            i {
+                transition: 0.2s ease-in-out;
+            }
+            [aria-expanded="true"] i{
+                transform: rotate(180deg);
+            }
+            
+            .select2-container--default .select2-selection--multiple .select2-selection__choice {
+                background-color: #444444;
+                border: 1px solid #aaa;
+                border-radius: 4px;
+                cursor: default;
+                float: left;
+                margin-right: 5px;
+                margin-top: 5px;
+                padding: 0 5px;
+            }
+            
+            .headborder{
+                border-bottom: solid #FCBA19;
+            }
+            
+        </style>
+    </x-slot>
+
 </x-side-layout>
 
 
@@ -474,6 +456,546 @@
         height: 350px; 
         overflow-y: scroll;
     }
+</style>   
+
+
+@push('css')
+
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+	<style>
+        #employee-list-table_filter label {
+            text-align: right !important;
+            padding-right: 10px;
+        } 
+    </style>
+@endpush
+
+@push('js')
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/select/1.3.3/js/dataTables.select.min.js"></script>
+@endpush   
+
+<script>
+    $(document).ready(function() {
+      const json_goalbanks = <?php echo $json_goalbanks;?>;
+      const goalbanks = $('#goalbanks').DataTable({
+        data: json_goalbanks,
+        columns: [
+          {
+            title: "<input type='checkbox' id='checkAll'>",
+            data: null,
+            orderable: false, // Disable sorting
+            render: function(data, type, row) {
+              return '<input type="checkbox" name="goal_ids[]" value="' + row.id + '" class="row-checkbox goal_ids">';
+            }
+          },
+          { title: "ID", data: "id" },
+          {
+            title: "Goal Title",
+            data: null,
+            render: function(data, type, row) {
+                return '<a href="#" class="show-goal-detail highlighter" data-id="' + row.id + '">' + data.title + '</a>';
+            }
+          },
+          { title: "Goal Type", data: "typename" },
+          { title: "Tags", data: "tagnames" },
+          { title: "Date Added", data: "created_at" },
+          {
+            title: "Created by",
+            data: null,
+            render: function(data, type, row) {
+              if (row.display_name) {
+                return row.display_name;
+              } else {
+                return row.username;
+              }
+            }
+          },
+          { title: "Mandatory/Suggested", data: "is_mandatory" }
+        ],
+        "order": [[0, "desc"]],
+        dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>'
+      });
+
+      goalbanks.column(1).visible(false);
+      
+      // Add event listener for "check all" checkbox
+      $('#checkAll').on('change', function() {
+          $('.goal_ids').prop('checked', this.checked);
+          if (this.checked) {
+            $('#addMultipleGoalButton').prop('disabled', false);
+            dataTable.page.len(-1).draw(); // Disable paging temporarily
+            dataTable.rows().select(); // Select all rows
+          } else {
+            $('#addMultipleGoalButton').prop('disabled', true);
+            dataTable.rows().deselect(); // Deselect all rows
+            dataTable.page.len(10).draw(); // Set the original page length and redraw
+          }
+      });
+
+        // Get the checkbox elements
+      var checkboxes = $('.goal_ids');
+        // Get the button element
+      var addButton = $('#addMultipleGoalButton');
+        // Attach an event listener to the checkboxes
+      var anyChecked = false;  
+      checkboxes.on('change', function() {
+            // Check if any checkbox is checked
+            var anyChecked = checkboxes.is(':checked');
+            // Enable or disable the button based on checkbox state
+            addButton.prop('disabled', !anyChecked);
+            // Check if none of the checkboxes are checked
+            if (!anyChecked) {
+                 $('#checkAll').prop('checked', false);
+            }
+      });
+      
+      
+      
+        // Add event listener for row checkboxes
+      $('#goalbanks').on('change', '.goal_ids', function() {
+        if ($('.goal_ids:checked').length === $('.goalcheck').length) {
+            if(anyChecked){
+                $('#checkAll').prop('checked', true);
+            } 
+        } else {
+            $('#checkAll').prop('checked', false);
+        }
+      });
+        // Add event listener for DataTable page change
+      $('#goalbanks').on('page.dt', function () {
+          $('#checkAll').prop('checked', false);
+      });
+      
+      
+        const json_team_goalbanks = <?php echo $json_team_goalbanks;?>;
+        const team_goalbanks = $('#team_goalbanks').DataTable({
+          data: json_team_goalbanks,
+          columns: [
+            { title: "ID", data: "id" },
+            {
+              title: "Goal Title",
+              data: "title",
+              render: function(data, type, row) {
+                return '<a href="' + '{{ route("goal.edit", ":id") }}'.replace(':id', row.id) + '" class="p-2">' + data + '</a>';
+              }
+            },
+            { title: "Goal Type", data: "typename" },
+            { title: "Tags", data: "tagnames" },
+            { title: "Date Added", data: "created_at" },
+            { title: "Mandatory/Suggested", data: "is_mandatory" },
+            {
+              title: "Audience",
+              data: null,
+              orderable: false, // Disable sorting
+              render: function(data, type, row) {
+                // Prepare the options for the multiselect dropdown
+                var options = '';
+                var sharedUserIds = data.shared_user_id ? data.shared_user_id.split(',') : [];
+                var sharedUserNames = data.shared_user_name ? data.shared_user_name.split(',') : [];
+                
+                var employees = <?php echo json_encode($employees_list); ?>;
+
+                for (var i = 0; i < employees.length; i++) {
+                      var selected = '';
+                      if(sharedUserIds.length > 0){
+                          for (var a = 0; a < sharedUserIds.length; a++) {
+                             if(sharedUserIds[a] == employees[i].id) {
+                                 selected = 'selected';
+                             }
+                          }
+                      }   
+                  
+                  options += '<option value="' + employees[i].id + '" ' + selected + '>' + employees[i].name + '</option>';
+                  
+                }
+                // Generate the multiselect dropdown HTML
+                var dropdownHtml = '<select multiple class="form-control search-users ml-1"  id="search-users-' + row.id + '" name="share_with[' + row.id + '][]"  data-goal-id="' + row.id + '" >' +
+                  options +
+                  '</select>';
+
+                return dropdownHtml;
+              }
+            },
+            {
+              title: "Actions",
+              data: null,
+              orderable: false, // Disable sorting
+              render: function (data, type, row) {
+                var deleteButton = '<button class="btn btn-danger" onclick="confirmDelete(' + row.id + ')"><i class="fas fa-trash-alt"></i></button>';
+                return deleteButton;
+              }
+            }
+          ],
+          "order": [[0, "desc"]],
+          dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>'
+        });
+
+      team_goalbanks.column(0).visible(false);
+      
+      
+      
+    });
+    
+    
+    $(document).ready(() => {            
+            $(".tags").multiselect({
+                enableFiltering: true,
+                enableCaseInsensitiveFiltering: true,
+            });
+            $(".search-users").each(function() {
+                const goalId = $(this).data('goal-id');
+                const selectDropdown = this;
+                let valueBeforeChange = [];
+                $(this).multiselect({
+                    allSelectedText: 'All',
+                    selectAllText: 'All',
+                    nonSelectedText: 'No one',
+                    // nonSelectedText: null,
+                    includeSelectAllOption: true,
+                    onDropdownShow: function () {
+                        valueBeforeChange = [...selectDropdown.options].filter(option => option.selected).map(option => option.value);
+                    },
+                    onDropdownHide: function () {
+                        const valueAfterChange = [...selectDropdown.options].filter(option => option.selected).map(option => option.value);
+                        let toRevert;
+                        if (valueBeforeChange.length === 0 && valueAfterChange.length !== 0) {
+                            toRevert = !confirm("Sharing this goal will make it visible to the selected employees. Continue?");
+                        }
+
+                        if (valueBeforeChange.length !==0 && valueAfterChange.length === 0) {
+                            toRevert = !confirm("Making this goal private will hide it from all employees. Continue?");
+                        }
+
+                        if (toRevert) {
+                            valueAfterChange.forEach((value) => {
+                                if (!valueBeforeChange.includes(value)) {
+                                    $(selectDropdown).multiselect('deselect', value);
+                                }
+                            });
+                            valueBeforeChange.forEach((value) => {
+                                $(selectDropdown).multiselect('select', value);
+                            });
+                        }
+                        const finalSelectedOptions = [...selectDropdown.options].filter(option => option.selected).map(option => option.value);
+                        document.getElementById("syncGoalSharingData").innerHTML = "";
+                        finalSelectedOptions.forEach((value) => {
+                            const input = document.createElement("input");
+                            input.setAttribute('value', value);
+                            input.name = $(selectDropdown).attr('name');
+                            document.getElementById("syncGoalSharingData").appendChild(input);
+                        });
+                        const input = document.createElement("input");
+                        input.setAttribute('value', finalSelectedOptions.length !== 0 ? "1" : "0");
+                        input.name = "is_shared["+goalId+"]";
+                        document.getElementById("syncGoalSharingData").appendChild(input);
+                        const form = $("#share-my-goals-form").get()[0];
+                        fetch(form.action, {method:'POST', body: new FormData(form)});
+                    }
+                });
+            });
+            
+            $("#goal_title").change(function(){
+                var goal_title = $("#goal_title").val();
+                var tags = $('.tags').val(); 
+                if (goal_title != '' && tags != ''){
+                   CKEDITOR.instances['what'].setReadOnly(false);
+                   CKEDITOR.instances['measure_of_success'].setReadOnly(false);
+                   $('#start_date').prop("readonly",false);
+                   $('#target_date').prop("readonly",false);
+                } else {
+                   CKEDITOR.instances['what'].setReadOnly(true);
+                   CKEDITOR.instances['measure_of_success'].setReadOnly(true);
+                   $('#start_date').prop("readonly",true);
+                   $('#target_date').prop("readonly",true);
+                }
+            });
+            
+            $(".tags").change(function(){
+                var goal_title = $("#goal_title").val();
+                var tags = $('.tags').val(); 
+                if (goal_title != '' && tags != ''){ 
+                    CKEDITOR.instances['what'].setReadOnly(false);
+                    CKEDITOR.instances['measure_of_success'].setReadOnly(false);
+                    $('#start_date').prop("readonly",false);
+                    $('#target_date').prop("readonly",false);
+                } else {
+                   CKEDITOR.instances['what'].setReadOnly(true);
+                   CKEDITOR.instances['measure_of_success'].setReadOnly(true);
+                   $('#start_date').prop("readonly",true);
+                   $('#target_date').prop("readonly",true);
+                }
+            });
+            
+        });  
+    
+</script>  
+
+<style>
+    .multiselect {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 275px;
+    }
+    
+    .alert-danger {
+        color: #a94442;
+        background-color: #f2dede;
+        border-color: #ebccd1;
+    }
+    
+    
+    .multiselect-container{
+        height: 350px; 
+        overflow-y: scroll;
+    }
 </style>    
 
+<style>
+    
+    .dataTable > thead > tr > th:nth-child(5)[class*="sort"]:before,
+    .dataTable > thead > tr > th:nth-child(5)[class*="sort"]:after {
+        content: "" !important;
+    }
+    
+    .panel-heading{
+        opacity: 0.5;
+    }
+    .acc-title {
+	display: block;
+	height: 22px;
+	position:absolute;
+	top:11px;
+	left:20px;
+    }
+    .acc-status {
+	display: block;
+	width: 22px;
+	height: 22px;
+	position:absolute;
+	top:11px;
+	right:11px;
+    }
+    
+    #upcoming {
+        font-weight: bold;
+    }
+    
+    #employee_conversations {
+        width: 100%;
+    }  
+    
+    table.dataTable thead th {
+        border-bottom: solid #FCBA19;
+    }
+</style> 
+@include('my-team.partials.add-goal-to-library-modal')
 
+<script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
+<script>
+    $(document).on('click', '#add-goal-to-library-btn', function () {
+        modal_open = true;
+        $("#addGoalToLibraryModal").modal('show');
+    });
+    $(".items-to-share").multiselect({
+        allSelectedText: 'All',
+        selectAllText: 'All',
+        includeSelectAllOption: true
+    });
+    $(document).ready(function(){
+        CKEDITOR.replace('what', {
+            toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent", "Link"] ] });
+        CKEDITOR.replace('measure_of_success', {
+            toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent", "Link"] ] });
+    });
+    $('#addGoalToLibraryModal').on('hidden.bs.modal', function (e) {
+        $('#what').val('');
+        $('#measure_of_success').val('');
+        $("#goal_title").val('');
+        $('input[name=goal_type_id]').val(1);
+        
+        modal_open = false;
+    })
+</script>
+
+<script>
+
+        $('body').popover({
+            selector: '[data-toggle]',
+            trigger: 'click',
+        });
+        
+        $('.modal').popover({
+            selector: '[data-toggle-select]',
+            trigger: 'click',
+        });
+
+        // $('.tags').multiselect({
+        //         	enableFiltering: true,
+        //         	enableCaseInsensitiveFiltering: true,
+		// 			// nonSelectedText: null,
+        //     	});              
+                
+		$('body').on('click', function (e) {
+            $('[data-toggle=popover]').each(function () {
+            // hide any open popovers when the anywhere else in the body is clicked
+               	if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                        $(this).popover('hide');
+                    	}
+             	});
+		});
+        
+        $('body').on('click', function (e) {
+            $('[data-toggle=dropdown]').each(function () {
+            // hide any open popovers when the anywhere else in the body is clicked
+               	if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                        $(this).popover('hide');
+                    	}
+             	});
+		}); 
+
+        $(document).on('show.bs.modal', '#addGoalToLibraryModal', function(e) {
+            modal_open = true;
+            $('.alert-danger').hide();
+            $('.text-danger').html('');
+            $('.form-control').removeClass('is-invalid');
+            
+            const minutes = 15;
+            const SessionTime = 1000 * 60 * minutes;
+            const myTimeout = setTimeout(sessionWarning, SessionTime);    
+            
+            $('#what').val('');
+            $('#measure_of_success').val('');
+            $("#goal_title").val('');
+            $('input[name=goal_type_id]').val(1);
+            //$('.tooltip-dropdown').find('.dropdown-item[data-value="1"]').click();
+            $("input[name=start_date]").val('');
+            $("input[name=target_date]").val('');
+            for (var i in CKEDITOR.instances){
+                CKEDITOR.instances[i].setData('');
+            };
+                    
+        });
+        $(document).on('hide.bs.modal', '#addGoalToLibraryModal', function(e) {
+            const isContentModified = () => {
+                if ($('#what').val() !== '' || $('#measure_of_success').val() !== ''
+                    || $("#goal_title").val() !== '' || $('input[name=goal_type_id]').val() != 1 
+                    || $("input[name=start_date]").val() !== '' || $("input[name=target_date]").val() != ''
+                    ) {
+                    return true;
+                } 
+                return false;
+            };
+            for (var i in CKEDITOR.instances){
+                CKEDITOR.instances[i].updateElement();
+            };
+            if (isContentModified() && !confirm("If you continue you will lose any unsaved changes.")) {
+                e.preventDefault();
+            } else {
+                location.reload();
+            }
+        });
+        
+        $("#add-goal-to-library-form").on('submit', function (e) {
+            $('#savebtn').prop('disabled', true);
+            e.preventDefault();
+            for (var i in CKEDITOR.instances){
+                CKEDITOR.instances[i].updateElement();
+            };
+            const form = this;
+            $.ajax({
+                url: $(form).attr('action'),
+                type : 'POST',
+                data: $(form).serialize(),
+                success: function (result) {
+                    if(result.success){
+                        $('.alert-danger').hide();
+                        window.location.reload();
+                    }
+                },
+                error: function (error){
+                    $('#savebtn').prop('disabled', false);
+                    var errors = error.responseJSON.errors;
+                    $('.alert-danger').show();
+                    $('.modal-body').animate({scrollTop: 0},100);
+                    $('.text-danger').each(function(i, obj) {
+                        $('.text-danger').text('');
+                    });
+                    Object.entries(errors).forEach(function callback(value, index) {
+                         console.log(value[0]);
+                        var className = '.error-' + value[0];
+                        $('#addGoalToLibraryModal input[name='+value[0]+']').addClass('is-invalid');
+                        $(className).text(value[1]);
+                    });
+                }
+            });
+        });
+        
+        
+				$('body').on('click', function (e) {
+                $('[data-toggle=popover]').each(function () {
+                    // hide any open popovers when the anywhere else in the body is clicked
+                    	if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                        $(this).popover('hide');
+                    	}
+                	});
+				});
+                                
+        
+       var goal_bank_title = $('#goal_bank_title').val();
+       var goal_bank_types = $('#goal_bank_types').val();
+       var goal_bank_tags = $('#goal_bank_tags').val();
+       var goal_bank_dateadd = $('#goal_bank_dateadd').val();
+       var goal_bank_createdby = $('#goal_bank_createdby').val();
+       var goal_bank_mandatory = $('#goal_bank_mandatory').val();
+       if(goal_bank_title != '' || goal_bank_types != 0 || goal_bank_tags != 0 || goal_bank_dateadd != '' || goal_bank_createdby != 0  || goal_bank_mandatory != '' ){
+           $('#collapse_0').collapse('show');
+       } else {
+           $('#collapse_0').collapse('hide');
+       }
+       
+       var title = $('#title').val();
+       var goal_type = $('#goal_type').val();
+       var tag_id = $('#tag_id').val();
+       var date_added = $('#date_added').val();
+       var is_mandatory = $('#is_mandatory').val();
+       
+       if(title != '' || goal_type != 0 || tag_id != 0 || date_added != ''  || is_mandatory != '' ){
+           $('#collapse_1').collapse('show');
+       } else {
+           $('#collapse_1').collapse('hide');
+       }
+       
+       
+       
+      function confirmDelete(goalId) {
+        if (confirm("Are you sure you want to permanently delete this goal?")) {
+          deleteGoal(goalId);
+        }
+      }
+
+      function deleteGoal(goalId) {
+        $.ajax({
+            url: '{{ route("goal.destroy", ":id") }}'.replace(':id', goalId),
+            type: 'POST',
+            data: {
+              '_token': '{{ csrf_token() }}',
+              '_method': 'DELETE'
+            },
+            success: function (response) {
+              alert('Selected goal is deleted');
+              var currentUrl = window.location.href;
+              // Add the parameter 'open=1' to the URL
+              var newUrl = currentUrl + (currentUrl.indexOf('?') === -1 ? '?' : '&') + 'goaldeleted=1';
+              // Reload the page with the updated URL
+              window.location.href = newUrl;
+            },
+            error: function (xhr, status, error) {
+              // Handle error response
+              console.error("Error deleting goal:", error);
+              // Optionally, you can display an error message or perform additional actions here
+            }
+        });
+      }
+    </script>
