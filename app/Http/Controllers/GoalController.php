@@ -503,7 +503,7 @@ class GoalController extends Controller
         if ($request->has('goal_bank_createdby') && $request->goal_bank_createdby) {
             // $query = $query->where('user_id', $request->created_by);
             if(is_numeric($request->goal_bank_createdby)) {
-                $adminGoals = $adminGoals->where('created_by', $request->goal_bank_createdby);
+                $adminGoals = $adminGoals->where('created_by', $request->goal_bank_createdby)->whereNull('display_name');
             } else {
                 $adminGoals = $adminGoals->where('display_name', 'like',$request->goal_bank_createdby);
             }
@@ -576,7 +576,7 @@ class GoalController extends Controller
         if ($request->has('goal_bank_createdby') && $request->goal_bank_createdby) {
             // $query = $query->where('user_id', $request->created_by);
             if(is_numeric($request->goal_bank_createdby)) {
-                $adminGoalsInherited = $adminGoalsInherited->where('created_by', $request->goal_bank_createdby);
+                $adminGoalsInherited = $adminGoalsInherited->where('created_by', $request->goal_bank_createdby)->whereNull('display_name');
             } else {
                 $adminGoalsInherited = $adminGoalsInherited->where('display_name', 'like',$request->goal_bank_createdby);
             }
@@ -639,7 +639,7 @@ class GoalController extends Controller
         if ($request->has('goal_bank_createdby') && $request->goal_bank_createdby) {
             // $query = $query->where('user_id', $request->created_by);
             if(is_numeric($request->goal_bank_createdby)) {
-                $query = $query->where('created_by', $request->goal_bank_createdby);
+                $query = $query->where('created_by', $request->goal_bank_createdby)->whereNull('display_name');
             } else {
                 $query = $query->where('display_name', 'like',$request->goal_bank_createdby);
             }
@@ -700,8 +700,11 @@ class GoalController extends Controller
         usort($goalCreatedBy, function($a, $b) {
             return strcmp($a["name"], $b["name"]);
         });
-        $createdBy = collect($createdBy)->unique('name')->values()->all();
-        
+        $createdBy = collect($goalCreatedBy)->unique('name')->values()->all();
+        array_unshift($createdBy , [
+            "id" => "0",
+            "name" => "Any"
+        ]);
         
         //no need private in goalbank module
         unset($goaltypes[4]);
