@@ -84,31 +84,7 @@
                     <div class="col-12 col-lg-6 col-xl-4">
                         @include('goal.partials.card')
                     </div>
-                    <input name="sortby" id="sortby" value="{{$sortby}}" type="hidden">
-                    <input name="sortorder" id="sortorder" value="{{$sortorder}}" type="hidden">
-                </form>    
-            @endif    
-            @if ($type == 'current' || $type == 'supervisor')
-                @if($type == 'supervisor')
-                    <div class="col-12 mb-4">
-                        @if($goals->count() != 0)
-                            These goals have been shared with you by your supervisor. You can view them to see what your supervisor is working on and use this information to align your own goals where possible. You can also copy your supervisor&rsquo;s goal to your own profile and modify or personalize it without having any impact on your supervisor's original goal.
-                        @else
-                            <div class="alert alert-warning alert-dismissible no-border"  style="border-color:#d5e6f6; background-color:#d5e6f6" role="alert">
-                            <span class="h5" aria-hidden="true"><i class="icon fa fa-info-circle"></i><b>No goals are currently being shared with you.</b></span>
-                            </div>
-                        @endif
-                    </div>
-                    @foreach ($goals as $goal)
-                        <div class="col-12 col-lg-6 col-xl-4">
-                            @include('goal.partials.card')
-                        </div>
-                    @endforeach
-                @else
-                    <div class="col-12 col-sm-12">
-                        @include('goal.partials.target-table',['goals'=>$goals])
-                    </div>
-                @endif            
+                @endforeach
             @else
                 <div class="col-12 col-sm-12">
                     @include('goal.partials.target-table',['goals'=>$goals])
