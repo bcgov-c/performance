@@ -884,12 +884,26 @@ class GoalController extends Controller
        
         $display_names = DB::table('goals')
                     ->select('display_name')
-                    ->join('goals_shared_with', 'goals_shared_with.goal_id', 'goals.id')
+                    ->Join('goals_shared_with', 'goals_shared_with.goal_id', 'goals.id')
                     ->where('goals_shared_with.user_id', Auth::id())
                     ->whereNull('deleted_at')
                     ->distinct()
                     ->pluck('display_name')
                     ->toArray();
+        $display_names_by_self = DB::table('goals')
+                    ->select('display_name')
+                    ->where('user_id', Auth::id())
+                    ->whereNull('deleted_at')
+                    ->distinct()
+                    ->pluck('display_name')
+                    ->toArray();
+        if(count($display_names_by_self)>0){
+            foreach($display_names_by_self as $name){
+                if($name != "" && !in_array($name, $display_names)){
+                    array_push($display_names, $name);
+                }
+            }
+        }
         
         $i = count($createdBy) + 1;
         foreach($display_names as $display_name){
