@@ -108,7 +108,7 @@
             scrollX: true,
             stateSave: true,
             ajax: {
-                url: '/sysadmin/org-organizations2'
+                url: '/sysadmin/org-list/1/0'
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -140,7 +140,7 @@
             scrollX: true,
             stateSave: true,
             ajax: {
-                url: '/sysadmin/org-programs2' 
+                url: '/sysadmin/org-list/1/1' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -173,7 +173,7 @@
             scrollX: true,
             stateSave: true,
             ajax: {
-                url: '/sysadmin/org-divisions2' 
+                url: '/sysadmin/org-list/1/2' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -207,7 +207,7 @@
             scrollX: true,
             stateSave: true,
             ajax: {
-                url: '/sysadmin/org-branches2' 
+                url: '/sysadmin/org-list/1/3' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -242,7 +242,7 @@
             scrollX: true,
             stateSave: true,
             ajax: {
-                url: '/sysadmin/org-level42' 
+                url: '/sysadmin/org-list/1/4' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -288,6 +288,10 @@
         $('#dd_level3').on('select2:select', function (e) {
             // Do something
             $('#dd_level4').val(null).trigger('change');
+        });
+
+        $('#dd_level4').on('select2:select', function (e) {
+            e.preventDefault();
         });
 
         $('#dd_level0').on('select2:unselect', function (e) {
@@ -373,7 +377,6 @@
             $('#dd_level2').val(null).trigger('change');
             $('#dd_level3').val(null).trigger('change');
             $('#dd_level4').val(null).trigger('change');
-            // $('#btn_search').click();
         });
 
     </script>

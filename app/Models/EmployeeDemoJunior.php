@@ -31,6 +31,7 @@ class EmployeeDemoJunior extends Model
         'excused_type',
         'created_by_id',
         'updated_by_id',
+        'updated_by_name',
     ];
 
     public function users() {

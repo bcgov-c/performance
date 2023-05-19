@@ -117,7 +117,7 @@ class NotifyConversationDue extends Command
                 if ($user->guid == $prev_guid) {
                     continue;
                 }
-
+                $prev_guid = $user->guid;
                 $row_count += 1;
 
                 //$due = Conversation::nextConversationDue( $user );
@@ -131,7 +131,7 @@ class NotifyConversationDue extends Command
 
                 $dueIndays = 0;
                 $msg = '';
-                if ($dayDiff >= 7 and $dayDiff <= 30) {
+                if ($dayDiff >= 7 and $dayDiff < 30) {
                     $msg = 'REMINDER - your next conversation is due by ' . $due ;
                     $dueIndays = 30;
                 }
@@ -142,6 +142,12 @@ class NotifyConversationDue extends Command
                 if ($dayDiff < 0) {  
                     $msg = 'OVERDUE - your next conversation is due by ' .  $due ;
                     $dueIndays = 0;
+                }
+
+                // To avoid the past email sent out when the sysadmin turn on global flag under system access control
+                if ( ($dayDiff < 0 && $dueDate < today()->subDays(6)) ||
+                     ($dayDiff >= 0 && $dueDate < today()) ) {
+                    $msg = '';
                 }
 
                 if ($msg) {
@@ -207,8 +213,6 @@ class NotifyConversationDue extends Command
                     // $this->logInfo( $now->format('Y-m-d') . ' - A - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . '   ** SKIPPED ** (NOT DUE YET)' );
                     $skip_count += 1;
                 }
-
-                $prev_guid = $user->guid;
 
             }
 
@@ -295,7 +299,7 @@ class NotifyConversationDue extends Command
 
                     $dueIndays = 0;
                     $msg = '';
-                    if ($dayDiff >= 7 and $dayDiff <= 30) {
+                    if ($dayDiff >= 7 and $dayDiff < 30) {
                         $msg = 'REMINDER - ' . $user->name . '\'s next conversation is due by ' . $due ;
                         $dueIndays = 30;
                     }
@@ -306,6 +310,12 @@ class NotifyConversationDue extends Command
                     if ($dayDiff < 0) {  
                         $msg = 'OVERDUE - ' . $user->name . '\'s next conversation is due by ' . $due ;
                         $dueIndays = 0;
+                    }
+
+                    // To avoid the past email sent out when the sysadmin turn on global flag under system access control
+                    if ( ($dayDiff < 0 && $dueDate < today()->subDays(6)) ||
+                         ($dayDiff >= 0 && $dueDate < today()) ) {
+                        $msg = '';
                     }
 
                     if ($msg) {
@@ -413,7 +423,7 @@ class NotifyConversationDue extends Command
                 if ($user->guid == $prev_guid) {
                     continue;
                 }
-
+                $prev_guid = $user->guid;
                 $row_count += 1;
 
                 // User Prference 
@@ -439,7 +449,7 @@ class NotifyConversationDue extends Command
                 $bSend = false;
                 $bind1 = $user->name;
                 $bind2 = $dueDate->format('M d, Y');
-                if ($dayDiff >= 7 and $dayDiff <= 30) {
+                if ($dayDiff >= 7 and $dayDiff < 30) {
                     $dueIndays = 30;
                     if ($pref->conversation_due_month == 'Y') {
                         // $subject = 'REMINDER - your next performance conversation is due in 1 month';
@@ -460,7 +470,13 @@ class NotifyConversationDue extends Command
                         $bSend = true;
                     }
                 }
-        
+
+                // To avoid the past email sent out when the sysadmin turn on global flag under system access control
+                if ( ($dayDiff < 0 && $dueDate < today()->subDays(6)) ||
+                     ($dayDiff >= 0 && $dueDate < today()) ) {                    
+                    $bSend = false;
+                }
+
                 if ($bSend) {
 
                     // check the notification sent or not 
@@ -505,8 +521,6 @@ class NotifyConversationDue extends Command
                     // $this->logInfo( $now->format('Y-m-d') . ' - E - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays . ' ** SKIPPED ** (NOT DUE YET)' );
                     $skip_count += 1;
                 }
-
-                $prev_guid = $user->guid;
 
             }
 
@@ -610,7 +624,7 @@ class NotifyConversationDue extends Command
                     $bind2 = $user->name;
                     $bind3 = $dueDate->format('M d, Y');
 
-                    if ($dayDiff >= 7 and $dayDiff <= 30) {
+                    if ($dayDiff >= 7 and $dayDiff < 30) {
                         $dueIndays = 30;
                         if ($pref->team_conversation_due_month == 'Y') {
                             // $subject = 'REMINDER - your next performance conversation is due in 1 month';
@@ -632,6 +646,12 @@ class NotifyConversationDue extends Command
                             $bSend = true;
                         }
                     }
+
+                    // To avoid the past email sent out when the sysadmin turn on global flag under system access control
+                    if ( ($dayDiff < 0 && $dueDate < today()->subDays(6)) ||
+                         ($dayDiff >= 0 && $dueDate < today()) ) {
+                        $bSend = false;                        
+                    }                      
             
                     if ($bSend) {
 

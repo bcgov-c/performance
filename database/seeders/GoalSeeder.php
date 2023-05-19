@@ -36,7 +36,8 @@ class GoalSeeder extends Seeder
                 'why' => $faker->paragraph,
                 'how' => $faker->paragraph,
                 'measure_of_success' => $faker->paragraph,
-                'status' => $faker->randomElement(['active', 'not met', 'cancelled or deferred']),
+                // 'status' => $faker->randomElement(['active', 'not met', 'cancelled or deferred']),
+                'status' => $faker->randomElement(['active', 'achieved', 'archived']),
                 'goal_type_id' => $faker->randomElement( $goal_types ),
                 'user_id' => $faker->randomElement( $users ),
             ]);

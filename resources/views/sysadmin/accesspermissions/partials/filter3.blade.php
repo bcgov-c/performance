@@ -108,7 +108,7 @@
             scrollX: true,
             stateSave: true,
             ajax: {
-                url: '/sysadmin/org-organizations'
+                url: '/sysadmin/org-list/1/0'
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -140,7 +140,7 @@
             scrollX: true,
             stateSave: true,
             ajax: {
-                url: '/sysadmin/org-programs' 
+                url: '/sysadmin/org-list/1/1' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -173,7 +173,7 @@
             scrollX: true,
             stateSave: true,
             ajax: {
-                url: '/sysadmin/org-divisions' 
+                url: '/sysadmin/org-list/1/2' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -207,7 +207,7 @@
             scrollX: true,
             stateSave: true,
             ajax: {
-                url: '/sysadmin/org-branches' 
+                url: '/sysadmin/org-list/1/3' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -242,7 +242,7 @@
             scrollX: true,
             stateSave: true,
             ajax: {
-                url: '/sysadmin/org-level4' 
+                url: '/sysadmin/org-list/1/4' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -373,13 +373,8 @@
             $('#dd_level2').val(null).trigger('change');
             $('#dd_level3').val(null).trigger('change');
             $('#dd_level4').val(null).trigger('change');
-            // $('#btn_search').click();
         });
 
-        $('#btn_search').click(function(e) {
-            e.preventDefault();
-            $('#filtertable').DataTable().ajax.reload();
-        });
 
 
 

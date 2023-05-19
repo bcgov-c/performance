@@ -4,7 +4,7 @@
 
         <a role="button" class="disabled collapsed">
 
-            <div class="container">
+            <div class="container" style="vertical-align:middle; float:left">
                 <div class="row">
                     <div class="col-1">
                         <input pid="{{ $parent_id }}" 
