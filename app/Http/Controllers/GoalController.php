@@ -444,7 +444,7 @@ class GoalController extends Controller
         $goaltypes = GoalType::all()->toArray();
 
         $adminGoals = Goal::withoutGlobalScopes()
-            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator ', ') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
+            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator ', ') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
             ->join('goal_bank_orgs', function ($qon) {
                 return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
                     ->on('goal_bank_orgs.version', \DB::raw(2))
@@ -460,7 +460,7 @@ class GoalController extends Controller
             ->whereIn('goals.by_admin', [1, 2])
             ->where('goals.is_library', true)
             ->whereNull('goals.deleted_at')        
-            ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.name', 'goals.is_mandatory');
+            ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.id', 'u2.name', 'goals.is_mandatory');
         // Admin List filter below
         if ($request->has('goal_bank_mandatory') && $request->goal_bank_mandatory !== null) {
             if ($request->goal_bank_mandatory == "1") {
@@ -510,7 +510,7 @@ class GoalController extends Controller
         }
 
         $adminGoalsInherited = Goal::withoutGlobalScopes()
-            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator ', ') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
+            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator ', ') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
             ->join('goal_bank_orgs', function ($qon) {
                 return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
                     ->on('goal_bank_orgs.version', \DB::raw(2))
@@ -533,7 +533,7 @@ class GoalController extends Controller
                         )
                     ");
             })
-        ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.name', 'goals.is_mandatory');
+        ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.id', 'u2.name', 'goals.is_mandatory');
         // Admin List filter below
         if ($request->has('goal_bank_mandatory') && $request->goal_bank_mandatory !== null) {
             if ($request->goal_bank_mandatory == "1") {
@@ -649,7 +649,7 @@ class GoalController extends Controller
             $query->where('user_id', Auth::id());
         });
         $query->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory');
-        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name separator "<br/> ") as tagnames'));
+        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.id as creator_id','u2.name as username',DB::raw('group_concat(distinct tags.name separator "<br/> ") as tagnames'));
         $query = $query->union($adminGoals)->union($adminGoalsInherited);
                 
         $sortby = 'created_at';
@@ -661,8 +661,9 @@ class GoalController extends Controller
         $bankGoals = $query->get();
         $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goaltypes, $tagsList);
         $bankGoals_arr = array();
-        
+        $goalCreatedBy = array();
         $i = 0;
+        
         foreach($bankGoals as $item){
             $bankGoals_arr[$i]['id'] = $item->id;
             $bankGoals_arr[$i]['title'] = $item->title;
@@ -679,12 +680,28 @@ class GoalController extends Controller
                 $bankGoals_arr[$i]['is_mandatory'] = 'Suggested';
             }
             $bankGoals_arr[$i]['display_name'] = $item->display_name;
+            if($item->display_name != '' ){
+                $goalCreatedBy[$i]['id'] = $item->display_name; 
+                $goalCreatedBy[$i]['name'] = $item->display_name;
+            } else {
+                $goalCreatedBy[$i]['id'] = $item->creator_id;
+                $goalCreatedBy[$i]['name'] = $item->username; 
+            }
+            
+            
             $bankGoals_arr[$i]['typename'] = $item->typename;
             $bankGoals_arr[$i]['username'] = $item->username;
             $bankGoals_arr[$i]['tagnames'] = $item->tagnames;
             $i++;
         }
         $json_goalbanks = json_encode($bankGoals_arr);   
+        
+        
+        usort($goalCreatedBy, function($a, $b) {
+            return strcmp($a["name"], $b["name"]);
+        });
+        $createdBy = collect($createdBy)->unique('name')->values()->all();
+        
         
         //no need private in goalbank module
         unset($goaltypes[4]);
