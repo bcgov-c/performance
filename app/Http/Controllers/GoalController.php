@@ -462,6 +462,8 @@ class GoalController extends Controller
             ->where('goals.is_library', true)
             ->whereNull('goals.deleted_at')        
             ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.id', 'u2.name', 'goals.is_mandatory');
+        $all_adminGoals = $adminGoals;
+        
         // Admin List filter below
         if ($request->has('goal_bank_mandatory') && $request->goal_bank_mandatory !== null) {
             if ($request->goal_bank_mandatory == "1") {
@@ -535,6 +537,8 @@ class GoalController extends Controller
                     ");
             })
         ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.id', 'u2.name', 'goals.is_mandatory');
+        $all_adminGoalsInherited = $adminGoalsInherited;
+        
         // Admin List filter below
         if ($request->has('goal_bank_mandatory') && $request->goal_bank_mandatory !== null) {
             if ($request->goal_bank_mandatory == "1") {
@@ -592,7 +596,10 @@ class GoalController extends Controller
         ->leftjoin('users as u2', 'u2.id', '=', 'goals.created_by')
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')    
         ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
-        ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id');    
+        ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id');  
+        
+        $all_bankquery = $query;
+        
         if ($request->has('goal_bank_mandatory') && $request->goal_bank_mandatory !== null) {
             if ($request->goal_bank_mandatory == "1") {
                 $query = $query->where('is_mandatory', $request->goal_bank_mandatory);
@@ -680,7 +687,24 @@ class GoalController extends Controller
             }else{
                 $bankGoals_arr[$i]['is_mandatory'] = 'Suggested';
             }
-            $bankGoals_arr[$i]['display_name'] = $item->display_name;
+            $bankGoals_arr[$i]['display_name'] = $item->display_name;            
+            
+            $bankGoals_arr[$i]['typename'] = $item->typename;
+            $bankGoals_arr[$i]['username'] = $item->username;
+            $bankGoals_arr[$i]['tagnames'] = $item->tagnames;
+            $i++;
+        }
+        $json_goalbanks = json_encode($bankGoals_arr);   
+                
+        //no need private in goalbank module
+        unset($goaltypes[4]);
+        
+        
+        $all_bankquery = $all_bankquery->union($all_adminGoals)->union($all_adminGoalsInherited);
+        
+        $i = 0;
+        $all_bankGoals = $all_bankquery->get();
+        foreach($all_bankGoals as $item){
             if($item->display_name != '' ){
                 $goalCreatedBy[$i]['id'] = $item->display_name; 
                 $goalCreatedBy[$i]['name'] = $item->display_name;
@@ -689,15 +713,8 @@ class GoalController extends Controller
                 $goalCreatedBy[$i]['name'] = $item->username; 
             }
             
-            
-            $bankGoals_arr[$i]['typename'] = $item->typename;
-            $bankGoals_arr[$i]['username'] = $item->username;
-            $bankGoals_arr[$i]['tagnames'] = $item->tagnames;
             $i++;
-        }
-        $json_goalbanks = json_encode($bankGoals_arr);   
-        
-        
+        }        
         usort($goalCreatedBy, function($a, $b) {
             return strcmp($a["name"], $b["name"]);
         });
@@ -707,8 +724,6 @@ class GoalController extends Controller
             "name" => "Any"
         ]);
         
-        //no need private in goalbank module
-        unset($goaltypes[4]);
 
         //$myTeamController = new MyTeamController();
         //$suggestedGoalsData = $myTeamController->showSugggestedGoals('my-team.goals.bank', false);
