@@ -735,7 +735,10 @@ class GoalController extends Controller
         ->leftjoin('users as u2', 'u2.id', '=', 'goals.created_by')
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')    
         ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
-        ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')
+        ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id');
+        $all_bankquery->whereHas('sharedWith', function($query) {
+            $query->where('user_id', Auth::id());
+        })
         ->groupBy('u2.id', 'u2.name', 'goals.display_name');        
         
         $all_bankquery = $all_bankquery->union($all_adminGoals)->union($all_adminGoalsInherited);
