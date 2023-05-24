@@ -697,11 +697,11 @@ class GoalController extends Controller
             ->leftjoin('goal_types', 'goal_types.id', 'goals.goal_type_id')   
             ->whereIn('goals.by_admin', [1, 2])
             ->where('goals.is_library', true)
-            ->whereNull('goals.deleted_at')        
-            ->groupBy('u2.id as creator_id', 'u2.name as username', 'goals.display_name');
+            ->whereNull('goals.deleted_at')           
+            ->groupBy('u2.id', 'u2.name', 'goals.display_name');
         
         $all_adminGoalsInherited = Goal::withoutGlobalScopes()
-            ->select('goals.display_name', 'u2.id as creator_id', 'u2.name as username')
+            ->select('u2.id as creator_id', 'u2.name as username', 'goals.display_name')
             ->join('goal_bank_orgs', function ($qon) {
                 return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
                     ->on('goal_bank_orgs.version', \DB::raw(2))
@@ -724,10 +724,10 @@ class GoalController extends Controller
                         )
                     ");
             })
-        ->groupBy('goals.display_name', 'u2.id as creator_id', 'u2.name as username');
+        ->groupBy('u2.id', 'u2.name', 'goals.display_name');
         
         $all_bankquery = Goal::withoutGlobalScope(NonLibraryScope::class)
-        ->select('goals.display_name','u2.id as creator_id','u2.name as username')        
+        ->select('u2.id as creator_id', 'u2.name as username', 'goals.display_name')        
         ->where('is_library', true)
         ->whereNull('goals.deleted_at')        
         ->join('users', 'goals.user_id', '=', 'users.id')          
@@ -735,7 +735,7 @@ class GoalController extends Controller
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')    
         ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
         ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')
-        ->groupBy('goals.display_name', 'u2.id as creator_id', 'u2.name as username');        
+        ->groupBy('u2.id', 'u2.name', 'goals.display_name');        
         
         $all_bankquery = $all_bankquery->union($all_adminGoals)->union($all_adminGoalsInherited);
         
@@ -752,8 +752,14 @@ class GoalController extends Controller
             }
             
             $i++;
-        }        
-        usort($goalCreatedBy, function($a, $b) {
+        }   
+        foreach($goalCreatedBy as $a=>$t){
+            if($t["name"] == ''){
+                unset($goalCreatedBy[$a]);
+            }
+        }
+
+        usort($goalCreatedBy, function ($a, $b) {
             return strcmp($a["name"], $b["name"]);
         });
 
