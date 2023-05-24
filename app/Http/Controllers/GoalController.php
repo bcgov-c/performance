@@ -462,8 +462,7 @@ class GoalController extends Controller
             ->where('goals.is_library', true)
             ->whereNull('goals.deleted_at')        
             ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.id', 'u2.name', 'goals.is_mandatory');
-        $all_adminGoals = $adminGoals;
-        
+              
         // Admin List filter below
         if ($request->has('goal_bank_mandatory') && $request->goal_bank_mandatory !== null) {
             if ($request->goal_bank_mandatory == "1") {
@@ -537,7 +536,6 @@ class GoalController extends Controller
                     ");
             })
         ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.id', 'u2.name', 'goals.is_mandatory');
-        $all_adminGoalsInherited = $adminGoalsInherited;
         
         // Admin List filter below
         if ($request->has('goal_bank_mandatory') && $request->goal_bank_mandatory !== null) {
@@ -599,8 +597,6 @@ class GoalController extends Controller
         ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id');  
         $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.id as creator_id','u2.name as username',DB::raw('group_concat(distinct tags.name separator "<br/> ") as tagnames'));
         
-        $all_bankquery = $query;
-        
         if ($request->has('goal_bank_mandatory') && $request->goal_bank_mandatory !== null) {
             if ($request->goal_bank_mandatory == "1") {
                 $query = $query->where('is_mandatory', $request->goal_bank_mandatory);
@@ -628,18 +624,6 @@ class GoalController extends Controller
         }
 
         if ($request->has('goal_bank_dateadd') && $request->goal_bank_dateadd && Str::lower($request->goal_bank_dateadd) !== 'any') {
-            /*
-            $dateRange = explode("-",$request->date_added);
-            $dateRange[0] = trim($dateRange[0]);
-            $dateRange[1] = trim($dateRange[1]);
-
-            $startDate = Carbon::createFromFormat('M d, Y', $dateRange[0]);
-            $endDate = Carbon::createFromFormat('M d, Y', $dateRange[1]);
-
-            $query = $query->whereDate('goals.created_at', '>=', $startDate);
-            $query = $query->whereDate('goals.created_at', '<=', $endDate);
-             * 
-             */
             $dateadded = $request->goal_bank_dateadd;
             $query = $query->where('goals.created_at', '>=', $dateadded . " 00:00:00");
             $query = $query->where('goals.created_at', '<=', $dateadded . " 23:59:59");
@@ -669,7 +653,6 @@ class GoalController extends Controller
         $bankGoals = $query->get();
         $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goaltypes, $tagsList);
         $bankGoals_arr = array();
-        $goalCreatedBy = array();
         $i = 0;
         
         foreach($bankGoals as $item){
@@ -699,10 +682,66 @@ class GoalController extends Controller
         //no need private in goalbank module
         unset($goaltypes[4]);
         
+        $all_adminGoals = Goal::withoutGlobalScopes()
+            ->select('u2.id as creator_id', 'u2.name as username', 'goals.display_name')
+            ->join('goal_bank_orgs', function ($qon) {
+                return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
+                    ->on('goal_bank_orgs.version', \DB::raw(2))
+                    ->on('goal_bank_orgs.inherited', \DB::raw(0));
+            })
+            ->join('employee_demo', 'employee_demo.orgid', 'goal_bank_orgs.orgid')
+            ->join('users', function ($qon) use ($authId) {
+                return $qon->on('users.employee_id', 'employee_demo.employee_id')
+                    ->on('users.id', \DB::raw($authId));
+            })
+            ->leftjoin('users as u2', 'u2.id', 'goals.created_by')
+            ->leftjoin('goal_types', 'goal_types.id', 'goals.goal_type_id')   
+            ->whereIn('goals.by_admin', [1, 2])
+            ->where('goals.is_library', true)
+            ->whereNull('goals.deleted_at')        
+            ->groupBy('u2.id as creator_id', 'u2.name as username', 'goals.display_name');
+        
+        $all_adminGoalsInherited = Goal::withoutGlobalScopes()
+            ->select('goals.display_name', 'u2.id as creator_id', 'u2.name as username')
+            ->join('goal_bank_orgs', function ($qon) {
+                return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
+                    ->on('goal_bank_orgs.version', \DB::raw(2))
+                    ->on('goal_bank_orgs.inherited', \DB::raw(1));
+            })
+            ->join('employee_demo_tree', 'employee_demo_tree.id', 'goal_bank_orgs.orgid')
+            ->leftjoin('users as u2', 'u2.id', 'goals.created_by')
+            ->leftjoin('goal_types', 'goal_types.id', 'goals.goal_type_id')   
+            ->whereIn('goals.by_admin', [1, 2])
+            ->where('goals.is_library', true)
+            ->whereNull('goals.deleted_at')        
+            ->where(function ($where) use ($authId) {
+                return $where->whereRaw("
+                        (
+                            EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud0 WHERE ud0.user_id = {$authId} AND employee_demo_tree.level = 0 AND ud0.organization_key = employee_demo_tree.organization_key)
+                            OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud1 WHERE ud1.user_id = {$authId} AND employee_demo_tree.level = 1 AND ud1.organization_key = employee_demo_tree.organization_key AND ud1.level1_key = employee_demo_tree.level1_key)
+                            OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud2 WHERE ud2.user_id = {$authId} AND employee_demo_tree.level = 2 AND ud2.organization_key = employee_demo_tree.organization_key AND ud2.level1_key = employee_demo_tree.level1_key AND ud2.level2_key = employee_demo_tree.level2_key)
+                            OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud3 WHERE ud3.user_id = {$authId} AND employee_demo_tree.level = 3 AND ud3.organization_key = employee_demo_tree.organization_key AND ud3.level1_key = employee_demo_tree.level1_key AND ud3.level2_key = employee_demo_tree.level2_key AND ud3.level3_key = employee_demo_tree.level3_key)
+                            OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud4 WHERE ud4.user_id = {$authId} AND employee_demo_tree.level = 4 AND ud4.organization_key = employee_demo_tree.organization_key AND ud4.level1_key = employee_demo_tree.level1_key AND ud4.level2_key = employee_demo_tree.level2_key AND ud4.level3_key = employee_demo_tree.level3_key AND ud4.level4_key = employee_demo_tree.level4_key)
+                        )
+                    ");
+            })
+        ->groupBy('goals.display_name', 'u2.id as creator_id', 'u2.name as username');
+        
+        $all_bankquery = Goal::withoutGlobalScope(NonLibraryScope::class)
+        ->select('goals.display_name','u2.id as creator_id','u2.name as username')        
+        ->where('is_library', true)
+        ->whereNull('goals.deleted_at')        
+        ->join('users', 'goals.user_id', '=', 'users.id')          
+        ->leftjoin('users as u2', 'u2.id', '=', 'goals.created_by')
+        ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')    
+        ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
+        ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')
+        ->groupBy('goals.display_name', 'u2.id as creator_id', 'u2.name as username');        
         
         $all_bankquery = $all_bankquery->union($all_adminGoals)->union($all_adminGoalsInherited);
         
         $i = 0;
+        $goalCreatedBy = array();
         $all_bankGoals = $all_bankquery->get();
         foreach($all_bankGoals as $item){
             if($item->display_name != '' ){
