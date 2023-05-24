@@ -28,18 +28,18 @@ class HRAdminSharedController extends Controller
                 $option = '';
                 break;
         } 
-        return response()->json(EmployeeDemoTree::join('auth_orgs', function($on){
-            return $on->on(function($on1){
-                return $on1->whereRaw("auth_orgs.type = 'HR' AND auth_orgs.auth_id = ".Auth::id()." AND auth_orgs.orgid = employee_demo_tree.id");
-            });
-        })
-        ->where('employee_demo_tree.level', \DB::raw($level))
+        return response()->json(EmployeeDemoTree::where('employee_demo_tree.level', \DB::raw($level))
         ->when($request->q, function ($q) use($request) { return $q->whereRaw("employee_demo_tree.name LIKE '%{$request->q}%'"); })
         ->when($level > 0 && "{$request->{$option.'level0'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.organization_key = '."{$request->{$option.'level0'}}"); })
         ->when($level > 1 && "{$request->{$option.'level1'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level1_key = '."{$request->{$option.'level1'}}"); })
         ->when($level > 2 && "{$request->{$option.'level2'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level2_key = '."{$request->{$option.'level2'}}"); })
         ->when($level > 3 && "{$request->{$option.'level3'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level3_key = '."{$request->{$option.'level3'}}"); })
         ->when($level > 4 && "{$request->{$option.'level4'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.level4_key = '."{$request->{$option.'level4'}}"); })
+        ->when($level == 0, function ($q) { return $q->whereRaw("employee_demo_tree.id IN (SELECT t1.organization_key FROM auth_orgs o1, employee_demo_tree t1 WHERE o1.type = 'HR' AND o1.auth_id = ".Auth::id()." AND o1.orgid = t1.id)"); })
+        ->when($level == 1, function ($q) { return $q->whereRaw("employee_demo_tree.id IN (SELECT t1.level1_key FROM auth_orgs o1, employee_demo_tree t1 WHERE o1.type = 'HR' AND o1.auth_id = ".Auth::id()." AND o1.orgid = t1.id)"); })
+        ->when($level == 2, function ($q) { return $q->whereRaw("employee_demo_tree.id IN (SELECT t1.level2_key FROM auth_orgs o1, employee_demo_tree t1 WHERE o1.type = 'HR' AND o1.auth_id = ".Auth::id()." AND o1.orgid = t1.id)"); })
+        ->when($level == 3, function ($q) { return $q->whereRaw("employee_demo_tree.id IN (SELECT t1.level3_key FROM auth_orgs o1, employee_demo_tree t1 WHERE o1.type = 'HR' AND o1.auth_id = ".Auth::id()." AND o1.orgid = t1.id)"); })
+        ->when($level == 4, function ($q) { return $q->whereRaw("employee_demo_tree.id IN (SELECT t1.level4_key FROM auth_orgs o1, employee_demo_tree t1 WHERE o1.type = 'HR' AND o1.auth_id = ".Auth::id()." AND o1.orgid = t1.id)"); })
         ->select('employee_demo_tree.id AS id', 'employee_demo_tree.name AS text')
         ->orderBy('employee_demo_tree.name', 'ASC')
         ->limit(300)
