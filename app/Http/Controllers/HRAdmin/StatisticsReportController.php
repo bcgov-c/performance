@@ -64,7 +64,6 @@ class StatisticsReportController extends Controller
     }
 
     public function goalSummary(Request $request) {
-       
         // send back the input parameters
         $this->preservedInputParams($request);
 
@@ -76,83 +75,181 @@ class StatisticsReportController extends Controller
 
         $types = GoalType::orderBy('id')->get();
         $types->prepend( new GoalType()  ) ;
-
-        foreach($types as $type)
-        {
-            $goal_id = $type->id ? $type->id : '';
-
-            $from_stmt = $this->goalSummary_from_statement($type->id);
-
-            $sql = User::selectRaw('AVG(goals_count) as goals_average')
-                        ->from(DB::raw( $from_stmt ))
-                        ->join('employee_demo', function($join) {
-                            $join->on('employee_demo.employee_id', '=', 'A.employee_id');
+        
+        $total_goals = UserDemoJrView::selectRaw('count(*) as goal_count, goals.goal_type_id')
+                        ->join('goals', 'goals.user_id', 'user_demo_jr_view.user_id') 
+                        ->where(function($query) {
+                            $query->where(function($query) {
+                                $query->where('due_date_paused', 'N')
+                                    ->orWhereNull('due_date_paused');
+                            });
                         })
-                        ->where('A.due_date_paused', 'N')
-                        ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-                        ->whereNull('employee_demo.date_deleted')        
-                        ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-                        ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-                        ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-                        ->when( $request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-                        ->when( $request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
+                        ->where(function($query) {
+                            $query->where(function($query) {
+                                $query->where('excused_flag', '<>', '1')
+                                    ->orWhereNull('excused_flag');
+                            });
+                        })
+                        ->whereNull('deleted_at')
+                        ->where('goals.status','active')
+                        ->where('goals.is_library','0')   
+                        ->where('goals.goal_type_id','<>','4')        
+                        ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                        ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                        ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                        ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                        ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
                         ->whereExists(function ($query) {
+                            return $query->select(DB::raw(1))
+                                    ->from('auth_users')
+                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
+                            ->where('auth_users.type', '=', 'HR')
+                            ->where('auth_users.auth_id', '=', Auth::id());
+                        })
+                        ->groupBy('goals.goal_type_id')
+                        ->get();
+        
+                        
+        $goaltype_count = User::selectRaw("case when goals_count between 0 and 0  then '0'  
+                                        when goals_count between 1 and 5  then '1-5'
+                                        when goals_count between 6 and 10 then '6-10'
+                                        when goals_count  > 10            then '>10'
+                                end AS group_key, count(*) as goals_count, A.goal_type_id")
+                    ->from(DB::raw( "(SELECT users.id, users.email, users.employee_id, users.empl_record, users.guid, users.reporting_to,
+       users.excused_start_date, users.excused_end_date, users.due_date_paused,users.excused_flag,
+       COUNT(goals.id) AS goals_count, goals.goal_type_id
+FROM users
+LEFT JOIN goals ON goals.user_id = users.id
+                AND goals.status = 'active'
+                AND goals.deleted_at IS NULL
+                AND goals.is_library = 0
+                AND goals.goal_type_id <> 4
+GROUP BY users.id, users.email, users.employee_id, users.empl_record, users.guid, users.reporting_to,
+         users.excused_start_date, users.excused_end_date, users.due_date_paused, users.excused_flag, goals.goal_type_id) AS A" ))
+                    ->groupBy(['group_key', 'goal_type_id'])
+                    ->join('employee_demo', function($join) {
+                        $join->on('employee_demo.employee_id', '=', 'A.employee_id');
+                    })                
+                    ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')                    
+                    ->where(function($query) {
+                            $query->where(function($query) {
+                                $query->where('A.due_date_paused', 'N')
+                                    ->orWhereNull('A.due_date_paused');
+                            });
+                        })
+                    ->where(function($query) {
+                            $query->where(function($query) {
+                                $query->where('A.excused_flag', '<>', '1')
+                                    ->orWhereNull('A.excused_flag');
+                            });
+                        })            
+                    ->whereNull('employee_demo.date_deleted')
+                    ->whereExists(function ($query) {
                             return $query->select(DB::raw(1))
                                     ->from('auth_users')
                             ->whereColumn('auth_users.user_id', 'A.id')
                             ->where('auth_users.type', '=', 'HR')
                             ->where('auth_users.auth_id', '=', Auth::id());
-                        });
-
-            $goals_average = $sql->get()->first()->goals_average;
-
+                        })            
+                    ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
+                    ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
+                    ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
+                    ->when( $request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
+                    ->when( $request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); });                
+        
+        $total_goal_counts = 0;   
+        $goals_count_type_array = $goaltype_count->get()->toArray();
+        $no_type_count = array();
+        $no_type_count["1-5"] = 0;
+        $no_type_count["6-10"] = 0;        
+        $no_type_count[">10"] = 0;
+        $total_notype_count = 0;
+        foreach($goals_count_type_array as $item){
+            $total_goal_counts = $total_goal_counts + $item["goals_count"];
+            if($item["goal_type_id"]){
+                if($item["group_key"] == '1-5'){
+                    $no_type_count["1-5"] =  $no_type_count["1-5"] + $item["goals_count"];
+                    $total_notype_count = $total_notype_count + $item["goals_count"];
+                }
+                if($item["group_key"] == '6-10'){
+                    $no_type_count["6-10"] =  $no_type_count["6-10"] + $item["goals_count"];
+                    $total_notype_count = $total_notype_count + $item["goals_count"];
+                }
+                if($item["group_key"] == '>10'){
+                    $no_type_count[">10"] =  $no_type_count[">10"] + $item["goals_count"];
+                    $total_notype_count = $total_notype_count + $item["goals_count"];
+                }
+            }
+        }        
+        
+        foreach($types as $type)
+        {
+            $goal_id = $type->id ? $type->id : '';
+            if($goal_id != '') {
+                $goals = $total_goals->filter(function ($type_goals) use($goal_id){
+                    return $type_goals->goal_type_id == $goal_id;
+                });
+            } else {
+                $goals = $total_goals;
+            }
+            $total_count = 0;
+            $total_item = 0;
+            if ($total_item != 0){
+                $goals_average = $total_count / $total_item;
+            }else{
+                $goals_average = 0;
+            }
             $data[$goal_id] = [ 
                 'name' => $type->name ? ' ' . $type->name : '',
                 'goal_type_id' => $goal_id,
                 'average' =>  $goals_average, 
                 'groups' => []
             ];
-
-            $sql = User::selectRaw("case when goals_count between 0 and 0  then '0'  
-                                    when goals_count between 1 and 5  then '1-5'
-                                    when goals_count between 6 and 10 then '6-10'
-                                    when goals_count  > 10            then '>10'
-                            end AS group_key, count(*) as goals_count")
-                ->from(DB::raw( $from_stmt ))
-                ->groupBy('group_key')
-                    ->from(DB::raw( $from_stmt ))
-                    ->join('employee_demo', function($join) {
-                        $join->on('employee_demo.employee_id', '=', 'A.employee_id');
-                    })
-                    ->where('A.due_date_paused', 'N')
-                    ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-                    ->whereNull('employee_demo.date_deleted')        
-                    ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-                    ->when($request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-                    ->when($request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-                    ->when($request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-                    ->when($request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
-                    ->whereExists(function ($query) {
-                        return $query->select(DB::raw(1))
-                                ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'A.id')
-                            ->where('auth_users.type', '=', 'HR')
-                            ->where('auth_users.auth_id', '=', Auth::id());
-                    });
-
-                $goals_count_array = $sql->pluck( 'goals_count','group_key' )->toArray();
-
-                foreach($this->groups as $key => $range) {
-                    $goals_count = 0;
-                    if (array_key_exists( $key, $goals_count_array)) {
-                            $goals_count = $goals_count_array[$key];
+            
+            $goals_count_array = array();
+            $goals_count_array["0"] = 0;
+            $goals_count_array["1-5"] = 0;
+            $goals_count_array["6-10"] = 0;
+            $goals_count_array[">10"] = 0;
+            $sub_type_total = 0;
+            foreach($goals_count_type_array as $item){
+                if($type->id){
+                    if ($item["goal_type_id"] == $type->id){
+                        if($item["group_key"] == '1-5'){
+                            $goals_count_array["1-5"] = $item["goals_count"]; 
+                            $sub_type_total = $sub_type_total + $item["goals_count"];
+                        }
+                        if($item["group_key"] == '6-10'){
+                            $goals_count_array["6-10"] = $item["goals_count"];
+                            $sub_type_total = $sub_type_total + $item["goals_count"];
+                        }
+                        if($item["group_key"] == '>10'){
+                            $goals_count_array[">10"] = $item["goals_count"];
+                            $sub_type_total = $sub_type_total + $item["goals_count"];
+                        }
                     }
-    
-                    array_push( $data[$goal_id]['groups'], [ 'name' => $key, 'value' => $goals_count, 
-                        'goal_id' => $goal_id, 
-                                                                                            
-                    ]);
+                } else {
+                    $goals_count_array["1-5"] = $no_type_count["1-5"]; 
+                    $goals_count_array["6-10"] = $no_type_count["6-10"]; 
+                    $goals_count_array[">10"] = $no_type_count[">10"]; 
+                    
+                    $sub_type_total = $total_notype_count;
                 }
+            }
+            $result_count = $total_goal_counts - $sub_type_total;
+            $goals_count_array["0"] = $result_count;
+
+            foreach($this->groups as $key => $range) {
+                $goals_count = 0;
+                if (array_key_exists( $key, $goals_count_array)) {
+                        $goals_count = $goals_count_array[$key];
+                }
+
+                array_push( $data[$goal_id]['groups'], [ 'name' => $key, 'value' => $goals_count, 
+                    'goal_id' => $goal_id, 
+                ]);
+            }
+
         }
 
         // Goal Tag count 
@@ -163,18 +260,14 @@ class StatisticsReportController extends Controller
         $count_raw .= "     and users.id = goals.user_id ";
         $count_raw .= "     and users.employee_id = employee_demo.employee_id ";
         $count_raw .= "     and employee_demo.orgid = employee_demo_tree.id ";
-        $count_raw .= $request->dd_level0 ? "     and employee_demo_tree.organization_key = '{ $request->dd_level0 }'" : '';
-        $count_raw .= $request->dd_level1 ? "     and employee_demo_tree.level1_key = '{ $request->dd_level1 }'" : '';
-        $count_raw .= $request->dd_level2 ? "     and employee_demo_tree.level2_key = '{ $request->dd_level2 }'" : '';
-        $count_raw .= $request->dd_level3 ? "     and employee_demo_tree.level3_key = '{ $request->dd_level3 }'" : '';
-        $count_raw .= $request->dd_level4 ? "     and employee_demo_tree.level4_key = '{ $request->dd_level4 }'" : '';
+        $count_raw .= $request->dd_level0 ? "     and employee_demo_tree.organization = '{ $request->dd_level0 }'" : '';
+        $count_raw .= $request->dd_level1 ? "     and employee_demo_tree.level1_program = '{ $request->dd_level1 }'" : '';
+        $count_raw .= $request->dd_level2 ? "     and employee_demo_tree.level2_division = '{ $request->dd_level2 }'" : '';
+        $count_raw .= $request->dd_level3 ? "     and employee_demo_tree.level3_branch = '{ $request->dd_level3 }'" : '';
+        $count_raw .= $request->dd_level4 ? "     and employee_demo_tree.level4 = '{ $request->dd_level4 }'" : '';
         $count_raw .= "     and ( ";
         $count_raw .= "           users.due_date_paused = 'N' ";
         $count_raw .= "         )";
-        $count_raw .= "     and exists (select 1 from admin_org_users ";
-        $count_raw .= "                  where admin_org_users.allowed_user_id = users.id ";
-        $count_raw .= "                    and admin_org_users.access_type in (0,1) ";
-        $count_raw .= "                    and admin_org_users.granted_to_id = ".  Auth::id()  .") ";
         $count_raw .= ") as count";
 
         $sql = Tag::selectRaw($count_raw);
@@ -186,12 +279,12 @@ class StatisticsReportController extends Controller
                 })
                 ->where('users.due_date_paused', 'N')                
                 ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-                ->whereNull('employee_demo.date_deleted')        
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-                ->when($request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-                ->when($request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-                ->when($request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-                ->when($request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
+                ->whereNull('employee_demo.date_deleted')
                 ->whereNotExists(function ($query) {
                     $query->select(DB::raw(1))
                           ->from('goal_tags')
@@ -199,13 +292,13 @@ class StatisticsReportController extends Controller
                 })
                 ->where('employee_demo.guid', '<>', '')
                 ->whereExists(function ($query) {
-                    $query->select(DB::raw(1))
-                            ->from('admin_org_users')
-                            ->whereColumn('admin_org_users.allowed_user_id', 'users.id')
-                            ->whereIn('admin_org_users.access_type', [0,1])
-                            ->where('admin_org_users.granted_to_id', '=', Auth::id());
-                });
-
+                            return $query->select(DB::raw(1))
+                                    ->from('auth_users')
+                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->where('auth_users.type', '=', 'HR')
+                            ->where('auth_users.auth_id', '=', Auth::id());
+                        });        
+                
         $tags = $sql->get();
         $blank_count = $sql2->count();
         
@@ -224,7 +317,7 @@ class StatisticsReportController extends Controller
             array_push($data_tag['values'], $tag->count);
         }
 
-        return view('hradmin.statistics.goalsummary',compact('data','data_tag'));
+        return view('sysadmin.statistics.goalsummary',compact('data', 'data_tag'));
     }
 
     public function goalSummaryExport(Request $request) {
