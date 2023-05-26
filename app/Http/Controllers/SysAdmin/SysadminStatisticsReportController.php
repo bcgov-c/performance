@@ -82,7 +82,7 @@ class SysadminStatisticsReportController extends Controller
 
         $types = GoalType::orderBy('id')->get();
         $types->prepend( new GoalType()  ) ;
-        Log::info('port 1 =========> ' . Carbon::now());
+        
         $total_goals = UserDemoJrView::selectRaw('count(*) as goal_count, goals.goal_type_id')
                         ->join('goals', 'goals.user_id', 'user_demo_jr_view.user_id') 
                         ->where(function($query) {
@@ -108,15 +108,37 @@ class SysadminStatisticsReportController extends Controller
                         ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
                         ->groupBy('goals.goal_type_id')
                         ->get();
-        Log::info('port 1st query complete at =========> ' . Carbon::now());
+                        
+        $total_number_query = UserDemoJrView::selectRaw('count(*) as total_emp')
+                                  ->where(function($query) {
+                            $query->where(function($query) {
+                                $query->where('user_demo_jr_view.due_date_paused', 'N')
+                                    ->orWhereNull('user_demo_jr_view.due_date_paused');
+                            });
+                        })
+                    ->where(function($query) {
+                            $query->where(function($query) {
+                                $query->where('user_demo_jr_view.excused_flag', '<>', '1')
+                                    ->orWhereNull('user_demo_jr_view.excused_flag');
+                            });
+                        }) 
+                    ->whereNull('user_demo_jr_view.date_deleted')     
+                    ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
+                    ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
+                    ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
+                    ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
+                    ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); });
+        $total_number_obj = $total_number_query->get();
+        $total_number_emp = $total_number_obj[0]->total_emp;
+        
         $goal_count_cal = UserDemoJrView::selectRaw("user_demo_jr_view.user_id, COUNT(goals.id) AS goals_count, goals.goal_type_id")
                 ->leftJoin('goals', function ($join) {
-                    $join->on('goals.user_id', '=', 'user_demo_jr_view.user_id')
-                        ->where('goals.status', '=', 'active')
-                        ->whereNull('goals.deleted_at')
-                        ->where('goals.is_library', '=', 0)
-                        ->where('goals.goal_type_id', '<>', 4);
+                    $join->on('goals.user_id', '=', 'user_demo_jr_view.user_id');
                 })
+                ->where('goals.status', '=', 'active')
+                ->whereNull('goals.deleted_at')
+                ->where('goals.is_library', '=', 0)
+                ->where('goals.goal_type_id', '<>', 4)
                 ->where(function($query) {
                             $query->where(function($query) {
                                 $query->where('user_demo_jr_view.due_date_paused', 'N')
@@ -136,16 +158,18 @@ class SysadminStatisticsReportController extends Controller
                     ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
                     ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })            
                     ->groupBy(['user_demo_jr_view.user_id', 'goals.goal_type_id']);
+                            
         $goal_count_cal = $goal_count_cal->get()->toArray();
-        Log::info('port 2nd query complete at =========> ' . Carbon::now());        
+               
         $convertedArray = [];
         $groupedData = [];
-
+        $toal_goal_counts = 0;
         foreach ($goal_count_cal as $item) {
             $user_id = $item['user_id'];
             $goals_count = $item['goals_count'];
             $goal_type_id = $item['goal_type_id'];
-
+            
+            $toal_goal_counts = $toal_goal_counts + $goals_count;
             if ($goals_count == 0) {
                 $groupKey = '0';
             } elseif ($goals_count >= 1 && $goals_count <= 5) {
@@ -165,14 +189,15 @@ class SysadminStatisticsReportController extends Controller
                     'goal_type_id' => $goal_type_id,
                 ];
             }
-            if($goals_count > 0){
-                $groupedData[$key]['goals_count'] += $goals_count;
-            } else {
-                $groupedData[$key]['goals_count'] += 1;
-            }
+            $groupedData[$key]['goals_count'] += $goals_count;
         }
+        
+        $groupedData[0]['goals_count'] = $total_number_emp - $toal_goal_counts;
+        $groupedData[0]['goal_type_id'] = '';
+        $groupedData[0]['group_key'] = 0;
+        
         $goals_count_type_array = array_values($groupedData);
-                      
+        
         $total_goal_counts = 0; 
         $no_type_count = array();
         $no_type_count["1-5"] = 0;
@@ -195,8 +220,8 @@ class SysadminStatisticsReportController extends Controller
                     $total_notype_count = $total_notype_count + $item["goals_count"];
                 }
             }
-        }        
-        Log::info('port 3 array organized =========> ' . Carbon::now());  
+        }   
+        
         foreach($types as $type)
         {
             $goal_id = $type->id ? $type->id : '';
@@ -266,7 +291,7 @@ class SysadminStatisticsReportController extends Controller
             }
 
         }
-        Log::info('port 4 array goal chart finished =========> ' . Carbon::now());
+        
         // Goal Tag count 
         $count_raw = "id, name, ";
         $count_raw .= " (select count(*) from goal_tags, goals, users, employee_demo, employee_demo_tree ";
@@ -284,7 +309,7 @@ class SysadminStatisticsReportController extends Controller
         $count_raw .= "           users.due_date_paused = 'N' ";
         $count_raw .= "         )";
         $count_raw .= ") as count";
-        Log::info('port 5  tag chart started =========> ' . Carbon::now());
+        
         $sql = Tag::selectRaw($count_raw);
         $sql2 = Goal::join('users', function($join) {
                     $join->on('goals.user_id', '=', 'users.id');
@@ -309,7 +334,7 @@ class SysadminStatisticsReportController extends Controller
                 
         $tags = $sql->get();
         $blank_count = $sql2->count();
-        Log::info('port 6  tag chart ended =========> ' . Carbon::now());
+        
         $data_tag = [ 
             'name' => 'Active Goal Tags',
             'labels' => [],
