@@ -82,7 +82,7 @@ class SysadminStatisticsReportController extends Controller
 
         $types = GoalType::orderBy('id')->get();
         $types->prepend( new GoalType()  ) ;
-        Log::info('====> port 1 '. Carbon::now());
+        
         $total_goals = UserDemoJrView::selectRaw('count(*) as goal_count, goals.goal_type_id')
                         ->join('goals', 'goals.user_id', 'user_demo_jr_view.user_id') 
                         ->where(function($query) {
@@ -108,7 +108,7 @@ class SysadminStatisticsReportController extends Controller
                         ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
                         ->groupBy('goals.goal_type_id')
                         ->get();
-        Log::info('====> port 2 '. Carbon::now());
+        
                         
         $goaltype_count = User::selectRaw("case when goals_count between 0 and 0  then '0'  
                                         when goals_count between 1 and 5  then '1-5'
@@ -152,9 +152,6 @@ GROUP BY users.id, users.email, users.employee_id, users.empl_record, users.guid
         
         $total_goal_counts = 0;   
         $goals_count_type_array = $goaltype_count->get()->toArray();
-        
-        Log::info('====> port 3 '. Carbon::now());
-        
         $no_type_count = array();
         $no_type_count["1-5"] = 0;
         $no_type_count["6-10"] = 0;        
@@ -177,7 +174,7 @@ GROUP BY users.id, users.email, users.employee_id, users.empl_record, users.guid
                 }
             }
         }        
-        Log::info('====> port 4 '. Carbon::now());
+        
         foreach($types as $type)
         {
             $goal_id = $type->id ? $type->id : '';
@@ -247,7 +244,7 @@ GROUP BY users.id, users.email, users.employee_id, users.empl_record, users.guid
             }
 
         }
-        Log::info('====> port 5 '. Carbon::now());
+
         // Goal Tag count 
         $count_raw = "id, name, ";
         $count_raw .= " (select count(*) from goal_tags, goals, users, employee_demo, employee_demo_tree ";
@@ -290,7 +287,7 @@ GROUP BY users.id, users.email, users.employee_id, users.empl_record, users.guid
                 
         $tags = $sql->get();
         $blank_count = $sql2->count();
-        Log::info('====> port 6 '. Carbon::now());
+        
         $data_tag = [ 
             'name' => 'Active Goal Tags',
             'labels' => [],
