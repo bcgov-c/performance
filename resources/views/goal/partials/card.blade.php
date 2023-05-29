@@ -116,7 +116,7 @@
             @endif
             
             @if(($type ?? '') === 'supervisor' && !$disableEdit)
-                <form action="{{route('goal.supervisor.copy', $goal->id)}}" method="post" onSubmit="return confirm('This goal will be copied to your Current Goals tab. You can access and edit it there without impacting your supervisor\'s goal. Continue?');">
+                <form action="{{route('goal.supervisor.copy', $goal->id)}}" method="post" onSubmit="return confirm('This goal will be copied to your Current Goals tab. You can access and edit it there without impacting the original goal. Continue?');">
                     @csrf
                     <x-button
                         :data-id="$goal->id"
