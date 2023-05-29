@@ -26,6 +26,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\SharedEmployeeExport;
 use App\Exports\ExcusedEmployeeExport;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Collection;
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -333,6 +334,9 @@ class SysadminStatisticsReportController extends Controller
                 ->where('employee_demo.guid', '<>', '');
                 
         $tags = $sql->get();
+        $collection = new Collection($tags);
+        $sortedArray = $collection->sortBy('name')->values()->all();
+        
         $blank_count = $sql2->count();
         
         $data_tag = [ 
@@ -344,7 +348,7 @@ class SysadminStatisticsReportController extends Controller
         // each group 
         array_push($data_tag['labels'], '[Blank]');  
         array_push($data_tag['values'], $blank_count);
-        foreach($tags as $key => $tag)
+        foreach($sortedArray as $key => $tag)
         {
             array_push($data_tag['labels'], $tag->name);  
             array_push($data_tag['values'], $tag->count);
