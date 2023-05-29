@@ -1280,7 +1280,13 @@ class SysadminStatisticsReportController extends Controller
                 })
                 ->where('users.due_date_paused', 'N')                
                 ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-                ->whereNull('employee_demo.date_deleted')        
+                ->whereNull('employee_demo.date_deleted')   
+                ->where(function($query) {
+                        $query->where(function($query) {
+                            $query->where('users.excused_flag', '<>', '1')
+                                ->orWhereNull('users.excused_flag');
+                        });
+                    })         
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
                 ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
@@ -1327,7 +1333,13 @@ class SysadminStatisticsReportController extends Controller
                 $q->whereRaw(" (select count(*) from shared_profiles A where A.shared_id = users.id) = 0 ");
             }) 
             ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-            ->whereNull('employee_demo.date_deleted')        
+            ->whereNull('employee_demo.date_deleted') 
+            ->where(function($query) {
+                        $query->where(function($query) {
+                            $query->where('users.excused_flag', '<>', '1')
+                                ->orWhereNull('users.excused_flag');
+                        });
+                    })         
             ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
             ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
             ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
