@@ -25,9 +25,9 @@
     </div>
     @endif
     @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
-    <div class="px-4 py-1 border-bottom {{Route::current()->getName() == 'goal.my-supervisor' ? 'border-primary' : ''}}">
+    <div class="px-4 py-1 border-bottom {{Route::current()->getName() == 'goal.share' ? 'border-primary' : ''}}">
         
-        <x-button role="tab" :href="route('goal.my-supervisor')" style="">
+        <x-button role="tab" :href="route('goal.share')" style="">
             
             Goals Shared With Me
         </x-button>
