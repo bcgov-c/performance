@@ -49,7 +49,7 @@ objects:
   - kind: PersistentVolumeClaim
     apiVersion: v1
     metadata:
-      name: env-data-training
+      name: env-data
     spec:
       accessModes:
         - ReadWriteMany
@@ -59,7 +59,7 @@ objects:
   - kind: PersistentVolumeClaim
     apiVersion: v1
     metadata:
-      name: web-app-training
+      name: web-app-storage
     spec:
       accessModes:
         - ReadWriteMany
@@ -105,10 +105,10 @@ objects:
               ports:
                 - containerPort: 8000
               volumeMounts:
-                - name: config-vol-training
+                - name: config-vol
                   mountPath: /var/www/html/.env
                   subPath: .env
-                - name: web-app-training
+                - name: web-app-storage
                   mountPath: /var/www/html/storage
               resources:
                 limits:
@@ -179,15 +179,15 @@ objects:
                       key: database-name
                       name: '${APP_NAME}-secrets'
           volumes:
-            - name: config-vol-training
+            - name: config-vol
               configMap:
                 name: ${CONFIG_MAP}
                 items:
                   - key: .env
                     path: .env
-            - name: web-app-training
+            - name: web-app-storage
               persistentVolumeClaim:
-                claimName: web-app-training
+                claimName: web-app-storage
       triggers:
         - type: ConfigChange
       revisionHistoryLimit: 10
