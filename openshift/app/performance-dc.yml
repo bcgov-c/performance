@@ -65,7 +65,7 @@ objects:
         - ReadWriteMany
       resources:
         requests:
-          storage: 25Gi
+          storage: 4Gi
   - apiVersion: v1
     kind: DeploymentConfig
     metadata:
