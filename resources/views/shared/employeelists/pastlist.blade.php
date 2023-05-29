@@ -45,6 +45,10 @@
                     float: none;
                     text-align:right;
                 }
+
+                #listtable_wrapper .dataTables_processing {
+                    top: 50px;
+                }
             </style>
         </x-slot>
     @endpush
@@ -58,23 +62,7 @@
         <script type="text/javascript">
             $(document).ready(function() {
                 $('#listtable').DataTable ( {
-                    dom: 'lfBrtip',
-                    buttons: {
-                        buttons: [
-                            {
-                                extend: "csv",
-                                text: "Export",
-                                exportOptions:  {
-                                    columns: ':visible',
-                                    modifier: {
-                                        page: 'all',
-                                        search: 'none',
-                                    },
-                                },
-                            },
-                            'colvis'
-                        ],
-                    },
+                    dom: 'lfrtip',
                     serverSide: true,
                     searching: true,
                     processing: true,
@@ -127,14 +115,24 @@
                     ],
                 } );
 
-                // // add export button on right
-                // $("#listtable_filter").append('<button id="export-btn" value="export" class="dt-button buttons-csv buttons-html5">Export</button> ');
+                // add export button on right
+                $("#listtable_filter").append('<button id="export-btn" value="export" class="dt-button buttons-csv buttons-html5">Export</button> ');
 
-                // $('#export-btn').on('click', function() {
-                //     export_url = '{{ route("sysadmin.employeelists.export-past") }}';
-                //     let _url = export_url;
-                //     window.location.href = _url;
-                // });
+                $('#export-btn').on('click', function() {
+                    let parray = encodeURIComponent(JSON.stringify([
+                        $('#dd_level0').val(), 
+                        $('#dd_level1').val(),
+                        $('#dd_level2').val(),
+                        $('#dd_level3').val(),
+                        $('#dd_level4').val(),
+                        $('#criteria').val(),
+                        $('#search_text').val()
+                    ]));
+                    var export_url = "{{ route('sysadmin.employeelists.export-past', ':parray') }}";
+                    export_url = export_url.replace(':parray', parray);
+                    let _url = export_url;
+                    window.location.href = _url;
+                });
 
             } );
         </script>

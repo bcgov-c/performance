@@ -45,12 +45,15 @@
                     float: none;
                     text-align:right;
                 }
+
+                #listtable_wrapper .dataTables_processing {
+                    top: 50px;
+                }
             </style>
         </x-slot>
     @endpush
 
     @push('js')
-        <!-- <script src="https://code.jquery.com/jquery-3.5.1.js"></script> -->
         <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
         <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
@@ -60,34 +63,6 @@
             $(document).ready(function() {
                 $('#listtable').DataTable ( {
                     dom: 'lfrtip',
-                    // buttons: {
-                    //     buttons: [
-                    //         // {
-                    //         //     extend: "copy",
-                    //         //     text: "Copy to Clipboard",
-                    //         //     exportOptions:  {
-                    //         //         columns: ':visible',
-                    //         //         modifier: {
-                    //         //             page: 'all',
-                    //         //             search: 'none',
-                    //         //         },
-                    //         //     },
-                    //         // },
-                    //         {
-                    //             extend: "csv",
-                    //             text: "Export Displayed",
-                    //             exportOptions:  {
-                    //                 columns: ':visible',
-                    //                 modifier: {
-                    //                     page: 'all',
-                    //                     search: 'none',
-                    //                 },
-                    //             },
-                    //         },
-                    //         'colvis'
-                    //     ],
-                    // },
-
                     serverSide: true,
                     searching: true,
                     processing: true,
@@ -144,19 +119,17 @@
                 $("#listtable_filter").append("<button id='export-btn' value='export' class='dt-button buttons-csv buttons-html5'>Export</button> ");
 
                 $('#export-btn').on('click', function() {
-                    let parray = [
-                        ['dd_level0', $('#dd_level0').val()], 
-                        ['dd_level1', $('#dd_level1').val()],
-                        ['dd_level2', $('#dd_level2').val()],
-                        ['dd_level3', $('#dd_level3').val()],
-                        ['dd_level4', $('#dd_level4').val()],
-                        ['criteria', $('#criteria').val()],
-                        ['search_text', $('#search_text').val()],
-                    ];
-                    // export_url = '{{ route("sysadmin.employeelists.export-current") }}';
-                    // export_url = "{{ route('sysadmin.employeelists.export-current', ':parray') }}";
-                    // export_url = export_url.replace(':parray', parray);
-                    var export_url = "{{ route('sysadmin.employeelists.export-current') }}";
+                    let parray = encodeURIComponent(JSON.stringify([
+                        $('#dd_level0').val(), 
+                        $('#dd_level1').val(),
+                        $('#dd_level2').val(),
+                        $('#dd_level3').val(),
+                        $('#dd_level4').val(),
+                        $('#criteria').val(),
+                        $('#search_text').val()
+                    ]));
+                    var export_url = "{{ route('sysadmin.employeelists.export-current', ':parray') }}";
+                    export_url = export_url.replace(':parray', parray);
                     let _url = export_url;
                     window.location.href = _url;
                 });
