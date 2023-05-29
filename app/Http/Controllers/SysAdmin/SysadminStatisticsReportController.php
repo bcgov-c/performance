@@ -312,26 +312,37 @@ class SysadminStatisticsReportController extends Controller
         $count_raw .= ") as count";
         
         $sql = Tag::selectRaw($count_raw);
-        $sql2 = Goal::join('users', function($join) {
-                    $join->on('goals.user_id', '=', 'users.id');
+        $sql2 = Goal::join('user_demo_jr_view', function($join) {
+                    $join->on('goals.user_id', '=', 'user_demo_jr_view.user_id');
                 })
-                ->join('employee_demo', function($join) {
-                    $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-                })
-                ->where('users.due_date_paused', 'N')                
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-                ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
-                ->whereNull('employee_demo.date_deleted')
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })
+                ->where(function($query) {
+                            $query->where(function($query) {
+                                $query->where('user_demo_jr_view.due_date_paused', 'N')
+                                    ->orWhereNull('user_demo_jr_view.due_date_paused');
+                            });
+                        })
+                ->where(function($query) {
+                        $query->where(function($query) {
+                            $query->where('user_demo_jr_view.excused_flag', '<>', '1')
+                                ->orWhereNull('user_demo_jr_view.excused_flag');
+                        });
+                    }) 
+                ->whereNull('user_demo_jr_view.date_deleted')    
                 ->whereNotExists(function ($query) {
                     $query->select(DB::raw(1))
                           ->from('goal_tags')
                           ->whereColumn('goals.id', 'goal_tags.goal_id');
                 })
-                ->where('employee_demo.guid', '<>', '');
+                ->where('user_demo_jr_view.guid', '<>', '')
+                ->where('goals.status', '=', 'active')
+                ->whereNull('goals.deleted_at')
+                ->where('goals.is_library', '=', 0)
+                ->where('goals.goal_type_id', '<>', 4);
                 
         $tags = $sql->get();
         $collection = new Collection($tags);
