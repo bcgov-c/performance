@@ -122,34 +122,13 @@ class EmployeeListController extends Controller {
                     u.due_date_paused,
                     u.next_conversation_date,
                     u.excusedtype AS excused,
-                    '' AS nextConversationDue,
-                    '' AS shared,
-                    '' AS reportees,
-                    '' AS activeGoals
+                    CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
+                    CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
+                    u.reportees,
+                    (SELECT COUNT(g.id) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals
                 ");
-            return Datatables::of($query)->addIndexColumn()
-                ->editColumn('activeGoals', function($row) {
-                    return (User::where('id', $row->id)->first()->activeGoals()->count() ?? '0').' Goals';
-                })
-                ->editColumn('nextConversationDue', function ($row) {
-                    if ($row->excused_flag) {
-                        return 'Paused';
-                    } 
-                    if ($row->due_date_paused != 'Y') {
-                        $text = Carbon::parse($row->next_conversation_date)->format('M d, Y');
-                        return $text;
-                    } else {
-                        return 'Paused';
-                    }
-                    return '';
-                })
-                ->editColumn('shared', function ($row) {
-                    return SharedProfile::where('shared_id', $row->id)->count() > 0 ? "Yes" : "No";
-                })
-                ->editColumn('reportees', function($row) {
-                    return User::where('id', $row->id)->first()->reporteesCount() ?? '0';
-                })
-                ->rawColumns(['nextConversation'])
+            return Datatables::of($query)
+                ->addIndexColumn()
                 ->make(true);
         }
     }
@@ -200,9 +179,9 @@ class EmployeeListController extends Controller {
                 u.next_conversation_date,
                 u.excusedtype AS excused,
                 CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
-                CASE WHEN (SELECT COUNT(sp.id) FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id) > 0 THEN 'Yes' ELSE 'No' END AS shared,
-                (SELECT COUNT(DISTINCT rep.id) FROM users AS rep WHERE rep.reporting_to = u.employee_id) AS reportees,
-                (SELECT COUNT(DISTINCT g.id) FROM goals as g WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals
+                CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
+                u.reportees,
+                (SELECT COUNT(g.id) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals
             ");
         $records = $query->get();
         // Generating Output file
@@ -316,7 +295,7 @@ class EmployeeListController extends Controller {
                     u.level3_branch,
                     u.level4,
                     u.deptid,
-                    u.date_deleted,
+                    u.date_deleted AS u_date_deleted,
                     u.employee_status,
                     u.supervisor_name,
                     u.supervisor_position_number,
@@ -326,41 +305,14 @@ class EmployeeListController extends Controller {
                     u.due_date_paused,
                     u.next_conversation_date,
                     u.excusedtype AS excused,
-                    '' AS nextConversationDue,
-                    '' AS shared,
-                    '' AS reportees,
-                    '' AS activeGoals
+                    CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
+                    CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
+                    u.reportees,
+                    (SELECT COUNT(g.id) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals,
+                    CASE WHEN u.date_deleted IS NOT NULL THEN u.date_deleted ELSE '' END AS date_deleted
                 ");
             return Datatables::of($query)
-                ->editColumn('activeGoals', function($row) {
-                    return (User::where('id', $row->id)->first()->activeGoals()->count() ?? '0').' Goals';
-                })
-                ->editColumn('nextConversationDue', function ($row) {
-                    if ($row->excused_flag) {
-                        return 'Paused';
-                    } 
-                    if ($row->due_date_paused != 'Y') {
-                        $text = Carbon::parse($row->next_conversation_date)->format('M d, Y');
-                        return $text;
-                    } else {
-                        return 'Paused';
-                    }
-                })
-                ->editColumn('shared', function ($row) {
-                    return SharedProfile::where('shared_id', $row->id)->count() > 0 ? "Yes" : "No";
-                })
-                ->editColumn('reportees', function($row) {
-                    return User::where('id', $row->id)->first()->reporteesCount() ?? '0';
-                })
-                ->editColumn('date_deleted', function ($row) {
-                    if ($row->date_deleted) {
-                        $text = Carbon::parse($row->date_deleted)->format('M d, Y');
-                    } else {
-                        $text = '';
-                    }
-                    return $row->date_deleted ? $text : null;
-                })
-                ->rawColumns(['date_deleted', 'nextConversation'])
+                ->addIndexColumn()
                 ->make(true);
         }
     }
@@ -400,7 +352,7 @@ class EmployeeListController extends Controller {
                 u.level3_branch,
                 u.level4,
                 u.deptid,
-                u.date_deleted,
+                u.date_deleted AS u_date_deleted,
                 u.employee_status,
                 u.supervisor_name,
                 u.supervisor_position_number,
@@ -411,9 +363,10 @@ class EmployeeListController extends Controller {
                 u.next_conversation_date,
                 u.excusedtype AS excused,
                 CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
-                CASE WHEN (SELECT COUNT(sp.id) FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id) > 0 THEN 'Yes' ELSE 'No' END AS shared,
-                (SELECT COUNT(DISTINCT rep.id) FROM users AS rep WHERE rep.reporting_to = u.employee_id) AS reportees,
-                (SELECT COUNT(DISTINCT g.id) FROM goals as g WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals
+                CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
+                u.reportees,
+                (SELECT COUNT(g.id) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals,
+                CASE WHEN u.date_deleted IS NOT NULL THEN u.date_deleted ELSE '' END AS date_deleted
             ");
         $records = $query->get();
         // Generating Output file

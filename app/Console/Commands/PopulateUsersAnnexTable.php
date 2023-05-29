@@ -115,11 +115,12 @@ class PopulateUsersAnnexTable extends Command
           created_at,
           updated_at,
           isSupervisor,
-          isDelegate
+          isDelegate,
+          reportees
           )
           SELECT DISTINCT
             u.id,
-              d.orgid,
+            d.orgid,
             u.employee_id,
             edt.level,
             edt.headcount,
@@ -173,8 +174,9 @@ class PopulateUsersAnnexTable extends Command
             CASE when edj.excused_type = 'A' THEN date(edj.created_at) when edj.excused_type = 'M' THEN date(edj.updated_at) ELSE CASE when u.excused_flag = 1 THEN u.excused_updated_at ELSE '' END END AS created_at_string,
             NOW(),
             NOW(),
-            CASE WHEN (SELECT DISTINCT 1 FROM users AS su WHERE su.reporting_to = u.id) = 1 THEN 1 ELSE 0 END AS isSupervisor,
-            CASE WHEN (SELECT DISTINCT 1 FROM shared_profiles AS sp WHERE sp.shared_with = u.id) = 1 THEN 1 ELSE 0 END AS isDelegate
+            CASE WHEN (SELECT 1 FROM users AS su WHERE su.reporting_to = u.id LIMIT 1) THEN 1 ELSE 0 END AS isSupervisor,
+            CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_with = u.id LIMIT 1) THEN 1 ELSE 0 END AS isDelegate,
+            (SELECT COUNT(rep.user_id) FROM user_reporting_tos AS rep USE INDEX (IDX_REPORTING_TO_ID) WHERE rep.reporting_to_id = u.id) AS reportees
           FROM
             (employee_demo AS d 
               USE INDEX (idx_employee_demo_employeeid_orgid)
