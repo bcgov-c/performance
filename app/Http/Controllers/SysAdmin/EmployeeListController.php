@@ -149,22 +149,29 @@ class EmployeeListController extends Controller {
                 ->editColumn('reportees', function($row) {
                     return User::where('id', $row->id)->first()->reporteesCount() ?? '0';
                 })
+                ->rawColumns(['nextConversation'])
                 ->make(true);
         }
     }
 
-    public function exportCurrent(Request $request, $param) {
-        // dd($param);
+    public function exportCurrent(Request $request, $paramJSON = null) {
+        $param = json_decode($paramJSON);
+        $dd_level0 = $param[0];
+        $dd_level1 = $param[1];
+        $dd_level2 = $param[2];
+        $dd_level3 = $param[3];
+        $dd_level4 = $param[4];
+        $criteria = $param[5];
+        $search_text = $param[6];
         $query = UserDemoJrView::from('user_demo_jr_view AS u')
             ->whereNull('u.date_deleted')
-            ->when($param->dd_level0, function($q) use($param) { return $q->where('u.organization_key', $param->dd_level0); })
-            ->when($param->dd_level1, function($q) use($param) { return $q->where('u.level1_key', $param->dd_level1); })
-            ->when($param->dd_level2, function($q) use($param) { return $q->where('u.level2_key', $param->dd_level2); })
-            ->when($param->dd_level3, function($q) use($param) { return $q->where('u.level3_key', $param->dd_level3); })
-            ->when($param->dd_level4, function($q) use($param) { return $q->where('u.level4_key', $param->dd_level4); })
-            ->when($param->search_text && $param->criteria == 'u.employee_name', function($q) use ($param) { return $q->whereRaw("(u.employee_name LIKE '%{$param->search_text}%' OR u.user_name LIKE '%{$param->search_text}%')"); })
-            ->when($param->search_text && $param->criteria != 'u.employee_name', function($q) use ($param) { return $q->whereRaw("{$param->criteria} LIKE '%{$param->search_text}%'"); })
-            // ->whereRaw("u.user_name like '%may%'")
+            ->when($dd_level0, function($q) use($dd_level0) { return $q->where('u.organization_key', $dd_level0); })
+            ->when($dd_level1, function($q) use($dd_level1) { return $q->where('u.level1_key', $dd_level1); })
+            ->when($dd_level2, function($q) use($dd_level2) { return $q->where('u.level2_key', $dd_level2); })
+            ->when($dd_level3, function($q) use($dd_level3) { return $q->where('u.level3_key', $dd_level3); })
+            ->when($dd_level4, function($q) use($dd_level4) { return $q->where('u.level4_key', $dd_level4); })
+            ->when($search_text && $criteria == 'u.employee_name', function($q) use ($search_text) { return $q->whereRaw("(u.employee_name LIKE '%{$search_text}%' OR u.user_name LIKE '%{$search_text}%')"); })
+            ->when($search_text && $criteria != 'u.employee_name', function($q) use ($criteria, $search_text) { return $q->whereRaw("{$criteria} LIKE '%{$search_text}%'"); })
             ->selectRaw ("
                 u.user_id AS id,
                 u.guid,
@@ -192,7 +199,7 @@ class EmployeeListController extends Controller {
                 u.due_date_paused,
                 u.next_conversation_date,
                 u.excusedtype AS excused,
-                CASE WHEN (u.due_date_paused != 'Y' AND u.excused_flag <> 1) THEN u.next_conversation_date ELSE 'Paused' END AS nextConversationDue,
+                CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
                 CASE WHEN (SELECT COUNT(sp.id) FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id) > 0 THEN 'Yes' ELSE 'No' END AS shared,
                 (SELECT COUNT(DISTINCT rep.id) FROM users AS rep WHERE rep.reporting_to = u.employee_id) AS reportees,
                 (SELECT COUNT(DISTINCT g.id) FROM goals as g WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals
@@ -325,7 +332,6 @@ class EmployeeListController extends Controller {
                     '' AS activeGoals
                 ");
             return Datatables::of($query)
-                ->addIndexColumn()
                 ->editColumn('activeGoals', function($row) {
                     return (User::where('id', $row->id)->first()->activeGoals()->count() ?? '0').' Goals';
                 })
@@ -339,7 +345,6 @@ class EmployeeListController extends Controller {
                     } else {
                         return 'Paused';
                     }
-                    return '';
                 })
                 ->editColumn('shared', function ($row) {
                     return SharedProfile::where('shared_id', $row->id)->count() > 0 ? "Yes" : "No";
@@ -360,16 +365,24 @@ class EmployeeListController extends Controller {
         }
     }
 
-    public function exportPast(Request $request) {
+    public function exportPast(Request $request,  $paramJSON = null) {
+        $param = json_decode($paramJSON);
+        $dd_level0 = $param[0];
+        $dd_level1 = $param[1];
+        $dd_level2 = $param[2];
+        $dd_level3 = $param[3];
+        $dd_level4 = $param[4];
+        $criteria = $param[5];
+        $search_text = $param[6];
         $query = UserDemoJrView::from('user_demo_jr_view AS u')
             ->whereNotNull('u.date_deleted')
-            ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
-            ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
-            ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
-            ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
-            ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
-            ->when($request->search_text && $request->criteria == 'u.employee_name', function($q) use ($request) { return $q->whereRaw("(u.employee_name LIKE '%{$request->search_text}%' OR u.user_name LIKE '%{$request->search_text}%')"); })
-            ->when($request->search_text && $request->criteria != 'u.employee_name', function($q) use ($request) { return $q->whereRaw("{$request->criteria} LIKE '%{$request->search_text}%'"); })
+            ->when($dd_level0, function($q) use($dd_level0) { return $q->where('u.organization_key', $dd_level0); })
+            ->when($dd_level1, function($q) use($dd_level1) { return $q->where('u.level1_key', $dd_level1); })
+            ->when($dd_level2, function($q) use($dd_level2) { return $q->where('u.level2_key', $dd_level2); })
+            ->when($dd_level3, function($q) use($dd_level3) { return $q->where('u.level3_key', $dd_level3); })
+            ->when($dd_level4, function($q) use($dd_level4) { return $q->where('u.level4_key', $dd_level4); })
+            ->when($search_text && $criteria == 'u.employee_name', function($q) use ($search_text) { return $q->whereRaw("(u.employee_name LIKE '%{$search_text}%' OR u.user_name LIKE '%{$search_text}%')"); })
+            ->when($search_text && $criteria != 'u.employee_name', function($q) use ($criteria, $search_text) { return $q->whereRaw("{$criteria} LIKE '%{$search_text}%'"); })
             ->selectRaw ("
                 u.user_id AS id,
                 u.guid,
@@ -397,7 +410,7 @@ class EmployeeListController extends Controller {
                 u.due_date_paused,
                 u.next_conversation_date,
                 u.excusedtype AS excused,
-                CASE WHEN (u.due_date_paused != 'Y' AND u.excused_flag <> 1) THEN u.next_conversation_date ELSE 'Paused' END AS nextConversationDue,
+                CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
                 CASE WHEN (SELECT COUNT(sp.id) FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id) > 0 THEN 'Yes' ELSE 'No' END AS shared,
                 (SELECT COUNT(DISTINCT rep.id) FROM users AS rep WHERE rep.reporting_to = u.employee_id) AS reportees,
                 (SELECT COUNT(DISTINCT g.id) FROM goals as g WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals
