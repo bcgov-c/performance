@@ -219,7 +219,7 @@ class EmployeeListController extends Controller {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
             foreach ($records as $rec) {
-                $row['Employee ID'] = $rec->id;
+                $row['Employee ID'] = $rec->employee_id;
                 $row['Name'] = $rec->employee_name;
                 $row['Email'] = $rec->employee_email;
                 $row['Position #'] = $rec->position_number;
@@ -405,7 +405,7 @@ class EmployeeListController extends Controller {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
             foreach ($records as $rec) {
-                $row['Employee ID'] = $rec->id;
+                $row['Employee ID'] = $rec->employee_id;
                 $row['Name'] = $rec->employee_name;
                 $row['Email'] = $rec->employee_email;
                 $row['Position #'] = $rec->position_number;
