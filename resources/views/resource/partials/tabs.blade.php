@@ -4,6 +4,11 @@
             User Guide
         </x-button>
     </div>
+    <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'resource.video-tutorials' ? 'border-primary' : ''}}">
+        <x-button :href="route('resource.video-tutorials')" style="">
+            Video Tutorials
+        </x-button>
+    </div>
     <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'resource.goal-setting' ? 'border-primary' : ''}}">
         <x-button :href="route('resource.goal-setting')" style="">
             Goal Setting
@@ -12,6 +17,11 @@
     <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'resource.conversations' ? 'border-primary' : ''}}">
         <x-button :href="route('resource.conversations')" style="">
             Performance Conversations
+        </x-button>
+    </div>
+    <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'resource.contact' ? 'border-primary' : ''}}">
+        <x-button :href="route('resource.faq')" style="">
+            FAQ
         </x-button>
     </div>
     <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'resource.contact' ? 'border-primary' : ''}}">

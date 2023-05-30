@@ -25,12 +25,28 @@ class ResourceController extends Controller
                 'answer_file' => '3'
             ],
             [
+                'question' => 'How to use the conversation templates',
+                'answer_file' => '6'
+            ],
+            [
                 'question' => 'My Team Section (supervisors only)',
                 'answer_file' => '4'
             ],
 
         ];
         return view('resource.user-guide', compact('data', 't'));
+    }
+    public function videotutorials(Request $request)
+    {   
+        $t = $request->t;
+
+        $data = [
+            [
+                'question' => 'Video Tutorials',
+                'answer_file' => '1'
+            ],
+        ];
+        return view('resource.video-tutorials', compact('data', 't'));
     }
     public function goalsetting(Request $request)
     {
@@ -90,11 +106,11 @@ class ResourceController extends Controller
               'answer' => "Any conversation about an employee and their work can be considered a performance development conversation. They can be informal check-ins, regular 1-on-1's, recognition for a job well done, feedback, or more formal conversations when trying to modify behaviour."
           ],
           [
-              'question' => 'Why are conversations important?',
+              'question' => 'Why are performance conversations important?',
               'answer_file' => '2'
           ],
           [
-              'question' => 'When are conversations effective?',
+              'question' => 'What makes a conversation effective?',
               'answer_file' => '3'
           ],
           [
@@ -106,14 +122,35 @@ class ResourceController extends Controller
               'answer_file' => '5'
           ],
           [
-              'question' => 'How to use the conversation templates',
+              'question' => 'Asking for feedback or inquiring into someone else\'s perspective',
               'answer_file' => '6'
-          ],          
+          ],     
+          [
+              'question' => 'Addressing a performance issue',
+              'answer_file' => '7'
+          ],      
       ];
          return view('resource.conversations', compact('data', 't'));
     }
     public function contact()
     {
          return view('resource.contact');
+    }
+    public function faq(Request $request)
+    {
+      
+      $t = $request->t;
+
+      $data = [
+          [
+              'question' => 'Questions about Performance Development Approach and Process',
+              'answer_file' => "1"
+          ],
+          [
+              'question' => 'Questions about the Performance Development Platform (PDP)',
+              'answer_file' => '2'
+          ],
+      ];
+         return view('resource.faq', compact('data', 't'));
     }
 }
