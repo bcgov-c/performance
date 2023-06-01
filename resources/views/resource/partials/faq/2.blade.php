@@ -3,9 +3,9 @@
 <p>Sign-off by both parties in MyPerformance is required for the profile to be archived and made available. </p>
 <br>
 <h5>b. Who can assist my employees if they need help with the PDP?</h5>
-<p>Supervisors are supposed to help employees with their PDP profiles whenever possible. All supervisors and employees are encouraged to review the <a href="https://performance.gov.bc.ca/resources">Resources Section</a> of the PDP for a helpful user guide, tutorial videos, and best practice tips for setting effective goals and having effective conversations.</p>
-<p>If you can&rsquo;t find the answer after reviewing this material, you can escalate your request to your ministry contact listed in the <a href="https://performance.gov.bc.ca/resources/contact">Contacts Section</a> of the PDP.</p>
-<p>If you are experiencing a technical issue, first check to see if the answer is in the PDP <a href="https://performance.gov.bc.ca/resources">User Guide</a>. If you cannot find the answer, we can forward your email to someone who can investigate.</p>
+<p>Supervisors are supposed to help employees with their PDP profiles whenever possible. All supervisors and employees are encouraged to review the <a href="/resources"  target=\'_blank\'>Resources Section</a> of the PDP for a helpful user guide, tutorial videos, and best practice tips for setting effective goals and having effective conversations.</p>
+<p>If you can&rsquo;t find the answer after reviewing this material, you can escalate your request to your ministry contact listed in the <a href="/resources/contact"  target=\'_blank\'>Contacts Section</a> of the PDP.</p>
+<p>If you are experiencing a technical issue, first check to see if the answer is in the PDP <a href="/resources"  target=\'_blank\'>User Guide</a>. If you cannot find the answer, we can forward your email to someone who can investigate.</p>
 <br>
 <h5>c. How do I add a goal to my PDP profile?</h5>
 <p>There are two ways to include a goal in your PDP profile. You can:</p>
@@ -13,7 +13,7 @@
     <li>Create a new goal using the “Create New Goal” function; or</li>
     <li>Import a goal that has been assigned to you by your supervisor or organization using the “Add Goal from Goal Bank” function.</li>
 </ul>
-<p>When you launch the “Create New Goal” screen, you will be asked to select a goal type, goal title, and goal tags to help you identify and sort your goals. All three sections are mandatory. You can access more detailed information on these sections by clicking on the information “i” icon next to each heading in the app. There are tutorial videos and best practice tips to set effective goals available in the <a href="https://performance.gov.bc.ca/resources">PDP Resources Section</a>.</p>
+<p>When you launch the “Create New Goal” screen, you will be asked to select a goal type, goal title, and goal tags to help you identify and sort your goals. All three sections are mandatory. You can access more detailed information on these sections by clicking on the information “i” icon next to each heading in the app. There are tutorial videos and best practice tips to set effective goals available in the <a href="/resources"  target=\'_blank\'>PDP Resources Section</a>.</p>
 <p>The second way to include a goal in your PDP profile is to import a goal from your Goal Bank. This is a list of goals created for you by your supervisor or organization. Some goals will be marked as mandatory, but most are suggested starting points for you to consider. You can click on a goal to view the details and add it to your own profile. If needed, you can edit the goal to personalize it once it is in your profile.</p>
 <br>
 <h5>d. How do I share a goal with a colleague?</h5>
