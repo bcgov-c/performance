@@ -10,9 +10,9 @@
 <!-- <li>Click “Create New Goal”. This will launch a form that walks you through the process of creating a goal from the very beginning. There are helpful tips and examples available right in the form itself. You may also want to read the <a href='/resource/goal-setting' target=\'_blank\'>Goal Setting</a> resource to make your goals as strong as possible.</li>          -->
 <li>Click “Create New Goal”. This will launch a form that walks you through the process of creating a goal from the very beginning. There are helpful tips and examples available right in the form itself. You may also want to read the <a href='/resources/goal-setting' target=\'_blank\'>Goal Setting</a> resource to make your goals as strong as possible.</li>         
     <br>
-    <li>Click “Add Goal from Goal Bank”. This takes you to a list of goals created for you by your supervisor or organization. Some goals will be marked as mandatory, but most are suggested starting points for you to consider. This is a good place to start if you want to search for goal ideas on a certain topic. You will receive a notification when a new goal is added to your Goal Bank. <br><br> Click on a goal to view it and add it to your own profile. If needed, you can edit the goal to personalize it once it is in your own profile. </li>    
+    <li>Click “Add Goal from Goal Bank”. This takes you to a list of goals created for you by your supervisor or organization. Some goals will be marked as mandatory, but most are just suggested starting points for you to consider. This is a good place to start if you want to search for goal ideas on a certain topic. You will receive a notification when a new goal is added to your Goal Bank. <br><br> Click on a goal to view it and add it to your own profile. If needed, you can edit the goal to personalize it once it is in your own profile. </li>    
 </ol>
-<p>Once you have added a goal to your My Current Goals tab, you will see it display as a clickable list item. You can open the goal to edit the content or add comments. You can also change the status of the goal if it has been achieved or needs to be archived. Once you change the status, the goal will be transferred to your My Past Goals tab.</p>
+<p>Once you have added a goal to your My Current Goals tab, you will see it displayed as a clickable list item. You can open the goal to edit the content or add comments. You can also change the status of the goal if it has been achieved or needs to be archived. Once you change the status, the goal will be transferred to your My Past Goals tab.</p>
 <p>You will also have the option to share the goal with other users using the “Shared With” dropdown menu. Sharing a goal with someone adds it to their “Goals Shared with Me” tab and allows them to view the goal and add comments. This is a great way to collaborate on a common goal with your colleagues. As the creator of the shared goal, when you change the status to achieved or archived, the goal will move to the My Past Goals tab for everyone who has access to it.</p>
 <br>
 
@@ -24,7 +24,7 @@
 
 <u>Goals Shared with Me</u>
 <br><br>
-<p>This area lists any goals have been shared with you by a colleague. You can view and comment on these goals and collaborate with others to track progress.  Note that whoever created the goal is the one that can change the goal status to achieved or archived.</p> 
+<p>This area lists any goals that have been shared with you by a colleague. You can view and comment on these goals and collaborate with others to track progress.  Note that whoever created the goal is the one that can change the goal status to achieved or archived.</p> 
 <br>
 
 <u>Goal Bank</u>

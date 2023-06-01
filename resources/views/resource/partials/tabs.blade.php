@@ -19,7 +19,7 @@
             Performance Conversations
         </x-button>
     </div>
-    <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'resource.contact' ? 'border-primary' : ''}}">
+    <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'resource.faq' ? 'border-primary' : ''}}">
         <x-button :href="route('resource.faq')" style="">
             FAQ
         </x-button>
