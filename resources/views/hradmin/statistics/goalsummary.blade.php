@@ -402,13 +402,13 @@ $(function()  {
 					var tar = params[0];
 					return 'Tag : ' + tar.name + '<br/>Count : ' + tar.value;
 				}	
-			},
+                        },
 			grid: {
-				left: '3%',
-				right: '4%',
-				bottom: '10%',
-				containLabel: true
-			},
+                            left: '3%',
+                            right: '4%',
+                            bottom: '15%', // Increase the bottom value to allocate more space for labels
+                            containLabel: true
+                        },
 			series: [
 				{
 					// name: '2011',
