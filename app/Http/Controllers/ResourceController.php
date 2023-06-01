@@ -143,12 +143,12 @@ class ResourceController extends Controller
 
       $data = [
           [
-              'question' => 'Questions about Performance Development Approach and Process',
-              'answer_file' => "1"
-          ],
-          [
               'question' => 'Questions about the Performance Development Platform (PDP)',
               'answer_file' => '2'
+          ],
+          [
+              'question' => 'Questions about Performance Development Approach and Process',
+              'answer_file' => "1"
           ],
       ];
          return view('resource.faq', compact('data', 't'));
