@@ -100,8 +100,7 @@ class SysadminStatisticsReportController extends Controller
                         })
                         ->whereNull('deleted_at')
                         ->where('goals.status','active')
-                        ->where('goals.is_library','0')   
-                        ->where('goals.goal_type_id','<>','4')        
+                        ->where('goals.is_library','0')       
                         ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
                         ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
                         ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
@@ -139,7 +138,6 @@ class SysadminStatisticsReportController extends Controller
                 ->where('goals.status', '=', 'active')
                 ->whereNull('goals.deleted_at')
                 ->where('goals.is_library', '=', 0)
-                ->where('goals.goal_type_id', '<>', 4)
                 ->where(function($query) {
                             $query->where(function($query) {
                                 $query->where('user_demo_jr_view.due_date_paused', 'N')
@@ -341,8 +339,7 @@ class SysadminStatisticsReportController extends Controller
                 ->where('user_demo_jr_view.guid', '<>', '')
                 ->where('goals.status', '=', 'active')
                 ->whereNull('goals.deleted_at')
-                ->where('goals.is_library', '=', 0)
-                ->where('goals.goal_type_id', '<>', 4);
+                ->where('goals.is_library', '=', 0);
                 
         $tags = $sql->get();
         $collection = new Collection($tags);
@@ -398,7 +395,6 @@ class SysadminStatisticsReportController extends Controller
             ->where('status', 'active')
             ->whereNull('deleted_at')
             ->where('is_library', 0)
-            ->where('goal_type_id', '<>', 4)
             ->groupBy('user_id', 'goal_type_id');
 
         $goal_count_query = DB::table('user_demo_jr_view')
@@ -412,7 +408,6 @@ class SysadminStatisticsReportController extends Controller
             ->where('goals.status', 'active')
             ->whereNull('goals.deleted_at')
             ->where('goals.is_library', 0)
-            ->where('goals.goal_type_id', '<>', 4)
             ->where(function ($query) {
                 $query->where('user_demo_jr_view.due_date_paused', 'N')
                       ->orWhereNull('user_demo_jr_view.due_date_paused');
@@ -460,7 +455,7 @@ class SysadminStatisticsReportController extends Controller
         
         if(!$request->goal){
             $columns = ["Employee ID", "Name", "Email", 'Total Active Goals', 
-                            'Active Work Goals', 'Active Learning Goals', 'Active Career Development Goals', 
+                            'Active Work Goals', 'Active Learning Goals', 'Active Career Development Goals', 'Active Private Goals',
                             "Organization", "Level 1", "Level 2", "Level 3", "Level 4",
                         ];
         }elseif($request->goal == 1){
@@ -476,6 +471,11 @@ class SysadminStatisticsReportController extends Controller
         }elseif($request->goal == 3){
             $columns = ["Employee ID", "Name", "Email", 
                             'Active Learning Development Goals', 
+                            "Organization", "Level 1", "Level 2", "Level 3", "Level 4",
+                        ];
+        }elseif($request->goal == 4){
+            $columns = ["Employee ID", "Name", "Email", 
+                            'Active Private Goals', 
                             "Organization", "Level 1", "Level 2", "Level 3", "Level 4",
                         ];
         }
@@ -515,6 +515,14 @@ class SysadminStatisticsReportController extends Controller
                         $row['Active Career Development Goals'] = 0;
                     }
                 }
+                //Active Private Goals
+                if(!$request->goal || $request->goal == 4){
+                    if($user["goal_type_id"] == 4){
+                        $row['Active Private Goals'] = $user["sub_goals_count"];
+                    }else{
+                        $row['Active Private Goals'] = 0;
+                    }
+                }
                 $row['Organization'] = $user["organization"];
                 $row['Level 1'] = $user["level1_program"];
                 $row['Level 2'] = $user["level2_division"];
@@ -524,7 +532,7 @@ class SysadminStatisticsReportController extends Controller
                                 
                 if(!$request->goal){
                     fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Total Active Goals']
-                            , $row['Active Work Goals'], $row['Active Learning Goals'], $row['Active Career Development Goals']
+                            , $row['Active Work Goals'], $row['Active Learning Goals'], $row['Active Career Development Goals'], $row['Active Private Goals']
                             , $row['Organization'],$row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
                 }elseif($request->goal == 1){
                     fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email']
@@ -537,6 +545,10 @@ class SysadminStatisticsReportController extends Controller
                 }elseif($request->goal == 3){
                     fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email']
                             , $row['Active Learning Goals']
+                            , $row['Organization'],$row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
+                }elseif($request->goal == 4){
+                    fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email']
+                            , $row['Active Private Goals']
                             , $row['Organization'],$row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
                 }
             }
@@ -590,7 +602,13 @@ class SysadminStatisticsReportController extends Controller
                     })
                     ->where('users.due_date_paused', 'N')                    
                     ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-                    ->whereNull('employee_demo.date_deleted')        
+                    ->whereNull('employee_demo.date_deleted') 
+                    ->where(function($query) {
+                            $query->where(function($query) {
+                                $query->where('users.excused_flag', '<>', '1')
+                                    ->orWhereNull('users.excused_flag');
+                            });
+                        })         
                     ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
                     ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
                     ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
@@ -1218,7 +1236,7 @@ class SysadminStatisticsReportController extends Controller
                
             case 4:
 
-                $filename = 'Open Conversations by Employee.csv';
+                $filename = 'Open Conversation By Topic.csv';
                 $conversations =  $sql_chart4->get();
                 $conversations_unique = array();
                 $topics = ConversationTopic::select('id','name')->get();
@@ -1290,7 +1308,7 @@ class SysadminStatisticsReportController extends Controller
             
             case 5:
 
-                $filename = 'Completed Conversations by Employee.csv';
+                $filename = 'Completed Conversation By Topic.csv';
                 $conversations =  $sql_chart5->get();
                 $conversations_unique = array();
                 $topics = ConversationTopic::select('id','name')->get();
