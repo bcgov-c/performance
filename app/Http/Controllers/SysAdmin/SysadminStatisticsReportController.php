@@ -293,19 +293,27 @@ class SysadminStatisticsReportController extends Controller
         
         // Goal Tag count 
         $count_raw = "id, name, ";
-        $count_raw .= " (select count(*) from goal_tags, goals, users, employee_demo, employee_demo_tree ";
+        $count_raw .= " (select count(*) from goal_tags, goals, user_demo_jr_view ";
         $count_raw .= "   where goals.id = goal_tags.goal_id "; 
 	    $count_raw .= "     and tag_id = tags.id ";  
-        $count_raw .= "     and users.id = goals.user_id ";
-        $count_raw .= "     and users.employee_id = employee_demo.employee_id ";
-        $count_raw .= "     and employee_demo.orgid = employee_demo_tree.id ";
-        $count_raw .= $request->dd_level0 ? "     and employee_demo_tree.organization = '{ $request->dd_level0 }'" : '';
-        $count_raw .= $request->dd_level1 ? "     and employee_demo_tree.level1_program = '{ $request->dd_level1 }'" : '';
-        $count_raw .= $request->dd_level2 ? "     and employee_demo_tree.level2_division = '{ $request->dd_level2 }'" : '';
-        $count_raw .= $request->dd_level3 ? "     and employee_demo_tree.level3_branch = '{ $request->dd_level3 }'" : '';
-        $count_raw .= $request->dd_level4 ? "     and employee_demo_tree.level4 = '{ $request->dd_level4 }'" : '';
+        $count_raw .= "     and user_demo_jr_view.user_id = goals.user_id ";
+        if($request->dd_level0) {
+            $count_raw .= " and user_demo_jr_view.organization_key = '".$request->dd_level0."'";
+        }
+        if($request->dd_level1) {
+            $count_raw .= " and user_demo_jr_view.level1_key = '".$request->dd_level1."'";
+        }
+        if($request->dd_level2) {
+            $count_raw .= " and user_demo_jr_view.level2_key = '".$request->dd_level2."'";
+        }
+        if($request->dd_level3) {
+            $count_raw .= " and user_demo_jr_view.level3_key = '".$request->dd_level3."'";
+        }
+        if($request->dd_level4) {
+            $count_raw .= " and user_demo_jr_view.level4_key = '".$request->dd_level4."'";
+        }
         $count_raw .= "     and ( ";
-        $count_raw .= "           users.due_date_paused = 'N' ";
+        $count_raw .= "           user_demo_jr_view.due_date_paused = 'N' ";
         $count_raw .= "         )";
         $count_raw .= ") as count";
         

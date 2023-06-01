@@ -307,24 +307,32 @@ class StatisticsReportController extends Controller
 
         // Goal Tag count 
         $count_raw = "id, name, ";
-        $count_raw .= " (select count(*) from goal_tags, goals, users, employee_demo, employee_demo_tree ";
+        $count_raw .= " (select count(*) from goal_tags, goals, user_demo_jr_view ";
         $count_raw .= "   where goals.id = goal_tags.goal_id "; 
 	    $count_raw .= "     and tag_id = tags.id ";  
-        $count_raw .= "     and users.id = goals.user_id ";
-        $count_raw .= "     and users.employee_id = employee_demo.employee_id ";
-        $count_raw .= "     and employee_demo.orgid = employee_demo_tree.id ";
-        $count_raw .= $request->dd_level0 ? "     and employee_demo_tree.organization_key = '{ $request->dd_level0 }'" : '';
-        $count_raw .= $request->dd_level1 ? "     and employee_demo_tree.level1_key = '{ $request->dd_level1 }'" : '';
-        $count_raw .= $request->dd_level2 ? "     and employee_demo_tree.level2_key = '{ $request->dd_level2 }'" : '';
-        $count_raw .= $request->dd_level3 ? "     and employee_demo_tree.level3_key = '{ $request->dd_level3 }'" : '';
-        $count_raw .= $request->dd_level4 ? "     and employee_demo_tree.level4_key = '{ $request->dd_level4 }'" : '';
+        $count_raw .= "     and user_demo_jr_view.user_id = goals.user_id ";
+        if($request->dd_level0) {
+            $count_raw .= " and user_demo_jr_view.organization_key = '".$request->dd_level0."'";
+        }
+        if($request->dd_level1) {
+            $count_raw .= " and user_demo_jr_view.level1_key = '".$request->dd_level1."'";
+        }
+        if($request->dd_level2) {
+            $count_raw .= " and user_demo_jr_view.level2_key = '".$request->dd_level2."'";
+        }
+        if($request->dd_level3) {
+            $count_raw .= " and user_demo_jr_view.level3_key = '".$request->dd_level3."'";
+        }
+        if($request->dd_level4) {
+            $count_raw .= " and user_demo_jr_view.level4_key = '".$request->dd_level4."'";
+        }
         $count_raw .= "     and ( ";
-        $count_raw .= "           users.due_date_paused = 'N' ";
+        $count_raw .= "           user_demo_jr_view.due_date_paused = 'N' ";
         $count_raw .= "         )";
-        $count_raw .= "     and exists (select 1 from admin_org_users ";
-        $count_raw .= "                  where admin_org_users.allowed_user_id = users.id ";
-        $count_raw .= "                    and admin_org_users.access_type in (0,1) ";
-        $count_raw .= "                    and admin_org_users.granted_to_id = ".  Auth::id()  .") ";
+        $count_raw .= "     and exists (select 1 from auth_users ";
+        $count_raw .= "                  where auth_users.user_id = user_demo_jr_view.user_id ";
+        $count_raw .= "                    and auth_users.type = 'HR' ";
+        $count_raw .= "                    and auth_users.auth_id = ".  Auth::id()  .") ";
         $count_raw .= ") as count";
 
         $sql = Tag::selectRaw($count_raw);
