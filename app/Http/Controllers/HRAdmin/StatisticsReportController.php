@@ -375,6 +375,9 @@ class StatisticsReportController extends Controller
                     });
 
         $tags = $sql->get();
+        $collection = new Collection($tags);
+        $sortedArray = $collection->sortBy('name')->values()->all();
+        
         $blank_count = $sql2->count();
         
         $data_tag = [ 
