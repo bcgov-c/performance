@@ -12,6 +12,7 @@ use App\Models\GoalBankOrg;
 use App\Models\EmployeeDemo;
 use Illuminate\Http\Request;
 use App\Models\GoalSharedWith;
+use App\Models\UserDemoJrView;
 use App\Models\UserDemoJrForGoalbankView;
 use App\MicrosoftGraph\SendMail;
 use App\Models\EmployeeDemoTree;
@@ -531,7 +532,7 @@ class GoalBankController extends Controller
             , 'target_date' => $request->input('target_date')
             , 'user_id' => $current_user->id
             , 'created_by' => $current_user->id
-            , 'by_admin' => '1'
+            , 'by_admin' => 1
             , 'is_mandatory' => $request->input('is_mandatory')
             , 'display_name' => $request->input('display_name')
             ]
@@ -543,26 +544,28 @@ class GoalBankController extends Controller
             $selected_emp_ids = $request->userCheck ? $request->userCheck : [];
             $toRecipients = EmployeeDemo::from('employee_demo AS d')
                 ->select('u.id')
-                ->join('users as u', 'd.employee_id', 'u.employee_id')
+                ->join('users AS u', 'd.employee_id', 'u.employee_id')
                 ->whereIn('d.employee_id', $selected_emp_ids )
                 ->distinct()
                 ->select ('u.id')
                 ->orderBy('d.employee_name')
                 ->get() ;
             foreach ($toRecipients as $newId) {
-                $result = DB::table('goals_shared_with')
+                $result = \DB::table('goals_shared_with')
                     ->updateOrInsert(
-                        ['goal_id' => $resultrec->id
-                        , 'user_id' => $newId->id
+                        [
+                            'goal_id' => $resultrec->id,
+                            'user_id' => $newId->id
                         ],
-                        []
+                        [
+                        ]
                     );
             }
             $notify_audiences = $selected_emp_ids;
         }
         if($request->opt_audience == "byOrg") {
             $selected_org_nodes = $request->eorgCheck ? $request->eorgCheck : [];
-            $selected_inherited = $request->selected_inherited ? json_decode($request->selected_inherited) : [];
+            $selected_inherited = $request->eselected_inherited ? json_decode($request->eselected_inherited) : [];
             $organizationList = EmployeeDemoTree::select('id')
                 ->whereIn('id', $selected_org_nodes)
                 ->orWhereIn('level4_key', $selected_org_nodes)
@@ -583,7 +586,7 @@ class GoalBankController extends Controller
                         'orgid' => $org1->id,
                         'created_at' => date('Y-m-d H:i:s'),
                         'updated_at' => date('Y-m-d H:i:s') 
-                    ],
+                    ]
                 );
                 if(!$result){
                     break;
@@ -1199,59 +1202,46 @@ class GoalBankController extends Controller
         return ($employees ? $employees->toArray() : []); 
     }
 
-
     protected function notify_on_dashboard($goalBank, $employee_ids) {
-
         // Filter out the employee based on the Organization level and individual user preferences. 
-        $filtered_ee_ids = UserDemoJrForGoalbankView::join('access_organizations', 'user_demo_jr_for_goalbank_view.organization', 'access_organizations.organization')
-                                ->leftjoin('user_preferences', 'user_demo_jr_for_goalbank_view.user_id', 'user_preferences.user_id')
-                                ->whereIn('user_demo_jr_for_goalbank_view.employee_id', $employee_ids)
-                                ->where('access_organizations.allow_inapp_msg', 'Y')
-                                ->where( function($query) {
-                                    $query->where('user_preferences.goal_bank_flag', 'Y')
-                                          ->orWhereNull('user_preferences.goal_bank_flag');
-                                })
-                                ->pluck('user_demo_jr_for_goalbank_view.employee_id')
-                                ->toArray(); 
-
-        if (count($filtered_ee_ids)) {
-            // find user id based on the employee_id
-            $notify_users_ids = User::whereIn('employee_id', $employee_ids)->pluck('id');
-            // Add dasboard message to each participant_id
-            foreach ($notify_users_ids as $key => $value) {
-                // Use Class to create DashboardNotification
-                $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                $notification->user_id = $value;
-                $notification->notification_type = 'GB';
-                $notification->comment = ($goalBank->display_name ? $goalBank->display_name : $goalBank->user->name) . ' added a new goal to your goal bank.';
-                $notification->related_id = $goalBank->id;
-                $notification->notify_user_id =  $value;
-                $notification->send(); 
-            }
-        }
-
+        $data = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization', 'access_organizations.organization')
+            ->leftjoin('user_preferences', 'user_demo_jr_view.user_id', 'user_preferences.user_id')
+            ->whereIn('user_demo_jr_view.employee_id', $employee_ids)
+            ->where('access_organizations.allow_inapp_msg', 'Y')
+            ->where( function($query) {
+                $query->where('user_preferences.goal_bank_flag', 'Y')
+                    ->orWhereNull('user_preferences.goal_bank_flag');
+            })
+            ->selectRaw("
+                user_demo_jr_view.user_id, 
+                'GB' AS notification_type,
+                '".($goalBank->display_name ? $goalBank->display_name : $goalBank->user->name)." added a new goal to your goal bank.' AS comment,
+                ".$goalBank->id." AS related_id
+            ")
+            ->get()
+            ->toArray();
+        DashboardNotification::insert($data);
         // Additional Step -- sent out email message if required
         $this->notify_employees($goalBank, $employee_ids);
     }
 
     protected function notify_employees($goalBank, $employee_ids) {
-         // Filter out the employee based on the Organization level and individual user preferences. 
-         $filtered_ee_ids = UserDemoJrForGoalbankView::join('access_organizations', 'user_demo_jr_for_goalbank_view.organization', 'access_organizations.organization')
-                                    ->leftjoin('user_preferences', 'user_demo_jr_for_goalbank_view.user_id', 'user_preferences.user_id')
-                                    ->whereIn('user_demo_jr_for_goalbank_view.employee_id', $employee_ids)
-                                    ->where('access_organizations.allow_email_msg', 'Y')
-                                    ->where( function($query) {
-                                        $query->where('user_preferences.goal_bank_flag', 'Y')
-                                            ->orWhereNull('user_preferences.goal_bank_flag');
-                                    })
-                                    // ->pluck('user_demo_jr_for_goalbank_view.employee_id')
-                                    ->pluck('user_demo_jr_for_goalbank_view.user_id')
-                                    ->toArray(); 
+        // Filter out the employee based on the Organization level and individual user preferences. 
+        $filtered_ee_ids = UserDemoJrForGoalbankView::join('access_organizations', 'user_demo_jr_for_goalbank_view.organization', 'access_organizations.organization')
+            ->leftjoin('user_preferences', 'user_demo_jr_for_goalbank_view.user_id', 'user_preferences.user_id')
+            ->whereIn('user_demo_jr_for_goalbank_view.employee_id', $employee_ids)
+            ->where('access_organizations.allow_email_msg', 'Y')
+            ->where( function($query) {
+                $query->where('user_preferences.goal_bank_flag', 'Y')
+                    ->orWhereNull('user_preferences.goal_bank_flag');
+            })
+            // ->pluck('user_demo_jr_for_goalbank_view.employee_id')
+            ->pluck('user_demo_jr_for_goalbank_view.user_id')
+            ->toArray(); 
         if (count($filtered_ee_ids)) {
             // find user id based on the employee_id
             // $bcc_user_ids = User::whereIn('employee_id', $filtered_ee_ids)->pluck('id');
             $bcc_user_ids = $filtered_ee_ids;
-
             // Send Out Email Notification to Employee
             $sendMail = new SendMail();
             $sendMail->bccRecipients = $bcc_user_ids;  
