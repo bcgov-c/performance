@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\SharedEmployeeExport;
 use App\Exports\ExcusedEmployeeExport;
+use Illuminate\Support\Collection;
 
 class StatisticsReportController extends Controller
 {
