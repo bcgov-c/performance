@@ -5,7 +5,7 @@
 <h5>b. Who can assist my employees if they need help with the PDP?</h5>
 <p>Supervisors are supposed to help employees with their PDP profiles whenever possible. All supervisors and employees are encouraged to review the <a href="/resources"  target=\'_blank\'>Resources Section</a> of the PDP for a helpful user guide, tutorial videos, and best practice tips for setting effective goals and having effective conversations.</p>
 <p>If you can&rsquo;t find the answer after reviewing this material, you can escalate your request to your ministry contact listed in the <a href="/resources/contact"  target=\'_blank\'>Contacts Section</a> of the PDP.</p>
-<p>If you are experiencing a technical issue, first check to see if the answer is in the PDP <a href="/resources"  target=\'_blank\'>User Guide</a>. If you cannot find the answer, we can forward your email to someone who can investigate.</p>
+<p>If you are experiencing a technical issue, first check to see if the answer is in the PDP <a href="/resources"  target=\'_blank\'>User Guide</a>. If you cannot find the answer, please submit a service request through <a href="https://psa.frontlinesvc.com/app/ask" target=\'_blank\'>AskMyHR</a> to My Team or Organization > HR Software Systems Support > Performance Development Platform.</p>
 <br>
 <h5>c. How do I add a goal to my PDP profile?</h5>
 <p>There are two ways to include a goal in your PDP profile. You can:</p>
@@ -64,7 +64,7 @@
 <p>When an employee disagrees with the supervisor&rsquo;s comments and/or assessment, the employee has the option to check off this box when signing off on the conversation.</p>
 <p>This is another opportunity for the supervisor and employee to discuss the employee&rsquo;s perspective so that the supervisor can seek to understand and consider the employee&rsquo;s concerns and reasons for disagreeing with the conversation.</p>
 <p>The Conversations Resources area of the PDP can support you in this discussion. You may find the sections on “Asking for Feedback/Inquiring Into the Other&rsquo;s Perspective” and “Addressing a Performance Issue” particularly helpful.</p>
-<p>If you would like to speak with someone for guidance and advice, we could forward your Service Request to an HR Specialist. You may also want to partner with a Coach by signing up for individual Coaching Services. Please visit MyHR for more information on <a href="https://psa.frontlinesvc.com/app/answers/intermediate/a_id/1950">Coaching</a> and requesting Coaching.</p>
+<p>If you would like to speak with someone for guidance and advice, we could forward your Service Request to an HR Specialist. You may also want to partner with a Coach by signing up for individual Coaching Services. Please visit MyHR for more information on <a href="https://psa.frontlinesvc.com/app/answers/intermediate/a_id/1950" target=\'_blank\'>Coaching</a> and requesting Coaching.</p>
 
 
 

@@ -13,7 +13,7 @@
 <p>The Performance Development process requires employees to have one conversation with their supervisor every four months (three per year). The old MyPerformance system also required three conversations per year (Planning, Focusing and Sign-Off). There has been no change to this requirement.</p>
 <br>
 <h5>c. I am a supervisor and I don&rsquo;t have enough time. Why do I need to do this?</h5>
-The <a href="https://www2.gov.bc.ca/gov/content/careers-myhr/managers-supervisors/employee-labour-relations/conditions-agreements/accountability-framework">Accountability Framework for Human Resource Management</a> requires that all supervisors in the BC Public Service:
+The <a href="https://www2.gov.bc.ca/gov/content/careers-myhr/managers-supervisors/employee-labour-relations/conditions-agreements/accountability-framework" target=\'_blank\'>Accountability Framework for Human Resource Management</a> requires that all supervisors in the BC Public Service:
 <ul>
     <li>Organize, direct and manage the performance of staff to meet operational requirements; and</li>
     <li>Provide regular on-going feedback to their employees on their performance and support employees&rsquo; career paths.</li>
