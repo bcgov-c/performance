@@ -50,9 +50,17 @@ class MyTeamController extends Controller
             ->with('user')
             ->with('sharedWith')
             ->with('goalType')->get();
+        
         $employees = $this->myEmployeesAjax();
 
         $adminShared=SharedProfile::select('shared_id')
+        ->join('users', 'users.id', 'shared_profiles.shared_id')
+        ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('excused_flag', '<>', '1')
+                            ->orWhereNull('excused_flag');
+                    });
+                })       
         ->where('shared_with', '=', Auth::id())
         ->where(function ($sh) {
             $sh->where('shared_item', 'like', '%1%')
@@ -101,7 +109,7 @@ class MyTeamController extends Controller
                 $i++;
             }
         }
-
+        
         $ClassificationArray = ExcusedClassification::select('jobcode')->get()->toArray();
 
         $yesOrNo = [
@@ -253,24 +261,6 @@ class MyTeamController extends Controller
                 array_push($sharedProfile, SharedProfile::updateOrCreate($insert));
             }
 
-            // foreach ($sharedProfile as $result) {
-            //     // Dashboard message added when an shared employee's profile (goals, conversations, or both)
-            //     // DashboardNotification::create([
-            //     //     'user_id' => $result->shared_id,
-            //     //     'notification_type' => 'SP',         
-            //     //     'comment' => 'Your profile has been shared with ' . $result->sharedWith->name,
-            //     //     'related_id' => $result->id,
-            //     // ]);
-            //     // Use Class to create DashboardNotification
-            //                 $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-            //                 $notification->user_id = $result->shared_id;
-            //                 $notification->notification_type = 'SP';
-            //                 $notification->comment = 'Your profile has been shared with ' . $result->sharedWith->name;
-            //                 $notification->related_id =  $result->id;
-            //     $notification->notify_user_id = $result->shared_id;
-            //                 $notification->send(); 
-            // }
-
             // Send out email to the user when his profile was shared
             foreach ($sharedProfile as $result) {
 
@@ -325,10 +315,23 @@ class MyTeamController extends Controller
         $search = $request->search;
         
         if ($current_user == '') {
-            $user_query = User::where('name', 'LIKE', "%{$search}%")->paginate();
+            $user_query = User::where('name', 'LIKE', "%{$search}%")
+                          ->where(function($query) {
+                            $query->where(function($query) {
+                                $query->where('excused_flag', '<>', '1')
+                                    ->orWhereNull('excused_flag');
+                            });
+                          })  
+                          ->paginate();
         } else {
             $user_query = User::where('name', 'LIKE', "%{$search}%")
                           ->where('id', '<>', $current_user)
+                          ->where(function($query) {
+                            $query->where(function($query) {
+                                $query->where('excused_flag', '<>', '1')
+                                    ->orWhereNull('excused_flag');
+                            });
+                          })
                           ->paginate();
         }
         
