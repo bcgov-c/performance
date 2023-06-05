@@ -475,10 +475,16 @@ class ConversationController extends Controller
                 });
             }         
         }
-        $json_conversations = json_encode($conversations_arr);            
+        $json_conversations = json_encode($conversations_arr);   
+        
+        
+        $excused = User::select('id')
+            ->where('excused_flag', '1')
+            ->get()
+            ->toArray();
 
         return view($view, compact('type', 'conversations', 'myTeamConversations', 'conversationTopics', 'conversationMessage', 'viewType', 'reportees', 'topics', 'textAboveFilter', 'user', 
-                                    'supervisor_conversations', 'open_modal_id', 'conversationList','team_members', 'supervisor_members', 'sub', 'json_myTeamConversations', 'json_conversations'));
+                                    'supervisor_conversations', 'open_modal_id', 'conversationList','team_members', 'supervisor_members', 'sub', 'json_myTeamConversations', 'json_conversations', 'excused'));
     }
 
     /**
@@ -1198,6 +1204,21 @@ class ConversationController extends Controller
             $participant_users[$i]["name"] = $participant->name;
             $i++;
         }
+        
+        $excused = User::select('id')
+            ->where('excused_flag', '1')
+            ->pluck('id')
+            ->toArray();
+        
+        //remove excused employee from the list
+        if(count($excused) > 0){
+            foreach($participant_users as $index=>$item){
+                if(in_array($item['id'],$excused)){
+                    unset($participant_users[$index]);
+                }
+            }
+        }
+        
         usort($participant_users, function($a, $b){ return strcmp($a["name"], $b["name"]); });
         
         return view('conversation.templates', compact('templates', 'searchValue', 'conversationMessage', 'viewType', 'user', 'participants', 'participant_users'));

@@ -168,6 +168,12 @@ class User extends Authenticatable
     public function avaliableReportees() {
         return $this->reportees()
                 ->join('employee_demo', 'employee_demo.employee_id', '=', 'users.employee_id')
+                ->where(function($query) {
+                            $query->where(function($query) {
+                                $query->where('excused_flag', '<>', '1')
+                                    ->orWhereNull('excused_flag');
+                            });
+                        })
                 ->whereNull('employee_demo.date_deleted');
     }
 
