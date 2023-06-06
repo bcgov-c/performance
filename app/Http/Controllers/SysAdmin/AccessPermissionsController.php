@@ -206,21 +206,7 @@ class AccessPermissionsController extends Controller
                 ]
             );
             if($request->input('accessselect') == '3') {
-                foreach($organizationList as $org1) {
-                    $result = AdminOrg::updateOrCreate(
-                        [
-                            'user_id' => $newId->id,
-                            'version' => '2',
-                            'orgid' => $org1->id
-                        ],
-                        [
-                            'updated_at' => date('Y-m-d H:i:s')
-                        ],
-                    );
-                    if(!$result){
-                        break;
-                    }
-                }
+                // Update inherited orgs
                 foreach($inheritedList as $org1) {
                     $result = AdminOrg::updateOrCreate(
                         [
@@ -230,6 +216,22 @@ class AccessPermissionsController extends Controller
                         ],
                         [
                             'inherited' => 1,
+                            'updated_at' => date('Y-m-d H:i:s')
+                        ],
+                    );
+                    if(!$result){
+                        break;
+                    }
+                }
+                // Updae non-inherited orgs
+                foreach($organizationList as $org1) {
+                    $result = AdminOrg::updateOrCreate(
+                        [
+                            'user_id' => $newId->id,
+                            'version' => '2',
+                            'orgid' => $org1->id
+                        ],
+                        [
                             'updated_at' => date('Y-m-d H:i:s')
                         ],
                     );
@@ -554,6 +556,7 @@ class AccessPermissionsController extends Controller
                 AND auth_id = {$user_id}
         ");
         $now = date('Y-m-d H:i:s', strtotime(Carbon::now()->format('c')));
+        // Insert non-inherited orgs
         \DB::statement("
             INSERT IGNORE INTO auth_users (type, auth_id, user_id, created_at, updated_at) (
                 SELECT DISTINCT
@@ -578,6 +581,7 @@ class AccessPermissionsController extends Controller
                             AND ao.orgid = ed.orgid
             )
         ");
+        // Insert inherited orgs
         \DB::statement("
             INSERT IGNORE INTO auth_users (type, auth_id, user_id, created_at, updated_at) (
                 SELECT DISTINCT
