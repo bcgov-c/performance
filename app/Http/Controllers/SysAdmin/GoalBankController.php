@@ -1216,7 +1216,9 @@ class GoalBankController extends Controller
                 user_demo_jr_view.user_id, 
                 'GB' AS notification_type,
                 '".($goalBank->display_name ? $goalBank->display_name : $goalBank->user->name)." added a new goal to your goal bank.' AS comment,
-                ".$goalBank->id." AS related_id
+                ".$goalBank->id." AS related_id,
+                CURRENT_TIMESTAMP() AS created_at,
+                CURRENT_TIMESTAMP() AS updated_at
             ")
             ->get()
             ->toArray();

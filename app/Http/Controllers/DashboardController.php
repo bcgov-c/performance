@@ -62,21 +62,23 @@ class DashboardController extends Controller
                     switch($notification->notification_type) {
                         case 'GC':
                         case 'GR':
-                            $text .= 'Title: '.$notification->relatedGoal->title.' | Goal Type: '.$notification->relatedGoal->goalType->name. ' | Date: '.$notification->created_at->format('M d, Y H:i A');
+                            $text .= 'Title: '.$notification->relatedGoal->title.' | Goal Type: '.$notification->relatedGoal->goalType->name.($notification->created_at?' | Date: '.$notification->created_at->format('M d, Y H:i A'):'');
                             break;
                         case 'GB':
-                            $text .= 'Title: '.$notification->relatedGoal->title. ' | Type: '.$notification->relatedGoal->mandatory_status_descr. ' | Date: '.$notification->created_at->format('M d, Y H:i A');
+                            $text .= 'Title: '.$notification->relatedGoal->title. ' | Type: '.$notification->relatedGoal->mandatory_status_descr.($notification->created_at?' | Date: '.$notification->created_at->format('M d, Y H:i A'):'');
                         break;
-                    case 'CA':
-                    case 'CS':
-                            $text .= 'Title: '.($notification->conversation ? $notification->conversation->topic->name : '').' | Date: '.$notification->created_at->format('M d, Y H:i A');
-                        break;
-                    case 'SP':
-                            $text .= 'Elements: '.($notification->sharedProfile ? $notification->sharedProfile->shared_element_name : ''). ' | Date: '.$notification->created_at->format('M d, Y H:i A');
-                        break;
-                    case '':
-                            $text .= 'Date: '.$notification->created_at->format('M d, Y H:i A');
-                        break;
+                        case 'CA':
+                        case 'CS':
+                                $text .= 'Title: '.($notification->conversation ? $notification->conversation->topic->name : '');
+                                $text .= ($text?' | ':'').($notification->created_at?'Date: '.$notification->created_at->format('M d, Y H:i A'):'');
+                            break;
+                        case 'SP':
+                                $text .= 'Elements: '.($notification->sharedProfile ? $notification->sharedProfile->shared_element_name : '');
+                                $text .= ($text?' | ':'').($notification->created_at?'Date: '.$notification->created_at->format('M d, Y H:i A'):'');
+                            break;
+                        case '':
+                                $text .= ($notification->created_at?'Date: '.$notification->created_at->format('M d, Y H:i A'):'');
+                            break;
                     }
 
                     return '<table class="inner" style="border:none">'. 
