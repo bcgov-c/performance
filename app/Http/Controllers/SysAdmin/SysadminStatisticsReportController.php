@@ -2593,9 +2593,8 @@ class SysadminStatisticsReportController extends Controller
                 if($request->legend == 'No'){
                     //get has conversation users employee_id list
                     $excludedIds = $users->pluck('employee_id')->toArray();
-                    $sql_6_no = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
+                    $sql_6_all = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
                     organization, level1_program, level2_division, level3_branch, level4")
-                            ->whereNotIn('employee_id', $excludedIds)
                             ->whereNull('date_deleted')
                             ->where(function($query) {
                                 $query->where(function($query) {
@@ -2608,15 +2607,21 @@ class SysadminStatisticsReportController extends Controller
                                     $query->where('excused_flag', '<>', '1')
                                         ->orWhereNull('excused_flag');
                                 });
-                            }) 
+                            })
                             ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
                             ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
                             ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
                             ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                             ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); });
                             
-                    $users_no =  $sql_6_no->get();    
-                    $users = $users_no->unique('employee_id');        
+                    $users_all =  $sql_6_all->get();   
+                    foreach($users_all as $index=>$user){
+                        if(in_array($user->employee_id, $excludedIds)){
+                            unset($users_all[$index]);
+                        }
+                    }
+                    
+                    $users = $users_all->unique('employee_id');        
                 }  
 
                 $headers = array(
@@ -2669,10 +2674,8 @@ class SysadminStatisticsReportController extends Controller
                 if($request->legend == 'No'){
                     //get has conversation users employee_id list
                     $excludedIds = $users->pluck('employee_id')->toArray();
-                    $sql_7_no = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
-                    organization, level1_program, level2_division, level3_branch, level4
-         ")
-                            ->whereNotIn('employee_id', $excludedIds)
+                    $sql_7_all = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
+                    organization, level1_program, level2_division, level3_branch, level4")
                             ->whereNull('date_deleted')
                             ->where(function($query) {
                                 $query->where(function($query) {
@@ -2690,10 +2693,16 @@ class SysadminStatisticsReportController extends Controller
                             ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
                             ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
                             ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
-                            ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
-                            ->get();
-                    $users_no =  $sql_7_no->get();    
-                    $users = $users_no->unique('employee_id');            
+                            ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); });
+                            
+                    $users_all =  $sql_7_all->get();   
+                    foreach($users_all as $index=>$user){
+                        if(in_array($user->employee_id, $excludedIds)){
+                            unset($users_all[$index]);
+                        }
+                    }
+                            
+                    $users = $users_all->unique('employee_id');            
                 }  
 
                 $headers = array(
