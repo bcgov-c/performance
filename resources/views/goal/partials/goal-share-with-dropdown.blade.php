@@ -47,15 +47,6 @@
                 $employee_list[$i]['name'] = auth()->user()->name;
             }
             
-            //remove excused employee from the list
-            if(count($excused) > 0){
-                foreach($employee_list as $index=>$item){
-                    if(in_array($item['id'],$excused)){
-                        unset($employee_list[$index]);
-                    }
-                }
-            }
-            
             //asort($employee_list);
             //error_log(print_r($employee_list,true));
             usort($employee_list, function($a, $b){ return strcmp($a["name"], $b["name"]); });

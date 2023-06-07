@@ -221,14 +221,9 @@ class GoalController extends Controller
         $goals = $query->groupBy('id');
         $goals = $query->paginate(10);
         
-        $from = 'goal';      
+        $from = 'goal';        
         
-        $excused = User::select('id')
-            ->where('excused_flag', '1')
-            ->pluck('id')
-            ->toArray();
-        
-        return view('goal.index', compact('goals', 'type', 'goaltypes', 'goal_types_modal', 'tagsList', 'sortby', 'sortorder', 'createdBy', 'user', 'employees', 'tags', 'type_desc_str', 'statusList','from', 'excused'));
+        return view('goal.index', compact('goals', 'type', 'goaltypes', 'goal_types_modal', 'tagsList', 'sortby', 'sortorder', 'createdBy', 'user', 'employees', 'tags', 'type_desc_str', 'statusList','from'));
     }
 
     /**
@@ -1474,22 +1469,9 @@ class GoalController extends Controller
         $search = $request->search;
         
         if ($current_user == '') {
-            $user_query = User::where('name', 'LIKE', "%{$search}%")
-                          ->where(function($query) {
-                            $query->where(function($query) {
-                                $query->where('excused_flag', '<>', '1')
-                                    ->orWhereNull('excused_flag');
-                            });
-                            })  
-                            ->paginate();
+            $user_query = User::where('name', 'LIKE', "%{$search}%")->paginate();
         } else {
             $user_query = User::where('name', 'LIKE', "%{$search}%")
-                          ->where(function($query) {
-                            $query->where(function($query) {
-                                $query->where('excused_flag', '<>', '1')
-                                    ->orWhereNull('excused_flag');
-                            });
-                            })
                           ->where('id', '<>', $current_user)
                           ->paginate();
         }
