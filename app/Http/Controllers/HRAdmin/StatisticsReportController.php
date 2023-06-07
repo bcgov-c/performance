@@ -388,13 +388,14 @@ class StatisticsReportController extends Controller
         ];
 
         // each group 
-        array_push($data_tag['labels'], '[Blank]');  
-        array_push($data_tag['values'], $blank_count);
+        //array_push($data_tag['labels'], '[Blank]');  
+        //array_push($data_tag['values'], $blank_count);
         foreach($tags as $key => $tag)
         {
             array_push($data_tag['labels'], $tag->name);  
             array_push($data_tag['values'], $tag->count);
         }
+        array_multisort($data_tag['labels'], $data_tag['values']);
 
         return view('hradmin.statistics.goalsummary',compact('data','data_tag'));
     }
