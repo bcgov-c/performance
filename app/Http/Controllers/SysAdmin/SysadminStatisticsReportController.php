@@ -369,6 +369,7 @@ class SysadminStatisticsReportController extends Controller
             array_push($data_tag['labels'], $tag->name);  
             array_push($data_tag['values'], $tag->count);
         }
+        array_multisort($data_tag['labels'], $data_tag['values']);
 
         return view('sysadmin.statistics.goalsummary',compact('data', 'data_tag'));
     }
@@ -2526,7 +2527,7 @@ class SysadminStatisticsReportController extends Controller
                             ->orWhereNull('due_date_paused');
                     });
                 })
-		->where(function($query) {
+		        ->where(function($query) {
                     $query->where(function($query) {
                         $query->where('excused_flag', '<>', '1')
                             ->orWhereNull('excused_flag');
@@ -2564,7 +2565,7 @@ class SysadminStatisticsReportController extends Controller
                             ->orWhereNull('due_date_paused');
                     });
                 })
-		->where(function($query) {
+		        ->where(function($query) {
                     $query->where(function($query) {
                         $query->where('excused_flag', '<>', '1')
                             ->orWhereNull('excused_flag');
