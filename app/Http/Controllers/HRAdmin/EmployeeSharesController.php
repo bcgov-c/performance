@@ -485,13 +485,15 @@ class EmployeeSharesController extends Controller {
                     return $q->whereRaw("u.{$request->criteria} LIKE '%{$request->search_text}%'");
                 })
                 ->when($request->search_text && $request->criteria == 'all', function($q) use($request) {
-                    return $q->whereRaw("u.employee_id LIKE '%{$request->search_text}%'")
-                        ->orWhereRaw("u.employee_name LIKE '%{$request->search_text}%'")
-                        ->orWhereRaw("u2.employee_id LIKE '%{$request->search_text}%'")
-                        ->orWhereRaw("d2.employee_name LIKE '%{$request->search_text}%'")
-                        ->orWhereRaw("cd.employee_name LIKE '%{$request->search_text}%'")
-                        ->orWhereRaw("u.jobcode_desc LIKE '%{$request->search_text}%'")
-                        ->orWhereRaw("u.deptid LIKE '%{$request->search_text}%'");
+                    return $q->where(function ($r) use($request) {
+                        return $q->whereRaw("u.employee_id LIKE '%{$request->search_text}%'")
+                            ->orWhereRaw("u.employee_name LIKE '%{$request->search_text}%'")
+                            ->orWhereRaw("u2.employee_id LIKE '%{$request->search_text}%'")
+                            ->orWhereRaw("d2.employee_name LIKE '%{$request->search_text}%'")
+                            ->orWhereRaw("cd.employee_name LIKE '%{$request->search_text}%'")
+                            ->orWhereRaw("u.jobcode_desc LIKE '%{$request->search_text}%'")
+                            ->orWhereRaw("u.deptid LIKE '%{$request->search_text}%'");
+                    });
                 })
                 ->selectRaw ("
                     u.employee_id,
