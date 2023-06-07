@@ -2002,61 +2002,11 @@ class StatisticsReportController extends Controller
     
     public function conversationStatusExport(Request $request) {        
         // sql6 -- Employee Has Open Conversation
-        $sql_6 = User::selectRaw("employee_demo.employee_id, employee_name, 
-                            employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4
+        $sql_6 = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
+                            organization, level1_program, level2_division, level3_branch, level4
                  ")
-                ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
                 ->join('conversation_participants', function($join) {
-                    $join->on('conversation_participants.participant_id', '=', 'users.id');
-                })
-                ->join('conversations', function($join) {
-                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
-                })
-                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
-                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
-                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
-                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
-                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
-                ->where('conversation_participants.role','emp')   
-                ->whereNull('conversations.deleted_at')           
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('due_date_paused', 'N')
-                            ->orWhereNull('due_date_paused');
-                    });
-                })
-		->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('excused_flag', '<>', '1')
-                            ->orWhereNull('excused_flag');
-                    });
-                }) 
-                ->whereNull('date_deleted')
-                ->whereNotNull('conversation_id')      
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->whereNull('signoff_user_id')
-                              ->orWhereNull('supervisor_signoff_id');
-                    });
-                })
-                ->whereExists(function ($query) {
-                    $query->select(DB::raw(1))
-                            ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
-                            ->where('auth_users.type', '=', 'HR')
-                            ->where('auth_users.auth_id', '=', Auth::id());
-                });
-                
-                
-        // sql7 -- Employee Has Completed Conversation
-        $sql_7 = User::selectRaw("employee_demo.employee_id, employee_name, 
-                            employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4
-                 ")
-                ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-                ->join('conversation_participants', function($join) {
-                    $join->on('conversation_participants.participant_id', '=', 'users.id');
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
                 })
                 ->join('conversations', function($join) {
                     $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
@@ -2074,14 +2024,60 @@ class StatisticsReportController extends Controller
                             ->orWhereNull('due_date_paused');
                     });
                 })
-		->where(function($query) {
+		        ->where(function($query) {
                     $query->where(function($query) {
                         $query->where('excused_flag', '<>', '1')
                             ->orWhereNull('excused_flag');
                     });
                 }) 
                 ->whereNull('date_deleted')
-                ->whereNotNull('conversation_id')       
+                ->whereNotNull('conversation_id')          
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->whereNull('signoff_user_id')
+                              ->orWhereNull('supervisor_signoff_id');
+                    });
+                })
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('auth_users')
+                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
+                            ->where('auth_users.type', '=', 'HR')
+                            ->where('auth_users.auth_id', '=', Auth::id());
+                });
+                
+                
+        // sql7 -- Employee Has Completed Conversation
+        $sql_7 = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
+                            organization, level1_program, level2_division, level3_branch, level4
+                 ")
+                ->join('conversation_participants', function($join) {
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                })
+                ->join('conversations', function($join) {
+                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
+                })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })                      
+                ->where('conversation_participants.role','emp')  
+                ->whereNull('conversations.deleted_at')          
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
+                    });
+                })
+		        ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('excused_flag', '<>', '1')
+                            ->orWhereNull('excused_flag');
+                    });
+                }) 
+                ->whereNull('date_deleted')
+                ->whereNotNull('conversation_id')           
                 ->where(function($query) {
                     $query->where(function($query) {
                         $query->whereNotNull('signoff_user_id')
@@ -2091,7 +2087,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
                             ->where('auth_users.type', '=', 'HR')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 });    
@@ -2109,8 +2105,10 @@ class StatisticsReportController extends Controller
                 
                 if($request->legend == 'No'){
                     //get has conversation users employee_id list
-                    $excludedIds = $users->pluck('employee_id');
-                    $sql = UserDemoJrView::whereNotIn('employee_id', $excludedIds)
+                    $excludedIds = $users->pluck('employee_id')->toArray();
+                    $sql = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
+                    organization, level1_program, level2_division, level3_branch, level4")
+                            ->whereNotIn('employee_id', $excludedIds)
                             ->whereNull('date_deleted')
                             ->where(function($query) {
                                 $query->where(function($query) {
@@ -2132,7 +2130,7 @@ class StatisticsReportController extends Controller
                             ->whereExists(function ($query) {
                                     $query->select(DB::raw(1))
                                             ->from('auth_users')
-                                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.id')
+                                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
                                             ->where('auth_users.type', 'HR')
                                             ->where('auth_users.auth_id', '=', Auth::id());
                                 });
@@ -2158,7 +2156,7 @@ class StatisticsReportController extends Controller
                     $file = fopen('php://output', 'w');
                     fputcsv($file, $columns);
         
-                    foreach ($users as $user) {
+                    foreach ($users as $user) {                        
                         $row['Employee ID'] = "[".$user->employee_id."]";
                         $row['Name'] = $user->employee_name;
                         $row['Email'] = $user->employee_email;
@@ -2190,8 +2188,10 @@ class StatisticsReportController extends Controller
                 
                 if($request->legend == 'No'){
                     //get has conversation users employee_id list
-                    $excludedIds = $users->pluck('employee_id');
-                    $users = UserDemoJrView::whereNotIn('employee_id', $excludedIds)
+                    $excludedIds = $users->pluck('employee_id')->toArray();
+                    $sql = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
+                    organization, level1_program, level2_division, level3_branch, level4")
+                            ->whereNotIn('employee_id', $excludedIds)
                             ->whereNull('date_deleted')
                             ->where(function($query) {
                                 $query->where(function($query) {
@@ -2213,12 +2213,12 @@ class StatisticsReportController extends Controller
                             ->whereExists(function ($query) {
                                 $query->select(DB::raw(1))
                                             ->from('auth_users')
-                                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.id')
+                                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
                                             ->where('auth_users.type', 'HR')
                                             ->where('auth_users.auth_id', '=', Auth::id());
-                            })
-                            ->get();
-                    $users = $users->unique('employee_id');       
+                            });
+                    $users = $sql->get();
+                    $users = $users->unique('employee_id');               
                 }  
 
                 $headers = array(
