@@ -65,8 +65,33 @@
 <p>This is another opportunity for the supervisor and employee to discuss the employee&rsquo;s perspective so that the supervisor can seek to understand and consider the employee&rsquo;s concerns and reasons for disagreeing with the conversation.</p>
 <p>The Conversations Resources area of the PDP can support you in this discussion. You may find the sections on “Asking for Feedback/Inquiring Into the Other&rsquo;s Perspective” and “Addressing a Performance Issue” particularly helpful.</p>
 <p>If you would like to speak with someone for guidance and advice, we could forward your Service Request to an HR Specialist. You may also want to partner with a Coach by signing up for individual Coaching Services. Please visit MyHR for more information on <a href="https://psa.frontlinesvc.com/app/answers/intermediate/a_id/1950" target=\'_blank\'>Coaching</a> and requesting Coaching.</p>
-
-
-
-
+<br>
+<h5>n. I do not see the correct supervisor in the PDP / I do not see the correct direct reports in the PDP. What do I do?</h5>
+<p>Reporting relationship data is pulled from PeopleSoft (our HR system of record) once every 24 hours. This data cannot be modified in the PDP.</p>
+<p>If you want to add a shared supervisor for an employee in the PDP, you can have the current supervisor share the employee by clicking on the Yes / No under the “Shared” column on their My Team page.</p>
+<p>If the data in PeopleSoft is incorrect, you will need to submit a service request through AskMyHR using the category HR Software Systems Support > Position / Reporting Updates.</p>
+<p><b>Note:</b> Employees that report to a position number in PeopleSoft that is vacant are automatically assigned one level higher in the organization hierarchy. If that next level is also vacant, the employee will see on their home page that their current supervisor is “No supervisor”.</p>
+<p><b>Note:</b> Employees that report to a position number in PeopleSoft that has more than one active employee associated with it (“double-bunked” positions) will see a dropdown menu on their homepage that allows them to select which of the supervisors associated with the position number is correct for them.</p>
+<p>If a supervisor shares a position number with one or more additional employees in PeopleSoft (i.e. the supervisor is “double-bunked” in their position) they may not see the correct employees by default. In this case, their employees will be able to select the correct supervisor from a dropdown menu on the homepage under the “Current supervisor” heading. Once the employee has made the selection, the supervisor will gain access to that employee in the PDP.</p>
+<br>
+<h5>o. What notifications and reminders will the PDP send me? Can I choose how often to receive an email from the PDP?</h5>
+<p>By default the PDP will generate in-app notifications on your homepage and send an email whenever someone:</p>
+<ul>
+    <li>Makes a comment on one of your goals</li>
+    <li>Adds a new goal to your goal bank</li>
+    <li>Shares your profile with another supervisor</li>
+    <li>Wants to set up a performance conversation with you</li>
+    <li>Signs-off on a performance conversation with you</li>
+    <li>Disagrees with the content of a performance conversation with you</li>
+</ul>
+<p>And also:</p>
+<ul>
+    <li>One month before your next conversation due date</li>
+    <li>One week before your next conversation due date</li>
+    <li>When your conversation is past due</li>
+    <li>One month before your team member's next conversation due date (supervisors only)</li>
+    <li>One week before your team member's next conversation due date (supervisors only)</li>
+    <li>When your team member's conversation is past due (supervisors only)</li>
+</ul>
+<p>Users have the option of opting out of receiving some of these emails. Notification options can be set on the <a href="/user-preference"  target=\'_blank\>Account Preferences</a> page. You can access this page by clicking on your username in the top right corner of the app.</p>
 
