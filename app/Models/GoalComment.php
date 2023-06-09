@@ -38,4 +38,14 @@ class GoalComment extends Model implements Auditable
         }
         
     }
+
+    public function transformAudit(array $data): array
+    {
+
+        $original_auth_id = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
+
+        $data['original_auth_id'] =  $original_auth_id;
+
+        return $data;
+    }
 }

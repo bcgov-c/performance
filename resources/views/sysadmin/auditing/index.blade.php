@@ -26,6 +26,13 @@
             </div>
 
             <div class="form-group col-md-2">
+                <label for="audit_user">
+                    Original User 
+                </label>
+                <input name="original_user" placeholder="Name, Employee ID, iDir"  class="form-control" />
+            </div>
+
+            <div class="form-group col-md-2">
                 <label for="start_time">Start Time</label>
                 <input class="form-control datetime-range-filter" type="datetime-local"  name="start_time">
             </div>
@@ -75,6 +82,13 @@
 
         <div class="form-row">
 
+            <div class="form-group col-md-1">
+                <label for="audit_user">
+                    Audit ID 
+                </label>
+                <input name="auditable_id" placeholder=""  class="form-control" />
+            </div>
+
             <div class="form-group col-md-4">
                 <label for="old_values">
                     Old Values 
@@ -92,13 +106,13 @@
                 <label for="search">
                     &nbsp;
                 </label>
-                <input type="button" id="refresh-btn" value="Refresh" class="form-control btn btn-primary" />
+                <input type="button" id="refresh-btn" value="Search" class="form-control btn btn-primary" />
             </div>
             <div class="form-group col-md-1">
                 <label for="search">
                     &nbsp;
                 </label>
-                <input type="button" id="reset-btn" value="Reset" class="form-control btn btn-secondary" />
+                <input type="button" id="reset-btn" value="Clear" class="form-control btn btn-secondary" />
             </div>
 
         </div>
@@ -114,6 +128,7 @@
 				<tr>
                     <th>Tran ID </th>
                     <th>Audit User</th>
+                    <th>Original User</th>
                     <th>Audit Time</th>
                     <th>Event Type</th>
                     <th>Audit Type</th>
@@ -221,16 +236,21 @@
             // select: true,
             'order': [[ 0, 'desc']],
             fixedHeader: true,   
-            fixedColumn: true,         
+            fixedColumn: true, 
+            "initComplete": function(settings, json) {
+                oTable.columns.adjust().draw(false);
+            },        
             ajax: {
                 url: '{!! route('sysadmin.auditing.index') !!}',
                 data: function (data) {
                     // data.term = $('#user').val();
                     data.audit_user = $("input[name='audit_user']").val();
+                    data.original_user = $("input[name='original_user']").val();
                     data.event_type = $("select[name='event_type']").val();
                     data.auditable_type = $("select[name='auditable_type']").val();
                     data.start_time = $("input[name='start_time']").val();
                     data.end_time  = $("input[name='end_time']").val();
+                    data.auditable_id = $("input[name='auditable_id']").val();
                     data.old_values  = $("input[name='old_values']").val();
                     data.new_values  = $("input[name='new_values']").val();
                 }
@@ -238,6 +258,7 @@
             columns: [
                 {data: 'id', name: 'id', className: "dt-nowrap" },
                 {data: 'audit_user.name', name: 'audit_user.name', className: "dt-nowrap" },
+                {data: 'original_user.name', name: 'original_user.name', defaultContent:'', className: "dt-nowrap" },
                 {data: 'audit_timestamp', name: 'created_at', className: "dt-nowrap" },
                 {data: 'event', name: 'event', className: "dt-nowrap" },
                 {data: 'auditable_type_name',  name: 'auditable_type_name',  className: "dt-nowrap" },
@@ -265,6 +286,13 @@
 
         });
      
+        $("div.filter input").keydown(function(event){
+            if(event.keyCode == 13) {
+                event.preventDefault();
+                oTable.ajax.reload();
+                return false;
+            }
+        });
 
         $('#refresh-btn').on('click', function() {
             // oTable.ajax.reload(null, true);
@@ -272,11 +300,14 @@
         });
 
         $('#reset-btn').on('click', function() {
+
             $("input[name='audit_user']").val('');
+            $("input[name='original_user']").val('');
             $("select[name='event_type']").val('');
             $("select[name='auditable_type']").val('');
             $("input[name='start_time']").val('');
             $("input[name='end_time']").val('');
+            $("input[name='auditable_id']").val('');
             $("input[name='old_values']").val('');
             $("input[name='new_values']").val('');
 
