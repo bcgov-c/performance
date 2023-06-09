@@ -75,8 +75,8 @@ class BuildEmployeeDemoTree extends Command
                 $this->info(Carbon::now()->format('c')." - Processing Level {$level}...");
                 $allDepts = OrganizationHierarchy::distinct()
                     ->select("odoh.*")
-                    ->selectRaw("(SELECT COUNT(e.employee_id) FROM employee_demo AS e WHERE e.deptid = odoh.deptid AND e.date_deleted IS NULL) AS headcount")
-                    ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM employee_demo AS d WHERE d.deptid = ods_dept_org_hierarchy.deptid)")
+                    ->selectRaw("(SELECT COUNT(e.employee_id) FROM employee_demo AS e USE INDEX (idx_employee_demo_deptid) WHERE e.deptid = odoh.deptid AND e.date_deleted IS NULL) AS headcount")
+                    ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM employee_demo AS d USE INDEX (idx_employee_demo_deptid) WHERE d.deptid = ods_dept_org_hierarchy.deptid)")
                     ->orderBy("odoh.name")
                     ->orderBy("odoh.okey");
                 switch ($level) {
@@ -97,10 +97,11 @@ class BuildEmployeeDemoTree extends Command
                 }
                 $allDepts = $allDepts->get();
                 foreach ($allDepts AS $dept) {
-                    $groupcount = EmployeeDemo::join('ods_dept_org_hierarchy', 'employee_demo.deptid', 'ods_dept_org_hierarchy.deptid')
+                    $result = EmployeeDemo::join('ods_dept_org_hierarchy', 'employee_demo.deptid', 'ods_dept_org_hierarchy.deptid')
                         ->whereNull('employee_demo.date_deleted')
                         ->whereRaw("ods_dept_org_hierarchy.{$field} = {$dept->okey}")
-                        ->count();
+                        ->select(\DB::raw('count(1) AS groupcount'))->first();
+                    $groupcount = $result->groupcount;
                     $node = new EmployeeDemoTreeTemp([
                         'id' => $dept->okey,
                         'name' => $dept->name,
@@ -164,10 +165,30 @@ class BuildEmployeeDemoTree extends Command
 
             // Move new tree
             if($total > 0) {
-                $this->info(Carbon::now()->format('c').' - Copying tree from temp...');
-                EmployeeDemoTree::truncate();
-                \DB::statement("INSERT INTO employee_demo_tree SELECT * FROM employee_demo_tree_temp");
-                $this->info(Carbon::now()->format('c').' - Copy completed.');
+                \DB::beginTransaction();
+                try {
+                    $this->info(Carbon::now()->format('c').' - Copying tree from temp...');
+                    EmployeeDemoTree::query()->delete();
+                    \DB::statement("INSERT INTO employee_demo_tree SELECT * FROM employee_demo_tree_temp");
+                    \DB::commit();
+                    $this->info(Carbon::now()->format('c').' - Copy completed.');
+                } catch (Exception $e) {
+                    echo 'Unable to copy new tree from temp.'; echo "\r\n";
+                    \DB::rollback();
+                    $end_time = Carbon::now()->format('c');
+                    DB::table('job_sched_audit')->updateOrInsert(
+                        [
+                            'id' => $audit_id
+                        ],
+                        [
+                            'job_name' => $job_name,
+                            'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
+                            'end_time' => date('Y-m-d H:i:s', strtotime($end_time)),
+                            'status' => 'Failed',
+                            'details' => 'Unable to copy new tree from temp.',
+                        ]
+                    );
+                        }
             } else {
                 $this->info(Carbon::now()->format('c').' - No new tree generated. Keeping previous tree.');
             }
