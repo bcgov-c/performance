@@ -28,6 +28,15 @@ class AuditingController extends Controller
                                 ->orWhere('users.employee_id','LIKE','%'.$request->audit_user.'%');
                     });
                 })
+                ->when($request->original_user, function($query) use($request) {
+                        return $query->whereIn('original_auth_id', function($query) use($request) {
+                                    $query->select('id')
+                                          ->from('users as U2')
+                                          ->where('U2.name','LIKE','%'.$request->original_user.'%')
+                                          ->orWhere('U2.idir','LIKE','%'.$request->original_user.'%')
+                                          ->orWhere('U2.employee_id','LIKE','%'.$request->original_user.'%');
+                        });
+                })
                 ->when($request->event_type, function($query) use($request) {
                     return $query->where('audits.event', $request->event_type);
                 })
@@ -39,6 +48,9 @@ class AuditingController extends Controller
                     $to = $request->end_time ?? '2099-12-31';
                     return  $query->whereBetween('audits.created_at',[ $from, $to]);
                 })
+                ->when($request->auditable_id, function($query) use($request) {
+                    return $query->where('audits.auditable_id', $request->auditable_id);
+                })
                 ->when($request->old_values, function($query) use($request) {
                     return $query->where('audits.old_values', 'LIKE','%'.$request->old_values.'%');
                 })
@@ -46,7 +58,7 @@ class AuditingController extends Controller
                     return $query->where('audits.new_values', 'LIKE','%'.$request->new_values.'%');
                 })
                 ->select('audits.*')
-                ->with(['audit_user', 'goal', 'conversation']);
+                ->with(['audit_user', 'original_user', 'goal', 'conversation']);
 
             return Datatables::of($audits)
                 ->addColumn('auditable_type_name', function ($audit) {
