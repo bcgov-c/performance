@@ -23,6 +23,11 @@ class Audit extends Model
         return $this->hasOne(User::class, 'id', 'user_id' );
     }
 
+    public function original_user() 
+    {
+        return $this->hasOne(User::class, 'id', 'original_auth_id');
+    }
+
     public function goal()
     {
         return $this->hasOne(Goal::class, 'id', 'auditable_id' );
