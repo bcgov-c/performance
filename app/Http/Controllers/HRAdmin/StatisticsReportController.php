@@ -2103,10 +2103,10 @@ class StatisticsReportController extends Controller
                 $filename = 'Employee Has Open Conversation.csv';
                 $users =  $sql_6->get();
                 $users = $users->unique('employee_id');
+                //get has conversation users employee_id list
+                $excludedIds = $users->pluck('employee_id')->toArray();
                 
-                if($request->legend == 'No'){
-                    //get has conversation users employee_id list
-                    $excludedIds = $users->pluck('employee_id')->toArray();
+                if($request->legend == 'No' || !$request->legend){ 
                     $sql = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
                     organization, level1_program, level2_division, level3_branch, level4")
                             ->whereNotIn('employee_id', $excludedIds)
@@ -2137,7 +2137,13 @@ class StatisticsReportController extends Controller
                                 });
                     
                     $users = $sql->get();
-                    $users = $users->unique('employee_id');               
+                    if($request->legend == 'No' ) {
+                        foreach($users_all as $index=>$user){
+                            if(in_array($user->employee_id, $excludedIds)){
+                                unset($users_all[$index]);
+                            }
+                        }
+                    }           
                 }  
 
                 $headers = array(
@@ -2150,10 +2156,10 @@ class StatisticsReportController extends Controller
         
                 $columns = ["Employee ID", "Employee Name", "Email",
                                 "Organization","Next Conversation Due","Reporting To",
-                                "Level 1", "Level 2", "Level 3", "Level 4",
+                                "Level 1", "Level 2", "Level 3", "Level 4", 'Have Conversation',
                            ];
         
-                $callback = function() use($users, $columns) {
+                $callback = function() use($users, $excludedIds, $columns) {
                     $file = fopen('php://output', 'w');
                     fputcsv($file, $columns);
         
@@ -2168,10 +2174,16 @@ class StatisticsReportController extends Controller
                         $row['Level 2'] = $user->level2_division;
                         $row['Level 3'] = $user->level3_branch;
                         $row['Level 4'] = $user->level4;
+
+                        if(in_array($user->employee_id, $excludedIds)){
+                            $row['Have Conversation'] = 'Yes';
+                        } else {
+                            $row['Have Conversation'] = 'No';
+                        }
         
                         fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Organization'],
                                     $row['next_conversation_date'],$row['reporting_to_name'],
-                                    $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
+                                    $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], $row['Have Conversation'] ));
                     }
         
                     fclose($file);
@@ -2186,10 +2198,10 @@ class StatisticsReportController extends Controller
                 $filename = 'Employee Has Complete Conversation.csv';
                 $users =  $sql_7->get();
                 $users = $users->unique('employee_id');
+                //get has conversation users employee_id list
+                $excludedIds = $users->pluck('employee_id')->toArray();
                 
-                if($request->legend == 'No'){
-                    //get has conversation users employee_id list
-                    $excludedIds = $users->pluck('employee_id')->toArray();
+                if($request->legend == 'No' || !$request->legend){                 
                     $sql = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
                     organization, level1_program, level2_division, level3_branch, level4")
                             ->whereNotIn('employee_id', $excludedIds)
@@ -2219,7 +2231,13 @@ class StatisticsReportController extends Controller
                                             ->where('auth_users.auth_id', '=', Auth::id());
                             });
                     $users = $sql->get();
-                    $users = $users->unique('employee_id');               
+                    if($request->legend == 'No' ) {
+                        foreach($users_all as $index=>$user){
+                            if(in_array($user->employee_id, $excludedIds)){
+                                unset($users_all[$index]);
+                            }
+                        }
+                    }                
                 }  
 
                 $headers = array(
@@ -2232,7 +2250,7 @@ class StatisticsReportController extends Controller
         
                 $columns = ["Employee ID", "Employee Name", "Email",
                                 "Organization","Next Conversation Due","Reporting To",
-                                "Level 1", "Level 2", "Level 3", "Level 4",
+                                "Level 1", "Level 2", "Level 3", "Level 4", 'Have Conversation',
                            ];
         
                 $callback = function() use($users, $columns) {
@@ -2250,10 +2268,16 @@ class StatisticsReportController extends Controller
                         $row['Level 2'] = $user->level2_division;
                         $row['Level 3'] = $user->level3_branch;
                         $row['Level 4'] = $user->level4;
+
+                        if(in_array($user->employee_id, $excludedIds)){
+                            $row['Have Conversation'] = 'Yes';
+                        } else {
+                            $row['Have Conversation'] = 'No';
+                        }
         
                         fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Organization'],
                                     $row['next_conversation_date'],$row['reporting_to_name'],
-                                    $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
+                                    $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], $row['Have Conversation'] ));
                     }
         
                     fclose($file);
