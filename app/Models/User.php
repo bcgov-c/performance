@@ -154,7 +154,8 @@ class User extends Authenticatable
     }
 
     public function reportingManager() {
-        return $this->belongsTo('App\Models\User', 'reporting_to');
+        return $this->belongsTo('App\Models\User', 'reporting_to')
+        ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')->whereNull('employee_demo.date_deleted');
     }
 
     public function reportingManagerRecursive() {
