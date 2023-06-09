@@ -1470,10 +1470,15 @@ class GoalController extends Controller
         $search = $request->search;
         
         if ($current_user == '') {
-            $user_query = User::where('name', 'LIKE', "%{$search}%")->paginate();
+            $user_query = User::where('name', 'LIKE', "%{$search}%")
+                          ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
+                          ->whereNull('employee_demo.date_deleted')  
+                          ->paginate();
         } else {
             $user_query = User::where('name', 'LIKE', "%{$search}%")
                           ->where('id', '<>', $current_user)
+                          ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
+                          ->whereNull('employee_demo.date_deleted')  
                           ->paginate();
         }
         

@@ -1181,14 +1181,28 @@ class ConversationController extends Controller
         
         $participants = session()->has('original-auth-id') ? User::where('id', Auth::id())->get() : $user->avaliableReportees()->get();
         $reportingManager = $user->reportingManager()->get();
-        $sharedProfile = SharedProfile::where('shared_with', Auth::id())->with('sharedUser')->where('shared_item', 'like', '%2%')->get()->pluck('sharedUser');        
+
+        $sharedProfile = SharedProfile::where('shared_with', Auth::id())
+                         ->join('users','users.id','shared_profiles.shared_id')
+                         ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
+                         ->whereNull('employee_demo.date_deleted')
+                         ->with('sharedUser')->where('shared_item', 'like', '%2%')->get()->pluck('sharedUser'); 
+
         $participants = $participants->toBase()->merge($reportingManager)->merge($sharedProfile);
+
         $adminShared=SharedProfile::select('shared_with')
+        ->join('users','users.id','shared_profiles.shared_with')
+        ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
+        ->whereNull('employee_demo.date_deleted')
         ->where('shared_id', '=', Auth::id())
         ->where('shared_item', 'like', '%2%')
         ->pluck('shared_with');
+
         $adminemps = User::select('users.*')
+        ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
+        ->whereNull('employee_demo.date_deleted')
         ->whereIn('users.id', $adminShared)->get('id', 'name');
+
         $participants = $participants->merge($adminemps);
         
         $participant_users = array();

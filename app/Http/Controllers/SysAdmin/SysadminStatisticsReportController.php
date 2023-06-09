@@ -1735,6 +1735,7 @@ class SysadminStatisticsReportController extends Controller
                                         $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                     })
                                     ->whereNull('goals.deleted_at')
+                                    ->whereNull('employee_demo.date_deleted')
                                     ->where('status','=','active')
                                     ->where(function($query) use($request) {   
                                             $query->where(function($query) use($request) {   
@@ -1759,6 +1760,7 @@ class SysadminStatisticsReportController extends Controller
                                         $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                     })
                                     ->whereNull('goals.deleted_at')
+                                    ->whereNull('employee_demo.date_deleted')
                                     ->where('status','<>','active')
                                     ->where(function($query) use($request) {   
                                             $query->where(function($query) use($request) {   
@@ -1798,6 +1800,7 @@ class SysadminStatisticsReportController extends Controller
                                                         });
                                                     })
                                                   ->whereNull('conversations.deleted_at')
+                                                  ->whereNull('employee_demo.date_deleted')
                                                   ->where('conversation_participants.role', '=', 'emp')          
                                                   ->where('employee_demo.employee_id', '=', $request->employee_id)   
                                                   ->orderBy('conversations.created_at', 'DESC')                
@@ -1833,6 +1836,7 @@ class SysadminStatisticsReportController extends Controller
                                                         });
                                                     })
                                                   ->whereNull('conversations.deleted_at')
+                                                  ->whereNull('employee_demo.date_deleted')
                                                   ->where('conversation_participants.role', '=', 'emp')             
                                                   ->where('employee_demo.employee_id', '=', $request->employee_id)  
                                                   ->orderBy('conversations.id', 'DESC')              
@@ -1873,6 +1877,7 @@ class SysadminStatisticsReportController extends Controller
                                         $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                     })
                                     ->whereNull('goals.deleted_at')
+                                    ->whereNull('employee_demo.date_deleted')
                                     ->where('status','=','active')
                                     ->where(function($query) use($request) {   
                                             $query->where(function($query) use($request) {   
@@ -1948,6 +1953,7 @@ class SysadminStatisticsReportController extends Controller
                                         $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                     })
                                     ->whereNull('goals.deleted_at')
+                                    ->whereNull('employee_demo.date_deleted')
                                     ->where('status','<>','active')
                                     ->where(function($query) use($request) {   
                                             $query->where(function($query) use($request) {   
@@ -2039,6 +2045,7 @@ class SysadminStatisticsReportController extends Controller
                                                         });
                                                     })
                                                   ->whereNull('conversations.deleted_at')
+                                                  ->whereNull('employee_demo.date_deleted')
                                                   ->where('conversation_participants.role', '=', 'emp')          
                                                   ->where('employee_demo.employee_id', '=', $request->employee_id)   
                                                   ->orderBy('conversations.created_at', 'DESC')                
@@ -2127,6 +2134,7 @@ class SysadminStatisticsReportController extends Controller
                                                         });
                                                     })
                                                   ->whereNull('conversations.deleted_at')
+                                                  ->whereNull('employee_demo.date_deleted')
                                                   ->where('conversation_participants.role', '=', 'emp')             
                                                   ->where('employee_demo.employee_id', '=', $request->employee_id)  
                                                   ->orderBy('conversations.id', 'DESC')              
@@ -2197,6 +2205,7 @@ class SysadminStatisticsReportController extends Controller
                                         $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                                     })
                                     ->whereNull('goals.deleted_at')
+                                    ->whereNull('employee_demo.date_deleted')
                                     ->where('goals.id','=',$goal_id)           
                                     ->get();
                 $goal_comments = DB::table('goal_comments')

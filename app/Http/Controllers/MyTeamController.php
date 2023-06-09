@@ -53,14 +53,21 @@ class MyTeamController extends Controller
         $employees = $this->myEmployeesAjax();
 
         $adminShared=SharedProfile::select('shared_id')
+        ->join('users','users.id','shared_profiles.shared_id')
+        ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
+        ->whereNull('employee_demo.date_deleted')
         ->where('shared_with', '=', Auth::id())
         ->where(function ($sh) {
             $sh->where('shared_item', 'like', '%1%')
             ->orWhere('shared_item', 'like', '%2%');
         })
         ->pluck('shared_id');
+
         $adminemps = User::select('users.*')
+        ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
+        ->whereNull('employee_demo.date_deleted')
         ->whereIn('users.id', $adminShared)->get();
+
         $employees = $employees->merge($adminemps);
 
         $type = 'upcoming'; // Allow Editing
@@ -90,6 +97,8 @@ class MyTeamController extends Controller
         $shared_employees = DB::table('shared_profiles')
                     ->select('shared_profiles.shared_id', 'users.name')
                     ->join('users', 'users.id', '=', 'shared_profiles.shared_id')
+                    ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
+                    ->whereNull('employee_demo.date_deleted')
                     ->where('shared_profiles.shared_with', Auth::id())
                     ->where('shared_profiles.shared_item', 'like', '%1%')
                     ->get();
