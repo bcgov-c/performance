@@ -9,9 +9,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use App\Models\EmployeeDemoTree;
 use App\Models\EmployeeDemoTreeTemp;
-use App\Models\OrganizationHierarchy;
 use App\Models\JobSchedAudit;
-use App\Models\EmployeeDemo;
 use Carbon\Carbon;
 
 class BuildEmployeeDemoTree extends Command
@@ -63,9 +61,6 @@ class BuildEmployeeDemoTree extends Command
             ]
         );
 
-        $count_insert = 0;
-        $count_update = 0;
-        $count_delete = 0;
         $total = 0;
 
         if ($switch == 'on' || $manualoverride) {
@@ -73,95 +68,40 @@ class BuildEmployeeDemoTree extends Command
             $level = 0;
             do {
                 $this->info(Carbon::now()->format('c')." - Processing Level {$level}...");
-                $allDepts = OrganizationHierarchy::distinct()
-                    ->select("odoh.*")
-                    ->selectRaw("(SELECT COUNT(e.employee_id) FROM employee_demo AS e USE INDEX (idx_employee_demo_deptid) WHERE e.deptid = odoh.deptid AND e.date_deleted IS NULL) AS headcount")
-                    ->whereRaw("EXISTS (SELECT DISTINCT 1 FROM employee_demo AS d USE INDEX (idx_employee_demo_deptid) WHERE d.deptid = ods_dept_org_hierarchy.deptid)")
-                    ->orderBy("odoh.name")
-                    ->orderBy("odoh.okey");
                 switch ($level) {
                     case 0:
-                        $allDepts = $allDepts->join("ods_dept_org_hierarchy AS odoh", "odoh.okey", "ods_dept_org_hierarchy.organization_key");
                         $field = "organization_key";
+                        $parent_id = "NULL";
                         break;
                     case 1:
+                        $field = "level{$level}_key";
+                        $parent_id = "organization_key";
+                        break;
                     case 2:
                     case 3:
                     case 4:
                     case 5:
-                        $allDepts = $allDepts->join("ods_dept_org_hierarchy AS odoh", "odoh.okey", "ods_dept_org_hierarchy.level{$level}_key");
                         $field = "level{$level}_key";
+                        $level2 = $level - 1;
+                        $parent_id = "level{$level2}_key";
                         break;
                     default:
                         break;
                 }
-                $allDepts = $allDepts->get();
-                foreach ($allDepts AS $dept) {
-                    $result = EmployeeDemo::join('ods_dept_org_hierarchy', 'employee_demo.deptid', 'ods_dept_org_hierarchy.deptid')
-                        ->whereNull('employee_demo.date_deleted')
-                        ->whereRaw("ods_dept_org_hierarchy.{$field} = {$dept->okey}")
-                        ->select(\DB::raw('count(1) AS groupcount'))->first();
-                    $groupcount = $result->groupcount;
-                    $node = new EmployeeDemoTreeTemp([
-                        'id' => $dept->okey,
-                        'name' => $dept->name,
-                        'deptid' => $dept->deptid,
-                        'status' => 1,
-                        'level' => $dept->ulevel,
-                        'headcount' => $dept->headcount,
-                        'groupcount' => $groupcount,
-                        'organization' =>  $dept->organization_label,
-                        'level1_program' =>  $dept->level1_label,
-                        'level2_division' =>  $dept->level2_label,
-                        'level3_branch' =>  $dept->level3_label,
-                        'level4' =>  $dept->level4_label,
-                        'level5' =>  $dept->level5_label,
-                        'organization_key' =>  $dept->organization_key,
-                        'level1_key' =>  $dept->level1_key,
-                        'level2_key' =>  $dept->level2_key,
-                        'level3_key' =>  $dept->level3_key,
-                        'level4_key' =>  $dept->level4_key,
-                        'level5_key' =>  $dept->level5_key,
-                        'organization_deptid' =>  $dept->organization_deptid,
-                        'level1_deptid' =>  $dept->level1_deptid,
-                        'level2_deptid' =>  $dept->level2_deptid,
-                        'level3_deptid' =>  $dept->level3_deptid,
-                        'level4_deptid' =>  $dept->level4_deptid,
-                        'level5_deptid' =>  $dept->level5_deptid,
-                        'organization_orgid' =>  $dept->organization_orgid,
-                        'level1_orgid' =>  $dept->level1_orgid,
-                        'level2_orgid' =>  $dept->level2_orgid,
-                        'level3_orgid' =>  $dept->level3_orgid,
-                        'level4_orgid' =>  $dept->level4_orgid,
-                        'level5_orgid' =>  $dept->level5_orgid,
-                    ]);
-                    switch ($level) {
-                        case 0:
-                            $node->saveAsRoot(); 
-                            break;
-                        case 1:
-                            $node->parent_id = $dept->organization_key;     
-                            $node->save();
-                            break;              
-                        case 2:
-                        case 3:
-                        case 4:
-                        case 5:
-                            $level2 = $level - 1;
-                            $field = "level{$level2}_key";
-                            if ($dept->okey != $dept->{$field}) {
-                                $node->parent_id = $dept->{$field};     
-                            }
-                            $node->save();
-                            break;              
-                        default:
-                            break;
-                    }
-                    $this->info(Carbon::now()->format('c')." -   created {$level} - {$dept->okey} - {$dept->name}");
-                    $total++;
-                }
+                \DB::statement("
+                    INSERT INTO employee_demo_tree_temp (id, name, deptid, level, organization, level1_program, level2_division, level3_branch, level4, level5, organization_key, level1_key, level2_key, level3_key, level4_key, level5_key, organization_deptid, level1_deptid, level2_deptid, level3_deptid, level4_deptid, level5_deptid, headcount, groupcount, parent_id) 
+                    SELECT okey, name, deptid, ulevel, organization_label, level1_label, level2_label, level3_label, level4_label, level5_label, organization_key, level1_key, level2_key, level3_key, level4_key, level5_key, organization_deptid, level1_deptid, level2_deptid, level3_deptid, level4_deptid, level5_deptid,
+                        (SELECT COUNT(1) FROM employee_demo AS e WHERE e.deptid = ods_dept_org_hierarchy.deptid AND e.date_deleted IS NULL) AS headcount,
+                        (SELECT COUNT(1) FROM employee_demo AS f, ods_dept_org_hierarchy AS g WHERE f.deptid = g.deptid AND f.date_deleted IS NULL AND g.{$field} = ods_dept_org_hierarchy.okey) AS groupcount,
+                        {$parent_id}
+                    FROM ods_dept_org_hierarchy USE INDEX (idx_byHierarchyokey)
+                    WHERE EXISTS (SELECT 1 FROM ods_dept_org_hierarchy AS odoh, employee_demo AS d USE INDEX (idx_employee_demo_deptid) WHERE odoh.{$field} = ods_dept_org_hierarchy.okey AND odoh.deptid = d.deptid LIMIT 1)
+                ");
                 $level++;
             } while ($level < 6);
+
+            $result = EmployeeDemoTreeTemp::select(\DB::raw('count(1) AS totalcount'))->first();
+            $total = $result->totalcount;
 
             // Move new tree
             if($total > 0) {
@@ -209,7 +149,7 @@ class BuildEmployeeDemoTree extends Command
                     'end_time' => date('Y-m-d H:i:s', strtotime($end_time)),
                     'status' => 'Completed',
                     'details' => 'Processed '.$total.' rows.',
-                ]
+                    ]
             );
 
             $this->info(Carbon::now()->format('c')." - Build Employee Demographics Tree, Completed: {$end_time}");
