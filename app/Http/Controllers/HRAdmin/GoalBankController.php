@@ -1331,7 +1331,7 @@ class GoalBankController extends Controller
 
     protected function notify_on_dashboard($goalBank, $employee_ids) {
         // Filter out the employee based on the Organization level and individual user preferences. 
-        $data = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization', 'access_organizations.organization')
+        $data = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization_key', 'access_organizations.orgid')
             ->leftjoin('user_preferences', 'user_demo_jr_view.user_id', 'user_preferences.user_id')
             ->whereIn('user_demo_jr_view.employee_id', $employee_ids)
             ->where('access_organizations.allow_inapp_msg', 'Y')
@@ -1356,7 +1356,7 @@ class GoalBankController extends Controller
 
     protected function notify_employees($goalBank, $employee_ids) {
         // Filter out the employee based on the Organization level and individual user preferences. 
-        $filtered_ee_ids = UserDemoJrForGoalbankView::join('access_organizations', 'user_demo_jr_for_goalbank_view.organization', 'access_organizations.organization')
+        $filtered_ee_ids = UserDemoJrForGoalbankView::join('access_organizations', 'user_demo_jr_for_goalbank_view.organization_key', 'access_organizations.orgid')
             ->leftjoin('user_preferences', 'user_demo_jr_for_goalbank_view.user_id', 'user_preferences.user_id')
             ->whereIn('user_demo_jr_for_goalbank_view.employee_id', $employee_ids)
             ->where('access_organizations.allow_email_msg', 'Y')
