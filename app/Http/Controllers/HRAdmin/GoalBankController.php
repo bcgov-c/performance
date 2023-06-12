@@ -1112,11 +1112,14 @@ class GoalBankController extends Controller
                 ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
             $otherHRgoals = Goal::withoutGlobalScopes()
                 ->join('users as cu', 'cu.id', 'goals.created_by')
+                ->join('auth_orgs AS aoc', 'aoc.auth_id', 'goals.created_by')
                 ->leftjoin('employee_demo as ced', 'ced.employee_id', 'cu.employee_id')
                 ->where('is_library', true)
                 ->where('by_admin', 2)
                 ->where('goals.created_by', '<>', Auth::id())
-                ->whereRaw("EXISTS (SELECT 1 FROM auth_orgs AS ao, goal_bank_orgs AS gbo WHERE ao.type = 'HR' AND ao.auth_id = ".Auth::id()." AND ao.orgid = gbo.orgid AND gbo.goal_id = goals.id AND gbo.version = 2 AND gbo.inherited = 0 LIMIT 1)")
+                ->whereNotNull('goals.created_by')
+                ->whereRaw("EXISTS (SELECT 1 FROM auth_orgs AS a, auth_orgs AS b WHERE a.type = 'HR' AND b.type = 'HR' AND a.auth_id = ".Auth::id()." AND b.auth_id = goals.created_by AND a.orgid = b.orgid)")
+                // ->whereRaw("EXISTS (SELECT 1 FROM auth_orgs AS ao, goal_bank_orgs AS gbo WHERE ao.type = 'HR' AND ao.auth_id = ".Auth::id()." AND ao.orgid = gbo.orgid AND gbo.goal_id = goals.id AND gbo.version = 2 AND gbo.inherited = 0 LIMIT 1)")
                 ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
                     $q->where(function($query) use ($request) {
                         return $query->whereRaw("goals.title LIKE '%".$request->search_text."%'")
