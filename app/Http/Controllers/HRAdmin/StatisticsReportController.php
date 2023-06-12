@@ -2255,7 +2255,7 @@ class StatisticsReportController extends Controller
                                 "Level 1", "Level 2", "Level 3", "Level 4", 'Have Conversation',
                            ];
         
-                $callback = function() use($users, $columns) {
+                $callback = function() use($users, $excludedIds, $columns) {
                     $file = fopen('php://output', 'w');
                     fputcsv($file, $columns);
         
