@@ -88,15 +88,7 @@ class BuildEmployeeDemoTree extends Command
                     default:
                         break;
                 }
-                // \DB::statement("
-                //     INSERT INTO employee_demo_tree_temp (id, name, deptid, level, organization, level1_program, level2_division, level3_branch, level4, level5, organization_key, level1_key, level2_key, level3_key, level4_key, level5_key, organization_deptid, level1_deptid, level2_deptid, level3_deptid, level4_deptid, level5_deptid, headcount, groupcount, parent_id) 
-                //     SELECT okey, name, deptid, ulevel, organization_label, level1_label, level2_label, level3_label, level4_label, level5_label, organization_key, level1_key, level2_key, level3_key, level4_key, level5_key, organization_deptid, level1_deptid, level2_deptid, level3_deptid, level4_deptid, level5_deptid,
-                //         (SELECT COUNT(1) FROM employee_demo AS e USE INDEX (idx_employee_demo_deptid) WHERE e.deptid = ods_dept_org_hierarchy.deptid AND e.date_deleted IS NULL) AS headcount,
-                //         (SELECT COUNT(1) FROM employee_demo AS f USE INDEX (idx_employee_demo_deptid), ods_dept_org_hierarchy AS g USE INDEX (ods_dept_org_hierarchy_deptid_{$field}_index, idx_ods_dept_org_hierarchy_{$field}) WHERE f.deptid = g.deptid AND g.{$field} = ods_dept_org_hierarchy.{$field} AND f.date_deleted IS NULL) AS groupcount,
-                //         {$parent_id}
-                //     FROM ods_dept_org_hierarchy USE INDEX (idx_byHierarchyokey)
-                //     WHERE EXISTS (SELECT 1 FROM ods_dept_org_hierarchy AS odoh USE INDEX (ods_dept_org_hierarchy_deptid_{$field}_index, idx_ods_dept_org_hierarchy_{$field}), employee_demo AS d USE INDEX (idx_employee_demo_deptid) WHERE odoh.{$field} = ods_dept_org_hierarchy.{$field} AND odoh.deptid = d.deptid LIMIT 1)
-                // ");
+                // Insert by Org Level/Group
                 \DB::statement("
                     INSERT INTO employee_demo_tree_temp (id, name, deptid, level, organization, level1_program, level2_division, level3_branch, level4, level5, organization_key, level1_key, level2_key, level3_key, level4_key, level5_key, organization_deptid, level1_deptid, level2_deptid, level3_deptid, level4_deptid, level5_deptid, headcount, groupcount, parent_id) 
                     SELECT DISTINCT CONVERT(a.okey, UNSIGNED) AS okey, a.name, a.deptid, a.ulevel, a.organization_label, a.level1_label, a.level2_label, a.level3_label, a.level4_label, a.level5_label, a.organization_key, a.level1_key, a.level2_key, a.level3_key, a.level4_key, a.level5_key, a.organization_deptid, a.level1_deptid, a.level2_deptid, a.level3_deptid, a.level4_deptid, a.level5_deptid,
@@ -109,6 +101,21 @@ class BuildEmployeeDemoTree extends Command
                     WHERE a.okey = CONVERT(b.{$field}, UNSIGNED)
                         AND b.deptid = c.deptid AND c.date_deleted IS NULL
                 ");
+                // Update Group Count
+                $group = DB::select("
+                    SELECT g.{$field} AS orgid, COUNT(1) AS groupcount FROM employee_demo AS f USE INDEX (idx_employee_demo_deptid), ods_dept_org_hierarchy AS g USE INDEX (ods_dept_org_hierarchy_deptid_{$field}_index, idx_ods_dept_org_hierarchy_{$field})  
+                    WHERE g.deptid = f.deptid AND  f.date_deleted IS NULL AND g.{$field} IS NOT NULL
+                    GROUP BY g.{$field}
+                ");
+                foreach($group as $dept){
+                    EmployeeDemoTreeTemp::where('id', $dept->orgid)
+                        ->update(
+                            [
+                                'groupcount' => $dept->groupcount,
+                            ]
+                        );
+                    // $this->info(Carbon::now()->format('c')." - Org:{$dept->orgid} Count:{$dept->groupcount}");
+                }
                 $level++;
             } while ($level < 6);
 
