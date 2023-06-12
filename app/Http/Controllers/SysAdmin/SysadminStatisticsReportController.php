@@ -791,7 +791,13 @@ class SysadminStatisticsReportController extends Controller
             $subset =$open_conversations->filter(function ($conversation) use($topic) {
                 return $conversation->conversation_topic_id == $topic->id;
             }); 
-            $subset = array_unique(array_column($subset->toArray(), 'employee_id'));
+            $subset = $subset->toArray();
+            foreach($subset as $index=>$value){
+                if($value['deleted_at'] != ''){
+                    unset($subset[$index]);
+                }
+            }
+            $subset = array_unique(array_column($subset, 'employee_id')); 
             $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
@@ -816,7 +822,13 @@ class SysadminStatisticsReportController extends Controller
             $subset =$completed_conversations->filter(function ($conversation) use($topic) {
                 return $conversation->conversation_topic_id == $topic->id;
             }); 
-            $subset = array_unique(array_column($subset->toArray(), 'employee_id'));
+            $subset = $subset->toArray();
+            foreach($subset as $index=>$value){
+                if($value['deleted_at'] != ''){
+                    unset($subset[$index]);
+                }
+            }
+            $subset = array_unique(array_column($subset, 'employee_id')); 
             $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
