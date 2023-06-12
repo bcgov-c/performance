@@ -75,7 +75,7 @@ class BuildEmployeeDemoTree extends Command
                         break;
                     case 1:
                         $field = "level{$level}_key";
-                        $parent_id = "organization_key";
+                        $parent_id = "a.organization_key";
                         break;
                     case 2:
                     case 3:
@@ -83,7 +83,7 @@ class BuildEmployeeDemoTree extends Command
                     case 5:
                         $field = "level{$level}_key";
                         $level2 = $level - 1;
-                        $parent_id = "level{$level2}_key";
+                        $parent_id = "a.level{$level2}_key";
                         break;
                     default:
                         break;
@@ -99,12 +99,15 @@ class BuildEmployeeDemoTree extends Command
                 // ");
                 \DB::statement("
                     INSERT INTO employee_demo_tree_temp (id, name, deptid, level, organization, level1_program, level2_division, level3_branch, level4, level5, organization_key, level1_key, level2_key, level3_key, level4_key, level5_key, organization_deptid, level1_deptid, level2_deptid, level3_deptid, level4_deptid, level5_deptid, headcount, groupcount, parent_id) 
-                    SELECT okey, name, deptid, ulevel, organization_label, level1_label, level2_label, level3_label, level4_label, level5_label, organization_key, level1_key, level2_key, level3_key, level4_key, level5_key, organization_deptid, level1_deptid, level2_deptid, level3_deptid, level4_deptid, level5_deptid,
-                        (SELECT COUNT(1) FROM employee_demo AS e USE INDEX (idx_employee_demo_deptid) WHERE e.deptid = ods_dept_org_hierarchy.deptid AND e.date_deleted IS NULL) AS headcount,
+                    SELECT DISTINCT CONVERT(a.okey, UNSIGNED) AS okey, a.name, a.deptid, a.ulevel, a.organization_label, a.level1_label, a.level2_label, a.level3_label, a.level4_label, a.level5_label, a.organization_key, a.level1_key, a.level2_key, a.level3_key, a.level4_key, a.level5_key, a.organization_deptid, a.level1_deptid, a.level2_deptid, a.level3_deptid, a.level4_deptid, a.level5_deptid,
+                        (SELECT COUNT(1) FROM employee_demo AS e USE INDEX (idx_employee_demo_deptid) WHERE e.deptid = a.deptid AND e.date_deleted IS NULL) AS headcount,
                         0 AS groupcount,
                         {$parent_id}
-                    FROM ods_dept_org_hierarchy USE INDEX (idx_byHierarchyokey)
-                    WHERE EXISTS (SELECT 1 FROM ods_dept_org_hierarchy AS odoh USE INDEX (ods_dept_org_hierarchy_deptid_{$field}_index, idx_ods_dept_org_hierarchy_{$field}), employee_demo AS d USE INDEX (idx_employee_demo_deptid) WHERE CONVERT(odoh.{$field}, UNSIGNED) = ods_dept_org_hierarchy.okey AND odoh.deptid = d.deptid LIMIT 1)
+                    FROM ods_dept_org_hierarchy AS a USE INDEX (idx_byHierarchyokey),
+                        ods_dept_org_hierarchy AS b USE INDEX (ods_dept_org_hierarchy_deptid_{$field}_index, idx_ods_dept_org_hierarchy_{$field}),
+                        employee_demo AS c USE INDEX (idx_employee_demo_deptid) 
+                    WHERE a.okey = CONVERT(b.{$field}, UNSIGNED)
+                        AND b.deptid = c.deptid AND c.date_deleted IS NULL
                 ");
                 $level++;
             } while ($level < 6);
