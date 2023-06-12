@@ -844,10 +844,12 @@ class StatisticsReportController extends Controller
             $subset =$open_conversations->filter(function ($conversation) use($topic) {
                 return $conversation->conversation_topic_id == $topic->id;
             }); 
-            if($topic->name == 'Onboarding'){
-            Log::info((print_r($subset->toArray(),true)));
+            
+            $subset = array_unique(array_column($subset->toArray(), 'employee_id')); 
+            foreach($subset as $index=>$value){
+                unset($subset[$index]);
             }
-            $subset = array_unique(array_column($subset->toArray(), 'employee_id'));            
+            
             $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
@@ -872,7 +874,12 @@ class StatisticsReportController extends Controller
             $subset =$completed_conversations->filter(function ($conversation) use($topic) {
                 return $conversation->conversation_topic_id == $topic->id;
             }); 
-            $subset = array_unique(array_column($subset->toArray(), 'employee_id'));
+
+            $subset = array_unique(array_column($subset->toArray(), 'employee_id')); 
+            foreach($subset as $index=>$value){
+                unset($subset[$index]);
+            }
+            
             $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
