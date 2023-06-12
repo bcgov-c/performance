@@ -2107,7 +2107,7 @@ class StatisticsReportController extends Controller
                 $excludedIds = $users->pluck('employee_id')->toArray();
                 
                 if($request->legend == 'No' || !$request->legend){ 
-                    $sql = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
+                    $sql_6_all = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
                     organization, level1_program, level2_division, level3_branch, level4")
                             ->whereNotIn('employee_id', $excludedIds)
                             ->whereNull('date_deleted')
@@ -2203,7 +2203,7 @@ class StatisticsReportController extends Controller
                 $excludedIds = $users->pluck('employee_id')->toArray();
                 
                 if($request->legend == 'No' || !$request->legend){                 
-                    $sql = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
+                    $sql_7_all = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email, next_conversation_date, reporting_to_name,
                     organization, level1_program, level2_division, level3_branch, level4")
                             ->whereNotIn('employee_id', $excludedIds)
                             ->whereNull('date_deleted')
