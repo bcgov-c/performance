@@ -263,10 +263,11 @@ class User extends Authenticatable
 
     public function getAllowInappNotificationAttribute() {
 
-        $organization = EmployeeDemo::join('access_organizations', 'employee_demo.organization', 'access_organizations.organization')
-                            ->where('access_organizations.allow_inapp_msg', 'Y')
-                            ->where('employee_demo.employee_id', $this->employee_id)
-                            ->first(); 
+        $organization = EmployeeDemo::join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+            ->join('access_organizations', 'employee_demo_tree.organization_key', 'access_organizations.orgid')
+            ->where('access_organizations.allow_inapp_msg', 'Y')
+            ->where('employee_demo.employee_id', $this->employee_id)
+            ->first(); 
 
         return ($organization ? true : false);                            
 
@@ -278,11 +279,12 @@ class User extends Authenticatable
             return false;
         }
 
-        $organization = EmployeeDemo::join('access_organizations', 'employee_demo.organization', 'access_organizations.organization')
-                            ->where('access_organizations.allow_email_msg', 'Y')
-                            ->where('employee_demo.employee_id', $this->employee_id)
-                            ->select('employee_demo.guid', 'employee_demo.organization')
-                            ->first(); 
+        $organization = EmployeeDemo::join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+            ->join('access_organizations', 'employee_demo_tree.organization_key', 'access_organizations.orgid')
+            ->where('access_organizations.allow_email_msg', 'Y')
+            ->where('employee_demo.employee_id', $this->employee_id)
+            ->select('employee_demo.guid', 'access_organizations.organization')
+            ->first(); 
 
         return ($organization ? true : false);                            
 

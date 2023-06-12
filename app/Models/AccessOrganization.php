@@ -10,6 +10,7 @@ class AccessOrganization extends Model
     use HasFactory;
 
     protected $fillable =[
+        'orgid',
         'organization',
         'allow_login',
         'allow_inapp_msg',
@@ -35,7 +36,7 @@ class AccessOrganization extends Model
     }
 
     public function active_employee_ids() {
-        return $this->hasMany('App\Models\EmployeeDemo', 'organization', 'organization')
+        return $this->hasMany('App\Models\EmployeeDemo', 'orgid', 'orgid')
                         ->whereNull('employee_demo.date_deleted')
                         ->distinct('employee_demo.guid')
                         ->select('employee_demo.guid');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\SysAdmin;
 
 use App\Models\EmployeeDemo;
+use App\Models\EmployeeDemoTree;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Yajra\Datatables\Datatables;
@@ -21,19 +22,21 @@ class AccessOrganizationsController extends Controller
 
              // $columns = ["code","name","status","created_at"];
             $access_orgs = AccessOrganization::with('created_by', 'updated_by')
-                                ->when($request->organization, function($query) use($request) {
-                                    return $query->where('organization', 'like', '%'.$request->organization.'%');
-                                })
-                                ->when($request->allow_login, function($query) use($request) {
-                                    return $query->where('allow_login', $request->allow_login);
-                                })
-                                ->when($request->allow_inapp_msg, function($query) use($request) {
-                                    return $query->where('allow_inapp_msg', $request->allow_inapp_msg);
-                                })
-                                ->when($request->allow_email_msg, function($query) use($request) {
-                                    return $query->where('allow_email_msg', $request->allow_email_msg);
-                                })
-                                ->withCount('active_employee_ids');
+                ->leftjoin('employee_demo_tree', 'access_organizations.orgid', 'employee_demo_tree.id')
+                ->where('access_organizations.orgid', '<', 1000000)
+                ->when($request->organization, function($query) use($request) {
+                    return $query->where('employee_demo_tree.name', 'like', '%'.$request->organization.'%');
+                })
+                ->when($request->allow_login, function($query) use($request) {
+                    return $query->where('allow_login', $request->allow_login);
+                })
+                ->when($request->allow_inapp_msg, function($query) use($request) {
+                    return $query->where('allow_inapp_msg', $request->allow_inapp_msg);
+                })
+                ->when($request->allow_email_msg, function($query) use($request) {
+                    return $query->where('allow_email_msg', $request->allow_email_msg);
+                })
+                ->withCount('active_employee_ids');
 
             return Datatables::of($access_orgs)
                                 
@@ -161,17 +164,20 @@ class AccessOrganizationsController extends Controller
 
     protected function createNewAccessOrgsFromEmployeeDemo() 
     {
-        $org_names = EmployeeDemo::where('organization', '<>','')
-                            ->distinct('organization')->orderBy('organization')->pluck('organization');
+        $org_names = EmployeeDemoTree::where('level', 0)
+            ->select('id', 'name')
+            ->orderBy('name')->get();
 
         foreach ($org_names as $org_name) {
             
-            $access_org = AccessOrganization::where('organization', $org_name)->first();
+            $access_org = AccessOrganization::where('orgid', $org_name->id)->first();
 
             if ( !$access_org ) {
 
                 AccessOrganization::create([
-                    'organization' => $org_name,
+                    'orgid' => $org_name->id,
+                    'organization' => $org_name->name,
+                    // 'organization' => 'ABCDEFGHIJKL',
                     'created_by_id' => Auth::Id(),
                     'updated_by_id' => Auth::Id(),
                 ]);
