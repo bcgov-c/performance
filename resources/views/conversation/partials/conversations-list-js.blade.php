@@ -655,6 +655,7 @@
                    $('#info_area1').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
                    $('#control-info-comment1').show();
                    info_save1 = 0;
+                   $('#control-info-comment11').hide();
             });
             CKEDITOR.instances['info_comment1'].on('key', function(e) { 
                 $('#info_area1').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
@@ -680,6 +681,7 @@
                    $('#info_area2').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
                    $('#control-info-comment2').show();
                    info_save2 = 0;
+                   $('#control-info-comment11').hide();
             });
             CKEDITOR.instances['info_comment2'].on('key', function(e) { 
                 $('#info_area2').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
@@ -704,6 +706,7 @@
                    $('#info_area3').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
                    $('#control-info-comment3').show();
                    info_save3 = 0;
+                   $('#control-info-comment11').hide();
             });
             CKEDITOR.instances['info_comment3'].on('key', function(e) { 
                 $('#info_area3').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
@@ -894,12 +897,9 @@
                    $('#control-info-comment11').show();
                    info_save11 = 0;
             });
-            $('#info_comment11').blur(function() {
-                 $('#control-info-comment11').hide();
-            });
-            
             $('#control-info-comment11').click(function() {
                 saveComment('info_comment11');
+                info_save11 = 1;
                 $('#info_area11').html('<span style="color:red">Comment saved</span>');
                 setTimeRoll();
             });
