@@ -88,14 +88,23 @@ class BuildEmployeeDemoTree extends Command
                     default:
                         break;
                 }
+                // \DB::statement("
+                //     INSERT INTO employee_demo_tree_temp (id, name, deptid, level, organization, level1_program, level2_division, level3_branch, level4, level5, organization_key, level1_key, level2_key, level3_key, level4_key, level5_key, organization_deptid, level1_deptid, level2_deptid, level3_deptid, level4_deptid, level5_deptid, headcount, groupcount, parent_id) 
+                //     SELECT okey, name, deptid, ulevel, organization_label, level1_label, level2_label, level3_label, level4_label, level5_label, organization_key, level1_key, level2_key, level3_key, level4_key, level5_key, organization_deptid, level1_deptid, level2_deptid, level3_deptid, level4_deptid, level5_deptid,
+                //         (SELECT COUNT(1) FROM employee_demo AS e USE INDEX (idx_employee_demo_deptid) WHERE e.deptid = ods_dept_org_hierarchy.deptid AND e.date_deleted IS NULL) AS headcount,
+                //         (SELECT COUNT(1) FROM employee_demo AS f USE INDEX (idx_employee_demo_deptid), ods_dept_org_hierarchy AS g USE INDEX (ods_dept_org_hierarchy_deptid_{$field}_index, idx_ods_dept_org_hierarchy_{$field}) WHERE f.deptid = g.deptid AND g.{$field} = ods_dept_org_hierarchy.{$field} AND f.date_deleted IS NULL) AS groupcount,
+                //         {$parent_id}
+                //     FROM ods_dept_org_hierarchy USE INDEX (idx_byHierarchyokey)
+                //     WHERE EXISTS (SELECT 1 FROM ods_dept_org_hierarchy AS odoh USE INDEX (ods_dept_org_hierarchy_deptid_{$field}_index, idx_ods_dept_org_hierarchy_{$field}), employee_demo AS d USE INDEX (idx_employee_demo_deptid) WHERE odoh.{$field} = ods_dept_org_hierarchy.{$field} AND odoh.deptid = d.deptid LIMIT 1)
+                // ");
                 \DB::statement("
                     INSERT INTO employee_demo_tree_temp (id, name, deptid, level, organization, level1_program, level2_division, level3_branch, level4, level5, organization_key, level1_key, level2_key, level3_key, level4_key, level5_key, organization_deptid, level1_deptid, level2_deptid, level3_deptid, level4_deptid, level5_deptid, headcount, groupcount, parent_id) 
                     SELECT okey, name, deptid, ulevel, organization_label, level1_label, level2_label, level3_label, level4_label, level5_label, organization_key, level1_key, level2_key, level3_key, level4_key, level5_key, organization_deptid, level1_deptid, level2_deptid, level3_deptid, level4_deptid, level5_deptid,
                         (SELECT COUNT(1) FROM employee_demo AS e USE INDEX (idx_employee_demo_deptid) WHERE e.deptid = ods_dept_org_hierarchy.deptid AND e.date_deleted IS NULL) AS headcount,
-                        (SELECT COUNT(1) FROM employee_demo AS f USE INDEX (idx_employee_demo_deptid), ods_dept_org_hierarchy AS g USE INDEX (ods_dept_org_hierarchy_deptid_{$field}_index, idx_ods_dept_org_hierarchy_{$field}) WHERE f.deptid = g.deptid AND g.{$field} = ods_dept_org_hierarchy.{$field} AND f.date_deleted IS NULL) AS groupcount,
+                        0 AS groupcount,
                         {$parent_id}
                     FROM ods_dept_org_hierarchy USE INDEX (idx_byHierarchyokey)
-                    WHERE EXISTS (SELECT 1 FROM ods_dept_org_hierarchy AS odoh USE INDEX (ods_dept_org_hierarchy_deptid_{$field}_index, idx_ods_dept_org_hierarchy_{$field}), employee_demo AS d USE INDEX (idx_employee_demo_deptid) WHERE odoh.{$field} = ods_dept_org_hierarchy.{$field} AND odoh.deptid = d.deptid LIMIT 1)
+                    WHERE EXISTS (SELECT 1 FROM ods_dept_org_hierarchy AS odoh USE INDEX (ods_dept_org_hierarchy_deptid_{$field}_index, idx_ods_dept_org_hierarchy_{$field}), employee_demo AS d USE INDEX (idx_employee_demo_deptid) WHERE CONVERT(odoh.{$field}, UNSIGNED) = ods_dept_org_hierarchy.okey AND odoh.deptid = d.deptid LIMIT 1)
                 ");
                 $level++;
             } while ($level < 6);
