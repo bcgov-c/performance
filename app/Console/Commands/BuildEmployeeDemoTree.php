@@ -95,7 +95,7 @@ class BuildEmployeeDemoTree extends Command
                         (SELECT COUNT(1) FROM employee_demo AS f USE INDEX (idx_employee_demo_deptid), ods_dept_org_hierarchy AS g USE INDEX (ods_dept_org_hierarchy_deptid_{$field}_index, idx_ods_dept_org_hierarchy_{$field}) WHERE f.deptid = g.deptid AND g.{$field} = ods_dept_org_hierarchy.{$field} AND f.date_deleted IS NULL) AS groupcount,
                         {$parent_id}
                     FROM ods_dept_org_hierarchy USE INDEX (idx_byHierarchyokey)
-                    WHERE EXISTS (SELECT 1 FROM ods_dept_org_hierarchy AS odoh, employee_demo AS d USE INDEX (idx_employee_demo_deptid) WHERE odoh.{$field} = ods_dept_org_hierarchy.okey AND odoh.deptid = d.deptid LIMIT 1)
+                    WHERE EXISTS (SELECT 1 FROM ods_dept_org_hierarchy AS odoh USE INDEX (ods_dept_org_hierarchy_deptid_{$field}_index, idx_ods_dept_org_hierarchy_{$field}), employee_demo AS d USE INDEX (idx_employee_demo_deptid) WHERE odoh.{$field} = ods_dept_org_hierarchy.{$field} AND odoh.deptid = d.deptid LIMIT 1)
                 ");
                 $level++;
             } while ($level < 6);
