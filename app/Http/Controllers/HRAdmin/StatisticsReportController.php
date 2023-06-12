@@ -2136,14 +2136,15 @@ class StatisticsReportController extends Controller
                                             ->where('auth_users.auth_id', '=', Auth::id());
                                 });
                     
-                    $users = $sql->get();
+                    $users_all =  $sql_6_all->get(); 
                     if($request->legend == 'No' ) {
-                        foreach($users_all as $index=>$user){
+                    foreach($users_all as $index=>$user){
                             if(in_array($user->employee_id, $excludedIds)){
                                 unset($users_all[$index]);
                             }
                         }
-                    }           
+                    }  
+                    $users = $users_all->unique('employee_id');           
                 }  
 
                 $headers = array(
@@ -2230,14 +2231,15 @@ class StatisticsReportController extends Controller
                                             ->where('auth_users.type', 'HR')
                                             ->where('auth_users.auth_id', '=', Auth::id());
                             });
-                    $users = $sql->get();
+                    $users_all =  $sql_7_all->get();   
                     if($request->legend == 'No' ) {
                         foreach($users_all as $index=>$user){
                             if(in_array($user->employee_id, $excludedIds)){
                                 unset($users_all[$index]);
                             }
                         }
-                    }                
+                    } 
+                    $users = $users_all->unique('employee_id');                  
                 }  
 
                 $headers = array(
