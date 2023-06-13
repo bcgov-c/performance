@@ -19,17 +19,17 @@
 
         <div class="form-row">
             <div class="form-group col-md-2">
-                <label for="audit_user">
-                    Audit User 
+                <label for="original_user">
+                    User 
                 </label>
-                <input name="audit_user" placeholder="Name, Employee ID, iDir"  class="form-control" />
+                <input name="original_user" placeholder="Name, Employee ID, iDir"  class="form-control" />
             </div>
 
             <div class="form-group col-md-2">
                 <label for="audit_user">
-                    Original User 
+                    Profile
                 </label>
-                <input name="original_user" placeholder="Name, Employee ID, iDir"  class="form-control" />
+                <input name="audit_user" placeholder="Name, Employee ID, iDir"  class="form-control" />
             </div>
 
             <div class="form-group col-md-2">
