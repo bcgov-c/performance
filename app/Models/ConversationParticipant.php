@@ -35,7 +35,11 @@ class ConversationParticipant extends Model implements Auditable
     public function transformAudit(array $data): array
     {
 
-        $original_auth_id = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
+        if(session()->has('user_is_switched')) {
+            $original_auth_id = session()->get('existing_user_id');
+        } else {
+            $original_auth_id = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
+        }
 
         $data['auditable_id'] = $this->conversation_id;
         $data['original_auth_id'] =  $original_auth_id;
