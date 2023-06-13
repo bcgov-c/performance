@@ -127,8 +127,8 @@
 			<thead>
 				<tr>
                     <th>Tran ID </th>
-                    <th>Audit User</th>
-                    <th>Original User</th>
+                    <th>User</th>
+                    <th>Profile</th>
                     <th>Audit Time</th>
                     <th>Event Type</th>
                     <th>Audit Type</th>
@@ -257,8 +257,8 @@
             },
             columns: [
                 {data: 'id', name: 'id', className: "dt-nowrap" },
-                {data: 'audit_user.name', name: 'audit_user.name', className: "dt-nowrap" },
                 {data: 'original_user.name', name: 'original_user.name', defaultContent:'', className: "dt-nowrap" },
+                {data: 'audit_user.name', name: 'audit_user.name', className: "dt-nowrap" },
                 {data: 'audit_timestamp', name: 'created_at', className: "dt-nowrap" },
                 {data: 'event', name: 'event', className: "dt-nowrap" },
                 {data: 'auditable_type_name',  name: 'auditable_type_name',  className: "dt-nowrap" },
