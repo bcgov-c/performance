@@ -13,7 +13,16 @@
     @php( $logout_url = $logout_url ? url($logout_url) : '' )
 @endif
 <li class="navbar nav-item">
-    <p style="color:Red; text-transform:uppercase; font-weight:bold;">{{env('APP_ENV')}}</p>
+
+    @switch (env('APP_ENV')) 
+        @case ('dev') <p style="font-size:18px; color:Red; text-transform:uppercase; font-weight:bold;">Development Environment</p> 
+        @Break;
+        @case ('test') <p style="font-size:18px; color:Red; text-transform:uppercase; font-weight:bold;">Test Environment</p>
+        @break; 
+        @case ('local') <p style="font-size:18px; color:Red; text-transform:uppercase; font-weight:bold;">Local Environment</p>
+        @break;
+        @default <p style="font-size:18px; color:Red; text-transform:uppercase; font-weight:bold;">Unknown Environment</p>
+    @endswitch
 </li>
 
 <li class="nav-item dropdown user-menu">
