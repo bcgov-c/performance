@@ -12,6 +12,9 @@
     @php( $profile_url = $profile_url ? url($profile_url) : '' )
     @php( $logout_url = $logout_url ? url($logout_url) : '' )
 @endif
+<li class="navbar nav-item">
+    <p style="color:Red; text-transform:uppercase; font-weight:bold;">{{env('APP_ENV')}}</p>
+</li>
 
 <li class="nav-item dropdown user-menu">
 
