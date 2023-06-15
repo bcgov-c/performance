@@ -902,7 +902,7 @@ class StatisticsReportController extends Controller
                     unset($subset[$index]);
                 }
             }
-            $subset = array_unique(array_column($subset, 'employee_id')); 
+            //$subset = array_unique(array_column($subset, 'employee_id')); 
             $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
@@ -983,7 +983,7 @@ class StatisticsReportController extends Controller
                     unset($subset[$index]);
                 }
             }
-            $subset = array_unique(array_column($subset, 'employee_id')); 
+            //$subset = array_unique(array_column($subset, 'employee_id')); 
             $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
@@ -1111,6 +1111,7 @@ class StatisticsReportController extends Controller
                 })
                 ->whereNull('deleted_at')                
                 ->join('users', 'users.id', 'conversation_participants.participant_id') 
+                ->join('auth_users', 'auth_users.user_id', 'conversation_participants.participant_id')
                 ->join('conversations','conversations.id','conversation_participants.conversation_id')
                 ->join('conversation_topics','conversations.conversation_topic_id','conversation_topics.id')            
                 ->join('employee_demo', function($join) {
@@ -1136,18 +1137,7 @@ class StatisticsReportController extends Controller
                 ->when( $request->topic_id, function($q) use($request) {
                     $q->where('conversations.conversation_topic_id', $request->topic_id);
                 })
-                ->whereExists(function ($query) {
-                    $query->select(DB::raw(1))
-                            ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
-                            ->where('auth_users.type', 'HR')
-                            ->where('auth_users.auth_id', '=', Auth::id());
-                }); 
-
-        $s = $sql_chart4->toSql();
-        $b = $sql_chart4->getBindings();
-        Log::info(print_r($s,true));
-        Log::info(print_r($b,true));         
+                ->where('auth_users.auth_id', Auth::id());
                 
         // SQL for Chart 5
          $sql_chart5 = ConversationParticipant::selectRaw("conversations.*, conversation_topics.name as conversation_name, users.employee_id, employee_demo.employee_name, users.email,
@@ -1192,7 +1182,7 @@ class StatisticsReportController extends Controller
                             ->where('auth_users.type', 'HR')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 }); 
-            
+                
         // Generating Output file 
         $filename = 'Conversations.xlsx';
         switch ($request->chart) {
@@ -1372,8 +1362,8 @@ class StatisticsReportController extends Controller
                 $topics = ConversationTopic::select('id','name')->get();
                 foreach($topics as $topic){
                         $subset = $conversations->where('conversation_topic_id', $topic->id );
-                        $unique_subset = $subset->unique('employee_id');
-                        foreach($unique_subset as $item) {
+                        //$unique_subset = $subset->unique('employee_id');
+                        foreach($subset as $item) {
                             array_push($conversations_unique,$item);
                         }                        
                 }
@@ -1444,8 +1434,8 @@ class StatisticsReportController extends Controller
                 $topics = ConversationTopic::select('id','name')->get();
                 foreach($topics as $topic){
                         $subset = $conversations->where('conversation_topic_id', $topic->id );
-                        $unique_subset = $subset->unique('employee_id');
-                        foreach($unique_subset as $item) {
+                        //$unique_subset = $subset->unique('employee_id');
+                        foreach($subset as $item) {
                             array_push($conversations_unique,$item);
                         }                        
                 }
