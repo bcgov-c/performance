@@ -797,10 +797,10 @@ class SysadminStatisticsReportController extends Controller
                         DATEDIFF ( next_conversation_date
                             , curdate() )
                     as overdue_in_days")
-                ->leftJoin('conversation_participants', function($join) {
+                ->leftJoin('conversation_participants', function($join)  {
                     $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
                 })
-                ->leftJoin('conversations', function($join) {
+                ->leftJoin('conversations', function($join) use($topic) {
                     $join->on('conversations.id', '=', 'conversation_participants.conversation_id')->where('conversations.conversation_topic_id', $topic->id);
                 })        
                 ->where(function($query) {
@@ -874,7 +874,7 @@ class SysadminStatisticsReportController extends Controller
                 ->leftJoin('conversation_participants', function($join) {
                     $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
                 })
-                ->leftJoin('conversations', function($join) {
+                ->leftJoin('conversations', function($join)use($topic){
                     $join->on('conversations.id', '=', 'conversation_participants.conversation_id')->where('conversations.conversation_topic_id', $topic->id);
                 })        
                 ->where(function($query) {
