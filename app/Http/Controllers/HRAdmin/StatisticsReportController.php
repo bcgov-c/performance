@@ -797,6 +797,7 @@ class StatisticsReportController extends Controller
                 ->when($request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                 ->when($request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
                 ->whereNull('date_deleted')
+                ->whereNull('deleted_at')
                 ->where(function($query) {
                     $query->where(function($query) {
                         $query->where('excused_flag', '<>', '1')
@@ -851,7 +852,7 @@ class StatisticsReportController extends Controller
                             , curdate() )
                     as overdue_in_days")
                 ->leftJoin('conversation_participants', function($join) {
-                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id')->where('conversation_participants.role','emp');
                 })
                 ->leftJoin('conversations', function($join) use($topic){
                     $join->on('conversations.id', '=', 'conversation_participants.conversation_id')->where('conversations.conversation_topic_id', $topic->id);
@@ -868,6 +869,7 @@ class StatisticsReportController extends Controller
                 ->when($request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                 ->when($request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
                 ->whereNull('date_deleted')
+                ->whereNull('deleted_at')
                 ->where('conversations.conversation_topic_id', $topic->id)
                 ->where(function($query) {
                     $query->where(function($query) {
@@ -878,7 +880,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
+                            ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
                             ->where('auth_users.type', '=', 'HR')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 });
@@ -922,59 +924,10 @@ class StatisticsReportController extends Controller
         $data['chart5']['groups'] = array();
         foreach($topics as $topic)
         {
-            $employee_topic_query = UserDemoJrView::selectRaw("employee_id, empl_record, employee_name, 
-                                organization, level1_program, level2_division,
-                                level3_branch, level4,conversation_participants.role,
-                                conversations.deleted_at,conversation_participants.conversation_id,
-                                conversations.signoff_user_id,conversations.supervisor_signoff_id,
-                                conversation_participants.participant_id,conversations.conversation_topic_id,
-                        DATEDIFF ( next_conversation_date
-                            , curdate() )
-                    as overdue_in_days")
-                ->leftJoin('conversation_participants', function($join) {
-                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
-                })
-                ->leftJoin('conversations', function($join) use($topic){
-                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id')->where('conversations.conversation_topic_id', $topic->id);
-                })        
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('due_date_paused', 'N')
-                            ->orWhereNull('due_date_paused');
-                    });
-                })
-                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
-                ->when($request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
-                ->when($request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
-                ->when($request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
-                ->when($request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
-                ->whereNull('date_deleted')          
-                ->where('conversations.conversation_topic_id', $topic->id)      
-                ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('excused_flag', '<>', '1')
-                            ->orWhereNull('excused_flag');
-                    });
-                })
-                ->whereExists(function ($query) {
-                    $query->select(DB::raw(1))
-                            ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
-                            ->where('auth_users.type', '=', 'HR')
-                            ->where('auth_users.auth_id', '=', Auth::id());
-                }); 
-            $topic_employees = $employee_topic_query->get();              
-            
-            $conversations = $topic_employees->filter(function ($topic_employees) {
-                return $topic_employees->role == 'emp';
-            });
-            $complete_conversations = $conversations->filter(function ($conversation) {
-                return $conversation->signoff_user_id != null && $conversation->supervisor_signoff_id != null;
-            }); 
-                        
-            $subset =$complete_conversations->filter(function ($conversation) use($topic) {
+            $subset =$completed_conversations->filter(function ($conversation) use($topic) {
                 return $conversation->conversation_topic_id == $topic->id;
             }); 
+
             $subset = $subset->toArray();
             foreach($subset as $index=>$value){
                 if($value['deleted_at'] != ''){
@@ -1137,10 +1090,14 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
                             ->where('auth_users.type', 'HR')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 }); 
+        $s = $sql_chart4->toSql();
+        $b = $sql_chart4->getBindings();
+        Log::info(print_r($s,true));
+        Log::info(print_r($b,true));         
                 
         // SQL for Chart 5
          $sql_chart5 = ConversationParticipant::selectRaw("conversations.*, conversation_topics.name as conversation_name, users.employee_id, employee_demo.employee_name, users.email,
@@ -1181,11 +1138,15 @@ class StatisticsReportController extends Controller
             ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
                             ->where('auth_users.type', 'HR')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 }); 
-            
+                $s = $sql_chart4->toSql();
+                $b = $sql_chart4->getBindings();
+                Log::info(print_r($s,true));
+                Log::info(print_r($b,true));         
+                
         // Generating Output file 
         $filename = 'Conversations.xlsx';
         switch ($request->chart) {
