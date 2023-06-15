@@ -1143,6 +1143,11 @@ class StatisticsReportController extends Controller
                             ->where('auth_users.type', 'HR')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 }); 
+
+        $s = $sql_chart4->toSql();
+        $b = $sql_chart4->getBindings();
+        Log::info(print_r($s,true));
+        Log::info(print_r($b,true));         
                 
         // SQL for Chart 5
          $sql_chart5 = ConversationParticipant::selectRaw("conversations.*, conversation_topics.name as conversation_name, users.employee_id, employee_demo.employee_name, users.email,
