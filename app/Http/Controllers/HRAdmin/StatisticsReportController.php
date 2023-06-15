@@ -1143,7 +1143,6 @@ class StatisticsReportController extends Controller
                             ->where('auth_users.type', 'HR')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 }); 
-
         $s = $sql_chart4->toSql();
         $b = $sql_chart4->getBindings();
         Log::info(print_r($s,true));
@@ -1192,7 +1191,11 @@ class StatisticsReportController extends Controller
                             ->where('auth_users.type', 'HR')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 }); 
-            
+                $s = $sql_chart4->toSql();
+                $b = $sql_chart4->getBindings();
+                Log::info(print_r($s,true));
+                Log::info(print_r($b,true));         
+                
         // Generating Output file 
         $filename = 'Conversations.xlsx';
         switch ($request->chart) {
