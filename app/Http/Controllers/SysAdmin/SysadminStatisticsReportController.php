@@ -801,7 +801,7 @@ class SysadminStatisticsReportController extends Controller
                     $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
                 })
                 ->leftJoin('conversations', function($join) {
-                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
+                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id')->where('conversations.conversation_topic_id', $topic->id);
                 })        
                 ->where(function($query) {
                     $query->where(function($query) {
@@ -875,7 +875,7 @@ class SysadminStatisticsReportController extends Controller
                     $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
                 })
                 ->leftJoin('conversations', function($join) {
-                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
+                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id')->where('conversations.conversation_topic_id', $topic->id);
                 })        
                 ->where(function($query) {
                     $query->where(function($query) {
