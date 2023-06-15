@@ -797,6 +797,7 @@ class StatisticsReportController extends Controller
                 ->when($request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                 ->when($request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
                 ->whereNull('date_deleted')
+                ->whereNull('deleted_at')
                 ->where(function($query) {
                     $query->where(function($query) {
                         $query->where('excused_flag', '<>', '1')
@@ -851,7 +852,7 @@ class StatisticsReportController extends Controller
                             , curdate() )
                     as overdue_in_days")
                 ->leftJoin('conversation_participants', function($join) {
-                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id')->where('conversation_participants.role','emp');
                 })
                 ->leftJoin('conversations', function($join) use($topic){
                     $join->on('conversations.id', '=', 'conversation_participants.conversation_id')->where('conversations.conversation_topic_id', $topic->id);
@@ -868,6 +869,7 @@ class StatisticsReportController extends Controller
                 ->when($request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                 ->when($request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
                 ->whereNull('date_deleted')
+                ->whereNull('deleted_at')
                 ->where('conversations.conversation_topic_id', $topic->id)
                 ->where(function($query) {
                     $query->where(function($query) {
@@ -878,7 +880,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
+                            ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
                             ->where('auth_users.type', '=', 'HR')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 });
@@ -932,7 +934,7 @@ class StatisticsReportController extends Controller
                             , curdate() )
                     as overdue_in_days")
                 ->leftJoin('conversation_participants', function($join) {
-                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id')->where('conversation_participants.role','emp');
                 })
                 ->leftJoin('conversations', function($join) use($topic){
                     $join->on('conversations.id', '=', 'conversation_participants.conversation_id')->where('conversations.conversation_topic_id', $topic->id);
@@ -959,7 +961,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
+                            ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
                             ->where('auth_users.type', '=', 'HR')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 }); 
@@ -1137,7 +1139,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
                             ->where('auth_users.type', 'HR')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 }); 
@@ -1181,7 +1183,7 @@ class StatisticsReportController extends Controller
             ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->whereColumn('auth_users.user_id', 'conversation_participants.participant_id')
                             ->where('auth_users.type', 'HR')
                             ->where('auth_users.auth_id', '=', Auth::id());
                 }); 
