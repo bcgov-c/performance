@@ -854,7 +854,7 @@ class StatisticsReportController extends Controller
                     $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
                 })
                 ->leftJoin('conversations', function($join) {
-                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
+                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id')->where('conversations.conversation_topic_id', $topic->id);
                 })        
                 ->where(function($query) {
                     $query->where(function($query) {
@@ -935,7 +935,7 @@ class StatisticsReportController extends Controller
                     $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id');
                 })
                 ->leftJoin('conversations', function($join) {
-                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id');
+                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id')->where('conversations.conversation_topic_id', $topic->id);
                 })        
                 ->where(function($query) {
                     $query->where(function($query) {
@@ -948,8 +948,8 @@ class StatisticsReportController extends Controller
                 ->when($request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
                 ->when($request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
                 ->when($request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
-                ->whereNull('date_deleted')
-                ->where('conversations.conversation_topic_id', $topic->id)
+                ->whereNull('date_deleted')          
+                ->where('conversations.conversation_topic_id', $topic->id)      
                 ->where(function($query) {
                     $query->where(function($query) {
                         $query->where('excused_flag', '<>', '1')
