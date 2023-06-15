@@ -840,7 +840,7 @@ class SysadminStatisticsReportController extends Controller
                     unset($subset[$index]);
                 }
             }
-            $subset = array_unique(array_column($subset, 'employee_id')); 
+            //$subset = array_unique(array_column($subset, 'employee_id')); 
             $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
@@ -871,7 +871,7 @@ class SysadminStatisticsReportController extends Controller
                     unset($subset[$index]);
                 }
             }
-            $subset = array_unique(array_column($subset, 'employee_id')); 
+            //$subset = array_unique(array_column($subset, 'employee_id')); 
             $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
@@ -1235,8 +1235,8 @@ class SysadminStatisticsReportController extends Controller
                 $topics = ConversationTopic::select('id','name')->get();
                 foreach($topics as $topic){
                         $subset = $conversations->where('conversation_topic_id', $topic->id );
-                        $unique_subset = $subset->unique('employee_id');
-                        foreach($unique_subset as $item) {
+                        //$unique_subset = $subset->unique('employee_id');
+                        foreach($subset as $item) {
                             array_push($conversations_unique,$item);
                         }                        
                 }
@@ -1307,8 +1307,8 @@ class SysadminStatisticsReportController extends Controller
                 $topics = ConversationTopic::select('id','name')->get();
                 foreach($topics as $topic){
                         $subset = $conversations->where('conversation_topic_id', $topic->id );
-                        $unique_subset = $subset->unique('employee_id');
-                        foreach($unique_subset as $item) {
+                        //$unique_subset = $subset->unique('employee_id');
+                        foreach($subset as $item) {
                             array_push($conversations_unique,$item);
                         }                        
                 }
