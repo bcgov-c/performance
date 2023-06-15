@@ -946,7 +946,7 @@ class SysadminStatisticsReportController extends Controller
         // Chart 6 
         $legends = ['Yes', 'No'];
         $data['chart6']['chart_id'] = 6;
-        $data['chart6']['title'] = 'Employee Has Open Conversation';
+        $data['chart6']['title'] = 'User Has Open Conversation';
         $data['chart6']['legend'] = $legends;
         $data['chart6']['groups'] = array();
         
@@ -974,7 +974,7 @@ class SysadminStatisticsReportController extends Controller
         // Chart 7 
         $legends = ['Yes', 'No'];
         $data['chart7']['chart_id'] = 7;
-        $data['chart7']['title'] = 'Employee Has Completed Conversation';
+        $data['chart7']['title'] = 'User Has Completed Conversation';
         $data['chart7']['legend'] = $legends;
         $data['chart7']['groups'] = array();
 
