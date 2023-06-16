@@ -840,7 +840,7 @@ class SysadminStatisticsReportController extends Controller
                     unset($subset[$index]);
                 }
             }
-            $subset = array_unique(array_column($subset, 'employee_id')); 
+            //$subset = array_unique(array_column($subset, 'employee_id')); 
             $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
@@ -915,7 +915,7 @@ class SysadminStatisticsReportController extends Controller
                     unset($subset[$index]);
                 }
             }
-            $subset = array_unique(array_column($subset, 'employee_id')); 
+            //$subset = array_unique(array_column($subset, 'employee_id')); 
             $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
@@ -946,7 +946,7 @@ class SysadminStatisticsReportController extends Controller
         // Chart 6 
         $legends = ['Yes', 'No'];
         $data['chart6']['chart_id'] = 6;
-        $data['chart6']['title'] = 'Employee Has Open Conversation';
+        $data['chart6']['title'] = 'User Has Open Conversation';
         $data['chart6']['legend'] = $legends;
         $data['chart6']['groups'] = array();
         
@@ -974,7 +974,7 @@ class SysadminStatisticsReportController extends Controller
         // Chart 7 
         $legends = ['Yes', 'No'];
         $data['chart7']['chart_id'] = 7;
-        $data['chart7']['title'] = 'Employee Has Completed Conversation';
+        $data['chart7']['title'] = 'User Has Completed Conversation';
         $data['chart7']['legend'] = $legends;
         $data['chart7']['groups'] = array();
 
@@ -1279,8 +1279,8 @@ class SysadminStatisticsReportController extends Controller
                 $topics = ConversationTopic::select('id','name')->get();
                 foreach($topics as $topic){
                         $subset = $conversations->where('conversation_topic_id', $topic->id );
-                        $unique_subset = $subset->unique('employee_id');
-                        foreach($unique_subset as $item) {
+                        //$unique_subset = $subset->unique('employee_id');
+                        foreach($subset as $item) {
                             array_push($conversations_unique,$item);
                         }                        
                 }
@@ -1351,8 +1351,8 @@ class SysadminStatisticsReportController extends Controller
                 $topics = ConversationTopic::select('id','name')->get();
                 foreach($topics as $topic){
                         $subset = $conversations->where('conversation_topic_id', $topic->id );
-                        $unique_subset = $subset->unique('employee_id');
-                        foreach($unique_subset as $item) {
+                        //$unique_subset = $subset->unique('employee_id');
+                        foreach($subset as $item) {
                             array_push($conversations_unique,$item);
                         }                        
                 }
