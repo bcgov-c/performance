@@ -65,8 +65,9 @@ class DashboardController extends Controller
                             $text .= 'Title: '.$notification->relatedGoal->title.' | Goal Type: '.$notification->relatedGoal->goalType->name.($notification->created_at?' | Date: '.$notification->created_at->format('M d, Y H:i A'):'');
                             break;
                         case 'GB':
-                            $text .= 'Title: '.$notification->relatedGoal->title. ' | Type: '.$notification->relatedGoal->mandatory_status_descr.($notification->created_at?' | Date: '.$notification->created_at->format('M d, Y H:i A'):'');
-                        break;
+                            $dt = new \DateTimeImmutable($notification->created_at, new \DateTimeZone('UTC'));
+                            $text .= 'Title: '.$notification->relatedGoal->title. ' | Type: '.$notification->relatedGoal->mandatory_status_descr.($notification->created_at?' | Date: '.$dt->setTimezone((new \DateTime())->getTimezone())->format('M d, Y H:i A'):'');
+                            break;
                         case 'CA':
                         case 'CS':
                                 $text .= 'Title: '.($notification->conversation ? $notification->conversation->topic->name : '');
