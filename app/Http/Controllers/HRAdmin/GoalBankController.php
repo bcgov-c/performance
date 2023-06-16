@@ -23,12 +23,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Models\DashboardNotification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Goals\CreateGoalRequest;
 use Illuminate\Validation\ValidationException;
+use App\Models\DashboardNotification;
+use App\Models\NotificationLog;
 
 
 class GoalBankController extends Controller
@@ -1344,12 +1345,39 @@ class GoalBankController extends Controller
                 'GB' AS notification_type,
                 '".($goalBank->display_name ? $goalBank->display_name : $goalBank->user->name)." added a new goal to your goal bank.' AS comment,
                 ".$goalBank->id." AS related_id,
-                CURRENT_TIMESTAMP() AS created_at,
-                CURRENT_TIMESTAMP() AS updated_at
+                NOW() AS created_at,
+                NOW() AS updated_at
             ")
             ->get()
             ->toArray();
-        DashboardNotification::insert($data);
+            DashboardNotification::insert($data);
+            $data = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization_key', 'access_organizations.orgid')
+            ->leftjoin('user_preferences', 'user_demo_jr_view.user_id', 'user_preferences.user_id')
+            ->whereIn('user_demo_jr_view.employee_id', $employee_ids)
+            ->where('access_organizations.allow_inapp_msg', 'Y')
+            ->where( function($query) {
+                $query->where('user_preferences.goal_bank_flag', 'Y')
+                    ->orWhereNull('user_preferences.goal_bank_flag');
+            })
+            ->selectRaw("
+                ' ' AS recipients,
+                0 AS sender_id,
+                '".($goalBank->display_name ? $goalBank->display_name : $goalBank->user->name)." added a new goal to your goal bank.' AS subject,
+                '' AS description,
+                'N' AS alert_type,
+                'A' AS alert_format,
+                user_demo_jr_view.user_id AS notify_user_id,
+                NULL AS overdue_user_id,
+                NULL AS notify_due_date,
+                NULL AS notify_for_days,
+                NULL AS template_id,
+                NOW() AS date_sent,
+                NOW() AS created_at,
+                NOW() AS updated_at
+            ")
+            ->get()
+            ->toArray();
+            NotificationLog::insert($data);
         // Additional Step -- sent out email message if required
         $this->notify_employees($goalBank, $employee_ids);
     }
