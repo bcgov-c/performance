@@ -2580,7 +2580,7 @@ class SysadminStatisticsReportController extends Controller
                 
             case 6:
 
-                $filename = 'Employee Has Open Conversation.csv';
+                $filename = 'User Has Open Conversation.csv';
                 $users =  $sql_6->get();
                 $users = $users->unique('employee_id');
                 //get has conversation users employee_id list
@@ -2670,7 +2670,7 @@ class SysadminStatisticsReportController extends Controller
             
             case 7:
 
-                $filename = 'Employee Has Complete Conversation.csv';
+                $filename = 'User Has Complete Conversation.csv';
                 $users =  $sql_7->get();
                 $users = $users->unique('employee_id');
                 //get has conversation users employee_id list
