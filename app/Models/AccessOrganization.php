@@ -36,10 +36,10 @@ class AccessOrganization extends Model
     }
 
     public function active_employee_ids() {
-        return $this->hasMany('App\Models\EmployeeDemo', 'orgid', 'orgid')
-                        ->whereNull('employee_demo.date_deleted')
-                        ->distinct('employee_demo.guid')
-                        ->select('employee_demo.guid');
-    }
+        return $this->hasMany('App\Models\UserDemoJrView', 'organization_key', 'orgid')
+            ->whereNull('user_demo_jr_view.date_deleted')
+            ->distinct('user_demo_jr_view.guid')
+            ->select('user_demo_jr_view.guid');
+}
 
 }
