@@ -177,7 +177,6 @@ class AccessOrganizationsController extends Controller
                 AccessOrganization::create([
                     'orgid' => $org_name->id,
                     'organization' => $org_name->name,
-                    // 'organization' => 'ABCDEFGHIJKL',
                     'created_by_id' => Auth::Id(),
                     'updated_by_id' => Auth::Id(),
                 ]);
