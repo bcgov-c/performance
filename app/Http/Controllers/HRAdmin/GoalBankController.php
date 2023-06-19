@@ -23,12 +23,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Models\DashboardNotification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Goals\CreateGoalRequest;
 use Illuminate\Validation\ValidationException;
+use App\Models\DashboardNotification;
+use App\Models\NotificationLog;
 
 
 class GoalBankController extends Controller
@@ -1190,7 +1191,47 @@ class GoalBankController extends Controller
                         ->selectRAW('count(distinct id)')
                 ] )
                 ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
-            $query = $ownedgoals->union($otherHRgoals)->union($inheritedHRgoals);
+            $individualgoals = Goal::withoutGlobalScopes()
+                ->join('users as cu', 'cu.id', 'goals.created_by')
+                ->leftjoin('employee_demo as ced', 'ced.employee_id', 'cu.employee_id')
+                ->where('is_library', true)
+                ->where('by_admin', 2)
+                ->where('goals.created_by', '<>', Auth::id())
+                ->whereRaw("EXISTS (SELECT 1 FROM goals_shared_with AS gsw, user_demo_jr_view AS udjv, auth_orgs AS ao WHERE gsw.goal_id = goals.id AND gsw.user_id = udjv.user_id AND ao.type = 'HR' AND ao.auth_id = ".Auth::id()." AND udjv.orgid = ao.orgid LIMIT 1)")
+                ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
+                    $q->where(function($query) use ($request) {
+                        return $query->whereRaw("goals.title LIKE '%".$request->search_text."%'")
+                            ->orWhereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%')");
+                    });
+                })
+                ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
+                    return $q->whereRaw("goals.title LIKE '%".$request->search_text."%'");
+                })
+                ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
+                    return $q->whereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%')");
+                })
+                ->distinct()
+                ->select
+                    (
+                        'goals.id',
+                        'goals.title',
+                        'goals.created_at',
+                        'goals.is_mandatory',
+                        'goals.display_name',
+                        'ced.employee_name as creator_name',
+                    )
+                ->addSelect(['audience' =>
+                    GoalSharedWith::whereColumn('goal_id', 'goals.id')
+                        ->selectRAW('count(distinct id)')
+                ] )
+                ->addSelect(['org_audience' => 
+                    GoalBankOrg::whereColumn('goal_id', 'goals.id')
+                        ->where('version', 2)
+                        ->whereNotNull('orgid')
+                        ->selectRAW('count(distinct id)')
+                ] )
+                ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
+            $query = $ownedgoals->union($otherHRgoals)->union($inheritedHRgoals)->union($individualgoals);
             return Datatables::of($query)
                 ->addIndexColumn()
                 ->addcolumn('click_title', function ($row) {
@@ -1344,12 +1385,39 @@ class GoalBankController extends Controller
                 'GB' AS notification_type,
                 '".($goalBank->display_name ? $goalBank->display_name : $goalBank->user->name)." added a new goal to your goal bank.' AS comment,
                 ".$goalBank->id." AS related_id,
-                CURRENT_TIMESTAMP() AS created_at,
-                CURRENT_TIMESTAMP() AS updated_at
+                NOW() AS created_at,
+                NOW() AS updated_at
             ")
             ->get()
             ->toArray();
-        DashboardNotification::insert($data);
+            DashboardNotification::insert($data);
+            $data = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization_key', 'access_organizations.orgid')
+            ->leftjoin('user_preferences', 'user_demo_jr_view.user_id', 'user_preferences.user_id')
+            ->whereIn('user_demo_jr_view.employee_id', $employee_ids)
+            ->where('access_organizations.allow_inapp_msg', 'Y')
+            ->where( function($query) {
+                $query->where('user_preferences.goal_bank_flag', 'Y')
+                    ->orWhereNull('user_preferences.goal_bank_flag');
+            })
+            ->selectRaw("
+                ' ' AS recipients,
+                0 AS sender_id,
+                '".($goalBank->display_name ? $goalBank->display_name : $goalBank->user->name)." added a new goal to your goal bank.' AS subject,
+                '' AS description,
+                'N' AS alert_type,
+                'A' AS alert_format,
+                user_demo_jr_view.user_id AS notify_user_id,
+                NULL AS overdue_user_id,
+                NULL AS notify_due_date,
+                NULL AS notify_for_days,
+                NULL AS template_id,
+                NOW() AS date_sent,
+                NOW() AS created_at,
+                NOW() AS updated_at
+            ")
+            ->get()
+            ->toArray();
+            NotificationLog::insert($data);
         // Additional Step -- sent out email message if required
         $this->notify_employees($goalBank, $employee_ids);
     }

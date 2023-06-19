@@ -788,6 +788,49 @@ class SysadminStatisticsReportController extends Controller
         $data['chart4']['groups'] = array();
         foreach($topics as $topic)
         {
+            $employee_topic_query = UserDemoJrView::selectRaw("employee_id, empl_record, employee_name, 
+                                organization, level1_program, level2_division,
+                                level3_branch, level4,conversation_participants.role,
+                                conversations.deleted_at,conversation_participants.conversation_id,
+                                conversations.signoff_user_id,conversations.supervisor_signoff_id,
+                                conversation_participants.participant_id,conversations.conversation_topic_id,
+                        DATEDIFF ( next_conversation_date
+                            , curdate() )
+                    as overdue_in_days")
+                ->leftJoin('conversation_participants', function($join)  {
+                    $join->on('conversation_participants.participant_id', '=', 'user_demo_jr_view.user_id')->where('conversation_participants.role','emp');
+                })
+                ->leftJoin('conversations', function($join) use($topic) {
+                    $join->on('conversations.id', '=', 'conversation_participants.conversation_id')->where('conversations.conversation_topic_id', $topic->id);
+                })        
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('due_date_paused', 'N')
+                            ->orWhereNull('due_date_paused');
+                    });
+                })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when($request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when($request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when($request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when($request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
+                ->whereNull('date_deleted')
+                ->whereNull('deleted_at')
+                ->where('conversations.conversation_topic_id', $topic->id)
+                ->where(function($query) {
+                    $query->where(function($query) {
+                        $query->where('excused_flag', '<>', '1')
+                            ->orWhereNull('excused_flag');
+                    });
+                });  
+
+            $topic_employees = $employee_topic_query->get();              
+            
+            
+            $open_conversations = $conversations->filter(function ($conversation) {
+                return $conversation->signoff_user_id === null || $conversation->supervisor_signoff_id === null;
+            }); 
+                        
             $subset =$open_conversations->filter(function ($conversation) use($topic) {
                 return $conversation->conversation_topic_id == $topic->id;
             }); 
@@ -797,7 +840,7 @@ class SysadminStatisticsReportController extends Controller
                     unset($subset[$index]);
                 }
             }
-            $subset = array_unique(array_column($subset, 'employee_id')); 
+            //$subset = array_unique(array_column($subset, 'employee_id')); 
             $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
@@ -828,15 +871,15 @@ class SysadminStatisticsReportController extends Controller
                     unset($subset[$index]);
                 }
             }
-            $subset = array_unique(array_column($subset, 'employee_id')); 
+            //$subset = array_unique(array_column($subset, 'employee_id')); 
             $unique_emp = count($subset);    
             $per_emp = 0;
             if($total_unique_emp > 0) {
                 $per_emp = ($unique_emp / $total_unique_emp) * 100;
             }
-            array_push( $data['chart5']['groups'],  [ 'name' => $topic->name, 'value' => $unique_emp, 
-                    'topic_id' => $topic->id, 
-                ]);
+            array_push( $data['chart5']['groups'],  [ 'name' => $topic->name, 'value' => $unique_emp,
+                        'topic_id' => $topic->id, 
+                        ]);
         } 
                 
         // Chart6 -- Employee Has Open Conversation
@@ -859,7 +902,7 @@ class SysadminStatisticsReportController extends Controller
         // Chart 6 
         $legends = ['Yes', 'No'];
         $data['chart6']['chart_id'] = 6;
-        $data['chart6']['title'] = 'Employee Has Open Conversation';
+        $data['chart6']['title'] = 'User Has Open Conversation';
         $data['chart6']['legend'] = $legends;
         $data['chart6']['groups'] = array();
         
@@ -887,7 +930,7 @@ class SysadminStatisticsReportController extends Controller
         // Chart 7 
         $legends = ['Yes', 'No'];
         $data['chart7']['chart_id'] = 7;
-        $data['chart7']['title'] = 'Employee Has Completed Conversation';
+        $data['chart7']['title'] = 'User Has Completed Conversation';
         $data['chart7']['legend'] = $legends;
         $data['chart7']['groups'] = array();
 
@@ -1192,8 +1235,8 @@ class SysadminStatisticsReportController extends Controller
                 $topics = ConversationTopic::select('id','name')->get();
                 foreach($topics as $topic){
                         $subset = $conversations->where('conversation_topic_id', $topic->id );
-                        $unique_subset = $subset->unique('employee_id');
-                        foreach($unique_subset as $item) {
+                        //$unique_subset = $subset->unique('employee_id');
+                        foreach($subset as $item) {
                             array_push($conversations_unique,$item);
                         }                        
                 }
@@ -1264,8 +1307,8 @@ class SysadminStatisticsReportController extends Controller
                 $topics = ConversationTopic::select('id','name')->get();
                 foreach($topics as $topic){
                         $subset = $conversations->where('conversation_topic_id', $topic->id );
-                        $unique_subset = $subset->unique('employee_id');
-                        foreach($unique_subset as $item) {
+                        //$unique_subset = $subset->unique('employee_id');
+                        foreach($subset as $item) {
                             array_push($conversations_unique,$item);
                         }                        
                 }
@@ -2537,7 +2580,7 @@ class SysadminStatisticsReportController extends Controller
                 
             case 6:
 
-                $filename = 'Employee Has Open Conversation.csv';
+                $filename = 'User Has Open Conversation.csv';
                 $users =  $sql_6->get();
                 $users = $users->unique('employee_id');
                 //get has conversation users employee_id list
@@ -2627,7 +2670,7 @@ class SysadminStatisticsReportController extends Controller
             
             case 7:
 
-                $filename = 'Employee Has Complete Conversation.csv';
+                $filename = 'User Has Complete Conversation.csv';
                 $users =  $sql_7->get();
                 $users = $users->unique('employee_id');
                 //get has conversation users employee_id list
