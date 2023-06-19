@@ -15,13 +15,13 @@
 <li class="navbar nav-item">
 
     @switch (env('APP_ENV')) 
-        @case ('dev') <p style="font-size:18px; color:Red; text-transform:uppercase; font-weight:bold;">Development Environment</p> 
+        @case ('dev') <p style="font-size:18px; color:Red; font-weight:bold;">DEVELOPMENT ENVIRONMENT</p> 
         @Break;
-        @case ('test') <p style="font-size:18px; color:Red; text-transform:uppercase; font-weight:bold;">Test Environment</p>
+        @case ('test') <p style="font-size:18px; color:Red; font-weight:bold;">TEST ENVIRONMENT</p>
         @break; 
-        @case ('local') <p style="font-size:18px; color:Red; text-transform:uppercase; font-weight:bold;">Local Environment</p>
+        @case ('local') <p style="font-size:18px; color:Red; font-weight:bold;">LOCAL ENVIRONMENT</p>
         @break;
-        @default <p style="font-size:18px; color:Red; text-transform:uppercase; font-weight:bold;">Unknown Environment</p>
+        @case ('training') <p style="font-size:18px; color:Red; font-weight:bold;">TRAINING ENVIRONMENT</p>
     @endswitch
 </li>
 
