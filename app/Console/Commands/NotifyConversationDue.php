@@ -163,7 +163,7 @@ class NotifyConversationDue extends Command
                                         ->first();
 
                     if (!$log) {
-                        $this->logInfo( $now->format('Y-m-d') . ' - A - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
+                        $this->logInfo( $now->format('Y-m-d') . ' - A - ' . $user->id . ' (' . $user->employee_id . ')' . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
                         $sent_count += 1;
 
 
@@ -258,13 +258,15 @@ class NotifyConversationDue extends Command
                 // $row_count += 1;
 
                 // Look for direct report manager and Shared with
-                $manager_ids = SharedProfile::where('shared_id', $user->id)
-                                    ->where('shared_item', 'like',  '%"2"%' ) 
-                                    ->orderBy('id')
-                                    ->pluck('shared_with');
-                if ($user->reporting_to) {        
-                    $manager_ids->push($user->reporting_to);
-                }
+                // $manager_ids = SharedProfile::where('shared_id', $user->id)
+                //                     ->where('shared_item', 'like',  '%"2"%' ) 
+                //                     ->orderBy('id')
+                //                     ->pluck('shared_with');
+                // if ($user->reporting_to) {        
+                //     $manager_ids->push($user->reporting_to);
+                // }
+
+                $manager_ids = $this->getSupervisorList($user); 
 
                 // if no manager found, then next 
                 if ($manager_ids->count() == 0) {
@@ -286,7 +288,8 @@ class NotifyConversationDue extends Command
                         ->first();
 
                     if (!$mgr) {
-                        $this->logInfo( Carbon::now()->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . '  ** SKIPPED ** (MANAGER PREFER NOT TO RECECIVED EMAIL OR ORG IS NOT ALLOW EMAIL)' );
+                        $this->logInfo( Carbon::now()->format('Y-m-d') . ' - E - ' .  $manager_id . ' (' . ($mgr ? $mgr->employee_id : '      ') . ') - '  .
+                                $user->id . ' (' . $user->employee_id . ')' . '  ** SKIPPED ** (MANAGER PREFER NOT TO RECECIVED EMAIL OR ORG IS NOT ALLOW EMAIL)' );
                         $skip_count += 1;
                         continue;
                     }
@@ -333,7 +336,8 @@ class NotifyConversationDue extends Command
                                             ->first();
 
                         if (!$log) {
-                            $this->logInfo( $now->format('Y-m-d') . ' - A - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
+                            $this->logInfo( $now->format('Y-m-d') . ' - A - ' .  $manager_id . ' (' . ($mgr ? $mgr->employee_id : '      ') . ') - '  .
+                                $user->id . ' (' . $user->employee_id . ')' . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
                             $sent_count += 1;
         
                             // Use Class to create DashboardNotification
@@ -494,7 +498,7 @@ class NotifyConversationDue extends Command
 
                     // Send Email for team members
                     if (!$log) {
-                        $this->logInfo( $now->format('Y-m-d') . ' - E - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
+                        $this->logInfo( $now->format('Y-m-d') . ' - E - ' . $user->id . ' (' . $user->employee_id . ')' .' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
                         $sent_count += 1;
 
                         $sendMail = new \App\MicrosoftGraph\SendMail();
@@ -569,13 +573,15 @@ class NotifyConversationDue extends Command
                 // $row_count += 1;
 
                 // Look for direct report manager and Shared with
-                $manager_ids = SharedProfile::where('shared_id', $user->id)
-                                    ->where('shared_item', 'like',  '%"2"%' ) 
-                                    ->orderBy('id')
-                                    ->pluck('shared_with');
-                if ($user->reporting_to) {        
-                    $manager_ids->push($user->reporting_to);
-                }
+                // $manager_ids = SharedProfile::where('shared_id', $user->id)
+                //                     ->where('shared_item', 'like',  '%"2"%' ) 
+                //                     ->orderBy('id')
+                //                     ->pluck('shared_with');
+                // if ($user->reporting_to) {        
+                //     $manager_ids->push($user->reporting_to);
+                // }
+
+                $manager_ids = $this->getSupervisorList($user); 
 
                 // if no manager found, then next 
                 if ($manager_ids->count() == 0) {
@@ -597,7 +603,8 @@ class NotifyConversationDue extends Command
                         ->first();
 
                     if (!$mgr) {
-                        $this->logInfo( Carbon::now()->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . '  ** SKIPPED ** (MANAGER PREFER NOT TO RECECIVED EMAIL OR ORG IS NOT ALLOW EMAIL)' );
+                        $this->logInfo( Carbon::now()->format('Y-m-d') . ' - E - ' .  $manager_id . ' (' . ($mgr ? $mgr->employee_id : '      ') . ') - '  .
+                        $user->id . ' (' . $user->employee_id . ')' . ' - ' . '  ** SKIPPED ** (MANAGER PREFER NOT TO RECECIVED EMAIL OR ORG IS NOT ALLOW EMAIL)' );
                         $skip_count += 1;
                         continue;
                     }
@@ -672,7 +679,8 @@ class NotifyConversationDue extends Command
 
                         // Send Email for team members
                         if (!$log) {
-                            $this->logInfo( $now->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
+                            $this->logInfo( $now->format('Y-m-d') . ' - E - ' .  $manager_id . ' (' . ($mgr ? $mgr->employee_id : '      ') . ') - '  .
+                            $user->id . ' (' . $user->employee_id . ')' . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
                             $sent_count += 1;
 
                             $sendMail = new \App\MicrosoftGraph\SendMail();
@@ -716,6 +724,45 @@ class NotifyConversationDue extends Command
         $this->logInfo("Total eligible managers         : " . $row_count );
         $this->logInfo("Total notification skipped      : " . $skip_count );
         $this->logInfo("Total notification created/Sent : " . $sent_count );
+
+    }
+
+    protected function getSupervisorList ($current_user) {
+
+        // Shared Profile
+        $manager_ids = SharedProfile::where('shared_id', $current_user->id)
+                        ->join('users','users.id','shared_profiles.shared_with')
+                        ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
+                        ->whereNull('employee_demo.date_deleted')
+                        ->where('shared_item', 'like',  '%"2"%' ) 
+                        ->orderBy('users.id')
+                        ->pluck('shared_with');
+
+        // Superviser
+        $supervisorList = $current_user->supervisorList();
+        $supervisorListCount = $current_user->supervisorListCount();
+        $preferredSupervisor = $current_user->preferredSupervisor();
+
+        if ($supervisorListCount <= 1) {
+            if ($current_user->reportingManager) {
+                $manager_ids->push( $current_user->reportingManager->id );
+            }
+        } else {
+            if (!$preferredSupervisor) {
+                if ($current_user->reportingManager) {
+                    $manager_ids->push( $current_user->reportingManager->id );
+                }
+            } else {
+                foreach ($supervisorList as $supv) {
+                    if ($supv->employee_id == $preferredSupervisor->supv_empl_id) {
+                        $manager_ids->push( $supv->id );
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $manager_ids;
 
     }
 
