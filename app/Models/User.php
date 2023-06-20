@@ -295,7 +295,7 @@ class User extends Authenticatable
         ->join('employee_demo AS e', 'p.reports_to', 'e.position_number')
         ->join('users AS v', 'e.employee_id', 'v.employee_id')
         ->distinct()
-        ->select('e.position_number', 'v.employee_id', 'v.name')
+        ->select('e.position_number', 'v.employee_id', 'v.name', 'v.id')
         ->whereNull('e.date_deleted')
         ->where('employee_demo.employee_id', $this->employee_id)
         ->orderBy('e.position_number')
@@ -306,7 +306,7 @@ class User extends Authenticatable
     public function preferredSupervisor() {
         if ($this->employee_demo && $this->employee_demo->position_number) {
             return PreferredSupervisor::join('users AS u', 'u.employee_id', 'preferred_supervisor.supv_empl_id')
-            ->select('preferred_supervisor.supv_empl_id', 'u.name')
+            ->select('preferred_supervisor.supv_empl_id', 'u.name', 'u.id')
             ->where('preferred_supervisor.employee_id', '=', $this->employee_id)
             ->where('preferred_supervisor.position_nbr', '=', $this->employee_demo->position_number)
             ->first();
