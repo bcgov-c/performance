@@ -111,14 +111,10 @@ class GetODSEmployeeDemographics extends Command
           foreach($data as $item){
             DB::table('employee_demo')->updateOrInsert(
               [
-                //'guid' => $item['GUID'],
                 'employee_id' => $item['EMPLID'],
                 'empl_record' => $item['EMPL_RCD'],
               ],
               [
-                // 'guid' => $item['GUID'],
-                // 'employee_id' => $item['EMPLID'],
-                // 'empl_record' => $item['EMPL_RCD'],
                 'employee_first_name' => $item['first_name'],
                 'employee_last_name' => $item['last_name'],
                 'employee_status' => $item['EMPL_STATUS'],
@@ -126,18 +122,12 @@ class GetODSEmployeeDemographics extends Command
                 'classification_group' => $item['ClassificationGroup'],
                 'deptid' => $item['DEPTID'],
                 'jobcode' => $item['JOBCODE'],
-                // 'job_title' => $item['job_title'],
                 'job_title' => $item['jobcode_desc'],
                 'position_number' => $item['position_number'],
                 'position_start_date' => $item['position_start_date'] ? date('Y-m-d', strtotime($item['position_start_date'])) : null,
-                // 'manager_id' => $item['manager_id'],
-                // 'manager_first_name' => $item['manager_first_name'],
-                // 'manager_last_name' => $item['manager_last_name'],
                 'guid' => trim($item['GUID']),
-                // 'date_posted' => date('Y-m-d H:i:s', strtotime($item['date_posted'])),
                 'date_deleted' => $item['date_deleted'] ? date('Y-m-d H:i:s', strtotime($item['date_deleted'])) : null,
                 'date_updated' => $item['date_updated'] ? date('Y-m-d H:i:s', strtotime($item['date_updated'])) : null,
-                // 'date_created' => date('Y-m-d H:i:s', strtotime($item['date_created'])),
                 'business_unit' => $item['BUSINESS_UNIT'],
                 'effdt' => $item['EFFDT'],
                 'effseq' => $item['EFFSEQ'],
@@ -158,7 +148,6 @@ class GetODSEmployeeDemographics extends Command
                 'city' => $item['city'],
                 'country' => $item['country'],
                 'employee_status_long' => $item['employee_status_long_description'],
-                // 'estimated_years_service' => $item['estimated_years_service'],
                 'job_function_employee_group' => $item['job_function_employee_group'],
                 'jobcode_desc' => $item['jobcode_desc'],
                 'level1_program' => trim($item['level1_program']),
@@ -181,11 +170,9 @@ class GetODSEmployeeDemographics extends Command
                 'sal_admin_plan' => $item['sal_admin_plan'],
                 'stateprovince' => $item['stateprovince'],
                 'supervisor_emplid' => $item['supervisor_emplid'],
-                //'supervisor_position_start_date' => $item['supervisor_position_start_date'] ? date('Y-m-d', strtotime($item['supervisor_position_start_date'])) : null,
                 'supervisor_email' => $item['supervisor_email'],
                 'supervisor_name' => $item['supervisor_name'],
                 'supervisor_position_number' => $item['supervisor_position_number'],
-                //'supervisor_position_title' => $item['supervisor_position_title'],
                 'tgb_reg_district' => $item['tgb_reg_district'],
               ]
             );
@@ -237,7 +224,7 @@ class GetODSEmployeeDemographics extends Command
         $this->info(Carbon::now()->format('c').' - Last Pull Date Updated to: ' . $start_time);
 
         $end_time = Carbon::now();
-        DB::table('job_sched_audit')->updateOrInsert(
+        JobSchedAudit::updateOrCreate(
           [
             'id' => $audit_id
           ],
