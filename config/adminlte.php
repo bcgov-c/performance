@@ -409,6 +409,26 @@ return [
         ],
         [
             'role' => 'listitem',
+            'text' => 'System Administration',
+            'url'  => '#',
+            'icon' => 'fas fa-fw fa-cog',
+            'active' => ['sysadmin/*'],
+            'can' => ['service representative'],
+            'submenu' => [ 
+                [
+                    'text' => 'Employee List',
+                    'url'  => 'sysadmin/employeelists',
+                    'active' => ['sysadmin/employeelists/*']
+                ],               
+                [
+                    'text' => 'Switch Identity',
+                    'url'  => 'sysadmin/switch-identity',
+                    'active' => ['sysadmin/switch-identity/*']
+                ],
+            ],
+        ],
+        [
+            'role' => 'listitem',
             'text' => 'Resources',
             // 'url'  => 'resource/user-guide',
             'url'  => 'resources',

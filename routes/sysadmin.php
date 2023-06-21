@@ -59,17 +59,7 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
     Route::get('/sysadmin/aorg-branches', [SysAdminSharedController::class,'agetBranches']);
     Route::get('/sysadmin/aorg-level4', [SysAdminSharedController::class,'agetLevel4']);
 
-    //Employee List
-    Route::group(['middleware' => ['auth']], function() 
-    {    
-        Route::get('/sysadmin/employeelists', [EmployeeListController::class, 'currentList'])->name('sysadmin.employeelists');
-        Route::get('/sysadmin/employeelists/currentlist', [EmployeeListController::class, 'currentList'])->name('sysadmin.employeelists.currentlist');
-        Route::get('/sysadmin/employeelists/getcurrentlist', [EmployeeListController::class, 'getCurrentList'])->name('sysadmin.employeelists.getcurrentlist');
-        Route::get('/sysadmin/employeelists/pastlist', [EmployeeListController::class, 'pastList'])->name('sysadmin.employeelists.pastlist');
-        Route::get('/sysadmin/employeelists/getpastlist', [EmployeeListController::class, 'getPastList'])->name('sysadmin.employeelists.getpastlist');
-        Route::get('/sysadmin/employeelists/export-current/{param?}', [EmployeeListController::class, 'exportCurrent'])->name('sysadmin.employeelists.export-current');
-        Route::get('/sysadmin/employeelists/export-past/{param?}', [EmployeeListController::class, 'exportPast'])->name('sysadmin.employeelists.export-past');
-    });
+    
   
     Route::get('sysadmin/get-identities', [SysadminController::class, 'getIdentities'])->name('sysadmin.get-identities');
 
@@ -273,7 +263,18 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
     Route::get('/sysadmin/tag-delete/{id}', [SysadminController::class, 'tagDelete'])->name('sysadmin.tag-delete');
     Route::get('/sysadmin/tag-new', [SysadminController::class, 'tagNew'])->name('sysadmin.tag-new');
     Route::put('/sysadmin/tag-insert', [SysadminController::class, 'tagInsert'])->name('sysadmin.tag-insert');
+
 });
+
+    //Employee List
+    Route::get('/sysadmin/employeelists', [EmployeeListController::class, 'currentList'])->name('sysadmin.employeelists');
+    Route::get('/sysadmin/employeelists/currentlist', [EmployeeListController::class, 'currentList'])->name('sysadmin.employeelists.currentlist');
+    Route::get('/sysadmin/employeelists/getcurrentlist', [EmployeeListController::class, 'getCurrentList'])->name('sysadmin.employeelists.getcurrentlist');
+    Route::get('/sysadmin/employeelists/pastlist', [EmployeeListController::class, 'pastList'])->name('sysadmin.employeelists.pastlist');
+    Route::get('/sysadmin/employeelists/getpastlist', [EmployeeListController::class, 'getPastList'])->name('sysadmin.employeelists.getpastlist');
+    Route::get('/sysadmin/employeelists/export-current/{param?}', [EmployeeListController::class, 'exportCurrent'])->name('sysadmin.employeelists.export-current');
+    Route::get('/sysadmin/employeelists/export-past/{param?}', [EmployeeListController::class, 'exportPast'])->name('sysadmin.employeelists.export-past');
+
 
     Route::get('/sysadmin/switch-identity', [SysadminController::class, 'switchIdentity'])->name('sysadmin.switch-identity');
     Route::get('/sysadmin/identity-list', [SysadminController::class, 'identityList'])->name('sysadmin.identity-list');    

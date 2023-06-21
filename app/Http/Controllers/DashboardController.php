@@ -19,7 +19,7 @@ use Yajra\Datatables\Datatables;
 class DashboardController extends Controller
 {
     public function index(Request $request) {
-
+        $user = Auth::user();
         $notifications = DashboardNotification::where('user_id', Auth::id())
                         ->where(function ($q)  {
                             $q->whereExists(function ($query) {
