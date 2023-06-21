@@ -211,9 +211,13 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/employeeshares/manageindexlist', [EmployeeSharesController::class, 'manageindexlist'])->name('sysadmin.employeeshares.manageindexlist');
         Route::get('/sysadmin/employeeshares/deleteshare/{id}', [EmployeeSharesController::class, 'deleteshare'])->name('sysadmin.employeeshares.deleteshareget');
         Route::delete('/sysadmin/employeeshares/deleteshare/{id}', [EmployeeSharesController::class, 'deleteshare'])->name('sysadmin.employeeshares.deleteshare');
+        Route::get('/sysadmin/employeeshares/deletemultishare/{ids}', [EmployeeSharesController::class, 'deleteMultiShare'])->name('sysadmin.employeeshares.deletemultishareget');
+        Route::delete('/sysadmin/employeeshares/deletemultishare/{ids}', [EmployeeSharesController::class, 'deleteMultiShare'])->name('sysadmin.employeeshares.deletemultishare');
         Route::get('sysadmin/employeeshares/manageindexviewshares/{id}', [EmployeeSharesController::class, 'manageindexviewshares']);
         Route::get('/sysadmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('sysadmin.employeeshares.deleteitemget');
         Route::delete('/sysadmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('sysadmin.employeeshares.deleteitem');
+        Route::get('/sysadmin/employeeshares/removeallshare/{id}', [EmployeeSharesController::class, 'removeAllShare'])->name('sysadmin.employeeshares.removeallshareget');
+        Route::delete('/sysadmin/employeeshares/removeallshare/{id}', [EmployeeSharesController::class, 'removeAllShare'])->name('sysadmin.employeeshares.removeallshare');
 
         Route::get('/sysadmin/employeeshares/org-tree/{index}', [EmployeeSharesController::class,'loadOrganizationTree']);
         Route::get('/sysadmin/employeeshares/employee-list/{index}', [EmployeeSharesController::class, 'getDatatableEmployees']);

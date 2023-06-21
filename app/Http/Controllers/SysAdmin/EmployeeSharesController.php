@@ -122,7 +122,11 @@ class EmployeeSharesController extends Controller {
         $ematched_emp_ids = clone $matched_emp_ids;
         $criteriaList = $this->search_criteria_list();
         $ecriteriaList = $this->search_criteria_list();
-        return view('shared.employeeshares.addnew', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes') );
+        $yesOrNo = [
+            [ "id" => 0, "name" => 'No' ],
+            [ "id" => 1, "name" => 'Yes' ],
+        ];
+        return view('shared.employeeshares.addnew', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes', 'yesOrNo') );
     }
 
     public function saveall(Request $request) {
@@ -300,23 +304,34 @@ class EmployeeSharesController extends Controller {
         if($request->ajax()){
             $demoWhere = $this->baseFilteredWhere($request, $option);
             $sql = clone $demoWhere; 
-            $employees = $sql->select([ 
-                'u.employee_id', 
-                'u.employee_name', 
-                'u.jobcode_desc', 
-                'u.employee_email', 
-                'u.organization', 
-                'u.level1_program', 
-                'u.level2_division', 
-                'u.level3_branch', 
-                'u.level4', 
-                'u.deptid'
-            ]);
+            $employees = $sql->selectRaw("
+                u.user_id,
+                u.employee_id, 
+                u.employee_name, 
+                u.jobcode_desc, 
+                u.employee_email, 
+                u.organization, 
+                u.level1_program, 
+                u.level2_division, 
+                u.level3_branch, 
+                u.level4, 
+                u.deptid,
+                CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) = 1 THEN 'Yes' ELSE 'No' END AS shared_status
+            ");
             return Datatables::of($employees)
                 ->addColumn("{$option}select_users", static function ($employee) use($option) {
                         return '<input pid="1335" type="checkbox" id="'.$option.'userCheck'. 
                             $employee->employee_id.'" name="'.$option.'userCheck[]" value="'.$employee->employee_id.'" class="dt-body-center">';
-                })->rawColumns(["{$option}select_users", 'action'])
+                })
+                ->editColumn('shared_status', function($row) {
+                    $text = $row->shared_status;
+                    $yesOrNo = [
+                        [ "id" => 0, "name" => 'No' ],
+                        [ "id" => 1, "name" => 'Yes' ],
+                    ];
+                    return view('shared.employeeshares.partials.link', compact(["row", "yesOrNo", 'text']));
+                })
+                ->rawColumns(["{$option}select_users", 'shared_status'])
                 ->make(true);
         }
     }
@@ -380,8 +395,9 @@ class EmployeeSharesController extends Controller {
             ->when("{$request->{$option.'dd_level3'}}", function($q) use($request, $option) { return $q->whereRaw("u.level3_key = {$request->{$option.'dd_level3'}}"); })
             ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); })
             ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("u.{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); })
-            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(u.employee_id LIKE '%{$request->{$option.'search_text'}}%' OR u.employee_name LIKE '%{$request->{$option.'search_text'}}%' OR u.jobcode_desc LIKE '%{$request->{$option.'search_text'}}%' OR u.deptid LIKE '%{$request->{$option.'search_text'}}%')"); });
-    }
+            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(u.employee_id LIKE '%{$request->{$option.'search_text'}}%' OR u.employee_name LIKE '%{$request->{$option.'search_text'}}%' OR u.jobcode_desc LIKE '%{$request->{$option.'search_text'}}%' OR u.deptid LIKE '%{$request->{$option.'search_text'}}%')"); })
+            ;
+        }
 
     protected function baseFilteredSQLs(Request $request, $option = null) {
         $demoWhere = $this->baseFilteredWhere($request, $option);
@@ -446,7 +462,10 @@ class EmployeeSharesController extends Controller {
     public function manageindex(Request $request)
     {
         $errors = session('errors');
-
+        $old_selected_emp_ids = [];
+        $eold_selected_emp_ids = []; 
+        $old_selected_org_nodes = []; 
+        $eold_selected_org_nodes = []; 
         if ($errors) {
             $old = session()->getOldInput();
             $request->dd_level0 = isset($old['dd_level0']) ? $old['dd_level0'] : null;
@@ -475,7 +494,7 @@ class EmployeeSharesController extends Controller {
         $request->session()->flash('dd_level4', $request->dd_level4);
         $criteriaList = $this->search_criteria_list();
         $sharedElements = SharedElement::all();
-        return view('shared.employeeshares.manageindex', compact ('request', 'criteriaList', 'sharedElements'));
+        return view('shared.employeeshares.manageindex', compact ('request', 'criteriaList', 'sharedElements', 'old_selected_emp_ids'));
     }
 
     public function manageindexlist(Request $request) {
@@ -540,7 +559,9 @@ class EmployeeSharesController extends Controller {
                     sp.id as shared_profile_id
                 ");
             return Datatables::of($query)
-                ->addIndexColumn()
+                ->addColumn("select_users", static function ($row) {
+                    return '<input pid="1335" type="checkbox" id="userCheck'.$row->shared_profile_id.'" name="userCheck[]" value="'.$row->shared_profile_id.'" class="dt-body-center">';
+                })
                 ->editColumn('created_at', function ($row) {
                     return $row->created_at ? $row->created_at->format('M d, Y H:i:s') : null;
                 })
@@ -551,7 +572,7 @@ class EmployeeSharesController extends Controller {
                     $btn = '<a href="' . route(request()->segment(1) . '.employeeshares.deleteshare', ['id' => $row->shared_profile_id]) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="' . $row->shared_profile_id . '"><i class="fa fa-trash"></i></a>';
                     return $btn;
                 })
-                ->rawColumns(['created_at', 'updated_at', 'action'])
+                ->rawColumns(['select_users', 'created_at', 'updated_at', 'action'])
                 ->make(true);
         }
     }
@@ -603,6 +624,22 @@ class EmployeeSharesController extends Controller {
         return redirect()->back();
     }
 
+    public function deleteMultiShare(Request $request, $ids) {
+        $decoded = json_decode($ids);
+        $query1 = DB::table('shared_profiles')
+            ->whereIn('id', $decoded)
+            ->delete();
+        return redirect()->back();
+    }
+
+    public function removeAllShare(Request $request, $id) {
+        $decoded = json_decode($id);
+        $query1 = DB::table('shared_profiles')
+            ->where('shared_id', $decoded)
+            ->delete();
+        return redirect()->back();
+    }
+
     public function deleteitem(Request $request, $id, $part) {
         $query2 = DB::table('employee_shares')
             ->where('user_id', $id)
@@ -611,26 +648,26 @@ class EmployeeSharesController extends Controller {
         return redirect()->back();
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function manageEdit($id) {
-        $users = User::where('id', $id)
-        ->select('email')
-        ->get();
-        $email = $users->first()->email;
-        $roles = DB::table('roles')
-        ->whereIntegerInRaw('id', [3, 4])
-        ->get();
-        $access = DB::table('model_has_roles')
-        ->where('model_id', $id)
-        ->where('model_has_roles.model_type', 'App\Models\User')
-        ->get();
-        return view('shared.employeeshares.partials.access-edit-modal', compact('roles', 'access', 'email'));
-    }
+    // /**
+    //  * Show the form for editing the specified resource.
+    //  *
+    //  * @param  int  $id
+    //  * @return \Illuminate\Http\Response
+    //  */
+    // public function manageEdit($id) {
+    //     $users = User::where('id', $id)
+    //     ->select('email')
+    //     ->get();
+    //     $email = $users->first()->email;
+    //     $roles = DB::table('roles')
+    //     ->whereIntegerInRaw('id', [3, 4])
+    //     ->get();
+    //     $access = DB::table('model_has_roles')
+    //     ->where('model_id', $id)
+    //     ->where('model_has_roles.model_type', 'App\Models\User')
+    //     ->get();
+    //     return view('shared.employeeshares.partials.access-edit-modal', compact('roles', 'access', 'email'));
+    // }
 
 
 }
