@@ -856,7 +856,7 @@ class SysadminController extends Controller
         
         $user_role = DB::table('model_has_roles')                        
                         ->where('model_id', $userid)
-                        ->where('role_id', 4)
+                        ->whereIntegerInRaw('role_id', [4, 5])
                         ->where('model_type', 'App\Models\User')
                         ->get();
             
@@ -883,7 +883,7 @@ class SysadminController extends Controller
             
             $user_role = DB::table('model_has_roles')                        
                         ->where('model_id', $switched_userid)
-                        ->where('role_id', 4)
+                        ->whereIntegerInRaw('role_id', [4, 5])
                         ->where('model_type', 'App\Models\User')
                         ->get();
             

@@ -12,6 +12,7 @@ use App\Models\SharedProfile;
 use App\Models\UserDemoJrView;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 
 class EmployeeListController extends Controller {
@@ -21,6 +22,21 @@ class EmployeeListController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function currentList(Request $request) {
+        $user = auth()->user();
+        $userid = $user->id;
+            
+        $user_role = DB::table('model_has_roles')                        
+            ->where('model_id', $userid)
+            ->whereIntegerInRaw('role_id', [4, 5])
+            ->where('model_type', 'App\Models\User')
+            ->get();
+            
+        if(count($user_role) == 0) {
+            return redirect()->to('/');
+            exit;
+        }
+
+
         $errors = session('errors');
         if ($errors) {
             $old = session()->getOldInput();
@@ -53,6 +69,20 @@ class EmployeeListController extends Controller {
     }
 
     public function pastList(Request $request) {
+        $user = auth()->user();
+        $userid = $user->id;
+            
+        $user_role = DB::table('model_has_roles')                        
+            ->where('model_id', $userid)
+            ->whereIntegerInRaw('role_id', [4, 5])
+            ->where('model_type', 'App\Models\User')
+            ->get();
+            
+        if(count($user_role) == 0) {
+            return redirect()->to('/');
+            exit;
+        }
+
         $errors = session('errors');
         if ($errors) {
             $old = session()->getOldInput();
@@ -85,6 +115,20 @@ class EmployeeListController extends Controller {
     }
 
     public function getCurrentList(Request $request) {
+        $user = auth()->user();
+        $userid = $user->id;
+            
+        $user_role = DB::table('model_has_roles')                        
+            ->where('model_id', $userid)
+            ->whereIntegerInRaw('role_id', [4, 5])
+            ->where('model_type', 'App\Models\User')
+            ->get();
+            
+        if(count($user_role) == 0) {
+            return redirect()->to('/');
+            exit;
+        }
+
         if ($request->ajax()) {
             $query = UserDemoJrView::from('user_demo_jr_view AS u')
                 ->whereNull('u.date_deleted')
@@ -134,6 +178,20 @@ class EmployeeListController extends Controller {
     }
 
     public function exportCurrent(Request $request, $paramJSON = null) {
+        $user = auth()->user();
+        $userid = $user->id;
+            
+        $user_role = DB::table('model_has_roles')                        
+            ->where('model_id', $userid)
+            ->whereIntegerInRaw('role_id', [4, 5])
+            ->where('model_type', 'App\Models\User')
+            ->get();
+            
+        if(count($user_role) == 0) {
+            return redirect()->to('/');
+            exit;
+        }
+
         $param = json_decode($paramJSON);
         $dd_level0 = $param[0];
         $dd_level1 = $param[1];
@@ -268,6 +326,20 @@ class EmployeeListController extends Controller {
     }
 
     public function getPastList(Request $request) {
+        $user = auth()->user();
+        $userid = $user->id;
+            
+        $user_role = DB::table('model_has_roles')                        
+            ->where('model_id', $userid)
+            ->whereIntegerInRaw('role_id', [4, 5])
+            ->where('model_type', 'App\Models\User')
+            ->get();
+            
+        if(count($user_role) == 0) {
+            return redirect()->to('/');
+            exit;
+        }
+
         if ($request->ajax()) {
             $query = UserDemoJrView::from('user_demo_jr_view AS u')
                 ->whereNotNull('u.date_deleted')
@@ -318,6 +390,20 @@ class EmployeeListController extends Controller {
     }
 
     public function exportPast(Request $request,  $paramJSON = null) {
+        $user = auth()->user();
+        $userid = $user->id;
+            
+        $user_role = DB::table('model_has_roles')                        
+            ->where('model_id', $userid)
+            ->whereIntegerInRaw('role_id', [4, 5])
+            ->where('model_type', 'App\Models\User')
+            ->get();
+            
+        if(count($user_role) == 0) {
+            return redirect()->to('/');
+            exit;
+        }
+
         $param = json_decode($paramJSON);
         $dd_level0 = $param[0];
         $dd_level1 = $param[1];
