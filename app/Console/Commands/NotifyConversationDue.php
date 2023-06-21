@@ -774,7 +774,7 @@ class NotifyConversationDue extends Command
 
         // write to log
         $this->task->details = $this->details;
-        $this->task->save();
+        // $this->task->save();
 
     }
 
