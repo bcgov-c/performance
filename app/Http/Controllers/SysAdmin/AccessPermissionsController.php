@@ -85,7 +85,7 @@ class AccessPermissionsController extends Controller
         ->pluck('u.employee_id');
         $criteriaList = $this->search_criteria_list();
         $roles = DB::table('roles')
-        ->whereIntegerInRaw('id', [3, 4])
+        ->whereIntegerInRaw('id', [3, 4, 5])
         ->pluck('longname', 'id');
         return view('sysadmin.accesspermissions.index', compact('criteriaList','matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'old_selected_inherited', 'roles') );
     }
@@ -361,7 +361,7 @@ class AccessPermissionsController extends Controller
         $request->session()->flash('dd_level4', $request->dd_level4);
         $criteriaList = $this->search_criteria_list();
         $roles = DB::table('roles')
-        ->whereIntegerInRaw('id', [3, 4])
+        ->whereIntegerInRaw('id', [3, 4, 5])
         ->pluck('longname', 'id');
         return view('sysadmin.accesspermissions.manageexistingaccess', compact ('request', 'criteriaList', 'roles'));
     }
@@ -440,7 +440,7 @@ class AccessPermissionsController extends Controller
 
     public function get_access_entry($roleId, $modelId) {
         return DB::table('model_has_roles')
-        ->whereIn('model_id', [3, 4])
+        ->whereIn('model_id', [3, 4, 5])
         ->where('model_type', 'App\Models\User')
         ->where('role_id', $roleId)
         ->where('model_id', $modelId);
@@ -458,7 +458,7 @@ class AccessPermissionsController extends Controller
         ->get();
         $email = $users->first()->email;
         $roles = DB::table('roles')
-        ->whereIntegerInRaw('id', [3, 4])
+        ->whereIntegerInRaw('id', [3, 4, 5])
         ->get();
         $access = DB::table('model_has_roles')
         ->where('model_id', $id)
@@ -498,6 +498,16 @@ class AccessPermissionsController extends Controller
                 $query = DB::table('model_has_roles')
                 ->where('model_id', $request->model_id)
                 ->where('role_id', 3)
+                ->update(['reason' => $request->reason]);
+
+                $this->refreshAdminOrgUsersById( $request->model_id );
+
+                return redirect()->back();
+            }
+            if($request->accessselect == 5) {
+                $query = DB::table('model_has_roles')
+                ->where('model_id', $request->model_id)
+                ->where('role_id', 5)
                 ->update(['reason' => $request->reason]);
 
                 $this->refreshAdminOrgUsersById( $request->model_id );
