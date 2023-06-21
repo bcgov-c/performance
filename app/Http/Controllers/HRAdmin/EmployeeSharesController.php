@@ -489,7 +489,7 @@ class EmployeeSharesController extends Controller {
                 ->when($request->search_text && $request->criteria == 'employee_name', function($q) use($request) {
                     return $q->where(function ($r) use($request) {
                         return $r->whereRaw("u.{$request->criteria} LIKE '%{$request->search_text}%'")
-                            ->orWhereRaw("u2.{$request->criteria} LIKE '%{$request->search_text}%'")
+                            ->orWhereRaw("d2.{$request->criteria} LIKE '%{$request->search_text}%'")
                             ->orWhereRaw("cc.{$request->criteria} LIKE '%{$request->search_text}%'");
                     });
                 })
