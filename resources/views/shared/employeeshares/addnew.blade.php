@@ -6,12 +6,7 @@
         </div>
     </div>	
     <p class="px-3">Supervisors and administrators may share an employee's PDP profile with another supervisor or staff for a legitimate business reason. The profile should only be shared with people who normally handle employees' permanent personnel records (i.e. Public Service Agency or co-supervisors). An employee may also wish to share their profile with someone other than a direct supervisor (for example, a hiring manager). In order to do this - the employee's consent is required.</p>
-    <!-- <p class="px-3">An employee may also wish to share their profile with someone other than a direct supervisor (for example, a hiring manager). In order to do this - the employee's consent is required.</p>
-    <p class="px-3">To continue, please use the functions below to select the employee profiles that you would like to share, the person you would like to share the profiles with, which elements you would like to share, and your reason for sharing the profile.</p> -->
 	
-
-    <form id="notify-form" action="{{ route(request()->segment(1).'.employeeshares.saveall') }}" method="post">
-        @csrf
         @if(Session::has('message'))
             <div class="col-12">                    
                 <div class="alert alert-danger" style="display:">
@@ -21,8 +16,8 @@
         @endif
         <div class="container-fluid">
             <br>
-            <h6 class="text-bold">Step 1. Select employees to share</h6>
-            <br>
+            <h6 class="text-bold">Step 1: Select Employee(s)</h6>
+            <p class="px-3">Use the search functions to find the employee(s). If you are managing the status of a single employee, you can click on the Yes/No under Share Status in the employee row to make the changes directly. Otherwise, select the employee(s) you want to manage and proceed to Step 2 below.</p>
             <input type="hidden" id="selected_org_nodes" name="selected_org_nodes" value="">
             <input type="hidden" id="selected_emp_ids" name="selected_emp_ids" value="">
             @include('shared.employeeshares.partials.loader')
@@ -45,10 +40,16 @@
             </div>
         </div>
 
+        <form id="notify-form" action="{{ route(request()->segment(1).'.employeeshares.saveall') }}" method="post">
+        @csrf
+
         <div class="container-fluid">
             <br>
-            <h6 class="text-bold">Step 2. Select who you would like to share the selected employee(s) with</h6> 
-            <br>
+            <h6 class="text-bold">Step 2: Choose what to do with selected employee(s)</h6> 
+            <h6 class="px-3 text-bold">2A: Remove shared status" with a button that says "Delete" below.</h6> 
+            <h6 class="px-3 text-bold">2B: Add shared status</h6> 
+            <h6 class="px-5">Select who you would like to share the selected employee(s) with. Then proceed to Step 3.</h6> 
+
             <input type="hidden" id="eselected_org_nodes" name="eselected_org_nodes" value="">
             <input type="hidden" id="eselected_emp_ids" name="eselected_emp_ids" value="">
 
@@ -79,18 +80,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <!-- <div class="col col-2">
-                           <label for='elements' title='Items to Share Tooltip'>Items to Share
-                                <select name="input_elements" class="form-control" id="input_elements" >
-                                    <option value = 0 > Both </option>
-                                    <option value = 1 > Goal </option>
-                                    <option value = 2 > Conversation </option>
-                                </select>
- 					            <small  class="text-danger error-target_date"></small>
-                            </label>
-                       </div> -->
                         <div class="col col-12">
-                            <!-- <x-input id="reason" name="input_reason" label="Reason for sharing" data-toggle="tooltip" data-placement="top" data-trigger="manual" tooltip="Reason tooltip"/> -->
                             <b>Reason for sharing</b>
                             <i class="fa fa-info-circle" label="Reason for sharing" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Provide a brief explanation of why the profile is being shared. For example: <br><br><ul><li> Sharing profile with co-supervisor </li><li>Sharing profile because of inaccurate data in PeopleSoft</li><li>Sharing with hiring manager per employee request</li></ul>"> </i> 
                             <x-input id="reason" name="input_reason"/>                            
@@ -138,6 +128,8 @@
         <!--Modal ends here--->	
 
     </form>
+
+    @include('shared/employeeshares/partials/shared-edit-modal')
 
     <h6 class="m-20">&nbsp;</h6>
     <h6 class="m-20">&nbsp;</h6>
@@ -192,8 +184,6 @@
 				$('#saveAllModal').modal();
 			}
 
-
-
             $(document).ready(function(){
 
                 $('#employee-list-table').DataTable( {
@@ -241,9 +231,11 @@
                     "rowCallback": function( row, data ) {
                     },
                     columns: [
+                        {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'string', data: 'user_id', name: 'user_id', className: 'dt-nowrap', visible: false},
                         {title: '<input name="select_all" value="1" id="employee-list-select-all" type="checkbox" />', ariaTitle: 'employee-list-select-all', target: 0, type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
                         {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', className: 'dt-nowrap'},
                         {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', className: 'dt-nowrap'},
+                        {title: 'Shared', ariaTitle: 'Shared', target: 0, type: 'string', data: 'shared_status', name: 'shared_status', className: 'dt-nowrap'},
                         {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', className: 'dt-nowrap'},
                         // {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'employee_email', className: 'dt-nowrap'},
                         {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', className: 'dt-nowrap'},
@@ -609,7 +601,6 @@
                             while (pid);
                         }
                     });
-
                 }
 
                 // Set parent checkbox
@@ -696,6 +687,40 @@
                 
                 $("#notify-form").submit();
             });
+
+            $('#editModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget);
+                shared_status = button.data('shared_status');
+                $("#shared_status").val(shared_status);
+                user_id = button.data('user_id');
+                $("#user_id").val(user_id);
+                employee_name = button.data('employee_name');
+                $("#employee_name").val(employee_name);
+                message = '';
+                if (shared_status == 'Yes') {
+                    $("#removeAllShareButton").attr('disabled', false);
+                    message = "The employee is currently shared.  Click on Remove All Shares button to remove all sharing for the employee.";
+
+                } else {
+                    $("#removeAllShareButton").attr('disabled', true);
+                    message = "The employee is currently not shared with anyone.";
+                }
+                $("#message").val(message);
+                $("#sharedDetailLabel").html("Edit Employee Share:  "+employee_name);
+                $("#modal_text").html(message);
+            });
+
+            $('#removeAllShareButton').on('click', function(event) {
+                let confirmation = 'Confirm removal of all shares for '+$("#employee_name").val()+'?';
+                if(confirm(confirmation)) {
+                    let parray = JSON.stringify($("#user_id").val());
+                    var deleteall_url = "{{ route(request()->segment(1) . '.employeeshares.removeallshare', ':parray') }}";
+                    deleteall_url = deleteall_url.replace(':parray', parray);
+                    let _url = deleteall_url;
+                    window.location.href = _url;
+                }
+            });
+
             
 
         </script>

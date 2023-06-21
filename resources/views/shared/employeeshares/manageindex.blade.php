@@ -38,8 +38,14 @@
                 }
                 
                 #generictable_filter label {
-                    text-align: right !important;
+                    display: none;
                 }
+
+                #generictable_wrapper .dt-buttons {
+                    float: left;
+                }
+
+
             </style>
         </x-slot>
     @endpush
@@ -51,6 +57,8 @@
         <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
         <script type="text/javascript">
 
+            let g_selected_employees = {!!json_encode($old_selected_emp_ids)!!};
+            
             function showModal ($id) {
                 $("#edit-modal").modal('show');
             }
@@ -58,11 +66,17 @@
 			$(document).ready( function() {
 
                 $('#generictable').DataTable ( {
-                    processing: true,
+                    dom: 'lfrtip',
                     serverSide: true,
+                    searching: true,
+                    processing: true,
+                    paging: true,
+                    deferRender: true,
+                    retrieve: true,
+                    scrollCollapse: true,
+                    scroller: true,
                     scrollX: true,
                     stateSave: true,
-                    deferRender: true,
                     ajax: {
                         url: "{{ route(request()->segment(1).'.employeeshares.manageindexlist') }}",
                         type: 'GET',
@@ -77,11 +91,12 @@
                         }
                     },
                     columns: [
+                        {title: 'Shared Profile ID', ariaTitle: 'Shared Profile ID', target: 0, type: 'num', data: 'shared_profile_id', name: 'shared_profile_id', searchable: false, visible: false},
+                        {title: ' ', ariaTitle: 'Shared Checkboxes', target: 0, type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
                         {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Delegate ID', ariaTitle: 'Delegate ID', target: 0, type: 'string', data: 'delegate_ee_id', name: 'delegate_ee_id', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Delegate Name', ariaTitle: 'Delegate Name', target: 0, type: 'string', data: 'delegate_ee_name', name: 'delegate_ee_name', searchable: true, className: 'dt-nowrap show-modal'},
-                        // {title: 'Shared Item', ariaTitle: 'Shared Item', target: 0, type: 'string', data: 'shared_item', name: 'shared_item', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', searchable: true, className: 'dt-nowrap show-modal'},
@@ -93,13 +108,52 @@
                         {title: 'Created At', ariaTitle: 'Created At', target: 0, type: 'string', data: 'created_at', name: 'created_at', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'Updated At', ariaTitle: 'Updated At', target: 0, type: 'string', data: 'updated_at', name: 'updated_at', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false, className: 'dt-nowrap'},
-                        {title: 'Shared Profile ID', ariaTitle: 'Shared Profile ID', target: 0, type: 'num', data: 'shared_profile_id', name: 'shared_profile_id', searchable: false, visible: false},
                     ]
                 } );
 
+                // add delete selected button
+                $("#generictable_filter").append("<button id='delete-selected-btn' value='delete-selected' class='dt-buttons buttons-csv buttons-html5'>Delete Selected</button> ");
+
+                $('#delete-selected-btn').attr('disabled', true);
+
+                $('#generictable tbody').on( 'click', 'input:checkbox', function () {
+                    // if the input checkbox is selected 
+                    var id = parseInt(this.value);
+                    var index = $.inArray(id, g_selected_employees);
+                    var table = $('#generictable').DataTable();
+                    if(this.checked) {
+                        g_selected_employees.push( id );
+                    } else {
+                        g_selected_employees.splice( index, 1 );
+                    }
+                    if(g_selected_employees.length === 0) {
+                        $('#delete-selected-btn').attr('disabled', true);
+                    } else {
+                        $('#delete-selected-btn').attr('disabled', false);
+                    }
+                });
+
+                $('#delete-selected-btn').on('click', function() {
+                    let g_selected_string = g_selected_employees.toString();
+                    let parray = encodeURIComponent(JSON.stringify(g_selected_employees));
+                    let count = g_selected_employees.length;
+                    let message = 'Confirm deletion of selected row?';
+                    if(count>1){
+                        message = 'Confirm deletion of '+count+' selected rows?';
+                    }
+                    if(confirm(message)) {
+                        var deleteall_url = "{{ route(request()->segment(1) . '.employeeshares.deletemultishare', ':parray') }}";
+                        deleteall_url = deleteall_url.replace(':parray', parray);
+                        let _url = deleteall_url;
+                        window.location.href = _url;
+                    }
+                });
+
                 $('#btn_search').click(function(e) {
                     e.preventDefault();
-                    console.log('btn_search clicked');
+                    // console.log('btn_search clicked');
+                    g_selected_employees = [];
+                    $('#delete-selected-btn').attr('disabled', true);
 					$('#generictable').DataTable().rows().invalidate().draw();
                 } );
 

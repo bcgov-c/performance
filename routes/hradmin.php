@@ -113,9 +113,13 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('hradmin/employeeshares/manageindexviewshares/{id}', [EmployeeSharesController::class, 'manageindexviewshares']);
         Route::get('/hradmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('hradmin.employeeshares.deleteitemget');
         Route::delete('/hradmin/employeeshares/deleteitem/{id}/{part?}', [EmployeeSharesController::class, 'deleteitem'])->name('hradmin.employeeshares.deleteitem');
+        Route::get('/hradmin/employeeshares/deletemultishare/{ids}', [EmployeeSharesController::class, 'deleteMultiShare'])->name('hradmin.employeeshares.deletemultishareget');
+        Route::delete('/hradmin/employeeshares/deletemultishare/{ids}', [EmployeeSharesController::class, 'deleteMultiShare'])->name('hradmin.employeeshares.deletemultishare');
         Route::get('/hradmin/employeeshares/org-tree/{index}', [EmployeeSharesController::class,'loadOrganizationTree']);
         Route::get('/hradmin/employeeshares/employee-list/{index}', [EmployeeSharesController::class, 'getDatatableEmployees']);
         Route::get('/hradmin/employeeshares/employees/{id}/{index}', [EmployeeSharesController::class,'getEmployees']);
+        Route::get('/hradmin/employeeshares/removeallshare/{id}', [EmployeeSharesController::class, 'removeAllShare'])->name('hradmin.employeeshares.removeallshareget');
+        Route::delete('/hradmin/employeeshares/removeallshare/{id}', [EmployeeSharesController::class, 'removeAllShare'])->name('hradmin.employeeshares.removeallshare');
     });
 
     //Excuse Employees
