@@ -859,7 +859,7 @@ class SysadminController extends Controller
                         ->whereIntegerInRaw('role_id', [4, 5])
                         ->where('model_type', 'App\Models\User')
                         ->get();
-            
+    
         if(count($user_role) == 0) {
                 return redirect()->to('/');
                 exit;
@@ -873,6 +873,24 @@ class SysadminController extends Controller
             }
             $newuserId = $request->new_user_id;
             Auth::loginUsingId($newuserId);
+
+            if (session()->has('sr_user')) {
+                session()->put('SR_ALLOWED', true);
+            }
+
+
+            $switched_user_role = DB::table('model_has_roles')                        
+                                ->where('model_id', $newuserId)
+                                ->where('model_type', 'App\Models\User')
+                                ->get(); 
+            foreach($switched_user_role as $item){
+                if($item->role_id == 5){
+                    session()->put('sr_user', true);
+                }
+
+            }                    
+
+
             return redirect()->to('/');
         }  
     } 
