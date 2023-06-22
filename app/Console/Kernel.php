@@ -34,8 +34,16 @@ class Kernel extends ConsoleKernel
         ->dailyAt('00:00');
 
         $schedule->command('command:GetODSEmployeeDemographics')
-        ->timezone('America/Vancouver')
-        ->dailyAt('00:10');
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/GetODSEmployeeDemographics_daily.log'))
+            ->dailyAt('00:05')
+            ->days([1, 2, 3, 4, 5, 6]);
+
+        $schedule->command('command:GetODSEmployeeDemographics --alldata')
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/GetODSEmployeeDemographics_weekly.log'))
+            ->dailyAt('00:05')
+            ->sundays();
 
         $schedule->command('command:GetODSDeptHierarchy')
         ->timezone('America/Vancouver')
