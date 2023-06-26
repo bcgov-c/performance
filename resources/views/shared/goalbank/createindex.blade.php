@@ -122,6 +122,7 @@
 			<input type="hidden" id="selected_org_nodes" name="selected_org_nodes" value="">
 			<input type="hidden" id="eselected_emp_ids" name="eselected_emp_ids" value="">
 			<input type="hidden" id="eselected_org_nodes" name="eselected_org_nodes" value="">
+			<input type="hidden" id="selected_inherited" name="selected_inherited" value="">
 
 			@include('shared.goalbank.partials.filter')
 			@include('shared.goalbank.partials.filter2')
@@ -291,26 +292,25 @@
 			let g_selected_employees = {!!json_encode($old_selected_emp_ids)!!};
 			let g_selected_orgnodes = {!!json_encode($old_selected_org_nodes)!!};
 			let eg_selected_orgnodes = {!!json_encode($eold_selected_org_nodes)!!};
+			let eg_selected_inherited = {!!json_encode($eold_selected_inherited)!!};
 			let g_employees_by_org = [];
 
 			function confirmSaveChangesModal() {
                             
-                                $('#obtn_send').prop('disabled',true);
+				$('#obtn_send').prop('disabled',true);
                             
 				let count = 0;
 				if($('#opt_audience1').prop('checked')) {
 					count = g_selected_employees.length;
 				};
 				if($('#opt_audience2').prop('checked')) {
-					count = g_selected_orgnodes.length;
+					count = g_selected_orgnodes.length + eg_selected_inherited.length;
 				};
 				if (count == 0) {
 					$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal without an audience?');
 				} else {
 					$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal and assign to the selected audience?');
 				}
-                                
-                                
                                 
 				$('#saveGoalModal').modal();
 			}
@@ -392,7 +392,7 @@
 					$('#selected_emp_ids').val( text );
 					var text2 = JSON.stringify(g_selected_orgnodes);
 					$('#selected_org_nodes').val( text2 );
-					var text3 = JSON.stringify(g_selected_inherited);
+					var text3 = JSON.stringify(eg_selected_inherited);
 					$('#selected_inherited').val( text3 );
 					return true; // return false to cancel form action
 				});
