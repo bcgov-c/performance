@@ -264,8 +264,6 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
     Route::get('/sysadmin/tag-new', [SysadminController::class, 'tagNew'])->name('sysadmin.tag-new');
     Route::put('/sysadmin/tag-insert', [SysadminController::class, 'tagInsert'])->name('sysadmin.tag-insert');
 
-});
-
     //Employee List
     Route::get('/sysadmin/employeelists', [EmployeeListController::class, 'currentList'])->name('sysadmin.employeelists');
     Route::get('/sysadmin/employeelists/currentlist', [EmployeeListController::class, 'currentList'])->name('sysadmin.employeelists.currentlist');
@@ -275,7 +273,10 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
     Route::get('/sysadmin/employeelists/export-current/{param?}', [EmployeeListController::class, 'exportCurrent'])->name('sysadmin.employeelists.export-current');
     Route::get('/sysadmin/employeelists/export-past/{param?}', [EmployeeListController::class, 'exportPast'])->name('sysadmin.employeelists.export-past');
 
-
+    //Switch Identity
     Route::get('/sysadmin/switch-identity', [SysadminController::class, 'switchIdentity'])->name('sysadmin.switch-identity');
     Route::get('/sysadmin/identity-list', [SysadminController::class, 'identityList'])->name('sysadmin.identity-list');    
     Route::get('/sysadmin/switch-identity-action', [SysadminController::class, 'switchIdentityAction'])->name('sysadmin.switch-identity-action');
+
+});
+
