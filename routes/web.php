@@ -35,7 +35,6 @@ use App\Http\Controllers\UserPreferenceController;
             require __DIR__ . '/my-team.php';
             require __DIR__ . '/hradmin.php';
             require __DIR__ . '/sysadmin.php';
-            require __DIR__ . '/servicerepresentative.php';
         });
     });
 
