@@ -597,11 +597,13 @@ class GoalBankController extends Controller
                 }
             }
             foreach($inheritedList as $org1) {
-                $result = GoalBankOrg::create(
+                $result = GoalBankOrg::updateOrCreate(
                     [
                         'goal_id' => $resultrec->id,
                         'version' => '2', 
                         'orgid' => $org1->id,
+                    ],
+                    [
                         'inherited' => 1,
                         'created_at' => date('Y-m-d H:i:s'),
                         'updated_at' => date('Y-m-d H:i:s') 
