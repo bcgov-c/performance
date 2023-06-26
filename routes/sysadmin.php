@@ -17,13 +17,13 @@ use App\Http\Controllers\SysAdmin\AccessPermissionsController;
 use App\Http\Controllers\SysAdmin\UnlockConversationController;
 use App\Http\Controllers\SysAdmin\AccessOrganizationsController;
 use App\Http\Controllers\SysAdmin\SysadminStatisticsReportController;
-use Illuminate\Http\Request;
+// use Illuminate\Http\Request;
 
 
 Route::group(['middleware' => ['role:Sys Admin']], function () 
 {
-    //Shared functions v3.0
-    Route::get('/sysadmin/org-list/{index}/{level}', [SysAdminSharedController::class,'getOrganizationList']);
+    // //Shared functions v3.0
+    // Route::get('/sysadmin/org-list/{index}/{level}', [SysAdminSharedController::class,'getOrganizationList']);
 
     //Shared functions v2.0
     Route::get('/sysadmin/org-organizations2', [SysAdminSharedController::class,'getOrganizationsV2']);
@@ -264,6 +264,16 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
     Route::get('/sysadmin/tag-new', [SysadminController::class, 'tagNew'])->name('sysadmin.tag-new');
     Route::put('/sysadmin/tag-insert', [SysadminController::class, 'tagInsert'])->name('sysadmin.tag-insert');
 
+});
+
+
+Route::group(['middleware' => ['role:Sys Admin|Service Representative']], function () {
+    //Shared functions v3.0
+    Route::get('/sysadmin/org-list/{index}/{level}', [SysAdminSharedController::class,'getOrganizationList']);
+    //Identity Switch
+    Route::get('/sysadmin/switch-identity', [SysadminController::class, 'switchIdentity'])->name('sysadmin.switch-identity');
+    Route::get('/sysadmin/identity-list', [SysadminController::class, 'identityList'])->name('sysadmin.identity-list');    
+    Route::get('/sysadmin/switch-identity-action', [SysadminController::class, 'switchIdentityAction'])->name('sysadmin.switch-identity-action');
     //Employee List
     Route::get('/sysadmin/employeelists', [EmployeeListController::class, 'currentList'])->name('sysadmin.employeelists');
     Route::get('/sysadmin/employeelists/currentlist', [EmployeeListController::class, 'currentList'])->name('sysadmin.employeelists.currentlist');
@@ -272,11 +282,6 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
     Route::get('/sysadmin/employeelists/getpastlist', [EmployeeListController::class, 'getPastList'])->name('sysadmin.employeelists.getpastlist');
     Route::get('/sysadmin/employeelists/export-current/{param?}', [EmployeeListController::class, 'exportCurrent'])->name('sysadmin.employeelists.export-current');
     Route::get('/sysadmin/employeelists/export-past/{param?}', [EmployeeListController::class, 'exportPast'])->name('sysadmin.employeelists.export-past');
-
-    //Switch Identity
-    Route::get('/sysadmin/switch-identity', [SysadminController::class, 'switchIdentity'])->name('sysadmin.switch-identity');
-    Route::get('/sysadmin/identity-list', [SysadminController::class, 'identityList'])->name('sysadmin.identity-list');    
-    Route::get('/sysadmin/switch-identity-action', [SysadminController::class, 'switchIdentityAction'])->name('sysadmin.switch-identity-action');
-
 });
+
 
