@@ -899,13 +899,20 @@ class SysadminController extends Controller
             $user = auth()->user();
             $switched_userid = $user->id;
             
-            $user_role = DB::table('model_has_roles')                        
+            $user_roles = DB::table('model_has_roles')                        
                         ->where('model_id', $switched_userid)
                         ->whereIntegerInRaw('role_id', [4, 5])
                         ->where('model_type', 'App\Models\User')
                         ->get();
             
-            if(count($user_role) == 0) {
+            if(count($user_roles) == 0) {
+                foreach($user_roles as $item){
+                    if($item->role_id == 5){
+                        if (!Session::has('item_key')) {
+                            session()->put('sr_user', true);
+                        } 
+                    }
+                }    
                 return redirect()->to('/');
                 exit;
             }
