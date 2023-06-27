@@ -911,7 +911,7 @@ class SysadminController extends Controller
             } else {
                 foreach($user_roles as $item){
                     if($item->role_id == 5){
-                        if (!Session::has('item_key')) {
+                        if (!Session::has('sr_user')) {
                             session()->put('sr_user', true);
                         } 
                     }
