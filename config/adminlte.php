@@ -409,7 +409,7 @@ return [
         ],
         [
             'role' => 'listitem',
-            'text' => 'System Administration',
+            'text' => 'Service Representative',
             'url'  => '#',
             'icon' => 'fas fa-fw fa-cog',
             'active' => ['sysadmin/*'],
