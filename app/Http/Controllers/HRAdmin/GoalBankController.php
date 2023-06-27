@@ -658,7 +658,10 @@ class GoalBankController extends Controller
                     break;
                 }
             }
-            $notify_audiences = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
+            $notify_audiences_static = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
+            $notify_audiences_inherited = $this->get_employees_by_selected_inherited($selected_inherited);
+            $merged_list = array_unique(array_merge($notify_audiences_static, $notify_audiences_inherited), SORT_REGULAR);
+            $notify_audiences = $this->get_employees_by_selected_org_nodes($merged_list);
         }
         // notify_on_dashboard when new goal added
         $this->notify_on_dashboard($resultrec, $notify_audiences);
@@ -861,7 +864,9 @@ class GoalBankController extends Controller
             }
         }
         // call notify_on_dashboard for the newly added emplid of the goal         
-        $new_org_ee_ids = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
+        $new_org_ee_ids_static = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
+        $new_org_ee_ids_inherited = $this->get_employees_by_selected_inherited($selected_inherited);
+        $new_org_ee_ids = array_unique(array_merge($new_org_ee_ids_static, $new_org_ee_ids_inherited), SORT_REGULAR);
         $notify_audiences = array_diff($new_org_ee_ids, $old_ee_ids, $old_org_ee_ids);        
         $this->notify_on_dashboard($resultrec, $notify_audiences);   
         return redirect()->route(request()->segment(1).'.goalbank.manageindex')
@@ -1373,6 +1378,29 @@ class GoalBankController extends Controller
             ->whereIn('u.orgid', $selected_org_nodes)
             ->pluck('employee_id'); 
         return ($employees ? $employees->toArray() : []); 
+    }
+
+    protected function get_employees_by_selected_inherited($selected_inherited) {
+        $employees0 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
+            ->whereIn('u.organization_key', $selected_inherited)
+            ->pluck('employee_id'); 
+        $employees1 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
+            ->whereIn('u.level1_key', $selected_inherited)
+            ->pluck('employee_id'); 
+        $employees2 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
+            ->whereIn('u.level2_key', $selected_inherited)
+            ->pluck('employee_id'); 
+        $employees3 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
+            ->whereIn('u.level3_key', $selected_inherited)
+            ->pluck('employee_id'); 
+        $employees4 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
+            ->whereIn('u.level4_key', $selected_inherited)
+            ->pluck('employee_id'); 
+        $employees5 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
+            ->whereIn('u.level5_key', $selected_inherited)
+            ->pluck('employee_id'); 
+        $employees = array_unique(array_merge($employees0 ? $employees0->toArray() : [], $employees1 ? $employees1->toArray() : [], $employees2 ? $employees2->toArray() : [], $employees3 ? $employees3->toArray() : [], $employees4 ? $employees4->toArray() : [], $employees5 ? $employees5->toArray() : []), SORT_REGULAR);
+        return ($employees ? $employees : []); 
     }
 
     protected function notify_on_dashboard($goalBank, $employee_ids) {
