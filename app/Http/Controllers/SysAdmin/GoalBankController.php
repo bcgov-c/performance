@@ -1206,33 +1206,40 @@ class GoalBankController extends Controller
     }
 
     protected function get_employees_by_selected_org_nodes($selected_org_nodes) {
-        $employees = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
-            ->whereIn('u.orgid', $selected_org_nodes)
-            ->pluck('employee_id'); 
+        $employees = EmployeeDemo::from('employee_demo AS d')
+            ->whereIn('d.orgid', $selected_org_nodes)
+            ->select('d.employee_id')
+            ->pluck('d.employee_id'); 
         return ($employees ? $employees->toArray() : []); 
     }
 
     protected function get_employees_by_selected_inherited($selected_inherited) {
-        $employees0 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
-            ->whereIn('u.organization_key', $selected_inherited)
-            ->pluck('employee_id'); 
-        $employees1 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
-            ->whereIn('u.level1_key', $selected_inherited)
-            ->pluck('employee_id'); 
-        $employees2 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
-            ->whereIn('u.level2_key', $selected_inherited)
-            ->pluck('employee_id'); 
-        $employees3 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
-            ->whereIn('u.level3_key', $selected_inherited)
-            ->pluck('employee_id'); 
-        $employees4 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
-            ->whereIn('u.level4_key', $selected_inherited)
-            ->pluck('employee_id'); 
-        $employees5 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
-            ->whereIn('u.level5_key', $selected_inherited)
-            ->pluck('employee_id'); 
-        $employees = array_unique(array_merge($employees0 ? $employees0->toArray() : [], $employees1 ? $employees1->toArray() : [], $employees2 ? $employees2->toArray() : [], $employees3 ? $employees3->toArray() : [], $employees4 ? $employees4->toArray() : [], $employees5 ? $employees5->toArray() : []), SORT_REGULAR);
-        return ($employees ? $employees : []); 
+        $employees0 = EmployeeDemo::from('employee_demo AS d')
+            ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
+            ->whereIn('t.organization_key', $selected_inherited)
+            ->select('.employee_id');
+        $employees1 = EmployeeDemo::from('employee_demo AS d')
+            ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
+            ->whereIn('t.level1_key', $selected_inherited)
+            ->select('d.employee_id');
+        $employees2 = EmployeeDemo::from('employee_demo AS d')
+            ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
+            ->whereIn('t.level2_key', $selected_inherited)
+            ->select('d.employee_id');
+        $employees3 = EmployeeDemo::from('employee_demo AS d')
+            ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
+            ->whereIn('t.level3_key', $selected_inherited)
+            ->select('d.employee_id');
+        $employees4 = EmployeeDemo::from('employee_demo AS d')
+            ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
+            ->whereIn('t.level4_key', $selected_inherited)
+            ->select('d.employee_id');
+        $employees5 = EmployeeDemo::from('employee_demo AS d')
+            ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
+            ->whereIn('t.level5_key', $selected_inherited)
+            ->select('d.employee_id');
+        $employees = $employees0->union($employees1)->union($employees2)->union($employees3)->union($employees4)->union($employees5)->pluck('employee_id');
+        return ($employees ? $employees->toArray() : []); 
     }
 
     protected function notify_on_dashboard($goalBank, $employee_ids) {
