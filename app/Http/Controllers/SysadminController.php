@@ -25,6 +25,7 @@ use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Session;
 // use GuzzleHttp\Psr7\Request;
 
 
@@ -899,15 +900,23 @@ class SysadminController extends Controller
             $user = auth()->user();
             $switched_userid = $user->id;
             
-            $user_role = DB::table('model_has_roles')                        
+            $user_roles = DB::table('model_has_roles')                        
                         ->where('model_id', $switched_userid)
                         ->whereIntegerInRaw('role_id', [4, 5])
                         ->where('model_type', 'App\Models\User')
                         ->get();
             
-            if(count($user_role) == 0) {
+            if(count($user_roles) == 0) {
                 return redirect()->to('/');
                 exit;
+            } else {
+                foreach($user_roles as $item){
+                    if($item->role_id == 5){
+                        if (!Session::has('sr_user')) {
+                            session()->put('sr_user', true);
+                        } 
+                    }
+                }    
             }
        
         $errors = session('errors');
