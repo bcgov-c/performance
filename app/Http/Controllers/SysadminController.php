@@ -906,6 +906,9 @@ class SysadminController extends Controller
                         ->get();
             
             if(count($user_roles) == 0) {
+                return redirect()->to('/');
+                exit;
+            } else {
                 foreach($user_roles as $item){
                     if($item->role_id == 5){
                         if (!Session::has('item_key')) {
@@ -913,8 +916,6 @@ class SysadminController extends Controller
                         } 
                     }
                 }    
-                return redirect()->to('/');
-                exit;
             }
        
         $errors = session('errors');
