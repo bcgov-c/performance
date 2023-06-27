@@ -78,11 +78,6 @@ class Kernel extends ConsoleKernel
         ->timezone('America/Vancouver')
         ->dailyAt('02:00');
 
-        $schedule->command('command:NotifyConversationDue')
-        ->timezone('America/Vancouver')    
-        ->dailyAt('02:30')
-        ->appendOutputTo(storage_path('logs/NotifyConversationDue.log'));
-        
         $schedule->command('command:BuildEmployeeDemoTree')
         ->timezone('America/Vancouver')
         ->dailyAt('03:00');
@@ -98,6 +93,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:MaintainLogs')
         ->timezone('America/Vancouver')    
         ->dailyAt('06:00');
+
+        $schedule->command('command:NotifyConversationDue')
+        ->timezone('America/Vancouver')    
+        ->dailyAt('06:15')
+        ->appendOutputTo(storage_path('logs/NotifyConversationDue.log'));
         
         $schedule->command('notify:daily')
         ->dailyAt('08:00')
