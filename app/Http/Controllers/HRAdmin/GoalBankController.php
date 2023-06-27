@@ -1384,7 +1384,7 @@ class GoalBankController extends Controller
         $employees0 = EmployeeDemo::from('employee_demo AS d')
             ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
             ->whereIn('t.organization_key', $selected_inherited)
-            ->select('.employee_id');
+            ->select('d.employee_id');
         $employees1 = EmployeeDemo::from('employee_demo AS d')
             ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
             ->whereIn('t.level1_key', $selected_inherited)
