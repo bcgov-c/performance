@@ -660,8 +660,7 @@ class GoalBankController extends Controller
             }
             $notify_audiences_static = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
             $notify_audiences_inherited = $this->get_employees_by_selected_inherited($selected_inherited);
-            $merged_list = array_unique(array_merge($notify_audiences_static, $notify_audiences_inherited), SORT_REGULAR);
-            $notify_audiences = $this->get_employees_by_selected_org_nodes($merged_list);
+            $notify_audiences = array_unique(array_merge($notify_audiences_static, $notify_audiences_inherited), SORT_REGULAR);
         }
         // notify_on_dashboard when new goal added
         $this->notify_on_dashboard($resultrec, $notify_audiences);
@@ -1376,6 +1375,7 @@ class GoalBankController extends Controller
     protected function get_employees_by_selected_org_nodes($selected_org_nodes) {
         $employees = HRUserDemoJrForGoalbankView::from('hr_user_demo_jr_for_goalbank_view AS u')
             ->whereIn('u.orgid', $selected_org_nodes)
+            ->whereNull('u.date_deleted')
             ->pluck('employee_id'); 
         return ($employees ? $employees->toArray() : []); 
     }
@@ -1383,21 +1383,27 @@ class GoalBankController extends Controller
     protected function get_employees_by_selected_inherited($selected_inherited) {
         $employees0 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
             ->whereIn('u.organization_key', $selected_inherited)
+            ->whereNull('u.date_deleted')
             ->pluck('employee_id'); 
         $employees1 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
             ->whereIn('u.level1_key', $selected_inherited)
+            ->whereNull('u.date_deleted')
             ->pluck('employee_id'); 
         $employees2 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
             ->whereIn('u.level2_key', $selected_inherited)
+            ->whereNull('u.date_deleted')
             ->pluck('employee_id'); 
         $employees3 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
             ->whereIn('u.level3_key', $selected_inherited)
+            ->whereNull('u.date_deleted')
             ->pluck('employee_id'); 
         $employees4 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
             ->whereIn('u.level4_key', $selected_inherited)
+            ->whereNull('u.date_deleted')
             ->pluck('employee_id'); 
         $employees5 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
             ->whereIn('u.level5_key', $selected_inherited)
+            ->whereNull('u.date_deleted')
             ->pluck('employee_id'); 
         $employees = array_unique(array_merge($employees0 ? $employees0->toArray() : [], $employees1 ? $employees1->toArray() : [], $employees2 ? $employees2->toArray() : [], $employees3 ? $employees3->toArray() : [], $employees4 ? $employees4->toArray() : [], $employees5 ? $employees5->toArray() : []), SORT_REGULAR);
         return ($employees ? $employees : []); 

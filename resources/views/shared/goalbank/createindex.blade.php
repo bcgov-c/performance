@@ -167,7 +167,7 @@
 			<div class="row">
 				<div class="col-md-3 mb-2">
 					<button class="btn btn-primary mt-2" id="obtn_send" type="button" onclick="confirmSaveChangesModal()" name="btn_confirm" value="btn_confirm">Add Goal</button>
-					<button class="btn btn-secondary mt-2">Cancel</button>
+					<button id="obtn_cancel_send" name="obtn_cancel_send" class="btn btn-secondary mt-2">Cancel</button>
 				</div>
 			</div>
 		</div>
@@ -187,7 +187,7 @@
 					</div>
 					<div class="modal-footer">
 						<button class="btn btn-primary mt-2" type="submit" id="btn_send" name="btn_send" value="btn_send">Add New Goal</button>
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button id="btn_cancel_send" name="btn_cancel_send" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
 					</div>
 					
 				</div>
@@ -326,6 +326,10 @@
                                 
 				$( "#btn_send" ).click(function() {
 					$('#saveGoalModal').modal('toggle');
+				});
+
+				$( "#btn_cancel_send" ).click(function() {
+					$('#obtn_send').prop('disabled',false);
 				});
 
 				function navTreeActive() {
@@ -667,11 +671,6 @@
                     $('#pageLoader').show();
                 });
 
-                // $(window).resize(function(){
-                //     location.reload();
-                //     return;
-                // });
-                
 				$('#ebtn_search').click(function(e) {
 					e.preventDefault();
 					target = $('#enav-tree'); 
@@ -707,16 +706,6 @@
 					}
 				});
 
-				$(window).on('beforeunload', function(){
-					$('#pageLoader').show();
-				});
-
-				// $(window).resize(function(){
-				// 	location.reload();
-				// 	return;
-				// }); 
-
-
 				$('body').popover({
 					selector: '[data-toggle]',
 					trigger: 'hover',
@@ -728,11 +717,11 @@
 				});
 
 				$('body').on('click', function (e) {
-                $('[data-toggle=popover]').each(function () {
-                    // hide any open popovers when the anywhere else in the body is clicked
-                    if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
-                        $(this).popover('hide');
-                    }
+                	$('[data-toggle=popover]').each(function () {
+						// hide any open popovers when the anywhere else in the body is clicked
+						if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+							$(this).popover('hide');
+						}
                 	});
             	});							
 
@@ -755,13 +744,9 @@
 				});
 			};
                         
-                        @if(session()->has('title_miss'))                           
-                            $('input[name=title]').addClass('is-invalid');
-                        @endif
-                        
-                        
-                        
-                        
+			@if(session()->has('title_miss'))                           
+				$('input[name=title]').addClass('is-invalid');
+			@endif
 
 		</script>
 	</x-slot>
