@@ -48,6 +48,14 @@ class NotifyConversationDue extends Command
      */
     public function handle()
     {
+
+        $switch = env('EMAIL_NOTIFICATION_ENABLED');
+        if (!($switch)) {
+            $this->info( now() );
+            $this->info( "This process was skipped. The EMAIL_NOTIFICATION_ENABLED (in .env) is not enabled.");
+            return 0;
+        }
+
         $start_time = Carbon::now();
 
         $this->task = JobSchedAudit::Create([
