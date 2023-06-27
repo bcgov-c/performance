@@ -32,6 +32,7 @@
                 <div class="col-6">
                     <b>Goal Type</b>
                     <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="{{$type_desc_str}}"> </i>
+                    <?php unset($goaltypes[0]);?>
                     <?php unset($goaltypes[4]);?>
                     <x-dropdown :list="$goaltypes" name="goal_type_id" />
                 </div>

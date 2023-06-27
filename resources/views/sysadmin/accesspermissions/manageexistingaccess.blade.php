@@ -117,6 +117,9 @@
                     $('removeButton').prop('disabled', current == model_id);
                     $('#accessselect').prop('disabled', current == model_id);
                     $('#reason').prop('disabled', current == model_id);
+                    if($('#accessselect').val() == 5) {
+                        $('#accessselect').prop('disabled', true);
+                    }
                     if($('#accessselect').val() == 4) {
                         $('#accessselect').prop('disabled', true);
                     }
@@ -176,7 +179,7 @@
                         table = $('#admintable').DataTable();
                         table.destroy();
                     };
-                    if($('#accessselect').val() == 3) {
+                    if($('#accessselect').val() == 3 ) {
                         $('#admintable').show();
                     } else {
                         $('#admintable').hide();

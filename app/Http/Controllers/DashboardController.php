@@ -19,7 +19,7 @@ use Yajra\Datatables\Datatables;
 class DashboardController extends Controller
 {
     public function index(Request $request) {
-
+        $user = Auth::user();
         $notifications = DashboardNotification::where('user_id', Auth::id())
                         ->where(function ($q)  {
                             $q->whereExists(function ($query) {
@@ -361,6 +361,8 @@ class DashboardController extends Controller
          Auth::loginUsingId($oldUserId);
          $request->session()->forget('existing_user_id');
          $request->session()->forget('user_is_switched');
+         $request->session()->forget('sr_user');
+         $request->session()->forget('SR_ALLOWED');
          //return redirect()->back();
          return redirect()->to('/dashboard');
 

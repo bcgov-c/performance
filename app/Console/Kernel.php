@@ -30,78 +30,101 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly(); 
         $schedule->command('command:ExportDatabaseToBI')
-        ->timezone('America/Vancouver')
-        ->dailyAt('00:00');
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/ExportDatabaseToBI.log'))
+            ->daily();
 
         $schedule->command('command:GetODSEmployeeDemographics')
-        ->timezone('America/Vancouver')
-        ->dailyAt('00:10');
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/GetODSEmployeeDemographics_daily.log'))
+            ->dailyAt('00:05')
+            ->days([1, 2, 3, 4, 5, 6]);
+
+        $schedule->command('command:GetODSEmployeeDemographics --alldata')
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/GetODSEmployeeDemographics_weekly.log'))
+            ->dailyAt('00:05')
+            ->sundays();
 
         $schedule->command('command:GetODSDeptHierarchy')
-        ->timezone('America/Vancouver')
-        ->dailyAt('00:15');
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/GetODSDeptHierarchy.log'))
+            ->dailyAt('00:15');
   
         $schedule->command('command:BuildOrgTree')
-        ->timezone('America/Vancouver')
-        ->dailyAt('00:20');
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/BuildOrgTree.log'))
+            ->dailyAt('00:20');
   
         $schedule->command('command:SyncUserProfile')
-        ->timezone('America/Vancouver')
-        ->dailyAt('00:25')
-        ->appendOutputTo(storage_path('logs/SyncUserProfile.log'));
+            ->timezone('America/Vancouver')
+            ->dailyAt('00:25')
+            ->appendOutputTo(storage_path('logs/SyncUserProfile.log'));
 
         $schedule->command('command:GetODSPositions')
-        ->timezone('America/Vancouver')
-        ->dailyAt('00:30');
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/GetODSPositions.log'))
+            ->dailyAt('00:30');
 
         $schedule->command('command:UpdateGUIDByEmployeeId')
-        ->timezone('America/Vancouver')
-        ->dailyAt('00:45');
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/UpdateGUIDByEmployeeId.log'))
+            ->dailyAt('00:45');
 
         $schedule->command('command:PopulateAuthUsers')
-        ->timezone('America/Vancouver')
-        ->dailyAt('01:00');
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/PopulateAuthUsers.log'))
+            ->dailyAt('01:00');
   
         $schedule->command('command:PopulateAuthOrgs')
-        ->timezone('America/Vancouver')
-        ->dailyAt('01:05');
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/PopulateAuthOrgs.log'))
+            ->dailyAt('01:05');
   
         $schedule->command('command:SetNextLevelManager')
-        ->timezone('America/Vancouver')
-        ->dailyAt('01:15');
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/SetNextLevelManager.log'))
+            ->dailyAt('01:15');
 
         $schedule->command('command:BuildAdminOrgUsers')
-        ->timezone('America/Vancouver')
-        ->dailyAt('01:30');
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/BuildAdminOrgUsers.log'))
+            ->dailyAt('01:30');
 
         $schedule->command('command:CalcNextConversationDate')
-        ->timezone('America/Vancouver')
-        ->dailyAt('02:00');
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/CalcNextConversationDate.log'))
+            ->dailyAt('02:00');
 
         $schedule->command('command:BuildEmployeeDemoTree')
-        ->timezone('America/Vancouver')
-        ->dailyAt('03:00');
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/BuildEmployeeDemoTree.log'))
+            ->dailyAt('03:00');
   
         $schedule->command('command:PopulateUsersAnnexTable')
-        ->timezone('America/Vancouver')
-        ->dailyAt('04:00');
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/PopulateUsersAnnexTable.log'))
+            ->dailyAt('04:00');
   
         $schedule->command('command:CleanShareProfile')
-        ->timezone('America/Vancouver')    
-        ->dailyAt('05:00');
+            ->timezone('America/Vancouver')    
+            ->sendOutputTo(storage_path('logs/CleanShareProfile.log'))
+            ->dailyAt('05:00');
         
         $schedule->command('command:MaintainLogs')
-        ->timezone('America/Vancouver')    
-        ->dailyAt('06:00');
+            ->timezone('America/Vancouver')  
+            ->sendOutputTo(storage_path('logs/MaintainLogs.log'))
+            ->dailyAt('06:00');
 
         $schedule->command('command:NotifyConversationDue')
-        ->timezone('America/Vancouver')    
-        ->dailyAt('06:15')
-        ->appendOutputTo(storage_path('logs/NotifyConversationDue.log'));
+            ->timezone('America/Vancouver')    
+            ->dailyAt('06:15')
+            ->appendOutputTo(storage_path('logs/NotifyConversationDue.log'));
         
         $schedule->command('notify:daily')
-        ->dailyAt('08:00')
-        ->appendOutputTo(storage_path('logs/daily.log'));
+            ->timezone('America/Vancouver')    
+            ->dailyAt('08:00')
+            ->appendOutputTo(storage_path('logs/daily.log'));
 
     }
 

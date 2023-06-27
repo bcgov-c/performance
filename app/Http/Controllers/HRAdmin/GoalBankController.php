@@ -42,7 +42,7 @@ class GoalBankController extends Controller
         $request->firstTime = true;        
         $old_selected_emp_ids = []; // $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $old_selected_org_nodes = []; // $request->old_selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
-        // $old_selected_inherited = []; // $request->old_selected_inherited ? json_decode($request->selected_inherited) : [];
+        $old_selected_inherited = []; // $request->old_selected_inherited ? json_decode($request->selected_inherited) : [];
         $eold_selected_emp_ids = []; // $request->eselected_emp_ids ? json_decode($request->eselected_emp_ids) : [];
         $eold_selected_org_nodes = []; // $request->eold_selected_org_nodes ? json_decode($request->eselected_org_nodes) : [];
         $eold_selected_inherited = []; // $request->eold_selected_inherited ? json_decode($request->eselected_inherited) : [];
@@ -60,6 +60,7 @@ class GoalBankController extends Controller
             $request->userCheck = isset($old['userCheck']) ? $old['userCheck'] : null;
             $old_selected_emp_ids = isset($old['selected_emp_ids']) ? json_decode($old['selected_emp_ids']) : [];
             $old_selected_org_nodes = isset($old['selected_org_nodes']) ? json_decode($old['selected_org_nodes']) : [];
+            $old_selected_inherited = isset($old['selected_inherited']) ? json_decode($old['selected_inherited']) : [];
             $request->edd_level0 = isset($old['edd_level0']) ? $old['edd_level0'] : null;
             $request->edd_level1 = isset($old['edd_level1']) ? $old['edd_level1'] : null;
             $request->edd_level2 = isset($old['edd_level2']) ? $old['edd_level2'] : null;
@@ -70,6 +71,7 @@ class GoalBankController extends Controller
             $request->esearch_text = isset($old['esearch_text']) ? $old['esearch_text'] : null;
             $request->eorgCheck = isset($old['eorgCheck']) ? $old['eorgCheck'] : null;
             $request->euserCheck = isset($old['euserCheck']) ? $old['euserCheck'] : null;
+            $request->eselected_inherited = isset($old['einheritedCheck']) ? $old['einheritedCheck'] : null;
             $eold_selected_emp_ids = isset($old['eselected_emp_ids']) ? json_decode($old['eselected_emp_ids']) : [];
             $eold_selected_org_nodes = isset($old['eselected_org_nodes']) ? json_decode($old['eselected_org_nodes']) : [];
             $eold_selected_inherited = isset($old['eselected_inherited']) ? json_decode($old['eselected_inherited']) : [];
@@ -100,7 +102,7 @@ class GoalBankController extends Controller
                 'ecriteria' => $request->ecriteria,
                 'esearch_text' => $request->esearch_text,
                 'eorgCheck' => $request->eorgCheck,
-                'euserCheck' => $request->euserCheck,
+                'eselected_inherited' => $request->eselected_inherited,
             ]);
         }
         $request->session()->flash('dd_level0', $request->dd_level0);
@@ -111,6 +113,7 @@ class GoalBankController extends Controller
         $request->session()->flash('dd_superv', $request->dd_superv); 
         $request->session()->flash('userCheck', $request->userCheck);  // Dynamic load 
         $request->session()->flash('euserCheck', $request->euserCheck);  // Dynamic load 
+        $request->session()->flash('eselected_inherited', $request->eselected_inherited);  // Dynamic load
         $request->session()->flash('edd_level0', $request->edd_level0);
         $request->session()->flash('edd_level1', $request->edd_elevel1);
         $request->session()->flash('edd_level2', $request->edd_elevel2);
@@ -143,7 +146,7 @@ class GoalBankController extends Controller
         //no need private in goalbank module
         unset($goalTypes[3]);
         $currentView = $request->segment(2);
-        return view('shared.goalbank.createindex', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes', 'eold_selected_inherited', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'type_desc_str', 'currentView', 'supervisorList') );
+        return view('shared.goalbank.createindex', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes', 'old_selected_inherited', 'eold_selected_inherited', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'type_desc_str', 'currentView', 'supervisorList') );
     }
 
 
@@ -611,7 +614,7 @@ class GoalBankController extends Controller
         }
         if($request->opt_audience == "byOrg") {
             $selected_org_nodes = $request->eorgCheck ? $request->eorgCheck : [];
-            $selected_inherited = $request->eselected_inherited ? json_decode($request->eselected_inherited) : [];
+            $selected_inherited = $request->einheritedCheck ? $request->einheritedCheck : [];
             $organizationList = EmployeeDemoTree::select('id')
                 ->whereIn('id', $selected_org_nodes)
                 ->orWhereIn('level4_key', $selected_org_nodes)
@@ -639,11 +642,13 @@ class GoalBankController extends Controller
                 }
             }
             foreach($inheritedList as $org1) {
-                $result = GoalBankOrg::create(
+                $result = GoalBankOrg::updateOrCreate(
                     [
                         'goal_id' => $resultrec->id,
                         'version' => '2', 
                         'orgid' => $org1->id,
+                    ],
+                    [
                         'inherited' => 1,
                         'created_at' => date('Y-m-d H:i:s'),
                         'updated_at' => date('Y-m-d H:i:s') 
@@ -653,7 +658,9 @@ class GoalBankController extends Controller
                     break;
                 }
             }
-            $notify_audiences = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
+            $notify_audiences_static = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
+            $notify_audiences_inherited = $this->get_employees_by_selected_inherited($selected_inherited);
+            $notify_audiences = array_unique(array_merge($notify_audiences_static, $notify_audiences_inherited), SORT_REGULAR);
         }
         // notify_on_dashboard when new goal added
         $this->notify_on_dashboard($resultrec, $notify_audiences);
@@ -856,7 +863,9 @@ class GoalBankController extends Controller
             }
         }
         // call notify_on_dashboard for the newly added emplid of the goal         
-        $new_org_ee_ids = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
+        $new_org_ee_ids_static = $this->get_employees_by_selected_org_nodes($selected_org_nodes);
+        $new_org_ee_ids_inherited = $this->get_employees_by_selected_inherited($selected_inherited);
+        $new_org_ee_ids = array_unique(array_merge($new_org_ee_ids_static, $new_org_ee_ids_inherited), SORT_REGULAR);
         $notify_audiences = array_diff($new_org_ee_ids, $old_ee_ids, $old_org_ee_ids);        
         $this->notify_on_dashboard($resultrec, $notify_audiences);   
         return redirect()->route(request()->segment(1).'.goalbank.manageindex')
@@ -1364,9 +1373,39 @@ class GoalBankController extends Controller
     }
     
     protected function get_employees_by_selected_org_nodes($selected_org_nodes) {
-        $employees = HRUserDemoJrForGoalbankView::from('hr_user_demo_jr_for_goalbank_view AS u')
-            ->whereIn('u.orgid', $selected_org_nodes)
-            ->pluck('employee_id'); 
+        $employees = EmployeeDemo::from('employee_demo AS d')
+            ->whereIn('d.orgid', $selected_org_nodes)
+            ->select('d.employee_id')
+            ->pluck('d.employee_id'); 
+        return ($employees ? $employees->toArray() : []); 
+    }
+
+    protected function get_employees_by_selected_inherited($selected_inherited) {
+        $employees0 = EmployeeDemo::from('employee_demo AS d')
+            ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
+            ->whereIn('t.organization_key', $selected_inherited)
+            ->select('.employee_id');
+        $employees1 = EmployeeDemo::from('employee_demo AS d')
+            ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
+            ->whereIn('t.level1_key', $selected_inherited)
+            ->select('d.employee_id');
+        $employees2 = EmployeeDemo::from('employee_demo AS d')
+            ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
+            ->whereIn('t.level2_key', $selected_inherited)
+            ->select('d.employee_id');
+        $employees3 = EmployeeDemo::from('employee_demo AS d')
+            ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
+            ->whereIn('t.level3_key', $selected_inherited)
+            ->select('d.employee_id');
+        $employees4 = EmployeeDemo::from('employee_demo AS d')
+            ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
+            ->whereIn('t.level4_key', $selected_inherited)
+            ->select('d.employee_id');
+        $employees5 = EmployeeDemo::from('employee_demo AS d')
+            ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
+            ->whereIn('t.level5_key', $selected_inherited)
+            ->select('d.employee_id');
+        $employees = $employees0->union($employees1)->union($employees2)->union($employees3)->union($employees4)->union($employees5)->pluck('employee_id');
         return ($employees ? $employees->toArray() : []); 
     }
 

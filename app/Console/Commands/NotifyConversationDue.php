@@ -112,7 +112,6 @@ class NotifyConversationDue extends Command
             ->where('users.due_date_paused', 'N')
             ->where('access_organizations.allow_inapp_msg', 'Y')
             ->whereNull('employee_demo.date_deleted')
-            // ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                                                    
             ->select('users.*')
             ->orderBy('users.guid')
             ->orderBy('users.id', 'desc');
