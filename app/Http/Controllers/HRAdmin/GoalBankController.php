@@ -1375,7 +1375,6 @@ class GoalBankController extends Controller
     protected function get_employees_by_selected_org_nodes($selected_org_nodes) {
         $employees = HRUserDemoJrForGoalbankView::from('hr_user_demo_jr_for_goalbank_view AS u')
             ->whereIn('u.orgid', $selected_org_nodes)
-            ->whereNull('u.date_deleted')
             ->pluck('employee_id'); 
         return ($employees ? $employees->toArray() : []); 
     }
@@ -1383,27 +1382,21 @@ class GoalBankController extends Controller
     protected function get_employees_by_selected_inherited($selected_inherited) {
         $employees0 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
             ->whereIn('u.organization_key', $selected_inherited)
-            ->whereNull('u.date_deleted')
             ->pluck('employee_id'); 
         $employees1 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
             ->whereIn('u.level1_key', $selected_inherited)
-            ->whereNull('u.date_deleted')
             ->pluck('employee_id'); 
         $employees2 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
             ->whereIn('u.level2_key', $selected_inherited)
-            ->whereNull('u.date_deleted')
             ->pluck('employee_id'); 
         $employees3 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
             ->whereIn('u.level3_key', $selected_inherited)
-            ->whereNull('u.date_deleted')
             ->pluck('employee_id'); 
         $employees4 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
             ->whereIn('u.level4_key', $selected_inherited)
-            ->whereNull('u.date_deleted')
             ->pluck('employee_id'); 
         $employees5 = UserDemoJrForGoalbankView::from('user_demo_jr_for_goalbank_view AS u')
             ->whereIn('u.level5_key', $selected_inherited)
-            ->whereNull('u.date_deleted')
             ->pluck('employee_id'); 
         $employees = array_unique(array_merge($employees0 ? $employees0->toArray() : [], $employees1 ? $employees1->toArray() : [], $employees2 ? $employees2->toArray() : [], $employees3 ? $employees3->toArray() : [], $employees4 ? $employees4->toArray() : [], $employees5 ? $employees5->toArray() : []), SORT_REGULAR);
         return ($employees ? $employees : []); 
