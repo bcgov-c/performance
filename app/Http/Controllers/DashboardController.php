@@ -20,6 +20,15 @@ class DashboardController extends Controller
 {
     public function index(Request $request) {
         $user = Auth::user();
+
+        
+        if ($user->hasRole('service representative')) {
+            session()->put('sr_user', true);
+        }
+        if ($user->hasRole('sys admin')) {
+            session()->put('sys_user', true);
+        } 
+
         $notifications = DashboardNotification::where('user_id', Auth::id())
                         ->where(function ($q)  {
                             $q->whereExists(function ($query) {
