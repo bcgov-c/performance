@@ -5,6 +5,7 @@
             @include('shared.employeeshares.partials.tabs')
         </div>
     </div>
+    <p class="px-3">Each row below is a separate shared relationship in the PDP. You can search by employee or delegated supervisor to find the relationship you are looking for and view or delete as needed.</p>
 
     <div class="card">
         <div class="card-body">
