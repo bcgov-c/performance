@@ -1410,53 +1410,55 @@ class GoalBankController extends Controller
     }
 
     protected function notify_on_dashboard($goalBank, $employee_ids) {
-        // Filter out the employee based on the Organization level and individual user preferences. 
-        $data = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization_key', 'access_organizations.orgid')
-            ->leftjoin('user_preferences', 'user_demo_jr_view.user_id', 'user_preferences.user_id')
-            ->whereIn('user_demo_jr_view.employee_id', $employee_ids)
-            ->where('access_organizations.allow_inapp_msg', 'Y')
-            ->where( function($query) {
-                $query->where('user_preferences.goal_bank_flag', 'Y')
-                    ->orWhereNull('user_preferences.goal_bank_flag');
-            })
-            ->selectRaw("
-                user_demo_jr_view.user_id, 
-                'GB' AS notification_type,
-                '".($goalBank->display_name ? $goalBank->display_name : $goalBank->user->name)." added a new goal to your goal bank.' AS comment,
-                ".$goalBank->id." AS related_id,
-                NOW() AS created_at,
-                NOW() AS updated_at
-            ")
-            ->get()
-            ->toArray();
+        foreach(array_chunk($employee_ids, 1000) as $employee_ids_chunk) {
+            // Filter out the employee based on the Organization level and individual user preferences. 
+            $data = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization_key', 'access_organizations.orgid')
+                ->leftjoin('user_preferences', 'user_demo_jr_view.user_id', 'user_preferences.user_id')
+                ->whereIn('user_demo_jr_view.employee_id', $employee_ids_chunk)
+                ->where('access_organizations.allow_inapp_msg', 'Y')
+                ->where( function($query) {
+                    $query->where('user_preferences.goal_bank_flag', 'Y')
+                        ->orWhereNull('user_preferences.goal_bank_flag');
+                })
+                ->selectRaw("
+                    user_demo_jr_view.user_id, 
+                    'GB' AS notification_type,
+                    '".($goalBank->display_name ? $goalBank->display_name : $goalBank->user->name)." added a new goal to your goal bank.' AS comment,
+                    ".$goalBank->id." AS related_id,
+                    NOW() AS created_at,
+                    NOW() AS updated_at
+                ")
+                ->get()
+                ->toArray();
             DashboardNotification::insert($data);
             $data = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization_key', 'access_organizations.orgid')
-            ->leftjoin('user_preferences', 'user_demo_jr_view.user_id', 'user_preferences.user_id')
-            ->whereIn('user_demo_jr_view.employee_id', $employee_ids)
-            ->where('access_organizations.allow_inapp_msg', 'Y')
-            ->where( function($query) {
-                $query->where('user_preferences.goal_bank_flag', 'Y')
-                    ->orWhereNull('user_preferences.goal_bank_flag');
-            })
-            ->selectRaw("
-                ' ' AS recipients,
-                0 AS sender_id,
-                '".($goalBank->display_name ? $goalBank->display_name : $goalBank->user->name)." added a new goal to your goal bank.' AS subject,
-                '' AS description,
-                'N' AS alert_type,
-                'A' AS alert_format,
-                user_demo_jr_view.user_id AS notify_user_id,
-                NULL AS overdue_user_id,
-                NULL AS notify_due_date,
-                NULL AS notify_for_days,
-                NULL AS template_id,
-                NOW() AS date_sent,
-                NOW() AS created_at,
-                NOW() AS updated_at
-            ")
-            ->get()
-            ->toArray();
+                ->leftjoin('user_preferences', 'user_demo_jr_view.user_id', 'user_preferences.user_id')
+                ->whereIn('user_demo_jr_view.employee_id', $employee_ids_chunk)
+                ->where('access_organizations.allow_inapp_msg', 'Y')
+                ->where( function($query) {
+                    $query->where('user_preferences.goal_bank_flag', 'Y')
+                        ->orWhereNull('user_preferences.goal_bank_flag');
+                })
+                ->selectRaw("
+                    ' ' AS recipients,
+                    0 AS sender_id,
+                    '".($goalBank->display_name ? $goalBank->display_name : $goalBank->user->name)." added a new goal to your goal bank.' AS subject,
+                    '' AS description,
+                    'N' AS alert_type,
+                    'A' AS alert_format,
+                    user_demo_jr_view.user_id AS notify_user_id,
+                    NULL AS overdue_user_id,
+                    NULL AS notify_due_date,
+                    NULL AS notify_for_days,
+                    NULL AS template_id,
+                    NOW() AS date_sent,
+                    NOW() AS created_at,
+                    NOW() AS updated_at
+                ")
+                ->get()
+                ->toArray();
             NotificationLog::insert($data);
+        }
         // Additional Step -- sent out email message if required
         $this->notify_employees($goalBank, $employee_ids);
     }
