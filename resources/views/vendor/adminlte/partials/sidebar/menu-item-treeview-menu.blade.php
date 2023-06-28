@@ -1,14 +1,4 @@
 @if(!session()->has('view-profile-as'))
-<?php 
-$display_menu = true;
-
-if (session('sr_user') && $item['id'] == 'sys-admin-menu'){
-    $display_menu = false;
-}elseif (session('sys_user') && $item['id'] == 'sr-menu'){
-    $display_menu = false;
-} 
-?>
-@if($display_menu)
 <li @isset($item['id']) id="{{ $item['id'] }}" @endisset class="nav-item has-treeview {{ $item['submenu_class'] }}">
 
     {{-- Menu toggler --}}
@@ -59,5 +49,4 @@ if (session('sr_user') && $item['id'] == 'sys-admin-menu'){
     </ul>
 
 </li>
-@endif
 @endif
