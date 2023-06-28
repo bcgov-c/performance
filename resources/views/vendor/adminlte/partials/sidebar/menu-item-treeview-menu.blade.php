@@ -4,8 +4,6 @@ $display_menu = true;
 
 if (session('sr_user') && $item['id'] == 'sys-admin-menu'){
     $display_menu = false;
-}elseif (session('sys_user') && $item['id'] == 'sr-menu'){
-    $display_menu = false;
 } 
 ?>
 @if($display_menu)
