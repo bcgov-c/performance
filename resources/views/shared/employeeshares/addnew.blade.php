@@ -5,6 +5,7 @@
             @include('shared.employeeshares.partials.tabs')
         </div>
     </div>	
+    @include('my-team.partials.employee-profile-sharing-modal')
     <p class="px-3">Supervisors and administrators may share an employee's PDP profile with another supervisor or staff for a legitimate business reason. The profile should only be shared with people who normally handle employees' permanent personnel records (i.e. Public Service Agency or co-supervisors). An employee may also wish to share their profile with someone other than a direct supervisor (for example, a hiring manager). In order to do this - the employee's consent is required.</p>
 	
         @if(Session::has('message'))
@@ -45,10 +46,8 @@
 
         <div class="container-fluid">
             <br>
-            <h6 class="text-bold">Step 2: Choose what to do with selected employee(s)</h6> 
-            <h6 class="px-3 text-bold">2A: Remove shared status" with a button that says "Delete" below.</h6> 
-            <h6 class="px-3 text-bold">2B: Add shared status</h6> 
-            <h6 class="px-5">Select who you would like to share the selected employee(s) with. Then proceed to Step 3.</h6> 
+            <h6 class="text-bold">Step 2: Select shared supervisor</h6> 
+            <h6 class="px-3">Select who you would like to share the selected employee(s) with. Then proceed to Step 3.</h6> 
 
             <input type="hidden" id="eselected_org_nodes" name="eselected_org_nodes" value="">
             <input type="hidden" id="eselected_emp_ids" name="eselected_emp_ids" value="">
@@ -185,6 +184,29 @@
 			}
 
             $(document).ready(function(){
+
+                $(document).on('show.bs.modal', '#employee-profile-sharing-modal', function (e) {
+                    const userId = $(e.relatedTarget).data('user-id')
+                    $(this).find('#share-profile-form').find('[name=shared_id]').val(userId);
+                    $modal = $(this);
+                    currentUserForModal = userId;
+                    loadSharedProfileData(userId, $modal);
+                });
+
+                function loadSharedProfileData(userId, $modal) {
+                    $.ajax({
+                        url: "{{route('my-team.profile-shared-with', 'xxx')}}".replace('xxx', userId),
+                        success: function (response) {
+                            $modal.find('.shared-with-list').html(response);
+                            $(".items-to-share-edit").multiselect({
+                                allSelectedText: 'All',
+                                selectAllText: 'All',
+                                includeSelectAllOption: true,
+                                nonSelectedText: null,
+                            });
+                        }
+                    });
+                }
 
                 $('#employee-list-table').DataTable( {
                     scrollX: true,
@@ -686,6 +708,11 @@
                 $(".msg").html("Processing request. Please do not close this window.");
                 
                 $("#notify-form").submit();
+            });
+
+            $(document).on('click', '.share-profile-btn', function() {
+                const userName = $(this).data("user-name");
+                $("#employee-profile-sharing-modal").find(".user-name").html(userName);
             });
 
             $('#editModal').on('show.bs.modal', function(event) {
