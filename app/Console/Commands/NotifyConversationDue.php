@@ -105,7 +105,17 @@ class NotifyConversationDue extends Command
         $row_count = 0;
 
         // Eligible Users (check against Allow Access Oragnizations)
-        $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+        // $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+        //     ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+        //     ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+        //     ->where('employee_demo.guid','<>','')
+        //     ->where('users.due_date_paused', 'N')
+        //     ->where('access_organizations.allow_inapp_msg', 'Y')
+        //     ->whereNull('employee_demo.date_deleted')
+        //     ->select('users.*')
+        //     ->orderBy('users.guid')
+        //     ->orderBy('users.id', 'desc');
+        $sql = User::join(\DB::raw('employee_demo USE INDEX (idx_employee_demo_employeeid_orgid)'),'employee_demo.employee_id','users.employee_id')
             ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
             ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
             ->where('employee_demo.guid','<>','')
@@ -117,7 +127,7 @@ class NotifyConversationDue extends Command
             ->orderBy('users.id', 'desc');
 
         $prev_guid = '';
-        $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
+        $sql->chunk(10000, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
 
             foreach ($chunk as $index => $user) {
 
@@ -240,20 +250,29 @@ class NotifyConversationDue extends Command
         $row_count = 0;
 
         // Eligible Users (check against Allow Access Oragnizations)
-        $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+        // $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+        //     ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+        //     ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+        //     ->where('employee_demo.guid','<>','')
+        //     ->where('users.due_date_paused', 'N')
+        //     ->where('access_organizations.allow_inapp_msg', 'Y')
+        //     ->whereNull('date_deleted')
+        //     ->select('users.*')
+        //     ->orderBy('users.guid')
+        //     ->orderBy('users.id', 'desc');
+        $sql = User::join(\DB::raw('employee_demo USE INDEX (idx_employee_demo_employeeid_orgid)'),'employee_demo.employee_id','users.employee_id')
             ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
             ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
             ->where('employee_demo.guid','<>','')
             ->where('users.due_date_paused', 'N')
             ->where('access_organizations.allow_inapp_msg', 'Y')
             ->whereNull('date_deleted')
-            //->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                            
             ->select('users.*')
             ->orderBy('users.guid')
             ->orderBy('users.id', 'desc');
 
         $prev_guid = '';    
-        $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
+        $sql->chunk(10000, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
 
             foreach ($chunk as $index => $user) {
 
@@ -286,7 +305,14 @@ class NotifyConversationDue extends Command
                     $row_count += 1;
 
                     // check whether the manager can recieve In-App Message
-                    $mgr = User::join('employee_demo','employee_demo.guid','users.guid')
+                    // $mgr = User::join('employee_demo','employee_demo.guid','users.guid')
+                    //     ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                    //     ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+                    //     ->where('access_organizations.allow_inapp_msg', 'Y')
+                    //     ->whereNull('date_deleted')                                                
+                    //     ->where('users.id',  $manager_id)
+                    //     ->first();
+                    $mgr = User::join(\DB::raw('employee_demo USE INDEX (idx_employee_demo_employeeid_orgid)'),'employee_demo.employee_id','users.employee_id')
                         ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
                         ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
                         ->where('access_organizations.allow_inapp_msg', 'Y')
@@ -416,7 +442,17 @@ class NotifyConversationDue extends Command
         $row_count = 0;
 
         // Eligible Users (check against Allow Access Oragnizations)
-        $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+        // $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+        //     ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+        //     ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+        //     ->where('employee_demo.guid','<>','')
+        //     ->where('access_organizations.allow_email_msg', 'Y')
+        //     ->whereNull('employee_demo.date_deleted')
+        //     ->where('users.due_date_paused', 'N')
+        //     ->select('users.*')
+        //     ->orderBy('users.guid')
+        //     ->orderBy('users.id', 'desc');
+        $sql = User::join(\DB::raw('employee_demo USE INDEX (idx_employee_demo_employeeid_orgid)'),'employee_demo.employee_id','users.employee_id')
             ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
             ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
             ->where('employee_demo.guid','<>','')
@@ -424,13 +460,11 @@ class NotifyConversationDue extends Command
             ->whereNull('employee_demo.date_deleted')
             ->where('users.due_date_paused', 'N')
             ->select('users.*')
-            //  ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                                     
-            // ->whereIn('users.id',['365129','367485','391595'])
             ->orderBy('users.guid')
             ->orderBy('users.id', 'desc');
 
         $prev_guid = '';
-        $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
+        $sql->chunk(10000, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
 
             foreach ($chunk as $index => $user) {
 
@@ -555,7 +589,17 @@ class NotifyConversationDue extends Command
         $row_count = 0;
 
         // Eligible Users (check against Allow Access Oragnizations)
-        $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+        // $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+        //     ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+        //     ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+        //     ->where('employee_demo.guid','<>','')
+        //     ->where('access_organizations.allow_email_msg', 'Y')
+        //     ->whereNull('employee_demo.date_deleted')
+        //     ->where('users.due_date_paused', 'N')
+        //     ->select('users.*')
+        //     ->orderBy('users.guid')
+        //     ->orderBy('users.id', 'desc');
+        $sql = User::join(\DB::raw('employee_demo USE INDEX (idx_employee_demo_employeeid_orgid)'),'employee_demo.employee_id','users.employee_id')
             ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
             ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
             ->where('employee_demo.guid','<>','')
@@ -563,12 +607,11 @@ class NotifyConversationDue extends Command
             ->whereNull('employee_demo.date_deleted')
             ->where('users.due_date_paused', 'N')
             ->select('users.*')
-            // ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                                            
             ->orderBy('users.guid')
             ->orderBy('users.id', 'desc');
 
         $prev_guid = '';
-        $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
+        $sql->chunk(10000, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
 
             foreach ($chunk as $index => $user) {
 
@@ -601,7 +644,14 @@ class NotifyConversationDue extends Command
                     $row_count += 1;
 
                     // check whether the manager can recieve In-App Message
-                    $mgr = User::join('employee_demo','employee_demo.guid','users.guid')
+                    // $mgr = User::join('employee_demo','employee_demo.guid','users.guid')
+                    //     ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                    //     ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+                    //     ->where('access_organizations.allow_email_msg', 'Y')
+                    //     ->whereNull('date_deleted')                                                
+                    //     ->where('users.id',  $manager_id)
+                    //     ->first();
+                    $mgr = User::join(\DB::raw('employee_demo USE INDEX (idx_employee_demo_employeeid_orgid)'),'employee_demo.employee_id','users.employee_id')
                         ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
                         ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
                         ->where('access_organizations.allow_email_msg', 'Y')
