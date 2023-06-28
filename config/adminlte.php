@@ -289,6 +289,7 @@ return [
         [
             'role' => 'listitem',
             'text' => 'HR Administration',
+            'id' => 'hr-admin-menu',
             'url'  => '#',
             'icon' => 'fas fa-fw fa-cog',
             'active' => ['hradmin/*'],
@@ -330,6 +331,7 @@ return [
         [
             'role' => 'listitem',
             'text' => 'System Administration',
+            'id' => 'sys-admin-menu',
             'url'  => '#',
             'icon' => 'fas fa-fw fa-cog',
             'active' => ['sysadmin/*'],
@@ -410,6 +412,7 @@ return [
         [
             'role' => 'listitem',
             'text' => 'Service Representative',
+            'id' => 'sr-menu',
             'url'  => '#',
             'icon' => 'fas fa-fw fa-cog',
             'active' => ['sysadmin/*'],
