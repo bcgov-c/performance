@@ -373,6 +373,15 @@ class EmployeeSharesController extends Controller {
         ];
     }
 
+    protected function search_criteria_list_v2() {
+        return [
+            'u.employee_name'=> 'Employee Name',
+            'u.employee_id' => 'Employee ID', 
+            'u2.employee_id' => 'Delegate ID', 
+            'd2.employee_name'=> 'Delegate Name',
+        ];
+    }
+
     protected function baseFilteredWhere($request, $option = null) {
         $authId = Auth::id();
         return UserDemoJrView::from('user_demo_jr_view AS u')
@@ -464,7 +473,7 @@ class EmployeeSharesController extends Controller {
         $request->session()->flash('dd_level2', $request->dd_level2);
         $request->session()->flash('dd_level3', $request->dd_level3);
         $request->session()->flash('dd_level4', $request->dd_level4);
-        $criteriaList = $this->search_criteria_list();
+        $criteriaList = $this->search_criteria_list_v2();
         $sharedElements = SharedElement::all();
         return view('shared.employeeshares.manageindex', compact ('request', 'criteriaList', 'sharedElements', 'old_selected_emp_ids'));
     }
@@ -486,33 +495,36 @@ class EmployeeSharesController extends Controller {
                 ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
                 ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
                 ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
-                ->when($request->search_text && $request->criteria == 'employee_name', function($q) use($request) {
-                    return $q->where(function ($r) use($request) {
-                        return $r->whereRaw("u.{$request->criteria} LIKE '%{$request->search_text}%'")
-                            ->orWhereRaw("d2.{$request->criteria} LIKE '%{$request->search_text}%'")
-                            ->orWhereRaw("cd.{$request->criteria} LIKE '%{$request->search_text}%'");
-                    });
+                ->when($request->search_text && $request->criteria, function($q) use($request) {
+                    return $q->whereRaw("{$request->criteria} LIKE '%{$request->search_text}%'");
                 })
-                ->when($request->search_text && $request->criteria == 'employee_id', function($q) use($request) {
-                    return $q->where(function ($r) use($request) {
-                        return $r->whereRaw("u.{$request->criteria} LIKE '%{$request->search_text}%'")
-                            ->orWhereRaw("u2.{$request->criteria} LIKE '%{$request->search_text}%'");
-                    });
-                })
-                ->when($request->search_text && ($request->criteria == 'jobcode_desc' || $request->criteria == 'deptid'), function($q) use($request) {
-                    return $q->whereRaw("u.{$request->criteria} LIKE '%{$request->search_text}%'");
-                })
-                ->when($request->search_text && $request->criteria == 'all', function($q) use($request) {
-                    return $q->where(function ($r) use($request) {
-                        return $r->whereRaw("u.employee_id LIKE '%{$request->search_text}%'")
-                            ->orWhereRaw("u.employee_name LIKE '%{$request->search_text}%'")
-                            ->orWhereRaw("u2.employee_id LIKE '%{$request->search_text}%'")
-                            ->orWhereRaw("d2.employee_name LIKE '%{$request->search_text}%'")
-                            ->orWhereRaw("cd.employee_name LIKE '%{$request->search_text}%'")
-                            ->orWhereRaw("u.jobcode_desc LIKE '%{$request->search_text}%'")
-                            ->orWhereRaw("u.deptid LIKE '%{$request->search_text}%'");
-                    });
-                })
+                // ->when($request->search_text && $request->criteria == 'employee_name', function($q) use($request) {
+                //     return $q->where(function ($r) use($request) {
+                //         return $r->whereRaw("u.{$request->criteria} LIKE '%{$request->search_text}%'")
+                //             ->orWhereRaw("d2.{$request->criteria} LIKE '%{$request->search_text}%'")
+                //             ->orWhereRaw("cd.{$request->criteria} LIKE '%{$request->search_text}%'");
+                //     });
+                // })
+                // ->when($request->search_text && $request->criteria == 'employee_id', function($q) use($request) {
+                //     return $q->where(function ($r) use($request) {
+                //         return $r->whereRaw("u.{$request->criteria} LIKE '%{$request->search_text}%'")
+                //             ->orWhereRaw("u2.{$request->criteria} LIKE '%{$request->search_text}%'");
+                //     });
+                // })
+                // ->when($request->search_text && ($request->criteria == 'jobcode_desc' || $request->criteria == 'deptid'), function($q) use($request) {
+                //     return $q->whereRaw("u.{$request->criteria} LIKE '%{$request->search_text}%'");
+                // })
+                // ->when($request->search_text && $request->criteria == 'all', function($q) use($request) {
+                //     return $q->where(function ($r) use($request) {
+                //         return $r->whereRaw("u.employee_id LIKE '%{$request->search_text}%'")
+                //             ->orWhereRaw("u.employee_name LIKE '%{$request->search_text}%'")
+                //             ->orWhereRaw("u2.employee_id LIKE '%{$request->search_text}%'")
+                //             ->orWhereRaw("d2.employee_name LIKE '%{$request->search_text}%'")
+                //             ->orWhereRaw("cd.employee_name LIKE '%{$request->search_text}%'")
+                //             ->orWhereRaw("u.jobcode_desc LIKE '%{$request->search_text}%'")
+                //             ->orWhereRaw("u.deptid LIKE '%{$request->search_text}%'");
+                //     });
+                // })
                 ->selectRaw ("
                     u.employee_id,
                     u.employee_name,
