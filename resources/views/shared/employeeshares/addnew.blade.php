@@ -748,6 +748,34 @@
                 }
             });
 
+            $(".share-with-users").select2({
+                width: '100%',
+                ajax: {
+                    url: '/users',
+                    dataType: 'json',
+                    data: function (params) {
+                        const query = {
+                            search: params.term,
+                            page: params.page || 1
+                        };
+                        return query;
+                    },
+                    processResults: function (response, params) {
+                        return {
+                            results: $.map(response.data.data, function (item) {
+                                return {
+                                    text: item.name+(item.employee_id ? ' - '+item.employee_id : ''),
+                                    id: item.id
+                                }
+                            }),
+                            pagination: {
+                                more: response.data.current_page !== response.data.last_page
+                            }
+                        }
+                    }
+                }
+            });
+
             
 
         </script>
