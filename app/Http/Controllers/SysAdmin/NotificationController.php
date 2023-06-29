@@ -56,12 +56,14 @@ class NotificationController extends Controller
                 })
                 ->when($request->notify_user, function ($query) use($request) {
                     $query->whereHas('notify_user', function ($query) use($request) { 
-                        $query->whereRaw("lower(name) like  '%". strtolower($request->notify_user) . "%'"); 
+                        $query->whereRaw("lower(name) like  '%". strtolower($request->notify_user) . "%'") 
+                              ->orwhereRaw("users.employee_id like '%". strtolower($request->notify_user) . "%'"); 
                     });   
                 })
                 ->when($request->overdue_user, function ($query) use($request) {
                     $query->whereHas('overdue_user', function ($query) use($request) { 
-                        $query->whereRaw("lower(name) like  '%". strtolower($request->overdue_user) . "%'"); 
+                        $query->whereRaw("lower(name) like  '%". strtolower($request->overdue_user) . "%'") 
+                              ->orwhereRaw("users.employee_id like '%". strtolower($request->overdue_user) . "%'"); 
                     });   
                 })
                 ->when($request->notify_due_date, function ($query) use($request) {
