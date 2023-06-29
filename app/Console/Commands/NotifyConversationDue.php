@@ -657,6 +657,7 @@ class NotifyConversationDue extends Command
                         ->where('access_organizations.allow_email_msg', 'Y')
                         ->whereNull('date_deleted')                                                
                         ->where('users.id',  $manager_id)
+                        ->select('users.*')
                         ->first();
 
                     if (!$mgr) {
@@ -669,10 +670,10 @@ class NotifyConversationDue extends Command
 
 
                     // User Prference 
-                    $pref = UserPreference::where('user_id', $user->manager_id)->first();
+                    $pref = UserPreference::where('user_id', $mgr->id)->first();
                     if (!$pref) {
                         $pref = new UserPreference;
-                        $pref->user_id = $user->manager_id;
+                        $pref->user_id = $mgr->id;
                     }
 
                     // $due = Conversation::nextConversationDue( $user );
@@ -718,12 +719,11 @@ class NotifyConversationDue extends Command
                     }
 
                     // To avoid the past email sent out when the sysadmin turn on global flag under system access control
-                    if ( ($dayDiff < 0 && $dueDate < today()->subDays(6)) ||
-                         ($dayDiff >= 0 && $dueDate < today()) ) {
-                        $bSend = false;                        
+                    if ($bSend && ($dueDate < today()->subDays(6)))  {
+                            $bSend = false;                        
                     }                      
-            
-                    if ($bSend) {
+
+                     if ($bSend) {
 
                         // check the notification sent or not 
                         $log = NotificationLog::where('alert_type', 'N')
