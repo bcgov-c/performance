@@ -1213,7 +1213,8 @@ class ConversationController extends Controller
             $i++;
         }
         usort($participant_users, function($a, $b){ return strcmp($a["name"], $b["name"]); });
-        
+        $participant_users = collect($participant_users)->unique('id')->values()->all();
+
         return view('conversation.templates', compact('templates', 'searchValue', 'conversationMessage', 'viewType', 'user', 'participants', 'participant_users'));
     }
 
