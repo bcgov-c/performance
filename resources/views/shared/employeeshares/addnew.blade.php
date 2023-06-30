@@ -197,13 +197,8 @@
                     $.ajax({
                         url: "{{route('sysadmin.employeeshares.profile-shared-with', 'xxx')}}".replace('xxx', userId),
                         success: function (response) {
+                            console.log(response);
                             $modal.find('.shared-with-list').html(response);
-                            $(".items-to-share-edit").multiselect({
-                                allSelectedText: 'All',
-                                selectAllText: 'All',
-                                includeSelectAllOption: true,
-                                nonSelectedText: null,
-                            });
                         }
                     });
                 }
