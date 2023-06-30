@@ -193,6 +193,11 @@
                     loadSharedProfileData(userId, $modal);
                 });
 
+                $(document).on('hide.bs.modal', '#employee-profile-sharing-modal', function (e) {
+                    table  = $('#employee-list-table').DataTable();
+                    table.rows().invalidate().draw();
+                });
+
                 function loadSharedProfileData(userId, $modal) {
                     $.ajax({
                         url: "{{route('sysadmin.employeeshares.profile-shared-with', 'xxx')}}".replace('xxx', userId),
