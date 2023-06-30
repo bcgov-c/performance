@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\ConversationParticipant;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
+use App\Http\Requests\MyTeams\ShareProfileRequest;
 use Carbon\Carbon;
 
 
@@ -798,7 +799,47 @@ class EmployeeSharesController extends Controller {
     }
 
     
+    public function getProfileSharedWith($user_id) {
+        $sharedProfiles = SharedProfile::where('shared_id', $user_id)->with(['sharedWith' => function ($query) {
+            $query->select('id', 'name');
+        }])->get();
+        
+        session()->put('checking_user', $user_id);
 
+        return view('shared.employeeshares.partials.profile-shared-with', compact('sharedProfiles'));
+        // return $this->respondeWith($sharedProfiles);
+    }
+
+    public function updateProfileSharedWith($shared_profile_id, UpdateProfileSharedWithRequest $request) {
+        $sharedProfile = SharedProfile::findOrFail($shared_profile_id);
+        $input = $request->validated();
+        $update = [];
+        if ($input['action'] !== 'stop') {
+            if($input['action'] === 'comment') {
+                $update['comment'] = $input['comment'];
+            }
+            else if ($input['action'] === 'items') {
+                $update['shared_item'] = $input['shared_item'];
+            }
+            $sharedProfile->update($update);
+            /// $sharedProfile->save();
+            return $this->respondeWith($sharedProfile);
+        }
+        
+        //also clean up shared goals
+        $shared_id = $sharedProfile->shared_id;
+        $shared_with = $sharedProfile->shared_with;
+        
+        DB::table('goals_shared_with')
+                    ->where('user_id', $shared_id)
+                    ->whereIn('goal_id', function ($query) use ($shared_with) {
+                        $query->select('id')->from('goals')->where('user_id', $shared_with);
+                    })
+                    ->delete();
+        $sharedProfile->delete();        
+        
+        return $this->respondeWith('');
+    }
 
 
 }

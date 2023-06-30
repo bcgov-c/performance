@@ -195,7 +195,7 @@
 
                 function loadSharedProfileData(userId, $modal) {
                     $.ajax({
-                        url: "{{route('my-team.profile-shared-with', 'xxx')}}".replace('xxx', userId),
+                        url: "{{route('sysadmin.employeeshares.profile-shared-with', 'xxx')}}".replace('xxx', userId),
                         success: function (response) {
                             $modal.find('.shared-with-list').html(response);
                             $(".items-to-share-edit").multiselect({
