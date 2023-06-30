@@ -23,6 +23,8 @@ use Illuminate\Support\Facades\Route;
 use App\Models\ConversationParticipant;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
+use App\Http\Requests\MyTeams\ShareProfileRequest;
+use App\Http\Requests\MyTeams\UpdateProfileSharedWithRequest;
 use Carbon\Carbon;
 
 
@@ -654,5 +656,147 @@ class EmployeeSharesController extends Controller {
     //     ->get();
     //     return view('shared.employeeshares.partials.access-edit-modal', compact('roles', 'access', 'email'));
     // }
+
+    public function shareProfile(ShareProfileRequest $request) {
+        $input = $request->validated();
+        // dd($input);
+        // 
+        // 
+        //check if shared_id is direct team member of shared with users
+        $shared_id = $input['shared_id'];
+        $skip_sharing = false;
+        $error_msg = '';
+        foreach ($input['share_with_users'] as $shared_with_user_id) {
+            //not allow direct team members be shared to their manager
+            $get_direct = User::select('id')
+                           ->where('id', '=', $shared_id)
+                           ->where('reporting_to', '=', $shared_with_user_id)
+                           ->count();                 
+            if($get_direct > 0){
+                $skip_sharing = true;   
+                $error_msg = 'The employee already reports directly to that supervisor. Employees cannot be shared with their direct supervisor.';
+            }    
+            //not allow exsiting shared team members be shared to the same 
+            $get_shared = sharedProfile::select('id')
+                           ->where('shared_id', '=', $shared_id)
+                           ->where('shared_with', '=', $shared_with_user_id)
+                           ->count(); 
+            if($get_shared > 0){
+                $skip_sharing = true;  
+                $error_msg = 'The employee has already been shared with that supervisor. They cannot be shared with the same supervisor more than once.';
+            }      
+        }
+        
+        //check shared with users, if user dont have supervisor role, assign to the user
+        foreach ($input['share_with_users'] as $shared_with_user_id) {
+            $shared_with_user = User::findOrFail($shared_with_user_id);
+            //$this->assignSupervisorRole($user);
+            if (!($shared_with_user->hasRole('Supervisor'))) {
+                $shared_with_user->assignRole('Supervisor');
+            } 
+        }
+
+        $insert = [
+            'shared_by' => Auth::id(),
+            'shared_item' => $input['items_to_share'],
+            'shared_id' => $input['shared_id'],
+            'comment' => $input['reason']
+        ];
+
+        $sharedProfile = [];
+        if (!$skip_sharing) {
+            DB::beginTransaction();
+            foreach ($input['share_with_users'] as $user_id) {
+                $insert['shared_with'] = $user_id;
+                array_push($sharedProfile, SharedProfile::updateOrCreate($insert));
+            }
+
+            // Send out email to the user when his profile was shared
+            foreach ($sharedProfile as $result) {
+
+                $user = User::where('id', $result->shared_id)
+                                ->with('userPreference')
+                                ->select('id','name','guid', 'employee_id')
+                                ->first();
+
+                if ($user && $user->allow_inapp_notification) {
+                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                    $notification->user_id = $result->shared_id;
+                    $notification->notification_type = 'SP';
+                    $notification->comment = 'Your profile has been shared with ' . $result->sharedWith->name;
+                    $notification->related_id =  $result->id;
+                    $notification->notify_user_id = $result->shared_id;
+                    $notification->send();                                 
+                }
+
+                if ($user && $user->allow_email_notification && $user->userPreference->share_profile_flag == 'Y') {
+
+                    // Send Out Email Notification to Employee
+                    $sendMail = new \App\MicrosoftGraph\SendMail();
+                    $sendMail->toRecipients = [ $user->id ];  
+                    $sendMail->sender_id = null; 
+                    $sendMail->useQueue = false;
+                    $sendMail->saveToLog = true;
+                    $sendMail->alert_type = 'N';
+                    $sendMail->alert_format = 'E';
+
+                    $sendMail->template = 'PROFILE_SHARED';
+                    array_push($sendMail->bindvariables, $user->name);                 // Recipient of the email
+                    array_push($sendMail->bindvariables, $result->sharedWith->name);   // Person who added goal to goal bank
+                    array_push($sendMail->bindvariables, $result->sharedElementName);  // Shared element
+                    array_push($sendMail->bindvariables, $result->comment);             // comment
+                    $response = $sendMail->sendMailWithGenericTemplate();
+                }
+            }
+
+            DB::commit();
+            //return $this->respondeWith($sharedProfile);
+            return redirect('/hradmin/employeeshares');
+        }                
+        return response()->json(['success' => false, 'message' => $error_msg]);
+    }
+
+    
+    public function getProfileSharedWith($user_id) {
+        $sharedProfiles = SharedProfile::where('shared_id', $user_id)->with(['sharedWith' => function ($query) {
+            $query->select('id', 'name');
+        }])->get();
+        
+        session()->put('checking_user', $user_id);
+
+        return view('shared.employeeshares.partials.profile-shared-with', compact('sharedProfiles'));
+        // return $this->respondeWith($sharedProfiles);
+    }
+
+    public function updateProfileSharedWith($shared_profile_id, UpdateProfileSharedWithRequest $request) {
+        $sharedProfile = SharedProfile::findOrFail($shared_profile_id);
+        $input = $request->validated();
+        $update = [];
+        if ($input['action'] !== 'stop') {
+            if($input['action'] === 'comment') {
+                $update['comment'] = $input['comment'];
+            }
+            else if ($input['action'] === 'items') {
+                $update['shared_item'] = $input['shared_item'];
+            }
+            $sharedProfile->update($update);
+            /// $sharedProfile->save();
+            return $this->respondeWith($sharedProfile);
+        }
+        
+        //also clean up shared goals
+        $shared_id = $sharedProfile->shared_id;
+        $shared_with = $sharedProfile->shared_with;
+        
+        DB::table('goals_shared_with')
+                    ->where('user_id', $shared_id)
+                    ->whereIn('goal_id', function ($query) use ($shared_with) {
+                        $query->select('id')->from('goals')->where('user_id', $shared_with);
+                    })
+                    ->delete();
+        $sharedProfile->delete();        
+        
+        return $this->respondeWith('');
+    }
 
 }

@@ -5,7 +5,7 @@
             @include('shared.employeeshares.partials.tabs')
         </div>
     </div>	
-    @include('my-team.partials.employee-profile-sharing-modal')
+    @include('shared.employeeshares.partials.employee-profile-sharing-modal')
     <p class="px-3">Supervisors and administrators may share an employee's PDP profile with another supervisor or staff for a legitimate business reason. The profile should only be shared with people who normally handle employees' permanent personnel records (i.e. Public Service Agency or co-supervisors). An employee may also wish to share their profile with someone other than a direct supervisor (for example, a hiring manager). In order to do this - the employee's consent is required.</p>
 	
         @if(Session::has('message'))
@@ -178,6 +178,46 @@
             let g_selected_orgnodes = [];
             let eg_selected_orgnodes = [];
 
+            $(document).on('submit', '.share-profile-form-edit', function (e) {
+                $form = $(this);
+                const data = $form.serializeArray();
+                data.push({name: 'action', value: this.submitted});
+                $.ajax({
+                    method: 'POST',
+                    url: $form.attr('action'),
+                    data: data,
+                    success: function () {
+                        loadSharedProfileData(currentUserForModal, $form.parents('.modal'));
+                    }
+                });
+                e.preventDefault();
+            });
+
+            function loadSharedProfileData(userId, $modal) {
+                $.ajax({
+                    url: "/{{request()->segment(1)}}/profile-shared-with/xxx".replace('xxx', userId),
+                    success: function (response) {
+                        $modal.find('.shared-with-list').html(response);
+                        $(".items-to-share-edit").multiselect({
+                            allSelectedText: 'All',
+                            selectAllText: 'All',
+                            includeSelectAllOption: true,
+                            nonSelectedText: null,
+                        });
+                    }
+                });
+            }
+
+            $(document).on('click', ".edit-field", function (e) {
+                $('.view-mode').removeClass("d-none");
+                $('.edit-mode').addClass("d-none");
+                $viewArea = $(this).parents('.view-mode');
+                $editArea = $(this).parents('td').find('.edit-mode');
+                $editArea.removeClass("d-none");
+                $viewArea.addClass("d-none");
+            });
+
+
             function confirmSaveAllModal(){
 				$('#saveAllModal .modal-body p').html('Are you sure you want to share the selected profile(s)?');
 				$('#saveAllModal').modal();
@@ -186,7 +226,7 @@
             $(document).ready(function(){
 
                 $(document).on('show.bs.modal', '#employee-profile-sharing-modal', function (e) {
-                    const userId = $(e.relatedTarget).data('user-id')
+                    var userId = $(e.relatedTarget).data('user_id');
                     $(this).find('#share-profile-form').find('[name=shared_id]').val(userId);
                     $modal = $(this);
                     currentUserForModal = userId;
@@ -195,7 +235,7 @@
 
                 function loadSharedProfileData(userId, $modal) {
                     $.ajax({
-                        url: "{{route('sysadmin.employeeshares.profile-shared-with', 'xxx')}}".replace('xxx', userId),
+                        url: "{{ route(request()->segment(1).'.employeeshares.profile-shared-with', 'xxx')}}".replace('xxx', userId),
                         success: function (response) {
                             console.log(response);
                             $modal.find('.shared-with-list').html(response);
@@ -784,5 +824,14 @@
         background-color: #f2dede;
         border-color: #ebccd1;
     }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #444444;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    cursor: default;
+    float: left;
+    margin-right: 5px;
+    margin-top: 5px;
+    padding: 0 5px; }    
     
 </style> 

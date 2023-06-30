@@ -19,7 +19,7 @@ Route::group(['middleware' => ['role:Supervisor']], function () {
     Route::get( 'my-team/performance-statistics', [MyTeamController::class, 'performanceStatistics'])->name('my-team.performance-statistics');
     Route::post('my-team/sync', [MyTeamController::class, 'syncGoals'])->name('my-team.sync-goals');
     Route::post('my-team/add-goal-to-library', [MyTeamController::class, 'addGoalToLibrary'])->name('my-team.add-goal-to-library');
-    Route::get('users', [MyTeamController::class, 'userList'])->name('users-list');
+    
 
     Route::post('my-team/share-profile', [MyTeamController::class, 'shareProfile'])->name('my-team.share-profile');
     Route::get('profile-shared-with/{user_id}', [MyTeamController::class, 'getProfileSharedWith'])->name('my-team.profile-shared-with');
@@ -70,3 +70,4 @@ Route::group(['middleware' => ['ViewAsPermission']], function () {
     Route::get('my-team/return-to-my-view', [MyTeamController::class, 'returnToMyProfile'])->name('my-team.return-to-my-view');
 
 });
+Route::get('users', [MyTeamController::class, 'userList'])->name('users-list');

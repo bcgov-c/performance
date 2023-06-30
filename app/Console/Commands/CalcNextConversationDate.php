@@ -77,14 +77,14 @@ class CalcNextConversationDate extends Command
         if ($stored) {
             if ($stored->value){
                 $last_cutoff_time = $stored->value;
-                $this->info( 'Last Run Date:  ' . $last_cutoff_time);
+                $this->info(Carbon::now()->format('c').' - Last Run Date:  ' . $last_cutoff_time);
             } else { 
                 $last_cutoff_time = Carbon::create(1900, 1, 1, 0, 0, 0, 'PDT')->format('c');
-                $this->info( 'Last Run Date not found.  Using ' . $last_cutoff_time);
+                $this->info(Carbon::now()->format('c').' - Last Run Date not found.  Using ' . $last_cutoff_time);
             }
         } else {  
             $last_cutoff_time = Carbon::create(1900, 1, 1, 0, 0, 0, 'PDT')->format('c');
-            $this->info( 'Last Run Date not found.  Using ' . $last_cutoff_time);
+            $this->info(Carbon::now()->format('c').' - Last Run Date not found.  Using ' . $last_cutoff_time);
             $stored = DB::table('stored_dates')->updateOrInsert(
                 [
                     'name' => 'CalcNextConversationDate',
@@ -108,7 +108,7 @@ class CalcNextConversationDate extends Command
         ->distinct()
         ->orderBy('employee_demo.employee_id')
         ->orderBy('employee_demo.empl_record')
-        ->chunk(1000, function($employeeDemo) use (&$counter, &$updatecounter, $ClassificationArray, $DefaultCreatorName, $audit_id) {
+        ->chunk(10000, function($employeeDemo) use (&$counter, &$updatecounter, $ClassificationArray, $DefaultCreatorName, $audit_id) {
             foreach ($employeeDemo as $demo) {
                 $changeType = 'noChange';
                 $new_last_employee_status = null;
@@ -165,10 +165,17 @@ class CalcNextConversationDate extends Command
                     // Moved 1 month forward
                     // $virtualHardDate = Carbon::createFromDate(2022, 11, 14);
                     // Moved 2 week later
-                    $virtualHardDate = Carbon::createFromDate(2022, 11, 30);
+                    // $virtualHardDate = Carbon::createFromDate(2022, 11, 30);
+                    // if ($virtualHardDate->gt($initNextConversationDate)) {
+                    //     // distribute next conversation date, based on last digit of employee ID
+                    //     $DDt = abs (($demo->employee_id % 10) - 1) * 5 + (($demo->employee_id % 5));
+                    //     $initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
+                    // }
+                    // Updated Conversation Start Dates
+                    $virtualHardDate = Carbon::createFromDate(2023, 11, 01);
                     if ($virtualHardDate->gt($initNextConversationDate)) {
                         // distribute next conversation date, based on last digit of employee ID
-                        $DDt = abs (($demo->employee_id % 10) - 1) * 5 + (($demo->employee_id % 5));
+                        $DDt = (int) (($demo->employee_id % 100) * 52 / 100);
                         $initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
                     }
                     // calcualte initial last conversation date; init next conversation minus 4 months
@@ -387,38 +394,7 @@ class CalcNextConversationDate extends Command
                         }
                         $newJr->save();
                         $updatecounter += 1;
-                        // $old_values = [ 
-                        //     'table' => 'employee_demo_jr'
-                        // ];
-                        // $new_values = [ 
-                        //     'table' => 'employee_demo_jr', 
-                        //     'guid' => $demo->guid, 
-                        //     'employee_id' => $demo->employee_id, 
-                        //     'current_employee_status' => $demo->employee_status, 
-                        //     'current_classification' => $demo->jobcode, 
-                        //     'current_classification_descr' => $demo->jobcode_desc, 
-                        //     'current_manual_excuse' => $demo->excused_flag ? 'Y' : 'N', 
-                        //     'due_date_paused' => in_array($changeType, $excusedArrayTypes) ? 'Y' : 'N', 
-                        //     'last_employee_status' => $new_last_employee_status, 
-                        //     'last_classification' => $new_last_classification, 
-                        //     'last_classification_descr' => $new_last_classification_descr, 
-                        //     'last_manual_excuse' => $new_last_manual_excuse, 
-                        //     'excused_type' => $excuseType, 
-                        //     'last_conversation_date' => $lastConversationDate ? Carbon::parse($lastConversationDate) : null, 
-                        //     'next_conversation_date' => $initNextConversationDate ? Carbon::parse($initNextConversationDate) : null, 
-                        //     'created_by_id' => $DefaultCreatorName, 
-                        //     'updated_by_id' => $excused_updated_by ?? $DefaultCreatorName, 
-                        //     'updated_by_name' => $updated_by_name, 
-                        //     'excused_reason_id' => $excused_reason_id, 
-                        //     'excused_reason_desc' => $excused_reason_desc, 
-                        //     'updated_at' => $excused_updated_at ? $excused_updated_at : null
-                        // ];
-                        // $audit = new JobDataAudit;
-                        // $audit->job_sched_id = $audit_id;
-                        // $audit->old_values = json_encode($old_values);
-                        // $audit->new_values = json_encode($new_values);
-                        // $audit->save();
-                        echo 'GUID '.$newJr->guid.'.  $changeType '.$changeType.'.  EMPLID '.$demo->employee_id.'.'; echo "\r\n";
+                        echo '$changeType '.$changeType.'.  EMPLID '.$demo->employee_id.'.  newDueDate '.$newJr->next_conversation_date.'.  '; echo "\r\n";
                     } else {
                         if ($jr && $jr->next_conversation_date && $initNextConversationDate && $jr->next_conversation_date <> $initNextConversationDate) {
                             // save new next conversation due date;
@@ -446,39 +422,7 @@ class CalcNextConversationDate extends Command
                             $newJr->updated_at = $jr->updated_at;
                             $newJr->save();
                             $updatecounter += 1;
-                            // $old_values = [ 
-                            //     'table' => 'employee_demo_jr'
-                            // ];
-                            // $new_values = [ 
-                            //     'table' => 'employee_demo_jr', 
-                            //     'guid' => $jr->guid, 
-                            //     'employee_id' => $jr->employee_id, 
-                            //     'current_employee_status' => $jr->current_employee_status, 
-                            //     'current_classification' => $jr->current_classification, 
-                            //     'current_classification_descr' => $jr->current_classification_descr, 
-                            //     'current_manual_excuse' => $jr->current_manual_excuse, 
-                            //     'due_date_paused' => $jr->due_date_paused, 
-                            //     'last_employee_status' => $jr->last_employee_status, 
-                            //     'last_classification' => $jr->last_classification, 
-                            //     'last_classification_descr' => $jr->last_classification_descr, 
-                            //     'last_manual_excuse' => $jr->last_manual_excuse, 
-                            //     'excused_type' => $jr->excused_type, 
-                            //     'last_conversation_date' => $jr->last_conversation_date, 
-                            //     'next_conversation_date' => $initNextConversationDate ? Carbon::parse($initNextConversationDate) : null, 
-                            //     'created_by_id' => $jr->created_by_id, 
-                            //     'updated_by_id' => $jr->updated_by_id, 
-                            //     'updated_by_name' => $jr->updated_by_name, 
-                            //     'excused_reason_id' => $jr->excused_reason_id, 
-                            //     'excused_reason_desc' => $jr->excused_reason_desc, 
-                            //     'created_at' => $jr->created_at,
-                            //     'updated_at' => $jr->updated_at
-                            // ];
-                            // $audit = new JobDataAudit;
-                            // $audit->job_sched_id = $audit_id;
-                            // $audit->old_values = json_encode($old_values);
-                            // $audit->new_values = json_encode($new_values);
-                            // $audit->save();
-                            echo 'GUID '.$newJr->guid.'.  $changeType updateDueDate.  EMPLID '.$demo->employee_id.'.  oldDueDate '.$jr->next_conversation_date.'.  newDueDate '.$initNextConversationDate.'.  '; echo "\r\n";
+                            echo '$changeType updateDueDate.  EMPLID '.$demo->employee_id.'.  oldDueDate '.$jr->next_conversation_date.'.  newDueDate '.$initNextConversationDate.'.  '; echo "\r\n";
                         } else {
                             // SKIP if no change
                         }
@@ -504,17 +448,16 @@ class CalcNextConversationDate extends Command
                     if ($details == '') {
                         $details = 'Unidentified';
                     }
-                    // Log::info(Carbon::now()->format('c').' - '.$processname.' - ['.$details.'] does not have GUID in Employee Demo table.');
+                    Log::info(Carbon::now()->format('c').' - ['.$details.'] does not have GUID in Employee Demo table.');
                 }
                 $counter += 1;
-                echo 'Processed '.$counter.'.  Updated '.$updatecounter.'.'; echo "\r";
+                // echo 'Processed '.$counter.'.  Updated '.$updatecounter.'.'; echo "\r";
             }
+            $this->info(Carbon::now()->format('c').' - Processed '.$counter.'.  Updated '.$updatecounter.'.');
         });
 
         // Note: for speeding up performance, update 'Next conversation Due' and 'due_date_paused' in users table
-        // $this->info( 'Update users table - start: '. now() );
         $this->updateUsersTable();
-        // $this->info( 'Update users table - end : '. now() );
         
         echo 'Processed '.$counter.'.  Updated '.$updatecounter.'.'; echo "\r\n";
         DB::table('stored_dates')->updateOrInsert(
@@ -525,7 +468,7 @@ class CalcNextConversationDate extends Command
             'value' => $start_time,
             ]
         );
-        $this->info( 'Last Run Date Updated to: '.$start_time);
+        $this->info(Carbon::now()->format('c').' - Last Run Date Updated to: '.$start_time);
         $end_time = Carbon::now();
         DB::table('job_sched_audit')->updateOrInsert(
             [
@@ -540,7 +483,7 @@ class CalcNextConversationDate extends Command
                 'details' => 'Processed '.$counter.' and Updated '.$updatecounter.' rows.',
             ]
         );
-        $this->info('CalcNextConversationDate, Completed: '.$end_time);
+        $this->info(Carbon::now()->format('c').' - CalcNextConversationDate, Completed: '.$end_time);
         // Log::info($end_time->format('c').' - '.$processname.' - Finished');
     } 
      

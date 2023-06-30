@@ -23,6 +23,7 @@ use App\Models\ConversationParticipant;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\MyTeams\ShareProfileRequest;
+use App\Http\Requests\MyTeams\UpdateProfileSharedWithRequest;
 use Carbon\Carbon;
 
 
@@ -736,24 +737,6 @@ class EmployeeSharesController extends Controller {
                 array_push($sharedProfile, SharedProfile::updateOrCreate($insert));
             }
 
-            // foreach ($sharedProfile as $result) {
-            //     // Dashboard message added when an shared employee's profile (goals, conversations, or both)
-            //     // DashboardNotification::create([
-            //     //     'user_id' => $result->shared_id,
-            //     //     'notification_type' => 'SP',         
-            //     //     'comment' => 'Your profile has been shared with ' . $result->sharedWith->name,
-            //     //     'related_id' => $result->id,
-            //     // ]);
-            //     // Use Class to create DashboardNotification
-            //                 $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-            //                 $notification->user_id = $result->shared_id;
-            //                 $notification->notification_type = 'SP';
-            //                 $notification->comment = 'Your profile has been shared with ' . $result->sharedWith->name;
-            //                 $notification->related_id =  $result->id;
-            //     $notification->notify_user_id = $result->shared_id;
-            //                 $notification->send(); 
-            // }
-
             // Send out email to the user when his profile was shared
             foreach ($sharedProfile as $result) {
 
@@ -793,7 +776,8 @@ class EmployeeSharesController extends Controller {
             }
 
             DB::commit();
-            return $this->respondeWith($sharedProfile);
+            //return $this->respondeWith($sharedProfile);
+            return redirect('/sysadmin/employeeshares');
         }                
         return response()->json(['success' => false, 'message' => $error_msg]);
     }
@@ -840,6 +824,7 @@ class EmployeeSharesController extends Controller {
         
         return $this->respondeWith('');
     }
+
 
 
 }
