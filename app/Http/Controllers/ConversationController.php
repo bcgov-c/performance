@@ -475,10 +475,19 @@ class ConversationController extends Controller
                 });
             }         
         }
-        $json_conversations = json_encode($conversations_arr);            
+        $json_conversations = json_encode($conversations_arr);         
+        
 
-        return view($view, compact('type', 'conversations', 'myTeamConversations', 'conversationTopics', 'conversationMessage', 'viewType', 'reportees', 'topics', 'textAboveFilter', 'user', 
-                                    'supervisor_conversations', 'open_modal_id', 'conversationList','team_members', 'supervisor_members', 'sub', 'json_myTeamConversations', 'json_conversations'));
+        if($request->id){
+            $open_modal_id = $request->id;
+        }
+        $owner_role = '';
+        if($request->ownerrole){
+            $owner_role = $request->ownerrole;
+        }
+
+        return view($view, compact('type', 'conversations', 'myTeamConversations', 'conversationTopics', 'conversationMessage', 'viewType', 'reportees', 'topics', 'textAboveFilter', 'user',
+                                    'supervisor_conversations', 'open_modal_id', 'owner_role', 'conversationList','team_members', 'supervisor_members', 'sub', 'json_myTeamConversations', 'json_conversations'));
     }
 
     /**
@@ -507,6 +516,7 @@ class ConversationController extends Controller
         }
 
         $actualOwner = $isDirectRequest ? $authId : $request->owner_id ?? $authId;
+        $actualOwnerRole = 'emp';
 
         $conversation = new Conversation();
         $conversation->conversation_topic_id = $request->conversation_topic_id;
@@ -534,6 +544,7 @@ class ConversationController extends Controller
                         'participant_id' => $actualOwner,
                         'role' => 'mgr',
                     ]);
+                    $actualOwnerRole = 'mgr';
                     $is_direct = true;
                 } 
 
@@ -575,6 +586,7 @@ class ConversationController extends Controller
                                 'participant_id' => $value,
                                 'role' => 'emp',
                             ]);
+                            $actualOwnerRole = 'mgr';
                         }
                     }
 
@@ -621,6 +633,7 @@ class ConversationController extends Controller
                         'role' => 'mgr',
                     ]);
                     $is_direct = true;
+                    $actualOwnerRole = 'mgr';
                 } 
 
                 $mgrinfo_1 = DB::table('users')                        
@@ -661,6 +674,7 @@ class ConversationController extends Controller
                                 'participant_id' => $value,
                                 'role' => 'emp',
                             ]);
+                            $actualOwnerRole = 'mgr';
                         }
                     }
 
@@ -777,12 +791,14 @@ class ConversationController extends Controller
         if(request()->ajax()){
             return response()->json(['success' => true, 'message' => 'Conversation Created successfully']);
         }else{
-            return redirect()->route('conversation.upcoming');
+            //return redirect()->route('conversation.upcoming');
             /* if ($conversation->is_with_supervisor) {
                 return redirect()->route('conversation.upcoming');
             } else {
                 return redirect()->route('my-team.conversations.upcoming');
             } */
+            $conversation_id = $conversation->id;
+            return redirect()->route('conversation.upcoming', ['id' => $conversation_id, 'ownerrole'=>$actualOwnerRole]);
         }
     }
 
