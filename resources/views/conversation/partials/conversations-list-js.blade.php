@@ -32,13 +32,23 @@
                             $('.modal-body').find('.error').html('');
                             $('.modal-body').find('input[type=radio]').prop('checked', false);
                             $('#viewConversationModal').modal('toggle');
-                            window.location.reload();
+                            //window.location.href = window.location.origin + window.location.pathname + window.location.hash;
+
+                            var roleParam = getParameterByName('ownerrole');
+                            var newURL = window.location.origin + window.location.pathname + '?ownerrole=' + encodeURIComponent(roleParam) + window.location.hash;
+                            window.location.href = newURL;
+
                         }else {
                             e.preventDefault();                            
                         }  
                 } else if(checkIfItIsLocked()) {
                     $('#viewConversationModal').modal('toggle');
-                    window.location.reload();
+                    //window.location.href = window.location.origin + window.location.pathname + window.location.hash;
+
+                    var roleParam = getParameterByName('ownerrole');
+                    var newURL = window.location.origin + window.location.pathname + '?ownerrole=' + encodeURIComponent(roleParam) + window.location.hash;
+                    window.location.href = newURL;
+
                 }
             } 
         
@@ -943,6 +953,15 @@
             
             function sessionWarningStop() {
                 clearTimeout(SessionTime);
+            }
+
+            function getParameterByName(name) {
+                name = name.replace(/[\[\]]/g, '\\$&');
+                var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                    results = regex.exec(window.location.search);
+                if (!results) return null;
+                if (!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, ' '));
             }
             
             

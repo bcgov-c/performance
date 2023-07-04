@@ -409,6 +409,13 @@ i {
          $(".upcoming-border").addClass('border-primary');
          
   });  
+
+  <?php if($owner_role == 'emp'){ ?>
+    $('#collapse_sup').collapse('show');
+  <?php } elseif ($owner_role == 'mgr'){ ?>
+    $('#collapse_emp').collapse('show');
+  <?php } ?>
+
 </script>
 
 <style>
