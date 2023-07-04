@@ -91,6 +91,16 @@
                             d.search_text = $('#search_text').val();
                         }
                     },
+                    "fnDrawCallback": function() {
+                    },
+                    "fnRowCallback": function( row, data ) {
+                        var index = $.inArray(data.shared_profile_id, g_selected_employees);
+                        if ( index === -1 ) {
+                            $(row).find('input[id="userCheck'+data.shared_profile_id+'"]').prop('checked', false);
+                        } else {
+                            $(row).find('input[id="userCheck'+data.shared_profile_id+'"]').prop('checked', true);
+                        }
+                    },
                     columns: [
                         {title: 'Shared Profile ID', ariaTitle: 'Shared Profile ID', target: 0, type: 'num', data: 'shared_profile_id', name: 'shared_profile_id', searchable: false, visible: false},
                         {title: ' ', ariaTitle: 'Shared Checkboxes', target: 0, type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
