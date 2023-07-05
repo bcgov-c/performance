@@ -43,8 +43,7 @@ class GoalController extends Controller
         array_unshift($tagsList, [
             "id" => "0",
             "name" => "Any"
-        ]); 
-        Log::info('new log test');  
+        ]);   
         
         $sysstatus = \Config::get("global.status");
         
