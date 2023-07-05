@@ -1,3 +1,4 @@
+<script src="https://cdn.ckeditor.com/4.20.1/standard-all/ckeditor.js"></script>
 <style>
     th{
         padding:20px;
@@ -276,6 +277,11 @@
         <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
         <script>
             var modal_open = false;
+            var need_fresh = false;
+            var autosave = true;
+            var no_warning = false;
+            var myTimeout;
+
             $('#filter-menu select, #filter-menu input').change(function () {
                 $("#filter-menu").submit();
             });
@@ -389,6 +395,7 @@
 
 
 <script>    
+
         $( "#start_date" ).change(function() {
             var start_date = $( "#start_date" ).val();
             $( "#target_date" ).attr("min",start_date);            
@@ -412,44 +419,64 @@
             trigger: 'click',
         });
            
-            
-        function sessionWarning() {
-            if (modal_open == true) {
-                //$(".btn-submit").trigger("click");
-                for (var i in CKEDITOR.instances){
-                    CKEDITOR.instances[i].updateElement();
-                };
-                $.ajax({
-                    url:'/my-team/add-goal-to-library',
-                    type : 'POST',
-                    data: $('#add-goal-to-library-form').serialize(),
-                    success: function (result) {
-                        if(result.success){
-                            alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');  
-                            window.location.href= '/goal/goalbank'; 
-                        }
-                    },
-                    error: function (error){
-                        $('.btn-submit').prop('disabled',false);
-                        $('.btn-submit').html('Save Changes');
-                        $('.alert-danger').show();
-                        $('.modal-body').animate({scrollTop: 0},100);
-                        var errors = error.responseJSON.errors;
-                        $('.text-danger').each(function(i, obj) {
-                            $('.text-danger').text('');
+        function setTimeRoll(){
+                const minutes = 1;
+                const SessionTime = 1000 * 60 * minutes;
+                if (myTimeout) { clearInterval(myTimeout) };
+                //const myTimeout = setTimeout(sessionWarning, SessionTime);
+                myTimeout = setInterval(function() { 
+                    if (modal_open == true && autosave == true) {
+                        //$(".btn-submit").trigger("click");  
+                        for (var i in CKEDITOR.instances){
+                            CKEDITOR.instances[i].updateElement();
+                        };
+                        $.ajax({
+                            url:'/goal',
+                            type : 'POST',
+                            data: $('#goal_form').serialize(),
+                            success: function (result) {
+                                console.log(result);
+                                need_fresh = true;
+                                if(result.success){
+                                    autosave = false;
+                                    no_warning = true;
+                                    alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');
+                                    //window.location.href= '/goal';
+                                    $('.alert-danger').show();
+                                    $('.alert-danger').html('Your goal has been saved.');
+                                    $('.btn-submit').hide();
+                                    $('.text-danger').hide();
+                                    $('.form-control').removeClass('is-invalid');                                    
+                                    $('#addGoalModal').modal('toggle');
+                                }
+                            },
+                            error: function (error){
+                                console.log(error);
+                                need_fresh = false;
+                                autosave =  true;
+                                $('.btn-submit').show();
+                                $('.btn-submit').prop('disabled',false);
+                                $('.btn-submit').html('Save Changes');
+                                $('.alert-danger').html('<i class="fa fa-info-circle"></i> There are one or more errors on the page. Please review and try again.');
+                                $('.alert-danger').show();
+                                $('.modal-body').animate({scrollTop: 0},100);
+                                var errors = error.responseJSON.errors;
+                                $('.text-danger').each(function(i, obj) {
+                                    $('.text-danger').text('');
+                                });
+                                Object.entries(errors).forEach(function callback(value, index) {
+                                    var className = '.error-' + value[0];
+                                    $('#addGoalModal input[name='+value[0]+']').addClass('is-invalid');
+                                    $(className).text(value[1]);
+                                });
+                                //alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');
+                            }
                         });
-                        Object.entries(errors).forEach(function callback(value, index) {
-                            var className = '.error-' + value[0];
-                            $('input[name='+value[0]+']').addClass('is-invalid');
-                            $(className).text(value[1]);
-                        });
-                        alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');  
-                    }
-                });
-                
-                   
+                    }    
+                }, SessionTime);                
             }
-        } 
+
+
 </script>    
 <style>
     .multiselect-container{
@@ -805,9 +832,27 @@
     });
     $(document).ready(function(){
         CKEDITOR.replace('what', {
-            toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent", "Link"] ] });
-        CKEDITOR.replace('measure_of_success', {
-            toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent", "Link"] ] });
+                toolbar: "Custom",
+                toolbar_Custom: [
+                    ["Bold", "Italic", "Underline"],
+                    ["NumberedList", "BulletedList"],
+                    ["Outdent", "Indent"],
+                    ["Link"],
+                ],
+                extraPlugins: 'editorplaceholder',
+                editorplaceholder: 'Please complete goal type, title, and tags before entering this content.',
+                disableNativeSpellChecker: false
+            });
+            CKEDITOR.replace('measure_of_success', {
+                toolbar: "Custom",
+                toolbar_Custom: [
+                    ["Bold", "Italic", "Underline"],
+                    ["NumberedList", "BulletedList"],
+                    ["Outdent", "Indent"],
+                    ["Link"],
+                ],
+                disableNativeSpellChecker: false
+            });
     });
     $('#addGoalToLibraryModal').on('hidden.bs.modal', function (e) {
         $('#what').val('');
@@ -861,9 +906,7 @@
             $('.text-danger').html('');
             $('.form-control').removeClass('is-invalid');
             
-            const minutes = 15;
-            const SessionTime = 1000 * 60 * minutes;
-            const myTimeout = setTimeout(sessionWarning, SessionTime);    
+            setTimeRoll();  
             
             $('#what').val('');
             $('#measure_of_success').val('');
@@ -875,6 +918,11 @@
             for (var i in CKEDITOR.instances){
                 CKEDITOR.instances[i].setData('');
             };
+
+            CKEDITOR.instances['what'].setReadOnly(true);
+            CKEDITOR.instances['measure_of_success'].setReadOnly(true);
+            $('#start_date').prop("readonly",true);
+            $('#target_date').prop("readonly",true);
                     
         });
         $(document).on('hide.bs.modal', '#addGoalToLibraryModal', function(e) {
