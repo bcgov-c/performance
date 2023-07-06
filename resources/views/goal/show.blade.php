@@ -6,7 +6,7 @@
             <x-button icon="edit" :href="route('goal.edit', $goal->id)">Edit</x-button>
             @endif
         </h2>
-        @if(session(from-share))
+        @if(session('from_share'))
             <small><a href="{{ route('goal.share') }}">Back to list</a></small>
         @else
             <small><a href="{{ url()->previous() === url()->current() ? route('goal.index') : url()->previous() }}">Back to list</a></small>
