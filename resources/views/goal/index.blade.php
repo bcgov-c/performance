@@ -91,7 +91,7 @@
                 @endif            
             @else
                 <div class="col-12 col-sm-12">                 
-                    @include('goal.partials.target-table',['goals'=>$goals])
+                    @include('goal.partials.past-target-table',['goals'=>$goals])
                 </div>
             @endif
         </div>
