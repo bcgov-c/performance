@@ -6,7 +6,12 @@
             <x-button icon="edit" :href="route('goal.edit', $goal->id)">Edit</x-button>
             @endif
         </h2>
-        <small><a href="{{ url()->previous() === url()->current() ? route('goal.index') : url()->previous() }}">Back to list</a></small>
+        @if(session(from-share))
+        <small><a href="{{ route('goal.share') }}">Back to list</a></small>
+        @elseif
+            <small><a href="{{ url()->previous() === url()->current() ? route('goal.index') : url()->previous() }}">Back to list</a></small>
+        @endif
+        
     </x-slot>
     <div class="container-fluid">
         <div class="card">
