@@ -431,9 +431,9 @@
                             CKEDITOR.instances[i].updateElement();
                         };
                         $.ajax({
-                            url:'/goal',
+                            url:'/my-team/add-goal-to-library',
                             type : 'POST',
-                            data: $('#goal_form').serialize(),
+                            data: $('#add-goal-to-library-form').serialize(),
                             success: function (result) {
                                 console.log(result);
                                 need_fresh = true;
@@ -447,7 +447,7 @@
                                     $('.btn-submit').hide();
                                     $('.text-danger').hide();
                                     $('.form-control').removeClass('is-invalid');                                    
-                                    $('#addGoalModal').modal('toggle');
+                                    $('#addGoalToLibraryModal').modal('toggle');
                                 }
                             },
                             error: function (error){
