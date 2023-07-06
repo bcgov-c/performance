@@ -130,6 +130,7 @@ class GoalController extends Controller
         ->leftJoin('goals_shared_with', 'goals_shared_with.goal_id', 'goals.id')
         ->leftJoin('users as shared_users', 'shared_users.id', 'goals_shared_with.user_id');
         
+        session()->forget('from_share');
         if ($request->is("goal/current")) {
             $type = 'current';
             $query = $query->where('status', '=', 'active')
@@ -139,6 +140,7 @@ class GoalController extends Controller
                             ,'goal_types.name as typename');            
         } else if($request->is("goal/share")){
             $type = 'supervisor';
+            session()->put('from_share', true);
             $goals = $user->sharedGoals()->paginate(8);
             return view('goal.index', compact('goals', 'type', 'goaltypes','goal_types_modal','user', 'tags', 'type_desc_str'));
         } else {
