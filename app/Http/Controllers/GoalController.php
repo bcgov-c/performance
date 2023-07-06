@@ -320,8 +320,10 @@ class GoalController extends Controller
     * @param  int  $id
     * @return \Illuminate\Http\Response
     */
-    public function edit($id)
+    public function edit($id, Request $request)
     {
+        $from = $request->from;
+        
         $goal = Goal::withoutGlobalScope(NonLibraryScope::class)
         ->where('user_id', Auth::id())
         ->where('id', $id)
@@ -331,6 +333,11 @@ class GoalController extends Controller
         
         
         $goaltypes = GoalType::all()->toArray();
+        if($from == 'bank'){
+            $goaltypes = GoalType::where('name', '!=', 'private')->get()->toArray();
+        }
+
+
         $type_desc_arr = array();
         foreach($goaltypes as $goalType) {
             if(isset($goalType['description']) && isset($goalType['name'])) {                
@@ -441,7 +448,7 @@ class GoalController extends Controller
         $user = User::find($authId);
         $tags = Tag::all()->sortBy("name")->toArray();
         $tags_input = $request->tag_ids;
-        $goaltypes = GoalType::all()->toArray();
+        $goaltypes = GoalType::where('name', '!=', 'private')->get()->toArray();
 
         $adminGoals = Goal::withoutGlobalScopes()
             ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator '<br/>') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
@@ -677,10 +684,7 @@ class GoalController extends Controller
             $i++;
         }
         $json_goalbanks = json_encode($bankGoals_arr);   
-                
-        //no need private in goalbank module
-        unset($goaltypes[4]);
-        
+                        
         $all_adminGoals = Goal::withoutGlobalScopes()
             ->select('u2.id as creator_id', 'u2.name as username', 'goals.display_name')
             ->join('goal_bank_orgs', function ($qon) {

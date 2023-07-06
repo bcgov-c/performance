@@ -39,7 +39,7 @@
                 <div class="col-6">
                     <b>Goal Title</b>
                     <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>                        
-                    <x-input-modal name="title" />                    
+                    <x-input-modal name="title" id="goal_title"/>                    
                 </div>                
                 <div class="col-sm-6">
                         <b>Tags</b>
