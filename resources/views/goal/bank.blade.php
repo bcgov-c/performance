@@ -605,7 +605,7 @@
               title: "Goal Title",
               data: "title",
               render: function(data, type, row) {
-                return '<a href="' + '{{ route("goal.edit", ":id") }}'.replace(':id', row.id) + '" class="p-2">' + data + '</a>';
+                return '<a href="' + '{{ route("goal.edit", [":id", "from" => "bank"]) }}'.replace(':id', row.id) + '" class="p-2">' + data + '</a>';
               }
             },
             { title: "Goal Type", data: "typename" },
