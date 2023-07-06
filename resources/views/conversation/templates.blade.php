@@ -40,10 +40,9 @@
 		<div id="collapse_0" class="collapse" aria-labelledby="heading_0">
                     <div class="card-body">
                             <p>
-                                Review the information below to determine which template best suits your needs. Templates include suggestions for when to select a given conversation topic, questions to consider when having the conversation, and an attestation and sign-off area to formalize the results.
-                            </p>
+                                Review the information below to determine which template best suits your needs. You can find additional info in the <a href="/resources/conversations" target=\'_blank\'>User Guide</a> to see example scenarios and questions for each topic.                            </p>
                             <p>
-                                Once you've selected a template for use, select participants and hit "Start Conversation" to alert participants you want to meet. Conversations will still need to be scheduled independently in your outlook calendar.
+                                Once you've selected a template for use, select the participant and hit "Start Conversation" to alert participants you want to meet. Conversations will still need to be scheduled independently in your outlook calendar.
                             </p>
                     </div>
 		</div>
