@@ -142,12 +142,7 @@ class GoalController extends Controller
             $goals = $user->sharedGoals()->paginate(8);
             return view('goal.index', compact('goals', 'type', 'goaltypes','goal_types_modal','user', 'tags', 'type_desc_str'));
         } else {
-            $query = $query->where('status', '<>', 'active')
-            ->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames')
-                    ,DB::raw('group_concat(distinct goals_shared_with.user_id separator ",") as shared_user_id')
-                    ,DB::raw('group_concat(distinct shared_users.name separator ",") as shared_user_name')
-                    ,'goal_types.name as typename');  
-            //$query = $query->where('status', '<>', 'active')->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'), 'goal_types.name as typename');
+            $query = $query->where('status', '<>', 'active')->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'), 'goal_types.name as typename');
         }
         
         
