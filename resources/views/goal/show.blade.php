@@ -7,8 +7,8 @@
             @endif
         </h2>
         @if(session(from-share))
-        <small><a href="{{ route('goal.share') }}">Back to list</a></small>
-        @elseif
+            <small><a href="{{ route('goal.share') }}">Back to list</a></small>
+        @else
             <small><a href="{{ url()->previous() === url()->current() ? route('goal.index') : url()->previous() }}">Back to list</a></small>
         @endif
         
