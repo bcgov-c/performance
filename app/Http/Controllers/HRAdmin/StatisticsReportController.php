@@ -69,6 +69,36 @@ class StatisticsReportController extends Controller
         // send back the input parameters
         $this->preservedInputParams($request);
 
+        if($request->dd_level0) {
+            $level0 = $this->getOrgLevel(0,$request->dd_level0);
+            $level0_name = $level0->name;
+            $request->session()->flash('dd_level0_name', $level0_name);
+        }
+
+        if($request->dd_level1) {
+            $level1 = $this->getOrgLevel(1, $request->dd_level1);
+            $level1_name = $level1->name;
+            $request->session()->flash('dd_level1_name', $level1_name);
+        }
+
+        if($request->dd_level2) {
+            $level2 = $this->getOrgLevel(2, $request->dd_level2);
+            $level2_name = $level2->name;
+            $request->session()->flash('dd_level2_name', $level2_name);
+        }
+
+        if($request->dd_level3) {
+            $level3 = $this->getOrgLevel(3, $request->dd_level3);
+            $level3_name = $level3->name;
+            $request->session()->flash('dd_level3_name', $level3_name);
+        }
+
+        if($request->dd_level4) {
+            $level4 = $this->getOrgLevel(4, $request->dd_level4);
+            $level4_name = $level4->name;
+            $request->session()->flash('dd_level4_name', $level4_name);
+        }
+
         $request->session()->flash('dd_level0', $request->dd_level0);
         $request->session()->flash('dd_level1', $request->dd_level1);
         $request->session()->flash('dd_level2', $request->dd_level2);
@@ -762,6 +792,36 @@ class StatisticsReportController extends Controller
 
         // send back the input parameters
         $this->preservedInputParams($request);
+
+        if($request->dd_level0) {
+            $level0 = $this->getOrgLevel(0,$request->dd_level0);
+            $level0_name = $level0->name;
+            $request->session()->flash('dd_level0_name', $level0_name);
+        }
+
+        if($request->dd_level1) {
+            $level1 = $this->getOrgLevel(1, $request->dd_level1);
+            $level1_name = $level1->name;
+            $request->session()->flash('dd_level1_name', $level1_name);
+        }
+
+        if($request->dd_level2) {
+            $level2 = $this->getOrgLevel(2, $request->dd_level2);
+            $level2_name = $level2->name;
+            $request->session()->flash('dd_level2_name', $level2_name);
+        }
+
+        if($request->dd_level3) {
+            $level3 = $this->getOrgLevel(3, $request->dd_level3);
+            $level3_name = $level3->name;
+            $request->session()->flash('dd_level3_name', $level3_name);
+        }
+
+        if($request->dd_level4) {
+            $level4 = $this->getOrgLevel(4, $request->dd_level4);
+            $level4_name = $level4->name;
+            $request->session()->flash('dd_level4_name', $level4_name);
+        }
 
         $request->session()->flash('dd_level0', $request->dd_level0);
         $request->session()->flash('dd_level1', $request->dd_level1);
@@ -1599,6 +1659,36 @@ class StatisticsReportController extends Controller
         // send back the input parameters
         $this->preservedInputParams($request);
 
+        if($request->dd_level0) {
+            $level0 = $this->getOrgLevel(0,$request->dd_level0);
+            $level0_name = $level0->name;
+            $request->session()->flash('dd_level0_name', $level0_name);
+        }
+
+        if($request->dd_level1) {
+            $level1 = $this->getOrgLevel(1, $request->dd_level1);
+            $level1_name = $level1->name;
+            $request->session()->flash('dd_level1_name', $level1_name);
+        }
+
+        if($request->dd_level2) {
+            $level2 = $this->getOrgLevel(2, $request->dd_level2);
+            $level2_name = $level2->name;
+            $request->session()->flash('dd_level2_name', $level2_name);
+        }
+
+        if($request->dd_level3) {
+            $level3 = $this->getOrgLevel(3, $request->dd_level3);
+            $level3_name = $level3->name;
+            $request->session()->flash('dd_level3_name', $level3_name);
+        }
+
+        if($request->dd_level4) {
+            $level4 = $this->getOrgLevel(4, $request->dd_level4);
+            $level4_name = $level4->name;
+            $request->session()->flash('dd_level4_name', $level4_name);
+        }
+
         $request->session()->flash('dd_level0', $request->dd_level0);
         $request->session()->flash('dd_level1', $request->dd_level1);
         $request->session()->flash('dd_level2', $request->dd_level2);
@@ -1745,6 +1835,36 @@ class StatisticsReportController extends Controller
 
         // send back the input parameters
         $this->preservedInputParams($request);
+
+        if($request->dd_level0) {
+            $level0 = $this->getOrgLevel(0,$request->dd_level0);
+            $level0_name = $level0->name;
+            $request->session()->flash('dd_level0_name', $level0_name);
+        }
+
+        if($request->dd_level1) {
+            $level1 = $this->getOrgLevel(1, $request->dd_level1);
+            $level1_name = $level1->name;
+            $request->session()->flash('dd_level1_name', $level1_name);
+        }
+
+        if($request->dd_level2) {
+            $level2 = $this->getOrgLevel(2, $request->dd_level2);
+            $level2_name = $level2->name;
+            $request->session()->flash('dd_level2_name', $level2_name);
+        }
+
+        if($request->dd_level3) {
+            $level3 = $this->getOrgLevel(3, $request->dd_level3);
+            $level3_name = $level3->name;
+            $request->session()->flash('dd_level3_name', $level3_name);
+        }
+
+        if($request->dd_level4) {
+            $level4 = $this->getOrgLevel(4, $request->dd_level4);
+            $level4_name = $level4->name;
+            $request->session()->flash('dd_level4_name', $level4_name);
+        }
 
         $request->session()->flash('dd_level0', $request->dd_level0);
         $request->session()->flash('dd_level1', $request->dd_level1);
