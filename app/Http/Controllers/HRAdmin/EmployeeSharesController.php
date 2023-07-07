@@ -121,7 +121,7 @@ class EmployeeSharesController extends Controller {
     public function saveall(Request $request) {
         $input = $request->all();
         $rules = [ 'input_reason' => 'required' ];
-        $messages = [ 'required' => 'The :attribute field is required.' ];
+        $messages = [ 'required' => 'This field is required.' ];
         $validator = Validator::make($input, $rules, $messages);
         if ($validator->fails()) {
             return redirect()->route(request()->segment(1).'.employeeshares')
