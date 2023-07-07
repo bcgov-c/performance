@@ -328,12 +328,10 @@
             CKEDITOR.instances[i].updateElement();
         };
         if(no_warning == false) {
-            if (isContentModified() && !confirm("If you continue you will lose any unsaved changes.")) {
+            if (isContentModified() && !confirm("If you continue you will lose any unsaved changes.")) {                
                 e.preventDefault();
             } else {
-                if(need_fresh){
-                    location.reload();
-                }
+                location.reload();
             } 
         } else {
             localStorage.setItem('savemsg', 'Your goal is saved');
