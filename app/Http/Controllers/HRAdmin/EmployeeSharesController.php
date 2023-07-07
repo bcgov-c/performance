@@ -750,8 +750,8 @@ class EmployeeSharesController extends Controller {
             }
 
             DB::commit();
-            //return $this->respondeWith($sharedProfile);
-            return redirect('/hradmin/employeeshares');
+            return $this->respondeWith($sharedProfile);
+            //return redirect('/hradmin/employeeshares');
         }                
         return response()->json(['success' => false, 'message' => $error_msg]);
     }

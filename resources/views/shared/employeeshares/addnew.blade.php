@@ -193,6 +193,39 @@
                 e.preventDefault();
             });
 
+            $(document).on('submit', '#share-profile-form', function (e) {
+                e.preventDefault();
+                const $form = $(this);
+                $.ajax({
+                    url: $form.attr('action'),
+                    type : 'POST',
+                    data: $form.serialize(),
+                    success: function (result) {
+                        if(result.success){
+                            // window.location.href= '/goal';
+                            //$("#employee-profile-sharing-modal").modal('hide');
+                            alert("Successfully shared");
+                            window.location.reload(true);
+                        } else {
+                            alert(result.message);
+                        }
+                    },
+                    beforeSend: function() {
+                        $form.find('.text-danger').each(function(i, obj) {
+                            $('.text-danger').text('');
+                        });
+                    },
+                    error: function (error){
+                        var errors = error.responseJSON.errors;
+
+                        Object.entries(errors).forEach(function callback(value, index) {
+                            var className = '.error-' + value[0];
+                            $form.find(className).text(value[1]);
+                        });
+                    }
+                });
+            });
+
             function loadSharedProfileData(userId, $modal) {
                 $.ajax({
                     url: "/{{request()->segment(1)}}/profile-shared-with/xxx".replace('xxx', userId),

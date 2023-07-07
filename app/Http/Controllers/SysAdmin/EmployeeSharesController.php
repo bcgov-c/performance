@@ -776,8 +776,8 @@ class EmployeeSharesController extends Controller {
             }
 
             DB::commit();
-            //return $this->respondeWith($sharedProfile);
-            return redirect('/sysadmin/employeeshares');
+            return $this->respondeWith($sharedProfile);
+            //return redirect('/sysadmin/employeeshares');
         }                
         return response()->json(['success' => false, 'message' => $error_msg]);
     }
@@ -786,8 +786,7 @@ class EmployeeSharesController extends Controller {
     public function getProfileSharedWith($user_id) {
         $sharedProfiles = SharedProfile::where('shared_id', $user_id)->with(['sharedWith' => function ($query) {
             $query->select('id', 'name');
-        }])->get();
-        
+        }])->get();        
         session()->put('checking_user', $user_id);
 
         return view('shared.employeeshares.partials.profile-shared-with', compact('sharedProfiles'));
