@@ -926,6 +926,7 @@
                     
         });
         $(document).on('hide.bs.modal', '#addGoalToLibraryModal', function(e) {
+            modal_open = false;
             const isContentModified = () => {
                 if ($('#what').val() !== '' || $('#measure_of_success').val() !== ''
                     || $("#goal_title").val() !== '' || $('input[name=goal_type_id]').val() != 1 
@@ -938,10 +939,16 @@
             for (var i in CKEDITOR.instances){
                 CKEDITOR.instances[i].updateElement();
             };
-            if (isContentModified() && !confirm("If you continue you will lose any unsaved changes.")) {
-                e.preventDefault();
+            if(no_warning == false) {
+                if (isContentModified() && !confirm("If you continue you will lose any unsaved changes.")) {                
+                    e.preventDefault();
+                } else {
+                    location.reload();
+                } 
             } else {
-                location.reload();
+                localStorage.setItem('savemsg', 'Your goal is saved');
+                alert('Your goal is saved');
+                location.reload();            
             }
         });
         
