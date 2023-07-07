@@ -4,25 +4,19 @@
           <div class="form-group col-md-4">
             <label for="dd_level0">Organization</label>
             <select id="dd_level0" name="dd_level0" class="form-control select2" style="width:100%;">
-                @if ( old('dd_level0') && session()->get('level0') )
-                    <option value="{{ session()->get('level0')->id }}">{{ session()->get('level0')->name }}</option>
-                @endif
+                <option value="{{ session('dd_level0') }}">{{ session('dd_level0_name') }}</option>
             </select>
           </div>
           <div class="form-group col-md-4">
             <label for="dd_level1">Level 1</label>
             <select id="dd_level1" name="dd_level1" class="form-control select2" style="width:100%;">
-                @if ( old('dd_level1') && session()->get('level1') )
-                    <option value="{{ session()->get('level1')->id }}">{{ session()->get('level1')->name }}</option>
-                @endif
+                <option value="{{ session('dd_level1') }}">{{ session('dd_level1_name') }}</option>
             </select>
           </div>
           <div class="form-group col-md-4">
             <label for="dd_level2">Level 2</label>
             <select id="dd_level2" name="dd_level2" class="form-control select2" style="width:100%;">
-                @if ( old('dd_level2') && session()->get('level2') )
-                    <option value="{{ session()->get('level2')->id }}">{{ session()->get('level2')->name }}</option>
-                @endif
+                <option value="{{ session('dd_level2') }}">{{ session('dd_level2_name') }}</option>
             </select>
           </div>
 
@@ -32,17 +26,13 @@
           <div class="form-group col-md-4">
             <label for="dd_level3">Level 3</label>
             <select id="dd_level3" name="dd_level3" class="form-control select2" style="width:100%;">
-                @if ( old('dd_level3') && session()->get('level3') )
-                    <option value="{{ session()->get('level3')->id }}">{{ session()->get('level3')->name }}</option>
-                @endif
+                <option value="{{ session('dd_level3') }}">{{ session('dd_level3_name') }}</option>
             </select>
           </div>
           <div class="form-group col-md-4">
             <label for="dd_level4">Level 4</label>
             <select id="dd_level4" name="dd_level4" class="form-control select2" style="width:100%;">
-                @if ( old('dd_level4') && session()->get('level4') )
-                    <option value="{{ session()->get('level4')->id }}">{{ session()->get('level4')->name }}</option>
-                @endif
+                <option value="{{ session('dd_level4') }}">{{ session('dd_level4_name') }}</option>
             </select>
           </div>
 
