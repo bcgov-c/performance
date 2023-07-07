@@ -788,7 +788,6 @@ class NotifyConversationDue extends Command
                         ->pluck('shared_with');
 
         // Superviser
-        $supervisorList = $current_user->supervisorList();
         $supervisorListCount = $current_user->supervisorListCount();
         $preferredSupervisor = $current_user->preferredSupervisor();
 
@@ -802,12 +801,7 @@ class NotifyConversationDue extends Command
                     $manager_ids->push( $current_user->reportingManager->id );
                 }
             } else {
-                foreach ($supervisorList as $supv) {
-                    if ($supv->employee_id == $preferredSupervisor->supv_empl_id) {
-                        $manager_ids->push( $supv->id );
-                        break;
-                    }
-                }
+                $manager_ids->push( $preferredSupervisor->id );
             }
         }
 
