@@ -178,6 +178,79 @@
             let g_selected_orgnodes = [];
             let eg_selected_orgnodes = [];
 
+            $(document).on('submit', '.share-profile-form-edit', function (e) {
+                $form = $(this);
+                const data = $form.serializeArray();
+                data.push({name: 'action', value: this.submitted});
+                $.ajax({
+                    method: 'POST',
+                    url: $form.attr('action'),
+                    data: data,
+                    success: function () {
+                        loadSharedProfileData(currentUserForModal, $form.parents('.modal'));
+                    }
+                });
+                e.preventDefault();
+            });
+
+            $(document).on('submit', '#share-profile-form', function (e) {
+                e.preventDefault();
+                const $form = $(this);
+                $.ajax({
+                    url: $form.attr('action'),
+                    type : 'POST',
+                    data: $form.serialize(),
+                    success: function (result) {
+                        if(result.success){
+                            // window.location.href= '/goal';
+                            //$("#employee-profile-sharing-modal").modal('hide');
+                            alert("Successfully shared");
+                            window.location.reload(true);
+                        } else {
+                            alert(result.message);
+                        }
+                    },
+                    beforeSend: function() {
+                        $form.find('.text-danger').each(function(i, obj) {
+                            $('.text-danger').text('');
+                        });
+                    },
+                    error: function (error){
+                        var errors = error.responseJSON.errors;
+
+                        Object.entries(errors).forEach(function callback(value, index) {
+                            var className = '.error-' + value[0];
+                            $form.find(className).text(value[1]);
+                        });
+                    }
+                });
+            });
+
+            function loadSharedProfileData(userId, $modal) {
+                $.ajax({
+                    url: "/{{request()->segment(1)}}/profile-shared-with/xxx".replace('xxx', userId),
+                    success: function (response) {
+                        $modal.find('.shared-with-list').html(response);
+                        $(".items-to-share-edit").multiselect({
+                            allSelectedText: 'All',
+                            selectAllText: 'All',
+                            includeSelectAllOption: true,
+                            nonSelectedText: null,
+                        });
+                    }
+                });
+            }
+
+            $(document).on('click', ".edit-field", function (e) {
+                $('.view-mode').removeClass("d-none");
+                $('.edit-mode').addClass("d-none");
+                $viewArea = $(this).parents('.view-mode');
+                $editArea = $(this).parents('td').find('.edit-mode');
+                $editArea.removeClass("d-none");
+                $viewArea.addClass("d-none");
+            });
+
+
             function confirmSaveAllModal(){
 				$('#saveAllModal .modal-body p').html('Are you sure you want to share the selected profile(s)?');
 				$('#saveAllModal').modal();
