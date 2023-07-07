@@ -81,6 +81,37 @@ class SysadminStatisticsReportController extends Controller
         $request->session()->flash('dd_level3', $request->dd_level3);
         $request->session()->flash('dd_level4', $request->dd_level4);
 
+        if($request->dd_level0) {
+            $level0 = $this->getOrgLevel(0,$request->dd_level0);
+            $level0_name = $level0->name;
+            $request->session()->flash('dd_level0_name', $level0_name);
+        }
+
+        if($request->dd_level1) {
+            $level1 = $this->getOrgLevel(1, $request->dd_level1);
+            $level1_name = $level1->name;
+            $request->session()->flash('dd_level1_name', $level1_name);
+        }
+
+        if($request->dd_level2) {
+            $level2 = $this->getOrgLevel(2, $request->dd_level2);
+            $level2_name = $level2->name;
+            $request->session()->flash('dd_level2_name', $level2_name);
+        }
+
+        if($request->dd_level3) {
+            $level3 = $this->getOrgLevel(3, $request->dd_level3);
+            $level3_name = $level3->name;
+            $request->session()->flash('dd_level3_name', $level3_name);
+        }
+
+        if($request->dd_level4) {
+            $level4 = $this->getOrgLevel(4, $request->dd_level4);
+            $level4_name = $level4->name;
+            $request->session()->flash('dd_level4_name', $level4_name);
+        }
+
+
         $types = GoalType::orderBy('id')->get();
         $types->prepend( new GoalType()  ) ;
         
@@ -716,6 +747,36 @@ class SysadminStatisticsReportController extends Controller
 
         // send back the input parameters
         $this->preservedInputParams($request);
+
+        if($request->dd_level0) {
+            $level0 = $this->getOrgLevel(0,$request->dd_level0);
+            $level0_name = $level0->name;
+            $request->session()->flash('dd_level0_name', $level0_name);
+        }
+
+        if($request->dd_level1) {
+            $level1 = $this->getOrgLevel(1, $request->dd_level1);
+            $level1_name = $level1->name;
+            $request->session()->flash('dd_level1_name', $level1_name);
+        }
+
+        if($request->dd_level2) {
+            $level2 = $this->getOrgLevel(2, $request->dd_level2);
+            $level2_name = $level2->name;
+            $request->session()->flash('dd_level2_name', $level2_name);
+        }
+
+        if($request->dd_level3) {
+            $level3 = $this->getOrgLevel(3, $request->dd_level3);
+            $level3_name = $level3->name;
+            $request->session()->flash('dd_level3_name', $level3_name);
+        }
+
+        if($request->dd_level4) {
+            $level4 = $this->getOrgLevel(4, $request->dd_level4);
+            $level4_name = $level4->name;
+            $request->session()->flash('dd_level4_name', $level4_name);
+        }
 
         $request->session()->flash('dd_level0', $request->dd_level0);
         $request->session()->flash('dd_level1', $request->dd_level1);
@@ -1385,11 +1446,42 @@ class SysadminStatisticsReportController extends Controller
         // send back the input parameters
         $this->preservedInputParams($request);
 
+        if($request->dd_level0) {
+            $level0 = $this->getOrgLevel(0,$request->dd_level0);
+            $level0_name = $level0->name;
+            $request->session()->flash('dd_level0_name', $level0_name);
+        }
+
+        if($request->dd_level1) {
+            $level1 = $this->getOrgLevel(1, $request->dd_level1);
+            $level1_name = $level1->name;
+            $request->session()->flash('dd_level1_name', $level1_name);
+        }
+
+        if($request->dd_level2) {
+            $level2 = $this->getOrgLevel(2, $request->dd_level2);
+            $level2_name = $level2->name;
+            $request->session()->flash('dd_level2_name', $level2_name);
+        }
+
+        if($request->dd_level3) {
+            $level3 = $this->getOrgLevel(3, $request->dd_level3);
+            $level3_name = $level3->name;
+            $request->session()->flash('dd_level3_name', $level3_name);
+        }
+
+        if($request->dd_level4) {
+            $level4 = $this->getOrgLevel(4, $request->dd_level4);
+            $level4_name = $level4->name;
+            $request->session()->flash('dd_level4_name', $level4_name);
+        }
+
         $request->session()->flash('dd_level0', $request->dd_level0);
         $request->session()->flash('dd_level1', $request->dd_level1);
         $request->session()->flash('dd_level2', $request->dd_level2);
         $request->session()->flash('dd_level3', $request->dd_level3);
         $request->session()->flash('dd_level4', $request->dd_level4);
+
 
         $sql = User::selectRaw("users.employee_id, users.empl_record,
                 case when (select count(*) from shared_profiles A where A.shared_id = users.id) > 0 then 'Yes' else 'No' end as shared")
@@ -1516,6 +1608,36 @@ class SysadminStatisticsReportController extends Controller
 
         // send back the input parameters
         $this->preservedInputParams($request);
+
+        if($request->dd_level0) {
+            $level0 = $this->getOrgLevel(0,$request->dd_level0);
+            $level0_name = $level0->name;
+            $request->session()->flash('dd_level0_name', $level0_name);
+        }
+
+        if($request->dd_level1) {
+            $level1 = $this->getOrgLevel(1, $request->dd_level1);
+            $level1_name = $level1->name;
+            $request->session()->flash('dd_level1_name', $level1_name);
+        }
+
+        if($request->dd_level2) {
+            $level2 = $this->getOrgLevel(2, $request->dd_level2);
+            $level2_name = $level2->name;
+            $request->session()->flash('dd_level2_name', $level2_name);
+        }
+
+        if($request->dd_level3) {
+            $level3 = $this->getOrgLevel(3, $request->dd_level3);
+            $level3_name = $level3->name;
+            $request->session()->flash('dd_level3_name', $level3_name);
+        }
+
+        if($request->dd_level4) {
+            $level4 = $this->getOrgLevel(4, $request->dd_level4);
+            $level4_name = $level4->name;
+            $request->session()->flash('dd_level4_name', $level4_name);
+        }
 
         $request->session()->flash('dd_level0', $request->dd_level0);
         $request->session()->flash('dd_level1', $request->dd_level1);
@@ -2760,4 +2882,43 @@ class SysadminStatisticsReportController extends Controller
         }
         
     }
+
+
+    public function getOrgLevel($level, $id)
+    {
+        if($level == 0){
+            $query = DB::table('employee_demo_tree')
+                    ->select('organization_key as key', 'name')
+                    ->where('organization_key', $id)
+                    ->first();
+        }   
+        if($level == 1){
+            $query = DB::table('employee_demo_tree')
+                    ->select('level1_key as key', 'name')
+                    ->where('level1_key', $id)
+                    ->first();
+        }   
+        if($level == 2){
+            $query = DB::table('employee_demo_tree')
+                    ->select('level2_key as key', 'name')
+                    ->where('level2_key', $id)
+                    ->first();
+        } 
+        if($level == 3){
+            $query = DB::table('employee_demo_tree')
+                    ->select('level3_key as key', 'name')
+                    ->where('level3_key', $id)
+                    ->first();
+        }
+        if($level == 4){
+            $query = DB::table('employee_demo_tree')
+                    ->select('level4_key as key', 'name')
+                    ->where('level4_key', $id)
+                    ->first();
+        }       
+   
+
+        return $query;
+    }
+
 }
