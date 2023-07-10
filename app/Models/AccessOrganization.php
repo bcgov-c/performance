@@ -15,6 +15,7 @@ class AccessOrganization extends Model
         'allow_login',
         'allow_inapp_msg',
         'allow_email_msg',
+        'conversation_batch',
         'created_by_id',
         'updated_by_id',
     ];
