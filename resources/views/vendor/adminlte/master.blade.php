@@ -195,7 +195,26 @@
             });
         });
     </script>
+        
 
+    <script>
+        // Check session expiration status every minute (adjust as needed)
+        const minutes = 120;
+        const SessionTime = 1000 * 60 * minutes;
+        setInterval(checkSessionExpiration, SessionTime);
+
+        function checkSessionExpiration() {
+            $.ajax({
+                url: '/check-session-expiration', // Replace with the actual route to check session expiration
+                type: 'GET',
+                success: function(response) {
+                    if (response.sessionExpired) {
+                        window.location.href = '/session-expired';
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>

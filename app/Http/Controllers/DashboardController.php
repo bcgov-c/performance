@@ -399,5 +399,15 @@ class DashboardController extends Controller
         }
         return redirect()->back();
     }
+    
+    public function checkExpiration(Request $request) {
+        $user = Auth::user();
+        $sessionExpired = true;
+        if($user){
+            $sessionExpired = false;
+        }
 
+        //$sessionExpired = $request->session()->has('last_activity');
+        return response()->json(['sessionExpired' => $sessionExpired]);
+    }
 }
