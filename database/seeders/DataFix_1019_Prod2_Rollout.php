@@ -30,11 +30,16 @@ class DataFix_1019_Prod2_Rollout extends Seeder
         $admorgs = AdminOrg::where('version', '=', $version1)->orderBy('user_id')->get();
         foreach($admorgs AS $org){
             $tree = EmployeeDemoTree::whereNotNull('organization')
-                ->where('organization', '=',  $org->organization)
-                ->where('level1_program', '=',  $org->level1_program)
-                ->where('level2_division', '=',  $org->level2_division)
-                ->where('level3_branch', '=',  $org->level3_branch)
-                ->where('level4', '=',  $org->level4)
+                ->when($org->organization, function($q)use($org){return $q->where('organization', '=', $org->organization);})
+                ->when($org->level1_program, function($q)use($org){return $q->where('level1_program', '=', $org->level1_program);})
+                ->when($org->level2_division, function($q)use($org){return $q->where('level2_division', '=', $org->level2_division);})
+                ->when($org->level3_branch, function($q)use($org){return $q->where('level3_branch', '=', $org->level3_branch);})
+                ->when($org->level4, function($q)use($org){return $q->where('level4', '=', $org->level4);})
+                ->when(!$org->organization, function($q){return $q->whereNull('organization');})
+                ->when(!$org->level1_program, function($q){return $q->whereNull('level1_program');})
+                ->when(!$org->level2_division, function($q){return $q->whereNull('level2_division');})
+                ->when(!$org->level3_branch, function($q){return $q->whereNull('level3_branch');})
+                ->when(!$org->level4, function($q){return $q->whereNull('level4');})
                 ->first();
             if($tree){
                 $ver2 = AdminOrg::where('user_id', '=', $org->user_id)
@@ -62,11 +67,16 @@ class DataFix_1019_Prod2_Rollout extends Seeder
         $goalorgs = GoalBankOrg::where('version', '=', $version1)->orderBy('goal_id')->get();
         foreach($goalorgs AS $org){
             $tree = EmployeeDemoTree::whereNotNull('organization')
-                ->where('organization', '=',  $org->organization)
-                ->where('level1_program', '=',  $org->level1_program)
-                ->where('level2_division', '=',  $org->level2_division)
-                ->where('level3_branch', '=',  $org->level3_branch)
-                ->where('level4', '=',  $org->level4)
+                ->when($org->organization, function($q)use($org){return $q->where('organization', '=', $org->organization);})
+                ->when($org->level1_program, function($q)use($org){return $q->where('level1_program', '=', $org->level1_program);})
+                ->when($org->level2_division, function($q)use($org){return $q->where('level2_division', '=', $org->level2_division);})
+                ->when($org->level3_branch, function($q)use($org){return $q->where('level3_branch', '=', $org->level3_branch);})
+                ->when($org->level4, function($q)use($org){return $q->where('level4', '=', $org->level4);})
+                ->when(!$org->organization, function($q){return $q->whereNull('organization');})
+                ->when(!$org->level1_program, function($q){return $q->whereNull('level1_program');})
+                ->when(!$org->level2_division, function($q){return $q->whereNull('level2_division');})
+                ->when(!$org->level3_branch, function($q){return $q->whereNull('level3_branch');})
+                ->when(!$org->level4, function($q){return $q->whereNull('level4');})
                 ->first();
             if($tree){
                 $ver2 = GoalBankOrg::where('goal_id', '=', $org->goal_id)
