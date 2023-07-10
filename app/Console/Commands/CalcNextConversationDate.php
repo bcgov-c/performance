@@ -101,6 +101,8 @@ class CalcNextConversationDate extends Command
         $ClassificationArray = ExcusedClassification::select('jobcode')->pluck('jobcode')->toArray();
         EmployeeDemo::whereNull('employee_demo.date_deleted')
         ->leftjoin('users', 'users.employee_id', 'employee_demo.employee_id')
+        ->leftjoin('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+        ->leftjoin('access_organizations', 'access_organizations.orgid', 'employee_demo_tree.organization_key')
         ->whereRaw("trim(employee_demo.guid) <> ''")
         ->whereNotNull('employee_demo.guid')
         ->whereRaw("employee_demo.employee_status = (select min(a.employee_status) from employee_demo a where a.employee_id = employee_demo.employee_id)")
@@ -172,11 +174,33 @@ class CalcNextConversationDate extends Command
                     //     $initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
                     // }
                     // Updated Conversation Start Dates
-                    $virtualHardDate = Carbon::createFromDate(2023, 11, 01);
-                    if ($virtualHardDate->gt($initNextConversationDate)) {
-                        // distribute next conversation date, based on last digit of employee ID
-                        $DDt = (int) (($demo->employee_id % 100) * 52 / 100);
-                        $initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
+                    // Based on access_organizations.conversation_batch value for ministry groupings
+                    switch ($demo->conversation_batch) {
+                        case 0:
+                        case 2:
+                            $virtualHardDate = Carbon::createFromDate(2023, 11, 01);
+                            if ($virtualHardDate->gt($initNextConversationDate)) {
+                                // distribute next conversation date, based on last digit of employee ID
+                                $DDt = (int) (($demo->employee_id % 100) * 52 / 100);
+                                $initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
+                            }
+                            break;
+                        case 1:
+                            $virtualHardDate = Carbon::createFromDate(2022, 11, 30);
+                            if ($virtualHardDate->gt($initNextConversationDate)) {
+                                // distribute next conversation date, based on last digit of employee ID
+                                $DDt = abs (($demo->employee_id % 10) - 1) * 5 + (($demo->employee_id % 5));
+                                $initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
+                            }
+                            break;
+                        default:
+                            $virtualHardDate = Carbon::createFromDate(2023, 11, 01);
+                            if ($virtualHardDate->gt($initNextConversationDate)) {
+                                // distribute next conversation date, based on last digit of employee ID
+                                $DDt = (int) (($demo->employee_id % 100) * 52 / 100);
+                                $initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
+                            }
+                            break;
                     }
                     // calcualte initial last conversation date; init next conversation minus 4 months
                     $initLastConversationDate = Carbon::parse($initNextConversationDate)->subMonth(4)->toDateString();
