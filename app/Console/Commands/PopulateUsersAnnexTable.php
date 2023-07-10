@@ -179,7 +179,9 @@ class PopulateUsersAnnexTable extends Command
                   NOW(),
                   CASE WHEN (SELECT 1 FROM users AS su WHERE su.reporting_to = u.id LIMIT 1) THEN 1 ELSE 0 END AS isSupervisor,
                   CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_with = u.id LIMIT 1) THEN 1 ELSE 0 END AS isDelegate,
-                  (SELECT COUNT(rep.user_id) FROM user_reporting_tos AS rep USE INDEX (IDX_REPORTING_TO_ID) WHERE rep.reporting_to_id = u.id) AS reportees
+                  ( (SELECT COUNT(dmo.employee_id) FROM positions AS posn, employee_demo AS dmo WHERE posn.reports_to = d.position_number AND posn.position_nbr = dmo.position_number) +
+				              (SELECT COUNT(dmo.employee_id) FROM positions AS sspn, positions AS spn, employee_demo AS dmo WHERE d.position_number = sspn.reports_to and sspn.position_nbr = spn.reports_to AND spn.position_nbr = dmo.position_number 
+						          AND NOT EXISTS (SELECT 1 FROM employee_demo AS non WHERE non.position_number = sspn.position_nbr LIMIT 1)) ) AS reportees
                 FROM
                   (employee_demo AS d 
                     USE INDEX (idx_employee_demo_employeeid_orgid)
