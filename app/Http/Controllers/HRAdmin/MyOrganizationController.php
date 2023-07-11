@@ -67,14 +67,25 @@ class MyOrganizationController extends Controller {
                 ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
                 ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
                 ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
-                ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { return $q->whereRaw("u.{$request->criteria} like '%{$request->search_text}%'"); })
-                ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(u.employee_id LIKE '%{$request->search_text}%' OR u.employee_name LIKE '%{$request->search_text}%' OR u.jobcode_desc LIKE '%{$request->search_text}%' OR u.deptid LIKE '%{$request->search_text}%')"); })
+
+
+                ->when($request->search_text && $request->criteria != 'all' && $request->criteria == 'u.employee_name', function($q) use ($request) { return $q->whereRaw("(u.employee_name LIKE '%{$request->search_text}%' OR u.user_name LIKE '%{$request->search_text}%')"); })
+
+
+                ->when($request->search_text && $request->criteria != 'all' && $request->criteria != 'u.employee_name', function($q) use($request) { return $q->whereRaw("{$request->criteria} like '%{$request->search_text}%'"); })
+                ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(u.employee_id LIKE '%{$request->search_text}%' OR u.employee_name LIKE '%{$request->search_text}%'  OR u.user_name LIKE '%{$request->search_text}%' OR u.jobcode_desc LIKE '%{$request->search_text}%' OR u.deptid LIKE '%{$request->search_text}%')"); })
                 ->selectRaw ("
                     user_id,
+                    u.user_name,
                     guid,
                     excused_flag,
                     employee_id,
-                    employee_name, 
+                    u.employee_name, 
+                    u.employee_email,
+                    u.position_number,
+                    u.empl_record,
+                    u.reporting_to_name,
+                    u.supervisor_position_number,
                     jobcode_desc,
                     u.orgid AS orgid,
                     u.organization AS organization,
@@ -83,37 +94,19 @@ class MyOrganizationController extends Controller {
                     u.level3_branch AS level3_branch,
                     u.level4 AS level4,
                     u.deptid AS deptid,
-                    employee_status,
+                    u.employee_status,
                     due_date_paused,
-                    next_conversation_date,
+                    u.next_conversation_date,
                     excusedtype,
-                    '' AS nextConversationDue,
-                    '' AS shared,
-                    '' AS reportees,
-                    '' AS activeGoals
+                    CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
+                    CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
+                    u.reportees,
+                    (SELECT COUNT(g.id) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals
                 ");
             return Datatables::of($query)->addIndexColumn()
-                ->editColumn('activeGoals', function($row) {
-                    return (User::where('id', $row->user_id)->first()->activeGoals()->count() ?? '0').' Goals';
-                })
-                ->editColumn('nextConversationDue', function ($row) {
-                    if ($row->excused_flag) {
-                        return 'Paused';
-                    } 
-                    if ($row->due_date_paused != 'Y') {
-                        $text = Carbon::parse($row->next_conversation_date)->format('M d, Y');
-                        return $text;
-                    } else {
-                        return 'Paused';
-                    }
-                    return '';
-                })
-                ->editColumn('shared', function ($row) {
-                    return SharedProfile::where('shared_id', $row->user_id)->count() > 0 ? "Yes" : "No";
-                })
-                ->editColumn('reportees', function($row) {
-                    return User::where('id', $row->user_id)->first()->reporteesCount() ?? '0';
-                })
+                // ->editColumn('reportees', function($row) {
+                //     return User::where('id', $row->user_id)->first()->reporteesCount() ?? '0';
+                // })
                 ->make(true);
         }
     }
@@ -121,10 +114,10 @@ class MyOrganizationController extends Controller {
     protected function search_criteria_list() {
         return [
             'all' => 'All',
-            'employee_id' => 'Employee ID', 
-            'employee_name'=> 'Employee Name',
-            'jobcode_desc' => 'Classification', 
-            'deptid' => 'Department ID'
+            'u.employee_id' => 'Employee ID', 
+            'u.employee_name'=> 'Employee Name',
+            'u.jobcode_desc' => 'Classification', 
+            'u.deptid' => 'Department ID'
         ];
     }
 
