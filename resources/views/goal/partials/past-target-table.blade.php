@@ -76,7 +76,9 @@
             @csrf
             @method('DELETE')
             <x-button :href="route('goal.show', $goal->id)" size='sm' class="mr-2">View</x-button>
-            <x-button size='sm' icon='trash' style="danger"></x-button>
+            @if($goal->login_role == 'owner') 
+              <x-button size='sm' icon='trash' style="danger"></x-button>
+            @endif
           </form>
         </div>
       </td>
