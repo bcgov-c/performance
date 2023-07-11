@@ -227,6 +227,21 @@
                 });
             });
 
+            function loadSharedProfileData(userId, $modal) {
+                $.ajax({
+                    url: "/{{request()->segment(1)}}/profile-shared-with/xxx".replace('xxx', userId),
+                    success: function (response) {
+                        $modal.find('.shared-with-list').html(response);
+                        $(".items-to-share-edit").multiselect({
+                            allSelectedText: 'All',
+                            selectAllText: 'All',
+                            includeSelectAllOption: true,
+                            nonSelectedText: null,
+                        });
+                    }
+                });
+            }
+
             $(document).on('click', ".edit-field", function (e) {
                 $('.view-mode').removeClass("d-none");
                 $('.edit-mode').addClass("d-none");
