@@ -46,6 +46,13 @@
                     float: left;
                 }
 
+                .share-with-users {
+                    background-color: #1A5A96;
+                    border-color: #164d80;
+                    color: #fff;
+                    padding: 0 10px;
+                    margin-top: 0.31rem;
+                }
 
             </style>
         </x-slot>
@@ -123,7 +130,7 @@
                 } );
 
                 // add delete selected button
-                $("#generictable_filter").append("<button id='delete-selected-btn' value='delete-selected' class='dt-buttons buttons-csv buttons-html5'>Delete Selected</button> ");
+                $("#generictable_filter").append("<button id='delete-selected-btn' value='delete-selected' class='btn btn-xs  btn-primary dt-buttons buttons-csv buttons-html5'>Delete Selected</button> ");
 
                 $('#delete-selected-btn').attr('disabled', true);
 
