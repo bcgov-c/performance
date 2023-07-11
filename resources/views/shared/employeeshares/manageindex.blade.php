@@ -130,7 +130,7 @@
                 } );
 
                 // add delete selected button
-                $("#generictable_filter").append("<button id='delete-selected-btn' value='delete-selected' class='btn btn-xs  btn-primary dt-buttons buttons-csv buttons-html5'>Delete Selected</button> ");
+                $("#generictable_filter").append("<button id='delete-selected-btn' value='delete-selected' class='btn btn-primary dt-buttons buttons-csv buttons-html5'>Delete Selected</button> ");
 
                 $('#delete-selected-btn').attr('disabled', true);
 
