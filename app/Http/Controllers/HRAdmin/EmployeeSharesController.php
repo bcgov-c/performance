@@ -747,13 +747,13 @@ class EmployeeSharesController extends Controller {
                     array_push($sendMail->bindvariables, $result->comment);             // comment
                     $response = $sendMail->sendMailWithGenericTemplate();
                 }
-            }
-
-            DB::commit();
-            return $this->respondeWith($sharedProfile);
-            //return redirect('/hradmin/employeeshares');
-        }                
-        return response()->json(['success' => false, 'message' => $error_msg]);
+            } 
+ 
+            DB::commit();  
+            return $this->respondeWith($sharedProfile);  
+            //return redirect('/hradmin/employeeshares');  
+        }                  
+        return response()->json(['success' => false, 'message' => $error_msg]); 
     }
 
     
