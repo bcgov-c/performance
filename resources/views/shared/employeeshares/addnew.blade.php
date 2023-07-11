@@ -19,8 +19,6 @@
             <br>
             <h6 class="text-bold">Step 1: Select Employee(s)</h6>
             <p class="px-3">Use the search functions to find the employee(s). If you are managing the status of a single employee, you can click on the Yes/No under Share Status in the employee row to make the changes directly. Otherwise, select the employee(s) you want to manage and proceed to Step 2 below.</p>
-            <input type="hidden" id="selected_org_nodes" name="selected_org_nodes" value="">
-            <input type="hidden" id="selected_emp_ids" name="selected_emp_ids" value="">
             @include('shared.employeeshares.partials.loader')
 
             <div class="p-3">
@@ -49,6 +47,8 @@
             <h6 class="text-bold">Step 2: Select shared supervisor</h6> 
             <h6 class="px-3">Select who you would like to share the selected employee(s) with. Then proceed to Step 3.</h6> 
 
+            <input type="hidden" id="selected_org_nodes" name="selected_org_nodes" value="">
+            <input type="hidden" id="selected_emp_ids" name="selected_emp_ids" value="">
             <input type="hidden" id="eselected_org_nodes" name="eselected_org_nodes" value="">
             <input type="hidden" id="eselected_emp_ids" name="eselected_emp_ids" value="">
 
@@ -98,7 +98,7 @@
             <h6 class="text-bold">Step 4. Share selected profile(s)</h6>
             <br>
             <div class="col-md-3 mb-2">
-                <button class="btn btn-primary mt-2" type="button" onclick="confirmSaveAllModal()" name="btn_send" value="btn_send">Share</button>
+                <button class="btn btn-primary mt-2" type="button" onclick="confirmSaveAllModal()" id="btn_send" name="btn_send" value="btn_send">Share</button>
                 <button class="btn btn-secondary mt-2">Cancel</button>
             </div>
         </div>
@@ -558,7 +558,7 @@
 				});
 
 				$("#enav-tree-tab").on("click", function(e) {
-                    console.log('Clicked');
+                    // console.log('Clicked');
 					etarget = $('#enav-tree'); 
                     ddnotempty = $('#edd_level0').val() + $('#edd_level1').val() + $('#edd_level2').val() + $('#edd_level3').val() + $('#edd_level4').val();
                     if(ddnotempty) {
@@ -862,14 +862,16 @@
         background-color: #f2dede;
         border-color: #ebccd1;
     }
+    
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
-    background-color: #1A5A96;
-    border: 1px solid #aaa;
-    border-radius: 4px;
-    cursor: default;
-    float: left;
-    margin-right: 5px;
-    margin-top: 5px;
-    padding: 0 5px; }    
+        background-color: #1A5A96;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        cursor: default;
+        float: left;
+        margin-right: 5px;
+        margin-top: 5px;
+        padding: 0 5px; 
+    }    
     
 </style> 
