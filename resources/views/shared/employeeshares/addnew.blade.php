@@ -136,7 +136,7 @@
 
     <x-slot name="css">
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-        {{-- <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}"> --}}
+        <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}">
     </x-slot>
 
     <x-slot name="js">
@@ -145,6 +145,7 @@
         <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
 
         <script>				
 				$('body').popover({
@@ -226,21 +227,6 @@
                 });
             });
 
-            function loadSharedProfileData(userId, $modal) {
-                $.ajax({
-                    url: "/{{request()->segment(1)}}/profile-shared-with/xxx".replace('xxx', userId),
-                    success: function (response) {
-                        $modal.find('.shared-with-list').html(response);
-                        $(".items-to-share-edit").multiselect({
-                            allSelectedText: 'All',
-                            selectAllText: 'All',
-                            includeSelectAllOption: true,
-                            nonSelectedText: null,
-                        });
-                    }
-                });
-            }
-
             $(document).on('click', ".edit-field", function (e) {
                 $('.view-mode').removeClass("d-none");
                 $('.edit-mode').addClass("d-none");
@@ -260,6 +246,8 @@
 
                 $(document).on('show.bs.modal', '#employee-profile-sharing-modal', function (e) {
                     var userId = $(e.relatedTarget).data('user_id'); 
+                    var userName = $(e.relatedTarget).data('userName'); 
+                    $("#employee-profile-sharing-modal").find(".user-name").html(userName);
                     $(this).find('#share-profile-form').find('[name=shared_id]').val(userId);
                     $modal = $(this);
                     currentUserForModal = userId;
@@ -275,8 +263,14 @@
                     $.ajax({
                         url: "{{ route(request()->segment(1).'.employeeshares.profile-shared-with', 'xxx')}}".replace('xxx', userId), 
                         success: function (response) {
-                            console.log(response);
+                            // console.log(response);
                             $modal.find('.shared-with-list').html(response);
+                            $(".items-to-share-edit").multiselect({
+                                allSelectedText: 'All',
+                                selectAllText: 'All',
+                                includeSelectAllOption: true,
+                                nonSelectedText: null,
+                            });
                         }
                     });
                 }
@@ -558,7 +552,6 @@
 				});
 
 				$("#enav-tree-tab").on("click", function(e) {
-                    // console.log('Clicked');
 					etarget = $('#enav-tree'); 
                     ddnotempty = $('#edd_level0').val() + $('#edd_level1').val() + $('#edd_level2').val() + $('#edd_level3').val() + $('#edd_level4').val();
                     if(ddnotempty) {
@@ -848,8 +841,6 @@
                     }
                 }
             });
-
-            
 
         </script>
 
