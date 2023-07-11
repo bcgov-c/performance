@@ -67,13 +67,8 @@ class MyOrganizationController extends Controller {
                 ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
                 ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
                 ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
-
-
-                ->when($request->search_text && $request->criteria != 'all' && $request->criteria == 'u.employee_name', function($q) use ($request) { return $q->whereRaw("(u.employee_name LIKE '%{$request->search_text}%' OR u.user_name LIKE '%{$request->search_text}%')"); })
-
-
-                ->when($request->search_text && $request->criteria != 'all' && $request->criteria != 'u.employee_name', function($q) use($request) { return $q->whereRaw("{$request->criteria} like '%{$request->search_text}%'"); })
-                ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(u.employee_id LIKE '%{$request->search_text}%' OR u.employee_name LIKE '%{$request->search_text}%'  OR u.user_name LIKE '%{$request->search_text}%' OR u.jobcode_desc LIKE '%{$request->search_text}%' OR u.deptid LIKE '%{$request->search_text}%')"); })
+                ->when($request->search_text && $request->criteria == 'u.employee_name', function($q) use ($request) { return $q->whereRaw("(u.employee_name LIKE '%{$request->search_text}%' OR u.user_name LIKE '%{$request->search_text}%')"); })
+                ->when($request->search_text && $request->criteria != 'u.employee_name', function($q) use ($request) { return $q->whereRaw("{$request->criteria} LIKE '%{$request->search_text}%'"); })
                 ->selectRaw ("
                     user_id,
                     u.user_name,
@@ -113,11 +108,14 @@ class MyOrganizationController extends Controller {
 
     protected function search_criteria_list() {
         return [
-            'all' => 'All',
+            'u.employee_name'=> 'Name',
             'u.employee_id' => 'Employee ID', 
-            'u.employee_name'=> 'Employee Name',
-            'u.jobcode_desc' => 'Classification', 
-            'u.deptid' => 'Department ID'
+            'u.employee_email' => 'Email', 
+            'u.position_number' => 'Position #',
+            'u.reporting_to_name' => 'Reports To Name',
+            'u.supervisor_position_number' => 'Reports to Position #',
+            'u.jobcode_desc' => 'Classification',
+            'u.deptid' => 'Dept ID'
         ];
     }
 
