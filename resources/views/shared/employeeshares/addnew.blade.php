@@ -135,7 +135,7 @@
     <h6 class="m-20">&nbsp;</h6>
 
     <x-slot name="css">
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.css" rel="stylesheet" />
         <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}">
     </x-slot>
 
@@ -144,7 +144,6 @@
         <script src="//cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
         <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
 
         <script>				
@@ -871,13 +870,16 @@
     
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
         background-color: #1A5A96;
-        border: 1px solid #aaa;
-        border-radius: 4px;
-        cursor: default;
-        float: left;
-        margin-right: 5px;
-        margin-top: 5px;
-        padding: 0 5px; 
     }    
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        float: left;
+        border-right: 0px;
+        margin-left: 0px;
+        position: relative;
+        left: 0;
+        top: 0;
+    }
+
     
 </style> 
