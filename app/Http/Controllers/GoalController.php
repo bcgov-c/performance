@@ -1302,7 +1302,8 @@ class GoalController extends Controller
                         $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
 
                         array_push($sendMail->bindvariables, $goal->user->name);
-                        array_push($sendMail->bindvariables,  $user->reportingManager->name );    // %2 Person who added the comment
+                        // array_push($sendMail->bindvariables,  $user->reportingManager->name );    // %2 Person who added the comment
+                        array_push($sendMail->bindvariables,  $curr_user->name );    // %2 Person who added the comment
                         array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
                         array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
                         $response = $sendMail->sendMailWithGenericTemplate();
@@ -1336,20 +1337,20 @@ class GoalController extends Controller
                     $curr_user->reportingManager->allow_email_notification && 
                     $curr_user->reportingManager->userPreference->goal_comment_flag == 'Y') {                
 
-                $sendMail = new SendMail();
-                $sendMail->toRecipients = array( $curr_user->reporting_to );  
-                $sendMail->sender_id = null;
-                $sendMail->useQueue = true;
+                    $sendMail = new SendMail();
+                    $sendMail->toRecipients = array( $curr_user->reporting_to );  
+                    $sendMail->sender_id = null;
+                    $sendMail->useQueue = true;
                     $sendMail->saveToLog = true;
                     $sendMail->alert_type = 'N';
                     $sendMail->alert_format = 'E';
 
                 $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
-                    array_push($sendMail->bindvariables, $curr_user->reportingManager->name);  // %1 Recipient of the email
+                array_push($sendMail->bindvariables, $curr_user->reportingManager->name);  // %1 Recipient of the email
                 array_push($sendMail->bindvariables, $curr_user->name);    // %2 Person who added the comment
                 array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
                 array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
-                    $response = $sendMail->sendMailWithGenericTemplate();
+                $response = $sendMail->sendMailWithGenericTemplate();
                 }
             }
 
