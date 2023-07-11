@@ -129,8 +129,8 @@ class EmployeeSharesController extends Controller {
                 ->withErrors($validator)
                 ->withInput();
         }
-        $selected_emp_ids = $request->userCheck ? $request->userCheck : [];
-        $eselected_emp_ids = $request->euserCheck ? $request->euserCheck : [];
+        $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
+        $eselected_emp_ids = $request->eselected_emp_ids ? json_decode($request->eselected_emp_ids) : [];
         $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
         $eselected_org_nodes = $request->eselected_org_nodes ? json_decode($request->eselected_org_nodes) : [];
         $current_user = User::find(Auth::id());
@@ -498,33 +498,6 @@ class EmployeeSharesController extends Controller {
                 ->when($request->search_text && $request->criteria, function($q) use($request) {
                     return $q->whereRaw("{$request->criteria} LIKE '%{$request->search_text}%'");
                 })
-                // ->when($request->search_text && $request->criteria == 'employee_name', function($q) use($request) {
-                //     return $q->where(function ($r) use($request) {
-                //         return $r->whereRaw("u.{$request->criteria} LIKE '%{$request->search_text}%'")
-                //             ->orWhereRaw("d2.{$request->criteria} LIKE '%{$request->search_text}%'")
-                //             ->orWhereRaw("cd.{$request->criteria} LIKE '%{$request->search_text}%'");
-                //     });
-                // })
-                // ->when($request->search_text && $request->criteria == 'employee_id', function($q) use($request) {
-                //     return $q->where(function ($r) use($request) {
-                //         return $r->whereRaw("u.{$request->criteria} LIKE '%{$request->search_text}%'")
-                //             ->orWhereRaw("u2.{$request->criteria} LIKE '%{$request->search_text}%'");
-                //     });
-                // })
-                // ->when($request->search_text && ($request->criteria == 'jobcode_desc' || $request->criteria == 'deptid'), function($q) use($request) {
-                //     return $q->whereRaw("u.{$request->criteria} LIKE '%{$request->search_text}%'");
-                // })
-                // ->when($request->search_text && $request->criteria == 'all', function($q) use($request) {
-                //     return $q->where(function ($r) use($request) {
-                //         return $r->whereRaw("u.employee_id LIKE '%{$request->search_text}%'")
-                //             ->orWhereRaw("u.employee_name LIKE '%{$request->search_text}%'")
-                //             ->orWhereRaw("u2.employee_id LIKE '%{$request->search_text}%'")
-                //             ->orWhereRaw("d2.employee_name LIKE '%{$request->search_text}%'")
-                //             ->orWhereRaw("cd.employee_name LIKE '%{$request->search_text}%'")
-                //             ->orWhereRaw("u.jobcode_desc LIKE '%{$request->search_text}%'")
-                //             ->orWhereRaw("u.deptid LIKE '%{$request->search_text}%'");
-                //     });
-                // })
                 ->selectRaw ("
                     u.employee_id,
                     u.employee_name,
@@ -633,27 +606,6 @@ class EmployeeSharesController extends Controller {
             ->delete();
         return redirect()->back();
     }
-
-    // /**
-    //  * Show the form for editing the specified resource.
-    //  *
-    //  * @param  int  $id
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function manageEdit($id) {
-    //     $users = User::where('id', $id)
-    //     ->select('email')
-    //     ->get();
-    //     $email = $users->first()->email;
-    //     $roles = DB::table('roles')
-    //     ->whereIntegerInRaw('id', [3, 4])
-    //     ->get();
-    //     $access = DB::table('model_has_roles')
-    //     ->where('model_id', $id)
-    //     ->where('model_has_roles.model_type', 'App\Models\User')
-    //     ->get();
-    //     return view('shared.employeeshares.partials.access-edit-modal', compact('roles', 'access', 'email'));
-    // }
 
     public function shareProfile(ShareProfileRequest $request) {
         $input = $request->validated();
