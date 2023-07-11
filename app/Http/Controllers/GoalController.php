@@ -79,10 +79,22 @@ class GoalController extends Controller
         $employees = $myTeamController->myEmployeesAjax();
         
 
-        $query = Goal::with('user')
+        $query = Goal::where('goals.user_id', $authId)
+        ->with('user')
         ->with('goalType');
         $type = 'past';
-                        
+                
+        /*
+        $adminShared=SharedProfile::select('shared_with')
+        ->where('shared_id', '=', $authId)
+        ->where('shared_item', 'like', '%1%')
+        ->pluck('shared_with');
+        $adminemps = User::select('users.*')
+        ->whereIn('users.id', $adminShared)->get();
+        $employees = $employees->merge($adminemps);
+         * 
+         */
+        
         $empShared=SharedProfile::select('shared_id')
         ->where('shared_with', '=', $authId)
         ->where('shared_item', 'like', '%1%')
@@ -120,8 +132,7 @@ class GoalController extends Controller
         session()->forget('from_share');
         if ($request->is("goal/current")) {
             $type = 'current';
-            $query = $query->where('goals.user_id', $authId)
-                    ->where('status', '=', 'active')
+            $query = $query->where('status', '=', 'active')
                     ->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames')
                             ,DB::raw('group_concat(distinct goals_shared_with.user_id separator ",") as shared_user_id')
                             ,DB::raw('group_concat(distinct shared_users.name separator ",") as shared_user_name')
@@ -136,18 +147,7 @@ class GoalController extends Controller
             ->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames')
                     ,DB::raw('group_concat(distinct goals_shared_with.user_id separator ",") as shared_user_id')
                     ,DB::raw('group_concat(distinct shared_users.name separator ",") as shared_user_name')
-                    ,'goal_types.name as typename')
-            ->where(function($query) use($authId) {
-                $query->where('goals.user_id',$authId)
-                       ->orWhere('goals_shared_with.user_id',$authId);
-            });
-            /*
-            $q = $query->toSql();
-            $b = $query->getBindings();
-            print_r($q);
-            print_r($b);
-            exit;
-            */
+                    ,'goal_types.name as typename');  
             //$query = $query->where('status', '<>', 'active')->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'), 'goal_types.name as typename');
         }
         
@@ -227,13 +227,6 @@ class GoalController extends Controller
       
         $goals = $query->groupBy('id');
         $goals = $query->paginate(10);
-
-        foreach ($goals as $goal){
-            $goal->login_role = 'owner';
-            if($goal->user_id != $authId){
-                $goal->login_role = 'sharee';
-            }
-        }
         
         $from = 'goal';        
         

@@ -65,11 +65,11 @@
         @include('goal.partials.status-change')
       </td>
       <td>
-        <div class="d-flex">          
+        <div class="d-flex">
+          <x-button :href="route('goal.show', $goal->id)" size='sm' class="mr-2">View</x-button>
           <form id="delete-goal-{{$goal->id}}" action="{{ route('goal.destroy', $goal->id)}}" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete this goal?')">
             @csrf
             @method('DELETE')
-            <x-button :href="route('goal.show', $goal->id)" size='sm' class="mr-2">View</x-button>
             <x-button size='sm' icon='trash' style="danger"></x-button>
           </form>
         </div>
