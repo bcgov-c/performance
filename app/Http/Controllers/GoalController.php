@@ -112,6 +112,7 @@ class GoalController extends Controller
         ]);        
 
         $query = $query->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
+        ->join('users as owner_users', 'goals.user_id', 'owner_users.id')
         ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')
         ->leftJoin('goals_shared_with', 'goals_shared_with.goal_id', 'goals.id')
@@ -133,7 +134,10 @@ class GoalController extends Controller
             return view('goal.index', compact('goals', 'type', 'goaltypes','goal_types_modal','user', 'tags', 'type_desc_str'));
         } else {
             $query = $query->where('status', '<>', 'active')
-            ->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames')
+            ->select('goals.*'
+                    ,'owner_users.id as owner_id'
+                    ,'owner_users.name as owner_name'
+                    , DB::raw('group_concat(distinct tags.name separator ", ") as tagnames')
                     ,DB::raw('group_concat(distinct goals_shared_with.user_id separator ",") as shared_user_id')
                     ,DB::raw('group_concat(distinct shared_users.name separator ",") as shared_user_name')
                     ,'goal_types.name as typename')
@@ -141,13 +145,7 @@ class GoalController extends Controller
                 $query->where('goals.user_id',$authId)
                        ->orWhere('goals_shared_with.user_id',$authId);
             });
-            /*
-            $q = $query->toSql();
-            $b = $query->getBindings();
-            print_r($q);
-            print_r($b);
-            exit;
-            */
+                        
             //$query = $query->where('status', '<>', 'active')->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'), 'goal_types.name as typename');
         }
         
@@ -237,7 +235,7 @@ class GoalController extends Controller
         
         $from = 'goal';        
         
-        return view('goal.index', compact('goals', 'type', 'goaltypes', 'goal_types_modal', 'tagsList', 'sortby', 'sortorder', 'createdBy', 'user', 'employees', 'tags', 'type_desc_str', 'statusList','from'));
+        return view('goal.index', compact('goals', 'type', 'goaltypes', 'goal_types_modal', 'tagsList', 'sortby', 'sortorder', 'createdBy', 'user', 'employees', 'tags', 'type_desc_str', 'statusList','from', 'authId'));
     }
 
     /**
