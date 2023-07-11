@@ -66,7 +66,7 @@
         @if($goal->login_role == 'owner') 
           @include('goal.partials.status-change')
         @else
-           {{$goal->status}}  
+          <x-goal-status :status="$goal->status"></x-goal-status>
         @endif
         
       </td>
