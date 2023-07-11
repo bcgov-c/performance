@@ -21,9 +21,10 @@ use App\Models\DashboardNotification;
 use Illuminate\Support\Facades\Route;
 use App\Models\ConversationParticipant;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Validation\ValidationException;
-use App\Http\Requests\MyTeams\ShareProfileRequest;
-use Carbon\Carbon;
+use Illuminate\Validation\ValidationException;   
+use App\Http\Requests\MyTeams\ShareProfileRequest;   
+use App\Http\Requests\MyTeams\UpdateProfileSharedWithRequest;    
+use Carbon\Carbon;   
 
 
 class EmployeeSharesController extends Controller {
@@ -841,5 +842,6 @@ class EmployeeSharesController extends Controller {
         return $this->respondeWith('');
     }
 
-
+ 
+ 
 }

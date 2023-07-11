@@ -3,7 +3,7 @@
         <strong>{{$shared->sharedWith->name}}</strong>
     </div>
     <div class="p-2">
-        <form action="{{route('sysadmin.employeeshares.profile-shared-with.update', $shared->id)}}" method="POST" class="share-profile-form-edit">
+        <form action="{{route(request()->segment(1).'.employeeshares.profile-shared-with.update', $shared->id)}}" method="POST" class="share-profile-form-edit"> 
         @csrf
         <table class="table table-sm">
             <tr style="background-color: #ccc">
