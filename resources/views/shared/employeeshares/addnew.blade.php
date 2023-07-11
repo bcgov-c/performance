@@ -5,7 +5,7 @@
             @include('shared.employeeshares.partials.tabs')
         </div>
     </div>	
-    @include('shared.employeeshares.partials.employee-profile-sharing-modal')
+    @include('shared.employeeshares.partials.employee-profile-sharing-modal') 
     <p class="px-3">Supervisors and administrators may share an employee's PDP profile with another supervisor or staff for a legitimate business reason. The profile should only be shared with people who normally handle employees' permanent personnel records (i.e. Public Service Agency or co-supervisors). An employee may also wish to share their profile with someone other than a direct supervisor (for example, a hiring manager). In order to do this - the employee's consent is required.</p>
 	
         @if(Session::has('message'))
@@ -259,7 +259,7 @@
             $(document).ready(function(){
 
                 $(document).on('show.bs.modal', '#employee-profile-sharing-modal', function (e) {
-                    var userId = $(e.relatedTarget).data('user_id');
+                    var userId = $(e.relatedTarget).data('user_id'); 
                     $(this).find('#share-profile-form').find('[name=shared_id]').val(userId);
                     $modal = $(this);
                     currentUserForModal = userId;
@@ -273,7 +273,7 @@
 
                 function loadSharedProfileData(userId, $modal) {
                     $.ajax({
-                        url: "{{ route(request()->segment(1).'.employeeshares.profile-shared-with', 'xxx')}}".replace('xxx', userId),
+                        url: "{{ route(request()->segment(1).'.employeeshares.profile-shared-with', 'xxx')}}".replace('xxx', userId), 
                         success: function (response) {
                             console.log(response);
                             $modal.find('.shared-with-list').html(response);
