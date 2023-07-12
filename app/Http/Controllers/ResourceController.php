@@ -98,13 +98,14 @@ class ResourceController extends Controller
 
       $data = [
           
-          [
-              'question' => 'How to use the conversation templates',
-              'answer_file' => '0'
-          ],
+          
           [
               'question' => 'What is a performance development conversation?',
               'answer' => "Any conversation about an employee and their work can be considered a performance development conversation. They can be informal check-ins, regular 1-on-1's, recognition for a job well done, feedback, or more formal conversations when trying to modify behaviour."
+          ],
+          [
+            'question' => 'How to use the conversation templates',
+            'answer_file' => '0'
           ],
           [
               'question' => 'Why are performance conversations important?',
