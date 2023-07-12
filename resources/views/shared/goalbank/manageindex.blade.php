@@ -8,6 +8,12 @@
 
     <p class="px-3">Use the table below to modify or delete goals currently in the goal bank. Changes to content will be updated in employee goal banks as soon as you save the new version. You can also edit the audience if you want to add or remove individuals or business units.</p>
 
+
+
+
+    <p class="px-3"><b>Be very careful modifying or deleting goals that were created by other people!</b> Your changes will impact everyone in the audience, not just those in your authorized area. If in doubt, connect with the original goal creator to discuss before taking any action.</p>
+
+
     <div class="card">
         <div class="card-body">
             <!-- <div class="h5">{{__('Manage Goals in Goal Bank')}}</div> -->

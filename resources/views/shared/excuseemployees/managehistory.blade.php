@@ -6,9 +6,16 @@
         </div>
     </div>
 
+    <div class="p-3">
+        <p>
+            This tab lists all instances where an employee was excused from the PDP process in the past. It can be used to help understand and troubleshoot 
+            why an employee’s next conversation due date was previously paused or restarted.
+        </p>
+    </div>
+
     <div class="card">
-        <div class="card-body">
-            @include('shared.excuseemployees.partials.filter')
+        <div class="card-body">            
+            @include('shared.excuseemployees.partials.filter')            
             <div class="p-3">  
                 <table class="table table-bordered filtertable table-striped" id="filtertable" style="width: 100%; overflow-x: auto; "></table>
             </div>
