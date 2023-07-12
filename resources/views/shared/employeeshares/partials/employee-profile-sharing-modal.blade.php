@@ -39,7 +39,7 @@
                         </div> 
                         <label class="form-check-label"> 
                             <input type="checkbox" name="accepted"> 
-                            <span class="font-weight:normal">I wish to share this employee's profile with another supervisor. In doing so, I confirm that there is a legtimate business reason for providing shared access.</span> 
+                            <span class="font-weight:normal">I wish to share this employee's profile with another supervisor. In doing so, I confirm that there is a legitimate business reason for providing shared access.</span> 
                             <small class="text-danger error-accepted"> 
                                 {{ $errors->first('accepted') }} 
                             </small> 
