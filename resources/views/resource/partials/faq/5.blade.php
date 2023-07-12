@@ -1,5 +1,5 @@
 <p>
-Check out the this <a href="https://youtu.be/h80op_O03AY" target="_blank" >video tutorial</a> for an overview of this topic or continue reading below.
+Check out the this <a href="https://www.youtube.com/watch?v=rythd_z-9so" target="_blank" >video tutorial</a> for an overview of this topic or continue reading below.
 </p>
 <p>
 Navigate to My Goals > Goal Bank > Team Goal Bank and click the button to “Add Goal to Bank”. You create a goal here just as you would for yourself 

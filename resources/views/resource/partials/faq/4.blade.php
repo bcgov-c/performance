@@ -1,5 +1,5 @@
 <p>
-Check out the this <a href="https://youtu.be/h80op_O03AY" target="_blank" >video tutorial</a> for an overview of this topic or continue reading below.
+Check out the this <a href="https://www.youtube.com/watch?v=TuaLsDRZJ1E&feature=youtu.be" target="_blank" >video tutorial</a> for an overview of this topic or continue reading below.
 </p>
 <p>
 The My Conversations section is designed to support employees and supervisors to have the right conversation at the right time. 
