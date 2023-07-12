@@ -333,11 +333,11 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-12">
-                                            <p><b>We have reviewed progress of goals and adjusted as necessary.</b></p>
+                                            <p><b>We have reviewed goals and adjusted as necessary.</b></p>
                                             <p><input class="employee-sign-off1" type="radio" name="check_one" value="1"> Yes</p>
                                             <p><input class="employee-sign-off1"  type="radio" name="check_one" value="0"> No</p>
                                             <br/>
-                                            <p><b>Performance expectations have been clearly communicated.</b></p>
+                                            <p><b>Performance expectations are clear.</b></p>
                                             <p><input class="employee-sign-off2" type="radio" name="check_two" value="1"> Yes</p>
                                             <p><input class="employee-sign-off2" type="radio" name="check_two" value="0"> No</p>
                                             <br/>
@@ -367,11 +367,11 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-12">
-                                            <p><b>We have reviewed progress of goals and adjusted as necessary.</b></p>
+                                            <p><b>We have reviewed goals and adjusted as necessary.</b></p>
                                             <p><input class="supervisor-sign-off1" type="radio" name="check_one_" value="1"> Yes</p>
                                             <p><input class="supervisor-sign-off1" type="radio" name="check_one_" value="0"> No</p>
                                             <br/>
-                                            <p><b>Performance expectations have been clearly communicated.</b></p>
+                                            <p><b>Performance expectations are clear.</b></p>
                                             <p><input class="supervisor-sign-off2" type="radio" name="check_two_" value="1"> Yes</p>
                                             <p><input class="supervisor-sign-off2" type="radio" name="check_two_" value="0"> No</p>
                                             <br/>
