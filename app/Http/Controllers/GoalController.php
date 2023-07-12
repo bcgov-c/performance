@@ -1302,8 +1302,7 @@ class GoalController extends Controller
                         $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
 
                         array_push($sendMail->bindvariables, $goal->user->name);
-                        // array_push($sendMail->bindvariables,  $user->reportingManager->name );    // %2 Person who added the comment
-                        array_push($sendMail->bindvariables,  $curr_user->name );    // %2 Person who added the comment
+                        array_push($sendMail->bindvariables,  $comment->user->name );    // %2 Person who added the comment
                         array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
                         array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
                         $response = $sendMail->sendMailWithGenericTemplate();
