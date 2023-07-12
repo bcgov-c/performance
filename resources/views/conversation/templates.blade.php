@@ -40,9 +40,10 @@
 		<div id="collapse_0" class="collapse" aria-labelledby="heading_0">
                     <div class="card-body">
                             <p>
-                                Review the information below to determine which template best suits your needs. You can find additional info in the <a href="/resources/conversations" target=\'_blank\'>User Guide</a> to see example scenarios and questions for each topic.                            </p>
+                                Review the information below to determine which template best suits your needs. If you need more details, you can find example scenarios and sample questions for each template on the <a href="/resources/conversations" target=\'_blank\'>Performance Conversations</a> resource page.
+                            </p>
                             <p>
-                                Once you've selected a template for use, select the participant and hit "Start Conversation" to alert participants you want to meet. Conversations will still need to be scheduled independently in your outlook calendar.
+                                Once you've decided on a template for use, select the participant from the dropdown list and hit "Start Conversation" to alert participants you want to meet. Conversations will still need to be scheduled independently in your outlook calendar.
                             </p>
                     </div>
 		</div>
@@ -209,6 +210,7 @@
     </div>
     <x-slot name="js">
         <script>
+            
             function conversation_sub(topic_id){
                 $('#conversation_form_2 input[name="conversation_topic_id"]').val(topic_id);
                 var allow_submit = true;
@@ -255,6 +257,9 @@
             }
             
             
+            $( document ).ready(function() {
+                $('#collapse_0').collapse('show');
+            });
 
         </script>
     </x-slot>
