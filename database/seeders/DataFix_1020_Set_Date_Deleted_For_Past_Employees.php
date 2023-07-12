@@ -718,7 +718,7 @@ class DataFix_1020_Set_Date_Deleted_For_Past_Employees extends Seeder
             }
 
             if($demo->date_deleted) {
-                Log::info(Carbon::now()." - Skipping employee_demo update, date_deleted is blank - {$demo->employee_id} / {$demo->empl_record} - date_deleted={$demo->date_deleted}");
+                Log::info(Carbon::now()." - Skipping employee_demo update, date_deleted is NOT blank - {$demo->employee_id} / {$demo->empl_record} - date_deleted={$demo->date_deleted}");
             } else {
                 Log::info(Carbon::now()." - Updating blank date_deleted in employee_demo - {$demo->employee_id} / {$demo->empl_record} - date_deleted=2023-07-01");
                 EmployeeDemo::where('employee_id', $demo->employee_id)
