@@ -144,13 +144,93 @@ class ResourceController extends Controller
 
       $data = [
           [
-              'question' => 'Questions about the Performance Development Platform (PDP)',
-              'answer_file' => '2'
+              'question' => 'Why is performance development important?',
+              'answer_file' => '0'
           ],
           [
-              'question' => 'Questions about Performance Development Approach and Process',
+              'question' => 'How often do I need to have performance conversations?',
               'answer_file' => "1"
           ],
+          [
+            'question' => 'How do I add a goal to my PDP profile?',
+            'answer_file' => "2"
+        ],
+        [
+            'question' => 'How do I share a goal with a colleague?',
+            'answer_file' => "3"
+        ],
+        [
+            'question' => 'How do I set up a performance conversation with my employee / supervisor?',
+            'answer_file' => "4"
+        ],
+        [
+            'question' => 'I am a supervisor. How do I create a goal in my team’s Goal Bank?',
+            'answer_file' => "5"
+        ],
+        [
+            'question' => 'I’m a supervisor. I want to view my employee’s goals and upcoming conversation deadlines. How do I do this?',
+            'answer_file' => "6"
+        ],
+        [
+            'question' => 'I do not see the correct supervisor in the PDP / I do not see the correct direct reports in the PDP. What do I do?',
+            'answer_file' => "7"
+        ],
+        [
+            'question' => 'Is there an autosave function on the application?',
+            'answer_file' => "8"
+        ],
+        [
+            'question' => 'Is there a timeout on the application?',
+            'answer_file' => "9"
+        ],
+        [
+            'question' => 'Can I access the PDP from home?',
+            'answer_file' => "10"
+        ],
+        [
+            'question' => 'What notifications and reminders will the PDP send me? Can I choose how often to receive an email from the PDP?',
+            'answer_file' => "11"
+        ],
+        [
+            'question' => 'Who can assist me if I need help with the PDP?',
+            'answer_file' => "12"
+        ],
+        [
+            'question' => 'How do I access past MyPerformance files?',
+            'answer_file' => "13"
+        ],
+        [
+            'question' => 'Why are there no ratings in the new approach to performance development?',
+            'answer_file' => "14"
+        ],
+        [
+            'question' => 'How can I qualify for a Pacific Leaders Scholarship if there are no ratings as part of performance development?',
+            'answer_file' => "15"
+        ],
+        [
+            'question' => 'How will I qualify for MCCF in-range compensation movement if there are no ratings as part of performance development?',
+            'answer_file' => "16"
+        ],
+        [
+            'question' => 'What do I do if one of my employees is not performing up to expectations?',
+            'answer_file' => "17"
+        ],
+        [
+            'question' => 'What happens when an employee clicks “I disagree with the information contained in this performance review”?',
+            'answer_file' => "18"
+        ],
+        [
+            'question' => 'I am a supervisor and my employee clicked “I disagree with the information contained in this performance review”. What do I do?',
+            'answer_file' => "19"
+        ],
+        [
+            'question' => 'I am a supervisor and I don’t have enough time in my schedule to go through this process with my employees. Why do we need to do this?',
+            'answer_file' => "20"
+        ],
+        [
+            'question' => 'I support a ministry and need to have HR Administrator access for the PDP. How do I receive this status?',
+            'answer_file' => "21"
+        ],
       ];
          return view('resource.faq', compact('data', 't'));
     }

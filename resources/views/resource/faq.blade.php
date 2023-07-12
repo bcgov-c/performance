@@ -13,7 +13,7 @@
 		</h5>
 		</div>
 		
-		<div id="collapse_{{$index}}" class="collapse {{$index == $t ? 'show' : ''}}" aria-labelledby="heading_{{$index}}" data-parent="#accordion">
+		<div id="collapse_{{$index}}" class="collapse" aria-labelledby="heading_{{$index}}" data-parent="#accordion">
 		<div class="card-body">
 			@if (array_key_exists('answer', $question))
 				{{ $question['answer']}}
