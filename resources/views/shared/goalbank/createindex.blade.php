@@ -90,7 +90,7 @@
 			<div class="row">
 				<div class="col col-md-2">
 					<b> Display Name </b>
-					<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Organizational title to display when listing in Goal Bank."> </i>
+					<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Describe who created or approved the goal content (i.e. PSA Human Resources). If you don’t enter anything here, your own name will be shown as the creator of the goal throughout the platform. This could be confusing for users who may not know you or your role in the organization."> </i>
 					<x-input name="display_name" />
 				</div>
 			</div>
