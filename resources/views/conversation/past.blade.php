@@ -85,12 +85,12 @@ i {
                         <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_sup" aria-expanded="false" aria-controls="collapse_sup">
 
                                 <button class="btn btn-link text-left">
-                                    <h4>Conversations with My Supervisor</h4>
+                                    <h4>Completed Conversations with my Supervisor</h4>
                                 </button> 
                                 <span class="float-right" id="caret_1"    style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
                                 <br/>
                                 <button class="btn btn-link text-left" style="color:black">
-                                    <p>The list enclosed contains all open conversations between you and your supervisor(s).</p>
+                                    <p>This area contains all conversations signed by both you and your supervisor(s).</p>
                                 </button>   
                         </h5>
                     </h5>
@@ -167,12 +167,12 @@ i {
                         <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_emp" aria-expanded="false" aria-controls="collapse_emp">
 
                                 <button class="btn btn-link text-left">
-                                    <h4>Conversations with My Team</h4>
+                                    <h4>Completed Conversations with my Team</h4>
                                 </button> 
                                 <span class="float-right" id="caret_2" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
                                 <br/>
                                 <button class="btn btn-link text-left" style="color:black">
-                                    <p>The list enclosed contains all open conversations between you and your direct reports.</p>
+                                    <p>This area contains all conversations signed by both you and your direct reports.</p>
                                 </button>   
                         </h5>
                     </h5>
@@ -383,6 +383,8 @@ i {
 
         
          $(".complete-border").addClass('border-primary');
+
+         $('#collapse_ins').collapse('show');
   });  
 </script>
 
