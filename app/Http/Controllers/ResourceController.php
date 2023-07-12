@@ -25,10 +25,6 @@ class ResourceController extends Controller
                 'answer_file' => '3'
             ],
             [
-                'question' => 'How to use the conversation templates',
-                'answer_file' => '6'
-            ],
-            [
                 'question' => 'My Team Section (supervisors only)',
                 'answer_file' => '4'
             ],
@@ -101,6 +97,11 @@ class ResourceController extends Controller
       $t = $request->t;
 
       $data = [
+          
+          [
+              'question' => 'How to use the conversation templates',
+              'answer_file' => '0'
+          ],
           [
               'question' => 'What is a performance development conversation?',
               'answer' => "Any conversation about an employee and their work can be considered a performance development conversation. They can be informal check-ins, regular 1-on-1's, recognition for a job well done, feedback, or more formal conversations when trying to modify behaviour."
