@@ -8,7 +8,7 @@
 		<div class="card-header" id="heading_{{$index}}">		
 		<h5 class="mb-0"data-toggle="collapse" data-target="#collapse_{{$index}}" aria-expanded="{{$index === 0 && ($t === '' || $t === 0) ? 'true' : 'false'}}" aria-controls="collapse_{{$index}}">
 			<button class="btn btn-link">
-			{{ $question['question'] }}
+			{{$index+1}}. {{ $question['question'] }}
 			</button>
 		</h5>
 		</div>
