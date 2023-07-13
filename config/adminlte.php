@@ -289,6 +289,7 @@ return [
         [
             'role' => 'listitem',
             'text' => 'HR Administration',
+            'id' => 'hr-admin-menu',
             'url'  => '#',
             'icon' => 'fas fa-fw fa-cog',
             'active' => ['hradmin/*'],
@@ -330,6 +331,7 @@ return [
         [
             'role' => 'listitem',
             'text' => 'System Administration',
+            'id' => 'sys-admin-menu',
             'url'  => '#',
             'icon' => 'fas fa-fw fa-cog',
             'active' => ['sysadmin/*'],
@@ -409,6 +411,27 @@ return [
         ],
         [
             'role' => 'listitem',
+            'text' => 'Service Representative',
+            'id' => 'sr-menu',
+            'url'  => '#',
+            'icon' => 'fas fa-fw fa-cog',
+            'active' => ['sysadmin/*'],
+            'can' => ['service representative'],
+            'submenu' => [ 
+                [
+                    'text' => 'Employee List',
+                    'url'  => 'sysadmin/employeelists',
+                    'active' => ['sysadmin/employeelists/*']
+                ],               
+                [
+                    'text' => 'Switch Identity',
+                    'url'  => 'sysadmin/switch-identity',
+                    'active' => ['sysadmin/switch-identity/*']
+                ],
+            ],
+        ],
+        [
+            'role' => 'listitem',
             'text' => 'Resources',
             // 'url'  => 'resource/user-guide',
             'url'  => 'resources',
@@ -480,17 +503,17 @@ return [
                 [
                     'type' => 'js',
                     'asset' => false,
-                    'location' => '//cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js',
+                    'location' => '//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js',
                 ],
                 [
                     'type' => 'js',
                     'asset' => false,
-                    'location' => '//cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js',
+                    'location' => '//cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js',
                 ],
                 [
                     'type' => 'css',
                     'asset' => false,
-                    'location' => '//cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css',
+                    'location' => '//cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css',
                 ],
             ],
         ],

@@ -13,7 +13,7 @@ class OrganizationTree extends Model
     use HasFactory, NodeTrait;
 
     protected $fillable = [
-        'name', 'status', 'level', 'organization', 'level1_program', 'level2_division',
+        'name', 'status', 'level', 'deptid', 'organization', 'level1_program', 'level2_division',
         'level3_branch', 'level4', 'parent_id', 'no_of_employee', 
     ];
 

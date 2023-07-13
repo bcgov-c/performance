@@ -141,13 +141,14 @@ class KeycloakLoginController extends Controller
         //                 ->where('guid', $guid)
         //                 ->where('acctlock', 0)->first();
         $isUser = User::join('employee_demo','employee_demo.guid','users.guid')
-                        ->join('access_organizations','employee_demo.organization','access_organizations.organization')
-                        ->where('access_organizations.allow_inapp_msg', 'Y')
-                        ->whereNull('employee_demo.date_deleted')
-                        ->where('users.guid', $guid)
-                        ->where('users.acctlock', 0)
-                        ->select('users.*')
-                        ->first();
+            ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+            ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+            ->where('access_organizations.allow_login', 'Y')
+            ->whereNull('employee_demo.date_deleted')
+            ->where('users.guid', $guid)
+            ->where('users.acctlock', 0)
+            ->select('users.*')
+            ->first();
  
         // User was found, then update the signin information
         if ($isUser) {

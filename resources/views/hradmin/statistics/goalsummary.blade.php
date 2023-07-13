@@ -402,13 +402,15 @@ $(function()  {
 					var tar = params[0];
 					return 'Tag : ' + tar.name + '<br/>Count : ' + tar.value;
 				}	
-			},
+                        },
 			grid: {
-				left: '3%',
-				right: '4%',
-				bottom: '10%',
-				containLabel: true
-			},
+                            left: '1%',
+                            right: '1%',
+                            bottom: '6%',
+                            top: '3%',
+                            containLabel: true
+                        },
+                        maintainAspectRatio: false,
 			series: [
 				{
 					// name: '2011',

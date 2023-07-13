@@ -14,3 +14,4 @@ yarn-error.log
 .editorconfig
 /.vscode
 performance.code-workspace
+composer.lock

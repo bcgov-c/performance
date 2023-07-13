@@ -1,28 +1,21 @@
 <div class="card p-3">
-       
         <div class="form-row">
           <div class="form-group col-md-4">
             <label for="dd_level0">Organization</label>
             <select id="dd_level0" name="dd_level0" class="form-control select2" style="width:100%;">
-                @if ( old('dd_level0') && session()->get('level0') )
-                    <option value="{{ session()->get('level0')->id }}">{{ session()->get('level0')->name }}</option>
-                @endif
+                <option value="{{ session('dd_level0') }}">{{ session('dd_level0_name') }}</option>
             </select>
           </div>
           <div class="form-group col-md-4">
             <label for="dd_level1">Level 1</label>
             <select id="dd_level1" name="dd_level1" class="form-control select2" style="width:100%;">
-                @if ( old('dd_level1') && session()->get('level1') )
-                    <option value="{{ session()->get('level1')->id }}">{{ session()->get('level1')->name }}</option>
-                @endif
+                <option value="{{ session('dd_level1') }}">{{ session('dd_level1_name') }}</option>
             </select>
           </div>
           <div class="form-group col-md-4">
             <label for="dd_level2">Level 2</label>
             <select id="dd_level2" name="dd_level2" class="form-control select2" style="width:100%;">
-                @if ( old('dd_level2') && session()->get('level2') )
-                    <option value="{{ session()->get('level2')->id }}">{{ session()->get('level2')->name }}</option>
-                @endif
+                <option value="{{ session('dd_level2') }}">{{ session('dd_level2_name') }}</option>
             </select>
           </div>
 
@@ -32,17 +25,13 @@
           <div class="form-group col-md-4">
             <label for="dd_level3">Level 3</label>
             <select id="dd_level3" name="dd_level3" class="form-control select2" style="width:100%;">
-                @if ( old('dd_level3') && session()->get('level3') )
-                    <option value="{{ session()->get('level3')->id }}">{{ session()->get('level3')->name }}</option>
-                @endif
+                <option value="{{ session('dd_level3') }}">{{ session('dd_level3_name') }}</option>
             </select>
           </div>
           <div class="form-group col-md-4">
             <label for="dd_level4">Level 4</label>
             <select id="dd_level4" name="dd_level4" class="form-control select2" style="width:100%;">
-                @if ( old('dd_level4') && session()->get('level4') )
-                    <option value="{{ session()->get('level4')->id }}">{{ session()->get('level4')->name }}</option>
-                @endif
+                <option value="{{ session('dd_level4') }}">{{ session('dd_level4_name') }}</option>
             </select>
           </div>
 
@@ -98,7 +87,7 @@
         placeholder: 'select organization',
         allowClear: true,
         ajax: {
-            url: '/hradmin/statistics/org-organizations'
+            url: '/hradmin/org-list/1/0'
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -120,7 +109,7 @@
         placeholder: 'select level 1',
         allowClear: true,
         ajax: {
-            url: '/hradmin/statistics/org-programs' 
+            url: '/hradmin/org-list/1/1' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -143,7 +132,7 @@
         placeholder: 'select level 2',
         allowClear: true,
         ajax: {
-            url: '/hradmin/statistics/org-divisions' 
+            url: '/hradmin/org-list/1/2' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -167,7 +156,7 @@
         placeholder: 'select level 3',
         allowClear: true,
         ajax: {
-            url: '/hradmin/statistics/org-branches' 
+            url: '/hradmin/org-list/1/3' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -192,7 +181,7 @@
         placeholder: 'select level 4',
         allowClear: true,
         ajax: {
-            url: '/hradmin/statistics/org-level4' 
+            url: '/hradmin/org-list/1/4' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -248,9 +237,6 @@
         $('#dd_level2').val(null).trigger('change');
         $('#dd_level3').val(null).trigger('change');
         $('#dd_level4').val(null).trigger('change');
-        // $('#job_titles').val(null).trigger('change');
-        // $('#active_since').val(null);
-        // $('#search_text').val(null);
         
         $( "#filter-form" ).submit();
     });

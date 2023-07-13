@@ -51,12 +51,19 @@
 			</div>
 		</div>
 		<div class="row">
+				<div class="col col-md-2">
+					<b> Display Name </b>
+					<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Describe who created or approved the goal content (i.e. PSA Human Resources). If you don’t enter anything here, your own name will be shown as the creator of the goal throughout the platform. This could be confusing for users who may not know you or your role in the organization."> </i>
+					<x-input name="display_name" :value="$goaldetail->display_name"/>
+				</div>
+			</div>
+		<div class="row">
 			<div class="col-md-12">
 				<b>Goal Description</b>
 				<p>
 					Each goal should include a description of <b>WHAT</b>  
 					<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".'> </i> you will accomplish, <b>WHY</b> 
-					<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important,, and <b>HOW</b> 
+					<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important, and <b>HOW</b> 
 					<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> you will achieve it. 
 				</p>
 				<x-textarea id="what" name="what" :value="$goaldetail->what" />
@@ -83,10 +90,10 @@
 				<small  class="text-danger error-target_date"></small>
 			</div>
 		</div>
-
+		
 		<div class="col-md-3 mb-2">
 			<button class="btn btn-primary mt-2" type="submit" name="btn_send" value="btn_send">Save Changes</button>
-			<button class="btn btn-secondary mt-2">Cancel</button>
+			<button type="button" class="btn btn-cancel mt-2" onClick="window.location='{{ URL::previous() }}'">Cancel</button>
 		</div>
 
 	</form>
@@ -199,17 +206,6 @@
 					}
 				});
 
-				// $('#notify-form').submit(function() {
-				// 	// console.log('Search Button Clicked');			
-				// 	// assign back the selected employees to server
-				// 	var text = JSON.stringify(ag_selected_employees);
-				// 	$('#aselected_emp_ids').val( text );
-				// 	var text2 = JSON.stringify(ag_selected_orgnodes);
-				// 	$('#aselected_org_nodes').val( text2 );
-				// 	// dd(g_selected_orgnodes);
-				// 	return true; // return false to cancel form action
-				// });
-
 				CKEDITOR.replace('what', {
 					toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent", "Link"] ],disableNativeSpellChecker: false});
 
@@ -220,11 +216,6 @@
 					$('#pageLoader').show();
 				});
 
-				// $(window).resize(function(){
-				// 	location.reload();
-				// 	return;
-				// });
- 
 			});
 
 		</script>

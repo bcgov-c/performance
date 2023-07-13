@@ -11,7 +11,7 @@ WORKDIR /app
 COPY . /app
 
 RUN composer update --ignore-platform-reqs
-RUN composer require kalnoy/nestedset doctrine/dbal awobaz/compoships --ignore-platform-reqs
+RUN composer require kalnoy/nestedset doctrine/dbal awobaz/compoships dompdf/dompdf --ignore-platform-reqs
 
 RUN chgrp -R 0 /app && \
     chmod -R g=u /app
@@ -35,16 +35,16 @@ RUN apt-get update -y && apt -y upgrade && apt-get install -y \
     vim \
 	sudo
 
-RUN apt-get update && apt-get install -y cron && cron
+#RUN apt-get update && apt-get install -y cron && cron
 
 # Copy cron file to the cron.d directory
-COPY /laravelcron /etc/cron.d/laravelcron
+#COPY /laravelcron /etc/cron.d/laravelcron
 
 # Give execution rights on the cron job
-RUN chmod 0644 /etc/cron.d/laravelcron
+#RUN chmod 0644 /etc/cron.d/laravelcron
 
 # Apply cron job
-RUN crontab /etc/cron.d/laravelcron
+#RUN crontab /etc/cron.d/laravelcron
 
 RUN ln -sf /proc/self/fd/1 /var/log/apache2/access.log && \
     ln -sf /proc/self/fd/1 /var/log/apache2/error.log && \
@@ -119,8 +119,8 @@ EXPOSE 8000
 
 
 # Add a command to base-image entrypont script
-RUN sed -i 's/^exec /service cron start\n\nexec /' /usr/local/bin/apache2-foreground
+#RUN sed -i 's/^exec /service cron start\n\nexec /' /usr/local/bin/apache2-foreground
 
-#CMD /usr/local/bin/apache2-foreground
+CMD /usr/local/bin/apache2-foreground
 
 #RUN /usr/local/bin/apache2-foreground

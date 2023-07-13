@@ -19,6 +19,11 @@ use Yajra\Datatables\Datatables;
 class DashboardController extends Controller
 {
     public function index(Request $request) {
+        $user = Auth::user();
+        
+        if ($user->hasRole('Service Representative')) {
+            session()->put('sr_user', true);
+        } 
 
         $notifications = DashboardNotification::where('user_id', Auth::id())
                         ->where(function ($q)  {
@@ -62,21 +67,24 @@ class DashboardController extends Controller
                     switch($notification->notification_type) {
                         case 'GC':
                         case 'GR':
-                            $text .= 'Title: '.$notification->relatedGoal->title.' | Goal Type: '.$notification->relatedGoal->goalType->name. ' | Date: '.$notification->created_at->format('M d, Y H:i A');
+                            $text .= 'Title: '.$notification->relatedGoal->title.' | Goal Type: '.$notification->relatedGoal->goalType->name.($notification->created_at?' | Date: '.$notification->created_at->format('M d, Y H:i A'):'');
                             break;
                         case 'GB':
-                            $text .= 'Title: '.$notification->relatedGoal->title. ' | Type: '.$notification->relatedGoal->mandatory_status_descr. ' | Date: '.$notification->created_at->format('M d, Y H:i A');
-                        break;
-                    case 'CA':
-                    case 'CS':
-                            $text .= 'Title: '.($notification->conversation ? $notification->conversation->topic->name : '').' | Date: '.$notification->created_at->format('M d, Y H:i A');
-                        break;
-                    case 'SP':
-                            $text .= 'Elements: '.($notification->sharedProfile ? $notification->sharedProfile->shared_element_name : ''). ' | Date: '.$notification->created_at->format('M d, Y H:i A');
-                        break;
-                    case '':
-                            $text .= 'Date: '.$notification->created_at->format('M d, Y H:i A');
-                        break;
+                            $dt = new \DateTimeImmutable($notification->created_at, new \DateTimeZone('UTC'));
+                            $text .= 'Title: '.$notification->relatedGoal->title. ' | Type: '.$notification->relatedGoal->mandatory_status_descr.($notification->created_at?' | Date: '.$dt->setTimezone((new \DateTime())->getTimezone())->format('M d, Y H:i A'):'');
+                            break;
+                        case 'CA':
+                        case 'CS':
+                                $text .= 'Title: '.($notification->conversation ? $notification->conversation->topic->name : '');
+                                $text .= ($text?' | ':'').($notification->created_at?'Date: '.$notification->created_at->format('M d, Y H:i A'):'');
+                            break;
+                        case 'SP':
+                                $text .= 'Elements: '.($notification->sharedProfile ? $notification->sharedProfile->shared_element_name : '');
+                                $text .= ($text?' | ':'').($notification->created_at?'Date: '.$notification->created_at->format('M d, Y H:i A'):'');
+                            break;
+                        case '':
+                                $text .= ($notification->created_at?'Date: '.$notification->created_at->format('M d, Y H:i A'):'');
+                            break;
                     }
 
                     return '<table class="inner" style="border:none">'. 
@@ -202,7 +210,14 @@ class DashboardController extends Controller
         //                             ->orWhere('dashboard_notifications.notification_type', '');    
         //                         });
         $supervisorTooltip = 'If your current supervisor in the Performance Development Platform is incorrect, please have your supervisor submit a service request through AskMyHR and choose the category: <span class="text-primary">My Team or Organization > HR Software Systems Support > Position / Reporting Updates</span>';        
-        $sharedList = SharedProfile::where('shared_id', Auth::id())->with('sharedWithUser')->get();
+        
+        $sharedList = SharedProfile::where('shared_id', Auth::id())
+                    ->join('users','users.id','shared_profiles.shared_with')
+                    ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
+                    ->whereNull('employee_demo.date_deleted')
+                    ->with('sharedWithUser')->get();
+        
+        
         $profilesharedTooltip = 'If this information is incorrect, please discuss with your supervisor first and escalate to your organization\'s Strategic Human Resources shop if you are unable to resolve.';
         
         $message= '';
@@ -351,6 +366,8 @@ class DashboardController extends Controller
          Auth::loginUsingId($oldUserId);
          $request->session()->forget('existing_user_id');
          $request->session()->forget('user_is_switched');
+         $request->session()->forget('sr_user');
+         $request->session()->forget('SR_ALLOWED');
          //return redirect()->back();
          return redirect()->to('/dashboard');
 
@@ -382,5 +399,15 @@ class DashboardController extends Controller
         }
         return redirect()->back();
     }
+    
+    public function checkExpiration(Request $request) {
+        $user = Auth::user();
+        $sessionExpired = true;
+        if($user){
+            $sessionExpired = false;
+        }
 
+        //$sessionExpired = $request->session()->has('last_activity');
+        return response()->json(['sessionExpired' => $sessionExpired]);
+    }
 }

@@ -374,7 +374,6 @@ $(function()  {
 
 	}
 
-
 	function createBarChart(divId, myData) {
 
 		var myChart = echarts.init( document.getElementById( divId ) );
@@ -422,16 +421,18 @@ $(function()  {
 					type: 'shadow',
 				},
 				formatter: function (params) {
-     				var tar = params[0];
-     				return 'Tag : ' + tar.name + '<br/>Count : ' + tar.value;
-    			}	
+                                    var tar = params[0];
+                                    return 'Tag : ' + tar.name + '<br/>Count : ' + tar.value;
+                                }	
 			},
 			grid: {
-				left: '3%',
-				right: '4%',
-				bottom: '10%',
-				containLabel: true
-			},
+                            left: '1%',
+                            right: '1%',
+                            bottom: '6%',
+                            top: '3%',
+                            containLabel: true
+                        },
+                        maintainAspectRatio: false,
 			series: [
 				{
 					// name: '2011',
@@ -497,51 +498,6 @@ $(function()  {
 	btnExportHTML.addEventListener("click", async () => {        
 		window.print();
 		return;
-
-		// var element = document.getElementById('pdf-output');
-		// var opt = {
-		// 	margin:       0.2,
-		// 	filename:     'chart.pdf',
-		// 	image:        { type: 'jpeg', quality: 0.98 },
-		// 	html2canvas:  { scale: 0.8 },
-		// 	jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-		// };
-
-		// // New Promise-based usage:
-		// html2pdf().set(opt).from(element).save();
-	
-	
-
-	// 	try {
-	// 		const doc = new jspdf.jsPDF({
-	// 		unit: "px",
-	// 		orientation: "p",
-	// 		hotfixes: ["px_scaling"]
-	// 	});
-	// 	await doc
-	// 	.html(document.querySelector("#pdf-output"), {
-	// 		filename: "charts.pdf",
-	// 		// callback: function (doc) {
-	// 		//   doc.save('charts.pdf');
-	// 		// },
-	// 		html2canvas: {
-	// 		allowTaint: true,
-	// 		backgroundColor: "transparent",
-	// 		// scale: 0.8, 
-	// 		// logging: false
-	// 		}
-	// 	})
-	// 	.save();
-
-	// 	// another way:
-	// 	// const canvas = await html2canvas(document.querySelector(".chart-box"))
-	// 	// const img = await loadImage(canvas.toDataURL())
-	// 	// const dpr = chart1.getDevicePixelRatio()
-	// 	// doc.addImage(img.src, 'PNG', 0, 0, img.width / dpr, img.height / dpr)
-	// 	// await doc.save()
-	// } catch (e) {
-	// 	console.error("failed to export", e);
-	// }
 	});
 
 

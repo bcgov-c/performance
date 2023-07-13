@@ -22,6 +22,7 @@ class JobSchedAudit extends Model
         'start_time',
         'end_time',
         'status',
+        'details'
     ];
 
     // Static function for gettig the list of status

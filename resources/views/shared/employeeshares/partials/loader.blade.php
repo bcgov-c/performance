@@ -69,7 +69,7 @@
 </div>
 
 @push('css')
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.css" rel="stylesheet" />
 
     <style>
     .select2-selection--multiple{
@@ -101,7 +101,7 @@
                 placeholder: 'Select Organization',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/org-organizations" }}'
+                    url: '{{ "/".request()->segment(1)."/org-list/1/0" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -123,7 +123,7 @@
                 placeholder: 'Select Level 1',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/org-programs" }}'
+                    url: '{{ "/".request()->segment(1)."/org-list/1/1" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -146,7 +146,7 @@
                 placeholder: 'Select Level 2',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/org-divisions" }}'
+                    url: '{{ "/".request()->segment(1)."/org-list/1/2" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -170,7 +170,7 @@
                 placeholder: 'Select Level 3',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/org-branches" }}'
+                    url: '{{ "/".request()->segment(1)."/org-list/1/3" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -195,7 +195,7 @@
                 placeholder: 'Select level 4',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/org-level4" }}'
+                    url: '{{ "/".request()->segment(1)."/org-list/1/4" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {

@@ -8,22 +8,19 @@
 
     <div class="card">
         <div class="card-body">
-            {{-- <div class="h4">{{__('Manage Existing Access')}}</div> --}}
             @include('sysadmin.accesspermissions.partials.filter3')
-            {{-- <p></p> --}}
             <div class="p-3">  
                 <table class="table table-bordered filtertable table-striped" id="filtertable" style="width: 100%; overflow-x: auto; "></table>
             </div>
         </div>    
     </div>   
     @include('sysadmin/accesspermissions/partials/access-edit-modal')
-    {{-- @endsection --}}
 
 
     @push('css')
-        <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
         <x-slot name="css">
-            <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+            <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
             <style>
                 .text-truncate-30 {
                     white-space: wrap; 
@@ -48,8 +45,8 @@
     @endpush
 
     @push('js')
-        <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
         <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
         <script type="text/javascript">
 			$(document).ready(function(){
@@ -89,6 +86,7 @@
                         {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', name: 'deptid', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Access Level', ariaTitle: 'Access Level', target: 0, type: 'string', data: 'role_longname', name: 'role_longname', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'BU Assigned', ariaTitle: 'BU Assigned', target: 0, type: 'string', data: 'org_count', name: 'org_count', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},
                         {title: 'Model ID', ariaTitle: 'Model ID', target: 0, type: 'num', data: 'model_id', name: 'model_id', searchable: false, visible: false},
                         {title: 'Role ID', ariaTitle: 'Role ID', target: 0, type: 'num', data: 'role_id', name: 'role_id', searchable: false, visible: false},
@@ -100,9 +98,7 @@
                 $('#btn_search').click(function(e) {
                     e.preventDefault();
 					$('#filtertable').DataTable().rows().invalidate().draw();
-               } );
-
-                $('#btn_search').click();
+                } );
 
                 $('#editModal').on('show.bs.modal', function(event) {
                     var button = $(event.relatedTarget);
@@ -121,6 +117,9 @@
                     $('removeButton').prop('disabled', current == model_id);
                     $('#accessselect').prop('disabled', current == model_id);
                     $('#reason').prop('disabled', current == model_id);
+                    if($('#accessselect').val() == 5) {
+                        $('#accessselect').prop('disabled', true);
+                    }
                     if($('#accessselect').val() == 4) {
                         $('#accessselect').prop('disabled', true);
                     }
@@ -150,6 +149,7 @@
                                     {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', searchable: true},
                                     {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', searchable: true},
                                     {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true},
+                                    {title: 'Inherited', ariaTitle: 'Inherited', target: 0, type: 'string', data: 'inherited', name: 'inherited', searchable: true},
                                     {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'num', data: 'user_id', name: 'user_id', searchable: false, visible: false},
                                 ],  
                             }
@@ -179,7 +179,7 @@
                         table = $('#admintable').DataTable();
                         table.destroy();
                     };
-                    if($('#accessselect').val() == 3) {
+                    if($('#accessselect').val() == 3 ) {
                         $('#admintable').show();
                     } else {
                         $('#admintable').hide();

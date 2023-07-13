@@ -98,7 +98,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/eorg-organizations'
+                    url: '/sysadmin/org-list/2/0'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -129,7 +129,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/eorg-programs' 
+                    url: '/sysadmin/org-list/2/1' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -161,7 +161,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/eorg-divisions' 
+                    url: '/sysadmin/org-list/2/2' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -194,7 +194,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/eorg-branches' 
+                    url: '/sysadmin/org-list/2/3' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -228,7 +228,7 @@
                 scrollX: true,
                 stateSave: true,
                 ajax: {
-                    url: '/sysadmin/eorg-level4' 
+                    url: '/sysadmin/org-list/2/4' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -250,6 +250,36 @@
                 }
             });
             
+            $('#edd_level0').on('select2:select', function (e) {
+                // Do something
+                $('#edd_level1').val(null).trigger('change');
+                $('#edd_level2').val(null).trigger('change');
+                $('#edd_level3').val(null).trigger('change');
+                $('#edd_level4').val(null).trigger('change');
+            });
+
+            $('#edd_level1').on('select2:select', function (e) {
+                // Do something
+                $('#edd_level2').val(null).trigger('change');
+                $('#edd_level3').val(null).trigger('change');
+                $('#edd_level4').val(null).trigger('change');
+            });
+
+            $('#edd_level2').on('select2:select', function (e) {
+                // Do something
+                $('#edd_level3').val(null).trigger('change');
+                $('#edd_level4').val(null).trigger('change');
+            });
+
+            $('#edd_level3').on('select2:select', function (e) {
+                // Do something
+                $('#edd_level4').val(null).trigger('change');
+            });
+
+            $('#edd_level4').on('select2:select', function (e) {
+                e.preventDefault();
+            });
+
             $('#edd_level0').on('select2:unselect', function (e) {
                 e.preventDefault();
                 $('#edd_level0').val(null).trigger('change');
@@ -307,24 +337,24 @@
                 $('#ebtn_search').click();
             });
 
-            $('#criteria').change(function (e){
+            $('#ecriteria').change(function (e){
                 e.preventDefault();
-                $('#btn_search').click(e);
+                $('#ebtn_search').click(e);
             });
 
-            $('#search_text').change(function (e){
+            $('#esearch_text').change(function (e){
                 e.preventDefault();
-                $('#btn_search').click(e);
+                $('#ebtn_search').click(e);
             });
 
-            $('#search_text').keydown(function (e){
+            $('#esearch_text').keydown(function (e){
                 if (e.keyCode == 13) {
                     e.preventDefault();
-                    $('#btn_search').click(e);
+                    $('#ebtn_search').click(e);
                 }
             });
 
-            $('#ebtn_search_reset').click(function() {
+            $('#ebtn_search_reset').click(function(e) {
                 e.preventDefault();
                 $('#edd_level0').val(null).trigger('change');
                 $('#edd_level1').val(null).trigger('change');

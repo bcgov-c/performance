@@ -4,9 +4,11 @@ use App\Http\Controllers\GoalCommentController;
 use App\Http\Controllers\GoalController;
 use Illuminate\Support\Facades\Route;
 
+
+Route::get('goal/get_allusers', [GoalController::class, 'getAllUsers'])->name('goal.get-all-users');
 Route::get('goal/current', [GoalController::class, 'index'])->name('goal.current');
 Route::get('goal/past', [GoalController::class, 'index'])->name('goal.past');
-Route::get('goal/supervisor', [GoalController::class, 'index'])->name('goal.my-supervisor');
+Route::get('goal/share', [GoalController::class, 'index'])->name('goal.share');
 Route::get('goal/goalbank', [GoalController::class, 'goalBank'])->name('goal.library');
 Route::post('goal/goalbank', [GoalController::class, 'saveFromLibrary'])->name('goal.library');
 Route::get('goal/goalbank/{id}', [GoalController::class, 'showForLibrary'])->name('goal.library.detail');
@@ -15,6 +17,8 @@ Route::post('goal/supervisor/{id}/copy', [GoalController::class, 'copyGoal'])->n
 Route::post('goal/goalbank/copy-multiple', [GoalController::class, 'saveFromLibraryMultiple'])->name('goal.library.save-multiple');
 Route::delete('goal/comment/{id}', [GoalCommentController::class, 'delete'])->name('goal.comment.delete');
 Route::put('goal/comment/{id}', [GoalCommentController::class, 'edit'])->name('goal.comment.edit');
+
+Route::post('goal/sync', [GoalController::class, 'syncGoals'])->name('goal.sync-goals');
 
 Route::get('goal', function () {
     return redirect()->route('goal.current');

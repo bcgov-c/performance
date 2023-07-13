@@ -21,6 +21,7 @@ use App\Http\Requests\Goals\CreateGoalRequest;
 use App\Http\Requests\Goals\EditSuggestedGoalRequest;
 use App\MicrosoftGraph\SendMail;
 use App\Models\Tag;
+use App\Models\GoalSharedWith;
 
 class GoalController extends Controller
 {
@@ -76,30 +77,19 @@ class GoalController extends Controller
 
         $myTeamController = new MyTeamController(); 
         $employees = $myTeamController->myEmployeesAjax();
+        
 
-        $query = Goal::where('user_id', $authId)
-        ->with('user')
+        $query = Goal::with('user')
         ->with('goalType');
         $type = 'past';
-                
-        /*
-        $adminShared=SharedProfile::select('shared_with')
-        ->where('shared_id', '=', $authId)
-        ->where('shared_item', 'like', '%1%')
-        ->pluck('shared_with');
-        $adminemps = User::select('users.*')
-        ->whereIn('users.id', $adminShared)->get();
-        $employees = $employees->merge($adminemps);
-         * 
-         */
-        
+                        
         $empShared=SharedProfile::select('shared_id')
         ->where('shared_with', '=', $authId)
         ->where('shared_item', 'like', '%1%')
         ->pluck('shared_id');
         $empShared = User::select('users.*')
         ->whereIn('users.id', $empShared)->get();
-        $employees = $employees->merge($empShared);        
+        $employees = $employees->merge($empShared);   
         
         if(count($employees)>0) {
             $request->session()->put('has_employees', true);
@@ -114,24 +104,6 @@ class GoalController extends Controller
         }
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
         $goal_types_modal = $goaltypes;
-        
-        /*
-        if ($request->is("goal/current")) {
-            $goals = $query->where('status', 'active')
-            ->paginate(8);
-            $type = 'current';
-            return view('goal.index', compact('goals', 'type', 'goaltypes', 'user','employees', 'tags', 'tagsList', 'statusList', 'type_desc_str'));
-        } else if ($request->is("goal/supervisor")) {
-            //$user = Auth::user();
-            // TO remove already copied goals.
-            // $referencedGoals = Goal::where('user_id', $authId)->whereNotNull('referenced_from')->pluck('referenced_from');
-            $goals = $user->sharedGoals()
-            // ->whereNotIn('goals.id', $referencedGoals ) 
-            ->paginate(8);
-            $type = 'supervisor';
-            return view('goal.index', compact('goals', 'type', 'goaltypes', 'user', 'tags', 'type_desc_str'));
-        } 
-        */
 
         array_unshift($goaltypes, [
             "id" => "0",
@@ -140,17 +112,41 @@ class GoalController extends Controller
         ]);        
 
         $query = $query->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
+        ->join('users as owner_users', 'goals.user_id', 'owner_users.id')
         ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
-        ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id');
+        ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')
+        ->leftJoin('goals_shared_with', 'goals_shared_with.goal_id', 'goals.id')
+        ->leftJoin('users as shared_users', 'shared_users.id', 'goals_shared_with.user_id');
+        
+        session()->forget('from_share');
         if ($request->is("goal/current")) {
             $type = 'current';
-            $query = $query->where('status', '=', 'active')->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'), 'goal_types.name as typename');            
-        } else if($request->is("goal/supervisor")){
+            $query = $query->where('goals.user_id', $authId)
+                    ->where('status', '=', 'active')
+                    ->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames')
+                            ,DB::raw('group_concat(distinct goals_shared_with.user_id separator ",") as shared_user_id')
+                            ,DB::raw('group_concat(distinct shared_users.name separator ",") as shared_user_name')
+                            ,'goal_types.name as typename');            
+        } else if($request->is("goal/share")){
             $type = 'supervisor';
+            session()->put('from_share', true);
             $goals = $user->sharedGoals()->paginate(8);
             return view('goal.index', compact('goals', 'type', 'goaltypes','goal_types_modal','user', 'tags', 'type_desc_str'));
         } else {
-            $query = $query->where('status', '<>', 'active')->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'), 'goal_types.name as typename');
+            $query = $query->where('status', '<>', 'active')
+            ->select('goals.*'
+                    ,'owner_users.id as owner_id'
+                    ,'owner_users.name as owner_name'
+                    , DB::raw('group_concat(distinct tags.name separator ", ") as tagnames')
+                    ,DB::raw('group_concat(distinct goals_shared_with.user_id separator ",") as shared_user_id')
+                    ,DB::raw('group_concat(distinct shared_users.name separator ",") as shared_user_name')
+                    ,'goal_types.name as typename')
+            ->where(function($query) use($authId) {
+                $query->where('goals.user_id',$authId)
+                       ->orWhere('goals_shared_with.user_id',$authId);
+            });
+                        
+            //$query = $query->where('status', '<>', 'active')->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'), 'goal_types.name as typename');
         }
         
         
@@ -227,12 +223,19 @@ class GoalController extends Controller
             $query = $query->orderBy($sortby, $sortorder);
         }
       
-        $goals = $query->groupBy('title');
+        $goals = $query->groupBy('id');
         $goals = $query->paginate(10);
+
+        foreach ($goals as $goal){
+            $goal->login_role = 'owner';
+            if($goal->user_id != $authId){
+                $goal->login_role = 'sharee';
+            }
+        }
         
         $from = 'goal';        
         
-        return view('goal.index', compact('goals', 'type', 'goaltypes', 'goal_types_modal', 'tagsList', 'sortby', 'sortorder', 'createdBy', 'user', 'employees', 'tags', 'type_desc_str', 'statusList','from'));
+        return view('goal.index', compact('goals', 'type', 'goaltypes', 'goal_types_modal', 'tagsList', 'sortby', 'sortorder', 'createdBy', 'user', 'employees', 'tags', 'type_desc_str', 'statusList','from', 'authId'));
     }
 
     /**
@@ -329,8 +332,10 @@ class GoalController extends Controller
     * @param  int  $id
     * @return \Illuminate\Http\Response
     */
-    public function edit($id)
+    public function edit($id, Request $request)
     {
+        $from = $request->from;
+        
         $goal = Goal::withoutGlobalScope(NonLibraryScope::class)
         ->where('user_id', Auth::id())
         ->where('id', $id)
@@ -340,6 +345,11 @@ class GoalController extends Controller
         
         
         $goaltypes = GoalType::all()->toArray();
+        if($from == 'bank'){
+            $goaltypes = GoalType::where('name', '!=', 'private')->get()->toArray();
+        }
+
+
         $type_desc_arr = array();
         foreach($goaltypes as $goalType) {
             if(isset($goalType['description']) && isset($goalType['name'])) {                
@@ -444,46 +454,37 @@ class GoalController extends Controller
         return redirect()->back();
     }
 
-    public function goalBank(Request $request) {         
+    public function goalBank(Request $request) {      
         
         $authId = Auth::id();
         $user = User::find($authId);
         $tags = Tag::all()->sortBy("name")->toArray();
-        $tags_input = $request->tag_ids;  
+        $tags_input = $request->tag_ids;
+        $goaltypes = GoalType::where('name', '!=', 'private')->get()->toArray();
 
         $adminGoals = Goal::withoutGlobalScopes()
-        ->join('goal_bank_orgs', 'goals.id', '=', 'goal_bank_orgs.goal_id')
-        ->join('employee_demo', function ($j1) {
-            $j1->on(function ($j1a) {
-                $j1a->whereRAW('employee_demo.organization = goal_bank_orgs.organization OR ((employee_demo.organization = "" OR employee_demo.organization IS NULL) AND (goal_bank_orgs.organization = "" OR goal_bank_orgs.organization IS NULL))');
-            } )
-            ->on(function ($j2a) {
-                $j2a->whereRAW('employee_demo.level1_program = goal_bank_orgs.level1_program OR ((employee_demo.level1_program = "" OR employee_demo.level1_program IS NULL) AND (goal_bank_orgs.level1_program = "" OR goal_bank_orgs.level1_program IS NULL))');
-            } )
-            ->on(function ($j3a) {
-                $j3a->whereRAW('employee_demo.level2_division = goal_bank_orgs.level2_division OR ((employee_demo.level2_division = "" OR employee_demo.level2_division IS NULL) AND (goal_bank_orgs.level2_division = "" OR goal_bank_orgs.level2_division IS NULL))');
-            } )
-            ->on(function ($j4a) {
-                $j4a->whereRAW('employee_demo.level3_branch = goal_bank_orgs.level3_branch OR ((employee_demo.level3_branch = "" OR employee_demo.level3_branch IS NULL) AND (goal_bank_orgs.level3_branch = "" OR goal_bank_orgs.level3_branch IS NULL))');
-            } )
-            ->on(function ($j5a) {
-                $j5a->whereRAW('employee_demo.level4 = goal_bank_orgs.level4 OR ((employee_demo.level4 = "" OR employee_demo.level4 IS NULL) AND (goal_bank_orgs.level4 = "" OR goal_bank_orgs.level4 IS NULL))');
-            } );
-        } )
-        ->join('users', 'users.employee_id', '=', 'employee_demo.employee_id')
-        ->leftjoin('users as u2', 'u2.id', '=', 'goals.created_by')
-        ->where('users.id', '=', Auth::id())
-        ->whereIn('goals.by_admin', [1, 2])
-        ->where('is_library', true)
-        ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
-        ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
-        ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')   
-        ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'))
-        ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'users.name', 'goals.is_mandatory');
+            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator '<br/>') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
+            ->join('goal_bank_orgs', function ($qon) {
+                return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
+                    ->on('goal_bank_orgs.version', \DB::raw(2))
+                    ->on('goal_bank_orgs.inherited', \DB::raw(0));
+            })
+            ->join('employee_demo', 'employee_demo.orgid', 'goal_bank_orgs.orgid')
+            ->join('users', function ($qon) use ($authId) {
+                return $qon->on('users.employee_id', 'employee_demo.employee_id')
+                    ->on('users.id', \DB::raw($authId));
+            })
+            ->leftjoin('users as u2', 'u2.id', 'goals.created_by')
+            ->leftjoin('goal_types', 'goal_types.id', 'goals.goal_type_id')   
+            ->whereIn('goals.by_admin', [1, 2])
+            ->where('goals.is_library', true)
+            ->whereNull('goals.deleted_at')        
+            ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.id', 'u2.name', 'goals.is_mandatory');
+              
         // Admin List filter below
-        if ($request->has('is_mandatory') && $request->is_mandatory !== null) {
-            if ($request->is_mandatory == "1") {
-                $adminGoals = $adminGoals->where('is_mandatory', $request->is_mandatory);
+        if ($request->has('goal_bank_mandatory') && $request->goal_bank_mandatory !== null) {
+            if ($request->goal_bank_mandatory == "1") {
+                $adminGoals = $adminGoals->where('is_mandatory', $request->goal_bank_mandatory);
             }
             else {
                 $adminGoals = $adminGoals->where(function ($adminGoals1) {
@@ -492,18 +493,20 @@ class GoalController extends Controller
                 });
             }
         }
-        if ($request->has('goal_type') && $request->goal_type) {
+        if ($request->has('goal_bank_types') && $request->goal_bank_types) {
             $adminGoals = $adminGoals->whereHas('goalType', function($adminGoals1) use ($request) {
-                return $adminGoals1->where('goal_type_id', $request->goal_type);
+                return $adminGoals1->where('goal_type_id', $request->goal_bank_types);
             });
         }
-        if ($request->has('tag_id') && $request->tag_id) {
-            $adminGoals = $adminGoals->where('goal_tags.tag_id', "=", "$request->tag_id");
+        if ($request->has('goal_bank_tags') && $request->goal_bank_tags) {
+            // $adminGoals = $adminGoals->where('goal_tags.tag_id', "=", "$request->tag_id");
+            $adminGoals = $adminGoals->whereRaw("EXISTS (SELECT 1 FROM goal_tags WHERE goal_tags.goal_id = goals.id AND goal_tags.tag_id = '{$request->goal_bank_tags}')");
         }
-        if ($request->has('title') && $request->title) {
-            $adminGoals = $adminGoals->where('goals.title', "LIKE", "%$request->title%");
+        if ($request->has('goal_bank_title') && $request->goal_bank_title) {
+            $adminGoals = $adminGoals->where('goals.title', "LIKE", "%$request->goal_bank_title%");
         }
-        if ($request->has('date_added') && $request->date_added && Str::lower($request->date_added) !== 'any') {
+        if ($request->has('goal_bank_dateadd') && $request->goal_bank_dateadd && Str::lower($request->goal_bank_dateadd) !== 'any') {
+            /*
             $dateRange = explode("-",$request->date_added);
             $dateRange[0] = trim($dateRange[0]);
             $dateRange[1] = trim($dateRange[1]);
@@ -511,22 +514,110 @@ class GoalController extends Controller
             $endDate = Carbon::createFromFormat('M d, Y', $dateRange[1]);
             $adminGoals = $adminGoals->whereDate('goals.created_at', '>=', $startDate);
             $adminGoals = $adminGoals->whereDate('goals.created_at', '<=', $endDate);
+             * 
+             */
+            $dateadded = $request->goal_bank_dateadd;
+            $adminGoals = $adminGoals->whereDate('goals.created_at', '>=', $dateadded . " 00:00:00");
+            $adminGoals = $adminGoals->whereDate('goals.created_at', '<=', $dateadded . " 23:59:59");
         }
-        if ($request->has('created_by') && $request->created_by) {
+        if ($request->has('goal_bank_createdby') && $request->goal_bank_createdby) {
             // $query = $query->where('user_id', $request->created_by);
-            $adminGoals = $adminGoals->where('created_by', $request->created_by);
+            if(is_numeric($request->goal_bank_createdby)) {
+                $adminGoals = $adminGoals->where('created_by', $request->goal_bank_createdby)->whereNull('display_name');
+            } else {
+                $adminGoals = $adminGoals->where('display_name', 'like',$request->goal_bank_createdby);
+            }
         }
+
+        $adminGoalsInherited = Goal::withoutGlobalScopes()
+            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator '<br/>') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
+            ->join('goal_bank_orgs', function ($qon) {
+                return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
+                    ->on('goal_bank_orgs.version', \DB::raw(2))
+                    ->on('goal_bank_orgs.inherited', \DB::raw(1));
+            })
+            ->join('employee_demo_tree', 'employee_demo_tree.id', 'goal_bank_orgs.orgid')
+            ->leftjoin('users as u2', 'u2.id', 'goals.created_by')
+            ->leftjoin('goal_types', 'goal_types.id', 'goals.goal_type_id')   
+            ->whereIn('goals.by_admin', [1, 2])
+            ->where('goals.is_library', true)
+            ->whereNull('goals.deleted_at')        
+            ->where(function ($where) use ($authId) {
+                return $where->whereRaw("
+                        (
+                            EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud0 WHERE ud0.user_id = {$authId} AND employee_demo_tree.level = 0 AND ud0.organization_key = employee_demo_tree.organization_key)
+                            OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud1 WHERE ud1.user_id = {$authId} AND employee_demo_tree.level = 1 AND ud1.organization_key = employee_demo_tree.organization_key AND ud1.level1_key = employee_demo_tree.level1_key)
+                            OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud2 WHERE ud2.user_id = {$authId} AND employee_demo_tree.level = 2 AND ud2.organization_key = employee_demo_tree.organization_key AND ud2.level1_key = employee_demo_tree.level1_key AND ud2.level2_key = employee_demo_tree.level2_key)
+                            OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud3 WHERE ud3.user_id = {$authId} AND employee_demo_tree.level = 3 AND ud3.organization_key = employee_demo_tree.organization_key AND ud3.level1_key = employee_demo_tree.level1_key AND ud3.level2_key = employee_demo_tree.level2_key AND ud3.level3_key = employee_demo_tree.level3_key)
+                            OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud4 WHERE ud4.user_id = {$authId} AND employee_demo_tree.level = 4 AND ud4.organization_key = employee_demo_tree.organization_key AND ud4.level1_key = employee_demo_tree.level1_key AND ud4.level2_key = employee_demo_tree.level2_key AND ud4.level3_key = employee_demo_tree.level3_key AND ud4.level4_key = employee_demo_tree.level4_key)
+                        )
+                    ");
+            })
+        ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.id', 'u2.name', 'goals.is_mandatory');
+        
+        // Admin List filter below
+        if ($request->has('goal_bank_mandatory') && $request->goal_bank_mandatory !== null) {
+            if ($request->goal_bank_mandatory == "1") {
+                $adminGoalsInherited = $adminGoalsInherited->where('is_mandatory', $request->goal_bank_mandatory);
+            }
+            else {
+                $adminGoalsInherited = $adminGoalsInherited->where(function ($adminGoals1) {
+                    $adminGoals1->whereNull('is_mandatory');
+                    $adminGoals1->orWhere('is_mandatory', 0);
+                });
+            }
+        }
+        if ($request->has('goal_bank_types') && $request->goal_bank_types) {
+            $adminGoalsInherited = $adminGoalsInherited->whereHas('goalType', function($adminGoals1) use ($request) {
+                return $adminGoals1->where('goal_type_id', $request->goal_bank_types);
+            });
+        }
+        if ($request->has('goal_bank_tags') && $request->goal_bank_tags) {
+            // $adminGoalsInherited = $adminGoalsInherited->where('goal_tags.tag_id', "=", "$request->tag_id");
+            $adminGoalsInherited = $adminGoalsInherited->whereRaw("EXISTS (SELECT 1 FROM goal_tags WHERE goal_tags.goal_id = goals.id AND goal_tags.tag_id = '{$request->goal_bank_tags}')");
+        }
+        if ($request->has('goal_bank_title') && $request->goal_bank_title) {
+            $adminGoalsInherited = $adminGoalsInherited->where('goals.title', "LIKE", "%$request->goal_bank_title%");
+        }
+        if ($request->has('goal_bank_dateadd') && $request->date_added && Str::lower($request->goal_bank_dateadd) !== 'any') {
+            /*
+            $dateRange = explode("-",$request->date_added);
+            $dateRange[0] = trim($dateRange[0]);
+            $dateRange[1] = trim($dateRange[1]);
+            $startDate = Carbon::createFromFormat('M d, Y', $dateRange[0]);
+            $endDate = Carbon::createFromFormat('M d, Y', $dateRange[1]);
+            $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '>=', $startDate);
+            $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '<=', $endDate);
+             * 
+             */
+            $dateadded = $request->goal_bank_dateadd;
+            $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '>=', $dateadded . " 00:00:00");
+            $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '<=', $dateadded . " 23:59:59");
+        }
+        if ($request->has('goal_bank_createdby') && $request->goal_bank_createdby) {
+            // $query = $query->where('user_id', $request->created_by);
+            if(is_numeric($request->goal_bank_createdby)) {
+                $adminGoalsInherited = $adminGoalsInherited->where('created_by', $request->goal_bank_createdby)->whereNull('display_name');
+            } else {
+                $adminGoalsInherited = $adminGoalsInherited->where('display_name', 'like',$request->goal_bank_createdby);
+            }
+        }
+
+        // $adminGoals = $adminGoals->union($adminGoalsInherited);
 
         $query = Goal::withoutGlobalScope(NonLibraryScope::class)
         ->where('is_library', true)
+        ->whereNull('goals.deleted_at')        
         ->join('users', 'goals.user_id', '=', 'users.id')          
         ->leftjoin('users as u2', 'u2.id', '=', 'goals.created_by')
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')    
         ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
-        ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id');    
-        if ($request->has('is_mandatory') && $request->is_mandatory !== null) {
-            if ($request->is_mandatory == "1") {
-                $query = $query->where('is_mandatory', $request->is_mandatory);
+        ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id');  
+        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.id as creator_id','u2.name as username',DB::raw('group_concat(distinct tags.name separator "<br/>") as tagnames'));
+        
+        if ($request->has('goal_bank_mandatory') && $request->goal_bank_mandatory !== null) {
+            if ($request->goal_bank_mandatory == "1") {
+                $query = $query->where('is_mandatory', $request->goal_bank_mandatory);
             }
             else {
                 $query = $query->where(function ($query) {
@@ -536,85 +627,264 @@ class GoalController extends Controller
             }
         }
 
-        if ($request->has('goal_type') && $request->goal_type) {
+        if ($request->has('goal_bank_types') && $request->goal_bank_types) {
             $query = $query->whereHas('goalType', function($query) use ($request) {
-                return $query->where('goal_type_id', $request->goal_type);
+                return $query->where('goal_type_id', $request->goal_bank_types);
             });
         }
         
-        if ($request->has('tag_id') && $request->tag_id) {
-            $query = $query->where('goal_tags.tag_id', "=", "$request->tag_id");
+        if ($request->has('goal_bank_tags') && $request->goal_bank_tags) {
+            $query = $query->where('goal_tags.tag_id', "=", "$request->goal_bank_tags");
         }
 
-        if ($request->has('title') && $request->title) {
-            $query = $query->where('goals.title', "LIKE", "%$request->title%");
+        if ($request->has('goal_bank_title') && $request->goal_bank_title) {
+            $query = $query->where('goals.title', "LIKE", "%$request->goal_bank_title%");
         }
 
-        if ($request->has('date_added') && $request->date_added && Str::lower($request->date_added) !== 'any') {
-            $dateRange = explode("-",$request->date_added);
-            $dateRange[0] = trim($dateRange[0]);
-            $dateRange[1] = trim($dateRange[1]);
-
-            $startDate = Carbon::createFromFormat('M d, Y', $dateRange[0]);
-            $endDate = Carbon::createFromFormat('M d, Y', $dateRange[1]);
-
-            $query = $query->whereDate('goals.created_at', '>=', $startDate);
-            $query = $query->whereDate('goals.created_at', '<=', $endDate);
+        if ($request->has('goal_bank_dateadd') && $request->goal_bank_dateadd && Str::lower($request->goal_bank_dateadd) !== 'any') {
+            $dateadded = $request->goal_bank_dateadd;
+            $query = $query->where('goals.created_at', '>=', $dateadded . " 00:00:00");
+            $query = $query->where('goals.created_at', '<=', $dateadded . " 23:59:59");
         }
 
-        if ($request->has('created_by') && $request->created_by) {
+        if ($request->has('goal_bank_createdby') && $request->goal_bank_createdby) {
             // $query = $query->where('user_id', $request->created_by);
-            $query = $query->where('created_by', $request->created_by);
+            if(is_numeric($request->goal_bank_createdby)) {
+                $query = $query->where('created_by', $request->goal_bank_createdby)->whereNull('display_name');
+            } else {
+                $query = $query->where('display_name', 'like',$request->goal_bank_createdby);
+            }
         }
 
         $query->whereHas('sharedWith', function($query) {
             $query->where('user_id', Auth::id());
         });
         $query->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory');
-        // $bankGoals = $query->get();
-        
-        // $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goalTypes, $tagsList);
-        // $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','users.name as username',DB::raw('group_concat(distinct tags.name) as tagnames'));
-        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goal_types.name as typename','u2.name as username',DB::raw('group_concat(distinct tags.name separator ", ") as tagnames'));
-        $query = $query->union($adminGoals);
-        
-        if (!$request->has('sortorder') || $request->sortorder == '') {
-            $sortorder = 'DESC';
-        } elseif (strtoupper($request->sortorder) != 'ASC' && strtoupper($request->sortorder) != 'DESC') {
-            $sortorder = 'DESC';
-        }else {
-            $sortorder = $request->sortorder;
-        }
-        
+        $query = $query->union($adminGoals)->union($adminGoalsInherited);
+                
         $sortby = 'created_at';
-        if ($request->has('sortby') && ($request->sortby != 'created_at' && $request->sortby != '')) {
-            $sortby = $request->sortby;
-            $query = $query->orderby($sortby, $sortorder);    
-            if ($sortorder == 'ASC') {
-                $sortorder = 'DESC';
-            } else {
-                $sortorder = 'ASC';
-            }
-        } else {
-            $query = $query->orderby($sortby, $sortorder);    
-        }
+        $sortorder = 'ASC';
+        $query = $query->orderby($sortby, $sortorder);    
         
         // $query = $query->groupBy('goals.id');
-        $bankGoals = $query->paginate($perPage=10, $columns = ['*'], $pageName = 'Goal');
-        $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goalTypes, $tagsList);
+        //$bankGoals = $query->paginate($perPage=10, $columns = ['*'], $pageName = 'Goal');
+        $bankGoals = $query->get();
+        $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goaltypes, $tagsList);
+        $bankGoals_arr = array();
+        $i = 0;
         
-        //no need private in goalbank module
-        unset($goalTypes[4]);
+        foreach($bankGoals as $item){
+            $bankGoals_arr[$i]['id'] = $item->id;
+            $bankGoals_arr[$i]['title'] = $item->title;
+            $bankGoals_arr[$i]['goal_type_id'] = $item->goal_type_id;
+            
+            $date = Carbon::parse($item->created_at); // Parse the date string into a Carbon instance
+            $formattedDate = $date->format('Y-m-d');
+            $bankGoals_arr[$i]['created_at'] = $formattedDate;
+            
+            $bankGoals_arr[$i]['user_id'] = $item->user_id;
+            if($item->is_mandatory == 1){
+                $bankGoals_arr[$i]['is_mandatory'] = 'Mandatory';
+            }else{
+                $bankGoals_arr[$i]['is_mandatory'] = 'Suggested';
+            }
+            $bankGoals_arr[$i]['display_name'] = $item->display_name;            
+            
+            $bankGoals_arr[$i]['typename'] = $item->typename;
+            $bankGoals_arr[$i]['username'] = $item->username;
+            $bankGoals_arr[$i]['tagnames'] = $item->tagnames;
+            $i++;
+        }
+        $json_goalbanks = json_encode($bankGoals_arr);   
+                        
+        $all_adminGoals = Goal::withoutGlobalScopes()
+            ->select('u2.id as creator_id', 'u2.name as username', 'goals.display_name')
+            ->join('goal_bank_orgs', function ($qon) {
+                return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
+                    ->on('goal_bank_orgs.version', \DB::raw(2))
+                    ->on('goal_bank_orgs.inherited', \DB::raw(0));
+            })
+            ->join('employee_demo', 'employee_demo.orgid', 'goal_bank_orgs.orgid')
+            ->join('users', function ($qon) use ($authId) {
+                return $qon->on('users.employee_id', 'employee_demo.employee_id')
+                    ->on('users.id', \DB::raw($authId));
+            })
+            ->leftjoin('users as u2', 'u2.id', 'goals.created_by')
+            ->leftjoin('goal_types', 'goal_types.id', 'goals.goal_type_id')   
+            ->whereIn('goals.by_admin', [1, 2])
+            ->where('goals.is_library', true)
+            ->whereNull('goals.deleted_at')           
+            ->groupBy('u2.id', 'u2.name', 'goals.display_name');
+        
+        $all_adminGoalsInherited = Goal::withoutGlobalScopes()
+            ->select('u2.id as creator_id', 'u2.name as username', 'goals.display_name')
+            ->join('goal_bank_orgs', function ($qon) {
+                return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
+                    ->on('goal_bank_orgs.version', \DB::raw(2))
+                    ->on('goal_bank_orgs.inherited', \DB::raw(1));
+            })
+            ->join('employee_demo_tree', 'employee_demo_tree.id', 'goal_bank_orgs.orgid')
+            ->leftjoin('users as u2', 'u2.id', 'goals.created_by')
+            ->leftjoin('goal_types', 'goal_types.id', 'goals.goal_type_id')   
+            ->whereIn('goals.by_admin', [1, 2])
+            ->where('goals.is_library', true)
+            ->whereNull('goals.deleted_at')        
+            ->where(function ($where) use ($authId) {
+                return $where->whereRaw("
+                        (
+                            EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud0 WHERE ud0.user_id = {$authId} AND employee_demo_tree.level = 0 AND ud0.organization_key = employee_demo_tree.organization_key)
+                            OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud1 WHERE ud1.user_id = {$authId} AND employee_demo_tree.level = 1 AND ud1.organization_key = employee_demo_tree.organization_key AND ud1.level1_key = employee_demo_tree.level1_key)
+                            OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud2 WHERE ud2.user_id = {$authId} AND employee_demo_tree.level = 2 AND ud2.organization_key = employee_demo_tree.organization_key AND ud2.level1_key = employee_demo_tree.level1_key AND ud2.level2_key = employee_demo_tree.level2_key)
+                            OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud3 WHERE ud3.user_id = {$authId} AND employee_demo_tree.level = 3 AND ud3.organization_key = employee_demo_tree.organization_key AND ud3.level1_key = employee_demo_tree.level1_key AND ud3.level2_key = employee_demo_tree.level2_key AND ud3.level3_key = employee_demo_tree.level3_key)
+                            OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud4 WHERE ud4.user_id = {$authId} AND employee_demo_tree.level = 4 AND ud4.organization_key = employee_demo_tree.organization_key AND ud4.level1_key = employee_demo_tree.level1_key AND ud4.level2_key = employee_demo_tree.level2_key AND ud4.level3_key = employee_demo_tree.level3_key AND ud4.level4_key = employee_demo_tree.level4_key)
+                        )
+                    ");
+            })
+        ->groupBy('u2.id', 'u2.name', 'goals.display_name');
+        
+        $all_bankquery = Goal::withoutGlobalScope(NonLibraryScope::class)
+        ->select('u2.id as creator_id', 'u2.name as username', 'goals.display_name')        
+        ->where('is_library', true)
+        ->whereNull('goals.deleted_at')        
+        ->join('users', 'goals.user_id', '=', 'users.id')          
+        ->leftjoin('users as u2', 'u2.id', '=', 'goals.created_by')
+        ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')    
+        ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
+        ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id');
+        $all_bankquery->whereHas('sharedWith', function($query) {
+            $query->where('user_id', Auth::id());
+        })
+        ->groupBy('u2.id', 'u2.name', 'goals.display_name');        
+        
+        $all_bankquery = $all_bankquery->union($all_adminGoals)->union($all_adminGoalsInherited);
+        
+        $i = 0;
+        $goalCreatedBy = array();
+        $all_bankGoals = $all_bankquery->get();
+        foreach($all_bankGoals as $item){
+            if($item->display_name != '' ){
+                $goalCreatedBy[$i]['id'] = $item->display_name; 
+                $goalCreatedBy[$i]['name'] = $item->display_name;
+            } else {
+                $goalCreatedBy[$i]['id'] = $item->creator_id;
+                $goalCreatedBy[$i]['name'] = $item->username; 
+            }
+            
+            $i++;
+        }   
+        foreach($goalCreatedBy as $a=>$t){
+            if($t["name"] == ''){
+                unset($goalCreatedBy[$a]);
+            }
+        }
 
-        $myTeamController = new MyTeamController();
-        $suggestedGoalsData = $myTeamController->showSugggestedGoals('my-team.goals.bank', false);
+        usort($goalCreatedBy, function ($a, $b) {
+            return strcmp($a["name"], $b["name"]);
+        });
+
+        $createdBy = collect($goalCreatedBy)->unique('name')->values()->all();
+        array_unshift($createdBy , [
+            "id" => "0",
+            "name" => "Any"
+        ]);
+        
+
+        //$myTeamController = new MyTeamController();
+        //$suggestedGoalsData = $myTeamController->showSugggestedGoals('my-team.goals.bank', false);
+
+        $suggestedGoalsData = DB::table('goals')
+            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id'
+                    , 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.name as username'
+                    ,DB::raw('group_concat(distinct tags.name separator "<br/>") as tagnames')
+                    ,DB::raw('group_concat(distinct goals_shared_with.user_id separator ",") as shared_user_id')
+                    ,DB::raw('group_concat(distinct shared_users.name separator ",") as shared_user_name'))         
+            ->leftJoin('users as u2', 'u2.id', '=', 'goals.created_by')
+            ->leftJoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
+            ->leftJoin('tags', 'tags.id', '=', 'goal_tags.tag_id')
+            ->leftJoin('goal_types', 'goal_types.id', 'goals.goal_type_id')
+            ->leftJoin('goals_shared_with', 'goals_shared_with.goal_id', 'goals.id')
+            ->leftJoin('users as shared_users', 'shared_users.id', 'goals_shared_with.user_id')    
+            ->where('status', 'active')
+            ->where('is_library', 1)
+            ->where('by_admin', '=', 0)
+            ->where('goals.user_id', Auth::id()) 
+            ->whereNull('goals.deleted_at');   
+                
+            if ($request->has('is_mandatory') && $request->is_mandatory !== null) {
+                if ($request->is_mandatory == "1") {
+                    $suggestedGoalsData = $suggestedGoalsData->where('is_mandatory', $request->is_mandatory);
+                }
+                else {
+                    $suggestedGoalsData = $suggestedGoalsData->where(function ($query) {
+                        $query->whereNull('is_mandatory');
+                        $query->orWhere('is_mandatory', 0);
+                    });
+                }
+            }
+
+            if ($request->has('goal_type') && $request->goal_type) {
+                $suggestedGoalsData = $suggestedGoalsData->where('goals.goal_type_id', "=", "$request->goal_type");
+            }
+
+            if ($request->has('tag_id') && $request->tag_id) {
+                $suggestedGoalsData = $suggestedGoalsData->where('goal_tags.tag_id', "=", "$request->tag_id");
+            }
+
+            if ($request->has('title') && $request->title) {
+                $suggestedGoalsData = $suggestedGoalsData->where('goals.title', "LIKE", "%$request->title%");
+            }
+
+            if ($request->has('date_added') && $request->date_added && Str::lower($request->date_added) !== 'any') {
+                $dateadded = $request->date_added;
+                $suggestedGoalsData = $suggestedGoalsData->where('goals.created_at', '>=', $dateadded . " 00:00:00");
+                $suggestedGoalsData = $suggestedGoalsData->where('goals.created_at', '<=', $dateadded . " 23:59:59");
+            }
+
+            if ($request->has('created_by') && $request->created_by) {
+                // $query = $query->where('user_id', $request->created_by);
+                $suggestedGoalsData = $suggestedGoalsData->where('created_by', $request->created_by);
+            }    
+                
+            $suggestedGoalsData = $suggestedGoalsData->groupBy('goals.id')
+            ->orderBy('goals.id', 'desc')    
+            ->get(); 
+        $team_bankGoals_arr = array();
+        
+        $i = 0;
+        foreach($suggestedGoalsData as $item){
+                $team_bankGoals_arr[$i]['id'] = $item->id;
+                $team_bankGoals_arr[$i]['title'] = $item->title;
+                $team_bankGoals_arr[$i]['goal_type_id'] = $item->goal_type_id;
+                
+                $date = Carbon::parse($item->created_at); // Parse the date string into a Carbon instance
+                $formattedDate = $date->format('Y-m-d');
+                $team_bankGoals_arr[$i]['created_at'] = $formattedDate;
+                
+                $team_bankGoals_arr[$i]['user_id'] = $item->user_id;
+                
+                if($item->is_mandatory == 1){
+                    $team_bankGoals_arr[$i]['is_mandatory'] = 'Mandatory';
+                }else{
+                    $team_bankGoals_arr[$i]['is_mandatory'] = 'Suggested';
+                }
+                $team_bankGoals_arr[$i]['display_name'] = $item->display_name;
+                $team_bankGoals_arr[$i]['typename'] = $item->typename;
+                $team_bankGoals_arr[$i]['username'] = $item->username;
+                $team_bankGoals_arr[$i]['tagnames'] = $item->tagnames;
+                $team_bankGoals_arr[$i]['shared_user_id'] = $item->shared_user_id;
+                $team_bankGoals_arr[$i]['shared_user_name'] = $item->shared_user_name;
+                $i++;
+        }
+
+        $json_team_goalbanks = json_encode($team_bankGoals_arr);
+        
 
         // $compacted = compact('bankGoals', 'tags', 'tagsList', 'goalTypes', 'mandatoryOrSuggested', 'createdBy');
         // dd($compacted);
         // $merged = array_merge(compact('bankGoals', 'tags', 'tagsList', 'goalTypes', 'mandatoryOrSuggested', 'createdBy'), $suggestedGoalsData);
         // dd($merged);
         $type_desc_arr = array();
-        foreach($goalTypes as $goalType) {
+        foreach($goaltypes as $goalType) {
             if(isset($goalType['description']) && isset($goalType['name'])) {                
                 $item = "<b>" . $goalType['name'] . " Goals</b> ". str_replace($goalType['name'] . " Goals","",$goalType['description']);
                 array_push($type_desc_arr, $item);
@@ -630,14 +900,58 @@ class GoalController extends Controller
         $open_modal_id = (session('open_modal_id'));
         
         $from = 'bank';
+        $employees = $this->myEmployeesAjax();
+
+        $adminShared=SharedProfile::select('shared_id')
+        ->where('shared_with', '=', Auth::id())
+        ->where(function ($sh) {
+            $sh->where('shared_item', 'like', '%1%')
+            ->orWhere('shared_item', 'like', '%2%');
+        })
+        ->pluck('shared_id');
+        $adminemps = User::select('users.*')
+        ->whereIn('users.id', $adminShared)->get();
+        $employees = $employees->merge($adminemps);
+        
+        $self = User::select('users.*')
+                    ->where('users.id', Auth::id())->get();
+        $employees = $employees->merge($self);
+        
+        $employees_list = array();
+        $i = 0;
+        if(count($employees)>0) {
+            foreach ($employees as $employee) {
+                $employees_list[$i]["id"] = $employee->id;
+                $employees_list[$i]["name"] = $employee->name;
+                $i++;
+            }
+        }
+        usort($employees_list, function($a, $b) {
+            return strcmp($a["name"], $b["name"]);
+        });
+        
         $shared_employees = DB::table('shared_profiles')
                     ->select('shared_profiles.shared_id', 'users.name')
                     ->join('users', 'users.id', '=', 'shared_profiles.shared_id')
                     ->where('shared_profiles.shared_with', Auth::id())
+                    ->where('shared_profiles.shared_item', 'like', '%1%')
                     ->get();
-
-        return view('goal.bank', array_merge(compact('bankGoals', 'tags', 'user', 'tagsList', 'goalTypes', 'type_desc_str', 'mandatoryOrSuggested', 'createdBy', 'goals_count', 'sortby','sortorder',
-                                'open_modal_id','from','shared_employees'), $suggestedGoalsData));
+        /*
+        if(count($shared_employees)>0) {
+            foreach ($shared_employees as $shared_employee) {
+                $employees_list[$i]["id"] = $shared_employee->shared_id;
+                $employees_list[$i]["name"] = $shared_employee->name;
+                $i++;
+            }
+        }
+         * 
+         */
+        return view('goal.bank', compact('bankGoals', 'tags', 'user', 'tagsList', 'goaltypes',  'type_desc_str', 'mandatoryOrSuggested', 'createdBy', 'goals_count', 'sortby','sortorder',
+                                'open_modal_id','from','shared_employees', 'json_goalbanks','json_team_goalbanks','employees_list'));
+    }
+    
+    public function myEmployeesAjax() {
+        return User::find(Auth::id())->avaliableReportees()->get();
     }
 
     private function getDropdownValues(&$mandatoryOrSuggested, &$createdBy, &$goalTypes, &$tagsList) {
@@ -657,15 +971,50 @@ class GoalController extends Controller
         ];
         $createdBy = Goal::withoutGlobalScope(NonLibraryScope::class)
             ->where('is_library', true)
-            ->whereHas('sharedWith', function($query) {
-                $query->where('user_id', Auth::id());
-            })
             ->with('user')
+            ->where('user_id', Auth::id())    
+            ->whereNull('display_name')
+            ->whereNull('deleted_at')        
             ->groupBy('user_id')
             ->get()
             ->pluck('user')
             ->toArray();
-
+       
+        $display_names = DB::table('goals')
+                    ->select('display_name')
+                    ->Join('goals_shared_with', 'goals_shared_with.goal_id', 'goals.id')
+                    ->where('goals_shared_with.user_id', Auth::id())
+                    ->whereNull('deleted_at')
+                    ->distinct()
+                    ->pluck('display_name')
+                    ->toArray();
+        $display_names_by_self = DB::table('goals')
+                    ->select('display_name')
+                    ->where('user_id', Auth::id())
+                    ->whereNull('deleted_at')
+                    ->distinct()
+                    ->pluck('display_name')
+                    ->toArray();
+        if(count($display_names_by_self)>0){
+            foreach($display_names_by_self as $name){
+                if($name != "" && !in_array($name, $display_names)){
+                    array_push($display_names, $name);
+                }
+            }
+        }
+        
+        $i = count($createdBy) + 1;
+        foreach($display_names as $display_name){
+            if($display_name != ''){
+                $createdBy[$i]['id'] = $display_name;
+                $createdBy[$i]['name'] = $display_name;
+            }
+            $i++;
+        }
+        usort($createdBy, function($a, $b) {
+            return strcmp($a["name"], $b["name"]);
+        });
+        
         array_unshift($createdBy , [
             "id" => "0",
             "name" => "Any"
@@ -883,20 +1232,23 @@ class GoalController extends Controller
                     // $newNotify->related_id = $goal->id;
                     // $newNotify->save();
                     // Use Class to create DashboardNotification
-                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                    $notification->user_id = Auth::id();
-                    $notification->notification_type = 'GR';
-                    $notification->comment = $user->name . ' replied to your Goal comment.';
-                    $notification->related_id = $goal->id;
-                    $notification->notify_user_id = Auth::id();
-                    $notification->send(); 
+
+                    if ($user && $user->allow_inapp_notification) {
+                        $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                        $notification->user_id = Auth::id();
+                        $notification->notification_type = 'GR';
+                        $notification->comment = $user->name . ' replied to your Goal comment.';
+                        $notification->related_id = $goal->id;
+                        $notification->notify_user_id = Auth::id();
+                        $notification->send(); 
+                    }
 
                     // Send Out email notification
                     if ($user && $user->allow_email_notification && $user->userPreference->goal_comment_flag == 'Y') {
                         $sendMail = new SendMail();
                         $sendMail->toRecipients = array( $goal->user_id );  
                         $sendMail->sender_id = null;
-                        $sendMail->useQueue = false;
+                        $sendMail->useQueue = true;
                         $sendMail->saveToLog = true;
                         $sendMail->alert_type = 'N';
                         $sendMail->alert_format = 'E';
@@ -925,13 +1277,16 @@ class GoalController extends Controller
                     // $newNotify->related_id = $goal->id;
                     // $newNotify->save();
                     // Use Class to create DashboardNotification
-                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                    $notification->user_id = Auth::id();
-                    $notification->notification_type = 'GC';
-                    $notification->comment =  $comment->user->name . ' added a comment to your goal.';
-                    $notification->related_id = $goal->id;
-                    $notification->notify_user_id = Auth::id();
-                    $notification->send(); 
+
+                    if ($user && $user->allow_inapp_notification) {
+                        $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                        $notification->user_id = Auth::id();
+                        $notification->notification_type = 'GC';
+                        $notification->comment =  $comment->user->name . ' added a comment to your goal.';
+                        $notification->related_id = $goal->id;
+                        $notification->notify_user_id = Auth::id();
+                        $notification->send(); 
+                    }
 
                     // Send Out Email Notification to Employee when his supervisor comment his goal
                     if ($user && $user->allow_email_notification && $user->userPreference->goal_comment_flag == 'Y') {
@@ -939,14 +1294,14 @@ class GoalController extends Controller
                         $sendMail = new SendMail();
                         $sendMail->toRecipients = array( $goal->user_id );  
                         $sendMail->sender_id = null;
-                        $sendMail->useQueue = false;
+                        $sendMail->useQueue = true;
                         $sendMail->saveToLog = true;
                         $sendMail->alert_type = 'N';
                         $sendMail->alert_format = 'E';
                         $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
 
                         array_push($sendMail->bindvariables, $goal->user->name);
-                        array_push($sendMail->bindvariables,  $user->reportingManager->name );    // %2 Person who added the comment
+                        array_push($sendMail->bindvariables,  $comment->user->name );    // %2 Person who added the comment
                         array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
                         array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
                         $response = $sendMail->sendMailWithGenericTemplate();
@@ -964,33 +1319,36 @@ class GoalController extends Controller
                 // $newNotify->related_id = $goal->id;
                 // $newNotify->save();
                 // Use Class to create DashboardNotification
-                $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                $notification->user_id = $curr_user->reporting_to;
-                $notification->notification_type = 'GC';
-                $notification->comment = $curr_user->name . ' added a comment to your goal.';
-                $notification->related_id = $goal->id;
-                $notification->notify_user_id = Auth::id();
-                $notification->send(); 
+
+                if ($curr_user->reportingManager && $curr_user->reportingManager->allow_inapp_notification) {
+                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                    $notification->user_id = $curr_user->reporting_to;
+                    $notification->notification_type = 'GC';
+                    $notification->comment = $curr_user->name . ' added a comment to your goal.';
+                    $notification->related_id = $goal->id;
+                    $notification->notify_user_id = Auth::id();
+                    $notification->send(); 
+                }
 
                 // Send Out Email Notification to Supervisor when Employee comments his supervisor's goal
                 if ($curr_user->reportingManager && 
                     $curr_user->reportingManager->allow_email_notification && 
                     $curr_user->reportingManager->userPreference->goal_comment_flag == 'Y') {                
 
-                $sendMail = new SendMail();
-                $sendMail->toRecipients = array( $curr_user->reporting_to );  
-                $sendMail->sender_id = null;
-                $sendMail->useQueue = false;
+                    $sendMail = new SendMail();
+                    $sendMail->toRecipients = array( $curr_user->reporting_to );  
+                    $sendMail->sender_id = null;
+                    $sendMail->useQueue = true;
                     $sendMail->saveToLog = true;
                     $sendMail->alert_type = 'N';
                     $sendMail->alert_format = 'E';
 
                 $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
-                    array_push($sendMail->bindvariables, $curr_user->reportingManager->name);  // %1 Recipient of the email
+                array_push($sendMail->bindvariables, $curr_user->reportingManager->name);  // %1 Recipient of the email
                 array_push($sendMail->bindvariables, $curr_user->name);    // %2 Person who added the comment
                 array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
                 array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
-                    $response = $sendMail->sendMailWithGenericTemplate();
+                $response = $sendMail->sendMailWithGenericTemplate();
                 }
             }
 
@@ -1067,4 +1425,80 @@ class GoalController extends Controller
 
         return redirect()->route('goal.current');
     }
+    
+    public function syncGoals(Request $request) {
+        if ($request->has("sync_goal_id") && $request->sync_goal_id) {
+            $goal_id = $request->sync_goal_id;
+            if ($request->has("sync_users") && $request->sync_users) {
+                if(!is_array($request->sync_users)){                    
+                    GoalSharedWith::where('goal_id', $goal_id)->delete();
+                    $users_arr = explode(',', $request->sync_users);
+                } else {
+                    $users_arr = $request->sync_users;
+                }   
+                if(count($users_arr)>0){
+                    if(is_numeric($users_arr[0])){
+                        GoalSharedWith::where('goal_id', $goal_id)->delete();
+                        foreach($users_arr as $userId){
+                            $goalSharedWith = GoalSharedWith::create([
+                                'goal_id' => $goal_id,
+                                'user_id' => $userId,
+                            ]);
+                        }
+                    } else {
+                        foreach($users_arr as $userId){
+                            if (is_numeric($userId)){
+                                $goalSharedWith = GoalSharedWith::create([
+                                    'goal_id' => $goal_id,
+                                    'user_id' => $userId,
+                                ]);
+                            }
+                        }
+                    }
+                } else {
+                    GoalSharedWith::where('goal_id', $goal_id)->delete();
+                }
+                
+            } else {
+                GoalSharedWith::where('goal_id', $goal_id)->delete();
+            }
+            
+        }
+        
+        
+        
+        
+        
+        if (!$request->ajax()) {
+            return redirect()->back();
+        }
+    }
+    
+    public function getAllUsers(Request $request)
+    {
+        $current_user = '';
+        if(session()->has('checking_user') && session()->get('checking_user') != '') {
+            $current_user = session()->get('checking_user');
+        }
+        
+        
+        $search = $request->search;
+        
+        if ($current_user == '') {
+            $user_query = User::where('name', 'LIKE', "%{$search}%")
+                          ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
+                          ->whereNull('employee_demo.date_deleted')  
+                          ->paginate();
+        } else {
+            $user_query = User::where('name', 'LIKE', "%{$search}%")
+                          ->where('id', '<>', $current_user)
+                          ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
+                          ->whereNull('employee_demo.date_deleted')  
+                          ->paginate();
+        }
+        
+        return $this->respondeWith($user_query);
+    }
+    
+    
 }

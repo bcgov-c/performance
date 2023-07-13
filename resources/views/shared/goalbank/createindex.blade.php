@@ -52,6 +52,13 @@
 					@if(session()->has('tags_miss'))
                                             <small class="text-danger">The tags field is required</small>
                                         @endif
+				</div>				
+			</div>
+			<div class="row">
+				<div class="col col-md-2">
+					<b> Display Name </b>
+					<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Describe who created or approved the goal content (i.e. PSA Human Resources). If you don’t enter anything here, your own name will be shown as the creator of the goal throughout the platform. This could be confusing for users who may not know you or your role in the organization."> </i>
+					<x-input name="display_name" />
 				</div>
 			</div>
 			<div class="row">
@@ -60,7 +67,7 @@
 					<p>
 						Each goal should include a description of <b>WHAT</b>  
 						<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".'> </i> you will accomplish, <b>WHY</b> 
-						<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important,, and <b>HOW</b> 
+						<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important, and <b>HOW</b> 
 						<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> you will achieve it. 
 					</p>
 					<x-textarea id="what" name="what"/>
@@ -87,6 +94,7 @@
 					<small  class="text-danger error-target_date"></small>
 				</div>
 			</div>
+			
 		</div>
 
         <div class="container-fluid">
@@ -115,6 +123,7 @@
 			<input type="hidden" id="selected_org_nodes" name="selected_org_nodes" value="">
 			<input type="hidden" id="eselected_emp_ids" name="eselected_emp_ids" value="">
 			<input type="hidden" id="eselected_org_nodes" name="eselected_org_nodes" value="">
+			<input type="hidden" id="selected_inherited" name="selected_inherited" value="">
 
 			@include('shared.goalbank.partials.filter')
 			@include('shared.goalbank.partials.filter2')
@@ -159,7 +168,7 @@
 			<div class="row">
 				<div class="col-md-3 mb-2">
 					<button class="btn btn-primary mt-2" id="obtn_send" type="button" onclick="confirmSaveChangesModal()" name="btn_confirm" value="btn_confirm">Add Goal</button>
-					<button class="btn btn-secondary mt-2">Cancel</button>
+					<button id="obtn_cancel_send" name="obtn_cancel_send" class="btn btn-secondary mt-2">Cancel</button>
 				</div>
 			</div>
 		</div>
@@ -179,7 +188,7 @@
 					</div>
 					<div class="modal-footer">
 						<button class="btn btn-primary mt-2" type="submit" id="btn_send" name="btn_send" value="btn_send">Add New Goal</button>
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button id="btn_cancel_send" name="btn_cancel_send" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
 					</div>
 					
 				</div>
@@ -238,8 +247,8 @@
 	<x-slot name="js">
 		<script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
 		<script src="//cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
-		<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-		<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+		<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+		<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
 		
 
 		<script>				
@@ -284,26 +293,25 @@
 			let g_selected_employees = {!!json_encode($old_selected_emp_ids)!!};
 			let g_selected_orgnodes = {!!json_encode($old_selected_org_nodes)!!};
 			let eg_selected_orgnodes = {!!json_encode($eold_selected_org_nodes)!!};
+			let eg_selected_inherited = {!!json_encode($eold_selected_inherited)!!};
 			let g_employees_by_org = [];
 
 			function confirmSaveChangesModal() {
                             
-                                $('#obtn_send').prop('disabled',true);
+				$('#obtn_send').prop('disabled',true);
                             
 				let count = 0;
 				if($('#opt_audience1').prop('checked')) {
 					count = g_selected_employees.length;
 				};
 				if($('#opt_audience2').prop('checked')) {
-					count = g_selected_orgnodes.length;
+					count = g_selected_orgnodes.length + eg_selected_inherited.length;
 				};
 				if (count == 0) {
 					$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal without an audience?');
 				} else {
 					$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal and assign to the selected audience?');
 				}
-                                
-                                
                                 
 				$('#saveGoalModal').modal();
 			}
@@ -317,9 +325,21 @@
 				switchTree();
                                 
                                 
-                                $( "#btn_send" ).click(function() {
-                                    $('#saveGoalModal').modal('toggle');
-                                });
+				$( "#btn_send" ).click(function() {
+					$('#saveGoalModal').modal('toggle');
+				});
+
+				$( "#btn_cancel_send" ).click(function() {
+					$('#obtn_send').prop('disabled',false);
+				});
+
+				function navTreeActive() {
+					return $('#nav-tree').attr('class').search(/active/i) > 0 ?? false;
+				}
+
+				function navListActive() {
+					return $('#nav-list').attr('class').search(/active/i) > 0 ?? false;
+				}
 
 				function switchTree(){
 					if($('#opt_audience2').prop('checked')) {
@@ -377,6 +397,8 @@
 					$('#selected_emp_ids').val( text );
 					var text2 = JSON.stringify(g_selected_orgnodes);
 					$('#selected_org_nodes').val( text2 );
+					var text3 = JSON.stringify(eg_selected_inherited);
+					$('#selected_inherited').val( text3 );
 					return true; // return false to cancel form action
 				});
 
@@ -401,36 +423,49 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                					url: '{{ "/" . request()->segment(1) . "/goalbank/org-tree" }}',
+                					url: '{{ "/".request()->segment(1)."/goalbank/org-tree/1" }}',
                                     type: 'GET',
                                     data: $("#notify-form").serialize(),
                                     dataType: 'html',
+									beforeSend: function() {
+                                        $("#tree-loading-spinner").show();                    
+                                    },
                                     success: function (result) {
                                         $(target).html(''); 
                                         $(target).html(result);
-
-                                        $('#nav-tree').attr('loaded','loaded');
+                                        $('#nav-tree').attr('loaded', 'loaded');
+                                    },
+									complete: function() {
+                                        $("#tree-loading-spinner").hide();
                                     },
                                     error: function () {
                                         alert("error");
                                         $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
                                     }
                                 })
-                                
                             ).then(function( data, textStatus, jqXHR ) {
-                                //alert( jqXHR.status ); // Alerts 200
                                 nodes = $('#accordion-level0 input:checkbox');
                                 redrawTreeCheckboxes();	
                             }); 
-                        
                         } else {
-                            redrawTreeCheckboxes();
+							$(target).removeAttr('loaded');
+							$("#nav-tree-tab").click();
                         }
                     } else {
-						// alert("error");
+						$(target).removeAttr('loaded');
                         $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
 					}
 				});
+
+				$('#btn_search').click(function(e) {
+					e.preventDefault();
+					if (navListActive()) {
+						$('#employee-list-table').DataTable().rows().invalidate().draw();
+					}
+					if (navTreeActive()) {
+						$("#nav-tree-tab").click();
+					}
+				} );
 
 				function redrawTreeCheckboxes() {
 					// redraw the selection 
@@ -586,12 +621,6 @@
 					}
 				}
 
-				$('#btn_search').click(function(e) {
-					e.preventDefault();
-					user_selected = [];
-					$('#employee-list-table').DataTable().rows().invalidate().draw();
-				});
-
 				// Handle click on "Select all" control
 				$('#employee-list-select-all').on('click', function() {
 					// Check/uncheck all checkboxes in the table
@@ -605,56 +634,6 @@
 						$('#employee-list-select-all').prop("checked", false);
 						$('#employee-list-select-all').prop("indeterminate", false);    
 					}    
-				});
-
-				$('#dd_level0').change(function (e){
-					e.preventDefault();
-				});
-
-				$('#dd_level1').change(function (e){
-					e.preventDefault();
-				});
-
-				$('#dd_level2').change(function (e){
-					e.preventDefault();
-				});
-
-				$('#dd_level3').change(function (e){
-					e.preventDefault();
-				});
-
-				$('#dd_level4').change(function (e){
-					e.preventDefault();
-					$('#btn_search').click();
-				});
-
-				$('#criteria').change(function (e){
-					e.preventDefault();
-					$('#btn_search').click();
-				});
-
-				$('#search_text').change(function (e){
-					e.preventDefault();
-					$('#btn_search').click();
-				});
-
-				$('#search_text').keydown(function (e){
-					if (e.keyCode == 13) {
-						e.preventDefault();
-						$('#btn_search').click();
-					}
-				});
-
-				$('#btn_search_reset').click(function (e){
-					e.preventDefault();
-					$('#criteria').val('all');
-					$('#search_text').val(null);
-					$('#dd_level0').val(null).trigger('change');
-					$('#dd_level1').val(null).trigger('change');
-					$('#dd_level2').val(null).trigger('change');
-					$('#dd_level3').val(null).trigger('change');
-					$('#dd_level4').val(null).trigger('change');
-					$('#btn_search').click();
 				});
 
 				$('#edd_level0').change(function (e) {
@@ -693,11 +672,6 @@
                     $('#pageLoader').show();
                 });
 
-                // $(window).resize(function(){
-                //     location.reload();
-                //     return;
-                // });
-                
 				$('#ebtn_search').click(function(e) {
 					e.preventDefault();
 					target = $('#enav-tree'); 
@@ -706,14 +680,14 @@
 						// To do -- ajax called to load the tree
 						$.when( 
 							$.ajax({
-                				url: '{{ "/" . request()->segment(1) . "/goalbank/eorg-tree" }}'
+                				url: '{{ "/".request()->segment(1)."/goalbank/org-tree/2" }}'
 								, type: 'GET'
 								, data: $("#notify-form").serialize()
 								, dataType: 'html'
 								, success: function (result) {
 									$('#enav-tree').html(''); 
 									$('#enav-tree').html(result);
-									$('#enav-tree').attr('loaded','loaded');
+									$('#enav-tree').attr('loaded', 'loaded');
 								},
 
 
@@ -733,16 +707,6 @@
 					}
 				});
 
-				$(window).on('beforeunload', function(){
-					$('#pageLoader').show();
-				});
-
-				// $(window).resize(function(){
-				// 	location.reload();
-				// 	return;
-				// }); 
-
-
 				$('body').popover({
 					selector: '[data-toggle]',
 					trigger: 'hover',
@@ -754,14 +718,13 @@
 				});
 
 				$('body').on('click', function (e) {
-                $('[data-toggle=popover]').each(function () {
-                    // hide any open popovers when the anywhere else in the body is clicked
-                    if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
-                        $(this).popover('hide');
-                    }
+                	$('[data-toggle=popover]').each(function () {
+						// hide any open popovers when the anywhere else in the body is clicked
+						if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+							$(this).popover('hide');
+						}
                 	});
             	});							
-
 
 			});
 
@@ -782,13 +745,9 @@
 				});
 			};
                         
-                        @if(session()->has('title_miss'))                           
-                            $('input[name=title]').addClass('is-invalid');
-                        @endif
-                        
-                        
-                        
-                        
+			@if(session()->has('title_miss'))                           
+				$('input[name=title]').addClass('is-invalid');
+			@endif
 
 		</script>
 	</x-slot>

@@ -51,4 +51,5 @@ use App\Http\Controllers\UserPreferenceController;
         Route::resource('user-preference', UserPreferenceController::class)->only(['index', 'store']);
     });
     
-    
+    Route::get('check-session-expiration', [DashboardController::class, 'checkExpiration'])->name('check-session-expiration');
+    Route::view('session-expired', 'session-expired')->name('session-expired');

@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use App\Scopes\NonLibraryScope;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable as AuditableTrait;
-use OwenIt\Auditing\Contracts\Auditable;
 
 class Goal extends Model implements Auditable
 {
@@ -32,7 +33,8 @@ class Goal extends Model implements Auditable
     'updated_at',
     'is_library',
     'is_mandatory',
-    'by_admin'
+    'by_admin',
+    'display_name'
   ];
 
 
@@ -127,5 +129,19 @@ class Goal extends Model implements Auditable
       //return $this->designation_name();
       return array_key_exists($this->is_mandatory, self::MANDATORY_STATUS_LIST) ? self::MANDATORY_STATUS_LIST[$this->is_mandatory] : '';
   }
+
+  public function transformAudit(array $data): array
+    {
+
+        if(session()->has('user_is_switched')) {
+          $original_auth_id = session()->get('existing_user_id');
+        } else {
+          $original_auth_id = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
+        }
+
+        $data['original_auth_id'] =  $original_auth_id;
+
+        return $data;
+    }
 
 }

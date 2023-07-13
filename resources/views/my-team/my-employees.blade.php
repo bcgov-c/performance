@@ -3,14 +3,12 @@
 
  <style>            
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
-    background-color: #444444;
-    border: 1px solid #aaa;
-    border-radius: 4px;
-    cursor: default;
-    float: left;
-    margin-right: 5px;
-    margin-top: 5px;
-    padding: 0 5px; }           
+        background-color: #1A5A96;
+    }      
+    
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        float: left;
+    }
 </style>
 
 <div>
