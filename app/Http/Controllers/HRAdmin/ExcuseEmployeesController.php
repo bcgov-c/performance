@@ -98,7 +98,7 @@ class ExcuseEmployeesController extends Controller {
                 ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
                 ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
                 ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { return $q->whereRaw("{$request->criteria} like '%{$request->search_text}%'"); })
-                ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(employee_id LIKE '%{$request->search_text}%' OR employee_name LIKE '%{$request->search_text}%' OR j_excusedtype LIKE '%{$request->search_text}%' OR j_excused_reason_desc LIKE '%{$request->search_text}%' OR excused_by_name LIKE '%{$request->search_text}%')"); })
+                ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(employee_id LIKE '%{$request->search_text}%' OR employee_name LIKE '%{$request->search_text}%' OR u.excusedtype LIKE '%{$request->search_text}%' OR j_excused_reason_desc LIKE '%{$request->search_text}%' OR excused_by_name LIKE '%{$request->search_text}%')"); })
                 ->distinct()
                 ->selectRaw ("
                     u.user_id AS id
@@ -355,7 +355,7 @@ class ExcuseEmployeesController extends Controller {
             'employee_id' => 'Employee ID', 
             'employee_name'=> 'Employee Name',
             'excusedtype' => 'Excuse Type', 
-            'j_excused_reason_desc' => 'Excuse Reason',
+            'edj_excused_reason_desc' => 'Excuse Reason',
             'excused_by_name' => 'Excused By'
         ];
     }
@@ -365,7 +365,7 @@ class ExcuseEmployeesController extends Controller {
             'all' => 'All',
             'employee_id' => 'Employee ID', 
             'employee_name'=> 'Employee Name',
-            'j_excusedtype' => 'Excuse Type', 
+            'u.excusedtype' => 'Excuse Type', 
             'j_excused_reason_desc' => 'Excuse Reason',
             'excused_by_name' => 'Excused By'
         ];
@@ -382,7 +382,7 @@ class ExcuseEmployeesController extends Controller {
             ->when("{$request->{$option.'dd_level3'}}", function($q) use($request, $option) { return $q->whereRaw("u.level3_key = {$request->{$option.'dd_level3'}}"); })
             ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); })
             ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); })
-            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(employee_id LIKE '%{$request->{$option.'search_text'}}%' OR employee_name LIKE '%{$request->{$option.'search_text'}}%' OR excusedtype LIKE '%{$request->{$option.'search_text'}}%' OR j_excused_reason_desc LIKE '%{$request->{$option.'search_text'}}%' OR excused_by_name LIKE '%{$request->{$option.'search_text'}}%')"); });
+            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(employee_id LIKE '%{$request->{$option.'search_text'}}%' OR employee_name LIKE '%{$request->{$option.'search_text'}}%' OR excusedtype LIKE '%{$request->{$option.'search_text'}}%' OR edj_excused_reason_desc LIKE '%{$request->{$option.'search_text'}}%' OR excused_by_name LIKE '%{$request->{$option.'search_text'}}%')"); });
         return $base;
     }
 
