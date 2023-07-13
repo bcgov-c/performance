@@ -134,25 +134,138 @@ class ResourceController extends Controller
       ];
          return view('resource.conversations', compact('data', 't'));
     }
-    public function contact()
+    public function contact(Request $request)
     {
-         return view('resource.contact');
+        $t = $request->t;
+
+        $data = [
+            [
+                'question' => 'Agriculture and Food',
+                'answer_file' => "0"
+            ],
+            [
+                'question' => 'Attorney General',
+                'answer_file' => "1"
+            ],
+            [
+              'question' => 'BC Public Service Agency',
+              'answer_file' => "2"
+            ],
+            [
+                'question' => 'Children and Family Development',
+                'answer_file' => "3"
+            ],
+            [
+                'question' => 'Citizens’ Services',
+                'answer_file' => "4"
+            ],
+            [
+                'question' => 'Education and Child Care',
+                'answer_file' => "5"
+            ],
+            [
+                'question' => 'Emergency Management and Climate Readiness',
+                'answer_file' => "6"
+            ],
+            [                                                                                                                                         
+                'question' => 'Energy, Mines and Low Carbon Innovation',
+                'answer_file' => "7"
+            ],
+            [
+                'question' => 'Environment and Climate Change Strategy',
+                'answer_file' => "8"
+            ],
+            [
+                'question' => 'Finance',
+                'answer_file' => "9"
+            ],
+            [
+                'question' => 'Forests',
+                'answer_file' => "10"
+            ],
+            [
+                'question' => 'Government Communications & Public Engagement',
+                'answer_file' => "11"
+            ],
+            [
+                'question' => 'Health',
+                'answer_file' => "12"
+            ],
+            [
+                'question' => 'Housing',
+                'answer_file' => "13"
+            ],
+            [
+                'question' => 'Indigenous Relations and Reconciliation',
+                'answer_file' => "14"
+            ],
+            [
+                'question' => 'Jobs, Economic Development and Innovation',
+                'answer_file' => "15"
+            ],
+            [
+                'question' => 'Labour',
+                'answer_file' => "16"
+            ],
+            [
+                'question' => 'Mental Health and Addictions',
+                'answer_file' => "17"
+            ],
+            [
+                'question' => 'Municipal Affairs',
+                'answer_file' => "18"
+            ],
+            [
+                'question' => 'Post-Secondary Education and Future Skills',
+                'answer_file' => "19"
+            ],
+            [
+                'question' => 'Premier’s Office',
+                'answer_file' => "20"
+            ],
+            [
+                'question' => 'Public Safety and Solicitor General',
+                'answer_file' => "21"
+            ],
+            [
+                'question' => 'Royal BC Museum',
+                'answer_file' => "22"
+            ],
+            [
+                'question' => 'Social Development and Poverty Reduction',
+                'answer_file' => "23"
+            ],
+            [
+                'question' => 'Tourism, Arts, Culture and Sport',
+                'answer_file' => "24"
+            ],
+            [
+                'question' => 'Transportation and Infrastructure',
+                'answer_file' => "25"
+            ],
+            [
+                'question' => 'Water, Land and Resource Stewardship',
+                'answer_file' => "26"
+            ],
+        ];
+        return view('resource.contact', compact('data', 't'));
     }
+
     public function faq(Request $request)
     {
       
       $t = $request->t;
 
       $data = [
-          [
-              'question' => 'Why is performance development important?',
-              'answer_file' => '0'
-          ],
-          [
-              'question' => 'How often do I need to have performance conversations?',
-              'answer_file' => "1"
-          ],
-          [
+        [
+            'question' => 'Why is performance development important?',
+            'answer_file' => "0"
+        ],
+        [
+            'question' => 'How often do I need to have performance conversations?',
+            'answer_file' => "1"
+        ],
+        [
             'question' => 'How do I add a goal to my PDP profile?',
             'answer_file' => "2"
         ],
