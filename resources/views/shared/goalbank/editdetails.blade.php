@@ -51,6 +51,13 @@
 			</div>
 		</div>
 		<div class="row">
+				<div class="col col-md-2">
+					<b> Display Name </b>
+					<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Describe who created or approved the goal content (i.e. PSA Human Resources). If you don’t enter anything here, your own name will be shown as the creator of the goal throughout the platform. This could be confusing for users who may not know you or your role in the organization."> </i>
+					<x-input name="display_name" :value="$goaldetail->display_name"/>
+				</div>
+			</div>
+		<div class="row">
 			<div class="col-md-12">
 				<b>Goal Description</b>
 				<p>
@@ -83,13 +90,7 @@
 				<small  class="text-danger error-target_date"></small>
 			</div>
 		</div>
-		<div class="row">
-				<div class="col col-md-2">
-					<b> Display Name </b>
-					<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Describe who created or approved the goal content (i.e. PSA Human Resources). If you don’t enter anything here, your own name will be shown as the creator of the goal throughout the platform. This could be confusing for users who may not know you or your role in the organization."> </i>
-					<x-input name="display_name" :value="$goaldetail->display_name"/>
-				</div>
-			</div>
+		
 		<div class="col-md-3 mb-2">
 			<button class="btn btn-primary mt-2" type="submit" name="btn_send" value="btn_send">Save Changes</button>
 			<button type="button" class="btn btn-cancel mt-2" onClick="window.location='{{ URL::previous() }}'">Cancel</button>
