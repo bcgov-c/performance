@@ -70,4 +70,8 @@ Route::group(['middleware' => ['ViewAsPermission']], function () {
     Route::get('my-team/return-to-my-view', [MyTeamController::class, 'returnToMyProfile'])->name('my-team.return-to-my-view');
 
 });
-Route::get('users', [MyTeamController::class, 'userList'])->name('users-list');
+
+Route::group(['middleware' => ['role:Sys Admin|HR Admin|Supervisor']], function () {
+    Route::get('users', [MyTeamController::class, 'userList'])->name('users-list');
+});
+
