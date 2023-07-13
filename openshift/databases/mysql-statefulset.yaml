@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: mysql-training
+  name: mysql
 spec:
   selector:
     matchLabels:
-      app: performance-mysql-training
-  serviceName: mysql-training-h
-  replicas: 1
+      app: performance-mysql
+  serviceName: mysqlh
+  replicas: 2
   template:
     metadata:
       labels:
-        app: erformance-mysql-training
+        app: performance-mysql
     spec:
       initContainers:
       - name: init-mysql
-        image: aro.jfrog.io/performance-app/mysql:test
+        image: aro.jfrog.io/performance-app/mysql:5.7
         command:
         - bash
         - "-c"
@@ -63,33 +63,12 @@ spec:
           mountPath: /etc/mysql/conf.d
       containers:
       - name: mysql
-        image: aro.jfrog.io/performance-app/mysql:test
+        image: aro.jfrog.io/performance-app/mysql:5.7
         env:
-        - name: MYSQL_ROOT_USER
-          valueFrom:
-            secretKeyRef:
-              name: mysql-training-secret
-              key: MYSQL_ROOT_USER
-        - name: MYSQL_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-training-secret
-              key: MYSQL_ROOT_PASSWORD
-        - name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-training-secret
-              key: MYSQL_PASSWORD  
-        - name: MYSQL_USER
-          valueFrom:
-            secretKeyRef:
-              name: mysql-training-secret
-              key: MYSQL_USER
-        - name: MYSQL_DATABASE
-          valueFrom:
-            secretKeyRef:
-              name: mysql-training-secret
-              key: MYSQL_DATABASE   
+        - name: MYSQL_ALLOW_EMPTY_PASSWORD
+          value: "1"
+        - name: ALLOW_EMPTY_PASSWORD
+          value: "yes"
         ports:
         - name: mysql
           containerPort: 3306
@@ -184,7 +163,7 @@ spec:
         emptyDir: {}
       - name: config-map
         configMap:
-          name: mysql-training
+          name: mysql
   volumeClaimTemplates:
   - metadata:
       name: data

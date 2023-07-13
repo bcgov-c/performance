@@ -2,30 +2,30 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql-training-h
+  name: mysqlh
   labels:
-    app: mysql-training
+    app: mysql
 spec:
   ports:
-  - name: mysql-training
+  - name: mysql
     port: 3306
   clusterIP: None
   selector:
-    app: performance-mysql-training
+    app: performance-mysql
 ---
 # Client service for connecting to any MySQL instance for reads.
 # For writes, you must instead connect to the primary: mysql-0.mysql.
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql-read-training
+  name: mysql-read
   labels:
-    app: mysql-training
+    app: mysql
 spec:
   ports:
-  - name: mysql-training
+  - name: mysql
     port: 3306
   selector:
-    app: performance-mysql-training
+    app: performance-mysql
 
 
