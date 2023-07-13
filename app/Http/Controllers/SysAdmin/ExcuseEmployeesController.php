@@ -363,7 +363,7 @@ public function getDatatableEmployees(Request $request) {
             'employee_id' => 'Employee ID', 
             'employee_name'=> 'Employee Name',
             'excusedtype' => 'Excuse Type', 
-            'j_excused_reason_desc' => 'Excuse Reason',
+            'edj_excused_reason_desc' => 'Excuse Reason',
             'excused_by_name' => 'Excused By'
         ];
     }
