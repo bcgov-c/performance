@@ -26,7 +26,7 @@
     </div>
     <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'resource.contact' ? 'border-primary' : ''}}">
         <x-button :href="route('resource.contact')" style="">
-            Contact
+            Contact Us
         </x-button>
     </div>
 </div>
