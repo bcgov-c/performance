@@ -41,7 +41,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-2">
+			<div class="col-md-4">
 				<b>Tags</b>
 				<i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>."></i>				
 				<x-dropdown :list="$tags" name="tag_ids[]" :selected="array_column($goaldetail->tags->toArray(), 'id')" class="tags" multiple/>								
@@ -49,12 +49,14 @@
                                     <small class="text-danger">The tags field is required</small>
                                 @endif
 			</div>
-			<div class="col col-md-2">
+		</div>
+		<div class="row">
+				<div class="col col-md-2">
 					<b> Display Name </b>
 					<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Describe who created or approved the goal content (i.e. PSA Human Resources). If you don’t enter anything here, your own name will be shown as the creator of the goal throughout the platform. This could be confusing for users who may not know you or your role in the organization."> </i>
 					<x-input name="display_name" :value="$goaldetail->display_name"/>
 				</div>
-		</div>
+			</div>
 		<div class="row">
 			<div class="col-md-12">
 				<b>Goal Description</b>
