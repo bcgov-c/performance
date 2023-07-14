@@ -556,7 +556,9 @@
       $('#checkAll').on('change', function() {
           $('.goal_ids').prop('checked', this.checked);
           if (this.checked) {
-            $('#addMultipleGoalButton').prop('disabled', false);
+            if(json_goalbanks != ''){        
+                $('#addMultipleGoalButton').prop('disabled', false);
+            }
             dataTable.page.len(-1).draw(); // Disable paging temporarily
             dataTable.rows().select(); // Select all rows
           } else {
