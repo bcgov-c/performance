@@ -162,6 +162,8 @@
 			let g_selected_employees = {!!json_encode($old_selected_emp_ids)!!};
 			let g_selected_orgnodes = {!!json_encode($old_selected_org_nodes)!!};
 			let g_selected_inherited = {!! json_encode($old_selected_inherited) !!};
+			let eg_selected_orgnodes = {!!json_encode($eold_selected_org_nodes)!!};
+			let eg_selected_inherited = {!!json_encode($eold_selected_inherited)!!};
 			let g_employees_by_org = [];
 
 			function confirmSaveChangesModal(){
@@ -219,7 +221,7 @@
 
 				$('#delete_org').click(function(e) {
 					e.preventDefault();
-					dd('button clicked');
+					// dd('button clicked');
 					$('#btn_search').hide();
 				});
 
@@ -317,7 +319,7 @@
 					$('#selected_emp_ids').val( text );
 					var text2 = JSON.stringify(g_selected_orgnodes);
 					$('#selected_org_nodes').val( text2 );
-					var text3 = JSON.stringify(g_selected_inherited);
+					var text3 = JSON.stringify(eg_selected_inherited);
 					$('#selected_inherited').val( text3 );
 					return true; // return false to cancel form action
 				});
