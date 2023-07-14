@@ -506,6 +506,11 @@
 <script>
     $(document).ready(function() {
       const json_goalbanks = <?php echo $json_goalbanks;?>;
+
+      if(json_goalbanks == ''){
+        $('#addMultipleGoalButton').prop('disabled', true);
+      }
+
       const goalbanks = $('#goalbanks').DataTable({
         data: json_goalbanks,
         columns: [
