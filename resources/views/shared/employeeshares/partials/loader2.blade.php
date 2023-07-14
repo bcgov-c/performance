@@ -46,14 +46,14 @@
             <label for="ecriteria">Search Criteria</label>
             <select id="ecriteria" name="ecriteria" class="form-control">
                 @foreach( $ecriteriaList as $key => $value )
-                    <option value="{{ $key }}" {{  old('ecriteria') == $key ? 'selected' : '' }} >{{ $value }}</option>
+                    <option value="{{ $key }}" >{{ $value }}</option>
                 @endforeach
             </select>
         </div>
         <div class="form-group col-md-2">
             <label for="esearch_text">Search Text</label>
             <input type="text" id="esearch_text" name="esearch_text" class="form-control" 
-                value="{{ old('esearch_text') }}" placeholder="Search Text">
+                value="" placeholder="Search Text">
         </div>
         <div class="form-group col-md-2 p-3" style="text-align:left; vertical-align:bottom;">
             <div class="form-group row"> 
