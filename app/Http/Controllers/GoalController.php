@@ -946,6 +946,8 @@ class GoalController extends Controller
         }
          * 
          */
+
+        $goaltypes = GoalType::where('name', '!=', 'private')->get()->toArray();
         return view('goal.bank', compact('bankGoals', 'tags', 'user', 'tagsList', 'goaltypes',  'type_desc_str', 'mandatoryOrSuggested', 'createdBy', 'goals_count', 'sortby','sortorder',
                                 'open_modal_id','from','shared_employees', 'json_goalbanks','json_team_goalbanks','employees_list'));
     }
