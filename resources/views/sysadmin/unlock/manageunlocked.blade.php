@@ -94,7 +94,7 @@
 				<label for="criteria">Search Criteria</label>
 				<select id="criteria" name="criteria" class="form-control">
 					@foreach( $criteriaList as $key => $value )
-						<option value="{{ $key }}" {{  old('criteria') == $key ? 'selected' : '' }} >{{ $value }}</option>
+						<option value="{{ $key }}"  >{{ $value }}</option>
 					@endforeach
 				</select>
 			</div>
