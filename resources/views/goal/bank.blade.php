@@ -91,7 +91,7 @@
                     </div>
 		</div>
 	</div>
-        
+        @include('goal.partials.goal-detail-modal')
         @if(Auth::user()->hasRole('Supervisor'))
         @php $shareWithLabel = 'Audience' @endphp
         @php $doNotShowInfo = true @endphp
@@ -165,7 +165,7 @@
 	</div>
         
         
-        @include('goal.partials.goal-detail-modal')
+        
         <div class="modal fade" id="addGoalModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
                 <div class="modal-content">
@@ -301,6 +301,7 @@
                 $("#goal_form").find('input[name=selected_goal]').val($(this).data('id'));
 
                 $.get('/goal/goalbank/'+$(this).data('id')+'?add=true', function (data) {
+                    console.log(data);
                     $("#goal-detail-modal").find('.data-placeholder').html(data);
                     $("#goal-detail-modal").modal('show');
                 });
