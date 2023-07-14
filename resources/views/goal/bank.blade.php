@@ -301,7 +301,6 @@
                 $("#goal_form").find('input[name=selected_goal]').val($(this).data('id'));
 
                 $.get('/goal/goalbank/'+$(this).data('id')+'?add=true', function (data) {
-                    console.log(data);
                     $("#goal-detail-modal").find('.data-placeholder').html(data);
                     $("#goal-detail-modal").modal('show');
                 });
