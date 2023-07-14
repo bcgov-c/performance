@@ -10,7 +10,7 @@
         {{ str_contains( Route::current()->getName(), 'sysadmin.unlock.manageunlocked') ? 'border-primary' : '' }}">
         {{-- {{Route::current()->getName() == 'sysadmin.unlock.manageunlocked' ? 'border-primary' : ''}}"> --}}
         <x-button role="tab" :href="route('sysadmin.unlock.manageunlocked')" style="">
-          Manage Existing unlocked Conversations
+          Manage Existing Unlocked Conversations
         </x-button>
     </div>
 </div>
