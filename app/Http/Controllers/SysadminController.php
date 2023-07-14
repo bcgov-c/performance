@@ -963,10 +963,10 @@ class SysadminController extends Controller
 
         $criteriaList = [
             'all' => 'All',
-            'u.employee_id' => 'Employee ID', 
-            'u.employee_name'=> 'Employee Name',
-            'u.jobcode_desc' => 'Classification', 
-            'u.deptid' => 'Department ID'
+            'employee_id' => 'Employee ID', 
+            'employee_name'=> 'Employee Name',
+            'jobcode_desc' => 'Classification', 
+            'deptid' => 'Department ID'
         ];
         
         //return view('sysadmin.switch-identity.index',compact('search_user'));   
