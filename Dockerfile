@@ -11,7 +11,7 @@ WORKDIR /app
 COPY . /app
 
 RUN composer update --ignore-platform-reqs
-RUN composer require kalnoy/nestedset doctrine/dbal awobaz/compoships --ignore-platform-reqs
+RUN composer require kalnoy/nestedset doctrine/dbal awobaz/compoships dompdf/dompdf --ignore-platform-reqs
 
 RUN chgrp -R 0 /app && \
     chmod -R g=u /app
