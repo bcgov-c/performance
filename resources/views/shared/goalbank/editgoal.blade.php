@@ -41,8 +41,8 @@
 						<p>Are you sure to send out this message ?</p>
 					</div>
 					<div class="modal-footer">
-						<button class="btn btn-primary mt-2" type="submit" name="btn_send" value="btn_send">Update Goal</button>
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button class="btn btn-primary mt-2" type="submit" id="btn_send" name="btn_send" value="btn_send">Update Goal</button>
+						<button class="btn btn-secondary" type="button" id="btn_cancel_send" name="btn_cancel_send" data-dismiss="modal">Cancel</button>
 					</div>
 					
 				</div>
@@ -69,8 +69,8 @@
 		<h6 class="text-bold">Step 2. Finish</h6>
 		<br>
 		<div class="col-md-3 mb-2">
-			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveChangesModal()" name="btn_send" value="btn_send">Save Changes</button>
-			<button class="btn btn-secondary mt-2">Cancel</button>
+			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveChangesModal()" id="obtn_send" name="obtn_send" value="btn_send">Save Changes</button>
+			<button class="btn btn-secondary mt-2" type="button" id="obtn_cancel_send" name="obtn_cancel_send">Cancel</button>
 		</div>
 
 	</form>
@@ -167,11 +167,12 @@
 			let g_employees_by_org = [];
 
 			function confirmSaveChangesModal(){
-				count = g_selected_orgnodes.length;
+				// $('#obtn_send').prop('disabled',true);
+				count = g_selected_orgnodes.length + eg_selected_inherited.length;
 				if (count == 0) {
-					$('#saveGoalModal .modal-body p').html('Are you sure to update goal without additional audience?');
+					$('#saveGoalModal .modal-body p').html('Are you sure to update goal without additional audience?<br><br>Only click \"Update Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
 				} else {
-					$('#saveGoalModal .modal-body p').html('Are you sure to update goal and assign to selected additional audience?');
+					$('#saveGoalModal .modal-body p').html('Are you sure to update goal and assign to selected additional audience?<br><br>Only click \"Update Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
 				}
 				$('#saveGoalModal').modal();
 			}
@@ -218,6 +219,16 @@
 						]
 					}
 				);
+
+				$( "#btn_send" ).click(function() {
+					// $('#btn_send').prop('disabled',true);
+					$('#saveGoalModal').modal('toggle');
+				});
+
+				$( "#btn_cancel_send" ).click(function() {
+					$('#btn_send').prop('disabled',false);
+					$('#obtn_send').prop('disabled',false);
+				});
 
 				$('#delete_org').click(function(e) {
 					e.preventDefault();
