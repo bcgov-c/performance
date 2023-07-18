@@ -308,9 +308,9 @@
 					count = g_selected_orgnodes.length + eg_selected_inherited.length;
 				};
 				if (count == 0) {
-					$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal without an audience?');
+					$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal without an audience?<br><br>Only click \"Add New Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
 				} else {
-					$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal and assign to the selected audience?');
+					$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal and assign to the selected audience?<br><br>Only click \"Add New Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
 				}
                                 
 				$('#saveGoalModal').modal();
@@ -326,10 +326,12 @@
                                 
                                 
 				$( "#btn_send" ).click(function() {
+					// $('#btn_send').prop('disabled',true);
 					$('#saveGoalModal').modal('toggle');
 				});
 
 				$( "#btn_cancel_send" ).click(function() {
+					$('#btn_send').prop('disabled',false);
 					$('#obtn_send').prop('disabled',false);
 				});
 

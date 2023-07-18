@@ -82,8 +82,8 @@
 		<h6 class="text-bold">Step 2. Finish</h6>
 		<br>
 		<div class="col-md-3 mb-2">
-			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveChangesModal()" name="btn_send" value="btn_send">Save Changes</button>
-			<button class="btn btn-secondary mt-2">Cancel</button>
+			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveChangesModal()" id="btn_send" name="btn_send" value="btn_send">Save Changes</button>
+			<button class="btn btn-secondary mt-2" id="btn_cancel_send" name="btn_cancel_send">Cancel</button>
 		</div>
 
 	</form>
