@@ -1210,6 +1210,7 @@ class GoalBankController extends Controller
     protected function get_employees_by_selected_org_nodes($selected_org_nodes) {
         $employees = EmployeeDemo::from('employee_demo AS d')
             ->whereIn('d.orgid', $selected_org_nodes)
+            ->whereNull('d.date_deleted')
             ->select('d.employee_id')
             ->pluck('d.employee_id'); 
         return ($employees ? $employees->toArray() : []); 
@@ -1219,26 +1220,32 @@ class GoalBankController extends Controller
         $employees0 = EmployeeDemo::from('employee_demo AS d')
             ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
             ->whereIn('t.organization_key', $selected_inherited)
-            ->select('.employee_id');
+            ->whereNull('d.date_deleted')
+            ->select('d.employee_id');
         $employees1 = EmployeeDemo::from('employee_demo AS d')
             ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
             ->whereIn('t.level1_key', $selected_inherited)
+            ->whereNull('d.date_deleted')
             ->select('d.employee_id');
         $employees2 = EmployeeDemo::from('employee_demo AS d')
             ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
             ->whereIn('t.level2_key', $selected_inherited)
+            ->whereNull('d.date_deleted')
             ->select('d.employee_id');
         $employees3 = EmployeeDemo::from('employee_demo AS d')
             ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
             ->whereIn('t.level3_key', $selected_inherited)
+            ->whereNull('d.date_deleted')
             ->select('d.employee_id');
         $employees4 = EmployeeDemo::from('employee_demo AS d')
             ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
             ->whereIn('t.level4_key', $selected_inherited)
+            ->whereNull('d.date_deleted')
             ->select('d.employee_id');
         $employees5 = EmployeeDemo::from('employee_demo AS d')
             ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
             ->whereIn('t.level5_key', $selected_inherited)
+            ->whereNull('d.date_deleted')
             ->select('d.employee_id');
         $employees = $employees0->union($employees1)->union($employees2)->union($employees3)->union($employees4)->union($employees5)->pluck('employee_id');
         return ($employees ? $employees->toArray() : []); 
