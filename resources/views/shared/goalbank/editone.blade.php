@@ -44,8 +44,8 @@
 						<p>Are you sure to send out this message ?</p>
 					</div>
 					<div class="modal-footer">
-						<button class="btn btn-primary mt-2" type="submit" name="btn_send" value="btn_send">Update Goal</button>
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button class="btn btn-primary mt-2" type="submit" id="btn_send" name="btn_send" value="btn_send">Update Goal</button>
+						<button class="btn btn-secondary" type="button" id="btn_cancel_send" name="btn_cancel_send" data-dismiss="modal">Cancel</button>
 					</div>
 					
 				</div>
@@ -82,8 +82,8 @@
 		<h6 class="text-bold">Step 2. Finish</h6>
 		<br>
 		<div class="col-md-3 mb-2">
-			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveChangesModal()" id="btn_send" name="btn_send" value="btn_send">Save Changes</button>
-			<button class="btn btn-secondary mt-2" id="btn_cancel_send" name="btn_cancel_send">Cancel</button>
+			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveChangesModal()" id="obtn_send" name="obtn_send" value="btn_send">Save Changes</button>
+			<button class="btn btn-secondary mt-2" id="obtn_cancel_send" name="obtn_cancel_send">Cancel</button>
 		</div>
 
 	</form>
@@ -129,8 +129,6 @@
 				position: fixed;
 				top: 25%;
 				left: 47%;
-				/* height: 100%;
-				width: 100%; */
 				width: 10em;
 				height: 10em;
 				z-index: 9000000;
@@ -183,13 +181,14 @@
 			let ag_employees_by_org = [];
 
 			function confirmSaveChangesModal(){
+				$('#obtn_send').prop('disabled',true);
 				let count = ag_selected_employees.length;
 				$('#aselected_emp_ids').val(ag_selected_employees);
 
 				if (count == 0) {
-					$('#saveGoalModal .modal-body p').html('Are you sure to update goal without additional audience?');
+					$('#saveGoalModal .modal-body p').html('Are you sure to update goal without additional audience?<br><br>Only click \"Update Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
 				} else {
-					$('#saveGoalModal .modal-body p').html('Are you sure to update goal and assign to selected additional audience?');
+					$('#saveGoalModal .modal-body p').html('Are you sure to update goal and assign to selected additional audience?<br><br>Only click \"Update Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
 				}
 				$('#saveGoalModal').modal();
 			}
@@ -232,52 +231,19 @@
 						]
 				} );
 
+				$( "#btn_send" ).click(function() {
+					$('#saveGoalModal').modal('toggle');
+				});
+
+				$( "#btn_cancel_send" ).click(function() {
+					$('#btn_send').prop('disabled',false);
+					$('#obtn_send').prop('disabled',false);
+				});
+
 				$('#btn_search').click(function(e) {
 					e.preventDefault();
 					//List
 					$('#currenttable').DataTable().rows().invalidate().draw();
-                                        	
-					// //Tree
-					// target = $('#nav-tree'); 
-					// ddnotempty = $('#dd_level0').val() + $('#dd_level1').val() + $('#dd_level2').val() + $('#dd_level3').val() + $('#dd_level4').val();
-					// if(ddnotempty) {
-					// 	// To do -- ajax called to load the tree
-					// 	$.when( 
-					// 		$.ajax({
-                	// 			url: '{{ "/" . request()->segment(1) . "/goalbank/org-tree" }}',
-					// 			type: 'GET',
-					// 			data: $("#notify-form").serialize(),
-					// 			dataType: 'html',
-
-					// 			beforeSend: function() {
-					// 				$("#tree-loading-spinner").show();                    
-					// 			},
-
-					// 			success: function (result) {
-					// 				$('#nav-tree').html(''); 
-					// 				$('#nav-tree').html(result);
-					// 				$('#nav-tree').attr('loaded','loaded');
-					// 			},
-
-					// 			complete: function() {
-					// 				$("#tree-loading-spinner").hide();
-					// 			},
-
-					// 			error: function () {
-					// 				alert("error");
-					// 				$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
-					// 			}
-					// 		})
-							
-					// 	).then(function( data, textStatus, jqXHR ) {
-					// 		//alert( jqXHR.status ); // Alerts 200
-					// 		enodes = $('#accordion-level0 input:checkbox');
-					// 		redrawTreeCheckboxes();	
-					// 	}); 
-					// } else {
-					// 	$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
-					// }
-
 				});
 
 				$(".tags").multiselect({
@@ -308,7 +274,6 @@
 				// Tab  -- LIST Page  activate
 				$("#anav-list-tab").on("click", function(e) {
 					let ag_selected_employees = [];
-					// let aselected_emp_ids = [];
 					$('#aselected_emp_ids').val( null );
 					table  = $('#aemployee-list-table').DataTable();
 					table.rows().invalidate().draw();
@@ -349,7 +314,6 @@
                                 })
                                 
                             ).then(function( data, textStatus, jqXHR ) {
-                                //alert( jqXHR.status ); // Alerts 200
                                 anodes = $('#aaccordion-level0 input:checkbox');
                                 aredrawTreeCheckboxes();	
                             }); 
