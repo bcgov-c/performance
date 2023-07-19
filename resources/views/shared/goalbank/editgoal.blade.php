@@ -116,8 +116,6 @@
 				position: fixed;
 				top: 25%;
 				left: 47%;
-				/* height: 100%;
-				width: 100%; */
 				width: 10em;
 				height: 10em;
 				z-index: 9000000;
@@ -167,7 +165,7 @@
 			let g_employees_by_org = [];
 
 			function confirmSaveChangesModal(){
-				// $('#obtn_send').prop('disabled',true);
+				$('#obtn_send').prop('disabled',true);
 				count = g_selected_orgnodes.length + eg_selected_inherited.length;
 				if (count == 0) {
 					$('#saveGoalModal .modal-body p').html('Are you sure to update goal without additional audience?<br><br>Only click \"Update Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
@@ -221,7 +219,6 @@
 				);
 
 				$( "#btn_send" ).click(function() {
-					// $('#btn_send').prop('disabled',true);
 					$('#saveGoalModal').modal('toggle');
 				});
 
@@ -232,7 +229,6 @@
 
 				$('#delete_org').click(function(e) {
 					e.preventDefault();
-					// dd('button clicked');
 					$('#btn_search').hide();
 				});
 
@@ -373,7 +369,6 @@
                                 })
                                 
                             ).then(function( data, textStatus, jqXHR ) {
-                                //alert( jqXHR.status ); // Alerts 200
                                 nodes = $('#accordion-level0 input:checkbox');
                                 redrawTreeCheckboxes();	
                             }); 
@@ -593,7 +588,6 @@
 								}
 							})
 						).then(function( data, textStatus, jqXHR ) {
-							//alert( jqXHR.status ); // Alerts 200
 							enodes = $('#eaccordion-level0 input:checkbox');
 							eredrawTreeCheckboxes();	
 						}); 
@@ -606,12 +600,6 @@
 			$(window).on('beforeunload', function(){
 				$('#pageLoader').show();
 			});
-
-			// $(window).resize(function(){
-			// 	location.reload();
-			// 	return;
-			// }); 
-
 
 		</script>
 	</x-slot>
