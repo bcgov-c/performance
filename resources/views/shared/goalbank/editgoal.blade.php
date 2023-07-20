@@ -170,7 +170,7 @@
 				if (count == 0) {
 					$('#saveGoalModal .modal-body p').html('Are you sure you want to update goal without additional audience?<br><br>Only click \"Update Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
 				} else {
-					$('#saveGoalModal .modal-body p').html('Are you sure you want to add selected business units to the audience??<br><br>Only click \"Update Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
+					$('#saveGoalModal .modal-body p').html('Are you sure you want to add selected business units to the audience?<br><br>Only click \"Update Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
 				}
 				$('#saveGoalModal').modal();
 			}
