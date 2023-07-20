@@ -1422,13 +1422,8 @@ class GoalBankController extends Controller
         foreach(array_chunk($employee_ids, 1000) as $employee_ids_chunk) {
             // Filter out the employee based on the Organization level and individual user preferences. 
             $data = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization_key', 'access_organizations.orgid')
-                ->leftjoin('user_preferences', 'user_demo_jr_view.user_id', 'user_preferences.user_id')
                 ->whereIn('user_demo_jr_view.employee_id', $employee_ids_chunk)
                 ->where('access_organizations.allow_inapp_msg', 'Y')
-                ->where( function($query) {
-                    $query->where('user_preferences.goal_bank_flag', 'Y')
-                        ->orWhereNull('user_preferences.goal_bank_flag');
-                })
                 ->selectRaw("
                     user_demo_jr_view.user_id, 
                     'GB' AS notification_type,
@@ -1441,13 +1436,8 @@ class GoalBankController extends Controller
                 ->toArray();
             DashboardNotification::insert($data);
             $data = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization_key', 'access_organizations.orgid')
-                ->leftjoin('user_preferences', 'user_demo_jr_view.user_id', 'user_preferences.user_id')
                 ->whereIn('user_demo_jr_view.employee_id', $employee_ids_chunk)
                 ->where('access_organizations.allow_inapp_msg', 'Y')
-                ->where( function($query) {
-                    $query->where('user_preferences.goal_bank_flag', 'Y')
-                        ->orWhereNull('user_preferences.goal_bank_flag');
-                })
                 ->selectRaw("
                     ' ' AS recipients,
                     0 AS sender_id,
