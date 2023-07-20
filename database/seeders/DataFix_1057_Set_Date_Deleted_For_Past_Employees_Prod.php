@@ -207,7 +207,7 @@ class DataFix_1057_Set_Date_Deleted_For_Past_Employees_Prod extends Seeder
                 ->distinct()
                 ->orderBy('id')
                 ->get();
-            if($profs == []) {
+            if($profs && $profs <> []) {
                 foreach($profs AS $prof) {
                     Log::info(Carbon::now()." - NO Active employee_demo found - {$prof->employee_id} / {$prof->empl_record}");
                     $all_reportto = UserReportingTo::where('reporting_to_id', $prof->id)
@@ -251,7 +251,7 @@ class DataFix_1057_Set_Date_Deleted_For_Past_Employees_Prod extends Seeder
                 ->orderBy('employee_id')
                 ->orderBy('empl_record')
                 ->get();
-            if($demos == []) {
+            if($demos && $demos <> []) {
                 foreach($demos AS $demo) {
                     if($demo->date_deleted) {
                         Log::info(Carbon::now()." - Skipping employee_demo update, date_deleted is NOT blank - {$demo->employee_id} / {$demo->empl_record} - date_deleted={$demo->date_deleted}");
