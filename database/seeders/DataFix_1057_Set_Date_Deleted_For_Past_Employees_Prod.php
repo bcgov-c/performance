@@ -207,9 +207,10 @@ class DataFix_1057_Set_Date_Deleted_For_Past_Employees_Prod extends Seeder
                 ->distinct()
                 ->orderBy('id')
                 ->get();
-            if($profs && $profs <> []) {
+            if($profs->isEmpty()) {
+                Log::info(Carbon::now()." - ACTIVE employee_demo found - {$employee_id}");
+            } else {
                 foreach($profs AS $prof) {
-                    Log::info(Carbon::now()." - NO Active employee_demo found - {$prof->employee_id} / {$prof->empl_record}");
                     $all_reportto = UserReportingTo::where('reporting_to_id', $prof->id)
                         ->get();
                     foreach($all_reportto AS $rpt) {
@@ -243,15 +244,15 @@ class DataFix_1057_Set_Date_Deleted_For_Past_Employees_Prod extends Seeder
                         $prefer->delete();
                     }
                 }
-            } else {
-                Log::info(Carbon::now()." - ACTIVE employee_demo found!!! - {$employee_id} / {$empl_record}");
             }
             $demos = EmployeeDemo::where('employee_id', $employee_id)
                 ->where('empl_record', $empl_record)
                 ->orderBy('employee_id')
                 ->orderBy('empl_record')
                 ->get();
-            if($demos && $demos <> []) {
+            if($demos->isEmpty()) {
+                Log::info(Carbon::now()." - NOT found in employee_demo - {$employee_id} / {$empl_record}");
+            } else {
                 foreach($demos AS $demo) {
                     if($demo->date_deleted) {
                         Log::info(Carbon::now()." - Skipping employee_demo update, date_deleted is NOT blank - {$demo->employee_id} / {$demo->empl_record} - date_deleted={$demo->date_deleted}");
@@ -262,8 +263,6 @@ class DataFix_1057_Set_Date_Deleted_For_Past_Employees_Prod extends Seeder
                             ->update(['date_deleted' => '2023-07-15']);
                     }
                 }
-            } else {
-                Log::info(Carbon::now()." - NOT found in employee_demo - {$employee_id} / {$empl_record}");
             }
         }
     
