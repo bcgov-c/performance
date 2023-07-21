@@ -173,9 +173,9 @@ $(function()  {
 	});
 
 	var	pie_basic_1_data = {!!json_encode( $data[''] )!!};
-	var	pie_basic_2_data = {!!json_encode( $data[1] )!!};
-	var	pie_basic_3_data = {!!json_encode( $data[2] )!!};
-	var	pie_basic_4_data = {!!json_encode( $data[3] )!!};
+	var	pie_basic_2_data = {!!json_encode( $data['Work'] )!!};
+	var	pie_basic_3_data = {!!json_encode( $data['Learning'] )!!};
+	var	pie_basic_4_data = {!!json_encode( $data['Career Development'] )!!};
 
 	var	bar_basic_1_data = {!!json_encode( $data_tag )!!};
 
