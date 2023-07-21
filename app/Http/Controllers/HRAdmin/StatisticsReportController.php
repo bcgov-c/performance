@@ -379,6 +379,7 @@ class StatisticsReportController extends Controller
         $sql2 = Goal::join('user_demo_jr_view', function($join) {
                     $join->on('goals.user_id', '=', 'user_demo_jr_view.user_id');
                 })
+                ->join('goal_types', 'goals.goal_type_id', 'goal_types.id')
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
                 ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
                 ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
@@ -403,7 +404,8 @@ class StatisticsReportController extends Controller
                                 ->orWhereNull('user_demo_jr_view.excused_flag');
                         });
                     }) 
-                ->whereNull('user_demo_jr_view.date_deleted')    
+                ->whereNull('user_demo_jr_view.date_deleted')   
+                ->where('goal_types.name','<>', 'Private')  
                 ->whereNotExists(function ($query) {
                     $query->select(DB::raw(1))
                           ->from('goal_tags')
