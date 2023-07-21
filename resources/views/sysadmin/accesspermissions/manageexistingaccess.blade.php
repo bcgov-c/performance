@@ -117,7 +117,7 @@
                         {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', searchable: true, className: 'dt-nowrap show-modal', visible: false},
                         {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', searchable: true, className: 'dt-nowrap show-modal', visible: false},
                         {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true, className: 'dt-nowrap show-modal', visible: false},
-                        {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', name: 'deptid', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', name: 'deptid', searchable: true, className: 'dt-nowrap show-modal', visible: false},
                         {title: 'Access Level', ariaTitle: 'Access Level', target: 0, type: 'string', data: 'role_longname', name: 'role_longname', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Access Description', ariaTitle: 'Access Description', target: 0, type: 'num', data: 'reason', name: 'reason', searchable: true, className: 'dt-nowrap show-modal', visible: true},
                         {title: 'BU Assigned', ariaTitle: 'BU Assigned', target: 0, type: 'string', data: 'org_count', name: 'org_count', searchable: false, className: 'dt-nowrap show-modal', visible: false},
