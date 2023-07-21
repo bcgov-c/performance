@@ -63,7 +63,7 @@
             </div>
         </div>
 		<br>
-		<h6 class="text-bold">Step 2. Select access level and reason for assigning access</h6> 
+		<h6 class="text-bold">Step 2. Select access level and access description</h6> 
 		<br>
 		<div class="row  p-3">
 			<div class="col col-4">
@@ -76,7 +76,9 @@
 				</label>
 			</div>
 			<div class="col col-8">
-				<x-input id="reason" name="reason" label="Reason for assigning" data-toggle="tooltip" data-placement="top" data-trigger="hover-focus" tooltip="Reason tooltip"/>
+				<b> Access Description </b>
+				<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="List org levels (i.e. BCPSA - All; or SDPR - Corporate Services) followed by the role of the individual (i.e. SHR, Ambassador, Reporting). Full example: BCPSA - Corporate Workforce Strategies: Ambassador."> </i>
+				<x-input id="reason" name="reason"/>
 			</div>
 		</div>
 
@@ -115,7 +117,7 @@
 
 			.select2-container .select2-selection--single {
 				height: 38px !important;
-			}EmployeeID
+			}
 
 			.select2-container--default .select2-selection--single .select2-selection__arrow {
 				height: 38px !important;
@@ -148,7 +150,39 @@
 
 	<x-slot name="js">
 
+		<script>	
+
+			$('body').popover({
+				selector: '[data-toggle]',
+				trigger: 'click',
+			});
+			
+			$('.modal').popover({
+				selector: '[data-toggle-select]',
+				trigger: 'click',
+			});
+
+			$('body').on('click', function (e) {
+			$('[data-toggle=popover]').each(function () {
+				// hide any open popovers when the anywhere else in the body is clicked
+				if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+					$(this).popover('hide');
+				}
+				});
+			});	
+			$('body').on('click', function (e) {
+			$('[data-toggle=dropdown]').each(function () {
+				// hide any open popovers when the anywhere else in the body is clicked
+				if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+					$(this).popover('hide');
+				}
+				});
+			});	
+
+		</script>
+
 		<script>
+
 			g_matched_employees = {!! json_encode($matched_emp_ids) !!};
 			g_selected_employees = {!! json_encode($old_selected_emp_ids) !!};
 			g_selected_orgnodes = {!! json_encode($old_selected_org_nodes) !!};
@@ -440,7 +474,6 @@
 							})
 							
 						).then(function( data, textStatus, jqXHR ) {
-							//alert( jqXHR.status ); // Alerts 200
 							enodes = $('#eaccordion-level0 input:checkbox');
 							eredrawTreeCheckboxes();	
 						}); 
@@ -453,11 +486,6 @@
 				$(window).on('beforeunload', function(){
 					$('#pageLoader').show();
 				});
-
-				// $(window).resize(function(){
-				// 	location.reload();
-				// 	return;
-				// });
 
 			});
 
