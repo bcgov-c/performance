@@ -123,6 +123,7 @@ class SysadminStatisticsReportController extends Controller
 
         $total_goals = UserDemoJrView::selectRaw('count(*) as goal_count, goals.goal_type_id')
         ->join('goals', 'goals.user_id', 'user_demo_jr_view.user_id') 
+        ->join('goal_types', 'goals.goal_type_id', 'goal_types.id')
         ->where(function($query) {
             $query->where(function($query) {
                 $query->where('due_date_paused', 'N')
@@ -135,9 +136,10 @@ class SysadminStatisticsReportController extends Controller
                     ->orWhereNull('excused_flag');
             });
         })
-        ->whereNull('deleted_at')
+        ->whereNull('goals.deleted_at')
         ->where('goals.status','active')
-        ->where('goals.is_library','0')       
+        ->where('goals.is_library','0')  
+        ->where('goal_types.name','<>', 'Private')     
         ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
         ->when( $request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
         ->when( $request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
@@ -172,6 +174,7 @@ class SysadminStatisticsReportController extends Controller
         ->leftJoin('goals', function ($join) {
             $join->on('goals.user_id', '=', 'user_demo_jr_view.user_id');
         })
+        ->join('goal_types', 'goals.goal_type_id', 'goal_types.id')
         ->where('goals.status', '=', 'active')
         ->whereNull('goals.deleted_at')
         ->where('goals.is_library', '=', 0)
@@ -188,6 +191,7 @@ class SysadminStatisticsReportController extends Controller
                     });
                 }) 
             ->whereNull('user_demo_jr_view.date_deleted')     
+            ->where('goal_types.name','<>', 'Private')    
             ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
             ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
             ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
@@ -201,31 +205,31 @@ class SysadminStatisticsReportController extends Controller
         $groupedData = [];
         $toal_goal_counts = 0;
         foreach ($goal_count_cal as $item) {
-        $user_id = $item['user_id'];
-        $goals_count = $item['goals_count'];
-        $goal_type_id = $item['goal_type_id'];
+            $user_id = $item['user_id'];
+            $goals_count = $item['goals_count'];
+            $goal_type_id = $item['goal_type_id'];
 
-        $toal_goal_counts = $toal_goal_counts + $goals_count;
-        if ($goals_count == 0) {
-        $groupKey = '0';
-        } elseif ($goals_count >= 1 && $goals_count <= 5) {
-        $groupKey = '1-5';
-        } elseif ($goals_count >= 6 && $goals_count <= 10) {
-        $groupKey = '6-10';
-        } else {
-        $groupKey = '>10';
-        }
+            $toal_goal_counts = $toal_goal_counts + $goals_count;
+            if ($goals_count == 0) {
+                $groupKey = '0';
+            } elseif ($goals_count >= 1 && $goals_count <= 5) {
+                $groupKey = '1-5';
+            } elseif ($goals_count >= 6 && $goals_count <= 10) {
+                $groupKey = '6-10';
+            } else {
+                $groupKey = '>10';
+            }
 
-        $key = $groupKey . '_' . $goal_type_id;
+            $key = $groupKey . '_' . $goal_type_id;
 
-        if (!isset($groupedData[$key])) {
-        $groupedData[$key] = [
-            'group_key' => $groupKey,
-            'goals_count' => 0,
-            'goal_type_id' => $goal_type_id,
-        ];
-        }
-        $groupedData[$key]['goals_count'] += $goals_count;
+            if (!isset($groupedData[$key])) {
+                $groupedData[$key] = [
+                    'group_key' => $groupKey,
+                    'goals_count' => 0,
+                    'goal_type_id' => $goal_type_id,
+                ];
+            }
+            $groupedData[$key]['goals_count'] += $goals_count;
         }
 
         $groupedData[0]['goals_count'] = $total_number_emp - $toal_goal_counts;
@@ -240,22 +244,23 @@ class SysadminStatisticsReportController extends Controller
         $no_type_count["6-10"] = 0;        
         $no_type_count[">10"] = 0;
         $total_notype_count = 0;
+
         foreach($goals_count_type_array as $item){
-        $total_goal_counts = $total_goal_counts + $item["goals_count"];
-        if($item["goal_type_id"]){
-        if($item["group_key"] == '1-5'){
-            $no_type_count["1-5"] =  $no_type_count["1-5"] + $item["goals_count"];
-            $total_notype_count = $total_notype_count + $item["goals_count"];
-        }
-        if($item["group_key"] == '6-10'){
-            $no_type_count["6-10"] =  $no_type_count["6-10"] + $item["goals_count"];
-            $total_notype_count = $total_notype_count + $item["goals_count"];
-        }
-        if($item["group_key"] == '>10'){
-            $no_type_count[">10"] =  $no_type_count[">10"] + $item["goals_count"];
-            $total_notype_count = $total_notype_count + $item["goals_count"];
-        }
-        }
+            $total_goal_counts = $total_goal_counts + $item["goals_count"];
+            if($item["goal_type_id"]){
+                if($item["group_key"] == '1-5'){
+                    $no_type_count["1-5"] =  $no_type_count["1-5"] + $item["goals_count"];
+                    $total_notype_count = $total_notype_count + $item["goals_count"];
+                }
+                if($item["group_key"] == '6-10'){
+                    $no_type_count["6-10"] =  $no_type_count["6-10"] + $item["goals_count"];
+                    $total_notype_count = $total_notype_count + $item["goals_count"];
+                }
+                if($item["group_key"] == '>10'){
+                    $no_type_count[">10"] =  $no_type_count[">10"] + $item["goals_count"];
+                    $total_notype_count = $total_notype_count + $item["goals_count"];
+                }
+            }
         }   
 
         foreach($types as $type)
