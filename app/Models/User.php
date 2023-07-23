@@ -154,7 +154,8 @@ class User extends Authenticatable
     }
 
     public function reportingManager() {
-        return $this->belongsTo('App\Models\User', 'reporting_to');
+        return $this->belongsTo('App\Models\User', 'reporting_to')
+        ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')->whereNull('employee_demo.date_deleted');
     }
 
     public function reportingManagerRecursive() {
@@ -262,10 +263,11 @@ class User extends Authenticatable
 
     public function getAllowInappNotificationAttribute() {
 
-        $organization = EmployeeDemo::join('access_organizations', 'employee_demo.organization', 'access_organizations.organization')
-                            ->where('access_organizations.allow_inapp_msg', 'Y')
-                            ->where('employee_demo.employee_id', $this->employee_id)
-                            ->first(); 
+        $organization = EmployeeDemo::join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+            ->join('access_organizations', 'employee_demo_tree.organization_key', 'access_organizations.orgid')
+            ->where('access_organizations.allow_inapp_msg', 'Y')
+            ->where('employee_demo.employee_id', $this->employee_id)
+            ->first(); 
 
         return ($organization ? true : false);                            
 
@@ -277,11 +279,12 @@ class User extends Authenticatable
             return false;
         }
 
-        $organization = EmployeeDemo::join('access_organizations', 'employee_demo.organization', 'access_organizations.organization')
-                            ->where('access_organizations.allow_email_msg', 'Y')
-                            ->where('employee_demo.employee_id', $this->employee_id)
-                            ->select('employee_demo.guid', 'employee_demo.organization')
-                            ->first(); 
+        $organization = EmployeeDemo::join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+            ->join('access_organizations', 'employee_demo_tree.organization_key', 'access_organizations.orgid')
+            ->where('access_organizations.allow_email_msg', 'Y')
+            ->where('employee_demo.employee_id', $this->employee_id)
+            ->select('employee_demo.guid', 'access_organizations.organization')
+            ->first(); 
 
         return ($organization ? true : false);                            
 
@@ -292,7 +295,7 @@ class User extends Authenticatable
         ->join('employee_demo AS e', 'p.reports_to', 'e.position_number')
         ->join('users AS v', 'e.employee_id', 'v.employee_id')
         ->distinct()
-        ->select('e.position_number', 'v.employee_id', 'v.name')
+        ->select('e.position_number', 'v.employee_id', 'v.name', 'v.id')
         ->whereNull('e.date_deleted')
         ->where('employee_demo.employee_id', $this->employee_id)
         ->orderBy('e.position_number')
@@ -303,7 +306,7 @@ class User extends Authenticatable
     public function preferredSupervisor() {
         if ($this->employee_demo && $this->employee_demo->position_number) {
             return PreferredSupervisor::join('users AS u', 'u.employee_id', 'preferred_supervisor.supv_empl_id')
-            ->select('preferred_supervisor.supv_empl_id', 'u.name')
+            ->select('preferred_supervisor.supv_empl_id', 'u.name', 'u.id')
             ->where('preferred_supervisor.employee_id', '=', $this->employee_id)
             ->where('preferred_supervisor.position_nbr', '=', $this->employee_demo->position_number)
             ->first();

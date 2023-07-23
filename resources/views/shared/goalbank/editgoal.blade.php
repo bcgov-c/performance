@@ -41,8 +41,8 @@
 						<p>Are you sure to send out this message ?</p>
 					</div>
 					<div class="modal-footer">
-						<button class="btn btn-primary mt-2" type="submit" name="btn_send" value="btn_send">Update Goal</button>
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button class="btn btn-primary mt-2" type="submit" id="btn_send" name="btn_send" value="btn_send">Update Goal</button>
+						<button class="btn btn-secondary" type="button" id="btn_cancel_send" name="btn_cancel_send" data-dismiss="modal">Cancel</button>
 					</div>
 					
 				</div>
@@ -55,6 +55,7 @@
 		<br>
 
 		<input type="hidden" id="selected_org_nodes" name="selected_org_nodes" value="">
+		<input type="hidden" id="selected_inherited" name="selected_inherited" value="">
 
 		@include('shared.goalbank.partials.filter2')
 
@@ -68,8 +69,8 @@
 		<h6 class="text-bold">Step 2. Finish</h6>
 		<br>
 		<div class="col-md-3 mb-2">
-			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveChangesModal()" name="btn_send" value="btn_send">Save Changes</button>
-			<button class="btn btn-secondary mt-2">Cancel</button>
+			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveChangesModal()" id="obtn_send" name="obtn_send" value="btn_send">Save Changes</button>
+			<button class="btn btn-secondary mt-2" type="button" id="obtn_cancel_send" name="obtn_cancel_send">Cancel</button>
 		</div>
 
 	</form>
@@ -115,8 +116,6 @@
 				position: fixed;
 				top: 25%;
 				left: 47%;
-				/* height: 100%;
-				width: 100%; */
 				width: 10em;
 				height: 10em;
 				z-index: 9000000;
@@ -160,14 +159,18 @@
 			let g_matched_employees = {!!json_encode($matched_emp_ids)!!};
 			let g_selected_employees = {!!json_encode($old_selected_emp_ids)!!};
 			let g_selected_orgnodes = {!!json_encode($old_selected_org_nodes)!!};
+			let g_selected_inherited = {!! json_encode($old_selected_inherited) !!};
+			let eg_selected_orgnodes = {!!json_encode($eold_selected_org_nodes)!!};
+			let eg_selected_inherited = {!!json_encode($eold_selected_inherited)!!};
 			let g_employees_by_org = [];
 
 			function confirmSaveChangesModal(){
-				count = g_selected_orgnodes.length;
+				$('#obtn_send').prop('disabled',true);
+				count = g_selected_orgnodes.length + eg_selected_inherited.length;
 				if (count == 0) {
-					$('#saveGoalModal .modal-body p').html('Are you sure to update goal without additional audience?');
+					$('#saveGoalModal .modal-body p').html('Are you sure you want to update goal without additional audience?<br><br>Only click \"Update Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
 				} else {
-					$('#saveGoalModal .modal-body p').html('Are you sure to update goal and assign to selected additional audience?');
+					$('#saveGoalModal .modal-body p').html('Are you sure you want to add selected business units to the audience?<br><br>Only click \"Update Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
 				}
 				$('#saveGoalModal').modal();
 			}
@@ -202,29 +205,30 @@
 							}
 						},
 						columns: [
-							{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization'
-								, name: 'organization', searchable: true, className: 'dt-nowrap'},
-							{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program'
-								, name: 'level1_program', searchable: true, className: 'dt-nowrap'},
-							{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division'
-								, name: 'level2_division', searchable: true, className: 'dt-nowrap'},
-							{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch'
-								, name: 'level3_branch', searchable: true, className: 'dt-nowrap'},
-							{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4'
-								, name: 'level4', searchable: true, className: 'dt-nowrap'},
-							{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action'
-								, name: 'action', orderable: false, searchable: false, className: 'dt-nowrap'},
-							{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id'
-								, name: 'goal_id', searchable: false, visible: false, className: 'dt-nowrap'},
-							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'num', data: 'id'
-								, name: 'id', searchable: false, visible: false, className: 'dt-nowrap'},
+							{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', searchable: true, className: 'dt-nowrap'},
+							{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', searchable: true, className: 'dt-nowrap'},
+							{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', searchable: true, className: 'dt-nowrap'},
+							{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', searchable: true, className: 'dt-nowrap'},
+							{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true, className: 'dt-nowrap'},
+							{title: 'Inherited', ariaTitle: 'Inherited', target: 0, type: 'string', data: 'inherited', name: 'inherited', searchable: false},
+							{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false, className: 'dt-nowrap'},
+							{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id', name: 'goal_id', searchable: false, visible: false, className: 'dt-nowrap'},
+							{title: 'ID', ariaTitle: 'ID', target: 0, type: 'num', data: 'id', name: 'id', searchable: false, visible: false, className: 'dt-nowrap'},
 						]
 					}
 				);
 
+				$( "#btn_send" ).click(function() {
+					$('#saveGoalModal').modal('toggle');
+				});
+
+				$( "#btn_cancel_send" ).click(function() {
+					$('#btn_send').prop('disabled',false);
+					$('#obtn_send').prop('disabled',false);
+				});
+
 				$('#delete_org').click(function(e) {
 					e.preventDefault();
-					dd('button clicked');
 					$('#btn_search').hide();
 				});
 
@@ -258,6 +262,7 @@
 								{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', searchable: true},
 								{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', searchable: true},
 								{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true},
+								{title: 'Inherited', ariaTitle: 'Inherited', target: 0, type: 'string', data: 'inherited', name: 'inherited', searchable: false},
 								{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},
 								{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id', name: 'goal_id', searchable: false, visible: false},
 							]
@@ -316,22 +321,17 @@
 				});
 
 				$('#notify-form').submit(function() {
-					// console.log('Search Button Clicked');			
 					// assign back the selected employees to server
 					var text = JSON.stringify(g_selected_employees);
 					$('#selected_emp_ids').val( text );
 					var text2 = JSON.stringify(g_selected_orgnodes);
 					$('#selected_org_nodes').val( text2 );
+					var text3 = JSON.stringify(eg_selected_inherited);
+					$('#selected_inherited').val( text3 );
 					return true; // return false to cancel form action
 				});
 
-				// CKEDITOR.replace('what', {
-				// 	toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ],disableNativeSpellChecker: false});
-
-				// CKEDITOR.replace('measure_of_success', {
-				// 	toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent"] ],disableNativeSpellChecker: false});
-
-			// Tab  -- LIST Page  activate
+				// Tab  -- LIST Page  activate
 				$("#nav-list-tab").on("click", function(e) {
 					table  = $('#employee-list-table').DataTable();
 					table.rows().invalidate().draw();
@@ -346,7 +346,7 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                					url: '{{ "/" . request()->segment(1) . "/goalbank/org-tree" }}',
+                					url: '{{ "/".request()->segment(1)."/goalbank/org-tree/1" }}',
                                     type: 'GET',
                                     data: $("#notify-form").serialize(),
                                     dataType: 'html',
@@ -357,7 +357,7 @@
                                         $(target).html(''); 
                                         $(target).html(result);
 
-                                        $('#nav-tree').attr('loaded','loaded');
+                                        $('#nav-tree').attr('loaded', 'loaded');
                                     },
                                     complete: function() {
                                         $(".tree-loading-spinner").hide();
@@ -369,7 +369,6 @@
                                 })
                                 
                             ).then(function( data, textStatus, jqXHR ) {
-                                //alert( jqXHR.status ); // Alerts 200
                                 nodes = $('#accordion-level0 input:checkbox');
                                 redrawTreeCheckboxes();	
                             }); 
@@ -419,7 +418,6 @@
 
 				function eredrawTreeCheckboxes() {
 					// redraw the selection 
-					//console.log('eredraw triggered');
 					enodes = $('#eaccordion-level0 input:checkbox');
 					$.each( enodes, function( index, chkbox ) {
 						if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
@@ -567,7 +565,8 @@
 						// To do -- ajax called to load the tree
 						$.when( 
 							$.ajax({
-                				url: '{{ "/" . request()->segment(1) . "/goalbank/eorg-tree" }}',
+								url: '{{ "/".request()->segment(1)."/goalbank/org-tree/2" }}',
+                				// url: '{{ "/".request()->segment(1)."/goalbank/eorg-tree" }}',
 								type: 'GET',
 								data: $("#notify-form").serialize(),
 								dataType: 'html',
@@ -575,25 +574,20 @@
 								beforeSend: function() {
 									$("#etree-loading-spinner").show();                    
 								},
-
 								success: function (result) {
 									$('#enav-tree').html(''); 
 									$('#enav-tree').html(result);
 									$('#enav-tree').attr('loaded','loaded');
 								},
-
 								complete: function() {
 									$("#etree-loading-spinner").hide();
 								},
-
 								error: function () {
 									alert("error");
 									$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
 								}
 							})
-							
 						).then(function( data, textStatus, jqXHR ) {
-							//alert( jqXHR.status ); // Alerts 200
 							enodes = $('#eaccordion-level0 input:checkbox');
 							eredrawTreeCheckboxes();	
 						}); 
@@ -601,18 +595,11 @@
 						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
 					}
 				});
-
 			});
 
 			$(window).on('beforeunload', function(){
 				$('#pageLoader').show();
 			});
-
-			// $(window).resize(function(){
-			// 	location.reload();
-			// 	return;
-			// }); 
-
 
 		</script>
 	</x-slot>

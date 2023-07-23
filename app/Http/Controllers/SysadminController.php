@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\GoalController;
+use App\Models\UserDemoJrView;
 use App\Models\Organization;
 use App\Models\User;
 use App\Models\Goal;
@@ -24,6 +25,7 @@ use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Session;
 // use GuzzleHttp\Psr7\Request;
 
 
@@ -855,10 +857,10 @@ class SysadminController extends Controller
         
         $user_role = DB::table('model_has_roles')                        
                         ->where('model_id', $userid)
-                        ->where('role_id', 4)
+                        ->whereIntegerInRaw('role_id', [4, 5])
                         ->where('model_type', 'App\Models\User')
                         ->get();
-            
+    
         if(count($user_role) == 0) {
                 return redirect()->to('/');
                 exit;
@@ -872,6 +874,24 @@ class SysadminController extends Controller
             }
             $newuserId = $request->new_user_id;
             Auth::loginUsingId($newuserId);
+
+            if (session()->has('sr_user')) {
+                session()->put('SR_ALLOWED', true);
+            }
+
+
+            $switched_user_role = DB::table('model_has_roles')                        
+                                ->where('model_id', $newuserId)
+                                ->where('model_type', 'App\Models\User')
+                                ->get(); 
+            foreach($switched_user_role as $item){
+                if($item->role_id == 5){
+                    session()->put('sr_user', true);
+                }
+
+            }                    
+
+
             return redirect()->to('/');
         }  
     } 
@@ -880,34 +900,25 @@ class SysadminController extends Controller
             $user = auth()->user();
             $switched_userid = $user->id;
             
-            $user_role = DB::table('model_has_roles')                        
+            $user_roles = DB::table('model_has_roles')                        
                         ->where('model_id', $switched_userid)
-                        ->where('role_id', 4)
+                        ->whereIntegerInRaw('role_id', [4, 5])
                         ->where('model_type', 'App\Models\User')
                         ->get();
             
-            if(count($user_role) == 0) {
+            if(count($user_roles) == 0) {
                 return redirect()->to('/');
                 exit;
+            } else {
+                foreach($user_roles as $item){
+                    if($item->role_id == 5){
+                        if (!Session::has('sr_user')) {
+                            session()->put('sr_user', true);
+                        } 
+                    }
+                }    
             }
-        
-        /*
-            $search_user = $request->search_user;        
-            if ($request->ajax()) {   
-                $username = $request->name; 
-                if ($username == '') {
-                    $data = User::latest()->take(0)->get();
-                } else {
-                    $data = User::where('name', 'like', '%' . $username . '%')->get();
-                }
-                return Datatables::of($data)
-                        ->addIndexColumn()
-                        ->make(true);                    
-            }
-        return view('sysadmin.switch-identity.index',compact('search_user'));   
-         * 
-         */     
-        
+       
         $errors = session('errors');
 
         if ($errors) {
@@ -933,19 +944,30 @@ class SysadminController extends Controller
             ]);
         }
 
-        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+        // $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
+        // $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
+        // $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
+        // $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
+        // $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
 
-        $request->session()->flash('level0', $level0);
-        $request->session()->flash('level1', $level1);
-        $request->session()->flash('level2', $level2);
-        $request->session()->flash('level3', $level3);
-        $request->session()->flash('level4', $level4);
+        $request->session()->flash('level0', $request->dd_level0);
+        $request->session()->flash('level1', $request->dd_level1);
+        $request->session()->flash('level2', $request->dd_level2);
+        $request->session()->flash('level3', $request->dd_level3);
+        $request->session()->flash('level4', $request->dd_level4);
+        // $request->session()->flash('level0', $level0);
+        // $request->session()->flash('level1', $level1);
+        // $request->session()->flash('level2', $level2);
+        // $request->session()->flash('level3', $level3);
+        // $request->session()->flash('level4', $level4);
 
-        $criteriaList = $this->search_criteria_list();
+        $criteriaList = [
+            'all' => 'All',
+            'employee_id' => 'Employee ID', 
+            'employee_name'=> 'Employee Name',
+            'jobcode_desc' => 'Classification', 
+            'deptid' => 'Department ID'
+        ];
         
         //return view('sysadmin.switch-identity.index',compact('search_user'));   
         return view('sysadmin.switch-identity.index', compact ('request', 'criteriaList'));
@@ -1084,57 +1106,33 @@ class SysadminController extends Controller
         return response()->json($formatted_orgs);
     } 
 
-    public function identityList(Request $request)
+    public function identityList(Request $request, $option = '')
     {  
         $get_data = 0;
         if ($request->ajax()) 
         {
-            $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-            $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-            $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-            $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-            $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
-
-
-            $query = User::withoutGlobalScopes()
-            ->leftjoin('employee_demo', 'users.employee_id', '=', 'employee_demo.employee_id')
-            // ->wherein('employee_demo.employee_status', ['A', 'L', 'P', 'S'])
-            ->whereNull('employee_demo.date_deleted')
-            ->when($level0, function($q) use($level0) {return $q->where('employee_demo.organization', $level0->name);})
-            ->when($level1, function($q) use($level1) {return $q->where('employee_demo.level1_program', $level1->name);})
-            ->when($level2, function($q) use($level2) {return $q->where('employee_demo.level2_division', $level2->name);})
-            ->when($level3, function($q) use($level3) {return $q->where('employee_demo.level3_branch', $level3->name);})
-            ->when($level4, function($q) use($level4) {return $q->where('employee_demo.level4', $level4->name);})
-            ->when($request->criteria == 'name', function($q) use($request){return $q->where('users.name', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'emp', function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'job', function($q) use($request){return $q->where('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'dpt', function($q) use($request){return $q->where('employee_demo.deptid', 'like', "%" . $request->search_text . "%");})
-            ->when([$request->criteria == 'all', $request->search_text], function($q) use ($request) 
-            {
-                return $q->where(function ($query2) use ($request) 
-                {
-                    $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
-                    ->orWhere('employee_demo.employee_name', 'like', "%" . $request->search_text . "%")
-                    ->orWhere('employee_demo.jobcode_desc', 'like', "%" . $request->search_text . "%")
-                    ->orWhere('employee_demo.deptid', 'like', "%" . $request->search_text . "%")
-                    ->orWhere('users.name', 'like', "%" . $request->search_text . "%");
-                });
-            })
-            ->select
-            (
-                'users.id',
-                'users.name',      
-                'employee_demo.employee_id',
-                'employee_demo.employee_name', 
-                'employee_demo.jobcode_desc',
-                'employee_demo.organization',
-                'employee_demo.level1_program',
-                'employee_demo.level2_division',
-                'employee_demo.level3_branch',
-                'employee_demo.level4',
-                'employee_demo.deptid'
-            );
-                      
+            $query = UserDemoJrView::from('user_demo_jr_view AS u')
+                ->whereNull('u.date_deleted')
+                ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
+                ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
+                ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
+                ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
+                ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
+                ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("u.{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); })
+                ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(u.employee_id LIKE '%{$request->{$option.'search_text'}}%' OR u.employee_name LIKE '%{$request->{$option.'search_text'}}%' OR u.jobcode_desc LIKE '%{$request->{$option.'search_text'}}%' OR u.deptid LIKE '%{$request->{$option.'search_text'}}%')"); })
+                ->selectRaw ("
+                    u.user_id AS id,
+                    u.user_name,
+                    u.employee_id,
+                    u.employee_name, 
+                    u.jobcode_desc,
+                    u.organization,
+                    u.level1_program,
+                    u.level2_division,
+                    u.level3_branch,
+                    u.level4,
+                    u.deptid
+                ");
             
             if($request->dd_level0 == '' && $request->dd_level1 == '' && $request->dd_level2 == '' && $request->dd_level3 == '' && $request->dd_level4 == '' && $request->search_text == '') {
                 $data = $query->take(0)->get();                

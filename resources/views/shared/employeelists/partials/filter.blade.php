@@ -46,13 +46,13 @@
             <label for="criteria">Search Criteria</label>
             <select id="criteria" name="criteria" class="form-control">
                 @foreach( $criteriaList as $key => $value )
-                    <option value="{{ $key }}" {{  old('criteria') == $key ? 'selected' : '' }} >{{ $value }}</option>
+                    <option value="{{ $key }}"  >{{ $value }}</option>
                 @endforeach
             </select>
         </div>
         <div class="form-group col-md-2" id="search_text_group">
             <label for="search_text">Search Text</label>
-            <input type="text" id="search_text" name="search_text" class="form-control" value="{{ old('search_text') }}" placeholder="Search Text">
+            <input type="text" id="search_text" name="search_text" class="form-control" value="" placeholder="Search Text">
         </div>
         <div class="form-group col-md-2 p-3 float-left float-bottom" style="display: flex; flex-direction: column;">
             <div class="form-group row"> </div>
@@ -112,7 +112,7 @@
                 placeholder: 'Select Organization',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/org-organizations" }}'
+                    url: '/sysadmin/org-list/1/0'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -143,7 +143,7 @@
                 placeholder: 'Select Level 1',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/org-programs" }}'
+                    url: '/sysadmin/org-list/1/1'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -175,7 +175,7 @@
                 placeholder: 'Select Level 2',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/org-divisions" }}'
+                    url: '/sysadmin/org-list/1/2'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -208,7 +208,7 @@
                 placeholder: 'Select Level 3',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/org-branches" }}'
+                    url: '/sysadmin/org-list/1/3'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -242,7 +242,7 @@
                 placeholder: 'Select level 4',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/org-level4" }}'
+                    url: '/sysadmin/org-list/1/4'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {

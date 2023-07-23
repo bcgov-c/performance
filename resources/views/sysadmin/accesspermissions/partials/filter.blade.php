@@ -46,14 +46,14 @@
             <label for="criteria">Search Criteria</label>
             <select id="criteria" name="criteria" class="form-control">
                 @foreach( $criteriaList as $key => $value )
-                    <option value="{{ $key }}" {{  old('criteria') == $key ? 'selected' : '' }} >{{ $value }}</option>
+                    <option value="{{ $key }}" >{{ $value }}</option>
                 @endforeach
             </select>
         </div>
         <div class="form-group col-md-2">
             <label for="search_text">Search Text</label>
             <input type="text" id="search_text" name="search_text" class="form-control" 
-                    value="{{ old('search_text') }}" placeholder="Search Text">
+                    value="" placeholder="Search Text">
         </div>
         <div class="form-group col-md-2 p-3 float-left float-bottom" style="display: flex; flex-direction: column;">
             <div class="form-group row"> </div>
@@ -108,7 +108,7 @@
             scrollX: true,
             stateSave: true,
             ajax: {
-                url: '/sysadmin/org-organizations'
+                url: '/sysadmin/org-list/1/0'
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -140,7 +140,7 @@
             scrollX: true,
             stateSave: true,
             ajax: {
-                url: '/sysadmin/org-programs' 
+                url: '/sysadmin/org-list/1/1' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -173,7 +173,7 @@
             scrollX: true,
             stateSave: true,
             ajax: {
-                url: '/sysadmin/org-divisions' 
+                url: '/sysadmin/org-list/1/2' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -207,7 +207,7 @@
             scrollX: true,
             stateSave: true,
             ajax: {
-                url: '/sysadmin/org-branches' 
+                url: '/sysadmin/org-list/1/3' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -242,7 +242,7 @@
             scrollX: true,
             stateSave: true,
             ajax: {
-                url: '/sysadmin/org-level4' 
+                url: '/sysadmin/org-list/1/4' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -288,6 +288,10 @@
         $('#dd_level3').on('select2:select', function (e) {
             // Do something
             $('#dd_level4').val(null).trigger('change');
+        });
+
+        $('#dd_level4').on('select2:select', function (e) {
+            e.preventDefault();
         });
 
         $('#dd_level0').on('select2:unselect', function (e) {
@@ -373,7 +377,6 @@
             $('#dd_level2').val(null).trigger('change');
             $('#dd_level3').val(null).trigger('change');
             $('#dd_level4').val(null).trigger('change');
-            // $('#btn_search').click();
         });
 
     </script>

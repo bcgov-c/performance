@@ -68,7 +68,7 @@
                 <label for="criteria">Search Criteria</label>
                 <select id="criteria" name="criteria" class="form-control">
                     @foreach( $criteriaList as $key => $value )
-                        <option value="{{ $key }}" {{  old('criteria') == $key ? 'selected' : '' }} >{{ $value }}</option>
+                        <option value="{{ $key }}"  >{{ $value }}</option>
                     @endforeach
                 </select>
             </div>
@@ -76,7 +76,7 @@
             <div class="form-group col-md-2">
                 <label for="search_text">search</label>
                 <input type="text" id="search_text" name="search_text" class="form-control" 
-                        value="{{ old('search_text') }}" placeholder="Employee name">
+                        value="" placeholder="Employee name">
             </div>
 
         </div>
@@ -123,7 +123,7 @@
         placeholder: 'select organization',
         allowClear: true,
         ajax: {
-            url: '/sysadmin/notifications/org-organizations'
+            url: '/sysadmin/org-list/1/0'
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -145,7 +145,7 @@
         placeholder: 'select program',
         allowClear: true,
         ajax: {
-            url: '/sysadmin/notifications/org-programs' 
+            url: '/sysadmin/org-list/1/1' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -168,7 +168,7 @@
         placeholder: 'select division',
         allowClear: true,
         ajax: {
-            url: '/sysadmin/notifications/org-divisions' 
+            url: '/sysadmin/org-list/1/2' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -192,7 +192,7 @@
         placeholder: 'select branch',
         allowClear: true,
         ajax: {
-            url: '/sysadmin/notifications/org-branches' 
+            url: '/sysadmin/org-list/1/3' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {
@@ -217,7 +217,7 @@
         placeholder: 'select level 4',
         allowClear: true,
         ajax: {
-            url: '/sysadmin/notifications/org-level4' 
+            url: '/sysadmin/org-list/1/4' 
             , dataType: 'json'
             , delay: 250
             , data: function(params) {

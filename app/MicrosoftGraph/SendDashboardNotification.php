@@ -51,7 +51,8 @@ class SendDashboardNotification
 
         // Eligible User's organization (check against Allow Access Oragnizations)
         // $user = User::join('employee_demo','employee_demo.guid','users.guid')
-        //                 ->join('access_organizations','employee_demo.organization','access_organizations.organization')
+                // ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+        //                 ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
         //                 ->where('access_organizations.allow_inapp_msg', 'Y')
         //                 ->whereNull('date_deleted')                                                
         //                 ->where('users.id',  $this->user_id)

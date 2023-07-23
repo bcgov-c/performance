@@ -46,14 +46,14 @@
             <label for="ecriteria">Search Criteria</label>
             <select id="ecriteria" name="ecriteria" class="form-control">
                 @foreach( $ecriteriaList as $key => $value )
-                    <option value="{{ $key }}" {{  old('ecriteria') == $key ? 'selected' : '' }} >{{ $value }}</option>
+                    <option value="{{ $key }}" >{{ $value }}</option>
                 @endforeach
             </select>
         </div>
         <div class="form-group col-md-2">
             <label for="esearch_text">Search Text</label>
             <input type="text" id="esearch_text" name="esearch_text" class="form-control" 
-                value="{{ old('esearch_text') }}" placeholder="Search Text">
+                value="" placeholder="Search Text">
         </div>
         <div class="form-group col-md-2 p-3" style="text-align:left; vertical-align:bottom;">
             <div class="form-group row"> 
@@ -151,7 +151,7 @@
                 placeholder: 'Select Organization',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/eorg-organizations" }}'
+                    url: '{{ "/".request()->segment(1)."/org-list/2/0" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -173,7 +173,7 @@
                 placeholder: 'Select Level 1',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/eorg-programs" }}'
+                    url: '{{ "/".request()->segment(1)."/org-list/2/1" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -196,7 +196,7 @@
                 placeholder: 'Select Level 2',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/eorg-divisions" }}'
+                    url: '{{ "/".request()->segment(1)."/org-list/2/2" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -220,7 +220,7 @@
                 placeholder: 'Select Level 3',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/eorg-branches" }}'
+                    url: '{{ "/".request()->segment(1)."/org-list/2/3" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -245,7 +245,7 @@
                 placeholder: 'Select Level 4',
                 allowClear: true,
                 ajax: {
-                    url: '{{ "/" . request()->segment(1) . "/eorg-level4" }}'
+                    url: '{{ "/".request()->segment(1)."/org-list/2/4" }}'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {

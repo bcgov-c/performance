@@ -21,18 +21,18 @@
 
 @push('css')
 
-    <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 	<style>
-	#employee-list-table_filter label {
-		text-align: right !important;
-        padding-right: 10px;
-	} 
+        #employee-list-table_filter label {
+            text-align: right !important;
+            padding-right: 10px;
+        } 
     </style>
 @endpush
 
 @push('js')
-    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
 
     <script>
     
@@ -48,13 +48,14 @@
                 select: true,
                 order: [[1, 'asc']],
                 ajax: {
-                    url: '{{ route(request()->segment(1).'.goalbank.employee.list') }}',
+                    url: '/'+'{{ request()->segment(1) }}'+'/goalbank/employee-list',
                     data: function (d) {
                         d.dd_level0 = $('#dd_level0').val();
                         d.dd_level1 = $('#dd_level1').val();
                         d.dd_level2 = $('#dd_level2').val();
                         d.dd_level3 = $('#dd_level3').val();
                         d.dd_level4 = $('#dd_level4').val();
+                        d.dd_superv = $('#dd_superv').val();
                         d.criteria = $('#criteria').val();
                         d.search_text = $('#search_text').val();
                     }
@@ -89,6 +90,7 @@
                     {title: '<input name="select_all" value="1" id="employee-list-select-all" type="checkbox" />', ariaTitle: 'employee-list-select-all', target: 0, type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
                     {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', className: 'dt-nowrap'},
                     {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', className: 'dt-nowrap'},
+                    {title: 'Supervisor', ariaTitle: 'Supervisor', target: 0, type: 'string', data: 'isSupervisor', name: 'isSupervisor', searchable: true, className: 'dt-nowrap'},
                     {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', className: 'dt-nowrap'},
                     {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'employee_email', className: 'dt-nowrap'},
                     {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', className: 'dt-nowrap'},

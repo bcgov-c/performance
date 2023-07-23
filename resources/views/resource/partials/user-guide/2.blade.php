@@ -4,29 +4,27 @@
 <br>
 <u>My Current Goals</u>
 <br><br>
-<p>This is the area for all the goals you are currently working on. You can add goals to this area in three different ways.</p>
+<p>This is the area for all the goals you are currently working on. You can add goals to this area in two different ways.</p>
 
 <ol>    
-    <li>Click “Create New Goal”. This will launch a form that walks you through the process of creating a goal from the very beginning. There are helpful tips and examples available right in the form itself. You may also want to read the <a href='/resource/goal-setting' target=\'_blank\'>Goal Setting</a> resource to make your goals as strong as possible.</li>         
+<!-- <li>Click “Create New Goal”. This will launch a form that walks you through the process of creating a goal from the very beginning. There are helpful tips and examples available right in the form itself. You may also want to read the <a href='/resource/goal-setting' target=\'_blank\'>Goal Setting</a> resource to make your goals as strong as possible.</li>          -->
+<li>Click “Create New Goal”. This will launch a form that walks you through the process of creating a goal from the very beginning. There are helpful tips and examples available right in the form itself. You may also want to read the <a href='/resources/goal-setting' target=\'_blank\'>Goal Setting</a> resource to make your goals as strong as possible.</li>         
     <br>
-    <li>Click “Add Goal from Goal Bank”. This takes you to a list of goals created for you by your supervisor or organization. Some goals will be marked as mandatory, but most are suggested starting points for you to consider. This is a good place to start if you want to search for goal ideas on a certain topic. You will receive a notification when a new goal is added to your Goal Bank. <br><br> Click on a goal to view it and add it to your own profile. If needed, you can edit the goal to personalize it once it is in your own profile. </li> 
-    <br>
-    <li>Click the “My Supervisor&rsquo;s Goals” tab. This takes you to a list of goals that your supervisor is currently working on and has decided to share with you. You can use this information to align your own goals where possible. You can also copy your supervisor&rsquo;s goal to your own profile and modify or personalize it without having any impact on your supervisor's original goal.</li>
+    <li>Click “Add Goal from Goal Bank”. This takes you to a list of goals created for you by your supervisor or organization. Some goals will be marked as mandatory, but most are just suggested starting points for you to consider. This is a good place to start if you want to search for goal ideas on a certain topic. You will receive a notification when a new goal is added to your Goal Bank. <br><br> Click on a goal to view it and add it to your own profile. If needed, you can edit the goal to personalize it once it is in your own profile. </li>    
 </ol>
-<p>Once you have added a new goal to your My Current Goals tab, you will see it display as a clickable card. You can open the goal card to edit the content or add comments. You can also change the status of the goal if it has been achieved, not met, cancelled or deferred. Once you change the status, the goal will be transferred to your My Past Goals tab.</p>
-<p><i>Supervisor Tip: you will see an additional option on your goal cards called “Shared with”. This dropdown menu allows you to make a goal visible to selected employees. This lets team members know what you are working on and may help team members set their own goals. By default, all your goals are private.</i></p>
+<p>Once you have added a goal to your My Current Goals tab, you will see it displayed as a clickable list item. You can open the goal to edit the content or add comments. You can also change the status of the goal if it has been achieved or needs to be archived. Once you change the status, the goal will be transferred to your My Past Goals tab.</p>
+<p>You will also have the option to share the goal with other users using the “Shared With” dropdown menu. Sharing a goal with someone adds it to their “Goals Shared with Me” tab and allows them to view the goal and add comments. This is a great way to collaborate on a common goal with your colleagues. As the creator of the shared goal, when you change the status to achieved or archived, the goal will move to the My Past Goals tab for everyone who has access to it.</p>
 <br>
 
 <u>My Past Goals</u>
 <br><br>
-<p>This area lists all your goals that have previously been achieved, not met, cancelled, or deferred. You can reactivate the goals by changing the status to “Active” and moving them to back to your My Current Goals tab.</p>
-<p>This list can be a useful reference point to recall all the work you&rsquo;ve done when preparing for performance conversations or applying for a new position.</p>
+<p>This area lists all your goals that have previously been achieved or archived. You can reactivate the goals by changing the status to “Active” and moving them to back to your My Current Goals tab.</p>
+<p>This can be a useful reference point to recall all the work you&rsquo;ve done when preparing for performance conversations or applying for a new position.</p>
 <br>
 
-<u>My Supervisor&rsquo;s Goals</u>
+<u>Goals Shared with Me</u>
 <br><br>
-<p>This area lists any goals have been shared with you by your supervisor. You can view them to see what your supervisor is working on and use this information to align your own goals where possible. You can also comment on the goals that have been shared with you.</p> 
-<p>There is also the option to copy your supervisor&rsquo;s goal to your own profile and modify or personalize it without having any impact on your supervisor's original goal.</p>
+<p>This area lists any goals that have been shared with you by a colleague. You can view and comment on these goals and collaborate with others to track progress.  Note that whoever created the goal is the one that can change the goal status to achieved or archived.</p> 
 <br>
 
 <u>Goal Bank</u>

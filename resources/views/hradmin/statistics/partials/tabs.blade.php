@@ -4,6 +4,13 @@
           Goals Summary
         </x-button>
     </div>
+    <!-----
+    <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'hradmin.statistics.conversationstatus' ? 'border-primary' : ''}}">
+        <x-button role="tab" :href="route('hradmin.statistics.conversationstatus')" style="">
+          Conversations Status
+        </x-button>
+    </div>
+    ------>
     <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'hradmin.statistics.conversationsummary' ? 'border-primary' : ''}}">
         <x-button role="tab" :href="route('hradmin.statistics.conversationsummary')" style="">
           Conversations Summary

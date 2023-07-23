@@ -97,19 +97,29 @@ class NotifyConversationDue extends Command
         $row_count = 0;
 
         // Eligible Users (check against Allow Access Oragnizations)
-        $sql = User::join('employee_demo','employee_demo.guid','users.guid')
-                        ->join('access_organizations','employee_demo.organization','access_organizations.organization')
-                        ->where('employee_demo.guid','<>','')
-                        ->where('users.due_date_paused', 'N')
-                        ->where('access_organizations.allow_inapp_msg', 'Y')
-                        ->whereNull('employee_demo.date_deleted')
-// ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                                                    
-                        ->select('users.*')
-                        ->orderBy('users.guid')
-                        ->orderBy('users.id', 'desc');
+        // $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+        //     ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+        //     ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+        //     ->where('employee_demo.guid','<>','')
+        //     ->where('users.due_date_paused', 'N')
+        //     ->where('access_organizations.allow_inapp_msg', 'Y')
+        //     ->whereNull('employee_demo.date_deleted')
+        //     ->select('users.*')
+        //     ->orderBy('users.guid')
+        //     ->orderBy('users.id', 'desc');
+        $sql = User::join(\DB::raw('employee_demo USE INDEX (idx_employee_demo_employeeid_orgid)'),'employee_demo.employee_id','users.employee_id')
+            ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+            ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+            ->where('employee_demo.guid','<>','')
+            ->where('users.due_date_paused', 'N')
+            ->where('access_organizations.allow_inapp_msg', 'Y')
+            ->whereNull('employee_demo.date_deleted')
+            ->select('users.*')
+            ->orderBy('users.guid')
+            ->orderBy('users.id', 'desc');
 
         $prev_guid = '';
-        $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
+        $sql->chunk(10000, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
 
             foreach ($chunk as $index => $user) {
 
@@ -117,7 +127,7 @@ class NotifyConversationDue extends Command
                 if ($user->guid == $prev_guid) {
                     continue;
                 }
-
+                $prev_guid = $user->guid;
                 $row_count += 1;
 
                 //$due = Conversation::nextConversationDue( $user );
@@ -131,7 +141,7 @@ class NotifyConversationDue extends Command
 
                 $dueIndays = 0;
                 $msg = '';
-                if ($dayDiff >= 7 and $dayDiff <= 30) {
+                if ($dayDiff >= 7 and $dayDiff < 30) {
                     $msg = 'REMINDER - your next conversation is due by ' . $due ;
                     $dueIndays = 30;
                 }
@@ -142,6 +152,12 @@ class NotifyConversationDue extends Command
                 if ($dayDiff < 0) {  
                     $msg = 'OVERDUE - your next conversation is due by ' .  $due ;
                     $dueIndays = 0;
+                }
+
+                // To avoid the past email sent out when the sysadmin turn on global flag under system access control
+                if ( ($dayDiff < 0 && $dueDate < today()->subDays(6)) ||
+                     ($dayDiff >= 0 && $dueDate < today()) ) {
+                    $msg = '';
                 }
 
                 if ($msg) {
@@ -156,7 +172,7 @@ class NotifyConversationDue extends Command
                                         ->first();
 
                     if (!$log) {
-                        $this->logInfo( $now->format('Y-m-d') . ' - A - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
+                        $this->logInfo( $now->format('Y-m-d') . ' - A - ' . $user->id . ' (' . $user->employee_id . ')' . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
                         $sent_count += 1;
 
 
@@ -208,8 +224,6 @@ class NotifyConversationDue extends Command
                     $skip_count += 1;
                 }
 
-                $prev_guid = $user->guid;
-
             }
 
         });
@@ -228,19 +242,29 @@ class NotifyConversationDue extends Command
         $row_count = 0;
 
         // Eligible Users (check against Allow Access Oragnizations)
-        $sql = User::join('employee_demo','employee_demo.guid','users.guid')
-                    ->join('access_organizations','employee_demo.organization','access_organizations.organization')
-                    ->where('employee_demo.guid','<>','')
-                    ->where('users.due_date_paused', 'N')
-                    ->where('access_organizations.allow_inapp_msg', 'Y')
-                    ->whereNull('date_deleted')
-//->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                            
-                    ->select('users.*')
-                    ->orderBy('users.guid')
-                    ->orderBy('users.id', 'desc');
+        // $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+        //     ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+        //     ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+        //     ->where('employee_demo.guid','<>','')
+        //     ->where('users.due_date_paused', 'N')
+        //     ->where('access_organizations.allow_inapp_msg', 'Y')
+        //     ->whereNull('date_deleted')
+        //     ->select('users.*')
+        //     ->orderBy('users.guid')
+        //     ->orderBy('users.id', 'desc');
+        $sql = User::join(\DB::raw('employee_demo USE INDEX (idx_employee_demo_employeeid_orgid)'),'employee_demo.employee_id','users.employee_id')
+            ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+            ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+            ->where('employee_demo.guid','<>','')
+            ->where('users.due_date_paused', 'N')
+            ->where('access_organizations.allow_inapp_msg', 'Y')
+            ->whereNull('date_deleted')
+            ->select('users.*')
+            ->orderBy('users.guid')
+            ->orderBy('users.id', 'desc');
 
         $prev_guid = '';    
-        $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
+        $sql->chunk(10000, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
 
             foreach ($chunk as $index => $user) {
 
@@ -252,13 +276,15 @@ class NotifyConversationDue extends Command
                 // $row_count += 1;
 
                 // Look for direct report manager and Shared with
-                $manager_ids = SharedProfile::where('shared_id', $user->id)
-                                    ->where('shared_item', 'like',  '%"2"%' ) 
-                                    ->orderBy('id')
-                                    ->pluck('shared_with');
-                if ($user->reporting_to) {        
-                    $manager_ids->push($user->reporting_to);
-                }
+                // $manager_ids = SharedProfile::where('shared_id', $user->id)
+                //                     ->where('shared_item', 'like',  '%"2"%' ) 
+                //                     ->orderBy('id')
+                //                     ->pluck('shared_with');
+                // if ($user->reporting_to) {        
+                //     $manager_ids->push($user->reporting_to);
+                // }
+
+                $manager_ids = $this->getSupervisorList($user); 
 
                 // if no manager found, then next 
                 if ($manager_ids->count() == 0) {
@@ -271,15 +297,24 @@ class NotifyConversationDue extends Command
                     $row_count += 1;
 
                     // check whether the manager can recieve In-App Message
-                    $mgr = User::join('employee_demo','employee_demo.guid','users.guid')
-                                ->join('access_organizations','employee_demo.organization','access_organizations.organization')
-                                ->where('access_organizations.allow_inapp_msg', 'Y')
-                                ->whereNull('date_deleted')                                                
-                                ->where('users.id',  $manager_id)
-                                ->first();
+                    // $mgr = User::join('employee_demo','employee_demo.guid','users.guid')
+                    //     ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                    //     ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+                    //     ->where('access_organizations.allow_inapp_msg', 'Y')
+                    //     ->whereNull('date_deleted')                                                
+                    //     ->where('users.id',  $manager_id)
+                    //     ->first();
+                    $mgr = User::join(\DB::raw('employee_demo USE INDEX (idx_employee_demo_employeeid_orgid)'),'employee_demo.employee_id','users.employee_id')
+                        ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                        ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+                        ->where('access_organizations.allow_inapp_msg', 'Y')
+                        ->whereNull('date_deleted')                                                
+                        ->where('users.id',  $manager_id)
+                        ->first();
 
                     if (!$mgr) {
-                        $this->logInfo( Carbon::now()->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . '  ** SKIPPED ** (MANAGER PREFER NOT TO RECECIVED EMAIL OR ORG IS NOT ALLOW EMAIL)' );
+                        $this->logInfo( Carbon::now()->format('Y-m-d') . ' - E - ' .  $manager_id . ' (' . ($mgr ? $mgr->employee_id : '      ') . ') - '  .
+                                $user->id . ' (' . $user->employee_id . ')' . '  ** SKIPPED ** (MANAGER PREFER NOT TO RECECIVED EMAIL OR ORG IS NOT ALLOW EMAIL)' );
                         $skip_count += 1;
                         continue;
                     }
@@ -295,7 +330,7 @@ class NotifyConversationDue extends Command
 
                     $dueIndays = 0;
                     $msg = '';
-                    if ($dayDiff >= 7 and $dayDiff <= 30) {
+                    if ($dayDiff >= 7 and $dayDiff < 30) {
                         $msg = 'REMINDER - ' . $user->name . '\'s next conversation is due by ' . $due ;
                         $dueIndays = 30;
                     }
@@ -306,6 +341,12 @@ class NotifyConversationDue extends Command
                     if ($dayDiff < 0) {  
                         $msg = 'OVERDUE - ' . $user->name . '\'s next conversation is due by ' . $due ;
                         $dueIndays = 0;
+                    }
+
+                    // To avoid the past email sent out when the sysadmin turn on global flag under system access control
+                    if ( ($dayDiff < 0 && $dueDate < today()->subDays(6)) ||
+                         ($dayDiff >= 0 && $dueDate < today()) ) {
+                        $msg = '';
                     }
 
                     if ($msg) {
@@ -320,7 +361,8 @@ class NotifyConversationDue extends Command
                                             ->first();
 
                         if (!$log) {
-                            $this->logInfo( $now->format('Y-m-d') . ' - A - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
+                            $this->logInfo( $now->format('Y-m-d') . ' - A - ' .  $manager_id . ' (' . ($mgr ? $mgr->employee_id : '      ') . ') - '  .
+                                $user->id . ' (' . $user->employee_id . ')' . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
                             $sent_count += 1;
         
                             // Use Class to create DashboardNotification
@@ -392,20 +434,29 @@ class NotifyConversationDue extends Command
         $row_count = 0;
 
         // Eligible Users (check against Allow Access Oragnizations)
-        $sql = User::join('employee_demo','employee_demo.guid','users.guid')
-                        ->join('access_organizations','employee_demo.organization','access_organizations.organization')
-                        ->where('employee_demo.guid','<>','')
-                        ->where('access_organizations.allow_email_msg', 'Y')
-                        ->whereNull('employee_demo.date_deleted')
-                        ->where('users.due_date_paused', 'N')
-                        ->select('users.*')
-//  ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                                     
-// ->whereIn('users.id',['365129','367485','391595'])
-                        ->orderBy('users.guid')
-                        ->orderBy('users.id', 'desc');
+        // $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+        //     ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+        //     ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+        //     ->where('employee_demo.guid','<>','')
+        //     ->where('access_organizations.allow_email_msg', 'Y')
+        //     ->whereNull('employee_demo.date_deleted')
+        //     ->where('users.due_date_paused', 'N')
+        //     ->select('users.*')
+        //     ->orderBy('users.guid')
+        //     ->orderBy('users.id', 'desc');
+        $sql = User::join(\DB::raw('employee_demo USE INDEX (idx_employee_demo_employeeid_orgid)'),'employee_demo.employee_id','users.employee_id')
+            ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+            ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+            ->where('employee_demo.guid','<>','')
+            ->where('access_organizations.allow_email_msg', 'Y')
+            ->whereNull('employee_demo.date_deleted')
+            ->where('users.due_date_paused', 'N')
+            ->select('users.*')
+            ->orderBy('users.guid')
+            ->orderBy('users.id', 'desc');
 
         $prev_guid = '';
-        $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
+        $sql->chunk(10000, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
 
             foreach ($chunk as $index => $user) {
 
@@ -413,7 +464,7 @@ class NotifyConversationDue extends Command
                 if ($user->guid == $prev_guid) {
                     continue;
                 }
-
+                $prev_guid = $user->guid;
                 $row_count += 1;
 
                 // User Prference 
@@ -439,7 +490,7 @@ class NotifyConversationDue extends Command
                 $bSend = false;
                 $bind1 = $user->name;
                 $bind2 = $dueDate->format('M d, Y');
-                if ($dayDiff >= 7 and $dayDiff <= 30) {
+                if ($dayDiff >= 7 and $dayDiff < 30) {
                     $dueIndays = 30;
                     if ($pref->conversation_due_month == 'Y') {
                         // $subject = 'REMINDER - your next performance conversation is due in 1 month';
@@ -460,7 +511,13 @@ class NotifyConversationDue extends Command
                         $bSend = true;
                     }
                 }
-        
+
+                // To avoid the past email sent out when the sysadmin turn on global flag under system access control
+                if ( ($dayDiff < 0 && $dueDate < today()->subDays(6)) ||
+                     ($dayDiff >= 0 && $dueDate < today()) ) {                    
+                    $bSend = false;
+                }
+
                 if ($bSend) {
 
                     // check the notification sent or not 
@@ -474,7 +531,7 @@ class NotifyConversationDue extends Command
 
                     // Send Email for team members
                     if (!$log) {
-                        $this->logInfo( $now->format('Y-m-d') . ' - E - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
+                        $this->logInfo( $now->format('Y-m-d') . ' - E - ' . $user->id . ' (' . $user->employee_id . ')' .' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
                         $sent_count += 1;
 
                         $sendMail = new \App\MicrosoftGraph\SendMail();
@@ -506,8 +563,6 @@ class NotifyConversationDue extends Command
                     $skip_count += 1;
                 }
 
-                $prev_guid = $user->guid;
-
             }
 
         });
@@ -526,19 +581,29 @@ class NotifyConversationDue extends Command
         $row_count = 0;
 
         // Eligible Users (check against Allow Access Oragnizations)
-        $sql = User::join('employee_demo','employee_demo.guid','users.guid')
-                        ->join('access_organizations','employee_demo.organization','access_organizations.organization')
-                        ->where('employee_demo.guid','<>','')
-                        ->where('access_organizations.allow_email_msg', 'Y')
-                        ->whereNull('employee_demo.date_deleted')
-                        ->where('users.due_date_paused', 'N')
-                    ->select('users.*')
-// ->whereIn('employee_demo.employee_id',['007745','132509','007707','139648'])                                            
-                    ->orderBy('users.guid')
-                    ->orderBy('users.id', 'desc');
+        // $sql = User::join('employee_demo','employee_demo.guid','users.guid')
+        //     ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+        //     ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+        //     ->where('employee_demo.guid','<>','')
+        //     ->where('access_organizations.allow_email_msg', 'Y')
+        //     ->whereNull('employee_demo.date_deleted')
+        //     ->where('users.due_date_paused', 'N')
+        //     ->select('users.*')
+        //     ->orderBy('users.guid')
+        //     ->orderBy('users.id', 'desc');
+        $sql = User::join(\DB::raw('employee_demo USE INDEX (idx_employee_demo_employeeid_orgid)'),'employee_demo.employee_id','users.employee_id')
+            ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+            ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+            ->where('employee_demo.guid','<>','')
+            ->where('access_organizations.allow_email_msg', 'Y')
+            ->whereNull('employee_demo.date_deleted')
+            ->where('users.due_date_paused', 'N')
+            ->select('users.*')
+            ->orderBy('users.guid')
+            ->orderBy('users.id', 'desc');
 
         $prev_guid = '';
-        $sql->chunk(500, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
+        $sql->chunk(10000, function($chunk) use(&$sent_count, &$skip_count, &$row_count, &$prev_guid) {
 
             foreach ($chunk as $index => $user) {
 
@@ -550,13 +615,15 @@ class NotifyConversationDue extends Command
                 // $row_count += 1;
 
                 // Look for direct report manager and Shared with
-                $manager_ids = SharedProfile::where('shared_id', $user->id)
-                                    ->where('shared_item', 'like',  '%"2"%' ) 
-                                    ->orderBy('id')
-                                    ->pluck('shared_with');
-                if ($user->reporting_to) {        
-                    $manager_ids->push($user->reporting_to);
-                }
+                // $manager_ids = SharedProfile::where('shared_id', $user->id)
+                //                     ->where('shared_item', 'like',  '%"2"%' ) 
+                //                     ->orderBy('id')
+                //                     ->pluck('shared_with');
+                // if ($user->reporting_to) {        
+                //     $manager_ids->push($user->reporting_to);
+                // }
+
+                $manager_ids = $this->getSupervisorList($user); 
 
                 // if no manager found, then next 
                 if ($manager_ids->count() == 0) {
@@ -569,15 +636,25 @@ class NotifyConversationDue extends Command
                     $row_count += 1;
 
                     // check whether the manager can recieve In-App Message
-                    $mgr = User::join('employee_demo','employee_demo.guid','users.guid')
-                            ->join('access_organizations','employee_demo.organization','access_organizations.organization')
-                            ->where('access_organizations.allow_email_msg', 'Y')
-                            ->whereNull('date_deleted')                                                
-                            ->where('users.id',  $manager_id)
-                            ->first();
+                    // $mgr = User::join('employee_demo','employee_demo.guid','users.guid')
+                    //     ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                    //     ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+                    //     ->where('access_organizations.allow_email_msg', 'Y')
+                    //     ->whereNull('date_deleted')                                                
+                    //     ->where('users.id',  $manager_id)
+                    //     ->first();
+                    $mgr = User::join(\DB::raw('employee_demo USE INDEX (idx_employee_demo_employeeid_orgid)'),'employee_demo.employee_id','users.employee_id')
+                        ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                        ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
+                        ->where('access_organizations.allow_email_msg', 'Y')
+                        ->whereNull('date_deleted')                                                
+                        ->where('users.id',  $manager_id)
+                        ->select('users.*')
+                        ->first();
 
                     if (!$mgr) {
-                        $this->logInfo( Carbon::now()->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . '  ** SKIPPED ** (MANAGER PREFER NOT TO RECECIVED EMAIL OR ORG IS NOT ALLOW EMAIL)' );
+                        $this->logInfo( Carbon::now()->format('Y-m-d') . ' - E - ' .  $manager_id . ' (' . ($mgr ? $mgr->employee_id : '      ') . ') - '  .
+                        $user->id . ' (' . $user->employee_id . ')' . ' - ' . '  ** SKIPPED ** (MANAGER PREFER NOT TO RECECIVED EMAIL OR ORG IS NOT ALLOW EMAIL)' );
                         $skip_count += 1;
                         continue;
                     }
@@ -585,10 +662,10 @@ class NotifyConversationDue extends Command
 
 
                     // User Prference 
-                    $pref = UserPreference::where('user_id', $user->manager_id)->first();
+                    $pref = UserPreference::where('user_id', $mgr->id)->first();
                     if (!$pref) {
                         $pref = new UserPreference;
-                        $pref->user_id = $user->manager_id;
+                        $pref->user_id = $mgr->id;
                     }
 
                     // $due = Conversation::nextConversationDue( $user );
@@ -606,11 +683,11 @@ class NotifyConversationDue extends Command
                     $template = 'SUPV_CONV_REMINDER';
                     $bSend = false;
                     // $bind1 = $user->reportingManager->name;
-                    $bind1 = $user->reportingManager ? $user->reportingManager->name : '';
+                    $bind1 = $mgr->name;
                     $bind2 = $user->name;
                     $bind3 = $dueDate->format('M d, Y');
 
-                    if ($dayDiff >= 7 and $dayDiff <= 30) {
+                    if ($dayDiff >= 7 and $dayDiff < 30) {
                         $dueIndays = 30;
                         if ($pref->team_conversation_due_month == 'Y') {
                             // $subject = 'REMINDER - your next performance conversation is due in 1 month';
@@ -632,8 +709,13 @@ class NotifyConversationDue extends Command
                             $bSend = true;
                         }
                     }
-            
-                    if ($bSend) {
+
+                    // To avoid the past email sent out when the sysadmin turn on global flag under system access control
+                    if ($bSend && ($dueDate < today()->subDays(6)))  {
+                            $bSend = false;                        
+                    }                      
+
+                     if ($bSend) {
 
                         // check the notification sent or not 
                         $log = NotificationLog::where('alert_type', 'N')
@@ -646,7 +728,8 @@ class NotifyConversationDue extends Command
 
                         // Send Email for team members
                         if (!$log) {
-                            $this->logInfo( $now->format('Y-m-d') . ' - E - ' .  $manager_id . ' - ' . $user->id . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
+                            $this->logInfo( $now->format('Y-m-d') . ' - E - ' .  $manager_id . ' (' . ($mgr ? $mgr->employee_id : '      ') . ') - '  .
+                            $user->id . ' (' . $user->employee_id . ')' . ' - ' . $dueDate->format('Y-m-d') . ' - (' . $dayDiff . ') - ' . $dueIndays);
                             $sent_count += 1;
 
                             $sendMail = new \App\MicrosoftGraph\SendMail();
@@ -693,6 +776,45 @@ class NotifyConversationDue extends Command
 
     }
 
+    protected function getSupervisorList ($current_user) {
+
+        // Shared Profile
+        $manager_ids = SharedProfile::where('shared_id', $current_user->id)
+                        ->join('users','users.id','shared_profiles.shared_with')
+                        ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
+                        ->whereNull('employee_demo.date_deleted')
+                        ->where('shared_item', 'like',  '%"2"%' ) 
+                        ->orderBy('users.id')
+                        ->pluck('shared_with');
+
+        // Superviser
+        $supervisorList = $current_user->supervisorList();
+        $supervisorListCount = $current_user->supervisorListCount();
+        $preferredSupervisor = $current_user->preferredSupervisor();
+
+        if ($supervisorListCount <= 1) {
+            if ($current_user->reportingManager) {
+                $manager_ids->push( $current_user->reportingManager->id );
+            }
+        } else {
+            if (!$preferredSupervisor) {
+                if ($current_user->reportingManager) {
+                    $manager_ids->push( $current_user->reportingManager->id );
+                }
+            } else {
+                foreach ($supervisorList as $supv) {
+                    if ($supv->employee_id == $preferredSupervisor->supv_empl_id) {
+                        $manager_ids->push( $supv->id );
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $manager_ids;
+
+    }
+
 
     protected function logInfo($text) {
 
@@ -701,7 +823,7 @@ class NotifyConversationDue extends Command
 
         // write to log
         $this->task->details = $this->details;
-        $this->task->save();
+        // $this->task->save();
 
     }
 

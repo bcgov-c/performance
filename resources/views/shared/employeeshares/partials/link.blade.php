@@ -1,0 +1,1 @@
+<x-button style="link" class="shared-btn" data-user-row="{{$row}}" data-user-demo="{{$row->employee_demo}}" data-shared_status="{{$row->shared_status}}" data-user_id="{{$row->user_id}}" data-user-name="{{$row->employee_name}}" data-employee_name="{{$row->employee_name}}" data-toggle="modal" data-target="#employee-profile-sharing-modal">{{ $text }}</x-button>

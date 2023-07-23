@@ -41,7 +41,9 @@
                             </label>
                         </div>
                         <div class="col col-8">
-                            <x-input class="form-control" id="reason" name="reason" label="Reason for assigning" data-toggle="tooltip" data-placement="top" data-trigger="hover-focus" tooltip="Reason tooltip"/>
+                            <b> Access Description </b>
+                            <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="List org levels (i.e. BCPSA - All; or SDPR - Corporate Services) followed by the role of the individual (i.e. SHR, Ambassador, Reporting). Full example: BCPSA - Corporate Workforce Strategies: Ambassador."> </i>
+                            <x-input class="form-control" id="reason" name="reason" aria-label="Access Description"/>
                         </div>
                     </div>
                     <table class="table table-bordered admintable table-striped" id="admintable" name="admintable" style="width: 100%; overflow-x: auto; "></table>

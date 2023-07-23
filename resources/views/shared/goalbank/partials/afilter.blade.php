@@ -42,6 +42,19 @@
         </div>
         <div class="form-group col-md-2" id="ablank5th">
         </div>
+        @if ($currentView == "editone")
+            <div class="form-group col-md-2" id="asuperv_group">
+                <div class="mb-2">
+                    <b> Supervisor Status </b> 
+                    <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='This filter includes direct reports from PeopleSoft and delegated reports in the PDP.'> </i> 
+                </div>
+                <select id="add_superv" name="add_superv" class="form-control select2">
+                    @foreach( $supervisorList as $key => $value )
+                        <option value="{{ $key }}" {{  old('add_superv') == $key ? 'selected' : '' }} >{{ $value }}</option>
+                    @endforeach
+                </select>
+            </div>
+        @endif
         <div class="form-group col-md-2" id="acriteria_group">
             <label for="acriteria">Search Criteria</label>
             <select id="acriteria" name="acriteria" class="form-control">
@@ -95,7 +108,7 @@
             placeholder: 'Select Organization',
             allowClear: true,
             ajax: {
-                url: '{{ "/" . request()->segment(1) . "/aorg-organizations" }}'
+                url: '{{ "/".request()->segment(1)."/org-list/3/0" }}'
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -117,7 +130,7 @@
             placeholder: 'Select Level 1',
             allowClear: true,
             ajax: {
-                url: '{{ "/" . request()->segment(1) . "/aorg-programs" }}'
+                url: '{{ "/".request()->segment(1)."/org-list/3/1" }}'
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -140,7 +153,7 @@
             placeholder: 'Select Level 2',
             allowClear: true,
             ajax: {
-                url: '{{ "/" . request()->segment(1) . "/aorg-divisions" }}'
+                url: '{{ "/".request()->segment(1)."/org-list/3/2" }}'
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -164,7 +177,7 @@
             placeholder: 'Select Level 3',
             allowClear: true,
             ajax: {
-                url: '{{ "/" . request()->segment(1) . "/aorg-branches" }}'
+                url: '{{ "/".request()->segment(1)."/org-list/3/3" }}'
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -189,7 +202,7 @@
             placeholder: 'Select Level 4',
             allowClear: true,
             ajax: {
-                url: '{{ "/" . request()->segment(1) . "/aorg-level4" }}'
+                url: '{{ "/".request()->segment(1)."/org-list/3/4" }}'
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -237,12 +250,16 @@
             $('#add_level4').val(null).trigger('change');
         });
 
-        $('#abtn_search_reset').click(function() {
-            $('#add_level0').val(null).trigger('change');
-            $('#add_level1').val(null).trigger('change');
-            $('#add_level2').val(null).trigger('change');
-            $('#add_level3').val(null).trigger('change');
-            $('#add_level4').val(null).trigger('change');
+        $('#abtn_search_reset').click(function(e) {
+        	e.preventDefault();
+        	$('#acriteria').val('all');
+        	$('#asearch_text').val(null);
+        	$('#add_superv').val('all');
+        	$('#add_level0').val(null);
+        	$('#add_level1').val(null);
+        	$('#add_level2').val(null);
+        	$('#add_level3').val(null);
+        	$('#add_level4').val(null);
         });
 
     </script>

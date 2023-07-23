@@ -8,6 +8,12 @@
 
     <p class="px-3">Use the table below to modify or delete goals currently in the goal bank. Changes to content will be updated in employee goal banks as soon as you save the new version. You can also edit the audience if you want to add or remove individuals or business units.</p>
 
+
+
+
+    <p class="px-3"><b>Be very careful modifying or deleting goals that were created by other people!</b> Your changes will impact everyone in the audience, not just those in your authorized area. If in doubt, connect with the original goal creator to discuss before taking any action.</p>
+
+
     <div class="card">
         <div class="card-body">
             <!-- <div class="h5">{{__('Manage Goals in Goal Bank')}}</div> -->
@@ -44,9 +50,9 @@
 
 
 @push('css')
-    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
     <x-slot name="css">
-        <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
         <style>
             .text-truncate-30 {
                 white-space: wrap; 
@@ -70,8 +76,8 @@
 @endpush
 
 @push('js')
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
     <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
     <script type="text/javascript">
 
@@ -123,39 +129,20 @@
                     },
                     columns: 
                     [
-                        {title: 'Goal Title', ariaTitle: 'Goal Title', target: 0, type: 'string', data: 'click_title'
-                            , name: 'click_title', searchable: true, className: 'dt-nowrap'},
-                        {title: 'Goal Type', ariaTitle: 'Goal Type', target: 0, type: 'string', data: 'click_goal_type'
-                            , name: 'click_goal_type', searchable: true, className: 'dt-nowrap'},
-                        {title: 'Mandatory', ariaTitle: 'Mandatory', target: 0, type: 'string', data: 'mandatory'
-                            , name: 'mandatory', searchable: true, className: 'dt-nowrap'},
-                        {title: 'Goal Creation Date', ariaTitle: 'Goal Creation Date', target: 0, type: 'date', data: 'created_at'
-                            , name: 'created_at', searchable: true, className: 'dt-nowrap'},
-                        {title: 'Created By', ariaTitle: 'Created By', target: 0, type: 'string', data: 'click_creator_name'
-                            , name: 'click_creator_name', searchable: true, className: 'dt-nowrap'},
-                        {title: 'Individual Audience', ariaTitle: 'Individual Audience', target: 0, type: 'num', data: 'audience'
-                            , name: 'audience', searchable: true},
-                        {title: 'Business Unit Audience', ariaTitle: 'Business Unit Audience', target: 0, type: 'num', data: 'org_audience'
-                            , name: 'org_audience', searchable: true},
-                        {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action'
-                            , name: 'action', orderable: false, searchable: false},
-                        {title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'string', data: 'id'
-                            , name: 'id', searchable: false, visible: false},
+                        {title: 'Goal Title', ariaTitle: 'Goal Title', target: 0, type: 'string', data: 'click_title', name: 'click_title', searchable: true, className: 'dt-nowrap'},
+                        {title: 'Goal Type', ariaTitle: 'Goal Type', target: 0, type: 'string', data: 'click_goal_type', name: 'click_goal_type', searchable: true, className: 'dt-nowrap'},
+                        {title: 'Mandatory', ariaTitle: 'Mandatory', target: 0, type: 'string', data: 'mandatory', name: 'mandatory', searchable: true, className: 'dt-nowrap'},
+                        {title: 'Goal Creation Date', ariaTitle: 'Goal Creation Date', target: 0, type: 'date', data: 'created_at', name: 'created_at', searchable: true, className: 'dt-nowrap'},
+                        {title: 'Created By', ariaTitle: 'Created By', target: 0, type: 'string', data: 'click_creator_name', name: 'click_creator_name', searchable: true, className: 'dt-nowrap'},
+                        {title: 'Individual Audience', ariaTitle: 'Individual Audience', target: 0, type: 'num', data: 'audience', name: 'audience', searchable: true},
+                        {title: 'Business Unit Audience', ariaTitle: 'Business Unit Audience', target: 0, type: 'num', data: 'org_audience', name: 'org_audience', searchable: true},
+                        {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},
+                        {title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'string', data: 'id', name: 'id', searchable: false, visible: false},
                     ]
                 } );
             });
 
             $('#btn_search').click();
-
-            $('#criteria').change(function (e){
-                e.preventDefault();
-                $('#btn_search').click();
-            });
-
-            $('#search_text').change(function (e){
-                e.preventDefault();
-                $('#btn_search').click();
-            });
 
             $('#search_text').keydown(function (e){
                 if (e.keyCode == 13) {
@@ -164,12 +151,12 @@
                 }
             });
 
-            $('#btn_search_reset').click(function(e) {
-                e.preventDefault();
-                $('#criteria').val('all');
-                $('#search_text').val(null);
-                $('#btn_search').click();
-            });
+            // $('#btn_search_reset').click(function(e) {
+            //     e.preventDefault();
+            //     $('#criteria').val('all');
+            //     $('#search_text').val(null);
+            //     // $('#btn_search').click();
+            // });
         });
 
         $(window).on('beforeunload', function(){

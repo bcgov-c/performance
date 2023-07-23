@@ -6,9 +6,16 @@
         </div>
     </div>
 
+    <div class="p-3">
+        <p>
+            This tab lists all instances where an employee was excused from the PDP process in the past. It can be used to help understand and troubleshoot 
+            why an employee’s next conversation due date was previously paused or restarted.
+        </p>
+    </div>
+
     <div class="card">
-        <div class="card-body">
-            @include('shared.excuseemployees.partials.filter')
+        <div class="card-body">            
+            @include('shared.excuseemployees.partials.filter')            
             <div class="p-3">  
                 <table class="table table-bordered filtertable table-striped" id="filtertable" style="width: 100%; overflow-x: auto; "></table>
             </div>
@@ -19,9 +26,9 @@
         <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}">
     @endpush
     @push('css')
-        <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
         <x-slot name="css">
-            <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+            <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
             <style>
                 .text-truncate-30 {
                     white-space: wrap; 
@@ -46,8 +53,8 @@
     @endpush
 
     @push('js')
-        <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
         <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
         <script type="text/javascript">
 
@@ -98,7 +105,6 @@
 
                 $('#btn_search').click(function(e) {
                     e.preventDefault();
-                    console.log('search button clicked');
                     $('#filtertable').DataTable().rows().invalidate().draw();
                 } );
 
