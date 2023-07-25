@@ -460,94 +460,63 @@ class StatisticsReportController extends Controller
         return view('hradmin.statistics.goalsummary',compact('data', 'data_tag'));
     }
 
-    public function goalSummaryExport(Request $request) {
+    public function goalSummaryExport(Request $request)
+    {
 
-        $total_emp_query = UserDemoJrView::selectRaw("user_demo_jr_view.user_id, 0 AS goals_count, 0 AS goal_type_id, user_demo_jr_view.employee_id,"
-                . "employee_name,employee_email,organization,level1_program,level2_division,level3_branch,level4")
-                    ->where(function($query) {
-                            $query->where(function($query) {
-                                $query->where('user_demo_jr_view.due_date_paused', 'N')
-                                    ->orWhereNull('user_demo_jr_view.due_date_paused');
-                            });
-                        })
-                    ->where(function($query) {
-                            $query->where(function($query) {
-                                $query->where('user_demo_jr_view.excused_flag', '<>', '1')
-                                    ->orWhereNull('user_demo_jr_view.excused_flag');
-                            });
-                        }) 
-                    ->whereNull('user_demo_jr_view.date_deleted')     
-                    ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
-                    ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
-                    ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
-                    ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
-                    ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })
-                    ->whereExists(function ($query) {
-                        $query->select(DB::raw(1))
-                                ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
-                            ->where('auth_users.type', '=', 'HR')
-                            ->where('auth_users.auth_id', '=', Auth::id());
-                    });
-        $total_emp_obj = $total_emp_query->get()->toArray();
-          
-        $subquery = DB::table('goals')
-            ->select('user_id', 'goal_type_id', DB::raw('COUNT(*) AS sub_count'))
-            ->where('status', 'active')
-            ->whereNull('deleted_at')
-            ->where('is_library', 0)
-            ->where('goals.goal_type_id', '<>', 4)
-            ->groupBy('user_id', 'goal_type_id');
+        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
+        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
+        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
+        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
+        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
 
-        $goal_count_query = DB::table('user_demo_jr_view')
-            ->leftJoin('goals', 'goals.user_id', '=', 'user_demo_jr_view.user_id')
-            ->leftJoin('goal_types', 'goals.goal_type_id', '=', 'goal_types.id')
-            ->leftJoinSub($subquery, 'subquery', function ($join) {
-                $join->on('subquery.user_id', '=', 'user_demo_jr_view.user_id')
-                     ->on('subquery.goal_type_id', '=', 'goals.goal_type_id');
-            })
-            ->select('user_demo_jr_view.user_id', DB::raw('COUNT(goals.id) AS goals_count'), 'goals.goal_type_id', 'user_demo_jr_view.employee_id', 'employee_name', 'employee_email', 'organization', 'level1_program', 'level2_division', 'level3_branch', 'level4', 'goal_types.name AS goal_type_name', 'subquery.sub_count AS sub_goals_count')
-            ->where('goals.status', 'active')
-            ->whereNull('goals.deleted_at')
-            ->where('goals.is_library', 0)
-            ->where('goals.goal_type_id', '<>', 4)
-            ->where(function ($query) {
-                $query->where('user_demo_jr_view.due_date_paused', 'N')
-                      ->orWhereNull('user_demo_jr_view.due_date_paused');
-            })
-            ->where(function ($query) {
-                $query->where('user_demo_jr_view.excused_flag', '<>', 1)
-                      ->orWhereNull('user_demo_jr_view.excused_flag');
-            })
-            ->whereNull('user_demo_jr_view.date_deleted')
-            ->whereExists(function ($query) {
-                        $query->select(DB::raw(1))
-                                ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
-                            ->where('auth_users.type', '=', 'HR')
-                            ->where('auth_users.auth_id', '=', Auth::id());
-                    })        
-            ->groupBy('user_demo_jr_view.user_id', 'goals.goal_type_id');
-                    
-        $goal_count_obj = $goal_count_query->get()->toArray();
-                       
-        foreach($total_emp_obj as $i => $emp_item){
-            foreach($goal_count_obj as $goal_item){
-                if($goal_item->user_id == $emp_item["user_id"]){
-                    $total_emp_obj[$i]["goals_count"] = $goal_item->goals_count;
-                    if($goal_item->goal_type_id != '' && $goal_item->goal_type_id != 4){
-                        $total_emp_obj[$i]["goal_type_id"] = $goal_item->goal_type_id;
-                        $total_emp_obj[$i]["goal_type_name"] = $goal_item->goal_type_name;
-                        $total_emp_obj[$i]["sub_goals_count"] = $goal_item->sub_goals_count;
-                    } else {
-                        $total_emp_obj[$i]["goal_type_id"] = '';
-                        $total_emp_obj[$i]["goal_type_name"] = '';
-                        $total_emp_obj[$i]["sub_goals_count"] = 0;
-                    }
-                }
-            }
-        }
-        
+
+        $from_stmt = $this->goalSummary_from_statement($request->goal);
+
+        $sql = User::selectRaw('A.*, goals_count, employee_name, 
+                                organization, level1_program, level2_division, level3_branch, level4')
+                ->from(DB::raw( $from_stmt ))                                
+                ->join('employee_demo', function($join) {
+                    $join->on('employee_demo.employee_id', '=', 'A.employee_id');
+                    //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
+                })
+                // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+                // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
+                ->where('A.due_date_paused', 'N')
+                ->whereNotNull('A.guid')
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('auth_users')
+                        ->whereColumn('auth_users.user_id', 'User.id')
+                        ->where('auth_users.type', '=', 'HR')
+                        ->where('auth_users.auth_id', '=', Auth::id());
+                })
+                ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.organization', $level0->name);
+                })
+                ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level1_program', $level1->name);
+                })
+                ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level2_division', $level2->name);
+                })
+                ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level3_branch', $level3->name);
+                })
+                ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
+                    return $q->where('employee_demo.level4', $level4->name);
+                })
+                // ->where('acctlock', 0)
+                ->when( (array_key_exists($request->range, $this->groups)) , function($q) use($request) {
+                    return $q->whereBetween('goals_count', $this->groups[$request->range]);
+                });
+                // ->where( function($query) {
+                //     $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01") ')
+                //           ->where('employee_demo.employee_status', 'A');
+                // });
+
+        $users = $sql->get();
+
+      
         // Generating Output file 
         $filename = 'Active Goals Per Employee.csv';
         if ($request->goal) {        
@@ -562,105 +531,29 @@ class StatisticsReportController extends Controller
             "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
             "Expires"             => "0"
         );
-        
-        if(!$request->goal){
-            $columns = ["Employee ID", "Name", "Email", 'Total Active Goals', 
-                            'Active Work Goals', 'Active Learning Goals', 'Active Career Development Goals', 'Active Private Goals', 
-                            "Organization", "Level 1", "Level 2", "Level 3", "Level 4",
-                        ];
-        }elseif($request->goal == 1){
-            $columns = ["Employee ID", "Name", "Email", 
-                            'Active Work Goals', 
-                            "Organization", "Level 1", "Level 2", "Level 3", "Level 4",
-                        ];
-        }elseif($request->goal == 2){
-            $columns = ["Employee ID", "Name", "Email", 
-                            'Active Career Development Goals', 
-                            "Organization", "Level 1", "Level 2", "Level 3", "Level 4",
-                        ];
-        }elseif($request->goal == 3){
-            $columns = ["Employee ID", "Name", "Email", 
-                            'Active Learning Development Goals', 
-                            "Organization", "Level 1", "Level 2", "Level 3", "Level 4",
-                        ];
-        }elseif($request->goal == 4){
-            $columns = ["Employee ID", "Name", "Email", 
-                            'Active Private Goals', 
-                            "Organization", "Level 1", "Level 2", "Level 3", "Level 4",
-                        ];
-        }
-        
-        $callback = function() use($total_emp_obj, $columns, $request) {
+
+        $columns = ["Employee ID", "Name", "Email", 'Active Goals Count', 
+                        "Organization", "Level 1", "Level 2", "Level 3", "Level 4", "Reporting To",
+                    ];
+
+        $callback = function() use($users, $columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
 
-            foreach ($total_emp_obj as $user) {
-                $row['Employee ID'] = "[".$user["employee_id"]."]";
-                $row['Name'] = $user["employee_name"];
-                $row['Email'] = $user["employee_email"];
-                if(!$request->goal){
-                    $row['Total Active Goals'] = $user["goals_count"];
-                }
-                //Active Work Goals
-                if(!$request->goal || $request->goal == 1){
-                    if($user["goal_type_id"] == 1){
-                        $row['Active Work Goals'] = $user["sub_goals_count"];
-                    }else{
-                        $row['Active Work Goals'] = 0;
-                    }
-                }
-                //Active Learning  Goals
-                if(!$request->goal || $request->goal == 3){
-                    if($user["goal_type_id"] == 3){
-                        $row['Active Learning Goals'] = $user["sub_goals_count"];
-                    }else{
-                        $row['Active Learning Goals'] = 0;
-                    }
-                }
-                //Active Career Development Goals
-                if(!$request->goal || $request->goal == 2){
-                    if($user["goal_type_id"] == 2){
-                        $row['Active Career Development Goals'] = $user["sub_goals_count"];
-                    }else{
-                        $row['Active Career Development Goals'] = 0;
-                    }
-                }
-                //Active Private  Goals
-                if(!$request->goal || $request->goal == 4){
-                    if($user["goal_type_id"] == 4){
-                        $row['Active Private Goals'] = $user["sub_goals_count"];
-                    }else{
-                        $row['Active Private Goals'] = 0;
-                    }
-                }
-                $row['Organization'] = $user["organization"];
-                $row['Level 1'] = $user["level1_program"];
-                $row['Level 2'] = $user["level2_division"];
-                $row['Level 3'] = $user["level3_branch"];
-                $row['Level 4'] = $user["level4"];
-                //$row['Reporting To'] = $user->reportingManager ? $user->reportingManager->name : '';
-                                
-                if(!$request->goal){
-                    fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Total Active Goals']
-                            , $row['Active Work Goals'], $row['Active Learning Goals'], $row['Active Career Development Goals'], $row['Active Private Goals']
-                            , $row['Organization'],$row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
-                }elseif($request->goal == 1){
-                    fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email']
-                            , $row['Active Work Goals']
-                            , $row['Organization'],$row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
-                }elseif($request->goal == 2){
-                    fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email']
-                            ,$row['Active Career Development Goals']
-                            , $row['Organization'],$row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
-                }elseif($request->goal == 3){
-                    fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email']
-                            , $row['Active Learning Goals']
-                            , $row['Organization'],$row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
-                }elseif($request->goal == 4){
-                    fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email']
-                            , $row['Active Private Goals']
-                            , $row['Organization'],$row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
-                }
+            foreach ($users as $user) {
+                $row['Employee ID'] = $user->employee_id;
+                $row['Name'] = $user->employee_name;
+                $row['Email'] = $user->email;
+                $row['Active Goals Count'] = $user->goals_count;
+                $row['Organization'] = $user->organization;
+                $row['Level 1'] = $user->level1_program;
+                $row['Level 2'] = $user->level2_division;
+                $row['Level 3'] = $user->level3_branch;
+                $row['Level 4'] = $user->level4;
+                $row['Reporting To'] = $user->reportingManager ? $user->reportingManager->name : '';
+
+                fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Active Goals Count'], $row['Organization'],
+                            $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], $row['Reporting To'] ));
             }
 
             fclose($file);
@@ -677,58 +570,67 @@ class StatisticsReportController extends Controller
                     })
                     ->orderBy('name')->get();
 
-        $count_raw = "user_demo_jr_view.* ";
+        $count_raw = "users.*, ";
+        $count_raw .= " employee_name, employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4";
         if (!$request->tag || $request->tag == '[Blank]') {
             $count_raw .= " ,(select count(*) from goals ";
-            $count_raw .= "    where user_demo_jr_view.user_id = goals.user_id ";
+            $count_raw .= "    where users.id = goals.user_id ";
             $count_raw .= "      and not exists (select 'x' from goal_tags ";
             $count_raw .= "                       where goals.id = goal_tags.goal_id) ";
-            $count_raw .= "      and goals.deleted_at is null and goals.is_library = 0 and goals.status = 'active' ";            
-            $count_raw .= "      and user_demo_jr_view.guid <> '' ";
+            $count_raw .= "      and goals.deleted_at is null and goals.is_library = 0 and goals.status = 'active' ";                
+            $count_raw .= "      and employee_demo.guid <> '' ";
             
             $count_raw .= "     and ( ";
-            $count_raw .= "            user_demo_jr_view.due_date_paused = 'N'";
+            $count_raw .= "            users.due_date_paused = 'N'";
             $count_raw .= "         )";
 
-            $count_raw .= "      and user_demo_jr_view.excused_flag <> 1 and user_demo_jr_view.date_deleted is null ";
-
+            $count_raw .= "     and users.excused_flag <> 1  ";
             $count_raw .= "     and goals.goal_type_id <> 4    ";
 
             $count_raw .= " ) as 'tag_0' ";
         }
         foreach ($tags as $tag) {
-            $count_raw .= " ,(select count(*) from goal_tags, goals, goal_types ";
+            $count_raw .= " ,(select count(*) from goal_tags, goals ";
             $count_raw .= "    where goals.id = goal_tags.goal_id "; 
             $count_raw .= "      and tag_id = " . $tag->id;  
-            $count_raw .= "      and user_demo_jr_view.user_id = goals.user_id ";
-            $count_raw .= "      and goal_types.id = goals.goal_type_id ";
+            $count_raw .= "      and goals.deleted_at is null and goals.is_library = 0 and goals.status = 'active' ";  
+            $count_raw .= "      and users.id = goals.user_id ";
 
             $count_raw .= "     and ( ";
-            $count_raw .= "            user_demo_jr_view.due_date_paused = 'N'";
+            $count_raw .= "            users.due_date_paused = 'N'";
             $count_raw .= "         )";
 
-            $count_raw .= "      and user_demo_jr_view.excused_flag <> 1 and user_demo_jr_view.date_deleted is null ";
-
-            $count_raw .= "     and goal_types.name <> 'Private'    ";
-            $count_raw .= "      and goals.deleted_at is null and goals.is_library = 0 and goals.status = 'active' ";    
+            $count_raw .= "     and users.excused_flag <> 1  ";
+            $count_raw .= "     and goals.goal_type_id <> 4    ";
 
             $count_raw .= ") as 'tag_". $tag->id ."'";
         }
    
-        $sql = UserDemoJrView::selectRaw($count_raw)
-                    ->where('user_demo_jr_view.due_date_paused', 'N')                    
-                    ->whereNull('user_demo_jr_view.date_deleted') 
+        $sql = User::selectRaw($count_raw)
+                    ->join('employee_demo', function($join) {
+                        $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                    })
+                    ->where('users.due_date_paused', 'N')                    
+                    ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                    ->whereNull('employee_demo.date_deleted') 
                     ->where(function($query) {
                             $query->where(function($query) {
-                                $query->where('user_demo_jr_view.excused_flag', '<>', '1')
-                                    ->orWhereNull('user_demo_jr_view.excused_flag');
+                                $query->where('users.excused_flag', '<>', '1')
+                                    ->orWhereNull('users.excused_flag');
                             });
-                        })         
-                    ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
-                    ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
-                    ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
-                    ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
-                    ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })
+                        }) 
+                    ->whereExists(function ($query) {
+                            $query->select(DB::raw(1))
+                                    ->from('auth_users')
+                                ->whereColumn('auth_users.user_id', 'users.id')
+                                ->where('auth_users.type', '=', 'HR')
+                                ->where('auth_users.auth_id', '=', Auth::id());
+                        })            
+                    ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
+                    ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
+                    ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
+                    ->when( $request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
+                    ->when( $request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
                     ->whereExists(function ($query) {
                         $query->select(DB::raw(1))
                                 ->from('goals')
@@ -736,8 +638,7 @@ class StatisticsReportController extends Controller
                                 ->where('goals.is_library', 0)
                                 ->where('goals.status', 'active')
                                 ->where('goals.goal_type_id', '<>', 4)
-                                ->whereColumn('goals.user_id',  'user_demo_jr_view.user_id');
-                                
+                                ->whereColumn('goals.user_id',  'users.id');
                     })
                     // To show the tag == selected tag name
                     ->when( ($request->tag && $request->tag <> '[Blank]' ), function ($q) use ($request) {
@@ -747,19 +648,19 @@ class StatisticsReportController extends Controller
                                         ->join('goal_tags', 'goals.id', '=', 'goal_tags.goal_id')
                                         ->join('tags', 'goal_tags.tag_id', '=', 'tags.id')
                                         ->join('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')
-                                        ->whereColumn('goals.user_id',  'user_demo_jr_view.user_id')
-                                        ->where('tags.name', $request->tag)
                                         ->whereNull('goals.deleted_at')
                                         ->where('goals.is_library', 0)
                                         ->where('goals.status', 'active')
                                         ->where('goal_types.name', '<>', 'Private')
+                                        ->where('goal_types.name', $request->tag)
                                         ->whereExists(function ($query) {
                                             $query->select(DB::raw(1))
                                                     ->from('auth_users')
-                                                ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
+                                                ->whereColumn('auth_users.user_id', 'users.id')
                                                 ->where('auth_users.type', '=', 'HR')
                                                 ->where('auth_users.auth_id', '=', Auth::id());
-                                        });
+                                        })
+                                        ->whereColumn('goals.user_id',  'users.id');
                             });
                     })  
                     // To show the  tag == '[blank]'
@@ -769,7 +670,6 @@ class StatisticsReportController extends Controller
                                         ->from('goals')
                                         ->join('goal_tags', 'goals.id', '=', 'goal_tags.goal_id')
                                         ->join('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')
-                                        ->whereColumn('goals.user_id',  'user_demo_jr_view.user_id')
                                         ->whereNull('goals.deleted_at')
                                         ->where('goals.is_library', 0)
                                         ->where('goals.status', 'active')
@@ -777,18 +677,12 @@ class StatisticsReportController extends Controller
                                         ->whereExists(function ($query) {
                                             $query->select(DB::raw(1))
                                                     ->from('auth_users')
-                                                ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
+                                                ->whereColumn('auth_users.user_id', 'users.id')
                                                 ->where('auth_users.type', '=', 'HR')
                                                 ->where('auth_users.auth_id', '=', Auth::id());
-                                        });
+                                        })
+                                        ->whereColumn('goals.user_id',  'users.id');
                                 });
-                    })
-                    ->whereExists(function ($query) {
-                        $query->select(DB::raw(1))
-                                ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
-                            ->where('auth_users.type', '=', 'HR')
-                            ->where('auth_users.auth_id', '=', Auth::id());
                     });
 
         $users = $sql->get();
@@ -822,7 +716,7 @@ class StatisticsReportController extends Controller
             foreach ($users as $user) {
                 $row['Employee ID'] = $user->employee_id;
                 $row['Name'] = $user->employee_name;
-                $row['Email'] = $user->employee_email;
+                $row['Email'] = $user->email;
                 $row['Organization'] = $user->organization;
                 $row['Level 1'] = $user->level1_program;
                 $row['Level 2'] = $user->level2_division;
@@ -832,21 +726,18 @@ class StatisticsReportController extends Controller
                 $row_data = array( $row['Employee ID'], $row['Name'], $row['Email'], $row['Organization'],
                                     $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'],
                                 );
-                $row_count = 0;                
+
                 if (!$request->tag || $request->tag == '[Blank]') {
-                    $row_count = $user->getAttribute('tag_0');
                     array_push($row_data, $user->getAttribute('tag_0') );
                 }
 
                 foreach ($tags as $tag) 
                 {
-                    $row_count = $user->getAttribute('tag_'.$tag->id);
                     array_push($row_data, $user->getAttribute('tag_'.$tag->id) );
                 }
 
-                if ($row_count > 0) {
-                    fputcsv($file, $row_data );
-                }
+                fputcsv($file, $row_data );
+
             }
 
             fclose($file);
