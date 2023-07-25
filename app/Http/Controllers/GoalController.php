@@ -463,7 +463,7 @@ class GoalController extends Controller
         $goaltypes = GoalType::where('name', '!=', 'private')->get()->toArray();
 
         $adminGoals = Goal::withoutGlobalScopes()
-            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator '<br/>') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
+            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_hide', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator '<br/>') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
             ->join('goal_bank_orgs', function ($qon) {
                 return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
                     ->on('goal_bank_orgs.version', \DB::raw(2))
@@ -530,7 +530,7 @@ class GoalController extends Controller
         }
 
         $adminGoalsInherited = Goal::withoutGlobalScopes()
-            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator '<br/>') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
+            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_hide', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator '<br/>') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
             ->join('goal_bank_orgs', function ($qon) {
                 return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
                     ->on('goal_bank_orgs.version', \DB::raw(2))
@@ -613,7 +613,7 @@ class GoalController extends Controller
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')    
         ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
         ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id');  
-        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.id as creator_id','u2.name as username',DB::raw('group_concat(distinct tags.name separator "<br/>") as tagnames'));
+        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.is_hide', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.id as creator_id','u2.name as username',DB::raw('group_concat(distinct tags.name separator "<br/>") as tagnames'));
         
         if ($request->has('goal_bank_mandatory') && $request->goal_bank_mandatory !== null) {
             if ($request->goal_bank_mandatory == "1") {
@@ -671,7 +671,9 @@ class GoalController extends Controller
         $bankGoals = $query->get();
         $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goaltypes, $tagsList);
         $bankGoals_arr = array();
+        $hidden_goals = array();
         $i = 0;
+        $c = 0;
         
         foreach($bankGoals as $item){
             $bankGoals_arr[$i]['id'] = $item->id;
@@ -696,6 +698,34 @@ class GoalController extends Controller
             $i++;
         }
         $json_goalbanks = json_encode($bankGoals_arr);   
+
+        foreach($bankGoals as $item){
+            if($item->is_hide){
+                $hidden_goals[$c]['id'] = $item->id;
+                $hidden_goals[$c]['title'] = $item->title;
+                $hidden_goals[$c]['goal_type_id'] = $item->goal_type_id;
+                
+                $date = Carbon::parse($item->created_at); // Parse the date string into a Carbon instance
+                $formattedDate = $date->format('Y-m-d');
+                $hidden_goals[$c]['created_at'] = $formattedDate;
+                
+                $hidden_goals[$c]['user_id'] = $item->user_id;
+                if($item->is_mandatory == 1){
+                    $hidden_goals[$c]['is_mandatory'] = 'Mandatory';
+                }else{
+                    $hidden_goals[$c]['is_mandatory'] = 'Suggested';
+                }
+                $hidden_goals[$c]['display_name'] = $item->display_name;            
+                
+                $hidden_goals[$c]['typename'] = $item->typename;
+                $bankhidden_goalsGoals_arr[$c]['username'] = $item->username;
+                $hidden_goals[$c]['tagnames'] = $item->tagnames;
+                $c++;
+            }
+            
+        }
+        $json_goalbanks_hidden = json_encode($bankGoals_arr);   
+
                         
         $all_adminGoals = Goal::withoutGlobalScopes()
             ->select('u2.id as creator_id', 'u2.name as username', 'goals.display_name')
@@ -949,7 +979,7 @@ class GoalController extends Controller
 
         $goaltypes = GoalType::where('name', '!=', 'private')->get()->toArray();
         return view('goal.bank', compact('bankGoals', 'tags', 'user', 'tagsList', 'goaltypes',  'type_desc_str', 'mandatoryOrSuggested', 'createdBy', 'goals_count', 'sortby','sortorder',
-                                'open_modal_id','from','shared_employees', 'json_goalbanks','json_team_goalbanks','employees_list'));
+                                'open_modal_id','from','shared_employees', 'json_goalbanks','json_team_goalbanks', 'json_goalbanks_hidden', 'employees_list'));
     }
     
     public function myEmployeesAjax() {

@@ -631,58 +631,60 @@ class SysadminStatisticsReportController extends Controller
                     })
                     ->orderBy('name')->get();
 
-        $count_raw = "user_demo_jr_view.* ";
+        $count_raw = "users.*, ";
+        $count_raw .= " employee_name, employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4";
         if (!$request->tag || $request->tag == '[Blank]') {
             $count_raw .= " ,(select count(*) from goals ";
-            $count_raw .= "    where user_demo_jr_view.user_id = goals.user_id ";
+            $count_raw .= "    where users.id = goals.user_id ";
             $count_raw .= "      and not exists (select 'x' from goal_tags ";
             $count_raw .= "                       where goals.id = goal_tags.goal_id) ";
-            $count_raw .= "      and goals.deleted_at is null and goals.is_library = 0 and goals.status = 'active' ";            
-            $count_raw .= "      and user_demo_jr_view.guid <> '' ";
+            $count_raw .= "      and goals.deleted_at is null and goals.is_library = 0 and goals.status = 'active' ";                
+            $count_raw .= "      and employee_demo.guid <> '' ";
             
             $count_raw .= "     and ( ";
-            $count_raw .= "            user_demo_jr_view.due_date_paused = 'N'";
+            $count_raw .= "            users.due_date_paused = 'N'";
             $count_raw .= "         )";
 
-            $count_raw .= "      and user_demo_jr_view.excused_flag <> 1 and user_demo_jr_view.date_deleted is null ";
-
+            $count_raw .= "     and users.excused_flag <> 1  ";
             $count_raw .= "     and goals.goal_type_id <> 4    ";
 
             $count_raw .= " ) as 'tag_0' ";
         }
         foreach ($tags as $tag) {
-            $count_raw .= " ,(select count(*) from goal_tags, goals, goal_types ";
+            $count_raw .= " ,(select count(*) from goal_tags, goals ";
             $count_raw .= "    where goals.id = goal_tags.goal_id "; 
             $count_raw .= "      and tag_id = " . $tag->id;  
-            $count_raw .= "      and user_demo_jr_view.user_id = goals.user_id ";
-            $count_raw .= "      and goal_types.id = goals.goal_type_id ";
+            $count_raw .= "      and goals.deleted_at is null and goals.is_library = 0 and goals.status = 'active' ";  
+            $count_raw .= "      and users.id = goals.user_id ";
 
             $count_raw .= "     and ( ";
-            $count_raw .= "            user_demo_jr_view.due_date_paused = 'N'";
+            $count_raw .= "            users.due_date_paused = 'N'";
             $count_raw .= "         )";
 
-            $count_raw .= "      and user_demo_jr_view.excused_flag <> 1 and user_demo_jr_view.date_deleted is null ";
-
-            $count_raw .= "     and goal_types.name <> 'Private'    ";
-            $count_raw .= "      and goals.deleted_at is null and goals.is_library = 0 and goals.status = 'active' ";    
+            $count_raw .= "     and users.excused_flag <> 1  ";
+            $count_raw .= "     and goals.goal_type_id <> 4    ";
 
             $count_raw .= ") as 'tag_". $tag->id ."'";
         }
    
-        $sql = UserDemoJrView::selectRaw($count_raw)
-                    ->where('user_demo_jr_view.due_date_paused', 'N')                    
-                    ->whereNull('user_demo_jr_view.date_deleted') 
+        $sql = User::selectRaw($count_raw)
+                    ->join('employee_demo', function($join) {
+                        $join->on('employee_demo.employee_id', '=', 'users.employee_id');
+                    })
+                    ->where('users.due_date_paused', 'N')                    
+                    ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+                    ->whereNull('employee_demo.date_deleted') 
                     ->where(function($query) {
                             $query->where(function($query) {
-                                $query->where('user_demo_jr_view.excused_flag', '<>', '1')
-                                    ->orWhereNull('user_demo_jr_view.excused_flag');
+                                $query->where('users.excused_flag', '<>', '1')
+                                    ->orWhereNull('users.excused_flag');
                             });
                         })         
-                    ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
-                    ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
-                    ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
-                    ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
-                    ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })
+                    ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
+                    ->when( $request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
+                    ->when( $request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
+                    ->when( $request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
+                    ->when( $request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
                     ->whereExists(function ($query) {
                         $query->select(DB::raw(1))
                                 ->from('goals')
@@ -690,8 +692,7 @@ class SysadminStatisticsReportController extends Controller
                                 ->where('goals.is_library', 0)
                                 ->where('goals.status', 'active')
                                 ->where('goals.goal_type_id', '<>', 4)
-                                ->whereColumn('goals.user_id',  'user_demo_jr_view.user_id');
-                                
+                                ->whereColumn('goals.user_id',  'users.id');
                     })
                     // To show the tag == selected tag name
                     ->when( ($request->tag && $request->tag <> '[Blank]' ), function ($q) use ($request) {
@@ -701,12 +702,12 @@ class SysadminStatisticsReportController extends Controller
                                         ->join('goal_tags', 'goals.id', '=', 'goal_tags.goal_id')
                                         ->join('tags', 'goal_tags.tag_id', '=', 'tags.id')
                                         ->join('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')
-                                        ->whereColumn('goals.user_id',  'user_demo_jr_view.user_id')
-                                        ->where('tags.name', $request->tag)
                                         ->whereNull('goals.deleted_at')
                                         ->where('goals.is_library', 0)
                                         ->where('goals.status', 'active')
-                                        ->where('goal_types.name', '<>', 'Private');
+                                        ->where('goal_types.name', '<>', 'Private')
+                                        ->whereColumn('goals.user_id',  'users.id')
+                                        ->where('name', $request->tag);
                             });
                     })  
                     // To show the  tag == '[blank]'
@@ -716,11 +717,11 @@ class SysadminStatisticsReportController extends Controller
                                         ->from('goals')
                                         ->join('goal_tags', 'goals.id', '=', 'goal_tags.goal_id')
                                         ->join('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')
-                                        ->whereColumn('goals.user_id',  'user_demo_jr_view.user_id')
                                         ->whereNull('goals.deleted_at')
                                         ->where('goals.is_library', 0)
                                         ->where('goals.status', 'active')
-                                        ->where('goal_types.name', '<>', 'Private');
+                                        ->where('goal_types.name', '<>', 'Private')
+                                        ->whereColumn('goals.user_id',  'user_demo_jr_view.user_id');
                                 });
                     });
 
@@ -755,7 +756,7 @@ class SysadminStatisticsReportController extends Controller
             foreach ($users as $user) {
                 $row['Employee ID'] = $user->employee_id;
                 $row['Name'] = $user->employee_name;
-                $row['Email'] = $user->employee_email;
+                $row['Email'] = $user->email;
                 $row['Organization'] = $user->organization;
                 $row['Level 1'] = $user->level1_program;
                 $row['Level 2'] = $user->level2_division;
@@ -765,21 +766,18 @@ class SysadminStatisticsReportController extends Controller
                 $row_data = array( $row['Employee ID'], $row['Name'], $row['Email'], $row['Organization'],
                                     $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'],
                                 );
-                $row_count = 0;                
+
                 if (!$request->tag || $request->tag == '[Blank]') {
-                    $row_count = $user->getAttribute('tag_0');
                     array_push($row_data, $user->getAttribute('tag_0') );
                 }
 
                 foreach ($tags as $tag) 
                 {
-                    $row_count = $user->getAttribute('tag_'.$tag->id);
                     array_push($row_data, $user->getAttribute('tag_'.$tag->id) );
                 }
 
-                if ($row_count > 0) {
-                    fputcsv($file, $row_data );
-                }
+                fputcsv($file, $row_data );
+
             }
 
             fclose($file);
