@@ -486,7 +486,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                        ->whereColumn('auth_users.user_id', 'User.id')
+                        ->whereColumn('auth_users.user_id', 'users.id')
                         ->where('auth_users.type', '=', 'HR')
                         ->where('auth_users.auth_id', '=', Auth::id());
                 })
@@ -652,7 +652,7 @@ class StatisticsReportController extends Controller
                                         ->where('goals.is_library', 0)
                                         ->where('goals.status', 'active')
                                         ->where('goal_types.name', '<>', 'Private')
-                                        ->where('goal_types.name', $request->tag)
+                                        ->where('tags.name', $request->tag)
                                         ->whereExists(function ($query) {
                                             $query->select(DB::raw(1))
                                                     ->from('auth_users')
