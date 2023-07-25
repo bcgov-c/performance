@@ -58,7 +58,7 @@ class StatisticsReportController extends Controller
                         (select count(*) from goals where user_id = users.id
                         and status = 'active' and deleted_at is null and is_library = 0 ";
         if ($goal_type_id)                        
-            $from_stmt .= " and goal_type_id =".  $goal_type_id ;
+            $from_stmt .= " and goals.goal_type_id =".  $goal_type_id ;
         $from_stmt .= ") as goals_count from users ) AS A";
 
         return $from_stmt;
@@ -364,7 +364,7 @@ class StatisticsReportController extends Controller
             ->where('status', 'active')
             ->whereNull('deleted_at')
             ->where('is_library', 0)
-            ->where('goal_type_id', '<>', 4)
+            ->where('goals.goal_type_id', '<>', 4)
             ->groupBy('user_id', 'goal_type_id');
 
         $goal_count_query = DB::table('user_demo_jr_view')
@@ -378,7 +378,7 @@ class StatisticsReportController extends Controller
             ->where('goals.status', 'active')
             ->whereNull('goals.deleted_at')
             ->where('goals.is_library', 0)
-            ->where('goal_type_id', '<>', 4)
+            ->where('goals.goal_type_id', '<>', 4)
             ->where(function ($query) {
                 $query->where('user_demo_jr_view.due_date_paused', 'N')
                       ->orWhereNull('user_demo_jr_view.due_date_paused');
@@ -545,9 +545,9 @@ class StatisticsReportController extends Controller
                     })
                     ->orderBy('name')->get();
 
-        $count_raw = "user_demo_jr_view.*, ";
+        $count_raw = "user_demo_jr_view.* ";
         if (!$request->tag || $request->tag == '[Blank]') {
-            $count_raw .= " (select count(*) from goals ";
+            $count_raw .= " ,(select count(*) from goals ";
             $count_raw .= "    where user_demo_jr_view.user_id = goals.user_id ";
             $count_raw .= "      and not exists (select 'x' from goal_tags ";
             $count_raw .= "                       where goals.id = goal_tags.goal_id) ";
@@ -565,7 +565,7 @@ class StatisticsReportController extends Controller
             $count_raw .= " ) as 'tag_0' ";
         }
         foreach ($tags as $tag) {
-            $count_raw .= " (select count(*) from goal_tags, goals, goal_types ";
+            $count_raw .= " ,(select count(*) from goal_tags, goals, goal_types ";
             $count_raw .= "    where goals.id = goal_tags.goal_id "; 
             $count_raw .= "      and tag_id = " . $tag->id;  
             $count_raw .= "      and user_demo_jr_view.user_id = goals.user_id ";
