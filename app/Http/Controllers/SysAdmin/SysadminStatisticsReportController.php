@@ -607,7 +607,7 @@ class SysadminStatisticsReportController extends Controller
                                         ->where('goals.status', 'active')
                                         ->where('goal_types.name', '<>', 'Private')
                                         ->whereColumn('goals.user_id',  'users.id')
-                                        ->where('goal_types.name', $request->tag);
+                                        ->where('tags.name', $request->tag);
                             });
                     })  
                     // To show the  tag == '[blank]'
