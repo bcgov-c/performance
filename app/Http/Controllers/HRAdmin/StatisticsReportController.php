@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Models\GoalType;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
+use App\Models\EmployeeDemo;
+use App\Models\EmployeeDemoTree;
 use App\Models\UserDemoJrView;
 use Illuminate\Http\Request;
 use App\Models\OrganizationTree;
@@ -456,20 +458,20 @@ class StatisticsReportController extends Controller
     public function goalSummaryExport(Request $request)
     {
 
-        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
+        $level0 = $request->dd_level0 ? EmployeeDemoTree::where('id', $request->dd_level0)->first() : null;
+        $level1 = $request->dd_level1 ? EmployeeDemoTree::where('id', $request->dd_level1)->first() : null;
+        $level2 = $request->dd_level2 ? EmployeeDemoTree::where('id', $request->dd_level2)->first() : null;
+        $level3 = $request->dd_level3 ? EmployeeDemoTree::where('id', $request->dd_level3)->first() : null;
+        $level4 = $request->dd_level4 ? EmployeeDemoTree::where('id', $request->dd_level4)->first() : null;
 
 
         $from_stmt = $this->goalSummary_from_statement($request->goal);
 
-        $sql = User::selectRaw('A.*, goals_count, employee_name, 
-                                organization, level1_program, level2_division, level3_branch, level4')
+        $sql = User::selectRaw('A.*, goals_count, user_demo_jr_view.employee_name, 
+        user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4')                
                 ->from(DB::raw( $from_stmt ))                                
-                ->join('employee_demo', function($join) {
-                    $join->on('employee_demo.employee_id', '=', 'A.employee_id');
+                ->join('user_demo_jr_view', function($join) {
+                    $join->on('user_demo_jr_view.employee_id', '=', 'A.employee_id');
                     //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
                 })
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
@@ -484,19 +486,19 @@ class StatisticsReportController extends Controller
                         ->where('auth_users.auth_id', '=', Auth::id());
                 })
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                    return $q->where('employee_demo.organization', $level0->name);
+                    return $q->where('user_demo_jr_view.organization', "'".$level0->name."'");
                 })
                 ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                    return $q->where('employee_demo.level1_program', $level1->name);
+                    return $q->where('user_demo_jr_view.level1_program',  "'".$level1->name."'");
                 })
                 ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                    return $q->where('employee_demo.level2_division', $level2->name);
+                    return $q->where('user_demo_jr_view.level2_division',  "'".$level2->name."'");
                 })
                 ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                    return $q->where('employee_demo.level3_branch', $level3->name);
+                    return $q->where('user_demo_jr_view.level3_branch',  "'".$level3->name."'");
                 })
                 ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                    return $q->where('employee_demo.level4', $level4->name);
+                    return $q->where('user_demo_jr_view.level4',  "'".$level4->name."'");
                 })
                 // ->where('acctlock', 0)
                 ->when( (array_key_exists($request->range, $this->groups)) , function($q) use($request) {
