@@ -479,7 +479,7 @@ class StatisticsReportController extends Controller
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                        ->whereColumn('auth_users.user_id', 'users.id')
+                        ->whereColumn('auth_users.user_id', 'A.id')
                         ->where('auth_users.type', '=', 'HR')
                         ->where('auth_users.auth_id', '=', Auth::id());
                 })
