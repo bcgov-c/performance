@@ -492,21 +492,11 @@ class StatisticsReportController extends Controller
                         ->where('auth_users.type', '=', 'HR')
                         ->where('auth_users.auth_id', '=', Auth::id());
                 })
-                ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                    return $q->where('user_demo_jr_view.organization', "'".$level0->name."'");
-                })
-                ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                    return $q->where('user_demo_jr_view.level1_program',  "'".$level1->name."'");
-                })
-                ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                    return $q->where('user_demo_jr_view.level2_division',  "'".$level2->name."'");
-                })
-                ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                    return $q->where('user_demo_jr_view.level3_branch',  "'".$level3->name."'");
-                })
-                ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                    return $q->where('user_demo_jr_view.level4',  "'".$level4->name."'");
-                })
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })
                 // ->where('acctlock', 0)
                 ->when( (array_key_exists($request->range, $this->groups)) , function($q) use($request) {
                     return $q->whereBetween('goals_count', $this->groups[$request->range]);

@@ -451,22 +451,12 @@ class SysadminStatisticsReportController extends Controller
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                 ->where('A.due_date_paused', 'N')
-                ->whereNotNull('A.guid')
-                ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                    return $q->where('user_demo_jr_view.organization', "'".$level0->name."'");
-                })
-                ->when( $level1, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                    return $q->where('user_demo_jr_view.level1_program',  "'".$level1->name."'");
-                })
-                ->when( $level2, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                    return $q->where('user_demo_jr_view.level2_division',  "'".$level2->name."'");
-                })
-                ->when( $level3, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                    return $q->where('user_demo_jr_view.level3_branch',  "'".$level3->name."'");
-                })
-                ->when( $level4, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
-                    return $q->where('user_demo_jr_view.level4',  "'".$level4->name."'");
-                })
+                ->whereNotNull('A.guid')                
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
+                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
+                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
+                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
+                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })
                 // ->where('acctlock', 0)
                 ->when( (array_key_exists($request->range, $this->groups)) , function($q) use($request) {
                     return $q->whereBetween('goals_count', $this->groups[$request->range]);
