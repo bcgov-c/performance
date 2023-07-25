@@ -18,21 +18,21 @@
     </div>
     <div class="mt-4">
         <div class="card">
-            <div class="card-header" id="heading_0">
-                        <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_0" aria-expanded="1" aria-controls="collapse_0">
-                            <button class="btn btn-link" >
-                                <h4>My Goal Bank</h4> 
-                            </button>                        
-                            <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span>    
-                            <br/>                                
-                            <button class="btn btn-link text-left" style="color:black">
-                                <p>The goals below have been created for you by your supervisor or organization. Click on a goal to view it and add it to your own profile. 
-                            If needed, you can edit the goal to personalize it once it is in your profile. </p>
-                            </button>  
-                        </h5>
-            </div>
+		<div class="card-header" id="heading_0">
+                    <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_0" aria-expanded="1" aria-controls="collapse_0">
+                        <button class="btn btn-link" >
+                            <h4>My Goal Bank</h4> 
+                        </button>                        
+                        <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span>    
+                        <br/>                                
+                        <button class="btn btn-link text-left" style="color:black">
+                            <p>The goals below have been created for you by your supervisor or organization. Click on a goal to view it and add it to your own profile. 
+                        If needed, you can edit the goal to personalize it once it is in your profile. </p>
+                        </button>  
+                    </h5>
+		</div>
 
-		    <div id="collapse_0" class="collapse" aria-labelledby="heading_0">
+		<div id="collapse_0" class="collapse" aria-labelledby="heading_0">
                     <div class="card-body">
                         
                         <form action="" method="get" id="filter-menu">
@@ -89,8 +89,8 @@
                         
                         
                     </div>
-		    </div>
-	    </div>
+		</div>
+	</div>
         @include('goal.partials.goal-detail-modal')
         @if(Auth::user()->hasRole('Supervisor'))
         @php $shareWithLabel = 'Audience' @endphp
@@ -163,81 +163,6 @@
                     </div>
 		</div>
 	</div>
-
-
-    <div class="card">
-            <div class="card-header" id="heading_2">
-                        <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_2" aria-expanded="1" aria-controls="collapse_2">
-                            <button class="btn btn-link" >
-                                <h4>Hidden Goals</h4> 
-                            </button>                        
-                            <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span>    
-                            <br/>                                
-                            <button class="btn btn-link text-left" style="color:black">
-                                <p>Hidden goals appear here. Clean up your goal bank by hiding goals which are not immediately reievant to you. </p>
-                            </button>  
-                        </h5>
-            </div>
-
-		    <div id="collapse_2" class="collapse" aria-labelledby="heading_2">
-                    <div class="card-body">
-                        
-                        <form action="" method="get" id="filter-menu-hidden">
-                            <div class="row">
-                                <div class="col">
-                                    <label>
-                                        Title
-                                        <input type="text" id="goal_bank_title_hidden" name="goal_bank_title" class="form-control" value="{{request()->goal_bank_title}}">
-                                    </label>
-                                </div>
-                                <div class="col">
-                                    <x-dropdown :list="$goaltypes" id="goal_bank_types_hidden" label="Goal Type" name="goal_bank_types" :selected="request()->goal_bank_types"></x-dropdown>
-                                </div>
-                                <div class="col">
-                                    <x-dropdown :list="$tagsList" label="Tags" id="goal_bank_tags_hidden" name="goal_bank_tags" :selected="request()->goal_bank_tags"></x-dropdown>
-                                </div>
-                                <div class="col">
-                                    <label>
-                                        Date Added
-                                        <input class="sup_filtersub form-control form-control-md" id="goal_bank_dateadd_hidden" type="date" name="goal_bank_dateadd" id="date_added" value="{{request()->goal_bank_dateadd}}" autocomplete="off">
-                                    </label>
-                                </div>
-                                <div class="col">
-                                    <x-dropdown :list="$createdBy" id="goal_bank_createdby_hidden" name="goal_bank_createdby" :selected="request()->goal_bank_createdby" label="Created by"></x-dropdown>
-                                </div>
-                                <div class="col">
-                                    <x-dropdown :list="$mandatoryOrSuggested" id="goal_bank_mandatory_hidden" label="Mandatory/Suggested" name="goal_bank_mandatory" :selected="request()->goal_bank_mandatory"></x-dropdown>
-                                </div><!-- 
-                                <div class="col">
-                                    <button class="btn btn-primary mt-4 px-5">Filter</button>
-                                </div> -->
-                            </div>
-                        </form>
-
-                        <form action="{{ route('goal.library.save-multiple') }}" method="post">
-                            @csrf
-                            <div class="row">
-                                <div class="col">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <input name="total_count" id="total_count_hidden" type="hidden" value="{{$goals_count}}">                                            
-                                            <table style="width:100%" id='goalbanks_hidden' class="table table-striped"> </table>
-                                        </div>
-                                    </div>
-                                    @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
-                                    <div class="text-center">
-                                        <x-button id="addMultipleGoalButton_hidden" disabled>Add Selected Goals to Your Profile</x-button>
-                                    </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </form>
-                        
-                        
-                        
-                    </div>
-		    </div>
-	    </div>
         
         
         
@@ -626,60 +551,6 @@
       });
 
       goalbanks.column(1).visible(false);
-
-
-
-
-      const json_goalbanks_hidden = <?php echo $json_goalbanks_hidden;?>;
-
-      if(json_goalbanks_hidden == ''){
-        $('#addMultipleGoalButton_hidden').prop('disabled', true);
-      }
-
-      const goalbanks_hidden = $('#goalbanks_hidden').DataTable({
-        data: json_goalbanks_hidden,
-        columns: [
-          {
-            title: "<input type='checkbox' id='checkAll_hidden'>",
-            data: null,
-            orderable: false, // Disable sorting
-            render: function(data, type, row) {
-              return '<input type="checkbox" name="goal_ids[]" value="' + row.id + '" class="row-checkbox goal_ids">';
-            }
-          },
-          { title: "ID", data: "id" },
-          {
-            title: "Goal Title",
-            data: null,
-            render: function(data, type, row) {
-                return '<a href="#" class="show-goal-detail highlighter" data-id="' + row.id + '">' + data.title + '</a>';
-            }
-          },
-          { title: "Goal Type", data: "typename" },
-          { title: "Tags", data: "tagnames" },
-          { title: "Date Added", data: "created_at" },
-          {
-            title: "Created by",
-            data: null,
-            render: function(data, type, row) {
-              if (row.display_name) {
-                return row.display_name;
-              } else {
-                return row.username;
-              }
-            }
-          },
-          { title: "Mandatory/Suggested", data: "is_mandatory" }
-        ],
-        "order": [[0, "desc"]],
-        dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>'
-      });
-
-      goalbanks_hidden.column(1).visible(false);
-
-
-
-
       
       // Add event listener for "check all" checkbox
       $('#checkAll').on('change', function() {
