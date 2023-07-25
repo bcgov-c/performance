@@ -448,6 +448,8 @@ class SysadminStatisticsReportController extends Controller
                     $join->on('user_demo_jr_view.employee_id', '=', 'A.employee_id');
                     //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
                 })
+                ->where('user_demo_jr_view.excused_flag', '<>', 1)
+                ->whereNull('user_demo_jr_view.date_deleted ')
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                 ->where('A.due_date_paused', 'N')
