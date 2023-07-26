@@ -205,8 +205,11 @@ class SysadminStatisticsReportController extends Controller
         $convertedArray = [];
         $groupedData = [];
         $toal_goal_counts = 0;
+        $sub_users = 0;
         foreach ($goal_count_cal as $item) {
             $user_id = $item['user_id'];
+            $sub_users++;
+
             $goals_count = $item['goals_count'];
             $goal_type_id = $item['goal_type_id'];
 
@@ -230,10 +233,10 @@ class SysadminStatisticsReportController extends Controller
                     'goal_type_id' => $goal_type_id,
                 ];
             }
-            $groupedData[$key]['goals_count'] += $goals_count;
+            $groupedData[$key]['goals_count'] ++;
         }
 
-        $groupedData[0]['goals_count'] = $total_number_emp - $toal_goal_counts;
+        $groupedData[0]['goals_count'] = $total_number_emp - $sub_users;
         $groupedData[0]['goal_type_id'] = '';
         $groupedData[0]['group_key'] = 0;
 
@@ -438,7 +441,6 @@ class SysadminStatisticsReportController extends Controller
         $level3 = $request->dd_level3 ? EmployeeDemoTree::where('id', $request->dd_level3)->first() : null;
         $level4 = $request->dd_level4 ? EmployeeDemoTree::where('id', $request->dd_level4)->first() : null;
 
-
         if($request->goal) {
             $from_stmt = $this->goalSummary_from_statement($request->goal);
             $sql = User::selectRaw('A.*, goals_count, user_demo_jr_view.employee_name, 
@@ -477,6 +479,16 @@ class SysadminStatisticsReportController extends Controller
                     //           ->where('employee_demo.employee_status', 'A');
                     // });
                     $users = $sql->get();
+                        
+                    /*
+                    $query = $sql->toSql();
+                    $bing = $sql->getBindings();
+                    echo $query;
+                    echo "<br/>";
+                    print_r($bing);
+                    exit;
+                    */
+
         } else {
             $types = GoalType::orderBy('id')->get();
             $users = collect();
@@ -520,11 +532,11 @@ class SysadminStatisticsReportController extends Controller
                             //           ->where('employee_demo.employee_status', 'A');
                             // });
                     $user_type = $sql->get();
+
                     $users = $users->merge($user_type);
                 }
 
             }
-
 
         }
         
@@ -555,7 +567,7 @@ class SysadminStatisticsReportController extends Controller
             foreach ($users as $user) {
                 $row['Employee ID'] = $user->employee_id;
                 $row['Name'] = $user->employee_name;
-                $row['Email'] = $user->email;
+                $row['Email'] = $user->employee_email;
                 $row['Active Goals Count'] = $user->goals_count;
                 $row['Organization'] = $user->organization;
                 $row['Level 1'] = $user->level1_program;
