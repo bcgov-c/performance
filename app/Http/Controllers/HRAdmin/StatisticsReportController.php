@@ -55,13 +55,14 @@ class StatisticsReportController extends Controller
 
     Public function goalSummary_from_statement($goal_type_id)
     {
-        $from_stmt = "(select users.id, users.email, users.employee_id, users.empl_record, users.guid, users.reporting_to, 
-                        users.excused_start_date, users.excused_end_date, users.due_date_paused,
-                        (select count(*) from goals where user_id = users.id
-                        and status = 'active' and deleted_at is null and is_library = 0 ";
-        if ($goal_type_id)                        
+        $from_stmt = "(select user_demo_jr_view.user_id, user_demo_jr_view.employee_email, user_demo_jr_view.employee_id, user_demo_jr_view.empl_record
+                    , user_demo_jr_view.guid, user_demo_jr_view.reporting_to, 
+                        (select count(*) from goals where goals.user_id = user_demo_jr_view.user_id
+                        and goals.status = 'active' and goals.deleted_at is null and goals.is_library = 0 ";
+        if ($goal_type_id != ''){                        
             $from_stmt .= " and goals.goal_type_id =".  $goal_type_id ;
-        $from_stmt .= ") as goals_count from users ) AS A";
+        }    
+        $from_stmt .= ") as goals_count from user_demo_jr_view ) AS A";
 
         return $from_stmt;
     }
@@ -472,43 +473,108 @@ class StatisticsReportController extends Controller
         $level4 = $request->dd_level4 ? EmployeeDemoTree::where('id', $request->dd_level4)->first() : null;
 
 
-        $from_stmt = $this->goalSummary_from_statement($request->goal);
+        if($request->goal) {
+            $from_stmt = $this->goalSummary_from_statement($request->goal);
+            $sql = User::selectRaw('A.*, goals_count, user_demo_jr_view.employee_name, 
+            user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4')
+                    ->from(DB::raw( $from_stmt ))                                
+                    ->join('user_demo_jr_view', function($join) {
+                        $join->on('user_demo_jr_view.employee_id', '=', 'A.employee_id');
+                        //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
+                    })
+                    ->where(function($query) {
+                        $query->where(function($query) {
+                            $query->where('user_demo_jr_view.excused_flag', '<>', '1')
+                                ->orWhereNull('user_demo_jr_view.excused_flag');
+                        });
+                    }) 
+                    ->where(function($query) {
+                        $query->where(function($query) {
+                            $query->where('user_demo_jr_view.due_date_paused', 'N')
+                                ->orWhereNull('user_demo_jr_view.due_date_paused');
+                        });
+                    })
+                    ->whereNull('user_demo_jr_view.date_deleted')
+                    // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+                    // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
+                    ->whereExists(function ($query) {
+                        $query->select(DB::raw(1))
+                                ->from('auth_users')
+                            ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
+                            ->where('auth_users.type', '=', 'HR')
+                            ->where('auth_users.auth_id', '=', Auth::id());
+                    })
+                    ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
+                    ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
+                    ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
+                    ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
+                    ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })
+                    // ->where('acctlock', 0)
+                    ->when( (array_key_exists($request->range, $this->groups)) , function($q) use($request) {
+                        return $q->whereBetween('goals_count', $this->groups[$request->range]);
+                    });
+                    // ->where( function($query) {
+                    //     $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01") ')
+                    //           ->where('employee_demo.employee_status', 'A');
+                    // });
+                    $users = $sql->get();
+        } else {
+            $types = GoalType::orderBy('id')->get();
+            $users = collect();
+            foreach ($types as $type){
+                if($type->name != 'Private') {
+                    $goal_type_id = $type->id;
+                    $from_stmt = $this->goalSummary_from_statement($goal_type_id);
+                    $sql = User::selectRaw('A.*, goals_count, user_demo_jr_view.employee_name, 
+                    user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4')
+                            ->from(DB::raw( $from_stmt ))                                
+                            ->join('user_demo_jr_view', function($join) {
+                                $join->on('user_demo_jr_view.employee_id', '=', 'A.employee_id');
+                                //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
+                            })
+                            ->where(function($query) {
+                                $query->where(function($query) {
+                                    $query->where('user_demo_jr_view.excused_flag', '<>', '1')
+                                        ->orWhereNull('user_demo_jr_view.excused_flag');
+                                });
+                            }) 
+                            ->where(function($query) {
+                                $query->where(function($query) {
+                                    $query->where('user_demo_jr_view.due_date_paused', 'N')
+                                        ->orWhereNull('user_demo_jr_view.due_date_paused');
+                                });
+                            })
+                            ->whereNull('user_demo_jr_view.date_deleted')
+                            // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+                            // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
+                            ->whereExists(function ($query) {
+                                $query->select(DB::raw(1))
+                                        ->from('auth_users')
+                                    ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
+                                    ->where('auth_users.type', '=', 'HR')
+                                    ->where('auth_users.auth_id', '=', Auth::id());
+                            })
+                            ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
+                            ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
+                            ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
+                            ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
+                            ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })
+                            // ->where('acctlock', 0)
+                            ->when( (array_key_exists($request->range, $this->groups)) , function($q) use($request) {
+                                return $q->whereBetween('goals_count', $this->groups[$request->range]);
+                            });
+                            // ->where( function($query) {
+                            //     $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01") ')
+                            //           ->where('employee_demo.employee_status', 'A');
+                            // });
+                    $user_type = $sql->get();
+                    $users = $users->merge($user_type);
+                }
 
-        $sql = User::selectRaw('A.*, goals_count, user_demo_jr_view.employee_name, 
-        user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4')                
-                ->from(DB::raw( $from_stmt ))                                
-                ->join('user_demo_jr_view', function($join) {
-                    $join->on('user_demo_jr_view.employee_id', '=', 'A.employee_id');
-                    //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
-                })
-                ->where('user_demo_jr_view.excused_flag', '<>', 1)
-                ->whereNull('user_demo_jr_view.date_deleted')
-                // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
-                // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
-                ->where('A.due_date_paused', 'N')
-                ->whereNotNull('A.guid')
-                ->whereExists(function ($query) {
-                    $query->select(DB::raw(1))
-                            ->from('auth_users')
-                        ->whereColumn('auth_users.user_id', 'A.id')
-                        ->where('auth_users.type', '=', 'HR')
-                        ->where('auth_users.auth_id', '=', Auth::id());
-                })
-                ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
-                ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
-                ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
-                ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
-                ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })
-                // ->where('acctlock', 0)
-                ->when( (array_key_exists($request->range, $this->groups)) , function($q) use($request) {
-                    return $q->whereBetween('goals_count', $this->groups[$request->range]);
-                });
-                // ->where( function($query) {
-                //     $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01") ')
-                //           ->where('employee_demo.employee_status', 'A');
-                // });
+            }
 
-        $users = $sql->get();
+
+        }
 
       
         // Generating Output file 
