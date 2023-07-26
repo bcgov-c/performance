@@ -222,8 +222,11 @@ class StatisticsReportController extends Controller
         $convertedArray = [];
         $groupedData = [];
         $toal_goal_counts = 0;
+        $sub_users = 0;
         foreach ($goal_count_cal as $item) {
             $user_id = $item['user_id'];
+            $sub_users++;
+
             $goals_count = $item['goals_count'];
             $goal_type_id = $item['goal_type_id'];
 
@@ -247,10 +250,11 @@ class StatisticsReportController extends Controller
                     'goal_type_id' => $goal_type_id,
                 ];
             }
-            $groupedData[$key]['goals_count'] += $goals_count;
+            //$groupedData[$key]['goals_count'] += $goals_count;
+            $groupedData[$key]['goals_count'] ++;
         }
 
-        $groupedData[0]['goals_count'] = $total_number_emp - $toal_goal_counts;
+        $groupedData[0]['goals_count'] = $total_number_emp - $sub_users;
         $groupedData[0]['goal_type_id'] = '';
         $groupedData[0]['group_key'] = 0;
 
@@ -561,11 +565,11 @@ class StatisticsReportController extends Controller
                             //           ->where('employee_demo.employee_status', 'A');
                             // });
                     $user_type = $sql->get();
+                    
                     $users = $users->merge($user_type);
                 }
 
             }
-
 
         }
 
@@ -596,7 +600,7 @@ class StatisticsReportController extends Controller
             foreach ($users as $user) {
                 $row['Employee ID'] = $user->employee_id;
                 $row['Name'] = $user->employee_name;
-                $row['Email'] = $user->email;
+                $row['Email'] = $user->employee_email;
                 $row['Active Goals Count'] = $user->goals_count;
                 $row['Organization'] = $user->organization;
                 $row['Level 1'] = $user->level1_program;
