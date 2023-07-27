@@ -463,7 +463,7 @@ class GoalController extends Controller
         $goaltypes = GoalType::where('name', '!=', 'private')->get()->toArray();
 
         $adminGoals = Goal::withoutGlobalScopes()
-            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator '<br/>') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
+            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_hide', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator '<br/>') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
             ->join('goal_bank_orgs', function ($qon) {
                 return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
                     ->on('goal_bank_orgs.version', \DB::raw(2))
@@ -529,8 +529,46 @@ class GoalController extends Controller
             }
         }
 
+        // Admin List filter for hidden items below
+        if ($request->has('goal_bank_mandatory_hidden') && $request->goal_bank_mandatory_hidden !== null) {
+            if ($request->goal_bank_mandatory_hidden == "1") {
+                $adminGoals = $adminGoals->where('is_mandatory', $request->goal_bank_mandatory_hidden);
+            }
+            else {
+                $adminGoals = $adminGoals->where(function ($adminGoals1) {
+                    $adminGoals1->whereNull('is_mandatory');
+                    $adminGoals1->orWhere('is_mandatory', 0);
+                });
+            }
+        }
+        if ($request->has('goal_bank_types_hidden') && $request->goal_bank_types_hidden) {
+            $adminGoals = $adminGoals->whereHas('goalType', function($adminGoals1) use ($request) {
+                return $adminGoals1->where('goal_type_id', $request->goal_bank_types_hidden);
+            });
+        }
+        if ($request->has('goal_bank_tags_hidden') && $request->goal_bank_tags_hidden) {
+            // $adminGoals = $adminGoals->where('goal_tags.tag_id', "=", "$request->tag_id");
+            $adminGoals = $adminGoals->whereRaw("EXISTS (SELECT 1 FROM goal_tags WHERE goal_tags.goal_id = goals.id AND goal_tags.tag_id = '{$request->goal_bank_tags_hidden}')");
+        }
+        if ($request->has('goal_bank_title_hidden') && $request->goal_bank_title_hidden) {
+            $adminGoals = $adminGoals->where('goals.title', "LIKE", "%$request->goal_bank_title_hidden%");
+        }
+        if ($request->has('goal_bank_dateadd_hidden') && $request->goal_bank_dateadd_hidden && Str::lower($request->goal_bank_dateadd_hidden) !== 'any') {
+            $dateadded_hidden = $request->goal_bank_dateadd_hidden;
+            $adminGoals = $adminGoals->whereDate('goals.created_at', '>=', $dateadded_hidden . " 00:00:00");
+            $adminGoals = $adminGoals->whereDate('goals.created_at', '<=', $dateadded_hidden . " 23:59:59");
+        }
+        if ($request->has('goal_bank_createdby_hidden') && $request->goal_bank_createdby_hidden) {
+            // $query = $query->where('user_id', $request->created_by);
+            if(is_numeric($request->goal_bank_createdby_hidden)) {
+                $adminGoals = $adminGoals->where('created_by', $request->goal_bank_createdby_hidden)->whereNull('display_name');
+            } else {
+                $adminGoals = $adminGoals->where('display_name', 'like',$request->goal_bank_createdby_hidden);
+            }
+        }
+
         $adminGoalsInherited = Goal::withoutGlobalScopes()
-            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator '<br/>') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
+            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_hide', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator '<br/>') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
             ->join('goal_bank_orgs', function ($qon) {
                 return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
                     ->on('goal_bank_orgs.version', \DB::raw(2))
@@ -603,6 +641,45 @@ class GoalController extends Controller
             }
         }
 
+        // Admin List hidden filter below
+        if ($request->has('goal_bank_mandatory_hidden') && $request->goal_bank_mandatory_hidden !== null) {
+            if ($request->goal_bank_mandatory_hidden == "1") {
+                $adminGoalsInherited = $adminGoalsInherited->where('is_mandatory', $request->goal_bank_mandatory_hidden);
+            }
+            else {
+                $adminGoalsInherited = $adminGoalsInherited->where(function ($adminGoals1) {
+                    $adminGoals1->whereNull('is_mandatory');
+                    $adminGoals1->orWhere('is_mandatory', 0);
+                });
+            }
+        }
+        if ($request->has('goal_bank_types_hidden') && $request->goal_bank_types_hidden) {
+            $adminGoalsInherited = $adminGoalsInherited->whereHas('goalType', function($adminGoals1) use ($request) {
+                return $adminGoals1->where('goal_type_id', $request->goal_bank_types_hidden);
+            });
+        }
+        if ($request->has('goal_bank_tags_hidden') && $request->goal_bank_tags_hidden) {
+            // $adminGoalsInherited = $adminGoalsInherited->where('goal_tags.tag_id', "=", "$request->tag_id");
+            $adminGoalsInherited = $adminGoalsInherited->whereRaw("EXISTS (SELECT 1 FROM goal_tags WHERE goal_tags.goal_id = goals.id AND goal_tags.tag_id = '{$request->goal_bank_tags_hidden}')");
+        }
+        if ($request->has('goal_bank_title_hidden') && $request->goal_bank_title_hidden) {
+            $adminGoalsInherited = $adminGoalsInherited->where('goals.title', "LIKE", "%$request->goal_bank_title_hidden%");
+        }
+        if ($request->has('goal_bank_dateadd_hidden') && $request->date_added_hidden && Str::lower($request->goal_bank_dateadd_hidden) !== 'any') {
+            $dateadded_hidden = $request->goal_bank_dateadd_hidden;
+            $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '>=', $dateadded_hidden . " 00:00:00");
+            $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '<=', $dateadded_hidden . " 23:59:59");
+        }
+        if ($request->has('goal_bank_createdby_hidden') && $request->goal_bank_createdby_hidden) {
+            // $query = $query->where('user_id', $request->created_by);
+            if(is_numeric($request->goal_bank_createdby_hidden)) {
+                $adminGoalsInherited = $adminGoalsInherited->where('created_by', $request->goal_bank_createdby_hidden)->whereNull('display_name');
+            } else {
+                $adminGoalsInherited = $adminGoalsInherited->where('display_name', 'like',$request->goal_bank_createdby_hidden);
+            }
+        }
+
+
         // $adminGoals = $adminGoals->union($adminGoalsInherited);
 
         $query = Goal::withoutGlobalScope(NonLibraryScope::class)
@@ -613,7 +690,7 @@ class GoalController extends Controller
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')    
         ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
         ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id');  
-        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.id as creator_id','u2.name as username',DB::raw('group_concat(distinct tags.name separator "<br/>") as tagnames'));
+        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.is_hide', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.id as creator_id','u2.name as username',DB::raw('group_concat(distinct tags.name separator "<br/>") as tagnames'));
         
         if ($request->has('goal_bank_mandatory') && $request->goal_bank_mandatory !== null) {
             if ($request->goal_bank_mandatory == "1") {
@@ -656,10 +733,55 @@ class GoalController extends Controller
             }
         }
 
+
+        //hidden items
+        if ($request->has('goal_bank_mandatory_hidden') && $request->goal_bank_mandatory_hidden !== null) {
+            if ($request->goal_bank_mandatory_hidden == "1") {
+                $query = $query->where('is_mandatory', $request->goal_bank_mandatory_hidden);
+            }
+            else {
+                $query = $query->where(function ($query) {
+                    $query->whereNull('is_mandatory');
+                    $query->orWhere('is_mandatory', 0);
+                });
+            }
+        }
+
+        if ($request->has('goal_bank_types_hidden') && $request->goal_bank_types_hidden) {
+            $query = $query->whereHas('goalType', function($query) use ($request) {
+                return $query->where('goal_type_id', $request->goal_bank_types_hidden);
+            });
+        }
+        
+        if ($request->has('goal_bank_tags_hidden') && $request->goal_bank_tags_hidden) {
+            $query = $query->where('goal_tags.tag_id', "=", "$request->goal_bank_tags_hidden");
+        }
+
+        if ($request->has('goal_bank_title_hidden') && $request->goal_bank_title_hidden) {
+            $query = $query->where('goals.title', "LIKE", "%$request->goal_bank_title_hidden%");
+        }
+
+        if ($request->has('goal_bank_dateadd_hidden') && $request->goal_bank_dateadd_hidden && Str::lower($request->goal_bank_dateadd_hidden) !== 'any') {
+            $dateadded_hidden = $request->goal_bank_dateadd_hidden;
+            $query = $query->where('goals.created_at', '>=', $dateadded_hidden . " 00:00:00");
+            $query = $query->where('goals.created_at', '<=', $dateadded_hidden . " 23:59:59");
+        }
+
+        if ($request->has('goal_bank_createdby') && $request->goal_bank_createdby_hidden) {
+            // $query = $query->where('user_id', $request->created_by);
+            if(is_numeric($request->goal_bank_createdby_hidden)) {
+                $query = $query->where('created_by', $request->goal_bank_createdby_hidden)->whereNull('display_name');
+            } else {
+                $query = $query->where('display_name', 'like',$request->goal_bank_createdby_hidden);
+            }
+        }
+
+
         $query->whereHas('sharedWith', function($query) {
             $query->where('user_id', Auth::id());
         });
         $query->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory');
+
         $query = $query->union($adminGoals)->union($adminGoalsInherited);
                 
         $sortby = 'created_at';
@@ -671,31 +793,65 @@ class GoalController extends Controller
         $bankGoals = $query->get();
         $this->getDropdownValues($mandatoryOrSuggested, $createdBy, $goaltypes, $tagsList);
         $bankGoals_arr = array();
+        $hidden_goals = array();
         $i = 0;
+        $c = 0;
+
         
         foreach($bankGoals as $item){
-            $bankGoals_arr[$i]['id'] = $item->id;
-            $bankGoals_arr[$i]['title'] = $item->title;
-            $bankGoals_arr[$i]['goal_type_id'] = $item->goal_type_id;
-            
-            $date = Carbon::parse($item->created_at); // Parse the date string into a Carbon instance
-            $formattedDate = $date->format('Y-m-d');
-            $bankGoals_arr[$i]['created_at'] = $formattedDate;
-            
-            $bankGoals_arr[$i]['user_id'] = $item->user_id;
-            if($item->is_mandatory == 1){
-                $bankGoals_arr[$i]['is_mandatory'] = 'Mandatory';
-            }else{
-                $bankGoals_arr[$i]['is_mandatory'] = 'Suggested';
+            if($item->is_hide != 1){
+                $bankGoals_arr[$i]['id'] = $item->id;
+                $bankGoals_arr[$i]['title'] = $item->title;
+                $bankGoals_arr[$i]['goal_type_id'] = $item->goal_type_id;
+                
+                $date = Carbon::parse($item->created_at); // Parse the date string into a Carbon instance
+                $formattedDate = $date->format('Y-m-d');
+                $bankGoals_arr[$i]['created_at'] = $formattedDate;
+                
+                $bankGoals_arr[$i]['user_id'] = $item->user_id;
+                if($item->is_mandatory == 1){
+                    $bankGoals_arr[$i]['is_mandatory'] = 'Mandatory';
+                }else{
+                    $bankGoals_arr[$i]['is_mandatory'] = 'Suggested';
+                }
+                $bankGoals_arr[$i]['display_name'] = $item->display_name;            
+                
+                $bankGoals_arr[$i]['typename'] = $item->typename;
+                $bankGoals_arr[$i]['username'] = $item->username;
+                $bankGoals_arr[$i]['tagnames'] = $item->tagnames;
+                $i++;
             }
-            $bankGoals_arr[$i]['display_name'] = $item->display_name;            
             
-            $bankGoals_arr[$i]['typename'] = $item->typename;
-            $bankGoals_arr[$i]['username'] = $item->username;
-            $bankGoals_arr[$i]['tagnames'] = $item->tagnames;
-            $i++;
         }
         $json_goalbanks = json_encode($bankGoals_arr);   
+
+        foreach($bankGoals as $item){
+            if($item->is_hide == 1){
+                $hidden_goals[$c]['id'] = $item->id;
+                $hidden_goals[$c]['title'] = $item->title;
+                $hidden_goals[$c]['goal_type_id'] = $item->goal_type_id;
+                
+                $date = Carbon::parse($item->created_at); // Parse the date string into a Carbon instance
+                $formattedDate = $date->format('Y-m-d');
+                $hidden_goals[$c]['created_at'] = $formattedDate;
+                
+                $hidden_goals[$c]['user_id'] = $item->user_id;
+                if($item->is_mandatory == 1){
+                    $hidden_goals[$c]['is_mandatory'] = 'Mandatory';
+                }else{
+                    $hidden_goals[$c]['is_mandatory'] = 'Suggested';
+                }
+                $hidden_goals[$c]['display_name'] = $item->display_name;            
+                
+                $hidden_goals[$c]['typename'] = $item->typename;
+                $hidden_goals[$c]['username'] = $item->username;
+                $hidden_goals[$c]['tagnames'] = $item->tagnames;
+                $c++;
+            }
+            
+        }
+        $json_goalbanks_hidden = json_encode($hidden_goals);   
+
                         
         $all_adminGoals = Goal::withoutGlobalScopes()
             ->select('u2.id as creator_id', 'u2.name as username', 'goals.display_name')
@@ -948,8 +1104,16 @@ class GoalController extends Controller
          */
 
         $goaltypes = GoalType::where('name', '!=', 'private')->get()->toArray();
+
+        $goaltypes_filter = $goaltypes;
+        array_unshift($goaltypes_filter, [
+            "id" => "0",
+            "name" => "Any"
+        ]);
+
+
         return view('goal.bank', compact('bankGoals', 'tags', 'user', 'tagsList', 'goaltypes',  'type_desc_str', 'mandatoryOrSuggested', 'createdBy', 'goals_count', 'sortby','sortorder',
-                                'open_modal_id','from','shared_employees', 'json_goalbanks','json_team_goalbanks','employees_list'));
+                                'open_modal_id','from','shared_employees', 'json_goalbanks','json_team_goalbanks', 'json_goalbanks_hidden', 'employees_list', 'goaltypes_filter'));
     }
     
     public function myEmployeesAjax() {
@@ -1162,6 +1326,25 @@ class GoalController extends Controller
             }             
         }
         return redirect()->route('goal.current');
+    }
+
+    public function hideFromLibraryMultiple(Request $request) {
+        foreach ($request->goal_ids as $goal_id) {
+            DB::table('goals')
+            ->where('id', $goal_id)
+            ->update(['is_hide' => 1]);          
+        }
+        return redirect()->route('goal.library');
+    }
+
+
+    public function showFromLibraryMultiple(Request $request) {
+        foreach ($request->goal_ids as $goal_id) {
+            DB::table('goals')
+            ->where('id', $goal_id)
+            ->update(['is_hide' => NULL]);          
+        }
+        return redirect()->route('goal.library');
     }
 
     public function saveFromLibrary(Request $request)

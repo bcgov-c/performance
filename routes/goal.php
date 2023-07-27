@@ -15,6 +15,8 @@ Route::get('goal/goalbank/{id}', [GoalController::class, 'showForLibrary'])->nam
 Route::get('goal/supervisor/{id}', [GoalController::class, 'getSupervisorGoals'])->name('goal.supervisor');
 Route::post('goal/supervisor/{id}/copy', [GoalController::class, 'copyGoal'])->name('goal.supervisor.copy');
 Route::post('goal/goalbank/copy-multiple', [GoalController::class, 'saveFromLibraryMultiple'])->name('goal.library.save-multiple');
+Route::post('goal/goalbank/hide-multiple', [GoalController::class, 'hideFromLibraryMultiple'])->name('goal.library.hide-multiple');
+Route::post('goal/goalbank/show-multiple', [GoalController::class, 'showFromLibraryMultiple'])->name('goal.library.show-multiple');
 Route::delete('goal/comment/{id}', [GoalCommentController::class, 'delete'])->name('goal.comment.delete');
 Route::put('goal/comment/{id}', [GoalCommentController::class, 'edit'])->name('goal.comment.edit');
 
