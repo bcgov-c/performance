@@ -1414,7 +1414,12 @@ class GoalBankController extends Controller
             ->whereIn('t.level5_key', $selected_inherited)
             ->whereNull('d.date_deleted')
             ->select('d.employee_id');
-        $employees = $employees0->union($employees1)->union($employees2)->union($employees3)->union($employees4)->union($employees5)->pluck('employee_id');
+        $employees6 = EmployeeDemo::from('employee_demo AS d')
+            ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
+            ->whereIn('t.level6_key', $selected_inherited)
+            ->whereNull('d.date_deleted')
+            ->select('d.employee_id');
+        $employees = $employees0->union($employees1)->union($employees2)->union($employees3)->union($employees4)->union($employees5)->union($employees6)->pluck('employee_id');
         return ($employees ? $employees->toArray() : []); 
     }
 

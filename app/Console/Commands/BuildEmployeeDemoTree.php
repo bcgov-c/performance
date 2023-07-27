@@ -81,6 +81,7 @@ class BuildEmployeeDemoTree extends Command
                     case 3:
                     case 4:
                     case 5:
+                    case 6:
                         $field = "level{$level}_key";
                         $level2 = $level - 1;
                         $parent_id = "a.level{$level2}_key";
@@ -90,8 +91,8 @@ class BuildEmployeeDemoTree extends Command
                 }
                 // Insert by Org Level/Group
                 \DB::statement("
-                    INSERT INTO employee_demo_tree_temp (id, name, deptid, level, organization, level1_program, level2_division, level3_branch, level4, level5, organization_key, level1_key, level2_key, level3_key, level4_key, level5_key, organization_deptid, level1_deptid, level2_deptid, level3_deptid, level4_deptid, level5_deptid, headcount, groupcount, parent_id) 
-                    SELECT DISTINCT CONVERT(a.okey, UNSIGNED) AS okey, a.name, a.deptid, a.ulevel, a.organization_label, a.level1_label, a.level2_label, a.level3_label, a.level4_label, a.level5_label, a.organization_key, a.level1_key, a.level2_key, a.level3_key, a.level4_key, a.level5_key, a.organization_deptid, a.level1_deptid, a.level2_deptid, a.level3_deptid, a.level4_deptid, a.level5_deptid,
+                    INSERT INTO employee_demo_tree_temp (id, name, deptid, level, organization, level1_program, level2_division, level3_branch, level4, level5, level6, organization_key, level1_key, level2_key, level3_key, level4_key, level5_key, level6_key, organization_deptid, level1_deptid, level2_deptid, level3_deptid, level4_deptid, level5_deptid, level6_deptid, headcount, groupcount, parent_id) 
+                    SELECT DISTINCT CONVERT(a.okey, UNSIGNED) AS okey, a.name, a.deptid, a.ulevel, a.organization_label, a.level1_label, a.level2_label, a.level3_label, a.level4_label, a.level5_label, a.level6_label, a.organization_key, a.level1_key, a.level2_key, a.level3_key, a.level4_key, a.level5_key, a.level6_key, a.organization_deptid, a.level1_deptid, a.level2_deptid, a.level3_deptid, a.level4_deptid, a.level5_deptid, a.level6_deptid,
                         (SELECT COUNT(1) FROM employee_demo AS e USE INDEX (idx_employee_demo_deptid) WHERE e.deptid = a.deptid AND e.date_deleted IS NULL) AS headcount,
                         0 AS groupcount,
                         {$parent_id}
@@ -117,7 +118,7 @@ class BuildEmployeeDemoTree extends Command
                     // $this->info(Carbon::now()->format('c')." - Org:{$dept->orgid} Count:{$dept->groupcount}");
                 }
                 $level++;
-            } while ($level < 6);
+            } while ($level < 7);
 
             $result = EmployeeDemoTreeTemp::select(\DB::raw('count(1) AS totalcount'))->first();
             $total = $result->totalcount;

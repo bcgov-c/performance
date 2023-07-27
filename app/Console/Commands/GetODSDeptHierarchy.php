@@ -164,6 +164,10 @@ class GetODSDeptHierarchy extends Command
                     null AS level5_label,
                     null AS level5_deptid,
                     null AS level5_key,
+                    null AS level6,
+                    null AS level6_label,
+                    null AS level6_deptid,
+                    null AS level6_key,
                     BusinessName AS org_path,
                     date_deleted,
                     date_updated,
@@ -205,6 +209,10 @@ class GetODSDeptHierarchy extends Command
                         'level5_label' => null,
                         'level5_deptid' => null,
                         'level5_key' => null,
+                        'level6' => null,
+                        'level6_label' => null,
+                        'level6_deptid' => null,
+                        'level6_key' => null,
                         'search_key' => "|{$org->organization_key}|",
                         'org_path' => $org->org_path,
                         'date_deleted' => $org->date_deleted,
@@ -256,6 +264,10 @@ class GetODSDeptHierarchy extends Command
                     null AS level5_label,
                     null AS level5_deptid,
                     null AS level5_key,
+                    null AS level6,
+                    null AS level6_label,
+                    null AS level6_deptid,
+                    null AS level6_key,
                     null AS org_path,
                     date_deleted,
                     date_updated,
@@ -372,6 +384,10 @@ class GetODSDeptHierarchy extends Command
                         'level5_label' => null,
                         'level5_deptid' => null,
                         'level5_key' => null,
+                        'level6' => null,
+                        'level6_label' => null,
+                        'level6_deptid' => null,
+                        'level6_key' => null,
                         'org_path' => $org_path,
                         'date_deleted' => $dept->date_deleted,
                         'date_updated' => $dept->date_updated,
@@ -422,6 +438,10 @@ class GetODSDeptHierarchy extends Command
                     null AS level5_label,
                     null AS level5_deptid,
                     null AS level5_key,
+                    null AS level6,
+                    null AS level6_label,
+                    null AS level6_deptid,
+                    null AS level6_key,
                      null AS org_path,
                     date_deleted,
                     date_updated,
@@ -550,6 +570,10 @@ class GetODSDeptHierarchy extends Command
                         'level5_label' => null,
                         'level5_deptid' => null,
                         'level5_key' => null,
+                        'level6' => null,
+                        'level6_label' => null,
+                        'level6_deptid' => null,
+                        'level6_key' => null,
                         'org_path' => $org_path,
                         'date_deleted' => $dept->date_deleted,
                         'date_updated' => $dept->date_updated,
@@ -600,6 +624,10 @@ class GetODSDeptHierarchy extends Command
                     null AS level5_label,
                     null AS level5_deptid,
                     null AS level5_key,
+                    null AS level6,
+                    null AS level6_label,
+                    null AS level6_deptid,
+                    null AS level6_key,
                     null AS org_path,
                     date_deleted,
                     date_updated,
@@ -743,6 +771,10 @@ class GetODSDeptHierarchy extends Command
                         'level5_label' => null,
                         'level5_deptid' => null,
                         'level5_key' => null,
+                        'level6' => null,
+                        'level6_label' => null,
+                        'level6_deptid' => null,
+                        'level6_key' => null,
                         'org_path' => $org_path,
                         'date_deleted' => $dept->date_deleted,
                         'date_updated' => $dept->date_updated,
@@ -793,6 +825,10 @@ class GetODSDeptHierarchy extends Command
                     null AS level5_label,
                     null AS level5_deptid,
                     null AS level5_key,
+                    null AS level6,
+                    null AS level6_label,
+                    null AS level6_deptid,
+                    null AS level6_key,
                     null AS org_path,
                     date_deleted,
                     date_updated,
@@ -953,6 +989,10 @@ class GetODSDeptHierarchy extends Command
                         'level5_label' => null,
                         'level5_deptid' => null,
                         'level5_key' => null,
+                        'level6' => null,
+                        'level6_label' => null,
+                        'level6_deptid' => null,
+                        'level6_key' => null,
                         'org_path' => $org_path,
                         'date_deleted' => $dept->date_deleted,
                         'date_updated' => $dept->date_updated,
@@ -1003,6 +1043,10 @@ class GetODSDeptHierarchy extends Command
                     null AS level5_label,
                     null AS level5_deptid,
                     null AS level5_key,
+                    null AS level6,
+                    null AS level6_label,
+                    null AS level6_deptid,
+                    null AS level6_key,
                     null AS org_path,
                     date_deleted,
                     date_updated,
@@ -1179,6 +1223,10 @@ class GetODSDeptHierarchy extends Command
                         'level5_label' => $dept->level5_label,
                         'level5_deptid' => $dept->level5_deptid,
                         'level5_key' => $dept->level5_key,
+                        'level6' => null,
+                        'level6_label' => null,
+                        'level6_deptid' => null,
+                        'level6_key' => null,
                         'org_path' => $org_path,
                         'date_deleted' => $dept->date_deleted,
                         'date_updated' => $dept->date_updated,
@@ -1187,6 +1235,256 @@ class GetODSDeptHierarchy extends Command
                         'unallocated' => $dept->unallocated,
                         'duplicate' => $dept->duplicate,
                         'search_key' => "|{$dept->organization_key}|{$dept->level1_key}|{$dept->level2_key}|{$dept->level3_key}|{$dept->level4_key}|{$dept->level5_key}|"
+                    ]);
+                };
+
+                // Level 6
+                $this->info(now().' Processing Level 6...');
+                $org_level = 8;
+                $actual_level = 6;
+                $depts = OrganizationHierarchyStaging::whereRaw("HierarchyLevel = {$org_level}")
+                ->orderBy("BusinessName")
+                ->orderBy("OrgHierarchyKey")
+                ->selectRaw("
+                    OrgID AS orgid,
+                    HierarchyLevel AS hlevel,
+                    ParentOrgHierarchyKey AS pkey,
+                    OrgHierarchyKey AS okey,
+                    DepartmentID AS deptid,
+                    BusinessName AS name,
+                    0 AS ulevel,
+                    null AS organization,
+                    null AS organization_label,
+                    null AS organization_deptid,
+                    null AS organization_key,
+                    null AS level1,
+                    null AS level1_label,
+                    null AS level1_deptid,
+                    null AS level1_key,
+                    null AS level2,
+                    null AS level2_label,
+                    null AS level2_deptid,
+                    null AS level2_key,
+                    null AS level3,
+                    null AS level3_label,
+                    null AS level3_deptid,
+                    null AS level3_key,
+                    null AS level4,
+                    null AS level4_label,
+                    null AS level4_deptid,
+                    null AS level4_key,
+                    null AS level5,
+                    null AS level5_label,
+                    null AS level5_deptid,
+                    null AS level5_key,
+                    null AS level6,
+                    null AS level6_label,
+                    null AS level6_deptid,
+                    null AS level6_key,
+                    null AS org_path,
+                    date_deleted,
+                    date_updated,
+                    0 AS exception,
+                    null AS exception_reason,
+                    0 AS unallocated,
+                    0 AS duplicate
+                ")
+                ->get();
+                foreach($depts as $dept){
+                    $parent = OrganizationHierarchy::whereRaw("okey = ".$dept->pkey)
+                    ->selectRaw("
+                        orgid,
+                        hlevel,
+                        pkey,
+                        okey,
+                        deptid,
+                        name,
+                        ulevel,
+                        organization,
+                        organization_label,
+                        organization_deptid,
+                        organization_key,
+                        level1,
+                        level1_label,
+                        level1_deptid,
+                        level1_key,
+                        level2,
+                        level2_label,
+                        level2_deptid,
+                        level2_key,
+                        level3,
+                        level3_label,
+                        level3_deptid,
+                        level3_key,
+                        level4,
+                        level4_label,
+                        level4_deptid,
+                        level4_key,
+                        level5,
+                        level5_label,
+                        level5_deptid,
+                        level5_key,
+                        org_path,
+                        date_deleted,
+                        date_updated,
+                        exception,
+                        exception_reason,
+                        unallocated,
+                        duplicate
+                    ")
+                    ->first();
+                    if ($parent) {
+                        if ($parent->exception) {
+                            $exception = 2;
+                            $exception_reason = "Parent has exception";
+                        } else {
+                            if ($parent->date_deleted) {
+                                $exception = 3;
+                                $exception_reason = "Parent was deleted";
+                            } else {
+                                $exception = 0;
+                                $exception_reason = NULL;
+                            }
+                        }
+                        $organization = $parent->organization;
+                        $organization_label = $parent->organization_label;
+                        $organization_deptid = $parent->organization_deptid;
+                        $organization_key = $parent->organization_key;
+                        $level1 = $parent->level1;
+                        $level1_label = $parent->level1_label;
+                        $level1_deptid = $parent->level1_deptid;
+                        $level1_key = $parent->level1_key;
+                        $level2 = $parent->level2;
+                        $level2_label = $parent->level2_label;
+                        $level2_deptid = $parent->level2_deptid;
+                        $level2_key = $parent->level2_key;
+                        $level3 = $parent->level3;
+                        $level3_label = $parent->level3_label;
+                        $level3_deptid = $parent->level3_deptid;
+                        $level3_key = $parent->level3_key;
+                        $level4 = $parent->level4;
+                        $level4_label = $parent->level4_label;
+                        $level4_deptid = $parent->level4_deptid;
+                        $level4_key = $parent->level4_key;
+                        $level5 = $parent->level5;
+                        $level5_label = $parent->level5_label;
+                        $level5_deptid = $parent->level5_deptid;
+                        $level5_key = $parent->level5_key;
+                    } else {
+                        $exception = 1;
+                        $exception_reason = "Parent Node missing";
+                        $organization = NULL;
+                        $organization_label = NULL;
+                        $organization_deptid = NULL;
+                        $organization_key = NULL;
+                        $level1 = NULL;
+                        $level1_label = NULL;
+                        $level1_deptid = NULL;
+                        $level1_key = NULL;
+                        $level2 = NULL;
+                        $level2_label = NULL;
+                        $level2_deptid = NULL;
+                        $level2_key = NULL;
+                        $level3 = NULL;
+                        $level3_label = NULL;
+                        $level3_deptid = NULL;
+                        $level3_key = NULL;
+                        $level4 = NULL;
+                        $level4_label = NULL;
+                        $level4_deptid = NULL;
+                        $level4_key = NULL;
+                        $level5 = NULL;
+                        $level5_label = NULL;
+                        $level5_deptid = NULL;
+                        $level5_key = NULL;
+                    }
+                    $dept->exception = $exception;
+                    $dept->exception_reason = $exception_reason;
+                    $dept->organization = $organization;
+                    $dept->organization_label = $organization_label;
+                    $dept->organization_deptid = $organization_deptid;
+                    $dept->organization_key = $organization_key;
+                    $dept->level1 = $level1;
+                    $dept->level1_label = $level1_label;
+                    $dept->level1_deptid = $level1_deptid;
+                    $dept->level1_key = $level1_key;
+                    $dept->level2 = $level2;
+                    $dept->level2_label = $level2_label;
+                    $dept->level2_deptid = $level2_deptid;
+                    $dept->level2_key = $level2_key;
+                    $dept->level3 = $level3;
+                    $dept->level3_label = $level3_label;
+                    $dept->level3_deptid = $level3_deptid;
+                    $dept->level3_key = $level3_key;
+                    $dept->level4 = $level4;
+                    $dept->level4_label = $level4_label;
+                    $dept->level4_deptid = $level4_deptid;
+                    $dept->level4_key = $level4_key;
+                    $dept->level5 = $level5;
+                    $dept->level5_label = $level5_label;
+                    $dept->level5_deptid = $level5_deptid;
+                    $dept->level5_key = $level5_key;
+                    if (str_contains(strtolower($dept->name), "unallocated") or str_contains(strtolower($dept->name), "inactive") or str_contains(strtolower($dept->name), "inactivate")) {
+                        $dept->unallocated = 1;
+                        if ($parent) {
+                            $org_path = $parent->org_path;
+                        } else {
+                            $org_path = null;
+                        }
+                    } else {
+                        $dept->unallocated = 0;
+                        $this->AssignToBlankLevel($dept, $parent);
+                        if ($parent) {
+                            $org_path = $parent->org_path." > ".$dept->name;
+                        } else {
+                            $org_path = $dept->name;
+                        }
+                    }
+                    $dept->org_path = $org_path;
+                    OrganizationHierarchy::create([
+                        'orgid' => $dept->orgid,
+                        'hlevel' => $dept->hlevel,
+                        'pkey' => $dept->pkey,
+                        'okey' => $dept->okey,
+                        'deptid' => $dept->deptid,
+                        'name' => $dept->name,
+                        'ulevel' => $dept->ulevel,
+                        'organization' => $dept->organization,
+                        'organization_label' => $dept->organization_label,
+                        'organization_deptid' => $dept->organization_deptid,
+                        'organization_key' => $dept->organization_key,
+                        'level1' => $dept->level1,
+                        'level1_label' => $dept->level1_label,
+                        'level1_deptid' => $dept->level1_deptid,
+                        'level1_key' => $dept->level1_key,
+                        'level2' => $dept->level2,
+                        'level2_label' => $dept->level2_label,
+                        'level2_deptid' => $dept->level2_deptid,
+                        'level2_key' => $dept->level2_key,
+                        'level3' => $dept->level3,
+                        'level3_label' => $dept->level3_label,
+                        'level3_deptid' => $dept->level3_deptid,
+                        'level3_key' => $dept->level3_key,
+                        'level4' => $dept->level4,
+                        'level4_label' => $dept->level4_label,
+                        'level4_deptid' => $dept->level4_deptid,
+                        'level4_key' => $dept->level4_key,
+                        'level5' => $dept->level5,
+                        'level5_label' => $dept->level5_label,
+                        'level5_deptid' => $dept->level5_deptid,
+                        'level5_key' => $dept->level5_key,
+                        'level6' => $dept->level6,
+                        'level6_label' => $dept->level6_label,
+                        'level6_deptid' => $dept->level6_deptid,
+                        'level6_key' => $dept->level6_key,
+                        'org_path' => $org_path,
+                        'date_deleted' => $dept->date_deleted,
+                        'date_updated' => $dept->date_updated,
+                        'exception' => $dept->exception,
+                        'exception_reason' => $dept->exception_reason,
+                        'unallocated' => $dept->unallocated,
+                        'duplicate' => $dept->duplicate,
+                        'search_key' => "|{$dept->organization_key}|{$dept->level1_key}|{$dept->level2_key}|{$dept->level3_key}|{$dept->level4_key}|{$dept->level5_key}|{$dept->level6_key}|"
                     ]);
                 };
             }
@@ -1217,9 +1515,17 @@ class GetODSDeptHierarchy extends Command
                 if ($dept->level3) {
                     if ($dept->level4) {
                         if ($dept->level5) {
-                            $dept->exception = 4;
-                            $dept->exception_reason = 'Exceeded 5 levels';
-                            $dept->ulevel = 6;
+                            if ($dept->level6) {
+                                $dept->exception = 4;
+                                $dept->exception_reason = 'Exceeded 6 levels';
+                                $dept->ulevel = 7;
+                            } else {
+                                $dept->level6 = $dept->orgid;
+                                $dept->level6_label = $dept->name;
+                                $dept->level6_deptid = $dept->deptid;
+                                $dept->level6_key = $dept->okey;
+                                $dept->ulevel = 6;
+                            }
                         } else {
                             $dept->level5 = $dept->orgid;
                             $dept->level5_label = $dept->name;
