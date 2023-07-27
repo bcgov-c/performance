@@ -18,21 +18,21 @@
     </div>
     <div class="mt-4">
         <div class="card">
-		<div class="card-header" id="heading_0">
-                    <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_0" aria-expanded="1" aria-controls="collapse_0">
-                        <button class="btn btn-link" >
-                            <h4>My Goal Bank</h4> 
-                        </button>                        
-                        <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span>    
-                        <br/>                                
-                        <button class="btn btn-link text-left" style="color:black">
-                            <p>The goals below have been created for you by your supervisor or organization. Click on a goal to view it and add it to your own profile. 
-                        If needed, you can edit the goal to personalize it once it is in your profile. </p>
-                        </button>  
-                    </h5>
-		</div>
+            <div class="card-header" id="heading_0">
+                        <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_0" aria-expanded="1" aria-controls="collapse_0">
+                            <button class="btn btn-link" >
+                                <h4>My Goal Bank</h4> 
+                            </button>                        
+                            <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span>    
+                            <br/>                                
+                            <button class="btn btn-link text-left" style="color:black">
+                                <p>The goals below have been created for you by your supervisor or organization. Click on a goal to view it and add it to your own profile. 
+                            If needed, you can edit the goal to personalize it once it is in your profile. </p>
+                            </button>  
+                        </h5>
+            </div>
 
-		<div id="collapse_0" class="collapse" aria-labelledby="heading_0">
+		    <div id="collapse_0" class="collapse" aria-labelledby="heading_0">
                     <div class="card-body">
                         
                         <form action="" method="get" id="filter-menu">
@@ -44,7 +44,7 @@
                                     </label>
                                 </div>
                                 <div class="col">
-                                    <x-dropdown :list="$goaltypes" id="goal_bank_types" label="Goal Type" name="goal_bank_types" :selected="request()->goal_bank_types"></x-dropdown>
+                                    <x-dropdown :list="$goaltypes_filter" id="goal_bank_types" label="Goal Type" name="goal_bank_types" :selected="request()->goal_bank_types"></x-dropdown>
                                 </div>
                                 <div class="col">
                                     <x-dropdown :list="$tagsList" label="Tags" id="goal_bank_tags" name="goal_bank_tags" :selected="request()->goal_bank_tags"></x-dropdown>
@@ -67,7 +67,7 @@
                             </div>
                         </form>
 
-                        <form action="{{ route('goal.library.save-multiple') }}" method="post">
+                        <form id="multigoals" action="{{ route('goal.library.save-multiple') }}" method="post">
                             @csrf
                             <div class="row">
                                 <div class="col">
@@ -80,6 +80,7 @@
                                     @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
                                     <div class="text-center">
                                         <x-button id="addMultipleGoalButton" disabled>Add Selected Goals to Your Profile</x-button>
+                                        <x-button id="hideMultipleGoalButton" disabled>Hide Selected Goals</x-button>
                                     </div>
                                     @endif
                                 </div>
@@ -89,8 +90,8 @@
                         
                         
                     </div>
-		</div>
-	</div>
+		    </div>
+	    </div>
         @include('goal.partials.goal-detail-modal')
         @if(Auth::user()->hasRole('Supervisor'))
         @php $shareWithLabel = 'Audience' @endphp
@@ -131,7 +132,7 @@
                                     </label>
                                 </div>
                                 <div class="col">
-                                    <x-dropdown :list="$goaltypes" label="Goal Type" id="goal_type"  name="goal_type" :selected="request()->goal_type"></x-dropdown>
+                                    <x-dropdown :list="$goaltypes_filter" label="Goal Type" id="goal_type"  name="goal_type" :selected="request()->goal_type"></x-dropdown>
                                 </div>
                                 <div class="col">
                                     <x-dropdown :list="$tagsList" label="Tags" id="tag_id" name="tag_id" :selected="request()->tag_id"></x-dropdown>
@@ -163,6 +164,81 @@
                     </div>
 		</div>
 	</div>
+
+
+    <div class="card">
+            <div class="card-header" id="heading_2">
+                        <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_2" aria-expanded="1" aria-controls="collapse_2">
+                            <button class="btn btn-link" >
+                                <h4>Hidden Goals</h4> 
+                            </button>                        
+                            <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span>    
+                            <br/>                                
+                            <button class="btn btn-link text-left" style="color:black">
+                                <p>Hidden goals appear here. Clean up your goal bank by hiding goals which are not immediately reievant to you. </p>
+                            </button>  
+                        </h5>
+            </div>
+
+		    <div id="collapse_2" class="collapse" aria-labelledby="heading_2">
+                    <div class="card-body">
+                        
+                        <form action="" method="get" id="filter-menu-hidden">
+                            <div class="row">
+                                <div class="col">
+                                    <label>
+                                        Title
+                                        <input type="text" id="goal_bank_title_hidden" name="goal_bank_title_hidden" class="form-control" value="{{request()->goal_bank_title_hidden}}">
+                                    </label>
+                                </div>
+                                <div class="col">
+                                    <x-dropdown :list="$goaltypes_filter" id="goal_bank_types_hidden" label="Goal Type" name="goal_bank_types_hidden" :selected="request()->goal_bank_types_hidden"></x-dropdown>
+                                </div>
+                                <div class="col">
+                                    <x-dropdown :list="$tagsList" label="Tags" id="goal_bank_tags_hidden" name="goal_bank_tags_hidden" :selected="request()->goal_bank_tags_hidden"></x-dropdown>
+                                </div>
+                                <div class="col">
+                                    <label>
+                                        Date Added
+                                        <input class="sup_filtersub form-control form-control-md" id="goal_bank_dateadd_hidden" type="date" name="goal_bank_dateadd_hidden" value="{{request()->goal_bank_dateadd_hidden}}" autocomplete="off">
+                                    </label>
+                                </div>
+                                <div class="col">
+                                    <x-dropdown :list="$createdBy" id="goal_bank_createdby_hidden" name="goal_bank_createdby_hidden" :selected="request()->goal_bank_createdby_hidden" label="Created by"></x-dropdown>
+                                </div>
+                                <div class="col">
+                                    <x-dropdown :list="$mandatoryOrSuggested" id="goal_bank_mandatory_hidden" label="Mandatory/Suggested" name="goal_bank_mandatory_hidden" :selected="request()->goal_bank_mandatory_hidden"></x-dropdown>
+                                </div><!-- 
+                                <div class="col">
+                                    <button class="btn btn-primary mt-4 px-5">Filter</button>
+                                </div> -->
+                            </div>
+                        </form>
+
+                        <form id="multigoals_hide"  action="{{ route('goal.library.show-multiple') }}" method="post">
+                            @csrf
+                            <div class="row">
+                                <div class="col">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <input name="total_count" id="total_count_hidden" type="hidden" value="{{$goals_count}}">                                            
+                                            <table style="width:100%" id='goalbanks_hidden' class="table table-striped"> </table>
+                                        </div>
+                                    </div>
+                                    @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
+                                    <div class="text-center">
+                                        <x-button id="listMultipleGoalButton" disabled>List Selected Goals to Your Profile</x-button>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </form>
+                        
+                        
+                        
+                    </div>
+		    </div>
+	    </div>
         
         
         
@@ -199,6 +275,15 @@
         @push('js')
             <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
         <script>
+            $('#hideMultipleGoalButton').click(function(e) {
+                e.preventDefault();
+                var form = $('#multigoals');
+                form.attr('action', '/goal/goalbank/hide-multiple');
+                form.submit();
+            });
+
+
+
             $(document).on('change', '.search-users', function() {
                 var goalId = $(this).data('goal-id');
                 var selectedValues = $(this).val();
@@ -294,6 +379,11 @@
             $('#filter-lib-menu select, #filter-lib-menu input').change(function () {
                 $("#filter-lib-menu").submit();
             });
+
+            $('#filter-menu-hidden select, #filter-menu input').change(function () {
+                $("#filter-menu-hidden").submit();
+            });
+
         </script>
         <script>
             $(document).on('click', '.show-goal-detail', function(e) {
@@ -509,6 +599,7 @@
 
       if(json_goalbanks == ''){
         $('#addMultipleGoalButton').prop('disabled', true);
+        $('#hideMultipleGoalButton').prop('disabled', true);
       }
 
       const goalbanks = $('#goalbanks').DataTable({
@@ -551,18 +642,20 @@
       });
 
       goalbanks.column(1).visible(false);
-      
+
       // Add event listener for "check all" checkbox
       $('#checkAll').on('change', function() {
           $('.goal_ids').prop('checked', this.checked);
           if (this.checked) {
             if(json_goalbanks != ''){        
                 $('#addMultipleGoalButton').prop('disabled', false);
+                $('#hideMultipleGoalButton').prop('disabled', false);
             }
             dataTable.page.len(-1).draw(); // Disable paging temporarily
             dataTable.rows().select(); // Select all rows
           } else {
             $('#addMultipleGoalButton').prop('disabled', true);
+            $('#hideMultipleGoalButton').prop('disabled', true);
             dataTable.rows().deselect(); // Deselect all rows
             dataTable.page.len(10).draw(); // Set the original page length and redraw
           }
@@ -572,13 +665,15 @@
       var checkboxes = $('.goal_ids');
         // Get the button element
       var addButton = $('#addMultipleGoalButton');
+      var hideButton = $('#hideMultipleGoalButton');
         // Attach an event listener to the checkboxes
       var anyChecked = false;  
       checkboxes.on('change', function() {
             // Check if any checkbox is checked
             var anyChecked = checkboxes.is(':checked');
             // Enable or disable the button based on checkbox state
-            addButton.prop('disabled', !anyChecked);
+            $('#addMultipleGoalButton').prop('disabled', !anyChecked);
+            $('#hideMultipleGoalButton').prop('disabled', !anyChecked);
             // Check if none of the checkboxes are checked
             if (!anyChecked) {
                  $('#checkAll').prop('checked', false);
@@ -601,6 +696,106 @@
       $('#goalbanks').on('page.dt', function () {
           $('#checkAll').prop('checked', false);
       });
+
+
+
+
+      const json_goalbanks_hidden = <?php echo $json_goalbanks_hidden;?>;
+
+      if(json_goalbanks_hidden == ''){
+        $('#listMultipleGoalButton').prop('disabled', true);
+      }
+
+      const goalbanks_hidden = $('#goalbanks_hidden').DataTable({
+        data: json_goalbanks_hidden,
+        columns: [
+          {
+            title: "<input type='checkbox' id='checkAll_hide'>",
+            data: null,
+            orderable: false, // Disable sorting
+            render: function(data, type, row) {
+              return '<input type="checkbox" name="goal_ids[]" value="' + row.id + '" class="row-checkbox goal_ids_hide">';
+            }
+          },
+          { title: "ID", data: "id" },
+          {
+            title: "Goal Title",
+            data: null,
+            render: function(data, type, row) {
+                return '<a href="#" class="show-goal-detail highlighter" data-id="' + row.id + '">' + data.title + '</a>';
+            }
+          },
+          { title: "Goal Type", data: "typename" },
+          { title: "Tags", data: "tagnames" },
+          { title: "Date Added", data: "created_at" },
+          {
+            title: "Created by",
+            data: null,
+            render: function(data, type, row) {
+              if (row.display_name) {
+                return row.display_name;
+              } else {
+                return row.username;
+              }
+            }
+          },
+          { title: "Mandatory/Suggested", data: "is_mandatory" }
+        ],
+        "order": [[0, "desc"]],
+        dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>'
+      });
+
+      goalbanks_hidden.column(1).visible(false);
+
+      // Add event listener for "check all" checkbox
+      $('#checkAll_hide').on('change', function() {
+          $('.goal_ids_hide').prop('checked', this.checked);
+          if (this.checked) {
+            if(json_goalbanks_hidden != ''){        
+                $('#listMultipleGoalButton').prop('disabled', false);
+            }
+            dataTable.page.len(-1).draw(); // Disable paging temporarily
+            dataTable.rows().select(); // Select all rows
+          } else {
+            $('#listMultipleGoalButton').prop('disabled', true);
+            dataTable.rows().deselect(); // Deselect all rows
+            dataTable.page.len(10).draw(); // Set the original page length and redraw
+          }
+      });
+
+        // Get the checkbox elements
+      var checkboxes_hide = $('.goal_ids_hide');
+        // Get the button element
+      var listButton = $('#listMultipleGoalButton');
+        // Attach an event listener to the checkboxes
+      var anyChecked_hide = false;  
+      checkboxes_hide.on('change', function() {
+            // Check if any checkbox is checked
+            var anyChecked_hide = checkboxes_hide.is(':checked');
+            // Enable or disable the button based on checkbox state
+            listButton.prop('disabled', !anyChecked_hide);
+            // Check if none of the checkboxes are checked
+            if (!anyChecked_hide) {
+                 $('#checkAll_hide').prop('checked', false);
+            }
+      });
+        // Add event listener for row checkboxes
+      $('#goalbanks_hide').on('change', '.goal_ids_hide', function() {
+        if ($('.goal_ids:checked').length === $('.goalcheck').length) {
+            if(anyChecked_hide){
+                $('#checkAll_hide').prop('checked', true);
+            } 
+        } else {
+            $('#checkAll_hide').prop('checked', false);
+        }
+      });
+        // Add event listener for DataTable page change
+      $('#goalbanks_hidden').on('page.dt', function () {
+          $('#checkAll_hide').prop('checked', false);
+      });
+
+      
+      
       
       
         const json_team_goalbanks = <?php echo $json_team_goalbanks;?>;
@@ -667,9 +862,6 @@
         });
 
       team_goalbanks.column(0).visible(false);
-      
-      
-      
     });
     
     
@@ -1028,6 +1220,19 @@
        } else {
            $('#collapse_1').collapse('hide');
        }
+
+       var goal_bank_title_hidden = $('#goal_bank_title_hidden').val();
+       var goal_bank_types_hidden = $('#goal_bank_types_hidden').val();
+       var goal_bank_tags_hidden = $('#goal_bank_tags_hidden').val();
+       var goal_bank_dateadd_hidden = $('#goal_bank_dateadd_hidden').val();
+       var goal_bank_createdby_hidden = $('#goal_bank_createdby_hidden').val();
+       var goal_bank_mandatory_hidden = $('#goal_bank_mandatory_hidden').val();
+       if(goal_bank_title_hidden != '' || goal_bank_types_hidden != 0 || goal_bank_tags_hidden != 0 || goal_bank_dateadd_hidden != '' || goal_bank_createdby_hidden != 0  || goal_bank_mandatory_hidden != '' ){
+           $('#collapse_2').collapse('show');
+       } else {
+           $('#collapse_2').collapse('hide');
+       }
+       
        
        
        
@@ -1060,4 +1265,5 @@
             }
         });
       }
+
     </script>
