@@ -288,7 +288,7 @@
                             <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span>    
                             <br/>                                
                             <button class="btn btn-link text-left" style="color:black">
-                                <p>Hidden goals appear here. Clean up your goal bank by hiding goals which are not immediately reievant to you. </p>
+                                <p>Hidden goals appear here. Clean up your goal bank by hiding goals which are not immediately relevant to you. </p>
                             </button>  
                         </h5>
             </div>
