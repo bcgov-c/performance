@@ -165,82 +165,6 @@
 		</div>
 	</div>
 
-
-    <div class="card">
-            <div class="card-header" id="heading_2">
-                        <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_2" aria-expanded="1" aria-controls="collapse_2">
-                            <button class="btn btn-link" >
-                                <h4>Hidden Goals</h4> 
-                            </button>                        
-                            <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span>    
-                            <br/>                                
-                            <button class="btn btn-link text-left" style="color:black">
-                                <p>Hidden goals appear here. Clean up your goal bank by hiding goals which are not immediately reievant to you. </p>
-                            </button>  
-                        </h5>
-            </div>
-
-		    <div id="collapse_2" class="collapse" aria-labelledby="heading_2">
-                    <div class="card-body">
-                        
-                        <form action="" method="get" id="filter-menu-hidden">
-                            <div class="row">
-                                <div class="col">
-                                    <label>
-                                        Title
-                                        <input type="text" id="goal_bank_title_hidden" name="goal_bank_title_hidden" class="form-control" value="{{request()->goal_bank_title_hidden}}">
-                                    </label>
-                                </div>
-                                <div class="col">
-                                    <x-dropdown :list="$goaltypes_filter" id="goal_bank_types_hidden" label="Goal Type" name="goal_bank_types_hidden" :selected="request()->goal_bank_types_hidden"></x-dropdown>
-                                </div>
-                                <div class="col">
-                                    <x-dropdown :list="$tagsList" label="Tags" id="goal_bank_tags_hidden" name="goal_bank_tags_hidden" :selected="request()->goal_bank_tags_hidden"></x-dropdown>
-                                </div>
-                                <div class="col">
-                                    <label>
-                                        Date Added
-                                        <input class="sup_filtersub form-control form-control-md" id="goal_bank_dateadd_hidden" type="date" name="goal_bank_dateadd_hidden" value="{{request()->goal_bank_dateadd_hidden}}" autocomplete="off">
-                                    </label>
-                                </div>
-                                <div class="col">
-                                    <x-dropdown :list="$createdBy" id="goal_bank_createdby_hidden" name="goal_bank_createdby_hidden" :selected="request()->goal_bank_createdby_hidden" label="Created by"></x-dropdown>
-                                </div>
-                                <div class="col">
-                                    <x-dropdown :list="$mandatoryOrSuggested" id="goal_bank_mandatory_hidden" label="Mandatory/Suggested" name="goal_bank_mandatory_hidden" :selected="request()->goal_bank_mandatory_hidden"></x-dropdown>
-                                </div><!-- 
-                                <div class="col">
-                                    <button class="btn btn-primary mt-4 px-5">Filter</button>
-                                </div> -->
-                            </div>
-                        </form>
-
-                        <form id="multigoals_hide"  action="{{ route('goal.library.show-multiple') }}" method="post">
-                            @csrf
-                            <div class="row">
-                                <div class="col">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <input name="total_count" id="total_count_hidden" type="hidden" value="{{$goals_count}}">                                            
-                                            <table style="width:100%" id='goalbanks_hidden' class="table table-striped"> </table>
-                                        </div>
-                                    </div>
-                                    @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
-                                    <div class="text-center">
-                                        <x-button id="listMultipleGoalButton" disabled>List Selected Goals to Your Profile</x-button>
-                                    </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </form>
-                        
-                        
-                        
-                    </div>
-		    </div>
-	    </div>
-        
-        
         
         <div class="modal fade" id="addGoalModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -351,6 +275,85 @@
         
         
     </div>
+
+
+    
+
+    <div class="card">
+            <div class="card-header" id="heading_2">
+                        <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_2" aria-expanded="1" aria-controls="collapse_2">
+                            <button class="btn btn-link" >
+                                <h4>Hidden Goals</h4> 
+                            </button>                        
+                            <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span>    
+                            <br/>                                
+                            <button class="btn btn-link text-left" style="color:black">
+                                <p>Hidden goals appear here. Clean up your goal bank by hiding goals which are not immediately reievant to you. </p>
+                            </button>  
+                        </h5>
+            </div>
+
+		    <div id="collapse_2" class="collapse" aria-labelledby="heading_2">
+                    <div class="card-body">
+                        
+                        <form action="" method="get" id="filter-menu-hidden">
+                            <div class="row">
+                                <div class="col">
+                                    <label>
+                                        Title
+                                        <input type="text" id="goal_bank_title_hidden" name="goal_bank_title_hidden" class="form-control" value="{{request()->goal_bank_title_hidden}}">
+                                    </label>
+                                </div>
+                                <div class="col">
+                                    <x-dropdown :list="$goaltypes_filter" id="goal_bank_types_hidden" label="Goal Type" name="goal_bank_types_hidden" :selected="request()->goal_bank_types_hidden"></x-dropdown>
+                                </div>
+                                <div class="col">
+                                    <x-dropdown :list="$tagsList" label="Tags" id="goal_bank_tags_hidden" name="goal_bank_tags_hidden" :selected="request()->goal_bank_tags_hidden"></x-dropdown>
+                                </div>
+                                <div class="col">
+                                    <label>
+                                        Date Added
+                                        <input class="sup_filtersub form-control form-control-md" id="goal_bank_dateadd_hidden" type="date" name="goal_bank_dateadd_hidden" value="{{request()->goal_bank_dateadd_hidden}}" autocomplete="off">
+                                    </label>
+                                </div>
+                                <div class="col">
+                                    <x-dropdown :list="$createdBy" id="goal_bank_createdby_hidden" name="goal_bank_createdby_hidden" :selected="request()->goal_bank_createdby_hidden" label="Created by"></x-dropdown>
+                                </div>
+                                <div class="col">
+                                    <x-dropdown :list="$mandatoryOrSuggested" id="goal_bank_mandatory_hidden" label="Mandatory/Suggested" name="goal_bank_mandatory_hidden" :selected="request()->goal_bank_mandatory_hidden"></x-dropdown>
+                                </div><!-- 
+                                <div class="col">
+                                    <button class="btn btn-primary mt-4 px-5">Filter</button>
+                                </div> -->
+                            </div>
+                        </form>
+
+                        <form id="multigoals_hide"  action="{{ route('goal.library.show-multiple') }}" method="post">
+                            @csrf
+                            <div class="row">
+                                <div class="col">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <input name="total_count" id="total_count_hidden" type="hidden" value="{{$goals_count}}">                                            
+                                            <table style="width:100%" id='goalbanks_hidden' class="table table-striped"> </table>
+                                        </div>
+                                    </div>
+                                    @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
+                                    <div class="text-center">
+                                        <x-button id="listMultipleGoalButton" disabled>List Selected Goals to Your Profile</x-button>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </form>
+                        
+                        
+                        
+                    </div>
+		    </div>
+	    </div>
+        
+        
     
     @push('css')
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
