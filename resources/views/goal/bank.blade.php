@@ -340,7 +340,7 @@
                                     </div>
                                     @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
                                     <div class="text-center">
-                                        <x-button id="listMultipleGoalButton" disabled>List Selected Goals to Your Profile</x-button>
+                                        <x-button id="listMultipleGoalButton" disabled>Move Selected Goals to My Goal Bank</x-button>
                                     </div>
                                     @endif
                                 </div>
