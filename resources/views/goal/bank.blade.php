@@ -717,7 +717,7 @@
             data: null,
             orderable: false, // Disable sorting
             render: function(data, type, row) {
-              return '<input type="checkbox" name="goal_ids[]" value="' + row.id + '" class="row-checkbox goal_ids_hide">';
+              return '<input type="checkbox" name="goal_ids_hide[]" value="' + row.id + '" class="row-checkbox goal_ids_hide">';
             }
           },
           { title: "ID", data: "id" },
