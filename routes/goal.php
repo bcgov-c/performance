@@ -10,7 +10,7 @@ Route::get('goal/current', [GoalController::class, 'index'])->name('goal.current
 Route::get('goal/past', [GoalController::class, 'index'])->name('goal.past');
 Route::get('goal/share', [GoalController::class, 'index'])->name('goal.share');
 Route::get('goal/goalbank', [GoalController::class, 'goalBank'])->name('goal.library');
-Route::post('goal/goalbank', [GoalController::class, 'saveFromLibrary'])->name('goal.library');
+//Route::post('goal/goalbank', [GoalController::class, 'saveFromLibrary'])->name('goal.library');
 Route::get('goal/goalbank/{id}', [GoalController::class, 'showForLibrary'])->name('goal.library.detail');
 Route::get('goal/supervisor/{id}', [GoalController::class, 'getSupervisorGoals'])->name('goal.supervisor');
 Route::post('goal/supervisor/{id}/copy', [GoalController::class, 'copyGoal'])->name('goal.supervisor.copy');
