@@ -681,6 +681,7 @@
       checkboxes.on('change', function() {
             // Check if any checkbox is checked
             var anyChecked = checkboxes.is(':checked');
+            alert(anyChecked);
             // Enable or disable the button based on checkbox state
             $('#addMultipleGoalButton').prop('disabled', !anyChecked);
             $('#hideMultipleGoalButton').prop('disabled', !anyChecked);
