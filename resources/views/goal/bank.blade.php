@@ -671,42 +671,35 @@
           }
       });
 
-        // Get the checkbox elements
-      var checkboxes = $('.goal_ids');
-        // Get the button element
-      var addButton = $('#addMultipleGoalButton');
-      var hideButton = $('#hideMultipleGoalButton');
-        // Attach an event listener to the checkboxes
-      var anyChecked = false;  
-      checkboxes.on('change', function() {
-            // Check if any checkbox is checked
-            var anyChecked = checkboxes.is(':checked');
-            alert(anyChecked);
-            // Enable or disable the button based on checkbox state
-            $('#addMultipleGoalButton').prop('disabled', !anyChecked);
-            $('#hideMultipleGoalButton').prop('disabled', !anyChecked);
-            // Check if none of the checkboxes are checked
-            if (!anyChecked) {
-                 $('#checkAll').prop('checked', false);
-            }
-      });
-      
-      
-      
-        // Add event listener for row checkboxes
-      $('#goalbanks').on('change', '.goal_ids', function() {
-        if ($('.goal_ids:checked').length === $('.goalcheck').length) {
-            if(anyChecked){
-                $('#checkAll').prop('checked', true);
-            } 
+    var addButton = $('#addMultipleGoalButton');
+    var hideButton = $('#hideMultipleGoalButton');
+    
+    $('#goalbanks').on('change', '.goal_ids', function() {
+        var checkboxes = $('.goal_ids'); // Get the updated checkboxes within the current page
+        
+        var anyChecked = checkboxes.is(':checked');
+        
+        addButton.prop('disabled', !anyChecked);
+        hideButton.prop('disabled', !anyChecked);
+        
+        if (!anyChecked) {
+            $('#checkAll').prop('checked', false);
+        }
+    });
+    
+    $('#goalbanks').on('change', '.goal_ids', function() {
+        var checkboxes = $('.goal_ids'); // Get the updated checkboxes within the current page
+        
+        if (checkboxes.length === checkboxes.filter(':checked').length) {
+            $('#checkAll').prop('checked', true);
         } else {
             $('#checkAll').prop('checked', false);
         }
-      });
-        // Add event listener for DataTable page change
-      $('#goalbanks').on('page.dt', function () {
-          $('#checkAll').prop('checked', false);
-      });
+    });
+    
+    $('#goalbanks').on('page.dt', function () {
+        $('#checkAll').prop('checked', false);
+    });
 
 
 
@@ -775,39 +768,35 @@
           }
       });
 
-        // Get the checkbox elements
-      var checkboxes_hide = $('.goal_ids_hide');
-        // Get the button element
-      var listButton = $('#listMultipleGoalButton');
-        // Attach an event listener to the checkboxes
-      var anyChecked_hide = false;  
-      checkboxes_hide.on('change', function() {
-            // Check if any checkbox is checked
-            var anyChecked_hide = checkboxes_hide.is(':checked');
-            // Enable or disable the button based on checkbox state
-            listButton.prop('disabled', !anyChecked_hide);
-            // Check if none of the checkboxes are checked
-            if (!anyChecked_hide) {
-                 $('#checkAll_hide').prop('checked', false);
-            }
-      });
-        // Add event listener for row checkboxes
-      $('#goalbanks_hide').on('change', '.goal_ids_hide', function() {
-        if ($('.goal_ids:checked').length === $('.goalcheck').length) {
-            if(anyChecked_hide){
-                $('#checkAll_hide').prop('checked', true);
-            } 
+
+    var listButton = $('#listMultipleGoalButton');
+    
+    $('#goalbanks_hidden').on('change', '.goal_ids_hide', function() {
+        var checkboxes = $('.goal_ids_hide'); // Get the updated checkboxes within the current page
+        
+        var anyChecked = checkboxes.is(':checked');
+        
+        listButton.prop('disabled', !anyChecked);
+        
+        if (!anyChecked) {
+            $('#checkAll_hide').prop('checked', false);
+        }
+    });
+    
+    $('#goalbanks_hidden').on('change', '.goal_ids_hide', function() {
+        var checkboxes = $('.goal_ids_hide'); // Get the updated checkboxes within the current page
+        
+        if (checkboxes.length === checkboxes.filter(':checked').length) {
+            $('#checkAll_hide').prop('checked', true);
         } else {
             $('#checkAll_hide').prop('checked', false);
         }
-      });
-        // Add event listener for DataTable page change
-      $('#goalbanks_hidden').on('page.dt', function () {
-          $('#checkAll_hide').prop('checked', false);
-      });
+    });
+    
+    $('#goalbanks_hidden').on('page.dt', function () {
+        $('#checkAll_hide').prop('checked', false);
+    });
 
-      
-      
       
       
         const json_team_goalbanks = <?php echo $json_team_goalbanks;?>;
