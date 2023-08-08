@@ -52,7 +52,7 @@
                                 <div class="col">
                                     <label>
                                         Date Added
-                                        <input class="sup_filtersub form-control form-control-md" id="goal_bank_dateadd" type="date" name="goal_bank_dateadd" id="date_added" value="{{request()->goal_bank_dateadd}}" autocomplete="off">
+                                        <input class="sup_filtersub form-control form-control-md" id="goal_bank_dateadd" type="date" name="goal_bank_dateadd" value="{{request()->goal_bank_dateadd}}" autocomplete="off">
                                     </label>
                                 </div>
                                 <div class="col">
@@ -390,7 +390,7 @@
                 $("#filter-lib-menu").submit();
             });
 
-            $('#filter-menu-hidden select, #filter-menu input').change(function () {
+            $('#filter-menu-hidden select, #filter-menu-hidden input').change(function () {
                 $("#filter-menu-hidden").submit();
             });
 
@@ -711,6 +711,7 @@
 
 
       const json_goalbanks_hidden = <?php echo $json_goalbanks_hidden;?>;
+      console.log(json_goalbanks_hidden);
 
       if(json_goalbanks_hidden == ''){
         $('#listMultipleGoalButton').prop('disabled', true);
