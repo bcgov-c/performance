@@ -67,7 +67,7 @@
                             </div>
                         </form>
 
-                        <form id="multigoals" action="{{ route('goal.library.save-multiple') }}" method="post">
+                        <form id="multigoals" action="" method="post">
                             @csrf
                             <div class="row">
                                 <div class="col">
@@ -206,6 +206,13 @@
                 form.submit();
             });
 
+            
+            $('#addMultipleGoalButton').click(function(e) {
+                e.preventDefault();                
+                var form = $('#multigoals');
+                form.attr('action', '/goal/goalbank/copy-multiple');
+                form.submit();
+            });
 
 
             $(document).on('change', '.search-users', function() {
@@ -654,13 +661,13 @@
                 $('#addMultipleGoalButton').prop('disabled', false);
                 $('#hideMultipleGoalButton').prop('disabled', false);
             }
-            dataTable.page.len(-1).draw(); // Disable paging temporarily
-            dataTable.rows().select(); // Select all rows
+            json_goalbanks.page.len(-1).draw(); // Disable paging temporarily
+            json_goalbanks.rows().select(); // Select all rows
           } else {
             $('#addMultipleGoalButton').prop('disabled', true);
             $('#hideMultipleGoalButton').prop('disabled', true);
-            dataTable.rows().deselect(); // Deselect all rows
-            dataTable.page.len(10).draw(); // Set the original page length and redraw
+            json_goalbanks.rows().deselect(); // Deselect all rows
+            json_goalbanks.page.len(10).draw(); // Set the original page length and redraw
           }
       });
 
@@ -757,12 +764,12 @@
             if(json_goalbanks_hidden != ''){        
                 $('#listMultipleGoalButton').prop('disabled', false);
             }
-            dataTable.page.len(-1).draw(); // Disable paging temporarily
-            dataTable.rows().select(); // Select all rows
+            goalbanks_hidden.page.len(-1).draw(); // Disable paging temporarily
+            goalbanks_hidden.rows().select(); // Select all rows
           } else {
             $('#listMultipleGoalButton').prop('disabled', true);
-            dataTable.rows().deselect(); // Deselect all rows
-            dataTable.page.len(10).draw(); // Set the original page length and redraw
+            goalbanks_hidden.rows().deselect(); // Deselect all rows
+            goalbanks_hidden.page.len(10).draw(); // Set the original page length and redraw
           }
       });
 
