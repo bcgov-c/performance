@@ -1408,9 +1408,6 @@ class GoalController extends Controller
     }
 
     public function saveFromLibraryMultiple(Request $request) {
-        Log::info('===================');
-        Log::info(print_r($request->goal_ids,true));
-        Log::info('===================');
         foreach ($request->goal_ids as $goal_id) {
             $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->find($goal_id);
             $newGoal = $this->copyFromLibrary($goal);
