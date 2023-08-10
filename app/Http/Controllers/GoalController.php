@@ -503,16 +503,6 @@ class GoalController extends Controller
             $adminGoals = $adminGoals->where('goals.title', "LIKE", "%$filter->goal_bank_title%");
         }
         if ($filter->has('goal_bank_dateadd') && $filter->goal_bank_dateadd && Str::lower($filter->goal_bank_dateadd) !== 'any') {
-            /*
-            $dateRange = explode("-",$filter->date_added);
-            $dateRange[0] = trim($dateRange[0]);
-            $dateRange[1] = trim($dateRange[1]);
-            $startDate = Carbon::createFromFormat('M d, Y', $dateRange[0]);
-            $endDate = Carbon::createFromFormat('M d, Y', $dateRange[1]);
-            $adminGoals = $adminGoals->whereDate('goals.created_at', '>=', $startDate);
-            $adminGoals = $adminGoals->whereDate('goals.created_at', '<=', $endDate);
-             * 
-             */
             $dateadded = $filter->goal_bank_dateadd;
             $adminGoals = $adminGoals->whereDate('goals.created_at', '>=', $dateadded . " 00:00:00");
             $adminGoals = $adminGoals->whereDate('goals.created_at', '<=', $dateadded . " 23:59:59");
@@ -577,17 +567,7 @@ class GoalController extends Controller
         if ($filter->has('goal_bank_title') && $filter->goal_bank_title) {
             $adminGoalsInherited = $adminGoalsInherited->where('goals.title', "LIKE", "%$filter->goal_bank_title%");
         }
-        if ($filter->has('goal_bank_dateadd') && $filter->date_added && Str::lower($filter->goal_bank_dateadd) !== 'any') {
-            /*
-            $dateRange = explode("-",$filter->date_added);
-            $dateRange[0] = trim($dateRange[0]);
-            $dateRange[1] = trim($dateRange[1]);
-            $startDate = Carbon::createFromFormat('M d, Y', $dateRange[0]);
-            $endDate = Carbon::createFromFormat('M d, Y', $dateRange[1]);
-            $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '>=', $startDate);
-            $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '<=', $endDate);
-             * 
-             */
+        if ($filter->has('goal_bank_dateadd') && $filter->goal_bank_dateadd && Str::lower($filter->goal_bank_dateadd) !== 'any') {
             $dateadded = $filter->goal_bank_dateadd;
             $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '>=', $dateadded . " 00:00:00");
             $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '<=', $dateadded . " 23:59:59");
@@ -659,6 +639,7 @@ class GoalController extends Controller
         $query->whereHas('sharedWith', function($query) {
             $query->where('user_id', Auth::id());
         });
+
         $query->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory');
 
 
@@ -791,7 +772,7 @@ class GoalController extends Controller
         if ($filter->has('goal_bank_title_hidden') && $filter->goal_bank_title_hidden) {
             $adminGoalsInherited = $adminGoalsInherited->where('goals.title', "LIKE", "%$filter->goal_bank_title_hidden%");
         }
-        if ($filter->has('goal_bank_dateadd_hidden') && $filter->date_added_hidden && Str::lower($filter->goal_bank_dateadd_hidden) !== 'any') {
+        if ($filter->has('goal_bank_dateadd_hidden') && $filter->goal_bank_dateadd_hidden && Str::lower($filter->goal_bank_dateadd_hidden) !== 'any') {
             $dateadded_hidden = $filter->goal_bank_dateadd_hidden;
             $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '>=', $dateadded_hidden . " 00:00:00");
             $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '<=', $dateadded_hidden . " 23:59:59");
@@ -852,7 +833,7 @@ class GoalController extends Controller
             $query = $query->where('goals.created_at', '<=', $dateadded_hidden . " 23:59:59");
         }
 
-        if ($filter->has('goal_bank_createdby') && $filter->goal_bank_createdby_hidden) {
+        if ($filter->has('goal_bank_createdby_hidden') && $filter->goal_bank_createdby_hidden) {
             // $query = $query->where('user_id', $filter->created_by);
             if(is_numeric($filter->goal_bank_createdby_hidden)) {
                 $query = $query->where('created_by', $filter->goal_bank_createdby_hidden)->whereNull('display_name');
