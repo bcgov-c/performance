@@ -199,19 +199,67 @@
         @push('js')
             <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
         <script>
-            $('#hideMultipleGoalButton').click(function(e) {
-                e.preventDefault();
-                var form = $('#multigoals');
-                form.attr('action', '/goal/goalbank/hide-multiple');
-                form.submit();
-            });
+            $(document).ready(function() {
+                $('#hideMultipleGoalButton').click(function(e) {
+                    e.preventDefault();
+                    
+                    var form = $('#multigoals');
+                    var actionUrl = '/goal/goalbank/hide-multiple';
+                    
+                    var selectedGoals = [];
+                    
+                    // Loop through the checkboxes and collect checked goal_ids
+                    $('.goal_ids:checked').each(function() {
+                        selectedGoals.push($(this).val());
+                    });
+                    
+                    if (selectedGoals.length > 0) {
+                        $.ajax({
+                            type: 'POST',
+                            url: actionUrl,
+                            data: {
+                                goal_ids: selectedGoals
+                            },
+                            success: function(response) {
+                                location.reload();
+                            },
+                            error: function(xhr, status, error) {
+                                // Handle errors here
+                            }
+                        });
+                    }
+                });
 
-            
-            $('#addMultipleGoalButton').click(function(e) {
-                e.preventDefault();                
-                var form = $('#multigoals');
-                form.attr('action', '/goal/goalbank/copy-multiple');
-                form.submit();
+
+                $('#addMultipleGoalButton').click(function(e) {
+                    e.preventDefault();
+                    
+                    var form = $('#multigoals');
+                    var actionUrl = '/goal/goalbank/copy-multiple';
+                    
+                    var selectedGoals = [];
+                    
+                    // Loop through the checkboxes and collect checked goal_ids
+                    $('.goal_ids:checked').each(function() {
+                        selectedGoals.push($(this).val());
+                    });
+                    
+                    if (selectedGoals.length > 0) {
+                        $.ajax({
+                            type: 'POST',
+                            url: actionUrl,
+                            data: {
+                                goal_ids: selectedGoals
+                            },
+                            success: function(response) {
+                                location.reload();
+                            },
+                            error: function(xhr, status, error) {
+                                // Handle errors here
+                            }
+                        });
+                    }
+                });
             });
 
 
