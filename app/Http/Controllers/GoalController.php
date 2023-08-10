@@ -1417,6 +1417,8 @@ class GoalController extends Controller
     }
 
     public function hideFromLibraryMultiple(Request $request) {
+        print_r($request->goal_ids);
+        exit;
         foreach ($request->goal_ids as $goal_id) {
             DB::table('goals')
             ->where('id', $goal_id)
