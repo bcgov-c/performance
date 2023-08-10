@@ -994,7 +994,7 @@
                                 goal_ids: selectedGoals
                             },
                             success: function(response) {
-                                location.reload();
+                                window.location.replace("/goal/current");
                             },
                             error: function(xhr, status, error) {
                                 // Handle errors here
