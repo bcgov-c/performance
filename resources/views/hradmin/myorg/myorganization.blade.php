@@ -4,7 +4,7 @@
             <h3>My Organization</h3>
         </div>
     </div>
-    @include('hradmin.myorg.partials.reportees-modal') 
+    <!-- @include('hradmin.myorg.partials.reportees-modal')  -->
 
     <div class="card">
         <div class="card-body">    
@@ -107,7 +107,7 @@
                                 {title: 'Next Conversation', ariaTitle: 'Next Conversation', target: 0, type: 'date', data: 'nextConversationDue', name: 'u.next_conversation_date', searchable: false, className: 'dt-nowrap'},
                                 {title: 'Excused', ariaTitle: 'Excused', target: 0, type: 'string', data: 'excusedtype', name: 'excusedtype', searchable: true, className: 'dt-nowrap'},
                                 {title: 'Shared', ariaTitle: 'Shared', target: 0, type: 'string', data: 'shared', name: 'shared', searchable: false, className: 'dt-nowrap'},
-                                {title: 'Direct / Shared Reports', ariaTitle: 'Direct / Shared Reports', target: 0, type: 'string', data: 'reportees', name: 'reportees', searchable: false, className: 'dt-nowrap show-modal'},
+                                {title: 'Reports', ariaTitle: 'Reports', target: 0, type: 'string', data: 'reportees', name: 'reportees', searchable: false, className: 'dt-nowrap'},
                                 {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'num', data: 'user_id', name: 'user_id', searchable: true, visible: false, className: 'dt-nowrap'},
                             ]
                         }
@@ -118,8 +118,7 @@
                     var button = $(event.relatedTarget);
                     var user_id = button.data('user_id');
                     var employee_name = button.data('employee_name');
-                    var position_number = button.data('position_number');
-                    $('#reporteesTitle').text('Direct / Shared Reports for '+employee_name);
+                    $('#reporteesTitle').text('Reports List for '+employee_name);
                     if($.fn.DataTable.isDataTable( "#reporteesTable" )) {
                         $('#reporteesTable').DataTable().clear().destroy();
                     };
@@ -136,17 +135,16 @@
                         stateSave: false,
                         ajax: {
                             type: 'GET',
-                            url: "/hradmin/myorg/reporteeslist/"+user_id+"/"+position_number,
+                            url: "/hradmin/myorg/reporteeslist/"+user_id,
                         },                    
                         fnDrawCallback: function() {
                         },
                         fnRowCallback: function( row, data ) {
                         },
                         columns: [
-                            {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', searchable: true},
+                            {title: 'Employee ID', ariaTitle: 'Employee ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', searchable: true},
                             {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', searchable: true},
-                            {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'employee_email', searchable: true},
-                            {title: 'Type <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="<b>Direct Reports</b> are employees that report directly to you in PeopleSoft. <br><br><b>Delegated Reports</b> are employees that report to a vacant position in PeopleSoft and have therefore been delegated to you as the next level supervisor in the org hierarchy. <br><br><b>Shared Reports</b> are employees that have been shared with you by another supervisor or administrator in the PDP. This is separate from any PeopleSoft data." ></i>', ariaTitle: 'Type', target: 0, type: 'string', data: 'reporteetype', name: 'reporteetype', searchable: true},
+                            {title: 'Type', ariaTitle: 'Type', target: 0, type: 'string', data: 'reporteetype', name: 'reporteetype', searchable: true},
                         ],  
                     });
                 });

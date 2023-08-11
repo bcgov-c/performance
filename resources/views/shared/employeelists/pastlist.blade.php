@@ -109,7 +109,7 @@
                         {title: 'Next Conversation', ariaTitle: 'Next Conversation', target: 0, type: 'date', data: 'nextConversationDue', name: 'nextConversationDue', searchable: false},
                         {title: 'Excused', ariaTitle: 'Excused', target: 0, type: 'string', data: 'excused', name: 'excused', searchable: false},
                         {title: 'Shared', ariaTitle: 'Shared', target: 0, type: 'string', data: 'shared', name: 'shared', searchable: false},
-                        {title: 'Direct Reports', ariaTitle: 'Direct Reports', target: 0, type: 'string', data: 'reportees', name: 'reportees', searchable: false},
+                        {title: 'Reports', ariaTitle: 'Reports', target: 0, type: 'string', data: 'reportees', name: 'reportees', searchable: false},
                         {title: 'Date Deleted', ariaTitle: 'Date Deleted', target: 0, type: 'date', data: 'date_deleted', name: 'u.date_deleted', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'num', data: 'id', name: 'u.id', searchable: true, visible: false},
                     ],
