@@ -333,6 +333,7 @@ class AccessPermissionsController extends Controller
     public function manageindex(Request $request)
     {
         $errors = session('errors');
+        $old_selected_emp_ids = [];
         if ($errors) {
             $old = session()->getOldInput();
             $request->dd_level0 = isset($old['dd_level0']) ? $old['dd_level0'] : null;
@@ -363,7 +364,7 @@ class AccessPermissionsController extends Controller
         $roles = DB::table('roles')
         ->whereIntegerInRaw('id', [3, 4, 5])
         ->pluck('longname', 'id');
-        return view('sysadmin.accesspermissions.manageexistingaccess', compact ('request', 'criteriaList', 'roles'));
+        return view('sysadmin.accesspermissions.manageexistingaccess', compact ('request', 'criteriaList', 'roles', 'old_selected_emp_ids'));
     }
 
     public function getList(Request $request, $option = null) {
@@ -422,20 +423,42 @@ class AccessPermissionsController extends Controller
             $query = AdminOrg::where('user_id', $model_id)
                 ->where('version', '2')
                 ->leftJoin('employee_demo_tree', 'admin_orgs.orgid', 'employee_demo_tree.id')
-                ->select (
-                    'employee_demo_tree.organization',
-                    'employee_demo_tree.level1_program',
-                    'employee_demo_tree.level2_division',
-                    'employee_demo_tree.level3_branch',
-                    'employee_demo_tree.level4',
-                    'inherited',
-                    'user_id',
-            );
+                ->selectRaw("
+                    admin_orgs.id,
+                    employee_demo_tree.organization,
+                    employee_demo_tree.level1_program,
+                    employee_demo_tree.level2_division,
+                    employee_demo_tree.level3_branch,
+                    employee_demo_tree.level4,
+                    CASE WHEN inherited = 1 THEN 'Yes' ELSE 'No' END AS inherited,
+                    user_id
+            ");
             return Datatables::of($query)
-                ->editColumn('inherited', function ($row) { return $row->inherited == 1 ? "Yes" : "No"; })
-                ->addIndexColumn()
+                ->addColumn("select_orgs", static function ($row) {
+                    return '<input pid="1335" type="checkbox" id="orgCheck'.$row->id.'" name="orgCheck[]" value="'.$row->id.'" class="dt-body-center">';
+                })
+                ->addcolumn('action', function($row) {
+                    $btn = '<a href="' . route(request()->segment(1) . '.accesspermissions.deleteitem', ['id' => $row->id]) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_access" value="'. $row->id .'"><i class="fa fa-trash"></i></a>';
+                    return $btn;
+                })
+                ->rawColumns(['select_orgs', 'action'])
                 ->make(true);
         }
+    }
+
+    public function deleteitem(Request $request, $id) {
+        $query2 = DB::table('admin_orgs')
+            ->where('id', $id)
+            ->delete();
+        return redirect()->back();
+    }
+
+    public function deleteMultiOrgs(Request $request, $ids) {
+        $decoded = json_decode($ids);
+        $query1 = DB::table('admin_orgs')
+            ->whereIn('id', $decoded)
+            ->delete();
+        return redirect()->back();
     }
 
     public function get_access_entry($roleId, $modelId) {

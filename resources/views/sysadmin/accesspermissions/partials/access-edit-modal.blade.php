@@ -4,7 +4,7 @@
 
         {{ method_field('PUT') }}
         {{ csrf_field() }}
-        <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document" style="min-width:90%">
             <div class="modal-content">
                 <div class="modal-header bg-primary">
                     <h5 class="modal-title" type="hidden" id="accessDetailLabel">Edit Employee Access Level</h5>

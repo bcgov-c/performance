@@ -253,6 +253,10 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/accesspermissions/manageexistingaccessadmin/{user_id}', [AccessPermissionsController::class, 'getAdminOrgs'])->name('sysadmin.accesspermissions.manageexistingaccessadmin');
         Route::get('/sysadmin/accesspermissions/accessedit/{id}', [AccessPermissionsController::class, 'manageEdit'])->name('sysadmin.accesspermissions.accessedit');
         Route::post('/sysadmin/accesspermissions/accessupdate/{id}', [AccessPermissionsController::class, 'manageUpdate']);
+        Route::get('/sysadmin/accesspermissions/deleteitem/{id}', [AccessPermissionsController::class, 'deleteitem'])->name('sysadmin.accesspermissions.deleteitemget');
+        Route::delete('/sysadmin/accesspermissions/deleteitem/{id}', [AccessPermissionsController::class, 'deleteitem'])->name('sysadmin.accesspermissions.deleteitem');
+        Route::get('/sysadmin/accesspermissions/deletemultiorgs/{ids}', [AccessPermissionsController::class, 'deleteMultiOrgs'])->name('sysadmin.accesspermissions.deletemultiorgsget');
+        Route::delete('/sysadmin/accesspermissions/deletemultiorgs/{ids}', [AccessPermissionsController::class, 'deleteMultiOrgs'])->name('sysadmin.accesspermissions.deletemultiorgs');
     });
 
     //Welcome Message Editor
