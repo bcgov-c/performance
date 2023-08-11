@@ -248,6 +248,10 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/accesspermissions/manageexistingaccessadmin/{user_id}', [AccessPermissionsController::class, 'getAdminOrgs'])->name('sysadmin.accesspermissions.manageexistingaccessadmin');
         Route::get('/sysadmin/accesspermissions/accessedit/{id}', [AccessPermissionsController::class, 'manageEdit'])->name('sysadmin.accesspermissions.accessedit');
         Route::post('/sysadmin/accesspermissions/accessupdate/{id}', [AccessPermissionsController::class, 'manageUpdate']);
+        Route::get('/sysadmin/accesspermissions/deleteitem/{id}', [AccessPermissionsController::class, 'deleteitem'])->name('sysadmin.accesspermissions.deleteitemget');
+        Route::delete('/sysadmin/accesspermissions/deleteitem/{id}', [AccessPermissionsController::class, 'deleteitem'])->name('sysadmin.accesspermissions.deleteitem');
+        Route::get('/sysadmin/accesspermissions/deletemultiorgs/{ids}', [AccessPermissionsController::class, 'deleteMultiOrgs'])->name('sysadmin.accesspermissions.deletemultiorgsget');
+        Route::delete('/sysadmin/accesspermissions/deletemultiorgs/{ids}', [AccessPermissionsController::class, 'deleteMultiOrgs'])->name('sysadmin.accesspermissions.deletemultiorgs');
     });
 
     //Welcome Message Editor
@@ -289,6 +293,7 @@ Route::group(['middleware' => ['role:Sys Admin|Service Representative']], functi
     Route::get('/sysadmin/employeelists/getpastlist', [EmployeeListController::class, 'getPastList'])->name('sysadmin.employeelists.getpastlist');
     Route::get('/sysadmin/employeelists/export-current/{param?}', [EmployeeListController::class, 'exportCurrent'])->name('sysadmin.employeelists.export-current');
     Route::get('/sysadmin/employeelists/export-past/{param?}', [EmployeeListController::class, 'exportPast'])->name('sysadmin.employeelists.export-past');
+    Route::get('/sysadmin/employeelists/reporteeslist/{id}', [EmployeeListController::class, 'reporteesList'])->name('sysadmin.employeelists.reporteeslist');
 });
 
 

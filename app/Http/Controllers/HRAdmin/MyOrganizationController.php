@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\HRAdmin;
 
+use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\SharedProfile;
 use App\Models\HRUserDemoJrView;
+use App\Models\Position;
+use App\Models\UserDemoJrView;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
-
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -95,13 +96,56 @@ class MyOrganizationController extends Controller {
                     excusedtype,
                     CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
                     CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
-                    u.reportees,
+                    CONCAT (u.reportees, ' / ', (SELECT COUNT(1) FROM shared_profiles AS sp USE INDEX (SHARED_PROFILES_SHARED_WITH_FOREIGN) WHERE sp.shared_with IS NOT NULL AND sp.shared_with = u.user_id)) AS reportees,
                     (SELECT COUNT(g.id) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals
                 ");
             return Datatables::of($query)->addIndexColumn()
-                // ->editColumn('reportees', function($row) {
-                //     return User::where('id', $row->user_id)->first()->reporteesCount() ?? '0';
-                // })
+                ->addIndexColumn()
+                ->editColumn('reportees', function($row) {
+                    $text = $row->reportees;
+                    return view('hradmin.myorg.partials.link', compact(["row", 'text']));
+                })
+                ->rawColumns(['reportees'])
+                ->make(true);
+        }
+    }
+
+    public function reporteesList(Request $request, $id) {
+        $user = UserDemoJrView::where('user_id', $id)->first();
+        if ($request->ajax()) {
+            $direct = Position::from('positions AS posn')
+                ->join('employee_demo AS dmo', 'posn.position_nbr', 'dmo.position_number')
+                ->whereNull('dmo.date_deleted')
+                ->where('posn.reports_to', $user->position_number)
+                ->selectRaw("
+                    dmo.employee_id AS employee_id, 
+                    dmo.employee_name AS employee_name, 
+                    'Direct Report' AS reporteetype
+                ");
+            $elevated = Position::from('positions AS sspn')
+                ->join('positions AS spn', 'sspn.position_nbr', 'spn.reports_to')
+                ->join('employee_demo AS dmo', 'spn.position_nbr', 'dmo.position_number')
+                ->whereNull('dmo.date_deleted')
+                ->where('sspn.reports_to', $user->position_number)
+                ->whereRaw("NOT EXISTS (SELECT 1 FROM employee_demo AS non WHERE non.position_number = sspn.position_nbr AND non.date_deleted IS NULL LIMIT 1)")
+                ->selectRaw("
+                    dmo.employee_id AS employee_id, 
+                    dmo.employee_name AS employee_name, 
+                    'Direct Report*' AS reporteetype
+                ");
+            $shared = SharedProfile::from('shared_profiles AS sp')
+                ->whereRaw("sp.shared_with = ".$user->user_id)
+                ->join('user_demo_jr_view AS u', 'sp.shared_id', 'u.user_id')
+                ->whereNull('u.date_deleted')
+                ->selectRaw("
+                    u.employee_id AS employee_id, 
+                    u.employee_name AS employee_name, 
+                    'Shared' AS reporteetype
+                ");
+            $query = $direct->union($elevated);
+            $query = $query->union($shared);
+            return Datatables::of($query)
+                ->addIndexColumn()
                 ->make(true);
         }
     }

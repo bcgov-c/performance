@@ -4,6 +4,7 @@
             <h3>My Organization</h3>
         </div>
     </div>
+    <!-- @include('hradmin.myorg.partials.reportees-modal')  -->
 
     <div class="card">
         <div class="card-body">    
@@ -106,11 +107,46 @@
                                 {title: 'Next Conversation', ariaTitle: 'Next Conversation', target: 0, type: 'date', data: 'nextConversationDue', name: 'u.next_conversation_date', searchable: false, className: 'dt-nowrap'},
                                 {title: 'Excused', ariaTitle: 'Excused', target: 0, type: 'string', data: 'excusedtype', name: 'excusedtype', searchable: true, className: 'dt-nowrap'},
                                 {title: 'Shared', ariaTitle: 'Shared', target: 0, type: 'string', data: 'shared', name: 'shared', searchable: false, className: 'dt-nowrap'},
-                                {title: 'Direct Reports', ariaTitle: 'Direct Reports', target: 0, type: 'string', data: 'reportees', name: 'reportees', searchable: false, className: 'dt-nowrap'},
+                                {title: 'Reports', ariaTitle: 'Reports', target: 0, type: 'string', data: 'reportees', name: 'reportees', searchable: false, className: 'dt-nowrap'},
                                 {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'num', data: 'user_id', name: 'user_id', searchable: true, visible: false, className: 'dt-nowrap'},
                             ]
                         }
                     );
+                });
+
+                $('#reportees-modal').on('show.bs.modal', function(event) {
+                    var button = $(event.relatedTarget);
+                    var user_id = button.data('user_id');
+                    var employee_name = button.data('employee_name');
+                    $('#reporteesTitle').text('Reports List for '+employee_name);
+                    if($.fn.DataTable.isDataTable( "#reporteesTable" )) {
+                        $('#reporteesTable').DataTable().clear().destroy();
+                    };
+                    $('#reporteesTable').DataTable({
+                        serverSide: true,
+                        searching: false,
+                        processing: true,
+                        paging: true,
+                        deferRender: true,
+                        retrieve: true,
+                        scrollCollapse: true,
+                        scroller: true,
+                        scrollX: true,
+                        stateSave: false,
+                        ajax: {
+                            type: 'GET',
+                            url: "/hradmin/myorg/reporteeslist/"+user_id,
+                        },                    
+                        fnDrawCallback: function() {
+                        },
+                        fnRowCallback: function( row, data ) {
+                        },
+                        columns: [
+                            {title: 'Employee ID', ariaTitle: 'Employee ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', searchable: true},
+                            {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', searchable: true},
+                            {title: 'Type', ariaTitle: 'Type', target: 0, type: 'string', data: 'reporteetype', name: 'reporteetype', searchable: true},
+                        ],  
+                    });
                 });
 
                 $('#btn_search').click(function(e) {
