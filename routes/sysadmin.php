@@ -339,7 +339,7 @@ Route::group(['middleware' => ['role:Sys Admin|Service Representative']], functi
     Route::get('/sysadmin/employeelists/getpastlist', [EmployeeListController::class, 'getPastList'])->name('sysadmin.employeelists.getpastlist');
     Route::get('/sysadmin/employeelists/export-current/{param?}', [EmployeeListController::class, 'exportCurrent'])->name('sysadmin.employeelists.export-current');
     Route::get('/sysadmin/employeelists/export-past/{param?}', [EmployeeListController::class, 'exportPast'])->name('sysadmin.employeelists.export-past');
-    Route::get('/sysadmin/employeelists/reporteeslist/{id}/{posn}', [EmployeeListController::class, 'reporteesList'])->name('sysadmin.employeelists.reporteeslist');
+    Route::get('/sysadmin/employeelists/reporteeslist/{id}', [EmployeeListController::class, 'reporteesList'])->name('sysadmin.employeelists.reporteeslist');
 });
 
 

@@ -1,1 +1,1 @@
-<x-button style="link" class="reportees-btn" data-user-row="{{$row}}" data-user_id="{{$row->id}}" data-user-name="{{$row->employee_name}}" data-employee_name="{{$row->employee_name}}" data-position_number="{{$row->position_number}}" data-toggle="modal" data-target="#reportees-modal">{{ $text }}</x-button>
+<x-button style="link" class="reportees-btn" data-user-row="{{$row}}" data-user_id="{{$row->id}}" data-user-name="{{$row->employee_name}}" data-employee_name="{{$row->employee_name}}" data-toggle="modal" data-target="#reportees-modal">{{ $text }}</x-button>

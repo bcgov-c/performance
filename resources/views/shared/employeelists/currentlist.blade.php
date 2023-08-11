@@ -5,6 +5,7 @@
             @include('shared.employeelists.partials.tabs')
         </div>
     </div>
+    @include('shared.employeelists.partials.reportees-modal') 
     
     <div class="card">
         <div class="card-body">
@@ -73,7 +74,6 @@
                     scroller: true,
                     scrollX: true,
                     stateSave: true,
-
                     ajax: 
                     {
                         url: "{{ route(request()->segment(1).'.employeelists.getcurrentlist') }}",
@@ -110,7 +110,7 @@
                         {title: 'Next Conversation', ariaTitle: 'Next Conversation', target: 0, type: 'date', data: 'nextConversationDue', name: 'nextConversationDue', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'Excused', ariaTitle: 'Excused', target: 0, type: 'string', data: 'excused', name: 'excused', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'Shared', ariaTitle: 'Shared', target: 0, type: 'string', data: 'shared', name: 'shared', searchable: false, className: 'dt-nowrap show-modal'},
-                        {title: 'Direct Reports', ariaTitle: 'Direct Reports', target: 0, type: 'string', data: 'reportees', name: 'reportees', searchable: false, className: 'dt-nowrap show-modal'},
+                        {title: 'Reports', ariaTitle: 'Reports', target: 0, type: 'string', data: 'reportees', name: 'reportees', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'num', data: 'id', name: 'u.id', searchable: false, visible: false},
                     ],
                 } );
@@ -138,8 +138,7 @@
                     var button = $(event.relatedTarget);
                     var user_id = button.data('user_id');
                     var employee_name = button.data('employee_name');
-                    var position_number = button.data('position_number');
-                    $('#reporteesTitle').text('Direct / Shared Reports for '+employee_name);
+                    $('#reporteesTitle').text('Reports List for '+employee_name);
                     if($.fn.DataTable.isDataTable( "#reporteesTable" )) {
                         $('#reporteesTable').DataTable().clear().destroy();
                     };
@@ -156,28 +155,22 @@
                         stateSave: false,
                         ajax: {
                             type: 'GET',
-                            url: "/sysadmin/employeelists/reporteeslist/"+user_id+"/"+position_number,
+                            url: "/sysadmin/employeelists/reporteeslist/"+user_id,
                         },                    
                         fnDrawCallback: function() {
                         },
                         fnRowCallback: function( row, data ) {
                         },
                         columns: [
-                            {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', searchable: true},
+                            {title: 'Employee ID', ariaTitle: 'Employee ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', searchable: true},
                             {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', searchable: true},
-                            {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'employee_email', searchable: true},
-                            {title: 'Type <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="<b>Direct Reports</b> are employees that report directly to you in PeopleSoft. <br><br><b>Delegated Reports</b> are employees that report to a vacant position in PeopleSoft and have therefore been delegated to you as the next level supervisor in the org hierarchy. <br><br><b>Shared Reports</b> are employees that have been shared with you by another supervisor or administrator in the PDP. This is separate from any PeopleSoft data." ></i>', ariaTitle: 'Type', target: 0, type: 'string', data: 'reporteetype', name: 'reporteetype', searchable: true},
+                            {title: 'Type', ariaTitle: 'Type', target: 0, type: 'string', data: 'reporteetype', name: 'reporteetype', searchable: true},
                         ],  
                     });
                 });
 
                 $(window).on('beforeunload', function(){
                     $('#pageLoader').show();
-                });
-
-                $('body').popover({
-                    selector: '[data-toggle]',
-                    trigger: 'hover',
                 });
 
             } );
