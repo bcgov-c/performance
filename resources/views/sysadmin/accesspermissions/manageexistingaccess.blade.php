@@ -39,6 +39,15 @@
                 #filtertable_filter label {
                     text-align: right !important;
                 }
+
+                #admintable_filter label {
+                    display: none;
+                }
+
+                #admintable_wrapper .dt-buttons {
+                    float: left;
+                }
+
             </style>
         </x-slot>
         
@@ -82,6 +91,9 @@
 
 
         <script type="text/javascript">
+
+            let g_selected_employees = {!!json_encode($old_selected_emp_ids)!!};
+            
 			$(document).ready(function(){
 
                 $('#filtertable').DataTable ( {
@@ -150,6 +162,9 @@
                     $('removeButton').prop('disabled', current == model_id);
                     $('#accessselect').prop('disabled', current == model_id);
                     $('#reason').prop('disabled', current == model_id);
+                    if($.fn.DataTable.isDataTable( "#admintable" )) {
+                        $('#admintable').DataTable().clear().destroy();
+                    };
                     if($('#accessselect').val() == 5) {
                         $('#accessselect').prop('disabled', true);
                     }
@@ -171,12 +186,24 @@
                                 scrollCollapse: true,
                                 scroller: true,
                                 scrollX: true,
-                                stateSave: true,
+                                stateSave: false,
                                 ajax: {
                                     type: 'GET',
                                     url: "/sysadmin/accesspermissions/manageexistingaccessadmin/"+model_id,
                                 },                        
+                                fnDrawCallback: function() {
+                                },
+                                fnRowCallback: function( row, data ) {
+                                    var index = $.inArray(data.id, g_selected_employees);
+                                    if ( index === -1 ) {
+                                        $(row).find('input[id="orgCheck'+data.id+'"]').prop('checked', false);
+                                    } else {
+                                        $(row).find('input[id="orgCheck'+data.id+'"]').prop('checked', true);
+                                    }
+                                },
                                 columns: [
+                                    {title: 'Admin Org ID', ariaTitle: 'Admin Org ID', target: 0, type: 'num', data: 'id', name: 'id', searchable: false, visible: false},
+                                    {title: ' ', ariaTitle: 'Org Checkboxes', target: 0, type: 'string', data: 'select_orgs', name: 'select_orgs', orderable: false, searchable: false},
                                     {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', searchable: true},
                                     {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', searchable: true},
                                     {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', searchable: true},
@@ -184,12 +211,52 @@
                                     {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true},
                                     {title: 'Inherited', ariaTitle: 'Inherited', target: 0, type: 'string', data: 'inherited', name: 'inherited', searchable: true},
                                     {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'num', data: 'user_id', name: 'user_id', searchable: false, visible: false},
+                                    {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false, className: 'dt-nowrap'},
                                 ],  
                             }
                         );
                     } else {
                         $('#admintable').hide();
                     };
+                });
+
+                // add delete selected button
+                $("#admintable").append("<button id='delete-selected-btn' name='delete-selected-btn' value='delete-selected' class='btn btn-xs btn-primary dt-buttons buttons-csv buttons-html5'>Delete Selected</button> ");
+
+                $('#delete-selected-btn').attr('disabled', true);
+
+                $('#admintable').on('click', 'input:checkbox', function () {
+                    // if the input checkbox is selected 
+                    var id = parseInt(this.value);
+                    var index = $.inArray(id, g_selected_employees);
+                    var table = $('#admintable').DataTable();
+                    if(this.checked) {
+                        g_selected_employees.push( id );
+                    } else {
+                        g_selected_employees.splice( index, 1 );
+                    }
+                    if(g_selected_employees.length === 0) {
+                        $('#delete-selected-btn').attr('disabled', true);
+                    } else {
+                        $('#delete-selected-btn').attr('disabled', false);
+                    }
+                });
+
+                $('#delete-selected-btn').on('click', function(e) {
+                    e.preventDefault();
+                    let g_selected_string = g_selected_employees.toString();
+                    let parray = encodeURIComponent(JSON.stringify(g_selected_employees));
+                    let count = g_selected_employees.length;
+                    let message = 'Confirm deletion of selected row?';
+                    if(count>1){
+                        message = 'Confirm deletion of '+count+' selected rows?';
+                    }
+                    if(confirm(message)) {
+                        var deleteall_url = "{{ route(request()->segment(1) . '.accesspermissions.deletemultiorgs', ':parray') }}";
+                        deleteall_url = deleteall_url.replace(':parray', parray);
+                        let _url = deleteall_url;
+                        window.location.href = _url;
+                    }
                 });
 
                 $('#editModal').on('hidden.bs.modal', function(event) {
