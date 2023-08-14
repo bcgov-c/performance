@@ -67,7 +67,10 @@ class SysadminStatisticsReportController extends Controller
         if ($goal_type_id != ''){                        
             $from_stmt .= " and goals.goal_type_id =".  $goal_type_id ;
         }    
-        $from_stmt .= ") as goals_count from user_demo_jr_view ) AS A";
+        $from_stmt .= ") as goals_count from user_demo_jr_view WHERE 
+        (user_demo_jr_view.excused_flag IS NULL OR user_demo_jr_view.excused_flag <> 1) 
+        AND 
+        (user_demo_jr_view.due_date_paused = 'N' OR user_demo_jr_view.due_date_paused IS NULL) ) AS A";
 
         return $from_stmt;
     }
