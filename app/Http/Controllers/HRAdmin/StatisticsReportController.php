@@ -58,7 +58,7 @@ class StatisticsReportController extends Controller
         $from_stmt = "(select user_demo_jr_view.user_id, user_demo_jr_view.employee_email, user_demo_jr_view.employee_id, user_demo_jr_view.empl_record
                     , user_demo_jr_view.guid, user_demo_jr_view.reporting_to, 
                         (select count(*) from goals where goals.user_id = user_demo_jr_view.user_id
-                        and goals.status = 'active' and goals.deleted_at is null and goals.is_library = 0 ";
+                        and goals.status = 'active' and goals.deleted_at is null and goals.is_library = 0 and goals.goal_type_id IN (1,2,3) ";
         if ($goal_type_id != ''){                        
             $from_stmt .= " and goals.goal_type_id =".  $goal_type_id ;
         }    
@@ -659,13 +659,13 @@ class StatisticsReportController extends Controller
                     $row['Active Learning Goals Count'] = 0;
 
                     foreach($subquery_counts as $sub){
-                        if($sub->goal_type_id == 3) {
+                        if($sub->goal_type_id == 1) {
                             $row['Active Work Goals Count'] = $sub->sub_count;
                         } 
-                        if($sub->goal_type_id == 4) {
+                        if($sub->goal_type_id == 2) {
                             $row['Active Career Development Goals Count'] = $sub->sub_count;
                         } 
-                        if($sub->goal_type_id == 5) {
+                        if($sub->goal_type_id == 3) {
                             $row['Active Learning Goals Count'] = $sub->sub_count;
                         } 
                     }
