@@ -70,7 +70,10 @@ class SysadminStatisticsReportController extends Controller
         $from_stmt .= ") as goals_count from user_demo_jr_view WHERE 
         (user_demo_jr_view.excused_flag IS NULL OR user_demo_jr_view.excused_flag <> 1) 
         AND 
-        (user_demo_jr_view.due_date_paused = 'N' OR user_demo_jr_view.due_date_paused IS NULL) ) AS A";
+        (user_demo_jr_view.due_date_paused = 'N' OR user_demo_jr_view.due_date_paused IS NULL) 
+        AND
+        user_demo_jr_view.date_deleted IS NULL
+        ) AS A";
 
         return $from_stmt;
     }
@@ -140,6 +143,7 @@ class SysadminStatisticsReportController extends Controller
                     ->orWhereNull('excused_flag');
             });
         })
+        ->whereNull('user_demo_jr_view.date_deleted')
         ->whereNull('goals.deleted_at')
         ->where('goals.status','active')
         ->where('goals.is_library','0')  
