@@ -188,10 +188,8 @@ class StatisticsReportController extends Controller
         $total_number_obj = $total_number_query->get();
         $total_number_emp = $total_number_obj[0]->total_emp;
 
-        $goal_count_cal = UserDemoJrView::selectRaw("user_demo_jr_view.user_id, COUNT(goals.id) AS goals_count, goals.goal_type_id")
-        ->leftJoin('goals', function ($join) {
-            $join->on('goals.user_id', '=', 'user_demo_jr_view.user_id');
-        })
+        $goal_count_cal = Goal::selectRaw("user_demo_jr_view.user_id, COUNT(goals.id) AS goals_count, goals.goal_type_id")
+        ->join('user_demo_jr_view', 'goals.user_id', 'user_demo_jr_view.user_id')
         ->join('goal_types', 'goals.goal_type_id', 'goal_types.id')
         ->where('goals.status', '=', 'active')
         ->whereNull('goals.deleted_at')
