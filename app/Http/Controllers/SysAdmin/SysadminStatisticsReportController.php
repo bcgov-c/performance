@@ -479,112 +479,162 @@ class SysadminStatisticsReportController extends Controller
                     //           ->where('employee_demo.employee_status', 'A');
                     // });
                     $users = $sql->get();
-                        
-                    /*
-                    $query = $sql->toSql();
-                    $bing = $sql->getBindings();
-                    echo $query;
-                    echo "<br/>";
-                    print_r($bing);
-                    exit;
-                    */
 
-        } else {
-            $types = GoalType::orderBy('id')->get();
-            $users = collect();
-            foreach ($types as $type){
-                if($type->name != 'Private') {
-                    $goal_type_id = $type->id;
-                    $from_stmt = $this->goalSummary_from_statement($goal_type_id);
-                    $sql = User::selectRaw('A.*, goals_count, user_demo_jr_view.employee_name, 
-                    user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4')
-                            ->from(DB::raw( $from_stmt ))                                
-                            ->join('user_demo_jr_view', function($join) {
-                                $join->on('user_demo_jr_view.employee_id', '=', 'A.employee_id');
-                                //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
-                            })
-                            ->where(function($query) {
-                                $query->where(function($query) {
-                                    $query->where('user_demo_jr_view.excused_flag', '<>', '1')
-                                        ->orWhereNull('user_demo_jr_view.excused_flag');
-                                });
-                            }) 
-                            ->where(function($query) {
-                                $query->where(function($query) {
-                                    $query->where('user_demo_jr_view.due_date_paused', 'N')
-                                        ->orWhereNull('user_demo_jr_view.due_date_paused');
-                                });
-                            })
-                            ->whereNull('user_demo_jr_view.date_deleted')
-                            // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
-                            // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
-                            ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
-                            ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
-                            ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
-                            ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
-                            ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })
-                            // ->where('acctlock', 0)
-                            ->when( (array_key_exists($request->range, $this->groups)) , function($q) use($request) {
-                                return $q->whereBetween('goals_count', $this->groups[$request->range]);
-                            });
-                            // ->where( function($query) {
-                            //     $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01") ')
-                            //           ->where('employee_demo.employee_status', 'A');
-                            // });
-                    $user_type = $sql->get();
+            // Generating Output file 
+            $filename = 'Active Goals Per Employee.csv';
+            if ($request->goal) {        
+                $type = GoalType::where('id', $request->goal)->first();
+                $filename = 'Active ' . ($type ? $type->name . ' ' : '') . 'Goals Per Employee.csv';
+            }
 
-                    $users = $users->merge($user_type);
+            $headers = array(
+                "Content-type"        => "text/csv",
+                "Content-Disposition" => "attachment; filename=$filename",
+                "Pragma"              => "no-cache",
+                "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                "Expires"             => "0"
+            );
+
+            $columns = ["Employee ID", "Name", "Email", 'Active Goals Count', 
+                            "Organization", "Level 1", "Level 2", "Level 3", "Level 4", "Reporting To",
+                        ];
+
+            $callback = function() use($users, $columns) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, $columns);
+
+                foreach ($users as $user) {
+                    $row['Employee ID'] = $user->employee_id;
+                    $row['Name'] = $user->employee_name;
+                    $row['Email'] = $user->employee_email;
+                    $row['Active Goals Count'] = $user->goals_count;
+                    $row['Organization'] = $user->organization;
+                    $row['Level 1'] = $user->level1_program;
+                    $row['Level 2'] = $user->level2_division;
+                    $row['Level 3'] = $user->level3_branch;
+                    $row['Level 4'] = $user->level4;
+                    $row['Reporting To'] = $user->reportingManager ? $user->reportingManager->name : '';
+
+                    fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Active Goals Count'], $row['Organization'],
+                                $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], $row['Reporting To'] ));
                 }
 
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);            
+        } else {
+            $from_stmt = $this->goalSummary_from_statement($request->goal);
+            $sql = User::selectRaw('A.*, goals_count, user_demo_jr_view.employee_name, 
+            user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4')
+                    ->from(DB::raw( $from_stmt ))                                
+                    ->join('user_demo_jr_view', function($join) {
+                        $join->on('user_demo_jr_view.employee_id', '=', 'A.employee_id');
+                        //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
+                    })
+                    ->where(function($query) {
+                        $query->where(function($query) {
+                            $query->where('user_demo_jr_view.excused_flag', '<>', '1')
+                                ->orWhereNull('user_demo_jr_view.excused_flag');
+                        });
+                    }) 
+                    ->where(function($query) {
+                        $query->where(function($query) {
+                            $query->where('user_demo_jr_view.due_date_paused', 'N')
+                                ->orWhereNull('user_demo_jr_view.due_date_paused');
+                        });
+                    })
+                    ->whereNull('user_demo_jr_view.date_deleted')
+                    // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
+                    // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
+                    ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
+                    ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
+                    ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
+                    ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
+                    ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })
+                    // ->where('acctlock', 0)
+                    ->when( (array_key_exists($request->range, $this->groups)) , function($q) use($request) {
+                        return $q->whereBetween('goals_count', $this->groups[$request->range]);
+                    });
+                    // ->where( function($query) {
+                    //     $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01") ')
+                    //           ->where('employee_demo.employee_status', 'A');
+                    // });
+                    $users = $sql->get();
+
+            // Generating Output file 
+            $filename = 'Active Goals Per Employee.csv';
+            if ($request->goal) {        
+                $type = GoalType::where('id', $request->goal)->first();
+                $filename = 'Active ' . ($type ? $type->name . ' ' : '') . 'Goals Per Employee.csv';
             }
 
+            $headers = array(
+                "Content-type"        => "text/csv",
+                "Content-Disposition" => "attachment; filename=$filename",
+                "Pragma"              => "no-cache",
+                "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                "Expires"             => "0"
+            );
+
+            $columns = ["Employee ID", "Name", "Email", 'Active Goals Count', 
+            'Active Work Goals Count',  'Active Career Development Goals Count',  'Active Learning Goals Count', 
+                            "Organization", "Level 1", "Level 2", "Level 3", "Level 4", "Reporting To",
+                        ];
+
+            $callback = function() use($users, $columns) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, $columns);
+
+                foreach ($users as $user) {
+                    $row['Employee ID'] = $user->employee_id;
+                    $row['Name'] = $user->employee_name;
+                    $row['Email'] = $user->employee_email;
+                    $row['Active Goals Count'] = $user->goals_count;
+
+                    $user_id = $user->user_id;
+                    $subquery = DB::table('goals')
+                                ->select('goal_type_id', DB::raw('COUNT(*) AS sub_count'))
+                                ->where('status', 'active')
+                                ->whereNull('deleted_at')
+                                ->where('is_library', 0)
+                                ->where('user_id', $user_id)
+                                ->groupBy('goal_type_id');
+                    $subquery_counts = $subquery->get();  
+                    
+                    $row['Active Work Goals Count'] = 0;
+                    $row['Active Career Development Goals Count'] = 0;
+                    $row['Active Learning Goals Count'] = 0;
+
+                    foreach($subquery_counts as $sub){
+                        if($sub->goal_type_id == 3) {
+                            $row['Active Work Goals Count'] = $sub->sub_count;
+                        } 
+                        if($sub->goal_type_id == 4) {
+                            $row['Active Career Development Goals Count'] = $sub->sub_count;
+                        } 
+                        if($sub->goal_type_id == 5) {
+                            $row['Active Learning Goals Count'] = $sub->sub_count;
+                        } 
+                    }
+
+                    $row['Organization'] = $user->organization;
+                    $row['Level 1'] = $user->level1_program;
+                    $row['Level 2'] = $user->level2_division;
+                    $row['Level 3'] = $user->level3_branch;
+                    $row['Level 4'] = $user->level4;
+                    $row['Reporting To'] = $user->reportingManager ? $user->reportingManager->name : '';
+
+                    fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Active Goals Count'], 
+                                $row['Active Work Goals Count'],$row['Active Career Development Goals Count'],$row['Active Learning Goals Count'],
+                                $row['Organization'], $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], $row['Reporting To'] ));
+                }
+
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);    
         }
-        
-      
-        // Generating Output file 
-        $filename = 'Active Goals Per Employee.csv';
-        if ($request->goal) {        
-            $type = GoalType::where('id', $request->goal)->first();
-            $filename = 'Active ' . ($type ? $type->name . ' ' : '') . 'Goals Per Employee.csv';
-        }
-
-        $headers = array(
-            "Content-type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename=$filename",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        );
-
-        $columns = ["Employee ID", "Name", "Email", 'Active Goals Count', 
-                        "Organization", "Level 1", "Level 2", "Level 3", "Level 4", "Reporting To",
-                    ];
-
-        $callback = function() use($users, $columns) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, $columns);
-
-            foreach ($users as $user) {
-                $row['Employee ID'] = $user->employee_id;
-                $row['Name'] = $user->employee_name;
-                $row['Email'] = $user->employee_email;
-                $row['Active Goals Count'] = $user->goals_count;
-                $row['Organization'] = $user->organization;
-                $row['Level 1'] = $user->level1_program;
-                $row['Level 2'] = $user->level2_division;
-                $row['Level 3'] = $user->level3_branch;
-                $row['Level 4'] = $user->level4;
-                $row['Reporting To'] = $user->reportingManager ? $user->reportingManager->name : '';
-
-                fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Active Goals Count'], $row['Organization'],
-                            $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], $row['Reporting To'] ));
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
-
     }
 
     public function goalSummaryTagExport(Request $request) {
