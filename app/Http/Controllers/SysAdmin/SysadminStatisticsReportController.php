@@ -560,11 +560,8 @@ class SysadminStatisticsReportController extends Controller
                     // ->where('acctlock', 0)
                     ->when( (array_key_exists($request->range, $this->groups)) , function($q) use($request) {
                         return $q->whereBetween('goals_count', $this->groups[$request->range]);
-                    });
-                    // ->where( function($query) {
-                    //     $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01") ')
-                    //           ->where('employee_demo.employee_status', 'A');
-                    // });
+                    })
+                    ->groupby('user_demo_jr_view.employee_id');
                     $users = $sql->get();
 
             // Generating Output file 
