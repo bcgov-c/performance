@@ -178,7 +178,7 @@ class SysadminStatisticsReportController extends Controller
         $total_number_obj = $total_number_query->get();
         $total_number_emp = $total_number_obj[0]->total_emp;
 
-        $goal_count_cal = Goal::selectRaw("user_demo_jr_view.user_id, COUNT(goals.id) AS goals_count, goals.goal_type_id")
+        $goal_count_cal = Goal::selectRaw("user_demo_jr_view.employee_id, COUNT(goals.id) AS goals_count, goals.goal_type_id")
         ->join('user_demo_jr_view', 'goals.user_id', 'user_demo_jr_view.user_id')
         ->join('goal_types', 'goals.goal_type_id', 'goal_types.id')
         ->where('goals.status', '=', 'active')
@@ -203,7 +203,7 @@ class SysadminStatisticsReportController extends Controller
             ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
             ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
             ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })            
-            ->groupBy(['user_demo_jr_view.user_id', 'goals.goal_type_id']);
+            ->groupBy(['user_demo_jr_view.employee_id', 'goals.goal_type_id']);
                     
         $goal_count_cal = $goal_count_cal->get()->toArray();
 
@@ -212,7 +212,7 @@ class SysadminStatisticsReportController extends Controller
         $toal_goal_counts = 0;
         $sub_users = 0;
         foreach ($goal_count_cal as $item) {
-            $user_id = $item['user_id'];
+            $employee_id = $item['employee_id'];
             $sub_users++;
 
             $goals_count = $item['goals_count'];
@@ -560,8 +560,7 @@ class SysadminStatisticsReportController extends Controller
                     // ->where('acctlock', 0)
                     ->when( (array_key_exists($request->range, $this->groups)) , function($q) use($request) {
                         return $q->whereBetween('goals_count', $this->groups[$request->range]);
-                    })
-                    ->groupby('user_demo_jr_view.employee_id');
+                    });
                     $users = $sql->get();
 
             // Generating Output file 
