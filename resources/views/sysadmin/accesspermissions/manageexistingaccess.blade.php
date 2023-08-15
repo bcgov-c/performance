@@ -16,7 +16,6 @@
     </div>   
     @include('sysadmin/accesspermissions/partials/access-edit-modal')
 
-
     @push('css')
         <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
         <x-slot name="css">
