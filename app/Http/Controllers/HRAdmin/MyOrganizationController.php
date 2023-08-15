@@ -120,7 +120,8 @@ class MyOrganizationController extends Controller {
                 ->selectRaw("
                     dmo.employee_id AS employee_id, 
                     dmo.employee_name AS employee_name, 
-                    'Direct Report' AS reporteetype
+                    dmo.employee_email AS employee_email, 
+                    'Direct' AS reporteetype
                 ");
             $elevated = Position::from('positions AS sspn')
                 ->join('positions AS spn', 'sspn.position_nbr', 'spn.reports_to')
@@ -131,7 +132,8 @@ class MyOrganizationController extends Controller {
                 ->selectRaw("
                     dmo.employee_id AS employee_id, 
                     dmo.employee_name AS employee_name, 
-                    'Direct Report*' AS reporteetype
+                    dmo.employee_email AS employee_email, 
+                    'Delegated' AS reporteetype
                 ");
             $shared = SharedProfile::from('shared_profiles AS sp')
                 ->whereRaw("sp.shared_with = ".$user->user_id)
@@ -140,6 +142,7 @@ class MyOrganizationController extends Controller {
                 ->selectRaw("
                     u.employee_id AS employee_id, 
                     u.employee_name AS employee_name, 
+                    u.employee_email AS employee_email, 
                     'Shared' AS reporteetype
                 ");
             $query = $direct->union($elevated);
