@@ -438,7 +438,7 @@ class AccessPermissionsController extends Controller
                     return '<input pid="1335" type="checkbox" id="orgCheck'.$row->id.'" name="orgCheck[]" value="'.$row->id.'" class="dt-body-center">';
                 })
                 ->addcolumn('action', function($row) {
-                    $btn = '<a href="' . route(request()->segment(1) . '.accesspermissions.deleteitem', ['id' => $row->id]) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_access" value="'. $row->id .'"><i class="fa fa-trash"></i></a>';
+                    $btn = '<a href="' . route(request()->segment(1) . '.accesspermissions.deleteitem', ['item_id' => $row->id]) . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_access" value="'. $row->id .'"><i class="fa fa-trash"></i></a>';
                     return $btn;
                 })
                 ->rawColumns(['select_orgs', 'action'])
@@ -446,19 +446,27 @@ class AccessPermissionsController extends Controller
         }
     }
 
-    public function deleteitem(Request $request, $id) {
-        $query2 = DB::table('admin_orgs')
-            ->where('id', $id)
-            ->delete();
-        return redirect()->back();
+    public function deleteitem(Request $request, $item_id) {
+        $item = AdminOrg::find($item_id);
+        if($item){
+            $query2 = DB::table('admin_orgs')
+                ->where('id', $item_id)
+                ->delete();
+            $this->refreshAdminOrgUsersById($item->user_id);
+            return redirect()->back();
+        }
     }
 
-    public function deleteMultiOrgs(Request $request, $ids) {
-        $decoded = json_decode($ids);
-        $query1 = DB::table('admin_orgs')
-            ->whereIn('id', $decoded)
-            ->delete();
-        return redirect()->back();
+    public function deleteMultiOrgs(Request $request, $item_ids) {
+        $decoded = json_decode($item_ids);
+        $item = AdminOrg::find($decoded[0]);
+        if($item){
+            $query1 = DB::table('admin_orgs')
+                ->whereIn('id', $decoded)
+                ->delete();
+            $this->refreshAdminOrgUsersById($item->user_id);
+            return redirect()->back();
+        }
     }
 
     public function get_access_entry($roleId, $modelId) {
