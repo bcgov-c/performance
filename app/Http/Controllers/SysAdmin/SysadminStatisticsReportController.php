@@ -650,13 +650,13 @@ class SysadminStatisticsReportController extends Controller
                     $row['Active Learning Goals Count'] = 0;
 
                     foreach($subquery_counts as $sub){
-                        if($sub->goal_type_id == 3) {
+                        if($sub->goal_type_id == 1) {
                             $row['Active Work Goals Count'] = $sub->sub_count;
                         } 
-                        if($sub->goal_type_id == 4) {
+                        if($sub->goal_type_id == 2) {
                             $row['Active Career Development Goals Count'] = $sub->sub_count;
                         } 
-                        if($sub->goal_type_id == 5) {
+                        if($sub->goal_type_id == 3) {
                             $row['Active Learning Goals Count'] = $sub->sub_count;
                         } 
                     }
