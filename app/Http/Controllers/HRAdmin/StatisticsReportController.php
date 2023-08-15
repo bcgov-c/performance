@@ -188,7 +188,7 @@ class StatisticsReportController extends Controller
         $total_number_obj = $total_number_query->get();
         $total_number_emp = $total_number_obj[0]->total_emp;
 
-        $goal_count_cal = Goal::selectRaw("user_demo_jr_view.user_id, COUNT(goals.id) AS goals_count, goals.goal_type_id")
+        $goal_count_cal = Goal::selectRaw("user_demo_jr_view.employee_id, COUNT(goals.id) AS goals_count, goals.goal_type_id")
         ->join('user_demo_jr_view', 'goals.user_id', 'user_demo_jr_view.user_id')
         ->join('goal_types', 'goals.goal_type_id', 'goal_types.id')
         ->where('goals.status', '=', 'active')
@@ -220,7 +220,7 @@ class StatisticsReportController extends Controller
                     ->where('auth_users.type', '=', 'HR')
                     ->where('auth_users.auth_id', '=', Auth::id());
             })            
-            ->groupBy(['user_demo_jr_view.user_id', 'goals.goal_type_id']);
+            ->groupBy(['user_demo_jr_view.employee_id', 'goals.goal_type_id']);
                     
         $goal_count_cal = $goal_count_cal->get()->toArray();
 
@@ -229,7 +229,7 @@ class StatisticsReportController extends Controller
         $toal_goal_counts = 0;
         $sub_users = 0;
         foreach ($goal_count_cal as $item) {
-            $user_id = $item['user_id'];
+            $employee_id = $item['employee_id'];
             $sub_users++;
 
             $goals_count = $item['goals_count'];
