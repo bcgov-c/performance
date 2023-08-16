@@ -187,9 +187,10 @@ class PopulateUsersAnnexTable extends Command
                   NOW(),
                   CASE WHEN (SELECT 1 FROM users AS su WHERE su.reporting_to = u.id LIMIT 1) THEN 1 ELSE 0 END AS isSupervisor,
                   CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_with = u.id LIMIT 1) THEN 1 ELSE 0 END AS isDelegate,
-                  ( (SELECT COUNT(dmo.employee_id) FROM positions AS posn, employee_demo AS dmo USE INDEX (IDX_EMPLOYEE_DEMO_POSITION_NUMBER_EMPLOYEE_ID), users AS u2  USE INDEX (IDX_USERS_EMPLOYEEID_EMPLRECORD)WHERE posn.reports_to = d.position_number AND posn.position_nbr = dmo.position_number AND dmo.date_deleted IS NULL AND dmo.employee_id = u2.employee_id AND dmo.empl_record = u2.empl_record) +
+                  ( (SELECT COUNT(dmo.employee_id) FROM positions AS posn, employee_demo AS dmo USE INDEX (IDX_EMPLOYEE_DEMO_POSITION_NUMBER_EMPLOYEE_ID), users AS u2  USE INDEX (IDX_USERS_EMPLOYEEID_EMPLRECORD) WHERE posn.reports_to = d.position_number AND posn.position_nbr = dmo.position_number AND dmo.date_deleted IS NULL AND dmo.employee_id = u2.employee_id AND dmo.empl_record = u2.empl_record) +
 				              (SELECT COUNT(dmo.employee_id) FROM positions AS sspn, positions AS spn USE INDEX (POSITIONS_REPORTS_TO_POSITION_NBR_INDEX), employee_demo AS dmo USE INDEX (IDX_EMPLOYEE_DEMO_POSITION_NUMBER_EMPLOYEE_ID), users AS u2 USE INDEX (IDX_USERS_EMPLOYEEID_EMPLRECORD) WHERE d.position_number = sspn.reports_to and sspn.position_nbr = spn.reports_to AND spn.position_nbr = dmo.position_number 
-                      AND dmo.date_deleted IS NULL AND NOT EXISTS (SELECT 1 FROM employee_demo AS non USE INDEX (IDX_EMPLOYEE_DEMO_POSITION_NUMBER_EMPLOYEE_ID) WHERE non.position_number = sspn.position_nbr AND non.date_deleted IS NULL AND dmo.employee_id = u2.employee_id AND dmo.empl_record = u2.empl_record LIMIT 1)) ) AS reportees
+                      AND dmo.date_deleted IS NULL AND dmo.employee_id = u2.employee_id AND dmo.empl_record = u2.empl_record 
+                      AND NOT EXISTS (SELECT 1 FROM employee_demo AS non USE INDEX (IDX_EMPLOYEE_DEMO_POSITION_NUMBER_EMPLOYEE_ID) WHERE non.position_number = sspn.position_nbr AND non.date_deleted IS NULL LIMIT 1)) ) AS reportees
                 FROM
                   (employee_demo AS d 
                     USE INDEX (idx_employee_demo_employeeid_orgid)
