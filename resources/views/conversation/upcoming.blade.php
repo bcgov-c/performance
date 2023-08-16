@@ -322,6 +322,7 @@ i {
   var supervisors = $('#supervisors').val();
   var sup_employee_signed = $('#sup_employee_signed').val();
   var sup_supervisor_signed = $('#sup_supervisor_signed').val();
+  var unsave_warning = false;
   
   if(sup_conversation_topic_id != 0 || supervisors != '' || sup_employee_signed != 'any' || sup_supervisor_signed != 'any'){
       var show_collapse_1 = true;
