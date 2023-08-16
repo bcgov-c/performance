@@ -73,7 +73,8 @@
             
             document.getElementById("closemodal").onclick = function(e) {myFunction(e)};
             function myFunction(e) {
-                if (modal_edit ==  true || !checkIfItIsLocked()){       
+                if (modal_edit ==  true || !checkIfItIsLocked()){ 
+                    if(unsave_warning == true) {   
                         if (confirm('If you continue you will lose any unsaved changes.')) {
                             modal_open=false;
                             //saveComments();                                
@@ -90,6 +91,9 @@
                         }else {
                             e.preventDefault();                            
                         }  
+                    } else {
+                        $('#viewConversationModal').modal('hide');
+                    }
                 } else if(checkIfItIsLocked()) {
                     $('#viewConversationModal').modal('toggle');
                     //window.location.href = window.location.origin + window.location.pathname + window.location.hash;
@@ -578,6 +582,12 @@
                         $('#info_area8').html('<span style="color:red">Comment saved</span>');
                         $('#info_area9').html('<span style="color:red">Comment saved</span>');
                         $('#info_area10').html('<span style="color:red">Comment saved</span>');
+
+                        var info_comment4_data = CKEDITOR.instances['info_comment4'].getData();
+                        var info_comment7_data = CKEDITOR.instances['info_comment7'].getData();
+                        var info_comment8_data = CKEDITOR.instances['info_comment8'].getData();
+                        var info_comment9_data = CKEDITOR.instances['info_comment9'].getData();
+                        var info_comment10_data = CKEDITOR.instances['info_comment10'].getData();
                         
                         if (db_info_comment4 != info_comment4_data) {
                             $('#control-info-comment4').show();
@@ -627,7 +637,8 @@
                    $('#control-info-comment11').hide();
             });
             CKEDITOR.instances['info_comment1'].on('key', function(e) { 
-                $('#info_area1').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                $('#info_area1').html('<button type="button" class="btn btn-primary">Save</button><br/>');                 
+                unsave_warning = true;
                 //$('#control-info-comment1').show();
                 info_save1 = 0;       
             });           
@@ -641,6 +652,7 @@
             $('#control-info-comment1').click(function() {
                 saveCkComment('info_comment1');
                 info_save1 = 1;
+                unsave_warning = false;
                 $('#info_area1').html('<span style="color:red">Comment saved</span>');
                 setTimeRoll();
             }); 
@@ -654,6 +666,7 @@
             });
             CKEDITOR.instances['info_comment2'].on('key', function(e) { 
                 $('#info_area2').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                unsave_warning = true;
                    //$('#control-info-comment2').show();
                    info_save2 = 0;
             });
@@ -666,6 +679,7 @@
             $('#control-info-comment2').click(function() {
                 saveCkComment('info_comment2');
                 info_save2 = 1;
+                unsave_warning = false;
                 $('#info_area2').html('<span style="color:red">Comment saved</span>');
                 setTimeRoll();
             }); 
@@ -679,6 +693,7 @@
             });
             CKEDITOR.instances['info_comment3'].on('key', function(e) { 
                 $('#info_area3').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                unsave_warning = true;
                    //$('#control-info-comment3').show();
                    info_save3 = 0;
             });
@@ -691,6 +706,7 @@
             $('#control-info-comment3').click(function() {
                 saveCkComment('info_comment3');
                 info_save3 = 1;
+                unsave_warning = false;
                 $('#info_area3').html('<span style="color:red">Comment saved</span>');
                 setTimeRoll();
             }); 
@@ -702,6 +718,7 @@
             });
             CKEDITOR.instances['info_comment4'].on('key', function(e) { 
                 $('#info_area4').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                unsave_warning = true;
                    //$('#control-info-comment4').show();
                    info_save4 = 0;
             });
@@ -714,6 +731,7 @@
             $('#control-info-comment4').click(function() {
                 saveCkComment('info_comment4');
                 info_save4 = 1;
+                unsave_warning = false;
                 $('#info_area4').html('<span style="color:red">Comment saved</span>');
                 setTimeRoll();
             });  
@@ -727,6 +745,7 @@
             });
             CKEDITOR.instances['info_comment5'].on('key', function(e) { 
                 $('#info_area5').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                unsave_warning = true;
                    //$('#control-info-comment5').show();
                    info_save5 = 0;
             });
@@ -739,6 +758,7 @@
             $('#control-info-comment5').click(function() {
                 saveCkComment('info_comment5');
                 info_save5 = 1;
+                unsave_warning = false;
                 $('#info_area5').html('<span style="color:red">Comment saved</span>');
                 setTimeRoll();
             });  
@@ -751,6 +771,7 @@
             });
             CKEDITOR.instances['info_comment6'].on('key', function(e) { 
                 $('#info_area6').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                unsave_warning = true;
                    //$('#control-info-comment6').show();
                    info_save6 = 0;
             });
@@ -763,6 +784,7 @@
             $('#control-info-comment6').click(function() {
                 saveCkComment('info_comment6');
                 info_save6 = 1;
+                unsave_warning = false;
                 $('#info_area6').html('<span style="color:red">Comment saved</span>');
                 setTimeRoll();
             });
@@ -775,6 +797,7 @@
             CKEDITOR.instances['info_comment7'].on('key', function(e) { 
                 $('#info_area7').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
                    //$('#control-info-comment7').show();
+                   unsave_warning = true;
                    info_save7 = 0;
             });
             CKEDITOR.instances['info_comment7'].on('blur', function(e) {
@@ -786,6 +809,7 @@
             $('#control-info-comment7').click(function() {
                 saveCkComment('info_comment7');
                 info_save7 = 1;
+                unsave_warning = false;
                 $('#info_area7').html('<span style="color:red">Comment saved</span>');
                 setTimeRoll();
             });
@@ -797,6 +821,7 @@
             });
             CKEDITOR.instances['info_comment8'].on('key', function(e) { 
                 $('#info_area8').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                unsave_warning = true;
                    //$('#control-info-comment8').show();
                    info_save8 = 0;
             });
@@ -809,6 +834,7 @@
             $('#control-info-comment8').click(function() {
                 saveCkComment('info_comment8');
                 info_save8 = 1;
+                unsave_warning = false;
                 $('#info_area8').html('<span style="color:red">Comment saved</span>');
                 setTimeRoll();
             });
@@ -820,6 +846,7 @@
             });
             CKEDITOR.instances['info_comment9'].on('key', function(e) { 
                 $('#info_area9').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                unsave_warning = true;
                    //$('#control-info-comment9').show();
                    info_save9 = 0;
             });
@@ -832,6 +859,7 @@
             $('#control-info-comment9').click(function() {
                 saveCkComment('info_comment9');
                 info_save9 = 1;
+                unsave_warning = false;
                 $('#info_area9').html('<span style="color:red">Comment saved</span>');
                 setTimeRoll();
             });
@@ -844,6 +872,7 @@
             });
             CKEDITOR.instances['info_comment10'].on('key', function(e) { 
                 $('#info_area10').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                unsave_warning = true;
                    //$('#control-info-comment10').show();
                    info_save10 = 0;
             });
@@ -856,6 +885,7 @@
             $('#control-info-comment10').click(function() {
                 saveCkComment('info_comment10');
                 info_save10 = 1;
+                unsave_warning = false;
                 $('#info_area10').html('<span style="color:red">Comment saved</span>');
                 setTimeRoll();
             });
@@ -869,6 +899,7 @@
             $('#control-info-comment11').click(function() {
                 saveComment('info_comment11');
                 info_save11 = 1;
+                unsave_warning = true;
                 $('#info_area11').html('<span style="color:red">Comment saved</span>');
                 setTimeRoll();
             });
@@ -876,6 +907,7 @@
             function saveCkComment(comment) {
                 var info_comment_data = CKEDITOR.instances[comment].getData();
                 var comments = {};
+                unsave_warning = false; 
                 comments[comment] = info_comment_data;
                 
                 $.ajax({
@@ -893,7 +925,8 @@
             
             function saveComment(comment) {
                 var info_comment_data = $('#'+comment).val();
-                var comments = {};
+                var comments = {};                
+                unsave_warning = false;  
                 comments[comment] = info_comment_data;
                 
                 $.ajax({
@@ -905,7 +938,7 @@
                                     //value: $("#" + $(that).data('id') + '_edit').val()
                                     value:comments
                                 }
-                            });
+                            });         
 
             }
             
