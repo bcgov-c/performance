@@ -92,7 +92,12 @@
                             e.preventDefault();                            
                         }  
                     } else {
-                        $('#viewConversationModal').modal('hide');
+                        $('#viewConversationModal').modal('toggle');
+                        //window.location.href = window.location.origin + window.location.pathname + window.location.hash;
+
+                        var roleParam = getParameterByName('ownerrole');
+                        var newURL = window.location.origin + window.location.pathname + '?ownerrole=' + encodeURIComponent(roleParam) + window.location.hash;
+                        window.location.href = newURL;
                     }
                 } else if(checkIfItIsLocked()) {
                     $('#viewConversationModal').modal('toggle');
@@ -958,7 +963,7 @@
             
             
             function setTimeRoll(){
-                const minutes = 20;
+                const minutes = 1;
                 const SessionTime = 1000 * 60 * minutes;
                 if (myTimeout) { clearInterval(myTimeout) };
                 //const myTimeout = setTimeout(sessionWarning, SessionTime);
