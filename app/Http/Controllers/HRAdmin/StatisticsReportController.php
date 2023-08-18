@@ -576,7 +576,7 @@ class StatisticsReportController extends Controller
         } else {
             $from_stmt_1 = $this->goalSummary_from_statement(1);
             $sql_1 = UserDemoJrView::selectRaw('A.*, goals_count, user_demo_jr_view.employee_name, 
-                    user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4')
+                    user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4, user_demo_jr_view.reporting_to_name')
                     ->from(DB::raw( $from_stmt_1 ))                                
                     ->join('user_demo_jr_view', function($join) {
                         $join->on('user_demo_jr_view.employee_id', '=', 'A.employee_id');
@@ -621,7 +621,7 @@ class StatisticsReportController extends Controller
 
             $from_stmt_2 = $this->goalSummary_from_statement(2);
             $sql_2 = UserDemoJrView::selectRaw('A.*, goals_count, user_demo_jr_view.employee_name, 
-                    user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4')
+                    user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4, user_demo_jr_view.reporting_to_name')
                     ->from(DB::raw( $from_stmt_2 ))                                
                     ->join('user_demo_jr_view', function($join) {
                         $join->on('user_demo_jr_view.employee_id', '=', 'A.employee_id');
@@ -666,7 +666,7 @@ class StatisticsReportController extends Controller
 
             $from_stmt_3 = $this->goalSummary_from_statement(3);
             $sql_3 = UserDemoJrView::selectRaw('A.*, goals_count, user_demo_jr_view.employee_name, 
-                    user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4')
+                    user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4, user_demo_jr_view.reporting_to_name')
                     ->from(DB::raw( $from_stmt_3 ))                                
                     ->join('user_demo_jr_view', function($join) {
                         $join->on('user_demo_jr_view.employee_id', '=', 'A.employee_id');
@@ -725,7 +725,7 @@ class StatisticsReportController extends Controller
                     $users[$user->user_id]["level2_division"] = $user->level2_division;
                     $users[$user->user_id]["level3_branch"] = $user->level3_branch;
                     $users[$user->user_id]["level4"] = $user->level4;
-                    $users[$user->user_id]["Reporting To"] = $user->reportingManager ? $user->reportingManager->name : '';
+                    $users[$user->user_id]["Reporting To"] = $user->reporting_to_name ? $user->reporting_to_name : '';
                 }
             }
 
@@ -744,7 +744,7 @@ class StatisticsReportController extends Controller
                     $users[$user->user_id]["level2_division"] = $user->level2_division;
                     $users[$user->user_id]["level3_branch"] = $user->level3_branch;
                     $users[$user->user_id]["level4"] = $user->level4;
-                    $users[$user->user_id]["Reporting To"] = $user->reportingManager ? $user->reportingManager->name : '';
+                    $users[$user->user_id]["Reporting To"] = $user->reporting_to_name ? $user->reporting_to_name : '';
                 }
                 
             }
@@ -764,7 +764,7 @@ class StatisticsReportController extends Controller
                     $users[$user->user_id]["level2_division"] = $user->level2_division;
                     $users[$user->user_id]["level3_branch"] = $user->level3_branch;
                     $users[$user->user_id]["level4"] = $user->level4;
-                    $users[$user->user_id]["Reporting To"] = $user->reportingManager ? $user->reportingManager->name : '';
+                    $users[$user->user_id]["Reporting To"] = $user->reporting_to_name ? $user->reporting_to_name : '';
                 }
                 
             }
