@@ -172,7 +172,7 @@ $(function()  {
 		}
 	});
 
-	var	pie_basic_1_data = {!!json_encode( $data[''] )!!};
+	var	pie_basic_1_data = {!!json_encode( $notype_data )!!};
 	var	pie_basic_2_data = {!!json_encode( $data['Work'] )!!};
 	var	pie_basic_3_data = {!!json_encode( $data['Learning'] )!!};
 	var	pie_basic_4_data = {!!json_encode( $data['Career Development'] )!!};
@@ -476,10 +476,201 @@ $(function()  {
 
 	}
 
+	function createChartNotype(divId, myData) {
+
+		var myChart = echarts.init( document.getElementById( divId ) );
+		allCharts.push(myChart);
+
+		var array_ids = [];
+		myData['groups'].forEach((element) => {
+			array_ids = array_ids.concat( element['ids'] );
+		});
+
+		option = {
+			ids: array_ids,								// parameter for exporting
+			goal_type_id: '',		// parameter for exporting
+			backgroundColor: "#fff",
+			textStyle: {
+				// fontFamily: 'Roboto, Arial, Verdana, sans-serif',
+				fontSize: 12
+			},
+			title: {
+				text: 'Active' + myData['name'] + ' Goals \nPer Employee',
+				left: 'center',
+				triggerEvent: true,
+				textStyle: {
+					fontSize: 15,
+					fontWeight: 1000,
+					color: '#6c757d',
+				},
+				subtextStyle: {
+					fontSize: 12
+				},
+			},
+			toolbox: {
+				show: true,
+				bottom: -5,
+				feature: {
+					// mark: { show: true },
+					dataView: { show: true, readOnly: true },
+					// restore: { show: true },
+					// saveAsImage: { show: true },
+					myTool1: {
+						show: true,
+						title: 'download to excel',
+						icon: 'path//M224 136V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V160H248c-13.2 0-24-10.8-24-24zm60.1 106.5L224 336l60.1 93.5c5.1 8-.6 18.5-10.1 18.5h-34.9c-4.4 0-8.5-2.4-10.6-6.3C208.9 405.5 192 373 192 373c-6.4 14.8-10 20-36.6 68.8-2.1 3.9-6.1 6.3-10.5 6.3H110c-9.5 0-15.2-10.5-10.1-18.5l60.3-93.5-60.3-93.5c-5.2-8 .6-18.5 10.1-18.5h34.8c4.4 0 8.5 2.4 10.6 6.3 26.1 48.8 20 33.6 36.6 68.5 0 0 6.1-11.7 36.6-68.5 2.1-3.9 6.2-6.3 10.6-6.3H274c9.5-.1 15.2 10.4 10.1 18.4zM384 121.9v6.1H256V0h6.1c6.4 0 12.5 2.5 17 7l97.9 98c4.5 4.5 7 10.6 7 16.9z',
+						onclick: function (option1) {
+							ids =  myChart.getModel().option.ids;
+							goal_id =  myChart.getModel().option.goal_type_id;
+							filter = $('input[name=filter_params').val();
+							console.log(goal_id);
+							
+							// let _url = '{{ route('sysadmin.statistics.goalsummary.export')}}' 
+							let _url = export_url + '?goal=' + goal_id + '&range=' + filter ;
+							window.location.href = _url;
+
+							//   $.ajax({
+							// 		url: export_url,
+							// 		method: 'POST',
+							// 		contentType: 'application/x-www-form-urlencoded',
+							// 		data : { 
+							// 			goal : goal_id,
+							// 			ids : ids,
+							// 		},
+							// 		success: function() {
+							// 			window.location = 'download.php';
+							// 		}
+							// 	});
+
+						}
+					},
+				}
+			},
+			// tooltip: {
+			// 	trigger: 'item',
+			// 	// backgroundColor: 'rgba(0,0,0,0.8)',
+			// 	padding: [20, 25],
+			// 	textStyle: {
+			// 	// 	color: "#fff",
+			// 	// 	fontSize: 12,
+			// 		fontFamily: 'Roboto, sans-serif'
+			// 	},
+			// 	formatter: "{b}:<br/>{c} ({d}%)"
+			// },
+			legend: {
+				orient: 'horizontal',
+				bottom: '10%',
+				left: 'center',                   
+				data: ['0', '1-5','6-10','>10'],
+				itemHeight: 8,
+				itemWidth: 8,
+				textStyle: {
+					color: '#6c757d',
+				}
+			},
+			series: [{
+				name: myData['name'],
+				type: 'pie',
+				// radius: '50%',
+				radius: ['15%', '50%'],
+				center: ['50%', '50%'],
+				itemStyle: {
+					normal: {
+						borderWidth: 1,
+						borderColor: '#fff'
+					}
+				},
+				label: {
+					alignTo: 'edge',
+					formatter: '{name|{b}}\n{value|{c}}  {per|{d}%}',
+					minMargin: 1,
+					fontWeight: 'bold',
+					edgeDistance: 3,
+					lineHeight: 20,
+					// verticalAlign: 'bottom',
+					rich: {
+						value: {
+							fontWeight: 'normal',
+							fontSize: 12,
+							color: '#999',
+						},
+						per: {
+							color: '#fff',
+							backgroundColor: '#888888', //'#4C5058',
+							padding: [2, 4],
+							borderRadius: 4,
+							fontSize: 10,
+							verticalAlign: 'middle',
+						}
+					}
+				},
+				labelLine: {
+					length: 15,
+					length2: 0,
+					maxSurfaceAngle: 80
+				},
+				labelLayout: function (params) {
+					const isLeft = params.labelRect.x < myChart.getWidth() / 2;
+					const points = params.labelLinePoints;
+					// Update the end point.
+					points[2][0] = isLeft
+						? params.labelRect.x
+						: params.labelRect.x + params.labelRect.width;
+					return {
+						labelLinePoints: points
+					};
+				},
+				emphasis: {
+					itemStyle: {
+					shadowBlur: 10,
+					shadowOffsetX: 0,
+					shadowColor: 'rgba(0, 0, 0, 0.5)'
+					}
+				},
+				data: myData['groups']
+			}],
+			
+		};
+
+
+
+
+		option && myChart.setOption(option);
+		// myChart.setOption(option);
+
+		myChart.on('click', function(params) {
+
+			if (params.componentType === 'title') {
+					console.log('title is clicked!')
+				return;
+			}
+
+			if (params.componentType === 'series') {
+				console.log( 'series  clicked' ) ;
+				if (params.seriesType === 'edge') {
+					console.log( 'edge clicked' ) ;
+				}
+			} 
+
+			// prepare the parameters for calling export on difference segments
+			// console.log(params.name + ' - '  + params.value + ' - ' +  ' - ' + params.data.goal_id) ;
+			goal_type_id = myChart.getModel().option.goal_type_id;
+			// let _url = '{{ route('sysadmin.statistics.goalsummary.export')}}' 
+			//  let _url = '{{ route('sysadmin.statistics.goalsummary.export')}}' 
+							// + '?goal=' + params.data.goal_id + '&range=' + params.name;
+			filter = $('input[name=filter_params').val();
+			let _url = export_url + '?goal=' + goal_type_id + '&range=' + params.name  + '&ids=' + params.data.ids + filter;
+			window.location.href = _url;
+
+
+		});
+
+	}
+
 
 
 	// call function to create chart 
-	createChart('pie_basic_1', pie_basic_1_data);
+	createChartNotype('pie_basic_1', pie_basic_1_data);
 	createChart('pie_basic_2', pie_basic_2_data);
 	createChart('pie_basic_3', pie_basic_3_data);
 	createChart('pie_basic_4', pie_basic_4_data);
