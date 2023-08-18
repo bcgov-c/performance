@@ -381,17 +381,30 @@ class SysadminStatisticsReportController extends Controller
         $notype_data["groups"][0]["value"] = $notype_employee_hasnogoal;   
         $notype_data["groups"][0]["goal_id"] = '';
 
-        $notype_count_1 = $query_notype->havingRaw('goals_count BETWEEN 1 AND 5')->count(); 
+
+        $notype_count_1 = 0;
+        $notype_count_2 = 0;
+        $notype_count_3 = 0;
+
+        foreach($goal_count_cal_notype as $item){
+            if($item['goals_count'] >= 1 and $item['goals_count'] <= 5){
+                $notype_count_1++;
+            }
+            if($item['goals_count'] >= 6 and $item['goals_count'] <= 10){
+                $notype_count_2++;
+            }
+            if($item['goals_count'] > 10){
+                $notype_count_3++;
+            }
+        }
         $notype_data["groups"][1]["name"] = '1-5';    
         $notype_data["groups"][1]["value"] = $notype_count_1;   
         $notype_data["groups"][1]["goal_id"] = '';
 
-        $notype_count_2 = $query_notype->havingRaw('goals_count BETWEEN 6 AND 10')->count(); 
         $notype_data["groups"][2]["name"] = '6-10';    
         $notype_data["groups"][2]["value"] = $notype_count_2;   
         $notype_data["groups"][2]["goal_id"] = '';
 
-        $notype_count_3 = $query_notype->havingRaw('goals_count > 10')->count(); 
         $notype_data["groups"][3]["name"] = '>10';    
         $notype_data["groups"][3]["value"] = $notype_count_3;   
         $notype_data["groups"][3]["goal_id"] = '';
