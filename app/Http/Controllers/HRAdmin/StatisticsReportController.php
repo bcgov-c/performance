@@ -362,78 +362,58 @@ class StatisticsReportController extends Controller
         }
 
 
-        $query_notype = Goal::selectRaw("user_demo_jr_view.employee_id, COUNT(goals.id) AS goals_count")
-        ->join('user_demo_jr_view', 'goals.user_id', 'user_demo_jr_view.user_id')
-        ->join('goal_types', 'goals.goal_type_id', 'goal_types.id')
-        ->where('goals.status', '=', 'active')
-        ->whereNull('goals.deleted_at')
-        ->where('goals.is_library', '=', 0)
-        ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('user_demo_jr_view.due_date_paused', 'N')
-                            ->orWhereNull('user_demo_jr_view.due_date_paused');
-                    });
-                })
-            ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('user_demo_jr_view.excused_flag', '<>', '1')
-                            ->orWhereNull('user_demo_jr_view.excused_flag');
-                    });
-                }) 
-            ->whereNull('user_demo_jr_view.date_deleted')     
-            ->where('goal_types.name','<>', 'Private')    
-            ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
-            ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
-            ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
-            ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
-            ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })
-            ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                        ->from('auth_users')
-                    ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
-                    ->where('auth_users.type', '=', 'HR')
-                    ->where('auth_users.auth_id', '=', Auth::id());
-            })            
-            ->groupBy(['user_demo_jr_view.employee_id']);
-                    
-            $goal_count_cal_notype = $query_notype->get()->toArray();
-            $notype_data = array();
-            $notype_data["groups"] = array();
+        usort($goal_count_cal, function ($a, $b) {
+            return $a['employee_id'] - $b['employee_id'];
+        });
+        
+        
+        
+        $notype_data["groups"][0]["name"] = 0;    
+        $notype_data["groups"][0]["value"] = 0;   
+        $notype_data["groups"][0]["goal_id"] = '';
+
+
+        $notype_count_1 = 0;
+        $notype_count_2 = 0;
+        $notype_count_3 = 0;
     
-            $notype_employee_hasgoal = count($goal_count_cal_notype);
-            $notype_employee_hasnogoal = $total_number_emp - $notype_employee_hasgoal;
-            $notype_data["groups"][0]["name"] = 0;    
-            $notype_data["groups"][0]["value"] = $notype_employee_hasnogoal;   
-            $notype_data["groups"][0]["goal_id"] = '';
-    
-    
-            $notype_count_1 = 0;
-            $notype_count_2 = 0;
-            $notype_count_3 = 0;
-    
-            foreach($goal_count_cal_notype as $item){
-                if($item['goals_count'] >= 1 and $item['goals_count'] <= 5){
+        $picked_emp = '';
+        foreach($goal_count_cal as $item){
+            if($item['goals_count'] >= 1 and $item['goals_count'] <= 5){
+                if($picked_emp != $item['employee_id']){ 
                     $notype_count_1++;
+                    $picked_emp = $item['employee_id'];
                 }
-                if($item['goals_count'] >= 6 and $item['goals_count'] <= 10){
+                
+            }
+            if($item['goals_count'] >= 6 and $item['goals_count'] <= 10){
+                if($picked_emp != $item['employee_id']){ 
                     $notype_count_2++;
-                }
-                if($item['goals_count'] > 10){
-                    $notype_count_3++;
+                    $picked_emp = $item['employee_id'];
                 }
             }
-            $notype_data["groups"][1]["name"] = '1-5';    
-            $notype_data["groups"][1]["value"] = $notype_count_1;   
-            $notype_data["groups"][1]["goal_id"] = '';
-    
-            $notype_data["groups"][2]["name"] = '6-10';    
-            $notype_data["groups"][2]["value"] = $notype_count_2;   
-            $notype_data["groups"][2]["goal_id"] = '';
-    
-            $notype_data["groups"][3]["name"] = '>10';    
-            $notype_data["groups"][3]["value"] = $notype_count_3;   
-            $notype_data["groups"][3]["goal_id"] = '';
+            if($item['goals_count'] > 10){
+                if($picked_emp != $item['employee_id']){
+                    $notype_count_3++;
+                    $picked_emp = $item['employee_id'];
+                }
+            }
+        }
+        $notype_data["groups"][1]["name"] = '1-5';    
+        $notype_data["groups"][1]["value"] = $notype_count_1;   
+        $notype_data["groups"][1]["goal_id"] = '';
 
+        $notype_data["groups"][2]["name"] = '6-10';    
+        $notype_data["groups"][2]["value"] = $notype_count_2;   
+        $notype_data["groups"][2]["goal_id"] = '';
+
+        $notype_data["groups"][3]["name"] = '>10';    
+        $notype_data["groups"][3]["value"] = $notype_count_3;   
+        $notype_data["groups"][3]["goal_id"] = '';
+        
+        $notype_employee_hasgoal = $notype_count_1 + $notype_count_2 + $notype_count_3;
+        $notype_employee_hasnogoal = $total_number_emp - $notype_employee_hasgoal;
+        $notype_data["groups"][0]["value"] = $notype_employee_hasnogoal;  
 
         
         // Goal Tag count 
