@@ -324,6 +324,19 @@ i {
   var sup_supervisor_signed = $('#sup_supervisor_signed').val();
   var unsave_warning = false;
   
+  var comment1_changed = false;
+  var comment2_changed = false;
+  var comment3_changed = false;
+  var comment4_changed = false;
+  var comment5_changed = false;
+  var comment6_changed = false;
+  var comment7_changed = false;
+  var comment8_changed = false;
+  var comment9_changed = false;
+  var comment10_changed = false;
+  var comment11_changed = false;
+   
+
   if(sup_conversation_topic_id != 0 || supervisors != '' || sup_employee_signed != 'any' || sup_supervisor_signed != 'any'){
       var show_collapse_1 = true;
   }  
