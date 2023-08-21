@@ -25,7 +25,7 @@
 
 	<div class="row justify-content-center">
 		@foreach($average as $type=>$num)
-		<div class="col-sm-12 col-md-6 col-xl-3">
+		<div class="col-sm-12 col-md-6 col-xl-4">
 			<div class="card text-center text-secondary" >
 				<div class="card-header border-0 px-5" >
 					<div class="d-table" style="min-height: 4em;">
