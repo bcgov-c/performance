@@ -583,7 +583,7 @@ class StatisticsReportController extends Controller
                 ->where('user_demo_jr_view.guid', '<>', '')
                 ->where('goals.status', '=', 'active')
                 ->whereNull('goals.deleted_at')
-                ->where('goals.goal_type_id', '<>', 4)
+                //->where('goals.goal_type_id', '<>', 4)
                 ->where('goals.is_library', '=', 0)       
                 ->whereExists(function ($query) {
                         $query->select(DB::raw(1))
@@ -1133,7 +1133,7 @@ class StatisticsReportController extends Controller
             $count_raw .= "         )";
 
             $count_raw .= "     and users.excused_flag <> 1  ";
-            $count_raw .= "     and goals.goal_type_id <> 4    ";
+            //$count_raw .= "     and goals.goal_type_id <> 4    ";
 
             $count_raw .= " ) as 'tag_0' ";
         }
@@ -1149,7 +1149,7 @@ class StatisticsReportController extends Controller
             $count_raw .= "         )";
 
             $count_raw .= "     and users.excused_flag <> 1  ";
-            $count_raw .= "     and goals.goal_type_id <> 4    ";
+            //$count_raw .= "     and goals.goal_type_id <> 4    ";
 
             $count_raw .= ") as 'tag_". $tag->id ."'";
         }
@@ -1185,7 +1185,7 @@ class StatisticsReportController extends Controller
                                 ->whereNull('goals.deleted_at')
                                 ->where('goals.is_library', 0)
                                 ->where('goals.status', 'active')
-                                ->where('goals.goal_type_id', '<>', 4)
+                                //->where('goals.goal_type_id', '<>', 4)
                                 ->whereColumn('goals.user_id',  'users.id');
                     })
                     // To show the tag == selected tag name
@@ -1199,7 +1199,7 @@ class StatisticsReportController extends Controller
                                         ->whereNull('goals.deleted_at')
                                         ->where('goals.is_library', 0)
                                         ->where('goals.status', 'active')
-                                        ->where('goal_types.name', '<>', 'Private')
+                                        //->where('goal_types.name', '<>', 'Private')
                                         ->where('tags.name', $request->tag)
                                         ->whereExists(function ($query) {
                                             $query->select(DB::raw(1))
@@ -1221,7 +1221,7 @@ class StatisticsReportController extends Controller
                                         ->whereNull('goals.deleted_at')
                                         ->where('goals.is_library', 0)
                                         ->where('goals.status', 'active')
-                                        ->where('goal_types.name', '<>', 'Private')
+                                        //->where('goal_types.name', '<>', 'Private')
                                         ->whereExists(function ($query) {
                                             $query->select(DB::raw(1))
                                                     ->from('auth_users')
