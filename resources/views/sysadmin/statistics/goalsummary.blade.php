@@ -193,6 +193,7 @@ $(function()  {
 			  array_ids = array_ids.concat( element['ids'] );
 		});
 
+		
 		option = {
 			ids: array_ids,								// parameter for exporting
 			goal_type_id: myData['goal_type_id'],		// parameter for exporting
@@ -495,7 +496,7 @@ $(function()  {
 				fontSize: 12
 			},
 			title: {
-				text: 'Active' + myData['name'] + ' Goals \nPer Employee',
+				text: 'Active Goals \nPer Employee',
 				left: 'center',
 				triggerEvent: true,
 				textStyle: {

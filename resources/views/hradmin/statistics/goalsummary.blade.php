@@ -480,7 +480,7 @@ $(function()  {
 				fontSize: 12
 			},
 			title: {
-				text: 'Active' + myData['name'] + ' Goals \nPer Employee',
+				text: 'Active Goals \nPer Employee',
 				left: 'center',
 				triggerEvent: true,
 				textStyle: {
