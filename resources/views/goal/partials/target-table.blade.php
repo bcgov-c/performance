@@ -10,7 +10,11 @@
       <th scope="col"><a href="javascript:sort('start_date');">Start Date</a></th>
       <th scope="col"><a href="javascript:sort('target_date');">End Date</a></th>
       @if ($type == 'current')
-      <th scope="col">Shared With</th>
+      <th scope="col">Shared With <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" 
+      data-content="You can use this function to share a goal with colleagues. This goal will appear on their “Goals Shared with Me” tab and they will be able view and add comments to the goal. 
+      <br/>Type the name of your colleague into the search field to find and select them. You can repeat this process to add additional colleagues if needed. You can also remove a colleague by clicking the &quot;X&quot; next to their name.
+      <br/>As the creator of the shared goal, you are the only one that can make major edits or change the status to achieved or archived." 
+      data-original-title="" title="" aria-describedby="popover271882"> </i></th>
       @endif
       <th scope="col"><a href="javascript:sort('status');">Status</a>
       <i class="fa fa-info-circle" id="status_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="<ul><li><b>Active</b>: currently in progress or scheduled for a future date</li><li><b>Achieved</b>: supervisor and employee agree objectives met</li><li><b>Archived</b>: cancelled, deferred or no longer relevant to your work but you want to save for future reference</li></ul>You can delete goals that do not meet any of the above criteria"></i>				
