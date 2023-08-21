@@ -1041,6 +1041,7 @@ class GoalBankController extends Controller
             $query = Goal::withoutGlobalScopes()
                 ->join('users as cu', 'cu.id', 'goals.created_by')
                 ->leftjoin('employee_demo as ced', 'ced.employee_id', 'cu.employee_id')
+                ->leftjoin('employee_demo_tree as edt', 'edt.id', 'ced.orgid')
                 ->where('is_library', true)
                 ->whereIn('by_admin', [1, 2])
                 ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
@@ -1056,7 +1057,6 @@ class GoalBankController extends Controller
                     return $q->whereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%')");
                 })
                 ->orderBy('goals.display_name') 
-                // ->distinct()
                 ->select
                     (
                         'goals.id',
@@ -1064,7 +1064,8 @@ class GoalBankController extends Controller
                         'goals.created_at',
                         'goals.is_mandatory',
                         'goals.display_name',
-                        'ced.employee_name as creator_name',
+                        'ced.employee_name AS creator_name',
+                        'edt.organization AS ced_organization',
                     )
                 ->addSelect(['audience' =>
                     GoalSharedWith::whereColumn('goal_id', 'goals.id')
@@ -1077,7 +1078,6 @@ class GoalBankController extends Controller
                         ->selectRAW('count(distinct goal_bank_orgs.id)')
                 ] )
                 ->addSelect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
-                // Log::info($query->toSQL()); 
             return Datatables::of($query)
                 ->addIndexColumn()
                 ->addcolumn('click_title', function ($row) {
@@ -1086,12 +1086,18 @@ class GoalBankController extends Controller
                 ->addcolumn('click_goal_type', function ($row) {
                     return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.$row->goal_type_name.' value="'.$row->id.'">'.$row->goal_type_name.'</a>';
                 })
-                ->addcolumn('click_creator_name', function ($row) {
+                ->addcolumn('click_display_name', function ($row) {
                     if ($row->display_name) {
                         return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.$row->display_name.' value="'.$row->id.'">'.$row->display_name.'</a>';
                     } else {
                         return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.$row->creator_name.' value="'.$row->id.'">'.$row->creator_name.'</a>';
                     }
+                })
+                ->addcolumn('click_creator_name', function ($row) {
+                    return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.$row->creator_name.' value="'.$row->id.'">'.$row->creator_name.'</a>';
+                })
+                ->addcolumn('click_creator_organization', function ($row) {
+                    return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.$row->ced_organization.' value="'.$row->id.'">'.$row->ced_organization.'</a>';
                 })
                 ->addColumn('mandatory', function ($row) {
                     return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.($row->is_mandatory ? "Mandatory" : "Suggested").' value="'.$row->id.'">'.($row->is_mandatory ? "Mandatory" : "Suggested").'</a>';
@@ -1109,7 +1115,7 @@ class GoalBankController extends Controller
                     $btn = '<a href="/'.request()->segment(1).'/goalbank/deletegoal/' . $row->id . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->id .'"><i class="fa fa-trash"></i></a>';
                     return $btn;
                 })
-                ->rawColumns(['click_title', 'click_goal_type', 'click_creator_name', 'mandatory', 'created_at', 'goal_type_name', 'created_by', 'audience', 'org_audience', 'action', 'title-link'])
+                ->rawColumns(['click_title', 'click_goal_type', 'click_display_name', 'click_creator_name', 'click_creator_organization', 'mandatory', 'created_at', 'goal_type_name', 'created_by', 'audience', 'org_audience', 'action', 'title-link'])
                 ->make(true);
         }
     }
