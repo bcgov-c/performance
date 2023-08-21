@@ -682,7 +682,7 @@ class StatisticsReportController extends Controller
         if($request->goal) {
             $from_stmt = $this->goalSummary_from_statement($request->goal);
             $sql = UserDemoJrView::selectRaw('A.*, goals_count, user_demo_jr_view.employee_name, 
-            user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4')
+            user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4, user_demo_jr_view.reporting_to_name')
                     ->from(DB::raw( $from_stmt ))                                
                     ->join('user_demo_jr_view', function($join) {
                         $join->on('user_demo_jr_view.employee_id', '=', 'A.employee_id');
@@ -758,7 +758,7 @@ class StatisticsReportController extends Controller
                     $row['Level 2'] = $user->level2_division;
                     $row['Level 3'] = $user->level3_branch;
                     $row['Level 4'] = $user->level4;
-                    $row['Reporting To'] = $user->reportingManager ? $user->reportingManager->name : '';
+                    $row['Reporting To'] = $user->reporting_to_name ? $user->reporting_to_name : '';
 
                     fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Active Goals Count'], $row['Organization'],
                                 $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], $row['Reporting To'] ));
