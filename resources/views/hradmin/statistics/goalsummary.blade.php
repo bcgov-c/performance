@@ -43,8 +43,7 @@
 	<p class="print-only page-break">&nbsp;</p>
 
 	<div class="row justify-content-center">
-
-		<div class="col-sm-12 col-md-10 col-xl-3">
+		<div class="col-sm-12 col-md-12 col-xl-4">
 			<div class="card">
 				<div class="card-body">
 					<div class=" chart has-fixed-height" id="pie_basic_1">
@@ -53,7 +52,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-sm-12 col-md-10 col-xl-3">
+		<div class="col-sm-12 col-md-12 col-xl-4">
 			<div class="card">
 				<div class="card-body">
 					<div class="chart has-fixed-height" id="pie_basic_2">
@@ -62,10 +61,7 @@
 				</div>
 			</div>
 		</div>
-
-		<p class="print-only page-break">&nbsp;</p>
-
-		<div class="col-sm-12 col-md-10 col-xl-3">
+		<div class="col-sm-12 col-md-12 col-xl-4">
 			<div class="card">
 				<div class="card-body">
 					<div class=" chart has-fixed-height" id="pie_basic_3">
@@ -74,13 +70,22 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-sm-12 col-md-10 col-xl-3">
+		<div class="col-sm-12 col-md-12 col-xl-4">
 			<div class="card">
-				<div class="card-body">
-					<div class=" chart has-fixed-height" id="pie_basic_4">
-						Loading...
-					</div>
+			<div class="card-body">
+				<div class=" chart has-fixed-height" id="pie_basic_4">
+					Loading...
 				</div>
+			</div>
+			</div>
+		</div>
+		<div class="col-sm-12 col-md-12 col-xl-4">
+			<div class="card">
+			<div class="card-body">
+				<div class=" chart has-fixed-height" id="pie_basic_5">
+					Loading...
+				</div>
+			</div>
 			</div>
 		</div>
 	
@@ -170,6 +175,7 @@ $(function()  {
 	var	pie_basic_2_data = {!!json_encode( $data['Work'] )!!};
 	var	pie_basic_3_data = {!!json_encode( $data['Learning'] )!!};
 	var	pie_basic_4_data = {!!json_encode( $data['Career Development'] )!!};
+	var	pie_basic_5_data = {!!json_encode( $data['Private'] )!!};
 
 	var	bar_basic_1_data = {!!json_encode( $data_tag )!!};
 
@@ -657,6 +663,7 @@ $(function()  {
 	createChart('pie_basic_2', pie_basic_2_data);
 	createChart('pie_basic_3', pie_basic_3_data);
 	createChart('pie_basic_4', pie_basic_4_data);
+	createChart('pie_basic_5', pie_basic_5_data);
 
 	// Tag chart 
 	createBarChart('bar_basic_1', bar_basic_1_data);
