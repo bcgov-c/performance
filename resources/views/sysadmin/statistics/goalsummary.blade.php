@@ -24,16 +24,16 @@
 <span id="pdf-output">
 
 	<div class="row justify-content-center">
-		@foreach($data as $type)
+		@foreach($average as $type=>$num)
 		<div class="col-sm-12 col-md-6 col-xl-3">
 			<div class="card text-center text-secondary" >
 				<div class="card-header border-0 px-5" >
 					<div class="d-table" style="min-height: 4em;">
-						<p class="card-text d-table-cell align-middle h6 font-weight-bold">Average Active {{ $type['name'] }} Goals Per Employee</p> 
+						<p class="card-text d-table-cell align-middle h6 font-weight-bold">Average Active {{ $type }} Goals Per Employee</p> 
 					</div>
 				</div>
 				<div class="card-body pt-2 pb-4">
-					<p class="card-text h2 text-primary">{{ number_format($type['average'],2) }}</p>
+					<p class="card-text h2 text-primary">{{ number_format($num,2) }}</p>
 				</div>
 			</div>
 		</div>
