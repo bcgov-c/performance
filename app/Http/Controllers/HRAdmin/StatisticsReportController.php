@@ -1081,7 +1081,7 @@ class StatisticsReportController extends Controller
                     $row['Employee ID'] = $user["employee_id"];
                     $row['Name'] = $user["employee_name"];
                     $row['Email'] = $user["employee_email"];
-                    $goals_count = $user["Active Work Goals Count"] + $user["Active Career Development Goals Count"] + $user["Active Learning Goals Count"];
+                    $goals_count = $user["Active Work Goals Count"] + $user["Active Career Development Goals Count"] + $user["Active Learning Goals Count"] + $user["Active Private Goals Count"];;
                     $row['Active Goals Count'] = $goals_count;
                     $row['Active Work Goals Count'] = $user["Active Work Goals Count"];
                     $row['Active Career Development Goals Count'] = $user["Active Career Development Goals Count"];
