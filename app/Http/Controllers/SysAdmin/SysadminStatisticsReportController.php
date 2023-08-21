@@ -1027,7 +1027,7 @@ class SysadminStatisticsReportController extends Controller
             $count_raw .= "         )";
 
             $count_raw .= "     and users.excused_flag <> 1  ";
-            $count_raw .= "     and goals.goal_type_id <> 4    ";
+            //$count_raw .= "     and goals.goal_type_id <> 4    ";
 
             $count_raw .= " ) as 'tag_0' ";
         }
@@ -1043,7 +1043,7 @@ class SysadminStatisticsReportController extends Controller
             $count_raw .= "         )";
 
             $count_raw .= "     and users.excused_flag <> 1  ";
-            $count_raw .= "     and goals.goal_type_id <> 4    ";
+            //$count_raw .= "     and goals.goal_type_id <> 4    ";
 
             $count_raw .= ") as 'tag_". $tag->id ."'";
         }
@@ -1072,7 +1072,7 @@ class SysadminStatisticsReportController extends Controller
                                 ->whereNull('goals.deleted_at')
                                 ->where('goals.is_library', 0)
                                 ->where('goals.status', 'active')
-                                ->where('goals.goal_type_id', '<>', 4)
+                                //->where('goals.goal_type_id', '<>', 4)
                                 ->whereColumn('goals.user_id',  'users.id');
                     })
                     // To show the tag == selected tag name
@@ -1086,7 +1086,7 @@ class SysadminStatisticsReportController extends Controller
                                         ->whereNull('goals.deleted_at')
                                         ->where('goals.is_library', 0)
                                         ->where('goals.status', 'active')
-                                        ->where('goal_types.name', '<>', 'Private')
+                                        //->where('goal_types.name', '<>', 'Private')
                                         ->whereColumn('goals.user_id',  'users.id')
                                         ->where('tags.name', $request->tag);
                             });
@@ -1101,7 +1101,7 @@ class SysadminStatisticsReportController extends Controller
                                         ->whereNull('goals.deleted_at')
                                         ->where('goals.is_library', 0)
                                         ->where('goals.status', 'active')
-                                        ->where('goal_types.name', '<>', 'Private')
+                                        //->where('goal_types.name', '<>', 'Private')
                                         ->whereColumn('goals.user_id',  'users.user_id');
                                 });
                     });
