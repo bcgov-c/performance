@@ -99,7 +99,7 @@
                         return {
                             results: $.map(response.data.data, function (item) {
                                 return {
-                                    text: item.name+(item.employee_id ? ' - '+item.employee_id : ''),
+                                    text: item.name+(item.email ? ' - '+item.email : ''),
                                     id: item.id
                                 }
                             }),
