@@ -615,7 +615,65 @@ class StatisticsReportController extends Controller
         }
         array_multisort($data_tag['labels'], $data_tag['values']);
 
-        return view('hradmin.statistics.goalsummary',compact('data', 'notype_data', 'data_tag'));
+
+        //average goals
+        $all_goals = Goal::selectRaw('count(goals.id) as num, goal_types.name')
+                            ->join('user_demo_jr_view', 'goals.user_id', 'user_demo_jr_view.user_id')
+                            ->join('goal_types', 'goals.goal_type_id', 'goal_types.id')
+                            ->where(function($query) {
+                                $query->where(function($query) {
+                                    $query->where('user_demo_jr_view.due_date_paused', 'N')
+                                        ->orWhereNull('user_demo_jr_view.due_date_paused');
+                                });
+                            })
+                            ->where(function($query) {
+                                    $query->where(function($query) {
+                                        $query->where('user_demo_jr_view.excused_flag', '<>', '1')
+                                            ->orWhereNull('user_demo_jr_view.excused_flag');
+                                    });
+                                }) 
+                            ->whereNull('user_demo_jr_view.date_deleted') 
+                            ->where('user_demo_jr_view.guid', '<>', '')
+                            ->where('goals.status', '=', 'active')
+                            ->whereNull('goals.deleted_at')
+                            ->where('goals.is_library', '=', 0)
+                            ->groupBy('goal_types.name')->get()->toArray();                   
+        
+        $total_works = 0;
+        $total_learning = 0;
+        $total_career = 0;
+        $total_private = 0;
+        $total_all = 0;
+        foreach($all_goals as $all_goal){
+            if($all_goal['name'] == 'Work') {
+                $total_works = $all_goal['num'];
+            }
+            if($all_goal['name'] == 'Learning') {
+                $total_learning = $all_goal['num'];
+            }
+            if($all_goal['name'] == 'Career Development') {
+                $total_career = $all_goal['num'];
+            }
+            if($all_goal['name'] == 'Private') {
+                $total_private = $all_goal['num'];
+            }
+            $total_all = $total_works + $total_learning + $total_career + $total_private;
+        }                    
+                 
+        $average_all = $total_all / $total_number_emp;
+        $average_works = $total_works / $total_number_emp;
+        $average_learning = $total_learning / $total_number_emp;
+        $average_career = $total_career / $total_number_emp;
+        $average_private = $total_private / $total_number_emp;
+
+        $average = array();
+        $average[''] = $average_all;
+        $average['Work'] = $average_works;
+        $average['Learning'] = $average_learning;
+        $average['Career Development'] = $average_career;
+        $average['Private'] = $average_private;
+
+        return view('hradmin.statistics.goalsummary',compact('data', 'notype_data', 'average', 'data_tag'));
     }
 
     public function goalSummaryExport(Request $request)
