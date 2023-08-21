@@ -44,6 +44,8 @@ class DashboardNotification extends Model
         switch ($this->notification_type) {
           case 'GC':
           case 'GR':
+          case 'GK':
+          case 'GS':
               $url = route("goal.show", $this->relatedGoal->id);
               break;
           case 'GB':

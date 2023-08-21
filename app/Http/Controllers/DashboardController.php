@@ -67,6 +67,8 @@ class DashboardController extends Controller
                     switch($notification->notification_type) {
                         case 'GC':
                         case 'GR':
+                        case 'GS':
+                        case 'GK':
                             $text .= 'Title: '.$notification->relatedGoal->title.' | Goal Type: '.$notification->relatedGoal->goalType->name.($notification->created_at?' | Date: '.$notification->created_at->format('M d, Y H:i A'):'');
                             break;
                         case 'GB':
