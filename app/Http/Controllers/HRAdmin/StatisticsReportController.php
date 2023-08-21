@@ -637,6 +637,18 @@ class StatisticsReportController extends Controller
                             ->where('goals.status', '=', 'active')
                             ->whereNull('goals.deleted_at')
                             ->where('goals.is_library', '=', 0)
+                            ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
+                            ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
+                            ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
+                            ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
+                            ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })
+                            ->whereExists(function ($query) {
+                                $query->select(DB::raw(1))
+                                        ->from('auth_users')
+                                    ->whereColumn('auth_users.user_id', 'user_demo_jr_view.user_id')
+                                    ->where('auth_users.type', '=', 'HR')
+                                    ->where('auth_users.auth_id', '=', Auth::id());
+                            })
                             ->groupBy('goal_types.name')->get()->toArray();                   
         
         $total_works = 0;
