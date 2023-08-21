@@ -579,6 +579,11 @@ class SysadminStatisticsReportController extends Controller
                             ->where('goals.status', '=', 'active')
                             ->whereNull('goals.deleted_at')
                             ->where('goals.is_library', '=', 0)
+                            ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
+                            ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
+                            ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
+                            ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
+                            ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })
                             ->groupBy('goal_types.name')->get()->toArray();                   
         
         $total_works = 0;
@@ -631,7 +636,7 @@ class SysadminStatisticsReportController extends Controller
         if($request->goal) {
             $from_stmt = $this->goalSummary_from_statement($request->goal);
             $sql = UserDemoJrView::selectRaw('A.*, goals_count, user_demo_jr_view.employee_name, 
-            user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4')
+            user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4, user_demo_jr_view.reporting_to_name')
                     ->from(DB::raw( $from_stmt ))                                
                     ->join('user_demo_jr_view', function($join) {
                         $join->on('user_demo_jr_view.employee_id', '=', 'A.employee_id');
@@ -700,7 +705,7 @@ class SysadminStatisticsReportController extends Controller
                     $row['Level 2'] = $user->level2_division;
                     $row['Level 3'] = $user->level3_branch;
                     $row['Level 4'] = $user->level4;
-                    $row['Reporting To'] = $user->reportingManager ? $user->reportingManager->name : '';
+                    $row['Reporting To'] = $user->reporting_to_name ? $user->reporting_to_name : '';
 
                     fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], $row['Active Goals Count'], $row['Organization'],
                                 $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], $row['Reporting To'] ));
