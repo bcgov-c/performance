@@ -39,7 +39,7 @@ class DashboardController extends Controller
                                     ->from('goals')
                                     ->whereColumn('dashboard_notifications.related_id', 'goals.id')
                                     ->whereNull('goals.deleted_at')
-                                    ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB']);
+                                    ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB', 'GK', 'GS']);
                         })
                         ->orWhereExists(function ($query) {
                             return $query->select(DB::raw(1))
@@ -342,7 +342,7 @@ class DashboardController extends Controller
                                         ->from('goals')
                                         ->whereColumn('dashboard_notifications.related_id', 'goals.id')
                                         ->whereNull('goals.deleted_at')
-                                        ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB']);
+                                        ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB', 'GK', 'GS']);
                             })
                             ->orWhereExists(function ($query) {
                                 return $query->select(DB::raw(1))
