@@ -43,10 +43,7 @@
     <div class="form-control-plaintext">
         {!!$goal['measure_of_success']!!}
     </div>
-    <b>{{__("Created Date")}}</b>
-    <div class="form-control-plaintext">
-        {{$goal['created_at']->format('M d, Y') }}
-    </div>
+    
     <b>{{__("Start Date")}}</b>
     <div class="form-control-plaintext">
         {{$goal['start_date_human']}}
@@ -63,4 +60,10 @@
             </div>
         @endforeach
     </div>
+
+    <b>{{__("Created Date")}}</b>
+    <div class="form-control-plaintext">
+        {{$goal['created_at']->format('M d, Y') }}
+    </div>
+
 </div>
