@@ -1625,6 +1625,38 @@ class GoalController extends Controller
                 }
             }
 
+            //Get all shared_with
+            $sharedWithList = \DB::table('goals_shared_with AS gsw')
+                ->where('gsw.goal_id', $goal->id)
+                ->where('gsw.user_id', '<>', $curr_user->id)
+                ->where('gsw.user_id', '<>', $goal->user_id)
+                ->get();
+            foreach($sharedWithList AS $shared) {
+                if($shared && $shared->allow_inapp_notification) {
+                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                    $notification->user_id = $curr_user->id;
+                    $notification->notification_type = 'GK';
+                    $notification->comment = $curr_user->name . ' added a comment to a shared goal.';
+                    $notification->related_id = $goal->id;
+                    $notification->notify_user_id = $shared->user_id;
+                    $notification->send(); 
+                }
+                if($shared && $shared->allow_email_notification && $shared->userPreference->goal_comment_flag == 'Y') {
+                    $sendMail = new SendMail();
+                    $sendMail->toRecipients = array( $shared->user_id );  
+                    $sendMail->sender_id = null;
+                    $sendMail->useQueue = true;
+                    $sendMail->saveToLog = true;
+                    $sendMail->alert_type = 'N';
+                    $sendMail->alert_format = 'E';
+                    $sendMail->template = 'GOAL_COMMENT_SHARED';
+                    array_push($sendMail->bindvariables, $shared->name);  // %1 Recipient of the email
+                    array_push($sendMail->bindvariables, $curr_user->name);    // %2 Person who added the comment
+                    array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
+                    array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
+                    $response = $sendMail->sendMailWithGenericTemplate();
+                }
+            }
         }
         return redirect()->back();
     }
@@ -1717,6 +1749,7 @@ class GoalController extends Controller
                                 'goal_id' => $goal_id,
                                 'user_id' => $userId,
                             ]);
+                            $this->syncGoalNotifications($request, $goal_id, $userId);
                         }
                     } else {
                         foreach($users_arr as $userId){
@@ -1725,6 +1758,7 @@ class GoalController extends Controller
                                     'goal_id' => $goal_id,
                                     'user_id' => $userId,
                                 ]);
+                                $this->syncGoalNotifications($request, $goal_id, $userId);
                             }
                         }
                     }
@@ -1735,16 +1769,40 @@ class GoalController extends Controller
             } else {
                 GoalSharedWith::where('goal_id', $goal_id)->delete();
             }
-            
         }
-        
-        
-        
-        
-        
         if (!$request->ajax()) {
             return redirect()->back();
         }
+    }
+
+    public function syncGoalNotifications(Request $request, $goal_id, $user_id) {
+        $user = User::findOrFail($user_id);
+        $curr_user = User::findOrFail(Auth::id());
+        $goal = Goal::findOrFail($goal_id);
+        if ($user && $user->allow_inapp_notification) {
+            $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+            $notification->user_id = $curr_user->id;
+            $notification->notification_type = 'GS';
+            $notification->comment =  $curr_user->name . ' shared a goal with you.';
+            $notification->related_id = $goal_id;
+            $notification->notify_user_id = $user_id;
+            $notification->send(); 
+        }
+        if($user && $user->allow_email_notification && $user->userPreference->goal_bank_flag == 'Y') {
+            $sendMail = new SendMail();
+            $sendMail->toRecipients = array( $user->user_id );  
+            $sendMail->sender_id = null;
+            $sendMail->useQueue = true;
+            $sendMail->saveToLog = true;
+            $sendMail->alert_type = 'N';
+            $sendMail->alert_format = 'E';
+            $sendMail->template = 'GOAL_SHARED';
+            array_push($sendMail->bindvariables, $user->name);  // %1 Recipient of the email
+            array_push($sendMail->bindvariables, $curr_user->name);    // %2 Person who shared the goal
+            array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
+            $response = $sendMail->sendMailWithGenericTemplate();
+        }
+
     }
     
     public function getAllUsers(Request $request)
