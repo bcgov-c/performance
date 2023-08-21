@@ -1626,22 +1626,23 @@ class GoalController extends Controller
             }
 
             //Get all shared_with
-            $sharedWithList = \DB::table('goals_shared_with AS gsw')
+            $sharedWithList = GoalSharedWith::from('goals_shared_with AS gsw')
                 ->where('gsw.goal_id', $goal->id)
                 ->where('gsw.user_id', '<>', $curr_user->id)
                 ->where('gsw.user_id', '<>', $goal->user_id)
                 ->get();
             foreach($sharedWithList AS $shared) {
-                if($shared && $shared->allow_inapp_notification) {
+                $userShared = User::with('userPreference')->findOrFail($shared->user_id);
+                if($userShared && $userShared->allow_inapp_notification) {
                     $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                    $notification->user_id = $curr_user->id;
+                    $notification->user_id = $shared->user_id;
                     $notification->notification_type = 'GK';
                     $notification->comment = $curr_user->name . ' added a comment to a shared goal.';
                     $notification->related_id = $goal->id;
                     $notification->notify_user_id = $shared->user_id;
                     $notification->send(); 
                 }
-                if($shared && $shared->allow_email_notification && $shared->userPreference->goal_comment_flag == 'Y') {
+                if($userShared && $userShared->allow_email_notification && $userShared->userPreference->goal_comment_flag == 'Y') {
                     $sendMail = new SendMail();
                     $sendMail->toRecipients = array( $shared->user_id );  
                     $sendMail->sender_id = null;
@@ -1776,12 +1777,13 @@ class GoalController extends Controller
     }
 
     public function syncGoalNotifications(Request $request, $goal_id, $user_id) {
-        $user = User::findOrFail($user_id);
-        $curr_user = User::findOrFail(Auth::id());
+        $user = User::with('userPreference')->findOrFail($user_id);
+        $curr_user = User::with('userPreference')->findOrFail(Auth::id());
         $goal = Goal::findOrFail($goal_id);
+        Log::info('$user->allow_inapp_notification = '.$user->allow_inapp_notification);
         if ($user && $user->allow_inapp_notification) {
             $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-            $notification->user_id = $curr_user->id;
+            $notification->user_id = $user_id;
             $notification->notification_type = 'GS';
             $notification->comment =  $curr_user->name . ' shared a goal with you.';
             $notification->related_id = $goal_id;
