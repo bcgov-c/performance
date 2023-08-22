@@ -109,20 +109,21 @@
 
                 }
             } 
-        
-            initCKEditor('info_comment1');
-            initCKEditor('info_comment2');
-            initCKEditor('info_comment3');
-            initCKEditor('info_comment4');
-            initCKEditor('info_comment5');
-            initCKEditor('info_comment6');
-            initCKEditor('info_comment7');
-            initCKEditor('info_comment8');
-            initCKEditor('info_comment9');
-            initCKEditor('info_comment10');
+
+            $( document ).ready(function() {        
+                initCKEditor('info_comment1');
+                initCKEditor('info_comment2');
+                initCKEditor('info_comment3');
+                initCKEditor('info_comment4');
+                initCKEditor('info_comment5');
+                initCKEditor('info_comment6');
+                initCKEditor('info_comment7');
+                initCKEditor('info_comment8');
+                initCKEditor('info_comment9');
+                initCKEditor('info_comment10');            
             
-            
-             modal_open=false;
+                modal_open=false;
+            });
              
         </script>    
         
