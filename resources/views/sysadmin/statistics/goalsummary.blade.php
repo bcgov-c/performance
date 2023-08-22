@@ -27,12 +27,12 @@
 		@foreach($average as $type=>$num)
 		<div class="col-sm-12 col-md-6 col-xl-4">
 			<div class="card text-center text-secondary" >
-				<div class="card-header border-0 px-5" >
-					<div class="d-table" style="min-height: 4em;">
-						<p class="card-text d-table-cell align-middle h6 font-weight-bold">Average Active {{ $type }} Goals Per Employee</p> 
-					</div>
+			<div class="card-header border-0 px-5">
+				<div class="d-flex justify-content-center align-items-center">
+					<p class="card-text h6 font-weight-bold mb-0">Average Active {{ $type }} Goals Per Employee</p>
 				</div>
-				<div class="card-body pt-2 pb-4">
+			</div>
+			<div class="card-body pt-2 pb-4">
 					<p class="card-text h2 text-primary">{{ number_format($num,4) }}</p>
 				</div>
 			</div>
