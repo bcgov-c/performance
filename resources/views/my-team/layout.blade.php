@@ -84,6 +84,11 @@
             });
 
             $(".share-with-users").select2({
+                language: {
+                        errorLoading: function () {
+                            return "Searching for results.";
+                        }
+                        },
                 width: '100%',
                 ajax: {
                     url: '/users',
