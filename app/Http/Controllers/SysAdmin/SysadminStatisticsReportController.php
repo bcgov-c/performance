@@ -831,7 +831,7 @@ class SysadminStatisticsReportController extends Controller
                     // });
             $users_3 = $sql_3->get();
 
-            $from_stmt_3 = $this->goalSummary_from_statement(4);
+            $from_stmt_4 = $this->goalSummary_from_statement(4);
             $sql_4 = UserDemoJrView::selectRaw('A.*, goals_count, user_demo_jr_view.employee_name, 
                     user_demo_jr_view.organization, user_demo_jr_view.level1_program, user_demo_jr_view.level2_division, user_demo_jr_view.level3_branch, user_demo_jr_view.level4, user_demo_jr_view.reporting_to_name')
                     ->from(DB::raw( $from_stmt_4 ))                                
