@@ -922,6 +922,7 @@
                         $('#info_area11').html('');
                         saveComments();                                
                         alert('You have not saved your work in 20 minutes so the PDP has auto-saved to make sure you don\'t lose any information.');
+                        unsave_warning = false;
                         /*
                         if(isSupervisor == 1) {                               
                             var info_comment1_data = CKEDITOR.instances['info_comment1'].getData();
