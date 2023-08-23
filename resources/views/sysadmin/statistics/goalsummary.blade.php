@@ -33,7 +33,7 @@
 				</div>
 			</div>
 			<div class="card-body pt-2 pb-4">
-					<p class="card-text h2 text-primary">{{ number_format($num,4) }}</p>
+					<p class="card-text h2 text-primary">{{ number_format($num,2) }}</p>
 				</div>
 			</div>
 		</div>
