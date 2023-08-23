@@ -401,6 +401,8 @@ class ConversationController extends Controller
                 }
             }
             if($item->last_sign_off_date != ''){
+                $sign_datetime = Carbon::parse($item->last_sign_off_date);
+                $last_sign_off_date = $sign_datetime->toDateString();
                 $myTeamConversations_arr[$i]['sign_date'] = $item->last_sign_off_date;
             } else {
                 $myTeamConversations_arr[$i]['sign_date'] = '';
@@ -469,6 +471,8 @@ class ConversationController extends Controller
                 }
             }
             if($item->last_sign_off_date != ''){
+                $sign_datetime = Carbon::parse($item->last_sign_off_date);
+                $last_sign_off_date = $sign_datetime->toDateString();
                 $conversations_arr[$i]['sign_date'] = $item->last_sign_off_date;
             } else {
                 $conversations_arr[$i]['sign_date'] = '';
