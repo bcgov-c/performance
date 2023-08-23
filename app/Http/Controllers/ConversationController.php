@@ -361,7 +361,6 @@ class ConversationController extends Controller
             $i++;
         }
         
-        
         $myTeamConversations_arr = array();
         $i = 0;
         foreach($myTeamConversations as $item){
@@ -401,12 +400,17 @@ class ConversationController extends Controller
                     $myTeamConversations_arr[$i]['status'] = '<i class="fa fa-unlock"></i>';     
                 }
             }
-            $sign_datetime = Carbon::parse($item->last_sign_off_date);
-            $sign_date = $sign_datetime->toDateString();
-            $myTeamConversations_arr[$i]['sign_date'] = $sign_date;
-            $create_datetime = Carbon::parse($item->created_at);
-            $create_date = $create_datetime->toDateString();
-            $myTeamConversations_arr[$i]['create_date'] = $create_date;
+            if($item->last_sign_off_date != ''){
+                $myTeamConversations_arr[$i]['sign_date'] = $item->last_sign_off_date;
+            } else {
+                $myTeamConversations_arr[$i]['sign_date'] = '';
+            }
+            if(isset($item->created_at)){
+                $create_datetime = Carbon::parse($item->created_at);
+                $create_date = $create_datetime->toDateString();
+                $myTeamConversations_arr[$i]['create_date'] = $create_date;
+            }                      
+           
             $i++;
         }
         
@@ -464,12 +468,16 @@ class ConversationController extends Controller
                     $conversations_arr[$i]['status'] = '<i class="fa fa-unlock"></i>';      
                 }
             }
-            $sign_datetime = Carbon::parse($item->last_sign_off_date);
-            $sign_date = $sign_datetime->toDateString();
-            $conversations_arr[$i]['sign_date'] = $sign_date;
-            $create_datetime = Carbon::parse($item->created_at);
-            $create_date = $create_datetime->toDateString();
-            $conversations_arr[$i]['create_date'] = $create_date;
+            if($item->last_sign_off_date != ''){
+                $conversations_arr[$i]['sign_date'] = $item->last_sign_off_date;
+            } else {
+                $conversations_arr[$i]['sign_date'] = '';
+            }
+            if(isset($item->created_at)){
+                $create_datetime = Carbon::parse($item->created_at);
+                $create_date = $create_datetime->toDateString();
+                $conversations_arr[$i]['create_date'] = $create_date;
+            } 
             $i++;
         }
         
@@ -484,7 +492,7 @@ class ConversationController extends Controller
                 });
             }         
         }
-        $json_conversations = json_encode($conversations_arr);      
+        $json_conversations = json_encode($conversations_arr);  
         
 
         if($request->id){
