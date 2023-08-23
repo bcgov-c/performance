@@ -367,6 +367,8 @@ i {
               { title: "Participants", data: "participants" },
               { title: "Employee Signed", data: "employee_signed" },
               { title: "Supervisor Signed", data: "supervisor_signed" },
+              { title: "Created At", data: "create_date" },
+              { title: "Last Updated", data: "sign_date" },
               {
                 title: "",
                 render: function(data, type, row) {
@@ -402,6 +404,8 @@ i {
               { title: "Participants", data: "participants" },
               { title: "Employee Signed", data: "employee_signed" },
               { title: "Supervisor Signed", data: "supervisor_signed" },
+              { title: "Created At", data: "create_date" },
+              { title: "Last Updated", data: "sign_date" },
               {
                 title: "",
                 render: function(data, type, row) {

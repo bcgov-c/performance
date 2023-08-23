@@ -186,7 +186,8 @@ class ConversationController extends Controller
             $myTeamConversations = $myTeamQuery->orderBy('id', 'DESC')->get();
         } else { // Upcoming
             //conversations with my supervisor
-            $sup_query = "SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as last_sign_off_date, conversations.unlock_until, conversation_topics.name, empusers.name as empname, mgrusers.name as mgrname 
+            $sup_query = "SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as last_sign_off_date, conversations.unlock_until
+            , conversation_topics.name, empusers.name as empname, mgrusers.name as mgrname, conversations.created_at, conversations.updated_at 
                                     FROM conversations 
                                     INNER JOIN conversation_topics  ON conversations.conversation_topic_id = conversation_topics.id
                                     LEFT JOIN conversation_participants emp_participants ON conversations.id = emp_participants.conversation_id AND emp_participants.role = 'emp'
@@ -198,6 +199,12 @@ class ConversationController extends Controller
                                     AND 
                                     ((`signoff_user_id` is null or `supervisor_signoff_id` is null))";
             
+            if ($request->has('created_at') && $request->created_at) {
+                $sup_query .= "  AND (created_at BETWEEN '".$request->created_at." 00:00:00' AND '".$request->created_at." 23:59:59')";   
+            } 
+            if ($request->has('updated_at') && $request->updated_at) {
+                $sup_query .= "  AND (updated_at BETWEEN '".$request->updated_at." 00:00:00' AND '".$request->updated_at." 23:59:59')";   
+            } 
             if ($request->has('sup_conversation_topic_id') && $request->sup_conversation_topic_id) {
                 $sup_query .= " AND conversations.conversation_topic_id = $request->sup_conversation_topic_id"; 
             }
@@ -246,7 +253,8 @@ class ConversationController extends Controller
             $conversations = DB::select($sup_query);
                         
             //conversations with my team            
-            $emp_query = "SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as last_sign_off_date,conversations.unlock_until, conversation_topics.name, empusers.name as empname, mgrusers.name as mgrname 
+            $emp_query = "SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as last_sign_off_date,conversations.unlock_until
+            , conversation_topics.name, empusers.name as empname, mgrusers.name as mgrname, conversations.created_at, conversations.updated_at 
                                     FROM conversations 
                                     INNER JOIN conversation_topics  ON conversations.conversation_topic_id = conversation_topics.id
                                     LEFT JOIN conversation_participants emp_participants ON conversations.id = emp_participants.conversation_id AND emp_participants.role = 'emp'
@@ -393,11 +401,12 @@ class ConversationController extends Controller
                     $myTeamConversations_arr[$i]['status'] = '<i class="fa fa-unlock"></i>';     
                 }
             }
-            if(isset($item->last_sign_off_date)){
-                $sign_datetime = Carbon::parse($item->last_sign_off_date);
-                $sign_date = $sign_datetime->toDateString();
-                $myTeamConversations_arr[$i]['date'] = $sign_date;
-            }
+            $sign_datetime = Carbon::parse($item->last_sign_off_date);
+            $sign_date = $sign_datetime->toDateString();
+            $myTeamConversations_arr[$i]['sign_date'] = $sign_date;
+            $create_datetime = Carbon::parse($item->created_at);
+            $create_date = $create_datetime->toDateString();
+            $myTeamConversations_arr[$i]['create_date'] = $create_date;
             $i++;
         }
         
@@ -414,7 +423,6 @@ class ConversationController extends Controller
         }
         
         $json_myTeamConversations = json_encode($myTeamConversations_arr);   
-        
         
         $conversations_arr = array();
         $i = 0;
@@ -456,11 +464,12 @@ class ConversationController extends Controller
                     $conversations_arr[$i]['status'] = '<i class="fa fa-unlock"></i>';      
                 }
             }
-            if(isset($item->last_sign_off_date)){
-                $sign_datetime = Carbon::parse($item->last_sign_off_date);
-                $sign_date = $sign_datetime->toDateString();
-                $conversations_arr[$i]['date'] = $sign_date;
-            }
+            $sign_datetime = Carbon::parse($item->last_sign_off_date);
+            $sign_date = $sign_datetime->toDateString();
+            $conversations_arr[$i]['sign_date'] = $sign_date;
+            $create_datetime = Carbon::parse($item->created_at);
+            $create_date = $create_datetime->toDateString();
+            $conversations_arr[$i]['create_date'] = $create_date;
             $i++;
         }
         
@@ -475,7 +484,7 @@ class ConversationController extends Controller
                 });
             }         
         }
-        $json_conversations = json_encode($conversations_arr);         
+        $json_conversations = json_encode($conversations_arr);      
         
 
         if($request->id){
