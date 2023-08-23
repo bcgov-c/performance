@@ -186,7 +186,7 @@ class ConversationController extends Controller
             $myTeamConversations = $myTeamQuery->orderBy('id', 'DESC')->get();
         } else { // Upcoming
             //conversations with my supervisor
-            $sup_query = "SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as last_sign_off_date, conversations.unlock_until
+            $sup_query = "SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, conversations.sign_off_time, conversations.supervisor_signoff_time, conversations.unlock_until
             , conversation_topics.name, empusers.name as empname, mgrusers.name as mgrname, conversations.created_at, conversations.updated_at 
                                     FROM conversations 
                                     INNER JOIN conversation_topics  ON conversations.conversation_topic_id = conversation_topics.id
@@ -253,7 +253,7 @@ class ConversationController extends Controller
             $conversations = DB::select($sup_query);
                         
             //conversations with my team            
-            $emp_query = "SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, GREATEST(conversations.sign_off_time, conversations.supervisor_signoff_time) as last_sign_off_date,conversations.unlock_until
+            $emp_query = "SELECT conversations.id, conversations.signoff_user_id, conversations.supervisor_signoff_id, conversations.sign_off_time, conversations.supervisor_signoff_time,conversations.unlock_until
             , conversation_topics.name, empusers.name as empname, mgrusers.name as mgrname, conversations.created_at, conversations.updated_at 
                                     FROM conversations 
                                     INNER JOIN conversation_topics  ON conversations.conversation_topic_id = conversation_topics.id
@@ -400,12 +400,22 @@ class ConversationController extends Controller
                     $myTeamConversations_arr[$i]['status'] = '<i class="fa fa-unlock"></i>';     
                 }
             }
-            if($item->last_sign_off_date != ''){
-                $sign_datetime = Carbon::parse($item->last_sign_off_date);
-                $last_sign_off_date = $sign_datetime->toDateString();
-                $myTeamConversations_arr[$i]['sign_date'] = $item->last_sign_off_date;
+            $last_sign_off_date = '';
+            if ($item->sign_off_time != '' && $item->supervisor_signoff_time != '' ){
+                $date1 = Carbon::parse($item->sign_off_time);
+                $date2 = Carbon::parse($item->supervisor_signoff_time);
+                $sign_datetime = $date1->max($date2);
+                $myTeamConversations_arr[$i]['sign_date'] = $last_sign_off_date;
             } else {
-                $myTeamConversations_arr[$i]['sign_date'] = '';
+                if ($item->sign_off_time != '') {
+                    $sign_datetime = $item->sign_off_time;
+                    $myTeamConversations_arr[$i]['sign_date'] = $sign_datetime;
+                } elseif($item->supervisor_signoff_time != '') {
+                    $sign_datetime = $item->supervisor_signoff_time;
+                    $myTeamConversations_arr[$i]['sign_date'] = $sign_datetime;
+                } else {
+                    $myTeamConversations_arr[$i]['sign_date'] = '';
+                }
             }
             if(isset($item->created_at)){
                 $create_datetime = Carbon::parse($item->created_at);
@@ -432,6 +442,8 @@ class ConversationController extends Controller
         
         $conversations_arr = array();
         $i = 0;
+
+
         foreach($conversations as $item){
             $conversations_arr[$i]['id'] = $item->id;
             //$conversations_arr[$i]['conversation_topic_id'] = $item->conversation_topic_id;            
@@ -470,12 +482,22 @@ class ConversationController extends Controller
                     $conversations_arr[$i]['status'] = '<i class="fa fa-unlock"></i>';      
                 }
             }
-            if($item->last_sign_off_date != ''){
-                $sign_datetime = Carbon::parse($item->last_sign_off_date);
-                $last_sign_off_date = $sign_datetime->toDateString();
-                $conversations_arr[$i]['sign_date'] = $item->last_sign_off_date;
+            $last_sign_off_date = '';
+            if ($item->sign_off_time != '' && $item->supervisor_signoff_time != '' ){
+                $date1 = Carbon::parse($item->sign_off_time);
+                $date2 = Carbon::parse($item->supervisor_signoff_time);
+                $sign_datetime = $date1->max($date2);
+                $conversations_arr[$i]['sign_date'] = $sign_datetime;
             } else {
-                $conversations_arr[$i]['sign_date'] = '';
+                if ($item->sign_off_time != '') {
+                    $sign_datetime = $item->sign_off_time;
+                    $conversations_arr[$i]['sign_date'] = $sign_datetime;
+                } elseif($item->supervisor_signoff_time != '') {
+                    $sign_datetime = $item->supervisor_signoff_time;
+                    $conversations_arr[$i]['sign_date'] = $sign_datetime;
+                } else {
+                    $conversations_arr[$i]['sign_date'] = '';
+                }
             }
             if(isset($item->created_at)){
                 $create_datetime = Carbon::parse($item->created_at);
