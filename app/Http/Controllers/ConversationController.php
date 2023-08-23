@@ -405,7 +405,8 @@ class ConversationController extends Controller
                 $date1 = Carbon::parse($item->sign_off_time);
                 $date2 = Carbon::parse($item->supervisor_signoff_time);
                 $sign_datetime = $date1->max($date2);
-                $myTeamConversations_arr[$i]['sign_date'] = $last_sign_off_date;
+                $sign_datetime = $sign_datetime->format('Y-m-d H:i:s');
+                $myTeamConversations_arr[$i]['sign_date'] = $sign_datetime;
             } else {
                 if ($item->sign_off_time != '') {
                     $sign_datetime = $item->sign_off_time;
@@ -439,7 +440,7 @@ class ConversationController extends Controller
         }
         
         $json_myTeamConversations = json_encode($myTeamConversations_arr);   
-        
+
         $conversations_arr = array();
         $i = 0;
 
@@ -487,6 +488,7 @@ class ConversationController extends Controller
                 $date1 = Carbon::parse($item->sign_off_time);
                 $date2 = Carbon::parse($item->supervisor_signoff_time);
                 $sign_datetime = $date1->max($date2);
+                $sign_datetime = $sign_datetime->format('Y-m-d H:i:s');
                 $conversations_arr[$i]['sign_date'] = $sign_datetime;
             } else {
                 if ($item->sign_off_time != '') {
