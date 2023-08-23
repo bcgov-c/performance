@@ -340,7 +340,7 @@ i {
                 }
               },
               { title: "Participants", data: "participants" },
-              { title: "Latest Signed Off Date", data: "date" }
+              { title: "Latest Signed Off Date", data: "sign_date" }
             ],
             "order": [[0, "desc"]],
             dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>'
@@ -368,7 +368,7 @@ i {
                     }
                 },
                 { title: "Participants", data: "participants" },
-                { title: "Latest Signed Off Date", data: "date" }
+                { title: "Latest Signed Off Date", data: "sign_date" }
             ],
             "order": [[0, "desc"]],
             dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>'
