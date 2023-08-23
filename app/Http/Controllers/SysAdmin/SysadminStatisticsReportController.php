@@ -2119,8 +2119,8 @@ class SysadminStatisticsReportController extends Controller
         $sql = User::selectRaw("users.employee_id, users.empl_record, 
                     employee_name, employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division,
                     employee_demo_tree.level3_branch, employee_demo_tree.level4,
-                    case when users.due_date_paused = 'N'
-                        then 'No' else 'Yes' end as excused")
+                    case when users.excused_flag = 1
+                        then 'Yes' else 'No' end as excused")
                     ->join('employee_demo', function($join) {
                          $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     })
@@ -2164,8 +2164,8 @@ class SysadminStatisticsReportController extends Controller
       $sql = User::selectRaw("users.employee_id, users.email, users.excused_start_date, users.excused_end_date,
                             users.excused_reason_id, users.reporting_to,
                     employee_demo.employee_name, employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4,
-                    case when users.due_date_paused = 'N'
-                        then 'No' else 'Yes' end as excused")
+                    case when users.excused_flag = 1
+                        then 'Yes' else 'No' end as excused")
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 })
