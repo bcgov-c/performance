@@ -1629,7 +1629,9 @@ class GoalController extends Controller
             $sharedWithList = GoalSharedWith::from('goals_shared_with AS gsw')
                 ->where('gsw.goal_id', $goal->id)
                 ->where('gsw.user_id', '<>', $curr_user->id)
-                ->where('gsw.user_id', '<>', $goal->user_id)
+                ->when($goal->user_id == Auth::id(), function($q){
+                    return $q->where('gsw.user_id', '<>', $goal->user_id);
+                })
                 ->get();
             foreach($sharedWithList AS $shared) {
                 $userShared = User::with('userPreference')->findOrFail($shared->user_id);
