@@ -299,7 +299,7 @@ class EmployeeListController extends Controller {
                 CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
                 CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
                 CONCAT (u.reportees, ' / ', (SELECT COUNT(1) FROM shared_profiles AS sp USE INDEX (SHARED_PROFILES_SHARED_WITH_FOREIGN), users AS u2, employee_demo AS dmo USE INDEX (IDX_EMPLOYEE_DEMO_EMPLOYEEID_RECORD) WHERE sp.shared_with IS NOT NULL AND sp.shared_with = u.user_id AND sp.shared_id = u2.id AND u2.employee_id = dmo.employee_id AND u2.empl_record = dmo.empl_record AND dmo.date_deleted IS NULL)) AS reportees,
-                (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals
+                (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active' AND g.is_library = 0 AND g.deleted_at IS NULL) AS activeGoals
             ");
         $records = $query->get();
         // Generating Output file
@@ -440,7 +440,7 @@ class EmployeeListController extends Controller {
                     CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
                     CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
                     u.reportees,
-                    (SELECT COUNT(g.id) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals,
+                    (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active' AND g.is_library = 0 AND g.deleted_at IS NULL) AS activeGoals,
                     CASE WHEN u.date_deleted IS NOT NULL THEN u.date_deleted ELSE '' END AS date_deleted
                 ");
             return Datatables::of($query)
@@ -511,7 +511,7 @@ class EmployeeListController extends Controller {
                 CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
                 CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
                 u.reportees,
-                (SELECT COUNT(g.id) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals,
+                (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active' AND g.is_library = 0 AND g.deleted_at IS NULL) AS activeGoals,
                 CASE WHEN u.date_deleted IS NOT NULL THEN u.date_deleted ELSE '' END AS date_deleted
             ");
         $records = $query->get();
