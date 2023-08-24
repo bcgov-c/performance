@@ -239,7 +239,7 @@ class EmployeeListController extends Controller {
                 CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
                 CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
                 u.reportees,
-                (SELECT COUNT(g.id) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals
+                (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active' AND g.is_library = 0 AND g.deleted_at IS NULL) AS activeGoals
             ");
         $records = $query->get();
         // Generating Output file
@@ -380,7 +380,7 @@ class EmployeeListController extends Controller {
                     CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
                     CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
                     u.reportees,
-                    (SELECT COUNT(g.id) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals,
+                    (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active' AND g.is_library = 0 AND g.deleted_at IS NULL) AS activeGoals,
                     CASE WHEN u.date_deleted IS NOT NULL THEN u.date_deleted ELSE '' END AS date_deleted
                 ");
             return Datatables::of($query)
@@ -451,7 +451,7 @@ class EmployeeListController extends Controller {
                 CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
                 CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
                 u.reportees,
-                (SELECT COUNT(g.id) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals,
+                (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active' AND g.is_library = 0 AND g.deleted_at IS NULL) AS activeGoals,
                 CASE WHEN u.date_deleted IS NOT NULL THEN u.date_deleted ELSE '' END AS date_deleted
             ");
         $records = $query->get();
