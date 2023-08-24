@@ -2116,11 +2116,11 @@ class SysadminStatisticsReportController extends Controller
         $request->session()->flash('dd_level3', $request->dd_level3);
         $request->session()->flash('dd_level4', $request->dd_level4);
 
-        $sql = User::selectRaw("users.employee_id, users.empl_record, 
-                    employee_name, employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division,
-                    employee_demo_tree.level3_branch, employee_demo_tree.level4,
-                    case when users.excused_flag = 1
-                        then 'Yes' else 'No' end as excused")
+        $sql = User::selectRaw("users.employee_id, users.email, users.excused_start_date, users.excused_end_date,
+                                users.excused_reason_id, users.reporting_to,
+                                employee_demo.employee_name, employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4,
+                                (CASE WHEN users.excused_flag = 1 OR due_date_paused <> 'N'
+                                    THEN 'Yes' ELSE 'No' END) AS excused")
                     ->join('employee_demo', function($join) {
                          $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     })
@@ -2164,8 +2164,8 @@ class SysadminStatisticsReportController extends Controller
       $sql = User::selectRaw("users.employee_id, users.email, users.excused_start_date, users.excused_end_date,
                             users.excused_reason_id, users.reporting_to,
                     employee_demo.employee_name, employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4,
-                    case when users.excused_flag = 1
-                        then 'Yes' else 'No' end as excused")
+                    (CASE WHEN users.excused_flag = 1 OR due_date_paused <> 'N'
+                                    THEN 'Yes' ELSE 'No' END) AS excused")
                 ->join('employee_demo', function($join) {
                     $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 })
