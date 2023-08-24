@@ -1630,7 +1630,7 @@ class GoalController extends Controller
                 ->where('gsw.goal_id', $goal->id)
                 ->where('gsw.user_id', '<>', $curr_user->id)
                 ->when($goal->user_id == Auth::id(), function($q){
-                    return $q->where('gsw.user_id', '<>', $goal->user_id);
+                    return $q->whereRaw("gsw.user_id <> { $goal->user_id }");
                 })
                 ->get();
             foreach($sharedWithList AS $shared) {
