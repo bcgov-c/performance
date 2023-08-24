@@ -1665,16 +1665,16 @@ class GoalController extends Controller
                 $userShared = User::with('userPreference')->findOrFail($goal->user_id);
                 if($userShared && $userShared->allow_inapp_notification) {
                     $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                    $notification->user_id = $userShared->user_id;
+                    $notification->user_id = $goal->user_id;
                     $notification->notification_type = 'GK';
                     $notification->comment = $curr_user->name . ' added a comment to a shared goal.';
                     $notification->related_id = $goal->id;
-                    $notification->notify_user_id = $userShared->user_id;
+                    $notification->notify_user_id = $goal->user_id;
                     $notification->send(); 
                 }
                 if($userShared && $userShared->allow_email_notification && $userShared->userPreference->goal_comment_flag == 'Y') {
                     $sendMail = new SendMail();
-                    $sendMail->toRecipients = array( $userShared->user_id );  
+                    $sendMail->toRecipients = array( $goal->user_id );  
                     $sendMail->sender_id = null;
                     $sendMail->useQueue = true;
                     $sendMail->saveToLog = true;
