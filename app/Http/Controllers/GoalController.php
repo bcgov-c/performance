@@ -1660,6 +1660,34 @@ class GoalController extends Controller
                     $response = $sendMail->sendMailWithGenericTemplate();
                 }
             }
+            //Notify Owner
+            if($goal->user_id <> Auth::id()) {
+                $userShared = User::with('userPreference')->findOrFail($goal->user_id);
+                if($userShared && $userShared->allow_inapp_notification) {
+                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                    $notification->user_id = $userShared->user_id;
+                    $notification->notification_type = 'GK';
+                    $notification->comment = $curr_user->name . ' added a comment to a shared goal.';
+                    $notification->related_id = $goal->id;
+                    $notification->notify_user_id = $userShared->user_id;
+                    $notification->send(); 
+                }
+                if($userShared && $userShared->allow_email_notification && $userShared->userPreference->goal_comment_flag == 'Y') {
+                    $sendMail = new SendMail();
+                    $sendMail->toRecipients = array( $userShared->user_id );  
+                    $sendMail->sender_id = null;
+                    $sendMail->useQueue = true;
+                    $sendMail->saveToLog = true;
+                    $sendMail->alert_type = 'N';
+                    $sendMail->alert_format = 'E';
+                    $sendMail->template = 'GOAL_COMMENT_SHARED';
+                    array_push($sendMail->bindvariables, $userShared->name);  // %1 Recipient of the email
+                    array_push($sendMail->bindvariables, $curr_user->name);    // %2 Person who added the comment
+                    array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
+                    array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
+                    $response = $sendMail->sendMailWithGenericTemplate();
+                }
+            }
         }
         return redirect()->back();
     }
