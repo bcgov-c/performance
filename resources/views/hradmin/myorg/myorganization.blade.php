@@ -4,7 +4,6 @@
             <h3>My Organization</h3>
         </div>
     </div>
-    <!-- @include('hradmin.myorg.partials.reportees-modal')  -->
 
     <div class="card">
         <div class="card-body">    
