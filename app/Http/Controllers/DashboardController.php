@@ -195,7 +195,7 @@ class DashboardController extends Controller
         $preferredSupervisor = Auth::user()->preferredSupervisor();
         $primaryJob = Auth::user()->primaryJob();
         $jobList = Auth::user()->jobList();
-        $jobTooltip = 'This option is only available for users with multiple jobs. To be updated.';        
+        $jobTooltip = 'This option only appears for employees that have more than one active position with BC Public Service. Please select the position that you would like to link to your PDP profile.';        
 
         return view('dashboard.index', compact('greetings', 'tab', 'supervisorTooltip', 'sharedList', 'profilesharedTooltip', 
                     // 'notifications', 'notifications_unread', 
