@@ -1141,11 +1141,9 @@ class StatisticsReportController extends Controller
             $count_raw .= "      and goals.deleted_at is null and goals.is_library = 0 and goals.status = 'active' ";  
             $count_raw .= "      and users.id = goals.user_id ";
 
-            $count_raw .= "     and ( ";
-            $count_raw .= "            users.due_date_paused = 'N'";
-            $count_raw .= "         )";
-
-            $count_raw .= "     and users.excused_flag <> 1  ";
+            $count_raw .= "   and  (users.excused_flag IS NULL OR users.excused_flag <> 1) 
+                            AND 
+                            (users.due_date_paused = 'N' OR users.due_date_paused IS NULL) ";
             //$count_raw .= "     and goals.goal_type_id <> 4    ";
 
             $count_raw .= ") as 'tag_". $tag->id ."'";
@@ -1159,11 +1157,17 @@ class StatisticsReportController extends Controller
                     ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
                     ->whereNull('employee_demo.date_deleted') 
                     ->where(function($query) {
-                            $query->where(function($query) {
-                                $query->where('users.excused_flag', '<>', '1')
-                                    ->orWhereNull('users.excused_flag');
-                            });
-                        }) 
+                        $query->where(function($query) {
+                            $query->where('users.excused_flag', '<>', '1')
+                                ->orWhereNull('users.excused_flag');
+                        });
+                    }) 
+                    ->where(function($query) {
+                        $query->where(function($query) {
+                            $query->where('users.due_date_paused', 'N')
+                                ->orWhereNull('users.due_date_paused');
+                        });
+                    })  
                     ->whereExists(function ($query) {
                             $query->select(DB::raw(1))
                                     ->from('auth_users')
