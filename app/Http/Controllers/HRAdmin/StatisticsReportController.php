@@ -530,7 +530,9 @@ class StatisticsReportController extends Controller
         if($request->dd_level4) {
             $count_raw .= " and user_demo_jr_view.level4_key = '".$request->dd_level4."'";
         }
-        $count_raw .= "     and (  user_demo_jr_view.due_date_paused = 'N' or user_demo_jr_view.excused_flag <> 1  )";
+        $count_raw .= "   and  (user_demo_jr_view.excused_flag IS NULL OR user_demo_jr_view.excused_flag <> 1) 
+                            AND 
+                            (user_demo_jr_view.due_date_paused = 'N' OR user_demo_jr_view.due_date_paused IS NULL) ";
         $count_raw .= "  and user_demo_jr_view.date_deleted is null ";
         $count_raw .= "     and goals.deleted_at is null   ";
         $count_raw .= "     and goals.is_library = 0   ";
