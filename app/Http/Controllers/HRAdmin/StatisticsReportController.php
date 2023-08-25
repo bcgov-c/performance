@@ -530,10 +530,8 @@ class StatisticsReportController extends Controller
         if($request->dd_level4) {
             $count_raw .= " and user_demo_jr_view.level4_key = '".$request->dd_level4."'";
         }
-        $count_raw .= "     and ( ";
-        $count_raw .= "           user_demo_jr_view.due_date_paused = 'N' ";
-        $count_raw .= "         )";
-        $count_raw .= " and user_demo_jr_view.excused_flag <> 1 and user_demo_jr_view.date_deleted is null ";
+        $count_raw .= "     and (  user_demo_jr_view.due_date_paused = 'N' or user_demo_jr_view.excused_flag <> 1  )";
+        $count_raw .= "  and user_demo_jr_view.date_deleted is null ";
         $count_raw .= "     and goals.deleted_at is null   ";
         $count_raw .= "     and goals.is_library = 0   ";
         $count_raw .= "     and goals.status = 'active'   ";
@@ -572,7 +570,13 @@ class StatisticsReportController extends Controller
                                 ->orWhereNull('user_demo_jr_view.excused_flag');
                         });
                     }) 
-                ->whereNull('user_demo_jr_view.date_deleted')    
+                ->whereNull('user_demo_jr_view.date_deleted')   
+                //->where('goal_types.name','<>', 'Private')  
+                ->whereNotExists(function ($query) {
+                    $query->select(DB::raw(1))
+                          ->from('goal_tags')
+                          ->whereColumn('goals.id', 'goal_tags.goal_id');
+                })
                 ->where('user_demo_jr_view.guid', '<>', '')
                 ->where('goals.status', '=', 'active')
                 ->whereNull('goals.deleted_at')
