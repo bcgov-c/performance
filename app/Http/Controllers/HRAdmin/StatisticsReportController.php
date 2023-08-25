@@ -1127,11 +1127,9 @@ class StatisticsReportController extends Controller
             $count_raw .= "      and goals.deleted_at is null and goals.is_library = 0 and goals.status = 'active' ";                
             $count_raw .= "      and employee_demo.guid <> '' ";
             
-            $count_raw .= "     and ( ";
-            $count_raw .= "            users.due_date_paused = 'N'";
-            $count_raw .= "         )";
-
-            $count_raw .= "     and users.excused_flag <> 1  ";
+            $count_raw .= "   and  (users.excused_flag IS NULL OR users.excused_flag <> 1) 
+                            AND 
+                            (users.due_date_paused = 'N' OR users.due_date_paused IS NULL) ";
             //$count_raw .= "     and goals.goal_type_id <> 4    ";
 
             $count_raw .= " ) as 'tag_0' ";
