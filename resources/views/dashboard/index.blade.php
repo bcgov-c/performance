@@ -60,6 +60,35 @@
                     </button>
                 </div>
             </div>
+            @if($jobList && $jobList->count() > 1)
+                <div class="col-12 col-sm-4 col-md-4">
+                    <strong>
+                        My Primary Job
+                        <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="{{ $jobTooltip }}"></i>
+                    </strong>
+                    <div class="bg-white border-b rounded p-2 mt-2 shadow-sm">
+                        {{-- <x-profile-pic></x-profile-pic> --}}
+                        <label for="primaryjob_btn">
+                            <button type="button" icon="fas fa-xs fa-ellipsis-v" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {{ $primaryJob ? $primaryJob->job : 'No job selected' }}
+                            </button>
+                            <div class="dropdown-menu"  size="xs">
+                                @foreach($jobList as $jobItem)
+                                    @if(!$primaryJob || ($primaryJob && $jobItem->empl_record != $primaryJob->empl_record))
+                                        <x-button icon="fas fa-xs fa-fw" value="{{ $jobItem->empl_record }}" data-id="{{ $jobItem->empl_record }}" data-name="{{ $jobItem->job }}" class="dropdown-item change_job" name="change_job" id="change_job">
+                                            {{ $jobItem->job }}
+                                        </x-button>
+                                    @else
+                                        <x-button icon="fas fa-xs fa-fw fa-solid fa-check" value="{{ $jobItem->empl_record }}" data-id="{{ $jobItem->empl_record }}" data-name="{{ $jobItem->job }}" class="dropdown-item no_change_job" name="no_change_job" id='no_change_job'>
+                                            {{ $jobItem->job }}
+                                        </x-button>
+                                    @endif
+                                @endforeach
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
     <div class="container-fluid">
@@ -132,6 +161,28 @@
             });
 
             $('.no_change_supervisor').on('click', function(e) {
+                e.preventDefault();
+            });
+
+            $('.change_job').on('click', function(e) {
+                e.preventDefault();
+                var check = confirm("Are you sure you want to change primary job?");
+                if(check == true){
+                    // alert($(this).data('id'));
+                    $.ajax({
+                        url: "{{ route('dashboard.updateJob') }}",
+                        type: 'POST',
+                        dataType: 'json',
+                        data: { id : $(this).data('id'), 
+                        },
+                        success: function (data) {
+                            window.location.reload();
+                        }
+                    });
+                }
+            });
+
+            $('.no_change_job').on('click', function(e) {
                 e.preventDefault();
             });
 
