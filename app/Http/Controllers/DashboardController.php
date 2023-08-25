@@ -8,6 +8,7 @@ use App\Models\UserReportingTo;
 use App\Models\SharedProfile;
 use App\Models\DashboardMessage;
 use App\Models\PreferredSupervisor;
+use App\Models\PrimaryJob;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -192,10 +193,13 @@ class DashboardController extends Controller
         $supervisorList = Auth::user()->supervisorList();
         $supervisorListCount = Auth::user()->supervisorListCount();
         $preferredSupervisor = Auth::user()->preferredSupervisor();
+        $primaryJob = Auth::user()->primaryJob();
+        $jobList = Auth::user()->jobList();
+        $jobTooltip = 'This option is only available for users with multiple jobs. To be updated.';        
 
         return view('dashboard.index', compact('greetings', 'tab', 'supervisorTooltip', 'sharedList', 'profilesharedTooltip', 
                     // 'notifications', 'notifications_unread', 
-                    'message', 'matched_dn_ids','old_selected_dn_ids', 'open_modal', 'supervisorList', 'supervisorListCount', 'preferredSupervisor'));
+                    'message', 'matched_dn_ids','old_selected_dn_ids', 'open_modal', 'supervisorList', 'supervisorListCount', 'preferredSupervisor', 'primaryJob', 'jobList', 'jobTooltip'));
     }
 
     public function show(Request $request, $id) {
@@ -347,6 +351,26 @@ class DashboardController extends Controller
                 'reporting_to_id' => $supvUser->id 
             ]);
         }
+        return redirect()->back();
+    }
+    
+    // public function updateJob(Request $request) {
+    //     PrimaryJob::updateOrCreate([
+    //         'employee_id' => Auth::user()->employee_id,
+    //     ], [
+    //         'empl_record' => $request->id,
+    //         'updated_by' => $request->session()->get('existing_user_id') ? $request->session()->get('existing_user_id') : Auth::id(),
+    //     ]);
+    //     return redirect()->back();
+    // }
+    
+    public function updateJob(Request $request) {
+        User::updateOrCreate([
+            'employee_id' => Auth::user()->employee_id,
+        ], [
+            'empl_record' => $request->id,
+            'updated_by' => $request->session()->get('existing_user_id') ? $request->session()->get('existing_user_id') : Auth::id(),
+        ]);
         return redirect()->back();
     }
     

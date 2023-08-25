@@ -12,6 +12,7 @@ use Spatie\Permission\Traits\HasRoles;
 use App\Models\EmployeeDemo;
 use App\Models\EmployeeDemoJunior;
 use App\Models\PreferredSupervisor;
+use App\Models\PrimaryJob;
 
 class User extends Authenticatable
 {
@@ -328,6 +329,50 @@ class User extends Authenticatable
         ->whereRaw("EXISTS (SELECT 1 FROM preferred_supervisor AS ps WHERE ps.employee_id = employee_demo.employee_id AND ps.position_nbr = employee_demo.position_number AND ps.supv_empl_id = e.employee_id)")
         ->first();
         return $row ? $row->employee_id : '';
+    }
+
+    // public function primaryJob() {
+    //     return PrimaryJob::from('primary_jobs AS pj')
+    //         ->join('employee_demo AS ed', function($join){
+    //             $join->on(function($on){
+    //                 $on->whereRaw('pj.employee_id = ed.employee_id')
+    //                     ->whereRaw('pj.empl_record = ed.empl_record')
+    //                     ->whereNull('ed.date_deleted');
+    //             });
+    //         })
+    //         ->join('employee_demo_tree AS edt', 'edt.id', 'ed.orgid')
+    //         ->where('pj.employee_id', $this->employee_id)
+    //         ->selectRaw("pj.employee_id, pj.empl_record, CONCAT(ed.jobcode_desc, ' - ', edt.organization) AS job")
+    //         ->first();
+    // }
+
+    public function primaryJob() {
+        return User::from('users AS pj')
+            ->join('employee_demo AS ed', function($join){
+                $join->on(function($on){
+                    $on->whereRaw('pj.employee_id = ed.employee_id')
+                        ->whereRaw('pj.empl_record = ed.empl_record')
+                        ->whereNull('ed.date_deleted');
+                });
+            })
+            ->join('employee_demo_tree AS edt', 'edt.id', 'ed.orgid')
+            ->where('pj.employee_id', $this->employee_id)
+            ->selectRaw("pj.employee_id, pj.empl_record, CONCAT(ed.jobcode_desc, ' - ', edt.organization) AS job")
+            ->first();
+    }
+
+    public function jobList() {
+        return EmployeeDemo::from('employee_demo AS ed1')
+            ->whereRaw("EXISTS (SELECT 1 FROM employee_demo AS ed2 WHERE ed2.employee_id = ed1.employee_id AND ed2.empl_record <> ed1.empl_record AND ed2.date_deleted IS NULL)")
+            ->join('employee_demo_tree AS edt', 'edt.id', 'ed1.orgid')
+            ->whereNull('ed1.date_deleted')
+            ->where('ed1.employee_id', $this->employee_id)
+            ->selectRaw("ed1.employee_id, ed1.empl_record, CONCAT(ed1.jobcode_desc, ' - ', edt.organization) AS job")
+            ->get();
+    }
+
+    public function jobCount() {
+        return $this->jobList->count();
     }
 
 }
