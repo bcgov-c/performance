@@ -25,6 +25,8 @@ use App\Http\Controllers\UserPreferenceController;
         Route::delete('/dashboarddeleteall',[DashboardController::class, 'destroyall'])->name('dashboard.destroyall');
         Route::post('/dashboardupdatestatus',[DashboardController::class, 'updatestatus'])->name('dashboard.updatestatus');
         Route::post('/dashboardUpdateSupervisor',[DashboardController::class, 'updateSupervisor'])->name('dashboard.updateSupervisor');
+        Route::get('/dashboardUpdateJob',[DashboardController::class, 'updateJob']);
+        Route::post('/dashboardUpdateJob',[DashboardController::class, 'updateJob'])->name('dashboard.updateJob');
         // Route::get('/dashboardresetstatus', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard.notifications');
         Route::post('/dashboardresetstatus',[DashboardController::class, 'resetstatus'])->name('dashboard.resetstatus');
         Route::get('/dashboardmessage-badgecount',[DashboardController::class, 'badgeCount'])->name('dashboard.badgecount');
