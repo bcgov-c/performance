@@ -418,6 +418,11 @@ class ConversationController extends Controller
                     $myTeamConversations_arr[$i]['sign_date'] = '';
                 }
             }
+            if(isset($item->updated_at)){
+                $update_datetime = Carbon::parse($item->updated_at);
+                $update_date = $update_datetime->toDateString();
+                $myTeamConversations_arr[$i]['update_date'] = $update_date;
+            } 
             if(isset($item->created_at)){
                 $create_datetime = Carbon::parse($item->created_at);
                 $create_date = $create_datetime->toDateString();
@@ -501,6 +506,11 @@ class ConversationController extends Controller
                     $conversations_arr[$i]['sign_date'] = '';
                 }
             }
+            if(isset($item->updated_at)){
+                $update_datetime = Carbon::parse($item->updated_at);
+                $update_date = $update_datetime->toDateString();
+                $conversations_arr[$i]['update_date'] = $update_date;
+            } 
             if(isset($item->created_at)){
                 $create_datetime = Carbon::parse($item->created_at);
                 $create_date = $create_datetime->toDateString();
