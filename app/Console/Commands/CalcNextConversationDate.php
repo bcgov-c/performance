@@ -107,6 +107,15 @@ class CalcNextConversationDate extends Command
         ->whereNotNull('employee_demo.guid')
         ->whereRaw("employee_demo.employee_status = (select min(a.employee_status) from employee_demo a where a.employee_id = employee_demo.employee_id)")
         ->whereRaw("employee_demo.empl_record = (select min(a.empl_record) from employee_demo a where a.employee_id = employee_demo.employee_id and a.employee_status = employee_demo.employee_status)")
+        ->whereRaw("
+            (
+                EXISTS (SELECT 1 FROM employee_demo AS edchk1 USE INDEX (idx_employee_demo_employeeid_record) WHERE edchk1.employee_id = employee_demo.employee_id AND edchk1.empl_record = employee_demo.empl_record AND edchk1.date_deleted IS NULL)
+                OR (
+                    NOT EXISTS (SELECT 1 FROM employee_demo AS edchk2 USE INDEX (idx_employee_demo_employeeid_record) WHERE edchk2.employee_id = employee_demo.employee_id AND edchk2.empl_record = employee_demo.empl_record AND edchk2.date_deleted IS NULL)
+                        AND EXISTS (SELECT 1 FROM employee_demo AS edchk3 USE INDEX (idx_employee_demo_employeeid_record) WHERE edchk3.employee_id = employee_demo.employee_id)
+                    )
+            )
+        ")
         ->distinct()
         ->orderBy('employee_demo.employee_id')
         ->orderBy('employee_demo.empl_record')
@@ -139,7 +148,12 @@ class CalcNextConversationDate extends Command
                 if ($demo->guid) {
                     // YES GUID
                     // get last conversation details
-                    $lastConv = Conversation::join('conversation_participants', 'conversations.id', 'conversation_participants.conversation_id')
+                    $lastConv = Conversation::join('conversation_participants', function($join) {
+                        return $join->on(function($on) {
+                            return $on->where('conversations.id', 'conversation_participants.conversation_id')
+                                ->whereRaw("role = 'emp'");
+                        });
+                    })
                     ->join('users', 'users.id', 'conversation_participants.participant_id')
                     ->whereRaw("trim(users.guid) <> ''")
                     ->whereNotNull('users.guid')
