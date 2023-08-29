@@ -220,7 +220,6 @@
         // <!-- Snowplow starts plowing - Standalone vE.2.14.0 -->
         var collector = '{{ env('SNOWPLOW_COLLECTOR') }}';
         if(collector != null && collector != ''){
-            console.log(collector);
             ;(function(p,l,o,w,i,n,g){if(!p[i]){p.GlobalSnowplowNamespace=p.GlobalSnowplowNamespace||[];
             p.GlobalSnowplowNamespace.push(i);p[i]=function(){(p[i].q=p[i].q||[]).push(arguments)
             };p[i].q=p[i].q||[];n=l.createElement(o);g=l.getElementsByTagName(o)[0];n.async=1;
