@@ -92,7 +92,7 @@
                                                 </tdhead>
                                                 <tbody style="border-collapse: collapse;">
                                                 <tr style="background-color: #efefef">
-                                                    <td>{{$template->name}}</td>
+                                                    <td><a class="btn btn-link ml-2 btn-view-conversation" data-id="{{$template->id}}" data-toggle="modal" data-target="#viewConversationModal">{{$template->name}}</a></td>
                                                     <td>{{$template->when_to_use}}</td>
                                                     <td>
                                                         <select class="form-control w-100 select" style="width:100%; margin-top: 8px;" name="participant_id[]" id="participant_id" required>
@@ -164,7 +164,7 @@
                                 @foreach ($templates as $template)
                                 @if(strtolower($template->name) !== 'performance check-in')
                                 <tr>
-                                    <td>{{$template->name}}</td>
+                                    <td><a class="btn btn-link ml-2 btn-view-conversation" data-id="{{$template->id}}" data-toggle="modal" data-target="#viewConversationModal">{{$template->name}}</a></td>
                                     <td>{{$template->when_to_use}}</td>
                                     <td>
                                         <select class="form-control w-100 select" style="width:100%; margin-top: 8px;"" name="participant_id_{{$template->id}}[]" id="participant_id_{{$template->id}}" required>
@@ -203,65 +203,17 @@
                     </div>
 		</div>
 	</div>
-        
-        
-        
-        
     </div>
-    <x-slot name="js">
-        <script>
-            
-            function conversation_sub(topic_id){
-                $('#conversation_form_2 input[name="conversation_topic_id"]').val(topic_id);
-                var allow_submit = true;
-                if(topic_id === 1){
-                    if ($('#participant_id_1')[0].checkValidity()) {
-                        var participant_id = $('#participant_id_1').val();     
-                    } else {
-                        $('#participant_id_1')[0].reportValidity();
-                        allow_submit = false;
-                    }             
-                }else if(topic_id === 2){
-                    if ($('#participant_id_2')[0].checkValidity()) {                        
-                        var participant_id = $('#participant_id_2').val();     
-                    } else {
-                        $('#participant_id_2')[0].reportValidity();
-                        allow_submit = false;
-                    } 
-                }else if(topic_id === 3){                    
-                    if ($('#participant_id_3')[0].checkValidity()) {                        
-                        var participant_id = $('#participant_id_3').val();    
-                    } else {
-                        $('#participant_id_3')[0].reportValidity();
-                        allow_submit = false;
-                    } 
-                }else if(topic_id === 4){
-                    if ($('#participant_id_4')[0].checkValidity()) {                        
-                        var participant_id = $('#participant_id_4').val();    
-                    } else {
-                        $('#participant_id_4')[0].reportValidity();
-                        allow_submit = false;
-                    } 
-                }else if(topic_id === 5){
-                    if ($('#participant_id_5')[0].checkValidity()) {                        
-                        var participant_id = $('#participant_id_5').val();    
-                    } else {
-                        $('#participant_id_5')[0].reportValidity();
-                        allow_submit = false;
-                    } 
-                }
-                $('#conversation_form_2 input[name="participant_id"]').val(participant_id);
-                if(allow_submit) {
-                    $('#conversation_form_2').submit();
-                }                
-            }
-            
-            
-            $( document ).ready(function() {
-                $('#collapse_0').collapse('show');
-            });
 
-        </script>
+
+        
+    @include('conversation.partials.template-conversation-modal')   
+    <x-slot name="js">
+        
+        <script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>     
+        @include('conversation.partials.conversations-template-js')    
+
+
     </x-slot>
     <x-slot name="css">
         <style>
@@ -291,3 +243,42 @@
     </x-slot>
 
 </x-side-layout>
+
+<style>
+    
+    .dataTable > thead > tr > th:nth-child(5)[class*="sort"]:before,
+    .dataTable > thead > tr > th:nth-child(5)[class*="sort"]:after {
+        content: "" !important;
+    }
+    
+    .panel-heading{
+        opacity: 0.5;
+    }
+    .acc-title {
+	display: block;
+	height: 22px;
+	position:absolute;
+	top:11px;
+	left:20px;
+    }
+    .acc-status {
+	display: block;
+	width: 22px;
+	height: 22px;
+	position:absolute;
+	top:11px;
+	right:11px;
+    }
+    
+    #upcoming {
+        font-weight: bold;
+    }
+    
+    #employee_conversations {
+        width: 100%;
+    }  
+    
+    table.dataTable thead th {
+        border-bottom: solid #FCBA19;
+    }
+</style> 
