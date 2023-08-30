@@ -361,7 +361,7 @@ i {
               {
                 title: '<div style="padding-left: 20px;">Name</div>', // add left padding to header cell
                 render: function(data, type, row) {
-                  return '<a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</button>';
+                  return '<a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</a>';
                 }
               },
               { title: "Participants", data: "participants" },
@@ -398,7 +398,7 @@ i {
               {
                 title: '<div style="padding-left: 20px;">Name</div>', // add left padding to header cell
                 render: function(data, type, row) {
-                  return '<a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</button>';
+                  return '<a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</a>';
                 }
               },
               { title: "Participants", data: "participants" },
