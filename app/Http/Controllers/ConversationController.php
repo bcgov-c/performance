@@ -1236,7 +1236,7 @@ class ConversationController extends Controller
         $conversation->update();
 
         return
-        response()->json(['success' => true, 'Message' => 'UnSign Successfull', 'data' => $conversation]);
+        response()->json(['success' => true, 'Message' => 'UnSign Successfull', 'data' => $conversation]);;
     }
 
     public function templates(Request $request, $viewType = 'conversations') {
@@ -1286,9 +1286,7 @@ class ConversationController extends Controller
         usort($participant_users, function($a, $b){ return strcmp($a["name"], $b["name"]); });
         $participant_users = collect($participant_users)->unique('id')->values()->all();
 
-        $type = 'template';
-
-        return view('conversation.templates', compact('templates', 'searchValue', 'conversationMessage', 'viewType', 'user', 'type', 'participants', 'participant_users'));
+        return view('conversation.templates', compact('templates', 'searchValue', 'conversationMessage', 'viewType', 'user', 'participants', 'participant_users'));
     }
 
     public function templateDetail($id) {
@@ -1311,13 +1309,6 @@ class ConversationController extends Controller
         $participants = $participants->merge($adminemps);
         
         return view('conversation.partials.template-detail-modal-body', compact('template','allTemplates','participants','reportingManager'));
-    }
-    
-    public function conversationTemplate($id) {
-        $template = ConversationTopic::findOrFail($id);
-        
-        return
-        response()->json(['success' => true, 'data' => $template]);
     }
     
 }
