@@ -243,3 +243,42 @@
     </x-slot>
 
 </x-side-layout>
+
+<style>
+    
+    .dataTable > thead > tr > th:nth-child(5)[class*="sort"]:before,
+    .dataTable > thead > tr > th:nth-child(5)[class*="sort"]:after {
+        content: "" !important;
+    }
+    
+    .panel-heading{
+        opacity: 0.5;
+    }
+    .acc-title {
+	display: block;
+	height: 22px;
+	position:absolute;
+	top:11px;
+	left:20px;
+    }
+    .acc-status {
+	display: block;
+	width: 22px;
+	height: 22px;
+	position:absolute;
+	top:11px;
+	right:11px;
+    }
+    
+    #upcoming {
+        font-weight: bold;
+    }
+    
+    #employee_conversations {
+        width: 100%;
+    }  
+    
+    table.dataTable thead th {
+        border-bottom: solid #FCBA19;
+    }
+</style> 
