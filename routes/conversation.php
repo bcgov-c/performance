@@ -21,4 +21,5 @@ Route::get('conversation/agreement/{conversation}', [ConversationController::cla
 Route::get('conversation/disagreement/{conversation}', [ConversationController::class, 'disagreement'])->name('conversation.disagreement');
 
 Route::get('participant', [ParticipantController::class, 'index'])->name('participant.index');
+Route::get('conversation-template/{id}', [ConversationController::class, 'conversationTemplate'])->name('conversation-template.detail');
 
