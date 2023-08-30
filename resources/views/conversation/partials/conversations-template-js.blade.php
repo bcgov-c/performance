@@ -215,8 +215,8 @@
                     var templateId = button.data('id'); 
                     updateConversation(templateId);
                     var modal = $(this);
-                    modal.find('#collapse_1').collapse("hide");
-                    modal.find('#collapse_2').collapse("hide");
+                    modal.find('#collapse_1_modal').collapse("hide");
+                    modal.find('#collapse_2_modal').collapse("hide");
                     modal.find('#templateId').val(templateId);
                 });
 
@@ -225,8 +225,8 @@
 
             document.getElementById("closemodal").onclick = function(e) {
                 $("#viewConversationModal").modal("hide");
-                $("#viewConversationModal").find('#collapse_1').collapse("hide");
-                $("#viewConversationModal").find('#collapse_2').collapse("hide");
+                $("#viewConversationModal").find('#collapse_1_modal').collapse("hide");
+                $("#viewConversationModal").find('#collapse_2_modal').collapse("hide");
             };
 
 
