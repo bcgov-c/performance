@@ -58,7 +58,7 @@
                 
                 
                 <div class="card"  id="pfc_card">
-                        <div class="card-header panel-heading bg-primary" id="heading_2">
+                        <div class="card-header panel-heading bg-primary" id="heading_2"  style="opacity: 0.5;">
                         <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_2_modal" aria-expanded="false" aria-controls="collapse_2_modal">
                                 <button class="btn btn-link" style="color:white">
                                     <span class="acc-title">Preparing For The Conversation</span>
@@ -76,7 +76,7 @@
                 
                 
                 <div class="card" id="sdq_card">
-                        <div class="card-header panel-heading bg-primary" id="heading_1">
+                        <div class="card-header panel-heading bg-primary" id="heading_1" style="opacity: 0.5;">
                         <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_1_modal" aria-expanded="false" aria-controls="collapse_1_modal">
                                 <button class="btn btn-link" style="color:white">
                                 <span class="acc-title">Suggested Discussion Questions</span>
@@ -98,7 +98,7 @@
                 <div class="row">
                     <div class="col-6">
                         <div class="card">
-                                <div class="card-header panel-heading bg-primary">
+                                <div class="card-header panel-heading bg-primary"  style="opacity: 0.5;">
                                 Employee Comments
                                 </div>
 
@@ -164,7 +164,7 @@
                 
                     <div class="col-6">
                         <div class="card">
-                               <div class="card-header panel-heading bg-primary">
+                               <div class="card-header panel-heading bg-primary"  style="opacity: 0.5;">
                                 Supervisor Comments
                                 </div>
 
@@ -258,7 +258,7 @@
                 <div class="row">
                     <div class="col-6">
                         <div class="card">
-                               <div class="card-header panel-heading bg-primary">
+                               <div class="card-header panel-heading bg-primary"  style="opacity: 0.5;">
                                 Employee Sign-Off
                                 </div>                                
                                 <div class="card-body">
@@ -286,7 +286,7 @@
                     </div>
                     <div class="col-6">
                         <div class="card">
-                               <div class="card-header panel-heading bg-primary">
+                               <div class="card-header panel-heading bg-primary"  style="opacity: 0.5;">
                                 Supervisor Sign-Off
                                 </div>
                                 <div class="card-body">
