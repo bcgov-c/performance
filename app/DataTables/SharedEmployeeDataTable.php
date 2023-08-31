@@ -96,7 +96,10 @@ class SharedEmployeeDataTable extends DataTable
             ->with('upcomingConversation')
             ->with('employee_demo')
             ->with('employee_demo_jr')
-            ->with('latestConversation');
+            ->with('latestConversation')
+            ->whereHas('employee_demo', function($qed){
+                return $qed->whereNull('employee_demo.date_deleted');
+            });
     }
 
     /**
