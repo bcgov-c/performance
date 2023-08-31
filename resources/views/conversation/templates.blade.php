@@ -282,3 +282,51 @@
         border-bottom: solid #FCBA19;
     }
 </style> 
+
+<script>
+
+function conversation_sub(topic_id){
+                $('#conversation_form_2 input[name="conversation_topic_id"]').val(topic_id);
+                var allow_submit = true;
+                if(topic_id === 1){
+                    if ($('#participant_id_1')[0].checkValidity()) {
+                        var participant_id = $('#participant_id_1').val();     
+                    } else {
+                        $('#participant_id_1')[0].reportValidity();
+                        allow_submit = false;
+                    }             
+                }else if(topic_id === 2){
+                    if ($('#participant_id_2')[0].checkValidity()) {                        
+                        var participant_id = $('#participant_id_2').val();     
+                    } else {
+                        $('#participant_id_2')[0].reportValidity();
+                        allow_submit = false;
+                    } 
+                }else if(topic_id === 3){                    
+                    if ($('#participant_id_3')[0].checkValidity()) {                        
+                        var participant_id = $('#participant_id_3').val();    
+                    } else {
+                        $('#participant_id_3')[0].reportValidity();
+                        allow_submit = false;
+                    } 
+                }else if(topic_id === 4){
+                    if ($('#participant_id_4')[0].checkValidity()) {                        
+                        var participant_id = $('#participant_id_4').val();    
+                    } else {
+                        $('#participant_id_4')[0].reportValidity();
+                        allow_submit = false;
+                    } 
+                }else if(topic_id === 5){
+                    if ($('#participant_id_5')[0].checkValidity()) {                        
+                        var participant_id = $('#participant_id_5').val();    
+                    } else {
+                        $('#participant_id_5')[0].reportValidity();
+                        allow_submit = false;
+                    } 
+                }
+                $('#conversation_form_2 input[name="participant_id"]').val(participant_id);
+                if(allow_submit) {
+                    $('#conversation_form_2').submit();
+                }                
+            }
+</script>
