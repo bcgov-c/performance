@@ -61,14 +61,17 @@ class MaintainLogs extends Command
         if(!$retentionSched) { $retentionSched = 30; }
         $retentionData = strtolower(env('PRCS_DATA_LOG_RETENTION'));
         if(!$retentionData) { $retentionData = 7; }
+        $notificationData = strtolower(env('PRCS_NOTIFICATION_LOG_RETENTION'));
+        if(!$notificationData) { $notificationData = 180; }
 
         if($retentionData > $retentionSched) {
             $extraMessage = "PRCS_SCHED_LOG_RETENTION ({$retentionSched}) must be greater than or equal to PRCS_DATA_LOG_RETENTION ({$retentionData}).  ";
         } else {
-            $extraMessage = "Retaining {$retentionSched} days of job_sched_audit, and {$retentionData} days of job_data_audit.  ";
+            $extraMessage = "Retaining {$retentionSched} days of job_sched_audit, {$retentionData} days of job_data_audit, and {$notificationData} days of notification_logs.  ";
 
             $dateSched = date('Y-m-d H:i:s', strtotime(Carbon::now()->subDays($retentionSched)->format('c')));
             $dateData = date('Y-m-d H:i:s', strtotime(Carbon::now()->subDays($retentionData)->format('c')));
+            $dateNotification = date('Y-m-d H:i:s', strtotime(Carbon::now()->subDays($notificationData)->format('c')));
 
             $this->info(Carbon::now()->format('c')." - Retaining past {$retentionData} days in job_data_audit.");
             $countDataBefore = \DB::table('job_data_audit')->count();
@@ -96,6 +99,18 @@ class MaintainLogs extends Command
             $countSchedAfter = \DB::table('job_sched_audit')->count();
             $countSchedDeleted = $countSchedBefore - $countSchedAfter;
             $this->info(Carbon::now()->format('c')." - Deleted {$countSchedDeleted} rows from job_sched_audit.");
+
+            $this->info(Carbon::now()->format('c')." - Retaining past {$notificationData} days in notification_logs.");
+            $countDataBefore = \DB::table('notification_logs')->count();
+            \DB::statement("
+                DELETE 
+                FROM notification_logs
+                WHERE created_at < '{$dateData}'
+            ");
+            $countDataAfter = \DB::table('notification_logs')->count();
+            $countDataDeleted = $countDataBefore - $countDataAfter;
+            $this->info(Carbon::now()->format('c')." - Deleted {$countDataDeleted} rows from notification_logs.");
+    
         }
 
         $end_time = Carbon::now()->format('c');
