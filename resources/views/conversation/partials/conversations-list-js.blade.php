@@ -121,293 +121,294 @@
                 initCKEditor('info_comment8');
                 initCKEditor('info_comment9');
                 initCKEditor('info_comment10');       
-                
-                CKEDITOR.instances['info_comment1'].on('focus', function(e) {
-                   $('#info_area1').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                   $('#control-info-comment1').show();
-                   info_save1 = 0;
-                   $('#control-info-comment11').hide();
-                });
-                CKEDITOR.instances['info_comment1'].on('key', function(e) { 
-                    $('#info_area1').html('<button type="button" class="btn btn-primary">Save</button><br/>');   
-                    comment1_changed = true;              
-                    unsave_warning = true;
-                    //$('#control-info-comment1').show();
-                    info_save1 = 0;       
-                });           
-            
-                CKEDITOR.instances['info_comment1'].on('blur', function(e) {
-                    if(info_save1 == 0){
-                    $('#control-info-comment1').hide();
-                    }   
-                });
-                
-                $('#control-info-comment1').click(function() {
-                    saveCkComment('info_comment1');
-                    info_save1 = 1;
-                    unsave_warning = false;
-                    $('#info_area1').html('<span style="color:red">Comment saved</span>');
-                    setTimeRoll();
-                }); 
-                
-                
-                CKEDITOR.instances['info_comment2'].on('focus', function(e) {
-                    $('#info_area2').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    $('#control-info-comment2').show();
-                    info_save2 = 0;
-                    $('#control-info-comment11').hide();
-                });
-                CKEDITOR.instances['info_comment2'].on('key', function(e) { 
-                    $('#info_area2').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    unsave_warning = true;
-                    comment2_changed = true; 
-                    //$('#control-info-comment2').show();
-                    info_save2 = 0;
-                });
-                CKEDITOR.instances['info_comment2'].on('blur', function(e) {
-                    if(info_save2 == 0){
-                    $('#control-info-comment2').hide();
-                    }   
-                });
-                
-                $('#control-info-comment2').click(function() {
-                    saveCkComment('info_comment2');
-                    info_save2 = 1;
-                    unsave_warning = false;
-                    $('#info_area2').html('<span style="color:red">Comment saved</span>');
-                    setTimeRoll();
-                }); 
-                
-                
-                CKEDITOR.instances['info_comment3'].on('focus', function(e) {
-                    $('#info_area3').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    $('#control-info-comment3').show();
-                    info_save3 = 0;
-                    $('#control-info-comment11').hide();
-                });
-                CKEDITOR.instances['info_comment3'].on('key', function(e) { 
-                    $('#info_area3').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    unsave_warning = true;
-                    comment3_changed = true; 
-                    //$('#control-info-comment3').show();
-                    info_save3 = 0;
-                });
-                CKEDITOR.instances['info_comment3'].on('blur', function(e) {
-                    if(info_save3 == 0){
-                    $('#control-info-comment3').hide();
-                    }   
-                });
-                
-                $('#control-info-comment3').click(function() {
-                    saveCkComment('info_comment3');
-                    info_save3 = 1;
-                    unsave_warning = false;
-                    $('#info_area3').html('<span style="color:red">Comment saved</span>');
-                    setTimeRoll();
-                }); 
-                
-                CKEDITOR.instances['info_comment4'].on('focus', function(e) {
-                    $('#info_area4').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    $('#control-info-comment4').show();
-                    info_save4 = 0;
-                });
-                CKEDITOR.instances['info_comment4'].on('key', function(e) { 
-                    $('#info_area4').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    unsave_warning = true;
-                    comment4_changed = true; 
-                    //$('#control-info-comment4').show();
-                    info_save4 = 0;
-                });
-                CKEDITOR.instances['info_comment4'].on('blur', function(e) {
-                    if(info_save4 == 0){
-                    $('#control-info-comment4').hide();
-                    }   
-                });
-                
-                $('#control-info-comment4').click(function() {
-                    saveCkComment('info_comment4');
-                    info_save4 = 1;
-                    unsave_warning = false;
-                    $('#info_area4').html('<span style="color:red">Comment saved</span>');
-                    setTimeRoll();
-                });  
-                
-                
-                
-                CKEDITOR.instances['info_comment5'].on('focus', function(e) {
-                    $('#info_area5').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    $('#control-info-comment5').show();
-                    info_save5 = 0;
-                });
-                CKEDITOR.instances['info_comment5'].on('key', function(e) { 
-                    $('#info_area5').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    unsave_warning = true;
-                    comment5_changed = true; 
-                    //$('#control-info-comment5').show();
-                    info_save5 = 0;
-                });
-                CKEDITOR.instances['info_comment5'].on('blur', function(e) {
-                    if(info_save5 == 0){
-                    $('#control-info-comment5').hide();
-                    }   
-                });
-                
-                $('#control-info-comment5').click(function() {
-                    saveCkComment('info_comment5');
-                    info_save5 = 1;
-                    unsave_warning = false;
-                    $('#info_area5').html('<span style="color:red">Comment saved</span>');
-                    setTimeRoll();
-                });  
-                
-                
-                CKEDITOR.instances['info_comment6'].on('focus', function(e) {
-                    $('#info_area6').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    $('#control-info-comment6').show();
-                    info_save6 = 0;
-                });
-                CKEDITOR.instances['info_comment6'].on('key', function(e) { 
-                    $('#info_area6').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    unsave_warning = true;
-                    comment6_changed = true; 
-                    //$('#control-info-comment6').show();
-                    info_save6 = 0;
-                });
-                CKEDITOR.instances['info_comment6'].on('blur', function(e) {
-                    if(info_save6 == 0){
-                    $('#control-info-comment6').hide();
-                    }   
-                });
-                
-                $('#control-info-comment6').click(function() {
-                    saveCkComment('info_comment6');
-                    info_save6 = 1;
-                    unsave_warning = false;
-                    $('#info_area6').html('<span style="color:red">Comment saved</span>');
-                    setTimeRoll();
-                });
-                
-                CKEDITOR.instances['info_comment7'].on('focus', function(e) {
-                    $('#info_area7').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    $('#control-info-comment7').show();
-                    info_save7 = 0;
-                });
-                CKEDITOR.instances['info_comment7'].on('key', function(e) { 
-                    $('#info_area7').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    //$('#control-info-comment7').show();
-                    unsave_warning = true;
-                    comment7_changed = true; 
-                    info_save7 = 0;
-                });
-                CKEDITOR.instances['info_comment7'].on('blur', function(e) {
-                    if(info_save7 == 0){
-                    $('#control-info-comment7').hide();
-                    }   
-                });
-                
-                $('#control-info-comment7').click(function() {
-                    saveCkComment('info_comment7');
-                    info_save7 = 1;
-                    unsave_warning = false;
-                    $('#info_area7').html('<span style="color:red">Comment saved</span>');
-                    setTimeRoll();
-                });
-                
-                CKEDITOR.instances['info_comment8'].on('focus', function(e) {
-                    $('#info_area8').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    $('#control-info-comment8').show();
-                    info_save8 = 0;
-                });
-                CKEDITOR.instances['info_comment8'].on('key', function(e) { 
-                    $('#info_area8').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    unsave_warning = true;
-                    comment8_changed = true; 
-                    //$('#control-info-comment8').show();
-                    info_save8 = 0;
-                });
-                CKEDITOR.instances['info_comment8'].on('blur', function(e) {
-                    if(info_save8 == 0){
-                    $('#control-info-comment8').hide();
-                    }   
-                });
-                
-                $('#control-info-comment8').click(function() {
-                    saveCkComment('info_comment8');
-                    info_save8 = 1;
-                    unsave_warning = false;
-                    $('#info_area8').html('<span style="color:red">Comment saved</span>');
-                    setTimeRoll();
-                });
-                
-                CKEDITOR.instances['info_comment9'].on('focus', function(e) {
-                    $('#info_area9').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    $('#control-info-comment9').show();
-                    info_save9 = 0;
-                });
-                CKEDITOR.instances['info_comment9'].on('key', function(e) { 
-                    $('#info_area9').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    unsave_warning = true;
-                    comment9_changed = true; 
-                    //$('#control-info-comment9').show();
-                    info_save9 = 0;
-                });
-                CKEDITOR.instances['info_comment9'].on('blur', function(e) {
-                    if(info_save9 == 0){
-                    $('#control-info-comment9').hide();
-                    }   
-                });
-                
-                $('#control-info-comment9').click(function() {
-                    saveCkComment('info_comment9');
-                    info_save9 = 1;
-                    unsave_warning = false;
-                    $('#info_area9').html('<span style="color:red">Comment saved</span>');
-                    setTimeRoll();
-                });
-                
-                
-                CKEDITOR.instances['info_comment10'].on('focus', function(e) {
-                    $('#info_area10').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    $('#control-info-comment10').show();
-                    info_save10 = 0;
-                });
-                CKEDITOR.instances['info_comment10'].on('key', function(e) { 
-                    $('#info_area10').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    unsave_warning = true;
-                    comment10_changed = true; 
-                    //$('#control-info-comment10').show();
-                    info_save10 = 0;
-                });
-                CKEDITOR.instances['info_comment10'].on('blur', function(e) {
-                    if(info_save10 == 0){
-                    $('#control-info-comment10').hide();
-                    }   
-                });
-                
-                $('#control-info-comment10').click(function() {
-                    saveCkComment('info_comment10');
-                    info_save10 = 1;
-                    unsave_warning = false;
-                    $('#info_area10').html('<span style="color:red">Comment saved</span>');
-                    setTimeRoll();
-                });
-                
-                            
-                $('#info_comment11').focus(function() {
-                    $('#info_area11').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
-                    $('#control-info-comment11').show();
-                    info_save11 = 0;
-                    comment11_changed = true; 
-                });
-                $('#control-info-comment11').click(function() {
-                    saveComment('info_comment11');
-                    info_save11 = 1;
-                    unsave_warning = true;
-                    $('#info_area11').html('<span style="color:red">Comment saved</span>');
-                    setTimeRoll();
-                });
 
-            
+                $('#viewConversationModal').on('show.bs.modal', function (event) {
+                    CKEDITOR.instances['info_comment1'].on('focus', function(e) {
+                    $('#info_area1').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                    $('#control-info-comment1').show();
+                    info_save1 = 0;
+                    $('#control-info-comment11').hide();
+                    });
+                    CKEDITOR.instances['info_comment1'].on('key', function(e) { 
+                        $('#info_area1').html('<button type="button" class="btn btn-primary">Save</button><br/>');   
+                        comment1_changed = true;              
+                        unsave_warning = true;
+                        //$('#control-info-comment1').show();
+                        info_save1 = 0;       
+                    });           
+                
+                    CKEDITOR.instances['info_comment1'].on('blur', function(e) {
+                        if(info_save1 == 0){
+                        $('#control-info-comment1').hide();
+                        }   
+                    });
+                    
+                    $('#control-info-comment1').click(function() {
+                        saveCkComment('info_comment1');
+                        info_save1 = 1;
+                        unsave_warning = false;
+                        $('#info_area1').html('<span style="color:red">Comment saved</span>');
+                        setTimeRoll();
+                    }); 
+                    
+                    
+                    CKEDITOR.instances['info_comment2'].on('focus', function(e) {
+                        $('#info_area2').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        $('#control-info-comment2').show();
+                        info_save2 = 0;
+                        $('#control-info-comment11').hide();
+                    });
+                    CKEDITOR.instances['info_comment2'].on('key', function(e) { 
+                        $('#info_area2').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        unsave_warning = true;
+                        comment2_changed = true; 
+                        //$('#control-info-comment2').show();
+                        info_save2 = 0;
+                    });
+                    CKEDITOR.instances['info_comment2'].on('blur', function(e) {
+                        if(info_save2 == 0){
+                        $('#control-info-comment2').hide();
+                        }   
+                    });
+                    
+                    $('#control-info-comment2').click(function() {
+                        saveCkComment('info_comment2');
+                        info_save2 = 1;
+                        unsave_warning = false;
+                        $('#info_area2').html('<span style="color:red">Comment saved</span>');
+                        setTimeRoll();
+                    }); 
+                    
+                    
+                    CKEDITOR.instances['info_comment3'].on('focus', function(e) {
+                        $('#info_area3').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        $('#control-info-comment3').show();
+                        info_save3 = 0;
+                        $('#control-info-comment11').hide();
+                    });
+                    CKEDITOR.instances['info_comment3'].on('key', function(e) { 
+                        $('#info_area3').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        unsave_warning = true;
+                        comment3_changed = true; 
+                        //$('#control-info-comment3').show();
+                        info_save3 = 0;
+                    });
+                    CKEDITOR.instances['info_comment3'].on('blur', function(e) {
+                        if(info_save3 == 0){
+                        $('#control-info-comment3').hide();
+                        }   
+                    });
+                    
+                    $('#control-info-comment3').click(function() {
+                        saveCkComment('info_comment3');
+                        info_save3 = 1;
+                        unsave_warning = false;
+                        $('#info_area3').html('<span style="color:red">Comment saved</span>');
+                        setTimeRoll();
+                    }); 
+                    
+                    CKEDITOR.instances['info_comment4'].on('focus', function(e) {
+                        $('#info_area4').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        $('#control-info-comment4').show();
+                        info_save4 = 0;
+                    });
+                    CKEDITOR.instances['info_comment4'].on('key', function(e) { 
+                        $('#info_area4').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        unsave_warning = true;
+                        comment4_changed = true; 
+                        //$('#control-info-comment4').show();
+                        info_save4 = 0;
+                    });
+                    CKEDITOR.instances['info_comment4'].on('blur', function(e) {
+                        if(info_save4 == 0){
+                        $('#control-info-comment4').hide();
+                        }   
+                    });
+                    
+                    $('#control-info-comment4').click(function() {
+                        saveCkComment('info_comment4');
+                        info_save4 = 1;
+                        unsave_warning = false;
+                        $('#info_area4').html('<span style="color:red">Comment saved</span>');
+                        setTimeRoll();
+                    });  
+                    
+                    
+                    
+                    CKEDITOR.instances['info_comment5'].on('focus', function(e) {
+                        $('#info_area5').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        $('#control-info-comment5').show();
+                        info_save5 = 0;
+                    });
+                    CKEDITOR.instances['info_comment5'].on('key', function(e) { 
+                        $('#info_area5').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        unsave_warning = true;
+                        comment5_changed = true; 
+                        //$('#control-info-comment5').show();
+                        info_save5 = 0;
+                    });
+                    CKEDITOR.instances['info_comment5'].on('blur', function(e) {
+                        if(info_save5 == 0){
+                        $('#control-info-comment5').hide();
+                        }   
+                    });
+                    
+                    $('#control-info-comment5').click(function() {
+                        saveCkComment('info_comment5');
+                        info_save5 = 1;
+                        unsave_warning = false;
+                        $('#info_area5').html('<span style="color:red">Comment saved</span>');
+                        setTimeRoll();
+                    });  
+                    
+                    
+                    CKEDITOR.instances['info_comment6'].on('focus', function(e) {
+                        $('#info_area6').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        $('#control-info-comment6').show();
+                        info_save6 = 0;
+                    });
+                    CKEDITOR.instances['info_comment6'].on('key', function(e) { 
+                        $('#info_area6').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        unsave_warning = true;
+                        comment6_changed = true; 
+                        //$('#control-info-comment6').show();
+                        info_save6 = 0;
+                    });
+                    CKEDITOR.instances['info_comment6'].on('blur', function(e) {
+                        if(info_save6 == 0){
+                        $('#control-info-comment6').hide();
+                        }   
+                    });
+                    
+                    $('#control-info-comment6').click(function() {
+                        saveCkComment('info_comment6');
+                        info_save6 = 1;
+                        unsave_warning = false;
+                        $('#info_area6').html('<span style="color:red">Comment saved</span>');
+                        setTimeRoll();
+                    });
+                    
+                    CKEDITOR.instances['info_comment7'].on('focus', function(e) {
+                        $('#info_area7').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        $('#control-info-comment7').show();
+                        info_save7 = 0;
+                    });
+                    CKEDITOR.instances['info_comment7'].on('key', function(e) { 
+                        $('#info_area7').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        //$('#control-info-comment7').show();
+                        unsave_warning = true;
+                        comment7_changed = true; 
+                        info_save7 = 0;
+                    });
+                    CKEDITOR.instances['info_comment7'].on('blur', function(e) {
+                        if(info_save7 == 0){
+                        $('#control-info-comment7').hide();
+                        }   
+                    });
+                    
+                    $('#control-info-comment7').click(function() {
+                        saveCkComment('info_comment7');
+                        info_save7 = 1;
+                        unsave_warning = false;
+                        $('#info_area7').html('<span style="color:red">Comment saved</span>');
+                        setTimeRoll();
+                    });
+                    
+                    CKEDITOR.instances['info_comment8'].on('focus', function(e) {
+                        $('#info_area8').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        $('#control-info-comment8').show();
+                        info_save8 = 0;
+                    });
+                    CKEDITOR.instances['info_comment8'].on('key', function(e) { 
+                        $('#info_area8').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        unsave_warning = true;
+                        comment8_changed = true; 
+                        //$('#control-info-comment8').show();
+                        info_save8 = 0;
+                    });
+                    CKEDITOR.instances['info_comment8'].on('blur', function(e) {
+                        if(info_save8 == 0){
+                        $('#control-info-comment8').hide();
+                        }   
+                    });
+                    
+                    $('#control-info-comment8').click(function() {
+                        saveCkComment('info_comment8');
+                        info_save8 = 1;
+                        unsave_warning = false;
+                        $('#info_area8').html('<span style="color:red">Comment saved</span>');
+                        setTimeRoll();
+                    });
+                    
+                    CKEDITOR.instances['info_comment9'].on('focus', function(e) {
+                        $('#info_area9').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        $('#control-info-comment9').show();
+                        info_save9 = 0;
+                    });
+                    CKEDITOR.instances['info_comment9'].on('key', function(e) { 
+                        $('#info_area9').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        unsave_warning = true;
+                        comment9_changed = true; 
+                        //$('#control-info-comment9').show();
+                        info_save9 = 0;
+                    });
+                    CKEDITOR.instances['info_comment9'].on('blur', function(e) {
+                        if(info_save9 == 0){
+                        $('#control-info-comment9').hide();
+                        }   
+                    });
+                    
+                    $('#control-info-comment9').click(function() {
+                        saveCkComment('info_comment9');
+                        info_save9 = 1;
+                        unsave_warning = false;
+                        $('#info_area9').html('<span style="color:red">Comment saved</span>');
+                        setTimeRoll();
+                    });
+                    
+                    
+                    CKEDITOR.instances['info_comment10'].on('focus', function(e) {
+                        $('#info_area10').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        $('#control-info-comment10').show();
+                        info_save10 = 0;
+                    });
+                    CKEDITOR.instances['info_comment10'].on('key', function(e) { 
+                        $('#info_area10').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        unsave_warning = true;
+                        comment10_changed = true; 
+                        //$('#control-info-comment10').show();
+                        info_save10 = 0;
+                    });
+                    CKEDITOR.instances['info_comment10'].on('blur', function(e) {
+                        if(info_save10 == 0){
+                        $('#control-info-comment10').hide();
+                        }   
+                    });
+                    
+                    $('#control-info-comment10').click(function() {
+                        saveCkComment('info_comment10');
+                        info_save10 = 1;
+                        unsave_warning = false;
+                        $('#info_area10').html('<span style="color:red">Comment saved</span>');
+                        setTimeRoll();
+                    });
+                    
+                                
+                    $('#info_comment11').focus(function() {
+                        $('#info_area11').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
+                        $('#control-info-comment11').show();
+                        info_save11 = 0;
+                        comment11_changed = true; 
+                    });
+                    $('#control-info-comment11').click(function() {
+                        saveComment('info_comment11');
+                        info_save11 = 1;
+                        unsave_warning = true;
+                        $('#info_area11').html('<span style="color:red">Comment saved</span>');
+                        setTimeRoll();
+                    });
+
+                });    
                 modal_open=false;
                 
                 <?php if ($open_modal_id) { ?>
@@ -1039,7 +1040,7 @@
 @isset($open_modal_id)
         // when redirect from dashboardController, and then open the modal box
         <script>
-            $(function() {
+            $( document ).ready(function() {  
                 conversation_id = {{ $open_modal_id }};
                 updateConversation(conversation_id);
                 $('#viewConversationModal').modal('show');                
