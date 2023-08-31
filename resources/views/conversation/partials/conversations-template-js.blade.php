@@ -218,6 +218,23 @@
                     modal.find('#collapse_1_modal').collapse("hide");
                     modal.find('#collapse_2_modal').collapse("hide");
                     modal.find('#templateId').val(templateId);
+
+                    // Disable comments
+                    CKEDITOR.instances['info_comment1'].setReadOnly( true );
+                    CKEDITOR.instances['info_comment2'].setReadOnly( true );
+                    CKEDITOR.instances['info_comment3'].setReadOnly( true );
+                    CKEDITOR.instances['info_comment4'].setReadOnly( true );
+                    CKEDITOR.instances['info_comment5'].setReadOnly( true );
+                    CKEDITOR.instances['info_comment6'].setReadOnly( true );
+                    CKEDITOR.instances['info_comment7'].setReadOnly( true );
+                    CKEDITOR.instances['info_comment8'].setReadOnly( true );
+                    CKEDITOR.instances['info_comment9'].setReadOnly( true );
+                    CKEDITOR.instances['info_comment10'].setReadOnly( true );
+                    $('#info_comment11').prop( 'disabled', true );
+    
+                    // Disable radio buttons and checkboxes
+                    modal.find('input[type="radio"]').prop('disabled', true);
+                    modal.find('input[type="checkbox"]').prop('disabled', true);
                 });
 
 
