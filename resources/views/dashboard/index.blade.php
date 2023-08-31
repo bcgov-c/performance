@@ -18,7 +18,7 @@
                     @else
                         <label for="supervisor_btn">
                             <button type="button" icon="fas fa-xs fa-ellipsis-v" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                {{ $preferredSupervisor ? $preferredSupervisor->name : (Auth::user()->reportingManager ? Auth::user()->reportingManager->name : 'No supervisor') }}
+                                {{ $preferredSupervisor ? $preferredSupervisor->name : (Auth::user()->reportingManager ? Auth::user()->reportingManager->name : 'Select a supervisor') }}
                             </button>
                             <div class="dropdown-menu"  size="xs">
                                 @foreach($supervisorList as $supv)
