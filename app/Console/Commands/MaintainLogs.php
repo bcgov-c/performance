@@ -105,7 +105,7 @@ class MaintainLogs extends Command
             \DB::statement("
                 DELETE 
                 FROM notification_logs
-                WHERE created_at < '{$dateData}'
+                WHERE created_at < '{$dateNotification}'
             ");
             $countDataAfter = \DB::table('notification_logs')->count();
             $countDataDeleted = $countDataBefore - $countDataAfter;
