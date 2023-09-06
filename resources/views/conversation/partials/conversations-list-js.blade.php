@@ -410,6 +410,14 @@
 
                 });    
                 modal_open=false;
+                
+                <?php if ($open_modal_id) { ?>
+                    conversation_id = {{ $open_modal_id }};
+                    updateConversation(conversation_id);
+                    setTimeout(function () {
+                        $('#viewConversationModal').modal('show');
+                    }, 1500); // 1500 milliseconds (10 seconds)
+                <?php } ?>    
             });
              
         </script>    
@@ -1023,9 +1031,7 @@
         // when redirect from dashboardController, and then open the modal box
         <script>
             $( document ).ready(function() {  
-                conversation_id = {{ $open_modal_id }};
-                updateConversation(conversation_id);
-                $('#viewConversationModal').modal('show');                
+                        
             });
 
             
