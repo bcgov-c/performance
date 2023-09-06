@@ -1041,9 +1041,7 @@
         // when redirect from dashboardController, and then open the modal box
         <script>
             $( document ).ready(function() {  
-                conversation_id = {{ $open_modal_id }};
-                updateConversation(conversation_id);
-                $('#viewConversationModal').modal('show');                
+                        
             });
 
             
