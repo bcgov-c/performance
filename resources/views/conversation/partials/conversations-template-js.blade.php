@@ -237,6 +237,7 @@
                     modal.find('input[type="checkbox"]').prop('disabled', true);
                 });
 
+                $('[data-toggle="popover"]').popover();
 
             });
 
