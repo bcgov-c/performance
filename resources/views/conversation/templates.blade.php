@@ -1,15 +1,3 @@
-<style>
-    th{
-        padding:20px;
-    }
-    td{
-        padding:20px;
-    }
-    .float-right {
-        float: right;
-    }
-</style>    
-
 <x-side-layout title="{{ __('My Conversations - Performance Development Platform') }}">
     <h3> 
         @if ((session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
@@ -24,30 +12,30 @@
     <div class="row">
         <div class="col-md-8"> @include('conversation.partials.tabs')</div>
     </div>
-    <div class="mt-4">
-        <div class="card">
-		<div class="card-header" id="heading_0">
-		<h5 class="mb-0"data-toggle="collapse" data-target="#collapse_0" aria-expanded="1" aria-controls="collapse_0">
-                    <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_0" aria-expanded="false" aria-controls="collapse_0">
-                            <button class="btn btn-link" >
-                                <h4>Instructions</h4> 
-                            </button>                        
-                            <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span>    
-                    </h5>
-                </h5>
-		</div>
+    
+    <div class="row">
+        <div class="col-12">
+            <br/>
+            <button
+            id="toggleCardButton"
+            class="btn btn-primary float-left"
+            data-trigger = "click"
+            data-toggle="popover"
+            data-placement="right"  
+            data-html="true"    
+            data-original-title="
+            <p><br/>Review the information below to determine which template best suits your needs. Click on a template name to view a sample. If you need more assistance, refer to the
+             <a href='/resources/conversations?t=1' target=\'_blank\'>Performance Conversations</a> 
+             resource page</p>
+            <p>Once you've decided on a template for use, select the participant from the dropdown list and 
+                hit 'Start Conversation' to alert participants you want to meet. Conversations will still need to be scheduled independently in your outlook calendar.</p>">
+            <i class="fa fa-info-circle"> </i> Instructions
+            </button>
+        </div>
+    </div>
 
-		<div id="collapse_0" class="collapse" aria-labelledby="heading_0">
-                    <div class="card-body">
-                            <p>
-                                Review the information below to determine which template best suits your needs. If you need more details, you can find example scenarios and sample questions for each template on the <a href="/resources/conversations?t=1" target=\'_blank\'>Performance Conversations</a> resource page.
-                            </p>
-                            <p>
-                                Once you've decided on a template for use, select the participant from the dropdown list and hit "Start Conversation" to alert participants you want to meet. Conversations will still need to be scheduled independently in your outlook calendar.
-                            </p>
-                    </div>
-		</div>
-	</div>
+
+    <div class="mt-4">
         
         <div class="card">
             
@@ -329,4 +317,23 @@ function conversation_sub(topic_id){
                     $('#conversation_form_2').submit();
                 }                
             }
+
 </script>
+
+<style>
+    th{
+        padding:20px;
+    }
+    td{
+        padding:20px;
+    }
+    .float-right {
+        float: right;
+    }
+    .popover {
+        max-width: 400px; /* Adjust the width as needed */
+    }
+    .popover .popover-body {
+        display: none;
+    }
+</style>    
