@@ -529,7 +529,7 @@ $(".share-with-users").select2({
             return {
                 results: $.map(response.data.data, function (item) {
                     return {
-                        text: item.name+(item.employee_email ? ' - '+item.employee_email : ''),
+                        text: item.name+(item.employee_email ? ' - '+item.employee_email : '')+(item.deptid ? ' - ['+item.deptid + ']' : ''),
                         id: item.id
                     }
                 }),
