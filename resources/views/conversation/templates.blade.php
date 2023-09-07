@@ -26,7 +26,7 @@
             data-original-title="
             <p><br/>Review the information below to determine which template best suits your needs. Click on a template name to view a sample. If you need more assistance, refer to the
              <a href='/resources/conversations?t=1' target=\'_blank\'>Performance Conversations</a> 
-             resource page</p>
+             resource page. </p>
             <p>Once you've decided on a template for use, select the participant from the dropdown list and 
                 hit 'Start Conversation' to alert participants you want to meet. Conversations will still need to be scheduled independently in your outlook calendar.</p>">
             <i class="fa fa-info-circle"> </i> Instructions
