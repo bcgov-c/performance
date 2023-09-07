@@ -103,8 +103,9 @@
                     processResults: function (response, params) {
                         return {
                             results: $.map(response.data.data, function (item) {
+                                console.log(item);
                                 return {
-                                    text: item.name+(item.email ? ' - '+item.email : ''),
+                                    text: item.name+(item.email ? ' - '+item.email : '')+(item.deptid ? ' - ['+item.deptid + ']' : ''),
                                     id: item.id
                                 }
                             }),
