@@ -83,18 +83,16 @@
     <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center sticky-top">
         <span class="flex-fill"></span>
         <span>
-            <i class="icon fas fa-exclamation-circle"></i> You are viewing {{$viewingProfileAs->name}}'s profile. Click "Return to My Profile" to go back to your own.
+            <i class="icon fas fa-exclamation-circle"></i> 
+            @if($viewingProfileAs)
+                You are viewing {{$viewingProfileAs->name}}'s profile. Click "Return to My Profile" to go back to your own.
+            @else
+                Click "Return to My Profile" to go back to your own.
+            @endif
         </span>
         <span class="flex-fill"></span>
 
         <div class="form-inline" style="position:absolute; right:0">
-            <!-----
-            <select name="" class="form-control form-control-sm" id="view-profile-as">
-                @foreach ($listOfEmployee as $employee)
-                    <option value="{{$employee->id}}" {{ ($viewingProfileAs->id === $employee->id) ? 'selected' : ''}}>{{$employee->name}}</option>
-                @endforeach
-            </select>
-            ---->
             <x-button :href="route('my-team.return-to-my-view')" size="sm" style="light" class="mx-2">Return to my profile</x-button>
         </div>
     </div>
@@ -102,18 +100,16 @@
     <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center fixed-top">
         <span class="flex-fill"></span>
         <span>
-            <i class="icon fas fa-exclamation-circle"></i> You are viewing {{$viewingProfileAs->name}}'s profile. Click "Return to My Profile" to go back to your own.
+            <i class="icon fas fa-exclamation-circle"></i> 
+            @if($viewingProfileAs)
+                You are viewing {{$viewingProfileAs->name}}'s profile. Click "Return to My Profile" to go back to your own.
+            @else
+                Click "Return to My Profile" to go back to your own.
+            @endif
         </span>
         <span class="flex-fill"></span>
 
         <div class="form-inline" style="position:absolute; right:0">
-            <!-----
-            <select name="" class="form-control form-control-sm" id="view-profile-as">
-                @foreach ($listOfEmployee as $employee)
-                    <option value="{{$employee->id}}" {{ ($viewingProfileAs->id === $employee->id) ? 'selected' : ''}}>{{$employee->name}}</option>
-                @endforeach
-            </select>
-            ---->
             <x-button :href="route('my-team.return-to-my-view')" size="sm" style="light" class="mx-2">Return to my profile</x-button>
         </div>
     </div>
