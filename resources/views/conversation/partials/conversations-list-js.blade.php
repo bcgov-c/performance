@@ -122,7 +122,6 @@
                 initCKEditor('info_comment9');
                 initCKEditor('info_comment10');       
 
-                $('#viewConversationModal').on('show.bs.modal', function (event) {
                     CKEDITOR.instances['info_comment1'].on('focus', function(e) {
                     $('#info_area1').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
                     $('#control-info-comment1').show();
@@ -408,7 +407,6 @@
                         setTimeRoll();
                     });
 
-                });    
                 modal_open=false;
                 
                 <?php if ($open_modal_id) { ?>
