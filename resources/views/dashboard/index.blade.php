@@ -14,11 +14,13 @@
                 <div class="bg-white border-b rounded p-2 mt-2 shadow-sm">
                     {{-- <x-profile-pic></x-profile-pic> --}}
                     @if($supervisorListCount <= 1)
-                        {{ Auth::user()->reportingManager ? Auth::user()->reportingManager->name : 'No supervisor' }}
+                        @foreach($supervisorList as $supv)
+                            {{ $supv ? $supv->name : 'No supervisor' }}
+                        @endforeach
                     @else
                         <label for="supervisor_btn">
                             <button type="button" icon="fas fa-xs fa-ellipsis-v" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                {{ $preferredSupervisor ? $preferredSupervisor->name : (Auth::user()->reportingManager ? Auth::user()->reportingManager->name : 'Select a supervisor') }}
+                                {{ $preferredSupervisor ? $preferredSupervisor->name : 'Select a supervisor' }}
                             </button>
                             <div class="dropdown-menu"  size="xs">
                                 @foreach($supervisorList as $supv)

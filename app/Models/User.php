@@ -320,14 +320,69 @@ class User extends Authenticatable
         return $this->supervisorList()->count();
     }
 
+    public function supervisorListPrimaryJob() {
+        $pJob = EmployeeDemo::from('employee_demo AS ed')
+            ->join('users AS u', function($join){
+                return $join->on(function($on){
+                    $on->whereRaw('u.employee_id = ed.employee_id')
+                        ->whereRaw('u.empl_record = ed.empl_record')
+                        ->whereNull('ed.date_deleted');
+                });
+            })
+            ->join('positions AS p', 'ed.position_number', 'p.position_nbr')
+            ->join('employee_demo AS e', 'p.reports_to', 'e.position_number')
+            ->join('users AS v', 'e.employee_id', 'v.employee_id')
+            ->distinct()
+            ->select('e.position_number', 'v.employee_id', 'v.name', 'v.id')
+            ->whereNull('e.date_deleted')
+            ->where('ed.employee_id', $this->employee_id)
+            ->orderBy('e.position_number')
+            ->orderBy('v.name')
+            ->get();
+        if(!$pJob){
+            $pJob = EmployeeDemo::from('employee_demo AS ed')
+                ->join('users AS u', function($join){
+                    return $join->on(function($on){
+                        $on->whereRaw('u.employee_id = ed.employee_id')
+                            ->whereRaw('u.empl_record = ed.empl_record')
+                            ->whereNull('ed.date_deleted');
+                    });
+                })
+                ->join('positions AS p', 'ed.position_number', 'p.position_nbr')
+                ->join('positions AS p2', 'p2.position_nbr', 'p.reports_to')
+                ->join('employee_demo AS e', 'p2.reports_to', 'e.position_number')
+                ->join('users AS v', 'e.employee_id', 'v.employee_id')
+                ->distinct()
+                ->select('e.position_number', 'v.employee_id', 'v.name', 'v.id')
+                ->whereNull('e.date_deleted')
+                ->where('ed.employee_id', $this->employee_id)
+                ->orderBy('e.position_number')
+                ->orderBy('v.name')
+                ->get();
+            }
+        return $pJob;
+    }
+
+    public function supervisorListPrimaryJobCount() {
+        return $this->supervisorListPrimaryJob()->count();
+    }
+
     public function validPreferredSupervisor() {
-        $row = EmployeeDemo::join('positions AS p', 'employee_demo.position_number', 'p.position_nbr')
-        ->join('employee_demo AS e', 'p.reports_to', 'e.position_number')
-        ->select('e.employee_id')
-        ->whereNull('e.date_deleted')
-        ->where('employee_demo.employee_id', $this->employee_id)
-        ->whereRaw("EXISTS (SELECT 1 FROM preferred_supervisor AS ps WHERE ps.employee_id = employee_demo.employee_id AND ps.position_nbr = employee_demo.position_number AND ps.supv_empl_id = e.employee_id)")
-        ->first();
+        $row = EmployeeDemo::from('employee_demo AS ed')
+            ->join('users AS u', function($join){
+                return $join->on(function($on){
+                    $on->whereRaw('u.employee_id = ed.employee_id')
+                        ->whereRaw('u.empl_record = ed.empl_record')
+                        ->whereNull('ed.date_deleted');
+                });
+            })
+            ->join('positions AS p', 'ed.position_number', 'p.position_nbr')
+            ->join('employee_demo AS e', 'p.reports_to', 'e.position_number')
+            ->select('e.employee_id')
+            ->whereNull('e.date_deleted')
+            ->where('ed.employee_id', $this->employee_id)
+            ->whereRaw("EXISTS (SELECT 1 FROM preferred_supervisor AS ps WHERE ps.employee_id = ed.employee_id AND ps.position_nbr = ed.position_number AND ps.supv_empl_id = e.employee_id)")
+            ->first();
         return $row ? $row->employee_id : '';
     }
 
