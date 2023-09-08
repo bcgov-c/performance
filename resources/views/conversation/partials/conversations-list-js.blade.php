@@ -122,7 +122,6 @@
                 initCKEditor('info_comment9');
                 initCKEditor('info_comment10');       
 
-                $('#viewConversationModal').on('show.bs.modal', function (event) {
                     CKEDITOR.instances['info_comment1'].on('focus', function(e) {
                     $('#info_area1').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
                     $('#control-info-comment1').show();
@@ -408,15 +407,14 @@
                         setTimeRoll();
                     });
 
-                });    
                 modal_open=false;
                 
                 <?php if ($open_modal_id) { ?>
-                    conversation_id = {{ $open_modal_id }};
-                    updateConversation(conversation_id);
+                    conversation_id = {{ $open_modal_id }};                    
                     setTimeout(function () {
                         $('#viewConversationModal').modal('show');
                     }, 1500); // 1500 milliseconds (10 seconds)
+                    updateConversation(conversation_id);
                 <?php } ?>    
             });
              
