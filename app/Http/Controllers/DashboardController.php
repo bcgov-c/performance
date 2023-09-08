@@ -232,8 +232,8 @@ class DashboardController extends Controller
 
         $open_modal = (session('open')) ? true : false;
 
-        $supervisorList = Auth::user()->supervisorList();
-        $supervisorListCount = Auth::user()->supervisorListCount();
+        $supervisorList = Auth::user()->supervisorListPrimaryJob();
+        $supervisorListCount = Auth::user()->supervisorListPrimaryJobCount();
         $preferredSupervisor = Auth::user()->preferredSupervisor();
         $primaryJob = Auth::user()->primaryJob();
         $jobList = Auth::user()->jobList();
