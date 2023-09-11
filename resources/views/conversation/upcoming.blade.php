@@ -49,31 +49,27 @@ i {
         </div>
         @endif
     </div>
-    
-    <div class="mt-4">
-        <div class="card">
-                <div class="card-header" id="heading_ins">
-                <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_ins" aria-expanded="1" aria-controls="collapse_ins">
-                    <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_ins" aria-expanded="false" aria-controls="collapse_ins">
-                            <button class="btn btn-link" >
-                                <h4>Instructions</h4> 
-                            </button>                        
-                            <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span>    
-                    </h5>
-                </h5>
-                </div>
 
-                <div id="collapse_ins" class="collapse" aria-labelledby="heading_ins">
-                    <div class="card-body">
-                            <p>
-                                The list below contains all planned conversations that have yet to be signed-off by both employee and supervisor. 
+    <div class="row">
+        <div class="col-12">
+            <br/>
+            <button
+            id="toggleCardButton"
+            class="btn btn-primary float-left"
+            data-trigger = "click"
+            data-toggle="popover"
+            data-placement="right"  
+            data-html="true"    
+            data-original-title="
+            <p><br/>The list below contains all planned conversations that have yet to be signed-off by both employee and supervisor. 
                                 Once a conversation has been signed-off by both participants, 
-                                it will move to the Completed Conversations tab and become an official performance development record for the employee.
-                            </p>
-                    </div>
-                </div>
+                                it will move to the Completed Conversations tab and become an official performance development record for the employee.</p>">
+            <i class="fa fa-info-circle"> </i> Instructions
+            </button>
         </div>
-       
+    </div>
+    
+    <div class="mt-4">       
             
         <div class="card">            
                 <div class="card-header" id="heading_sup" style="border-bottom-width: 0px;">
@@ -474,5 +470,11 @@ i {
     
     table.dataTable thead th {
         border-bottom: solid #FCBA19;
+    }
+    .popover {
+        max-width: 400px; /* Adjust the width as needed */
+    }
+    .popover .popover-body {
+        display: none;
     }
 </style> 
