@@ -175,11 +175,7 @@ function updateConversation(conversation_id) {
                             if (!isSupervisor) {
                                 $('#viewmode').val(0);
 
-                                CKEDITOR.instances['info_comment1'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment2'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment3'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment5'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment6'].setReadOnly(true);                            
+                                                       
                                 $('#info_comment11').prop('disabled', true);
                                 $('.supervisor-sign-off').prop('disabled', true);
 
@@ -224,11 +220,7 @@ function updateConversation(conversation_id) {
                                 $('#info_comment11').prop('disabled', false);
                                 $('.supervisor-sign-off').prop('disabled', false);
 
-                                CKEDITOR.instances['info_comment4'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment7'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment8'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment9'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment10'].setReadOnly(true);
+                                
                                 $('.employee-sign-off').prop('disabled', true);
                                 $('.team_member_agreement').prop('disabled', true);
 
@@ -257,19 +249,11 @@ function updateConversation(conversation_id) {
                             }
                         } else {
                                 $('#viewmode').val(0);
-                                CKEDITOR.instances['info_comment1'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment2'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment3'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment5'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment6'].setReadOnly(true);
+                                
                                 $('#info_comment11').prop('disabled', true);
                                 $('.supervisor-sign-off').prop('disabled', true);
 
-                                CKEDITOR.instances['info_comment4'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment7'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment8'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment9'].setReadOnly(true);
-                                CKEDITOR.instances['info_comment10'].setReadOnly(true);
+                                
                                 $('.employee-sign-off').prop('disabled', true);
                                 $('.team_member_agreement').prop('disabled', true);
                                 
