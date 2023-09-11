@@ -409,6 +409,24 @@
 
             
                 modal_open=false;
+                
+                <?php if ($open_modal_id) { ?>
+                    conversation_id = {{ $open_modal_id }};                    
+                    setTimeout(function () {
+                        $('#viewConversationModal').modal('show');
+                    }, 1500); // 1500 milliseconds (10 seconds)
+                    updateConversation(conversation_id);
+                <?php } ?>   
+                
+                $('[data-toggle="popover"]').popover();
+                $('#toggleCardButton').on('focus', function () {
+                    $(this).popover('show'); 
+                });
+                $('#toggleCardButton').on('blur', function () {
+                    $(this).popover('hide'); 
+                });
+
+
             });
              
         </script>    
