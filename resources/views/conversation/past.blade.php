@@ -49,35 +49,37 @@ i {
         </div>
         @endif
     </div>
+
+    <div class="row">
+        <div class="col-12">
+            <br/>
+            <button
+            id="toggleCardButton"
+            class="btn btn-primary float-left"
+            data-trigger = "click"
+            data-toggle="popover"
+            data-placement="right"  
+            data-html="true"    
+            data-original-title="
+            <br/>
+            <p>
+                The list below contains all conversations that have been signed by both employee and supervisor. There is a two week period from the date of sign-off when either participant can un-sign the conversation 
+                and return it to the Open Conversations tab for further edits. Conversations marked with a locked icon have passed the two-week time 
+                period and require approval and assistance to re-open. If you need to unlock a conversation, submit an AskMyHR requrest to Myself > HR Software Systems Support > Performance Development Platform.
+            </p>
+            <p>
+                <i class='fa fa-unlock'></i> Unlocked Conversations <br/>
+                <i class='fa fa-lock'></i> Locked Conversations
+            </p>
+            ">
+            <i class="fa fa-info-circle"> </i> Instructions
+            </button>
+        </div>
+    </div>
+    
+
     
     <div class="mt-4">
-        <div class="card">
-                <div class="card-header" id="heading_ins">
-                <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_ins" aria-expanded="1" aria-controls="collapse_ins">
-                    <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_ins" aria-expanded="false" aria-controls="collapse_ins">
-                            <button class="btn btn-link" >
-                                <h4>Instructions</h4> 
-                            </button>                        
-                            <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span>    
-                    </h5>
-                </h5>
-                </div>
-
-                <div id="collapse_ins" class="collapse" aria-labelledby="heading_ins">
-                    <div class="card-body">
-                            <p>
-                                The list below contains all conversations that have been signed by both employee and supervisor. There is a two week period from the date of sign-off when either participant can un-sign the conversation 
-                                and return it to the Open Conversations tab for further edits. Conversations marked with a locked icon have passed the two-week time 
-                                period and require approval and assistance to re-open. If you need to unlock a conversation, submit an AskMyHR requrest to Myself > HR Software Systems Support > Performance Development Platform.
-                            </p>
-                            <p>
-                                <i class="fa fa-unlock"></i> Unlocked Conversations <br/>
-                                <i class="fa fa-lock"></i> Locked Conversations
-                            </p>
-                    </div>
-                </div>
-        </div>
-       
             
         <div class="card">            
                 <div class="card-header" id="heading_sup" style="border-bottom-width: 0px;">
@@ -418,5 +420,11 @@ i {
     
     table.dataTable thead th {
         border-bottom: solid #FCBA19;
+    }
+    .popover {
+        max-width: 400px; /* Adjust the width as needed */
+    }
+    .popover .popover-body {
+        display: none;
     }
 </style> 
