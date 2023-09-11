@@ -257,11 +257,6 @@
 	top:11px;
 	right:11px;
     }
-    
-    #upcoming {
-        font-weight: bold;
-    }
-    
     #employee_conversations {
         width: 100%;
     }  
