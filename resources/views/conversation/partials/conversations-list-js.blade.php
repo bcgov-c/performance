@@ -19,54 +19,7 @@
             
             var ckeditorInstances = {};
 
-            // Function to initialize CKEditor for a given textarea ID
-            function initCKEditor(textareaId) {
-                if (!ckeditorInstances[textareaId]) {
-                    // If the instance is not yet initialized, create a new instance
-                    ckeditorInstances[textareaId] = CKEDITOR.replace(textareaId, {
-                        toolbar: "Custom",
-                        toolbar_Custom: [
-                            ["Bold", "Italic", "Underline"],
-                            ["NumberedList", "BulletedList"],
-                            ["Outdent", "Indent"],
-                            ["Link"],
-                        ],
-                        disableNativeSpellChecker: false
-                    });
-                } else {
-                    // If the instance is already initialized, check if it's ready
-                    if (ckeditorInstances[textareaId].status === "ready") {
-                        // The instance is fully loaded and ready to use
-                        return;
-                    } else {
-                        // The instance is still loading, try to reinitialize after a short delay
-                        setTimeout(function () {
-                            initCKEditor(textareaId);
-                        }, 200); // Adjust the delay time as needed (e.g., 200ms)
-                    }
-                }
-            }
-
-            // Binding an event handler to check when CKEditor is fully loaded
-            if (typeof CKEDITOR !== "undefined") {
-                // CKEditor is already loaded, initialize immediately for each textarea
-                document.addEventListener("DOMContentLoaded", function () {
-                    var textareaIds = ["info_comment1", "info_comment2", "info_comment3","info_comment4", "info_comment5", "info_comment6","info_comment7", "info_comment8", "info_comment9", "info_comment10"];
-                    textareaIds.forEach(function (id) {
-                        initCKEditor(id);
-                    });
-                });
-            } else {
-                // CKEditor is not yet loaded, bind the event handler
-                document.addEventListener("DOMContentLoaded", function () {
-                    CKEDITOR.on("instanceReady", function (event) {
-                        var textareaId = event.editor.container.$.querySelector('textarea').id;
-                        initCKEditor(textareaId);
-                    });
-                });
-            }
-
-            
+                        
             <?php if ($type == 'upcoming'){ ?>
                 var modal_edit = true;
             <?php } ?>
@@ -110,17 +63,178 @@
                 }
             } 
 
-            $( document ).ready(function() {        
-                initCKEditor('info_comment1');
-                initCKEditor('info_comment2');
-                initCKEditor('info_comment3');
-                initCKEditor('info_comment4');
-                initCKEditor('info_comment5');
-                initCKEditor('info_comment6');
-                initCKEditor('info_comment7');
-                initCKEditor('info_comment8');
-                initCKEditor('info_comment9');
-                initCKEditor('info_comment10');       
+            $( document ).ready(function() {   
+                    CKEDITOR.replace('info_comment1', {
+                        toolbar: "Custom",
+                        toolbar_Custom: [
+                            ["Bold", "Italic", "Underline"],
+                            ["NumberedList", "BulletedList"],
+                            ["Outdent", "Indent"],
+                            ["Link"],
+                        ],
+                        disableNativeSpellChecker: false,
+                        on: {
+                            instanceReady: function (event) {
+                                // CKEditor instance is ready, set it as read-only
+                                event.editor.setReadOnly(true);
+                            }
+                        }
+                    });
+
+                    ckeditorInstances['info_comment2'] = CKEDITOR.replace('info_comment2', {
+                        toolbar: "Custom",
+                        toolbar_Custom: [
+                            ["Bold", "Italic", "Underline"],
+                            ["NumberedList", "BulletedList"],
+                            ["Outdent", "Indent"],
+                            ["Link"],
+                        ],
+                        disableNativeSpellChecker: false,
+                        on: {
+                            instanceReady: function (event) {
+                                // CKEditor instance is ready, set it as read-only
+                                event.editor.setReadOnly(true);
+                            }
+                        }
+                    });
+    
+                    ckeditorInstances['info_comment3'] = CKEDITOR.replace('info_comment3', {
+                        toolbar: "Custom",
+                        toolbar_Custom: [
+                            ["Bold", "Italic", "Underline"],
+                            ["NumberedList", "BulletedList"],
+                            ["Outdent", "Indent"],
+                            ["Link"],
+                        ],
+                        disableNativeSpellChecker: false,
+                        on: {
+                            instanceReady: function (event) {
+                                // CKEditor instance is ready, set it as read-only
+                                event.editor.setReadOnly(true);
+                            }
+                        }
+                    });
+
+                    ckeditorInstances['info_comment4'] = CKEDITOR.replace('info_comment4', {
+                        toolbar: "Custom",
+                        toolbar_Custom: [
+                            ["Bold", "Italic", "Underline"],
+                            ["NumberedList", "BulletedList"],
+                            ["Outdent", "Indent"],
+                            ["Link"],
+                        ],
+                        disableNativeSpellChecker: false,
+                        on: {
+                            instanceReady: function (event) {
+                                // CKEditor instance is ready, set it as read-only
+                                event.editor.setReadOnly(true);
+                            }
+                        }
+                    });
+
+                    ckeditorInstances['info_comment5'] = CKEDITOR.replace('info_comment5', {
+                        toolbar: "Custom",
+                        toolbar_Custom: [
+                            ["Bold", "Italic", "Underline"],
+                            ["NumberedList", "BulletedList"],
+                            ["Outdent", "Indent"],
+                            ["Link"],
+                        ],
+                        disableNativeSpellChecker: false,
+                        on: {
+                            instanceReady: function (event) {
+                                // CKEditor instance is ready, set it as read-only
+                                event.editor.setReadOnly(true);
+                            }
+                        }
+                    });
+
+                    ckeditorInstances['info_comment6'] = CKEDITOR.replace('info_comment6', {
+                        toolbar: "Custom",
+                        toolbar_Custom: [
+                            ["Bold", "Italic", "Underline"],
+                            ["NumberedList", "BulletedList"],
+                            ["Outdent", "Indent"],
+                            ["Link"],
+                        ],
+                        disableNativeSpellChecker: false,
+                        on: {
+                            instanceReady: function (event) {
+                                // CKEditor instance is ready, set it as read-only
+                                event.editor.setReadOnly(true);
+                            }
+                        }
+                    });
+
+                    ckeditorInstances['info_comment7'] = CKEDITOR.replace('info_comment7', {
+                        toolbar: "Custom",
+                        toolbar_Custom: [
+                            ["Bold", "Italic", "Underline"],
+                            ["NumberedList", "BulletedList"],
+                            ["Outdent", "Indent"],
+                            ["Link"],
+                        ],
+                        disableNativeSpellChecker: false,
+                        on: {
+                            instanceReady: function (event) {
+                                // CKEditor instance is ready, set it as read-only
+                                event.editor.setReadOnly(true);
+                            }
+                        }
+                    });
+
+                    ckeditorInstances['info_comment8'] = CKEDITOR.replace('info_comment8', {
+                        toolbar: "Custom",
+                        toolbar_Custom: [
+                            ["Bold", "Italic", "Underline"],
+                            ["NumberedList", "BulletedList"],
+                            ["Outdent", "Indent"],
+                            ["Link"],
+                        ],
+                        disableNativeSpellChecker: false,
+                        on: {
+                            instanceReady: function (event) {
+                                // CKEditor instance is ready, set it as read-only
+                                event.editor.setReadOnly(true);
+                            }
+                        }
+                    });
+
+                    ckeditorInstances['info_comment9'] = CKEDITOR.replace('info_comment9', {
+                        toolbar: "Custom",
+                        toolbar_Custom: [
+                            ["Bold", "Italic", "Underline"],
+                            ["NumberedList", "BulletedList"],
+                            ["Outdent", "Indent"],
+                            ["Link"],
+                        ],
+                        disableNativeSpellChecker: false,
+                        on: {
+                            instanceReady: function (event) {
+                                // CKEditor instance is ready, set it as read-only
+                                event.editor.setReadOnly(true);
+                            }
+                        }
+                    });
+
+
+                    ckeditorInstances['info_comment10'] = CKEDITOR.replace('info_comment10', {
+                        toolbar: "Custom",
+                        toolbar_Custom: [
+                            ["Bold", "Italic", "Underline"],
+                            ["NumberedList", "BulletedList"],
+                            ["Outdent", "Indent"],
+                            ["Link"],
+                        ],
+                        disableNativeSpellChecker: false,
+                        on: {
+                            instanceReady: function (event) {
+                                // CKEditor instance is ready, set it as read-only
+                                event.editor.setReadOnly(true);
+                            }
+                        }
+                    });
+
 
                     CKEDITOR.instances['info_comment1'].on('focus', function(e) {
                     $('#info_area1').html('<button type="button" class="btn btn-primary">Save</button><br/>'); 
@@ -413,7 +527,7 @@
                     conversation_id = {{ $open_modal_id }};                    
                     setTimeout(function () {
                         $('#viewConversationModal').modal('show');
-                    }, 1500); // 1500 milliseconds (10 seconds)
+                    }, 1000); // 1000 milliseconds (1 seconds)
                     updateConversation(conversation_id);
                 <?php } ?>   
                 
