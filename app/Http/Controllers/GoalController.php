@@ -473,8 +473,7 @@ class GoalController extends Controller
             ->leftjoin('users as u2', 'u2.id', 'goals.created_by')
             ->leftjoin('goal_types', 'goal_types.id', 'goals.goal_type_id')   
             ->whereIn('goals.by_admin', [1, 2])
-            ->where('goals.is_library', true)
-            ->whereNull('goals.is_hide')        
+            ->where('goals.is_library', true) 
             ->whereNull('goals.deleted_at')        
             ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.id', 'u2.name', 'goals.is_mandatory');
               
@@ -528,7 +527,6 @@ class GoalController extends Controller
             ->leftjoin('goal_types', 'goal_types.id', 'goals.goal_type_id')   
             ->whereIn('goals.by_admin', [1, 2])
             ->where('goals.is_library', true)
-            ->whereNull('goals.is_hide')       
             ->whereNull('goals.deleted_at')        
             ->where(function ($where) use ($authId) {
                 return $where->whereRaw("
@@ -585,8 +583,7 @@ class GoalController extends Controller
         // $adminGoals = $adminGoals->union($adminGoalsInherited);
 
         $query = Goal::withoutGlobalScope(NonLibraryScope::class)
-        ->where('is_library', true)
-        ->whereNull('goals.is_hide')       
+        ->where('is_library', true)    
         ->whereNull('goals.deleted_at')        
         ->join('users', 'goals.user_id', '=', 'users.id')          
         ->leftjoin('users as u2', 'u2.id', '=', 'goals.created_by')
@@ -653,6 +650,22 @@ class GoalController extends Controller
         //$bankGoals = $query->paginate($perPage=10, $columns = ['*'], $pageName = 'Goal');
         $bankGoals = $query->get();
 
+
+        //get hidden goals ids
+        $hiddenGoals = DB::table('goal_hide')
+            ->select('goal_id')      
+            ->where('user_id', Auth::id())
+            ->get();
+        $hiddenGoal_arr = array();
+        foreach($hiddenGoals as $item){
+            $hiddenGoal_arr[] = $item->goal_id;
+        }    
+        foreach($bankGoals as $i=>$bankGoal){
+            if(in_array($bankGoal->id, $hiddenGoal_arr)){
+                unset($bankGoals[$i]);
+            }
+        }      
+
         return $bankGoals;
 
     }
@@ -677,7 +690,6 @@ class GoalController extends Controller
             ->leftjoin('goal_types', 'goal_types.id', 'goals.goal_type_id')   
             ->whereIn('goals.by_admin', [1, 2])
             ->where('goals.is_library', true)
-            ->where('goals.is_hide', 1)       
             ->whereNull('goals.deleted_at')        
             ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.id', 'u2.name', 'goals.is_mandatory');
               
@@ -732,7 +744,6 @@ class GoalController extends Controller
             ->leftjoin('goal_types', 'goal_types.id', 'goals.goal_type_id')   
             ->whereIn('goals.by_admin', [1, 2])
             ->where('goals.is_library', true)
-            ->where('goals.is_hide', 1)      
             ->whereNull('goals.deleted_at')        
             ->where(function ($where) use ($authId) {
                 return $where->whereRaw("
@@ -790,8 +801,7 @@ class GoalController extends Controller
         // $adminGoals = $adminGoals->union($adminGoalsInherited);
 
         $query = Goal::withoutGlobalScope(NonLibraryScope::class)
-        ->where('is_library', true)
-        ->where('goals.is_hide', 1)      
+        ->where('is_library', true)    
         ->whereNull('goals.deleted_at')        
         ->join('users', 'goals.user_id', '=', 'users.id')          
         ->leftjoin('users as u2', 'u2.id', '=', 'goals.created_by')
@@ -859,7 +869,24 @@ class GoalController extends Controller
         //$bankGoals = $query->paginate($perPage=10, $columns = ['*'], $pageName = 'Goal');
         $bankGoals = $query->get();
 
-        return $bankGoals;
+        $selectedGoals = array();
+
+        //get hidden goals ids
+        $hiddenGoals = DB::table('goal_hide')
+            ->select('goal_id')      
+            ->where('user_id', Auth::id())
+            ->get();
+        $hiddenGoal_arr = array();
+        foreach($hiddenGoals as $item){
+            $hiddenGoal_arr[] = $item->goal_id;
+        }    
+        foreach($bankGoals as $i=>$bankGoal){
+            if(in_array($bankGoal->id, $hiddenGoal_arr)){
+                array_push($selectedGoals, $bankGoals[$i]);
+            }
+        }     
+
+        return $selectedGoals;
     }    
 
 
@@ -881,12 +908,6 @@ class GoalController extends Controller
         $bankGoals_arr = array();
         $json_goalbanks_hidden = "";        
         $hidden_goals = array();
-
-        $hide_query = Goal::withoutGlobalScope(NonLibraryScope::class)->select('id')->where('is_hide', '1')->get()->toArray();
-        $hidden_goals_arr = array();
-        foreach($hide_query as $hide_item){
-            array_push($hidden_goals_arr, $hide_item["id"]);
-        }
 
         $bankGoals = $this->getNohiddenGoals($request);
         $bankGoals_hide = $this->gethiddenGoals($request);
@@ -1418,9 +1439,12 @@ class GoalController extends Controller
 
     public function hideFromLibraryMultiple(Request $request) {
         foreach ($request->goal_ids as $goal_id) {
-            DB::table('goals')
-            ->where('id', $goal_id)
-            ->update(['is_hide' => 1]);          
+            DB::table('goal_hide')->insert([
+                'goal_id' => $goal_id,
+                'user_id' => Auth::id(),
+                // Add more columns and values as needed
+            ]);
+            
         }
         return redirect()->route('goal.library');
     }
@@ -1428,9 +1452,11 @@ class GoalController extends Controller
 
     public function showFromLibraryMultiple(Request $request) {
         foreach ($request->goal_ids_hide as $goal_id) {
-            DB::table('goals')
-            ->where('id', $goal_id)
-            ->update(['is_hide' => NULL]);          
+            DB::table('goal_hide')
+                ->where('goal_id', $goal_id)
+                ->where('user_id', Auth::id())
+                ->delete();
+
         }
         return redirect()->route('goal.library');
     }
