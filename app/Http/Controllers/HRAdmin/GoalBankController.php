@@ -711,22 +711,26 @@ class GoalBankController extends Controller
             ->orderBy('orgid')->orderBy('employee_id')
             ->get();
         $empIdsByOrgId = $rows->groupBy('orgid')->all();
+        $authId = Auth::id();
+        $authorizedOrgs = \DB::table('auth_orgs')->where('auth_id', \DB::raw($authId))->pluck('orgid')->toArray();
         if($request->ajax()){
             switch ($index) {
                 case 2:
                     $eorgs = $orgs;
                     $ecountByOrg = $countByOrg;
                     $eempIdsByOrgId = $empIdsByOrgId;
-                    return view('shared.goalbank.partials.recipient-tree2', compact('eorgs','ecountByOrg','eempIdsByOrgId') );
+                    $eauthorizedOrgs = $authorizedOrgs;
+                    return view('shared.goalbank.partials.recipient-tree2', compact('eorgs','ecountByOrg','eempIdsByOrgId', 'eauthorizedOrgs') );
                     break;
                 case 3:
                     $aorgs = $orgs;
                     $acountByOrg = $countByOrg;
                     $aempIdsByOrgId = $empIdsByOrgId;
-                    return view('shared.goalbank.partials.arecipient-tree', compact('aorgs','acountByOrg','aempIdsByOrgId') );
+                    $aauthorizedOrgs = $authorizedOrgs;
+                    return view('shared.goalbank.partials.arecipient-tree', compact('aorgs','acountByOrg','aempIdsByOrgId', 'aauthorizedOrgs') );
                     break;
                 default:
-                    return view('shared.goalbank.partials.recipient-tree', compact('orgs','countByOrg','empIdsByOrgId') );
+                    return view('shared.goalbank.partials.recipient-tree', compact('orgs','countByOrg','empIdsByOrgId', 'authorizedOrgs') );
                     break;
             }
         }
