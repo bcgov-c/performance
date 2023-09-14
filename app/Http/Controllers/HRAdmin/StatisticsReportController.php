@@ -2434,7 +2434,7 @@ class StatisticsReportController extends Controller
       $selected_ids = $request->ids ? explode(',', $request->ids) : [];
 
       $sql = User::selectRaw("users.employee_id, users.email, users.excused_start_date, users.excused_end_date,
-                            users.excused_reason_id, users.reporting_to,users.excused_updated_by, 
+                            users.excused_reason_id, users.reporting_to,users.excused_updated_by, users.excused_updated_at, 
                     employee_demo.employee_name, employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4,
                     (CASE WHEN users.excused_flag = 1 OR due_date_paused <> 'N'
                                     THEN 'Yes' ELSE 'No' END) AS excused")
@@ -2478,7 +2478,7 @@ class StatisticsReportController extends Controller
         );
 
         $columns = ["Employee ID", "Name", "Email", 
-                        "Excused", "Reason", "Excused By", "Excused At",
+                        "Excused", "Reason", "Excused By", "Excused At", "Updated At",
                         "Organization", "Level 1", "Level 2", "Level 3", "Level 4",
                     ];
 
@@ -2501,6 +2501,7 @@ class StatisticsReportController extends Controller
                     $row['Excused By'] = '';
                 }
                 $row['Excused At'] = $user->excused_start_date;
+                $row['Updated At'] = $user->excused_updated_at;
 
                 $row['Organization'] = $user->organization;
                 $row['Level 1'] = $user->level1_program;
@@ -2509,7 +2510,7 @@ class StatisticsReportController extends Controller
                 $row['Level 4'] = $user->level4;
 
                 fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], 
-                        $row['Excused'], $row['Reason'], $row['Excused By'], $row['Excused At'],
+                        $row['Excused'], $row['Reason'], $row['Excused By'], $row['Excused At'],$row['Updated At'],
                         $row['Organization'], $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
             }
 
