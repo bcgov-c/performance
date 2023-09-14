@@ -2491,6 +2491,8 @@ class StatisticsReportController extends Controller
                 $row['Name'] = $user->employee_name;
                 $row['Email'] = $user->email;
 
+                $row['Excused'] = $user->excused;
+                $row['Reason'] = $user->excuseReason ? $user->excuseReason->name : '';
                 $excused_by_id = $user->excused_updated_by;
                 if($excused_by_id != ''){
                     $sql_excused = User::select("name")->where('id', $excused_by_id)->first();
