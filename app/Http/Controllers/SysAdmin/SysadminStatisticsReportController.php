@@ -2162,6 +2162,7 @@ class SysadminStatisticsReportController extends Controller
       $selected_ids = $request->ids ? explode(',', $request->ids) : [];
 
       $sql = User::selectRaw("users.employee_id, users.email, users.excused_start_date, users.excused_end_date,
+                            users.excused_reason_id, users.reporting_to,users.excused_updated_by, 
                             users.excused_reason_id, users.reporting_to,
                     employee_demo.employee_name, employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4,
                     (CASE WHEN users.excused_flag = 1 OR due_date_paused <> 'N'
@@ -2185,7 +2186,7 @@ class SysadminStatisticsReportController extends Controller
                 ->with('excuseReason') ;
 
         $users = $sql->get();
-
+        
       // Generating Output file
         $filename = 'Excused Employees.csv';
       
@@ -2198,7 +2199,7 @@ class SysadminStatisticsReportController extends Controller
         );
 
         $columns = ["Employee ID", "Name", "Email", 
-                        "Excused", "Excused Start Date", "Excused End Date", "Excused Reason",
+                        "Excused", "Reason", "Excused By", "Excused At",
                         "Organization", "Level 1", "Level 2", "Level 3", "Level 4",
                     ];
 
@@ -2212,9 +2213,17 @@ class SysadminStatisticsReportController extends Controller
                 $row['Email'] = $user->email;
 
                 $row['Excused'] = $user->excused;
-                $row['Excused Start Date'] = $user->excused_start_date;
-                $row['Excused End Date'] = $user->excused_end_date;
-                $row['Excused Reason'] = $user->excuseReason ? $user->excuseReason->name : '';
+                $row['Reason'] = $user->excuseReason ? $user->excuseReason->name : '';
+
+                $excused_by_id = $user->excused_updated_by;
+                if($excused_by_id != ''){
+                    $sql_excused = User::select("name")->where('id', $excused_by_id)->first();
+                    $row['Excused By'] = $sql_excused->name;
+                } else {
+                    $row['Excused By'] = '';
+                }
+                $row['Excused At'] = $user->excused_start_date;
+
                 $row['Organization'] = $user->organization;
                 $row['Level 1'] = $user->level1_program;
                 $row['Level 2'] = $user->level2_division;
@@ -2222,7 +2231,7 @@ class SysadminStatisticsReportController extends Controller
                 $row['Level 4'] = $user->level4;
 
                 fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], 
-                        $row['Excused'], $row['Excused Start Date'], $row['Excused End Date'], $row['Excused Reason'],
+                        $row['Excused'], $row['Reason'], $row['Excused By'], $row['Excused At'],
                         $row['Organization'], $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
             }
 
