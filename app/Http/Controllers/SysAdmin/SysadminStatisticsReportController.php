@@ -2199,7 +2199,7 @@ class SysadminStatisticsReportController extends Controller
         );
 
         $columns = ["Employee ID", "Name", "Email", 
-                        "Excused", "Reason", "Excused By", "Excused At", "Updated At",
+                        "Excused", "Reason", "Excused By", "Excused At", 
                         "Organization", "Level 1", "Level 2", "Level 3", "Level 4",
                     ];
 
@@ -2222,8 +2222,8 @@ class SysadminStatisticsReportController extends Controller
                 } else {
                     $row['Excused By'] = '';
                 }
-                $row['Excused At'] = $user->excused_start_date;
-                $row['Updated At'] = $user->excused_updated_at;
+                //$row['Excused At'] = $user->excused_start_date;
+                $row['Excused At'] = $user->excused_updated_at;
 
                 $row['Organization'] = $user->organization;
                 $row['Level 1'] = $user->level1_program;
@@ -2232,7 +2232,7 @@ class SysadminStatisticsReportController extends Controller
                 $row['Level 4'] = $user->level4;
 
                 fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], 
-                        $row['Excused'], $row['Reason'], $row['Excused By'], $row['Excused At'], $row['Updated At'],
+                        $row['Excused'], $row['Reason'], $row['Excused By'], $row['Excused At'], 
                         $row['Organization'], $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'] ));
             }
 
