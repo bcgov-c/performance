@@ -39,7 +39,26 @@ class DashboardController extends Controller
                                     ->from('goals')
                                     ->whereColumn('dashboard_notifications.related_id', 'goals.id')
                                     ->whereNull('goals.deleted_at')
-                                    ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB', 'GK', 'GS']);
+                                    ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GK', 'GS']);
+                        })
+                        ->orWhereExists(function ($query) {
+                            return $query->select(DB::raw(1))
+                                    ->from('goals')
+                                    ->whereColumn('dashboard_notifications.related_id', 'goals.id')
+                                    ->whereNull('goals.deleted_at')
+                                    ->where('dashboard_notifications.notification_type', 'GB')
+                                    ->whereRaw("(
+                                        EXISTS (SELECT 1 FROM goals_shared_with gsw WHERE gsw.goal_id = dashboard_notifications.related_id AND gsw.user_id = dashboard_notifications.user_id)
+                                        OR EXISTS (SELECT 1 FROM goal_bank_orgs gbo, employee_demo ed, users u WHERE gbo.goal_id = dashboard_notifications.related_id AND gbo.version = 2 AND gbo.inherited = 0 AND gbo.orgid = ed.orgid AND ed.employee_id = u.employee_id AND u.id = dashboard_notifications.user_id)
+                                        OR EXISTS (SELECT 1 FROM goal_bank_orgs gbo, employee_demo_tree edt WHERE gbo.goal_id = dashboard_notifications.related_id AND gbo.version = 2 AND gbo.inherited = 1 AND gbo.orgid = edt.id 
+                                            AND (EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud0 WHERE ud0.user_id = dashboard_notifications.user_id AND edt.level = 0 AND ud0.organization_key = edt.organization_key)
+                                                OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud1 WHERE ud1.user_id = dashboard_notifications.user_id AND edt.level = 1 AND ud1.organization_key = edt.organization_key AND ud1.level1_key = edt.level1_key)
+                                                OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud2 WHERE ud2.user_id = dashboard_notifications.user_id AND edt.level = 2 AND ud2.organization_key = edt.organization_key AND ud2.level1_key = edt.level1_key AND ud2.level2_key = edt.level2_key)
+                                                OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud3 WHERE ud3.user_id = dashboard_notifications.user_id AND edt.level = 3 AND ud3.organization_key = edt.organization_key AND ud3.level1_key = edt.level1_key AND ud3.level2_key = edt.level2_key AND ud3.level3_key = edt.level3_key)
+                                                OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud4 WHERE ud4.user_id = dashboard_notifications.user_id AND edt.level = 4 AND ud4.organization_key = edt.organization_key AND ud4.level1_key = edt.level1_key AND ud4.level2_key = edt.level2_key AND ud4.level3_key = edt.level3_key AND ud4.level4_key = edt.level4_key)
+                                            )
+                                        )
+                                    )");
                         })
                         ->orWhereExists(function ($query) {
                             return $query->select(DB::raw(1))
@@ -49,7 +68,6 @@ class DashboardController extends Controller
                         })
                         ->orWhere('dashboard_notifications.notification_type', '');    
                 })
-                // ->orderby('status', 'asc')->orderby('created_at', 'desc');
                 ->orderby('created_at', 'desc');
 
         if($request->ajax()) {
@@ -62,7 +80,6 @@ class DashboardController extends Controller
                     $text .= '>'.$notification->comment.'</span>';
                     $text .= $notification->status == 'R' ? '' : '<span class="badge badge-pill badge-primary ml-2">New</span>' ;
                     $text .= '<br/>';
-                    // $text .= '<span>sjskaj |  sadasdad  |dkajsdkjkjadskjdkja</span>';
 
                     switch($notification->notification_type) {
                         case 'GC':
@@ -92,7 +109,6 @@ class DashboardController extends Controller
                     return '<table class="inner" style="border:none">'. 
                         '<tr>'.
 
-                        // '<td class="'. ($notification->status == 'R' ? 'read' : 'new') .' pr-1">&nbsp;</td>'.
                         '<td class="pr-3" style="vertical-align:middle"><input type="checkbox" id="itemCheck'. 
                                 $notification->id .'" name="itemCheck[]" value="'. 
                                 $notification->id .'" class="dt-body-center"></td>'. 
@@ -105,13 +121,9 @@ class DashboardController extends Controller
                     $text = "";
                     if ($notification->related_id) {
                         $link = 'location.href=\''. route("dashboardmessage.show", $notification->id) . '\'" ';
-                        // if ($notification->notification_type == 'SP' ) {
-                        //     $link = "open_shared_profile_modal()";  
-                        // }
 
                         if  ( !(in_array($notification->notification_type, ['CA', 'CS'])) ) {
                             $text .= '<button onclick="'. $link . '"' .
-                                    // 'data-toggle="tooltip" data-placement="bottom" title="Click to view the details." '.
                                     'data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Now hover out." '.
                                     'class="notification-modal btn btn-sm btn-primary mt-2" value="'. $notification->id .'">View</button>';
                         }
@@ -122,7 +134,6 @@ class DashboardController extends Controller
                     return $text;
                 })
                 ->rawColumns(['item_detail', 'action'])
-                //->removeColumn('password')
                 ->make(true);
 
         }
@@ -157,60 +168,7 @@ class DashboardController extends Controller
             $greetings = "Hello";
         }
 
-        // $tab = (Route::current()->getName() == 'dashboard.notifications') ? 'notifications' : 'todo';
         $tab = (Route::current()->getName() == 'dashboard.notifications') ? 'notifications' : 'notifications';
-        // $notifications = DashboardNotification::where('user_id', Auth::id())->get();
-        // $notifications = DashboardNotification::where('user_id', Auth::id())
-        //         ->where(function ($q)  {
-        //                 $q->whereExists(function ($query) {
-        //                     return $query->select(DB::raw(1))
-        //                             ->from('conversations')
-        //                             ->whereColumn('dashboard_notifications.related_id', 'conversations.id')
-        //                             ->whereNull('conversations.deleted_at')
-        //                             ->whereIn('dashboard_notifications.notification_type', ['CA', 'CS']);
-        //                 })
-        //                 ->orWhereExists(function ($query) {
-        //                     return $query->select(DB::raw(1))
-        //                             ->from('goals')
-        //                             ->whereColumn('dashboard_notifications.related_id', 'goals.id')
-        //                             ->whereNull('goals.deleted_at')
-        //                             ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB']);
-        //                 })
-        //                 ->orWhereExists(function ($query) {
-        //                     return $query->select(DB::raw(1))
-        //                             ->from('shared_profiles')
-        //                             ->whereColumn('dashboard_notifications.related_id', 'shared_profiles.id')
-        //                             ->whereIn('dashboard_notifications.notification_type', ['SP']);
-        //                 })
-        //                 ->orWhere('dashboard_notifications.notification_type', '')
-        //                 ;    
-        //         })
-        //     ->orderby('status', 'asc')->orderby('created_at', 'desc')
-        //     ->paginate(8);
-        // $notifications_unread = DashboardNotification::where('user_id', Auth::id())->where('status', null)
-        //                         ->where(function ($q)  {
-        //                             $q->whereExists(function ($query) {
-        //                                 return $query->select(DB::raw(1))
-        //                                         ->from('conversations')
-        //                                         ->whereColumn('dashboard_notifications.related_id', 'conversations.id')
-        //                                         ->whereNull('conversations.deleted_at')
-        //                                         ->whereIn('dashboard_notifications.notification_type', ['CA', 'CS']);
-        //                             })
-        //                             ->orWhereExists(function ($query) {
-        //                                 return $query->select(DB::raw(1))
-        //                                         ->from('goals')
-        //                                         ->whereColumn('dashboard_notifications.related_id', 'goals.id')
-        //                                         ->whereNull('goals.deleted_at')
-        //                                         ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB']);
-        //                             })
-        //                             ->orWhereExists(function ($query) {
-        //                                 return $query->select(DB::raw(1))
-        //                                         ->from('shared_profiles')
-        //                                         ->whereColumn('dashboard_notifications.related_id', 'shared_profiles.id')
-        //                                         ->whereIn('dashboard_notifications.notification_type', ['SP']);
-        //                             })
-        //                             ->orWhere('dashboard_notifications.notification_type', '');    
-        //                         });
         $supervisorTooltip = 'If your current supervisor in the Performance Development Platform is incorrect, please have your supervisor submit a service request through AskMyHR and choose the category: <span class="text-primary">My Team or Organization > HR Software Systems Support > Position / Reporting Updates</span>';        
         
         $sharedList = SharedProfile::where('shared_id', Auth::id())
@@ -252,7 +210,6 @@ class DashboardController extends Controller
             $url = $notification->url;
 
             if ($notification->notification_type == 'SP' ) {
-                // $url .= '?open=1';
                 return redirect( $url )->with('open', '1');
             }
 
@@ -280,17 +237,7 @@ class DashboardController extends Controller
         $ids = $request->ids ? json_decode($request->ids) : [];
 
         DashboardNotification::wherein('id', $ids)->delete();
-        // return redirect()->back();
         return response()->noContent();
-
-        // return redirect()->to('/route');
-        // header("Refresh:0");
-        // return back();
-        // window.location.reload();
-        //return route::get('dashboard.notifications');
-        //return view('dashboard.partials.notifications');
-        // return Redirect()->route('dashboard.notifications');
-        // return response()->json(['success'=>"Notification(s) deleted successfully."]);
     }
 
     public function updatestatus(Request $request)
@@ -298,18 +245,7 @@ class DashboardController extends Controller
 
         $ids = $request->ids ? json_decode($request->ids) : [];
 
-// return $ids;        
-        // var check = confirm($ids);
-        // dd("RESULTS: " . $ids);
-
         DashboardNotification::wherein('id', $ids)->update(['status' => 'R']);
-        // return route::get('dashboard.notifications');
-        // return redirect()->back();
-        // $notification = DashboardNotification::where('id', 4)->update(['status' => 'S']);
-        // window.location.reload();
-        // return redirect()->to('/route');
-        // header("Refresh:0");
-        // return back();
         return response()->json(['success'=>"Notification(s) updated successfully."]);
     }
 
@@ -318,12 +254,6 @@ class DashboardController extends Controller
 
         $ids = $request->ids ? json_decode($request->ids) : [];
         DashboardNotification::wherein('id',$ids)->update(['status' => null]);
-        // DashboardNotification::where('id',5)->update(['status' => 'D']);
-        // header("Refresh:0");
-        // return back();
-        // window.location.reload();
-        // return redirect()->to('/route');
-        // return redirect()->back();
         return response()->json(['success'=>"Notification(s) updated successfully."]);
     }
     
@@ -344,7 +274,26 @@ class DashboardController extends Controller
                                         ->from('goals')
                                         ->whereColumn('dashboard_notifications.related_id', 'goals.id')
                                         ->whereNull('goals.deleted_at')
-                                        ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GB', 'GK', 'GS']);
+                                        ->whereIn('dashboard_notifications.notification_type', ['GC', 'GR', 'GK', 'GS']);
+                            })
+                            ->orWhereExists(function ($query) {
+                                return $query->select(DB::raw(1))
+                                        ->from('goals')
+                                        ->whereColumn('dashboard_notifications.related_id', 'goals.id')
+                                        ->whereNull('goals.deleted_at')
+                                        ->where('dashboard_notifications.notification_type', 'GB')
+                                        ->whereRaw("(
+                                            EXISTS (SELECT 1 FROM goals_shared_with gsw WHERE gsw.goal_id = dashboard_notifications.related_id AND gsw.user_id = dashboard_notifications.user_id)
+                                            OR EXISTS (SELECT 1 FROM goal_bank_orgs gbo, employee_demo ed, users u WHERE gbo.goal_id = dashboard_notifications.related_id AND gbo.version = 2 AND gbo.inherited = 0 AND gbo.orgid = ed.orgid AND ed.employee_id = u.employee_id AND u.id = dashboard_notifications.user_id)
+                                            OR EXISTS (SELECT 1 FROM goal_bank_orgs gbo, employee_demo_tree edt WHERE gbo.goal_id = dashboard_notifications.related_id AND gbo.version = 2 AND gbo.inherited = 1 AND gbo.orgid = edt.id 
+                                                AND (EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud0 WHERE ud0.user_id = dashboard_notifications.user_id AND edt.level = 0 AND ud0.organization_key = edt.organization_key)
+                                                    OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud1 WHERE ud1.user_id = dashboard_notifications.user_id AND edt.level = 1 AND ud1.organization_key = edt.organization_key AND ud1.level1_key = edt.level1_key)
+                                                    OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud2 WHERE ud2.user_id = dashboard_notifications.user_id AND edt.level = 2 AND ud2.organization_key = edt.organization_key AND ud2.level1_key = edt.level1_key AND ud2.level2_key = edt.level2_key)
+                                                    OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud3 WHERE ud3.user_id = dashboard_notifications.user_id AND edt.level = 3 AND ud3.organization_key = edt.organization_key AND ud3.level1_key = edt.level1_key AND ud3.level2_key = edt.level2_key AND ud3.level3_key = edt.level3_key)
+                                                    OR EXISTS (SELECT DISTINCT 1 FROM user_demo_jr_view ud4 WHERE ud4.user_id = dashboard_notifications.user_id AND edt.level = 4 AND ud4.organization_key = edt.organization_key AND ud4.level1_key = edt.level1_key AND ud4.level2_key = edt.level2_key AND ud4.level3_key = edt.level3_key AND ud4.level4_key = edt.level4_key)
+                                                )
+                                            )
+                                        )");
                             })
                             ->orWhereExists(function ($query) {
                                 return $query->select(DB::raw(1))
@@ -370,7 +319,6 @@ class DashboardController extends Controller
          $request->session()->forget('user_is_switched');
          $request->session()->forget('sr_user');
          $request->session()->forget('SR_ALLOWED');
-         //return redirect()->back();
          return redirect()->to('/dashboard');
 
     }
@@ -409,7 +357,6 @@ class DashboardController extends Controller
             $sessionExpired = false;
         }
 
-        //$sessionExpired = $request->session()->has('last_activity');
         return response()->json(['sessionExpired' => $sessionExpired]);
     }
 }
