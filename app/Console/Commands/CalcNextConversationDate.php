@@ -150,7 +150,7 @@ class CalcNextConversationDate extends Command
                     // get last conversation details
                     $lastConv = Conversation::join('conversation_participants', function($join) {
                         return $join->on(function($on) {
-                            return $on->where('conversations.id', 'conversation_participants.conversation_id')
+                            return $on->on('conversations.id', 'conversation_participants.conversation_id')
                                 ->whereRaw("role = 'emp'");
                         });
                     })
