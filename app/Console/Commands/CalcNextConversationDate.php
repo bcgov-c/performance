@@ -191,6 +191,14 @@ class CalcNextConversationDate extends Command
                     // Based on access_organizations.conversation_batch value for ministry groupings
                     switch ($demo->conversation_batch) {
                         case 0:
+                        case 3:
+                            $virtualHardDate = Carbon::createFromDate(2023, 12, 7);
+                            if ($virtualHardDate->gt($initNextConversationDate)) {
+                                // distribute next conversation date, based on last digit of employee ID
+                                $DDt = (int) (($demo->employee_id % 100) * 71 / 100);
+                                $initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
+                            }
+                            break;
                         case 2:
                             $virtualHardDate = Carbon::createFromDate(2023, 11, 01);
                             if ($virtualHardDate->gt($initNextConversationDate)) {
@@ -208,10 +216,10 @@ class CalcNextConversationDate extends Command
                             }
                             break;
                         default:
-                            $virtualHardDate = Carbon::createFromDate(2023, 11, 01);
+                            $virtualHardDate = Carbon::createFromDate(2023, 12, 7);
                             if ($virtualHardDate->gt($initNextConversationDate)) {
                                 // distribute next conversation date, based on last digit of employee ID
-                                $DDt = (int) (($demo->employee_id % 100) * 52 / 100);
+                                $DDt = (int) (($demo->employee_id % 100) * 71 / 100);
                                 $initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
                             }
                             break;
