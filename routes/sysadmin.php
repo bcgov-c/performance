@@ -17,6 +17,7 @@ use App\Http\Controllers\SysAdmin\AccessPermissionsController;
 use App\Http\Controllers\SysAdmin\UnlockConversationController;
 use App\Http\Controllers\SysAdmin\AccessOrganizationsController;
 use App\Http\Controllers\SysAdmin\SysadminStatisticsReportController;
+use App\Http\Controllers\SysAdmin\SupervisorOverridesController;
 // use Illuminate\Http\Request;
 
 
@@ -264,6 +265,26 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/messageeditor', [MessageEditorController::class, 'index'])->name('sysadmin.messageeditor');
         Route::get('/sysadmin/messageeditor/index', [MessageEditorController::class, 'index'])->name('sysadmin.messageeditor.index');
         Route::post('/sysadmin/messageeditor/update', [MessageEditorController::class, 'update'])->name('sysadmin.messageeditor.update');
+    });
+
+    //Supervisor Overrides
+    Route::group(['middleware' => ['auth']], function() {    
+        Route::get('/sysadmin/supervisoroverrides', [SupervisorOverridesController::class, 'addnew'])->name('sysadmin.supervisoroverrides');
+        Route::get('/sysadmin/supervisoroverrides/addnew', [SupervisorOverridesController::class, 'addnew'])->name('sysadmin.supervisoroverrides.addnew');
+        Route::post('/sysadmin/supervisoroverrides/saveall', [SupervisorOverridesController::class, 'saveall'])->name('sysadmin.supervisoroverrides.saveall');
+
+        Route::get('/sysadmin/supervisoroverrides/manageindex', [SupervisorOverridesController::class, 'manageindex'])->name('sysadmin.supervisoroverrides.manageindex');
+        Route::delete('/sysadmin/supervisoroverrides/manageindex', [SupervisorOverridesController::class, 'manageindex'])->name('sysadmin.supervisoroverrides.manageindexdelete');
+        Route::get('/sysadmin/supervisoroverrides/manageindexlist', [SupervisorOverridesController::class, 'manageindexlist'])->name('sysadmin.supervisoroverrides.manageindexlist');
+        Route::get('/sysadmin/supervisoroverrides/deleteoverride/{id}', [SupervisorOverridesController::class, 'deleteOverride'])->name('sysadmin.supervisoroverrides.deleteoverrideget');
+        Route::delete('/sysadmin/supervisoroverrides/deleteoverride/{id}', [SupervisorOverridesController::class, 'deleteOverride'])->name('sysadmin.supervisoroverrides.deleteoverride');
+        Route::get('/sysadmin/supervisoroverrides/deletemultioverride/{ids}', [SupervisorOverridesController::class, 'deleteMultiOverride'])->name('sysadmin.supervisoroverrides.deletemultioverrideget');
+        Route::delete('/sysadmin/supervisoroverrides/deletemultioverride/{ids}', [SupervisorOverridesController::class, 'deleteMultiOverride'])->name('sysadmin.supervisoroverrides.deletemultioverride');
+        Route::get('sysadmin/supervisoroverrides/manageindexviewshares/{id}', [SupervisorOverridesController::class, 'manageindexviewshares']);
+
+        Route::get('/sysadmin/supervisoroverrides/org-tree/{index}', [SupervisorOverridesController::class,'loadOrganizationTree']);
+        Route::get('/sysadmin/supervisoroverrides/employee-list/{index}', [SupervisorOverridesController::class, 'getDatatableEmployees']);
+        Route::get('/sysadmin/supervisoroverrides/employees/{id}/{index}', [SupervisorOverridesController::class,'getEmployees']);
     });
 
     Route::get('/sysadmin/level0', 'App\Http\Controllers\SysadminController@getOrgLevel0')->name('sysadmin.level0');

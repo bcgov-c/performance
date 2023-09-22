@@ -358,6 +358,11 @@ return [
                     'active' => ['sysadmin/goalbank/*']
                 ],
                 [
+                    'text' => 'Supervisor Overrides',
+                    'url'  => 'sysadmin/supervisoroverrides',
+                    'active' => ['sysadmin/supervisoroverrides/*']
+                ],
+                [
                     'text' => 'Tags Management',
                     'url'  => 'sysadmin/tags',
                     'active' => ['sysadmin/tags/*']
