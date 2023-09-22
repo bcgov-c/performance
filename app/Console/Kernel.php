@@ -106,6 +106,11 @@ class Kernel extends ConsoleKernel
             ->sendOutputTo(storage_path('logs/BuildEmployeeDemoTree.log'))
             ->dailyAt('03:00');
   
+        $schedule->command('command:PopulateEmployeeManagersTable')
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/PopulateEmployeeManagersTable.log'))
+            ->dailyAt('03:30');
+  
         $schedule->command('command:PopulateUsersAnnexTable')
             ->timezone('America/Vancouver')
             ->sendOutputTo(storage_path('logs/PopulateUsersAnnexTable.log'))
