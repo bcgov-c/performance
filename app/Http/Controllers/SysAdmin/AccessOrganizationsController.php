@@ -17,12 +17,10 @@ class AccessOrganizationsController extends Controller
     //
     public function index(Request $request) {
 
-
         if($request->ajax()) {
-
-             // $columns = ["code","name","status","created_at"];
-            $access_orgs = AccessOrganization::with('created_by', 'updated_by')
+             $access_orgs = AccessOrganization::from('access_organizations')
                 ->leftjoin('employee_demo_tree', 'access_organizations.orgid', 'employee_demo_tree.id')
+                ->leftjoin('organization_statistics', 'organization_statistics.orgid', 'access_organizations.orgid')
                 ->where('access_organizations.orgid', '<', 1000000)
                 ->when($request->organization, function($query) use($request) {
                     return $query->where('employee_demo_tree.name', 'like', '%'.$request->organization.'%');
@@ -36,16 +34,25 @@ class AccessOrganizationsController extends Controller
                 ->when($request->allow_email_msg, function($query) use($request) {
                     return $query->where('allow_email_msg', $request->allow_email_msg);
                 })
-                ->withCount('active_employee_ids');
-
+                ->with('created_by', 'updated_by')
+                ->selectRaw("
+                    access_organizations.id AS id,
+                    access_organizations.orgid,
+                    employee_demo_tree.organization AS organization,
+                    allow_login,
+                    allow_inapp_msg,
+                    allow_email_msg,
+                    conversation_batch,
+                    created_by_id,
+                    updated_by_id,
+                    access_organizations.created_at, 
+                    access_organizations.updated_at,
+                    organization_statistics.userdemojrview_groupcount AS active_employee_ids_count
+                ");
             return Datatables::of($access_orgs)
-                                
                     ->addColumn('action', function ($org) {
                         return '<a class="btn btn-info btn-sm edit-org" data-id="'. $org->id .'" >Change</a>' ;
                     })
-                    // ->addColumn('deleted_by', function ($user) {
-                    //     return $user->deleted_at ? $user->updated_by->name : '';       
-                    // })
                     ->addColumn('select_users', static function ($org) {
                         return '<input pid="1335" type="checkbox" id="userCheck'. 
                             $org->id .'" name="userCheck[]" value="'. $org->id .'" class="dt-body-center">';
@@ -56,13 +63,13 @@ class AccessOrganizationsController extends Controller
                     ->editColumn('updated_at', function ($user) {
                         return $user->updated_at->format('Y-m-d H:m:s'); // human readable format
                     })
-                    ->rawColumns(['action','select_users'])
+                    ->rawColumns(['action', 'select_users', 'created_at', 'updated_at'])
                     ->make(true);
         }
 
         $this->createNewAccessOrgsFromEmployeeDemo();
 
-        $matched_emp_ids = AccessOrganization::pluck('id');
+        $matched_emp_ids = AccessOrganization::where('orgid', '<', 1000000)->pluck('id');
         $old_selected_emp_ids = [];
 
         return view('sysadmin.system-security.access-orgs.index',compact('request','matched_emp_ids','old_selected_emp_ids') );

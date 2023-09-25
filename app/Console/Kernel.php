@@ -111,6 +111,11 @@ class Kernel extends ConsoleKernel
             ->sendOutputTo(storage_path('logs/PopulateUsersAnnexTable.log'))
             ->dailyAt('04:00');
   
+        $schedule->command('command:PopulateOrganizationStatistics')
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/PopulateOrganizationStatistics.log'))
+            ->dailyAt('04:05');
+  
         $schedule->command('command:CleanShareProfile')
             ->timezone('America/Vancouver')    
             ->sendOutputTo(storage_path('logs/CleanShareProfile.log'))
