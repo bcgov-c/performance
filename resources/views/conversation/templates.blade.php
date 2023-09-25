@@ -23,8 +23,8 @@
             data-toggle="popover"
             data-placement="right"  
             data-html="true"    
-            data-original-title="
-            <p><br/>Review the information below to determine which template best suits your needs. Click on a template name to view a sample. If you need more assistance, refer to the
+            data-content="
+            <p>Review the information below to determine which template best suits your needs. Click on a template name to view a sample. If you need more assistance, refer to the
              <a href='/resources/conversations?t=1' target=\'_blank\'>Performance Conversations</a> 
              resource page. </p>
             <p>Once you've decided on a template for use, select the participant from the dropdown list and 
@@ -268,6 +268,11 @@
 
 <script>
 
+$('.modal').popover({
+    selector: '[data-toggle]',
+    trigger: 'click',
+}); 
+
 function conversation_sub(topic_id){
                 $('#conversation_form_2 input[name="conversation_topic_id"]').val(topic_id);
                 var allow_submit = true;
@@ -327,8 +332,5 @@ function conversation_sub(topic_id){
     }
     .popover {
         max-width: 400px; /* Adjust the width as needed */
-    }
-    .popover .popover-body {
-        display: none;
     }
 </style>    
