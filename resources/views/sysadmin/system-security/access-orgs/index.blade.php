@@ -133,7 +133,7 @@
             serverSide: true,
             // select: true,
             fixedHeader: true,    
-            pageLength: 30,
+            pageLength: 10,
             dom: '<"toolbar">frtip',
             ajax: {
                 url: '{!! route('access-orgs.index') !!}',
