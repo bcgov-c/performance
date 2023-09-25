@@ -60,8 +60,8 @@ i {
             data-toggle="popover"
             data-placement="right"  
             data-html="true"    
-            data-original-title="
-            <p><br/>The list below contains all planned conversations that have yet to be signed-off by both employee and supervisor. 
+            data-content="
+            <p>The list below contains all planned conversations that have yet to be signed-off by both employee and supervisor. 
                                 Once a conversation has been signed-off by both participants, 
                                 it will move to the Completed Conversations tab and become an official performance development record for the employee.</p>">
             <i class="fa fa-info-circle"> </i> Instructions
@@ -480,7 +480,5 @@ i {
     .popover {
         max-width: 400px; /* Adjust the width as needed */
     }
-    .popover .popover-body {
-        display: none;
-    }
+    
 </style> 

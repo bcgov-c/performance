@@ -60,8 +60,7 @@ i {
             data-toggle="popover"
             data-placement="right"  
             data-html="true"    
-            data-original-title="
-            <br/>
+            data-content="
             <p>
                 The list below contains all conversations that have been signed by both employee and supervisor. There is a two week period from the date of sign-off when either participant can un-sign the conversation 
                 and return it to the Open Conversations tab for further edits. Conversations marked with a locked icon have passed the two-week time 
@@ -423,8 +422,5 @@ i {
     }
     .popover {
         max-width: 400px; /* Adjust the width as needed */
-    }
-    .popover .popover-body {
-        display: none;
     }
 </style> 
