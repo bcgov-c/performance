@@ -74,24 +74,7 @@
 
 	<div class="card-body">
 
-            <table class="table table-bordered" class="row-border" id="accessorgs-table" style="width:100%">
-                <thead>
-                    <tr>
-                        <th><input name="select_all" value="1" id="employee-list-select-all" type="checkbox" /></th>
-                        <th>Organization</th>
-                        <th>No. Of Employees</th>
-                        <th>Allow Login</th>
-                        <th>Allow In-App Message</th>
-                        <th>Allow eMail Message</th>
-                        <th>Action</th>
-                        <th>Created By</th>
-                        <th>Updated By</th>
-                        <th>Created At</th>
-                        <th>Updated At</th>
-
-                    </tr>
-                </thead>
-            </table>
+            <table class="table table-bordered" class="row-border" id="accessorgs-table" style="width:100%"></table>
 
 	</div>
 </div>
@@ -102,7 +85,6 @@
 
     <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/fixedheader/3.2.4/css/fixedHeader.dataTables.min.css" rel="stylesheet">
-    {{-- <link href="{{ asset('vendor/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}" rel="stylesheet"> --}}
 
 	<style>
     #accessorgs-table_filter {
@@ -122,7 +104,6 @@
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
     <script src="https://cdn.datatables.net/fixedheader/3.2.4/js/dataTables.fixedHeader.min.js"></script>
-    {{-- <script src="{{ asset('vendor/sweetalert2/sweetalert2.min.js') }}" ></script> --}}
 
     <script type="x-tmpl" id="charity-tmpl">
     <div class="dropdown">
@@ -143,7 +124,6 @@
 	let g_selected_employees = {!!json_encode($old_selected_emp_ids)!!};
 
     $(function() {
- 
         // Datatables
         var oTable = $('#accessorgs-table').DataTable({
             "scrollX": true,
@@ -153,10 +133,8 @@
             serverSide: true,
             // select: true,
             fixedHeader: true,    
-            pageLength: 10,
-            'order': [[ 0, 'asc']],
+            pageLength: 30,
             dom: '<"toolbar">frtip',
-            
             ajax: {
                 url: '{!! route('access-orgs.index') !!}',
                 data: function (data) {
@@ -167,9 +145,7 @@
                 }
             },
             "fnDrawCallback": function() {
-
-            list = ( $('#accessorgs-table input:checkbox') );
-
+                list = ( $('#accessorgs-table input:checkbox') );
                 $.each(list, function( index, item ) {
                     var index = $.inArray( parseInt(item.value) , g_selected_employees);
                     if ( index === -1 ) {
@@ -178,7 +154,6 @@
                         $(item).prop('checked', true);  // checked 
                     }
                 });
-
                 // update the check all checkbox status 
                 if (g_selected_employees.length == 0) {
                     $('#employee-list-select-all').prop("checked", false);
@@ -190,14 +165,13 @@
                     $('#employee-list-select-all').prop("checked", false);
                     $('#employee-list-select-all').prop("indeterminate", true);    
                 }
-
             },
             columns: [
-                {data: 'select_users', name: 'select_users', orderable: false, searchable: false},
-                {data: 'organization', name: 'organization', className: "dt-nowrap" },
-                {data: 'active_employee_ids_count', className: 'dt-center'},
-                
-                {data: 'allow_login', className: 'dt-center', render: function ( data, type, row, meta ) {
+                {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', visible: false, className: "dt-nowrap" },
+                {title: '<input name="select_all" value="1" id="employee-list-select-all" type="checkbox" />', ariaTitle: 'employee-list-select-all', target: 0, type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
+                {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', className: "dt-nowrap" },
+                {title: 'No. Of Employees', ariaTitle: 'No. Of Employees', target: 0, type: 'string', data: 'active_employee_ids_count', className: 'dt-center'},
+                {title: 'Allow Login', ariaTitle: 'Allow Login', target: 0, type: 'string', data: 'allow_login', className: 'dt-center', render: function ( data, type, row, meta ) {
                         if(data == 'Y') {
                             return '<i class="fa fa-user-check fa-lg text-primary"</i>';
                         } else {
@@ -205,7 +179,7 @@
                         }
                     }
                 },
-                {data: 'allow_inapp_msg', className: 'dt-center', render: function ( data, type, row, meta ) {
+                {title: 'Allow In-App Message', ariaTitle: 'Allow In-App Message', target: 0, type: 'string', data: 'allow_inapp_msg', className: 'dt-center', render: function ( data, type, row, meta ) {
                         if(data == 'Y') {
                             return '<i class="fa fa-check fa-lg text-primary"> </i>';
                         } else {
@@ -213,7 +187,7 @@
                         }
                     }
                 },
-                {data: 'allow_email_msg', className: 'dt-center', render: function ( data, type, row, meta ) {
+                {title: 'Allow eMail Message', ariaTitle: 'Allow eMail Message', target: 0, type: 'string', data: 'allow_email_msg', className: 'dt-center', render: function ( data, type, row, meta ) {
                         if(data == 'Y') {
                             return '<i class="fa fa-check fa-lg text-primary"> </i>';
                         } else {
@@ -221,21 +195,12 @@
                         }
                     }
                 },
-                {data: 'action', name: 'action', orderable: false, searchable: false, className: "dt-nowrap"},
-                {data: 'created_by.name', name: 'created_by.name', defaultContent: '', orderable: false, searchable: false, className: "dt-nowrap"},
-                {data: 'updated_by.name', name: 'updated_by.name', defaultContent: '', orderable: false, searchable: false, className: "dt-nowrap"},
-                {data: 'created_at', name: 'created_at', orderable: false, searchable: false, className: "dt-nowrap"},
-                {data: 'updated_at', name: 'updated_at', orderable: false, searchable: false, className: "dt-nowrap"},
-
+                {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false, className: "dt-nowrap"},
+                {title: 'Created By', ariaTitle: 'Created By', target: 0, type: 'string', data: 'created_by.name', name: 'created_by.name', defaultContent: '', orderable: false, searchable: false, className: "dt-nowrap"},
+                {title: 'Updated By', ariaTitle: 'Updated By', target: 0, type: 'string', data: 'updated_by.name', name: 'updated_by.name', defaultContent: '', orderable: false, searchable: false, className: "dt-nowrap"},
+                {title: 'Created At', ariaTitle: 'Created At', target: 0, type: 'string', data: 'created_at', name: 'created_at', orderable: false, searchable: false, className: "dt-nowrap"},
+                {title: 'Updated At', ariaTitle: 'Updated At', target: 0, type: 'string', data: 'updated_at', name: 'updated_at', orderable: false, searchable: false, className: "dt-nowrap"},
             ],
-            columnDefs: [
-                    {
-                        // width: '5em',
-                        // targets: [0]
-                    },
-            ],
-
-
         });
 
 
