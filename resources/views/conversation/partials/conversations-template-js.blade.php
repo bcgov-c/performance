@@ -244,6 +244,7 @@
                 $('#toggleCardButton').on('blur', function () {
                     $(this).popover('hide'); 
                 });
+                
             });
 
             document.getElementById("closemodal").onclick = function(e) {
