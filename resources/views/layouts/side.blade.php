@@ -49,5 +49,8 @@
     if(controllerName == 'dashboard' || controllerName == 'my-team' || controllerName == 'resources') {
         window.location.href = routeUrl;
     }
+    if(controllerName == 'hradmin' || controllerName == 'sysadmin') {
+        window.location.href = routeUrl;
+    }
 @endif
 </script>    
