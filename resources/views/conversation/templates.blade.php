@@ -268,10 +268,24 @@
 
 <script>
 
+// Enable popovers
 $('.modal').popover({
     selector: '[data-toggle]',
     trigger: 'click',
-}); 
+});
+
+// Close popover when clicking outside or before opening a new one
+$(document).on('click', function (e) {
+    // Check if the clicked element and its ancestors don't have the 'data-toggle' attribute
+    if ($(e.target).closest('[data-toggle]').length === 0) {
+        $('.modal [data-toggle="popover"]').popover('hide');
+    }
+});
+
+// Close popover when opening another one
+$('.modal').on('show.bs.popover', function () {
+    $('.modal [data-toggle="popover"]').not($(this)).popover('hide');
+});
 
 function conversation_sub(topic_id){
                 $('#conversation_form_2 input[name="conversation_topic_id"]').val(topic_id);
