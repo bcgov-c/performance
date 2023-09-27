@@ -32,7 +32,14 @@
     var segments = pathname.split('/');
     var controllerName = segments[1];
     if(controllerName == 'hradmin' || controllerName == 'sysadmin') {
-        window.location.href = routeUrl;
+        var functionName = segments[2];
+        var need_redirect = true;
+        if ((functionName == 'switch-identity') || (controllerName == 'sysadmin' && functionName == 'employeelists') ){
+            need_redirect = false;
+        }
+        if(need_redirect) {
+            window.location.href = routeUrl;
+        }
     }
 @endif
 
