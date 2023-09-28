@@ -21,6 +21,12 @@
                         </div>
                     </div>
                     @endif
+
+					<div class="col-12" id="error_msg" style="display:none">                    
+                        <div class="alert alert-danger" style="display:">
+                            <i class="fa fa-info-circle"></i> There are one or more errors on the page. Please review and try again.
+                        </div>
+                    </div>
 			<br>
 			<h6 class="text-bold">Step 1. Enter Goal Details</h6>
 			<br>
@@ -34,10 +40,11 @@
 				<div class="col col-md-8">
 					<b> Goal Title </b>
 					<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>
-					<x-input name="title" />
+						<input class="form-control form-control-md" name="title" id="title" autocomplete="off">
 					@if(session()->has('title_miss'))
                                             <small class="text-danger">The title field is required</small>
                                         @endif
+						<span id="title_error" style="display:none" class="text-danger">The title field is required</span>				
 				</div>
 				<div class="col col-md-2">
 					<x-dropdown :list="$mandatoryOrSuggested" label="Mandatory/Suggested" name="is_mandatory" :selected="request()->is_mandatory" />
@@ -51,7 +58,8 @@
 					@if(session()->has('tags_miss'))
                                             <small class="text-danger">The tags field is required</small>
                                         @endif
-				</div>				
+					<span id="tags_error" style="display:none" class="text-danger">The tags field is required</span>									
+				</div>		
 			</div>
 			<div class="row">
 				<div class="col col-md-2">
@@ -73,6 +81,7 @@
 					@if(session()->has('what_miss'))
                                             <small class="text-danger">The description field is required</small>
                                         @endif
+					<span id="what_error" style="display:none" class="text-danger">The description field is required</span>						
 				</div>
 			</div>
 			<div class="row">
@@ -293,23 +302,46 @@
 			let g_employees_by_org = [];
 
 			function confirmSaveChangesModal() {
-                            
-				$('#obtn_send').prop('disabled',true);
-                            
-				let count = 0;
-				if($('#opt_audience1').prop('checked')) {
-					count = g_selected_employees.length;
-				};
-				if($('#opt_audience2').prop('checked')) {
-					count = g_selected_orgnodes.length + eg_selected_inherited.length;
-				};
-				if (count == 0) {
-					$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal without an audience?<br><br>Only click \"Add New Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
-				} else {
-					$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal and assign to the selected audience?<br><br>Only click \"Add New Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
+				var title = $('#title').val();
+				var tag_ids = $('#tags').val();
+
+				$('#title_error').hide();
+				$('#tags_error').hide();
+				$('#what_error').hide();
+				$('#error_msg').hide();
+
+				var editor = CKEDITOR.instances.what; // Get the CKEditor instance by ID
+				var whatValue = editor.getData();
+
+				if(title == '' || tag_ids == '' || whatValue == '' ) {
+					$('#error_msg').show();
+					if(title == ''){
+						$('#title_error').show();
+					}
+					if(tag_ids == ''){
+						$('#tags_error').show();
+					}
+					if(whatValue == ''){
+						$('#what_error').show();
+					}
+				} else {   					
+					$('#obtn_send').prop('disabled',true);
+								
+					let count = 0;
+					if($('#opt_audience1').prop('checked')) {
+						count = g_selected_employees.length;
+					};
+					if($('#opt_audience2').prop('checked')) {
+						count = g_selected_orgnodes.length + eg_selected_inherited.length;
+					};
+					if (count == 0) {
+						$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal without an audience?<br><br>Only click \"Add New Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
+					} else {
+						$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal and assign to the selected audience?<br><br>Only click \"Add New Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
+					}
+									
+					$('#saveGoalModal').modal();
 				}
-                                
-				$('#saveGoalModal').modal();
 			}
 
 			$(document).ready(function(){
