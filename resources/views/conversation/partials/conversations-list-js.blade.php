@@ -521,15 +521,8 @@
                         setTimeRoll();
                     });
 
-                modal_open=false;
+                modal_open=false;              
                 
-                <?php if ($open_modal_id) { ?>
-                    conversation_id = {{ $open_modal_id }};                    
-                    setTimeout(function () {
-                        $('#viewConversationModal').modal('show');
-                    }, 1000); // 1000 milliseconds (1 seconds)
-                    updateConversation(conversation_id);
-                <?php } ?>   
                 
                 $('[data-toggle="popover"]').popover();
                 $('#toggleCardButton').on('focus', function () {
