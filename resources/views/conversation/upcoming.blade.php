@@ -423,6 +423,13 @@ i {
          $(".upcoming-border").addClass('border-primary');
 
          $('#collapse_ins').collapse('show');
+
+
+         <?php if ($open_modal_id): ?>
+            setTimeout(function() {
+                $('a[data-id="{{$open_modal_id}}"]').click();
+            }, 1000); 
+        <?php endif; ?>  
          
   });  
 
@@ -431,7 +438,6 @@ i {
   <?php } elseif ($owner_role == 'mgr'){ ?>
     $('#collapse_emp').collapse('show');
   <?php } ?>
-
 </script>
 
 <style>
