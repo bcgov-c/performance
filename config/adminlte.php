@@ -378,6 +378,11 @@ return [
                     'active' => ['sysadmin/notifications/*']
                 ],
                 [
+                    'text' => 'Resource Manage',
+                    'url'  => 'sysadmin/resource-manage',
+                    'active' => ['sysadmin/resource-manage/*']
+                ],
+                [
                     'text' => 'Access and Permissions',
                     'url'  => 'sysadmin/accesspermissions',
                     'active' => ['sysadmin/accesspermissions/*']
