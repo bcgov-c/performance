@@ -18,6 +18,7 @@ use App\Http\Controllers\SysAdmin\UnlockConversationController;
 use App\Http\Controllers\SysAdmin\AccessOrganizationsController;
 use App\Http\Controllers\SysAdmin\SysadminStatisticsReportController;
 use App\Http\Controllers\SysAdmin\SupervisorOverridesController;
+use App\Http\Controllers\SysAdmin\ResourceManageController;
 // use Illuminate\Http\Request;
 
 
@@ -174,6 +175,16 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/notifications/job-titles', [NotificationController::class,'getJobTitles']);
         Route::get('/sysadmin/notifications/employees/{id}', [NotificationController::class,'getEmployees']);
         Route::get('/sysadmin/notifications/employee-list', [NotificationController::class, 'getDatatableEmployees'])->name('sysadmin.notifications.employee.list');
+    });
+
+    //ResourceManage
+    Route::group(['middleware' => ['auth']], function() {
+        Route::get('/sysadmin/resource-manage', [ResourceManageController::class, 'index'])->name('sysadmin.resource-manage');
+        Route::get('/sysadmin/resource-manage/create', [ResourceManageController::class, 'create'])->name('resource-manage.create');
+        Route::get('/sysadmin/resource-manage/show/{id}', [ResourceManageController::class, 'show'])->name('resource-manage.show');
+        Route::get('/sysadmin/resource-manage/edit/{id}', [ResourceManageController::class, 'edit'])->name('resource-manage.edit');
+        Route::post('/sysadmin/resource-manage/store/{id}', [ResourceManageController::class, 'store'])->name('resource-manage.store');
+        Route::post('/sysadmin/resource-manage/new', [ResourceManageController::class, 'new'])->name('resource-manage.new');
     });
 
     //  Job Schedule Audit 

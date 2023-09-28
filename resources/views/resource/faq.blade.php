@@ -16,7 +16,7 @@
 		<div id="collapse_{{$index}}" class="collapse" aria-labelledby="heading_{{$index}}" data-parent="#accordion">
 		<div class="card-body">
 			@if (array_key_exists('answer', $question))
-				{{ $question['answer']}}
+				{!! $question['answer'] !!}
 			@else
 				@include('resource.partials.faq.'.$question['answer_file'])
 			@endif
