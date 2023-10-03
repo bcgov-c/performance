@@ -1384,11 +1384,9 @@ class GoalBankController extends Controller
             ->where('goals.id', '=', $goal_id) 
             ->where('goals.is_library', true) 
             ->delete(); 
-
         DashboardNotification::where('notification_type', 'GB')
             ->where('related_id', $goal_id)
             ->delete();            
-            
         return redirect()->back(); 
     }
     
@@ -1457,7 +1455,16 @@ class GoalBankController extends Controller
                 ")
                 ->get()
                 ->toArray();
-            DashboardNotification::insert($data);
+            DashboardNotification::whereNull('deleted_at')
+            ->updateOrCreate([
+                'user_id' => $data->user_id,
+                'notification_type' => $data->notification_type,
+                'related_id' => $data->related_id,
+            ],[
+                'comment' => $data->comment,
+                'created_at' => $data->created_at,
+                'updated_at' => $data->updated_at,
+            ]);
             $data = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization_key', 'access_organizations.orgid')
                 ->whereIn('user_demo_jr_view.employee_id', $employee_ids_chunk)
                 ->where('access_organizations.allow_inapp_msg', 'Y')
