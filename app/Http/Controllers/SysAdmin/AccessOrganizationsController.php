@@ -50,21 +50,22 @@ class AccessOrganizationsController extends Controller
                     organization_statistics.userdemojrview_groupcount AS active_employee_ids_count
                 ");
             return Datatables::of($access_orgs)
-                    ->addColumn('action', function ($org) {
-                        return '<a class="btn btn-info btn-sm edit-org" data-id="'. $org->id .'" >Change</a>' ;
-                    })
-                    ->addColumn('select_users', static function ($org) {
-                        return '<input pid="1335" type="checkbox" id="userCheck'. 
-                            $org->id .'" name="userCheck[]" value="'. $org->id .'" class="dt-body-center">';
-                    })
-                    ->editColumn('created_at', function ($user) {
-                        return $user->created_at->format('Y-m-d H:m:s'); // human readable format
-                    })
-                    ->editColumn('updated_at', function ($user) {
-                        return $user->updated_at->format('Y-m-d H:m:s'); // human readable format
-                    })
-                    ->rawColumns(['action', 'select_users', 'created_at', 'updated_at'])
-                    ->make(true);
+                ->addIndexColumn()
+                ->addColumn('action', function ($org) {
+                    return '<a class="btn btn-info btn-sm edit-org" data-id="'. $org->id .'" >Change</a>' ;
+                })
+                ->addColumn('select_users', static function ($org) {
+                    return '<input pid="1335" type="checkbox" id="userCheck'. 
+                        $org->id .'" name="userCheck[]" value="'. $org->id .'" class="dt-body-center">';
+                })
+                ->editColumn('created_at', function ($user) {
+                    return $user->created_at->format('Y-m-d H:m:s'); // human readable format
+                })
+                ->editColumn('updated_at', function ($user) {
+                    return $user->updated_at->format('Y-m-d H:m:s'); // human readable format
+                })
+                ->rawColumns(['action', 'select_users', 'created_at', 'updated_at'])
+                ->make(true);
         }
 
         $this->createNewAccessOrgsFromEmployeeDemo();
