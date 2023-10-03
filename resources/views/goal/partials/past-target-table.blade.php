@@ -5,7 +5,7 @@
   <thead>
     <tr>
       <th scope="col"><a href="javascript:sort('title');">Title</a></th>
-      <th scope="col"><a href="javascript:sort('goal_type_id');">Goal Type</a></th>
+      <th scope="col"><a href="javascript:sort('typename');">Goal Type</a></th>
       <th scope="col"><a href="javascript:sort('tagnames');">Tags</a></th>
       <th scope="col"><a href="javascript:sort('start_date');">Start Date</a></th>
       <th scope="col"><a href="javascript:sort('target_date');">End Date</a></th>
