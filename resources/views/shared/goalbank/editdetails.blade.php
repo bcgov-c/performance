@@ -82,11 +82,11 @@
 		</div>
 		<div class="row">
 			<div class="col-md-2">
-				<x-input label="Start Date " class="error-start" type="date" name="start_date" :value="$goaldetail->start_date ? $goaldetail->start_date->format('Y-m-d') : ''" />
+				<x-input label="Start Date " class="error-start" type="date" id="start_date" name="start_date" :value="$goaldetail->start_date ? $goaldetail->start_date->format('Y-m-d') : ''" />
 				<small  class="text-danger error-start_date"></small>
 			</div>
 			<div class="col-md-2">
-				<x-input label="End Date " class="error-target" type="date" name="target_date" :value="$goaldetail->target_date ? $goaldetail->target_date->format('Y-m-d') : ''" />
+				<x-input label="End Date " class="error-target" type="date" id="target_date" name="target_date" :value="$goaldetail->target_date ? $goaldetail->target_date->format('Y-m-d') : ''" />
 				<small  class="text-danger error-target_date"></small>
 			</div>
 		</div>
@@ -214,6 +214,19 @@
 
 				$(window).on('beforeunload', function(){
 					$('#pageLoader').show();
+				});
+
+				$( "#start_date" ).change(function() {
+					var start_date = $( "#start_date" ).val();
+					$( "#target_date" ).attr("min",start_date);            
+				});
+				
+				$( "#target_date" ).change(function() {
+					var start_date = $( "#start_date" ).val();
+					if (start_date === '') {
+						alert('Please choose start date first.');
+						$( "#target_date" ).val('');
+					}           
 				});
 
 			});
