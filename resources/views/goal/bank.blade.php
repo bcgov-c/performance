@@ -479,20 +479,7 @@
 </x-side-layout>
 
 
-<script>    
-
-        $( "#start_date" ).change(function() {
-            var start_date = $( "#start_date" ).val();
-            $( "#target_date" ).attr("min",start_date);            
-        });
-        
-        $( "#target_date" ).change(function() {
-            var start_date = $( "#start_date" ).val();
-            if (start_date === '') {
-                alert('Please choose start date first.');
-                $( "#target_date" ).val('');
-            }           
-        });
+<script>          
         
         $('body').popover({
             selector: '[data-toggle]',
@@ -914,13 +901,13 @@
                 if (goal_title != '' && tags != ''){
                    CKEDITOR.instances['what'].setReadOnly(false);
                    CKEDITOR.instances['measure_of_success'].setReadOnly(false);
-                   $('#start_date').prop("readonly",false);
-                   $('#target_date').prop("readonly",false);
+                   $('#addGoalToLibraryModal #start_date').prop("readonly",false);
+                   $('#addGoalToLibraryModal #target_date').prop("readonly",false);
                 } else {
                    CKEDITOR.instances['what'].setReadOnly(true);
                    CKEDITOR.instances['measure_of_success'].setReadOnly(true);
-                   $('#start_date').prop("readonly",true);
-                   $('#target_date').prop("readonly",true);
+                   $('#addGoalToLibraryModal #start_date').prop("readonly",true);
+                   $('#addGoalToLibraryModal #target_date').prop("readonly",true);
                 }
             });
             
@@ -930,14 +917,27 @@
                 if (goal_title != '' && tags != ''){ 
                     CKEDITOR.instances['what'].setReadOnly(false);
                     CKEDITOR.instances['measure_of_success'].setReadOnly(false);
-                    $('#start_date').prop("readonly",false);
-                    $('#target_date').prop("readonly",false);
+                    $('#addGoalToLibraryModal #start_date').prop("readonly",false);
+                    $('#addGoalToLibraryModal #target_date').prop("readonly",false);
                 } else {
                    CKEDITOR.instances['what'].setReadOnly(true);
                    CKEDITOR.instances['measure_of_success'].setReadOnly(true);
-                   $('#start_date').prop("readonly",true);
-                   $('#target_date').prop("readonly",true);
+                   $('#addGoalToLibraryModal #start_date').prop("readonly",true);
+                   $('#addGoalToLibraryModal #target_date').prop("readonly",true);
                 }
+            });
+
+            $( "#addGoalToLibraryModal #start_date" ).change(function() {
+                var start_date = $( "#addGoalToLibraryModal #start_date" ).val();
+                $( "#addGoalToLibraryModal #target_date" ).attr("min",start_date);            
+            });
+
+            $( "#addGoalToLibraryModal #target_date" ).change(function() {
+                var start_date = $( "#addGoalToLibraryModal #start_date" ).val();
+                if (start_date === '') {
+                    alert('Please choose start date first.');
+                    $( "#addGoalToLibraryModal #target_date" ).val('');
+                }           
             });
             
         });  
@@ -1170,8 +1170,8 @@
 
             CKEDITOR.instances['what'].setReadOnly(true);
             CKEDITOR.instances['measure_of_success'].setReadOnly(true);
-            $('#start_date').prop("readonly",true);
-            $('#target_date').prop("readonly",true);
+            $('#addGoalToLibraryModal #start_date').prop("readonly",true);
+            $('#addGoalToLibraryModal #target_date').prop("readonly",true);
                     
         });
         $(document).on('hide.bs.modal', '#addGoalToLibraryModal', function(e) {
