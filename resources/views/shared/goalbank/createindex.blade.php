@@ -94,11 +94,11 @@
 			</div>
 			<div class="row">
 				<div class="col-md-2">
-					<x-input label="Start Date " class="error-start" type="date" name="start_date"  />
+					<x-input label="Start Date " class="error-start" type="date" name="start_date"  id="start_date"/>
 					<small  class="text-danger error-start_date"></small>
 				</div>
 				<div class="col-md-2">
-					<x-input label="End Date " class="error-target" type="date" name="target_date"  />
+					<x-input label="End Date " class="error-target" type="date" name="target_date" id="target_date" />
 					<small  class="text-danger error-target_date"></small>
 				</div>
 			</div>
@@ -289,6 +289,20 @@
                     }
                 	});
             	});	
+
+
+				$( "#start_date" ).change(function() {
+					var start_date = $( "#start_date" ).val();
+					$( "#target_date" ).attr("min",start_date);            
+				});
+				
+				$( "#target_date" ).change(function() {
+					var start_date = $( "#start_date" ).val();
+					if (start_date === '') {
+						alert('Please choose start date first.');
+						$( "#target_date" ).val('');
+					}           
+				});
 
 		</script>
 
