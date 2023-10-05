@@ -62,68 +62,68 @@ class PopulateUsersAnnexTable extends Command
 
             \DB::statement("
                 INSERT INTO users_annex (
-                user_id,
-                orgid,
-                employee_id,
-                level,
-                headcount,
-                groupcount,
-                organization,
-                level1_program,
-                level2_division,
-                level3_branch,
-                level4,
-                level5,
-                level6,
-                organization_key,
-                level1_key,
-                level2_key,
-                level3_key,
-                level4_key,
-                level5_key,
-                level6_key,
-                organization_deptid,
-                level1_deptid,
-                level2_deptid,
-                level3_deptid,
-                level4_deptid,
-                level5_deptid,
-                level6_deptid,
-                organization_orgid,
-                level1_orgid,
-                level2_orgid,
-                level3_orgid,
-                level4_orgid,
-                level5_orgid,
-                level6_orgid,
-                reporting_to_employee_id,
-                reporting_to_name,
-                reporting_to_email,
-                jr_id,
-                jr_due_date_paused,
-                jr_next_conversation_date,
-                jr_excused_type,
-                jr_current_manual_excuse,
-                jr_created_by_id,
-                jr_created_at,
-                jr_updated_by_id,
-                jr_updated_at,
-                jr_excused_reason_id,
-                jr_excused_reason_desc,
-                jr_updated_by_name,
-                excused_updated_by_name,
-                r_name,
-                reason_id,
-                reason_name,
-                excusedtype,
-                excusedlink,
-                excused_by_name,
-                created_at_string,
-                created_at,
-                updated_at,
-                isSupervisor,
-                isDelegate,
-                reportees
+                  user_id,
+                  orgid,
+                  employee_id,
+                  level,
+                  headcount,
+                  groupcount,
+                  organization,
+                  level1_program,
+                  level2_division,
+                  level3_branch,
+                  level4,
+                  level5,
+                  level6,
+                  organization_key,
+                  level1_key,
+                  level2_key,
+                  level3_key,
+                  level4_key,
+                  level5_key,
+                  level6_key,
+                  organization_deptid,
+                  level1_deptid,
+                  level2_deptid,
+                  level3_deptid,
+                  level4_deptid,
+                  level5_deptid,
+                  level6_deptid,
+                  organization_orgid,
+                  level1_orgid,
+                  level2_orgid,
+                  level3_orgid,
+                  level4_orgid,
+                  level5_orgid,
+                  level6_orgid,
+                  reporting_to_employee_id,
+                  reporting_to_name,
+                  reporting_to_email,
+                  jr_id,
+                  jr_due_date_paused,
+                  jr_next_conversation_date,
+                  jr_excused_type,
+                  jr_current_manual_excuse,
+                  jr_created_by_id,
+                  jr_created_at,
+                  jr_updated_by_id,
+                  jr_updated_at,
+                  jr_excused_reason_id,
+                  jr_excused_reason_desc,
+                  jr_updated_by_name,
+                  excused_updated_by_name,
+                  r_name,
+                  reason_id,
+                  reason_name,
+                  excusedtype,
+                  excusedlink,
+                  excused_by_name,
+                  created_at_string,
+                  created_at,
+                  updated_at,
+                  isSupervisor,
+                  isDelegate,
+                  reportees
                 )
                 SELECT DISTINCT
                   u.id,
@@ -160,9 +160,36 @@ class PopulateUsersAnnexTable extends Command
                   edt.level4_orgid,
                   edt.level5_orgid,
                   edt.level6_orgid,
-                  urt.employee_id AS reporting_to_employee_id,
-                  edo.employee_name AS reporting_to_name,
-                  edo.employee_email AS reporting_to_email,
+                  CASE WHEN ps.supv_empl_id IS NOT NULL THEN ps.supv_empl_id 
+                  ELSE 
+                      CASE WHEN uesd.employee_id IS NOT NULL THEN uesd.employee_id
+                      ELSE
+                          CASE WHEN em.supervisor_emplid IS NOT NULL THEN em.supervisor_emplid
+                          ELSE
+                              NULL
+                          END
+                      END
+                  END reporting_to_employee_id,
+                  CASE WHEN ps.supv_empl_id IS NOT NULL THEN psd.employee_name 
+                  ELSE 
+                      CASE WHEN uesd.employee_id IS NOT NULL THEN uesd.employee_name
+                      ELSE
+                          CASE WHEN em.supervisor_emplid IS NOT NULL THEN em.supervisor_name
+                          ELSE
+                              NULL
+                          END
+                      END
+                  END reporting_to_name,
+                  CASE WHEN ps.supv_empl_id IS NOT NULL THEN psd.employee_email 
+                  ELSE 
+                      CASE WHEN uesd.employee_id IS NOT NULL THEN uesd.employee_email
+                      ELSE
+                          CASE WHEN em.supervisor_emplid IS NOT NULL THEN em.supervisor_email
+                          ELSE
+                              NULL
+                          END
+                      END
+                  END reporting_to_email,
                   edj.id AS jr_id,
                   edj.due_date_paused,
                   edj.next_conversation_date,
@@ -206,12 +233,26 @@ class PopulateUsersAnnexTable extends Command
                     ON en.id = u.excused_updated_by) ON u.employee_id = d.employee_id
                   LEFT JOIN excused_reasons AS r 
                     ON r.id = u.excused_reason_id
-                  LEFT JOIN (users AS urt 
+                  LEFT JOIN employee_managers AS em
+                    USE INDEX (employee_managers_employee_id_position_number_index)
+                    ON em.employee_id = d.employee_id
+                      AND em.position_number = d.position_number
+                  LEFT JOIN employee_supervisor AS es
+                    USE INDEX (employee_supervisor_user_id_supervisor_id_index)
+                    ON es.user_id = u.id
+                  LEFT JOIN users AS ues
                     USE INDEX (idx_users_id)
-                  LEFT JOIN employee_demo AS edo 
-                    USE INDEX (idx_employee_demo_employeeid_name_email) 
-                        ON edo.employee_id = urt.employee_id
-                  ) ON urt.id = u.reporting_to
+                    ON ues.id = es.supervisor_id
+                  LEFT JOIN employee_demo AS uesd
+                    USE INDEX (employee_demo_employee_id_empl_record_unique)
+                    ON uesd.employee_id = ues.employee_id
+                  LEFT JOIN preferred_supervisor AS ps
+                    USE INDEX (preferred_supervisor_employee_id_position_nbr_index)
+                    ON ps.employee_id = d.employee_id
+                      AND ps.position_nbr = d.position_number
+                  LEFT JOIN employee_demo AS psd
+                    USE INDEX (employee_demo_employee_id_empl_record_unique)
+                    ON psd.employee_id = ps.supv_empl_id
             ");
             \DB::commit();
         } catch (Exception $e) {
