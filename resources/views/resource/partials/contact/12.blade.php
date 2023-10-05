@@ -1,3 +1,3 @@
 <p>
-Sara Weeks: <a href="mailto:sara.weeks@gov.bc.ca" target="_blank">sara.weeks@gov.bc.ca</a>
+Sara Weeks: <a href="mailto:sarah.weeks@gov.bc.ca" target="_blank">sarah.weeks@gov.bc.ca</a>
 </p>
