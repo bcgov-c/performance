@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AlterUserDemoJrHistoryView5 extends Migration
+class AlterUserDemoJrHistoryView6 extends Migration
 {
     /**
      * Run the migrations.
@@ -60,14 +60,14 @@ class AlterUserDemoJrHistoryView5 extends Migration
                 d.deptid,
                 d.employee_status,
                 d.position_number,
-                emv.supervisor_emplid AS manager_id,
-                emv.supervisor_position_number,
-                emv.supervisor_emplid,
-                emv.supervisor_name,
-                emv.supervisor_email,
-                emv.supervisor_emplid AS reporting_to_employee_id,
-                emv.supervisor_name AS reporting_to_name,
-                emv.supervisor_email AS reporting_to_email,
+                d.manager_id,
+                d.supervisor_position_number,
+                d.supervisor_emplid,
+                d.supervisor_name,
+                d.supervisor_email,
+                ua.reporting_to_employee_id,
+                ua.reporting_to_name,
+                ua.reporting_to_email,
                 d.date_updated,
                 d.date_deleted,
 				ua.jr_id,
@@ -98,7 +98,7 @@ class AlterUserDemoJrHistoryView5 extends Migration
                 users AS u 
                     USE INDEX (idx_users_employeeid_emplrecord)
                 JOIN employee_demo AS d 
-                    USE INDEX (idx_employee_demo_employeeid_record) 
+                    USE INDEX (idx_employee_demo_employeeid_orgid) 
                     ON d.employee_id = u.employee_id 
                 INNER JOIN employee_demo_tree AS edt
 					ON edt.id = d.orgid
@@ -112,8 +112,6 @@ class AlterUserDemoJrHistoryView5 extends Migration
                 JOIN employee_demo_jr AS k 
                     USE INDEX (idx_employee_demo_jr_employeeid_id) 
                     ON k.employee_id = u.employee_id
-                LEFT JOIN employee_managers_view emv
-                    ON emv.employee_id = d.employee_id AND emv.position_number = d.position_number 
             WHERE 
                 NOT j.excused_type IS NULL
                 AND k.excused_type IS NULL

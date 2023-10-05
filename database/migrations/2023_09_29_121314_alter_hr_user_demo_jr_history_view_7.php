@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AlterHrUserDemoJrHistoryView6
+class AlterHrUserDemoJrHistoryView7
  extends Migration
 {
     /**
@@ -62,14 +62,14 @@ class AlterHrUserDemoJrHistoryView6
                 d.deptid,
                 d.employee_status,
                 d.position_number,
-                emv.supervisor_emplid AS manager_id,
-                emv.supervisor_position_number,
-                emv.supervisor_emplid,
-                emv.supervisor_name,
-                emv.supervisor_email,
-                emv.supervisor_emplid AS reporting_to_employee_id,
-                emv.supervisor_name AS reporting_to_name,
-                emv.supervisor_email AS reporting_to_email,
+                d.manager_id,
+                d.supervisor_position_number,
+                d.supervisor_emplid,
+                d.supervisor_name,
+                d.supervisor_email,
+                ua.reporting_to_employee_id,
+                ua.reporting_to_name,
+                ua.reporting_to_email,
                 d.date_updated,
                 d.date_deleted,
                 j.id as jr_id,
@@ -101,7 +101,7 @@ class AlterHrUserDemoJrHistoryView6
                 INNER JOIN users AS u 
                     ON u.id = au.user_id
                 INNER JOIN employee_demo AS d 
-                    USE INDEX (idx_employee_demo_employeeid_record)
+                    USE INDEX (idx_employee_demo_employeeid_orgid)
                     ON d.employee_id = u.employee_id
                 INNER JOIN employee_demo_tree AS edt
 					ON edt.id = d.orgid
@@ -122,8 +122,6 @@ class AlterHrUserDemoJrHistoryView6
                         AND k.id = (SELECT MIN(m.id) FROM employee_demo_jr m WHERE m.employee_id = k.employee_id AND m.id > j.id AND m.excused_type IS NULL)
                         AND k.id > j.id
                         AND NOT EXISTS (SELECT 1 FROM employee_demo_jr x WHERE x.employee_id = j.employee_id AND x.id > j.id AND x.id < k.id AND x.excused_type IS NULL)
-                LEFT JOIN employee_managers_view emv
-                    ON emv.employee_id = d.employee_id AND emv.position_number = d.position_number 
         ");
     }
 

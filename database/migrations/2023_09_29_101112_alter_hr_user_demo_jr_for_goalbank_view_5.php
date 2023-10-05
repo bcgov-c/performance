@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AlterUserDemoJrForGoalbankView4 extends Migration
+class AlterHrUserDemoJrForGoalbankView5 extends Migration
 {
     /**
      * Run the migrations.
@@ -14,9 +14,10 @@ class AlterUserDemoJrForGoalbankView4 extends Migration
     public function up()
     {
         \DB::statement("
-            ALTER VIEW user_demo_jr_for_goalbank_view
+            ALTER VIEW hr_user_demo_jr_for_goalbank_view
             AS
-            SELECT
+            SELECT 
+                au.auth_id,
                 u.id AS user_id,
                 u.name AS user_name,
                 u.employee_id,
@@ -60,14 +61,14 @@ class AlterUserDemoJrForGoalbankView4 extends Migration
                 d.deptid,
                 d.employee_status,
                 d.position_number,
-                emv.supervisor_emplid AS manager_id,
-                emv.supervisor_position_number,
-                emv.supervisor_emplid,
-                emv.supervisor_name,
-                emv.supervisor_email,
-                emv.supervisor_emplid AS reporting_to_employee_id,
-                emv.supervisor_name AS reporting_to_name,
-                emv.supervisor_email AS reporting_to_email,
+                d.manager_id,
+                d.supervisor_position_number,
+                d.supervisor_emplid,
+                d.supervisor_name,
+                d.supervisor_email,
+                ua.reporting_to_employee_id,
+                ua.reporting_to_name,
+                ua.reporting_to_email,
                 d.date_updated,
                 d.date_deleted,
                 ua.jr_id,
@@ -94,19 +95,23 @@ class AlterUserDemoJrForGoalbankView4 extends Migration
                 d.employee_name AS employee_name_search,
                 ua.isSupervisor,
                 ua.isDelegate
-            FROM
-                users AS u
-                    USE INDEX (idx_users_employeeid_emplrecord)
-                INNER JOIN employee_demo AS d
-                    USE INDEX (idx_employee_demo_employeeid_record)
+            FROM 
+                auth_users AS au
+                INNER JOIN users AS u 
+                    USE INDEX (idx_users_id)
+                    ON u.id = au.user_id
+                INNER JOIN employee_demo AS d 
+                    USE INDEX (idx_employee_demo_employeeid_orgid)
                     ON d.employee_id = u.employee_id
                 INNER JOIN employee_demo_tree AS edt
 					ON edt.id = d.orgid
-                INNER JOIN users_annex AS ua
+                INNER JOIN auth_orgs AS ao
+                    USE INDEX (idx_auth_orgs_type_auth_id_orgid)
+                    ON ao.type = 'HR' AND ao.auth_id = au.auth_id 
+                        AND ao.orgid = d.orgid
+                INNER JOIN users_annex AS ua 
                     ON ua.user_id = u.id
                         AND ua.orgid = d.orgid
-                LEFT JOIN employee_managers_view emv
-                    ON emv.employee_id = d.employee_id AND emv.position_number = d.position_number 
         ");
     }
 
