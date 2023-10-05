@@ -412,7 +412,7 @@ class User extends Authenticatable
             })
             ->join('employee_demo_tree AS edt', 'edt.id', 'ed.orgid')
             ->where('pj.employee_id', $this->employee_id)
-            ->selectRaw("pj.employee_id, pj.empl_record, CONCAT(ed.jobcode_desc, ' - ', edt.organization) AS job")
+            ->selectRaw("pj.employee_id, pj.empl_record, CONCAT(edt.deptid, ' ', ed.jobcode_desc) AS job")
             ->first();
     }
 
@@ -422,7 +422,7 @@ class User extends Authenticatable
             ->join('employee_demo_tree AS edt', 'edt.id', 'ed1.orgid')
             ->whereNull('ed1.date_deleted')
             ->where('ed1.employee_id', $this->employee_id)
-            ->selectRaw("ed1.employee_id, ed1.empl_record, CONCAT(ed1.jobcode_desc, ' - ', edt.organization) AS job")
+            ->selectRaw("ed1.employee_id, ed1.empl_record, CONCAT(edt.deptid, ' ', ed1.jobcode_desc) AS job")
             ->get();
     }
 
