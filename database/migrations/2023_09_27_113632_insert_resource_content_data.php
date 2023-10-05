@@ -844,7 +844,7 @@ class InsertResourceContentData extends Migration
                 'category' => 'contact',
                 'question' => 'Health',
                 'answer' => '<p>
-                Sara Weeks: <a href="mailto:sara.weeks@gov.bc.ca" target="_blank">sara.weeks@gov.bc.ca</a>
+                Sarah Weeks: <a href="mailto:sarah.weeks@gov.bc.ca" target="_blank">sarah.weeks@gov.bc.ca</a>
                 </p>                
                 ',
                 'answer_file' => '12',
