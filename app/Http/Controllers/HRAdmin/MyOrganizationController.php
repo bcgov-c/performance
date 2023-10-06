@@ -80,7 +80,10 @@ class MyOrganizationController extends Controller {
                     u.employee_email,
                     u.position_number,
                     u.empl_record,
+                    u.reporting_to_employee_id,
                     u.reporting_to_name,
+                    u.reporting_to_email,
+                    u.reporting_to_position_number,
                     u.supervisor_position_number,
                     jobcode_desc,
                     u.orgid AS orgid,
@@ -172,7 +175,7 @@ class MyOrganizationController extends Controller {
             'u.employee_email' => 'Email', 
             'u.position_number' => 'Position #',
             'u.reporting_to_name' => 'Reports To Name',
-            'u.supervisor_position_number' => 'Reports to Position #',
+            'u.reporting_to_position_number' => 'Reports to Position #',
             'u.jobcode_desc' => 'Classification',
             'u.deptid' => 'Dept ID'
         ];

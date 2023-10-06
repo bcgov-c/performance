@@ -99,6 +99,7 @@ class PopulateUsersAnnexTable extends Command
                   reporting_to_employee_id,
                   reporting_to_name,
                   reporting_to_email,
+                  reporting_to_position_number,
                   jr_id,
                   jr_due_date_paused,
                   jr_next_conversation_date,
@@ -190,6 +191,16 @@ class PopulateUsersAnnexTable extends Command
                           END
                       END
                   END reporting_to_email,
+                  CASE WHEN ps.supv_empl_id IS NOT NULL THEN psd.position_number 
+                  ELSE 
+                      CASE WHEN uesd.employee_id IS NOT NULL THEN uesd.position_number
+                      ELSE
+                          CASE WHEN em.supervisor_emplid IS NOT NULL THEN em.supervisor_position_number
+                          ELSE
+                              NULL
+                          END
+                      END
+                  END reporting_to_position_number,
                   edj.id AS jr_id,
                   edj.due_date_paused,
                   edj.next_conversation_date,
