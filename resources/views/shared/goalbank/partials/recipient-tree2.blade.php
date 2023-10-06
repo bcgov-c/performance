@@ -21,7 +21,7 @@
                                 <a role="button" data-toggle="collapse" href="#ecollapse-{{ $eorg->id }}" aria-expanded="false" class="collapsed"
                                     aria-controls="ecollapse-{{ $eorg->id }}">
                                     <span class="pr-2">{{ $eorg->name }}</span> 
-                                    @if ((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($eorg->id, $eauthorizedOrgs)))
+                                    @if (((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($eorg->id, $eauthorizedOrgs))) && $authorizedLevel <= 0)
                                         <input pid="" class="einheritedCheck" type="checkbox" id="einheritedCheck{{ $eorg->id }}" name="einheritedCheck[]" style="vertical-align:middle; float:right; margin-right:100px"
                                             {{ (is_array(old('einheritedCheck')) and in_array($eorg->id, old('einheritedCheck'))) ? ' checked' : '' }} value="{{ $eorg->id }}">   
                                         <span class="pr-2" style="float:right; margin-right:3px">Inherited</span> 
@@ -46,7 +46,7 @@
                                                             class="{{ $eprogram->children->count() == 0 ? 'disabled' : '' }} collapsed"
                                                             aria-controls="ecollapse-{{ $eprogram->id }}">
                                                             <span class="pr-1">{{ $eprogram->name }}</span>
-                                                            @if ((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($eprogram->id, $eauthorizedOrgs)))
+                                                            @if (((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($eprogram->id, $eauthorizedOrgs))) && $authorizedLevel <= 1)
                                                                 <input pid="" class="einheritedCheck" type="checkbox" id="einheritedCheck{{ $eprogram->id }}" name="einheritedCheck[]" style="vertical-align:middle; float:right; margin-right:100px"
                                                                     {{ (is_array(old('einheritedCheck')) and in_array($eprogram->id, old('einheritedCheck'))) ? ' checked' : '' }} value="{{ $eprogram->id }}">   
                                                                 <span class="pr-2" style="float:right; margin-right:3px">Inherited</span> 
@@ -69,7 +69,7 @@
                                                                                 <a role="button" data-toggle="collapse" href="#ecollapse-{{ $edivision->id }}" aria-expanded="false" class="collapsed"
                                                                                     aria-controls="ecollapse-{{ $edivision->id }}">
                                                                                     <span class="pr-1">{{ $edivision->name }}</span>
-                                                                                    @if ((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($edivision->id, $eauthorizedOrgs)))
+                                                                                    @if (((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($edivision->id, $eauthorizedOrgs))) && $authorizedLevel <= 2)
                                                                                         <input pid="" class="einheritedCheck" type="checkbox" id="einheritedCheck{{ $edivision->id }}" name="einheritedCheck[]" style="vertical-align:middle; float:right; margin-right:100px"
                                                                                             {{ (is_array(old('einheritedCheck')) and in_array($edivision->id, old('einheritedCheck'))) ? ' checked' : '' }} value="{{ $edivision->id }}">   
                                                                                         <span class="pr-2" style="float:right; margin-right:3px">Inherited</span> 
@@ -92,7 +92,7 @@
                                                                                                         <a role="button" data-toggle="collapse" href="#ecollapse-{{ $ebranch->id }}" aria-expanded="false" class="collapsed"
                                                                                                             aria-controls="ecollapse-{{ $ebranch->id }}">
                                                                                                             <span class="pr-1">{{ $ebranch->name }}</span>
-                                                                                                            @if ((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($ebranch->id, $eauthorizedOrgs)))
+                                                                                                            @if (((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($ebranch->id, $eauthorizedOrgs))) && $authorizedLevel <= 3)
                                                                                                                 <input pid="" class="einheritedCheck" type="checkbox" id="einheritedCheck{{ $ebranch->id }}" name="einheritedCheck[]" style="vertical-align:middle; float:right; margin-right:100px"
                                                                                                                     {{ (is_array(old('einheritedCheck')) and in_array($ebranch->id, old('einheritedCheck'))) ? ' checked' : '' }} value="{{ $ebranch->id }}">   
                                                                                                                 <span class="pr-2" style="float:right; margin-right:3px">Inherited</span> 
@@ -114,7 +114,7 @@
                                                                                                                             <a role="button" data-toggle="collapse" href="#ecollapse-{{ $elevel4->id }}" aria-expanded="false" class="collapsed"
                                                                                                                                 aria-controls="ecollapse-{{ $elevel4->id }}" data="{{ $elevel4->id }}">
                                                                                                                                 <span class="pr-2">{{ $elevel4->name }}</span>
-                                                                                                                                @if ((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($elevel4->id, $eauthorizedOrgs)))
+                                                                                                                                @if (((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($elevel4->id, $eauthorizedOrgs))) && $authorizedLevel <= 4)
                                                                                                                                     <input pid="" class="einheritedCheck" type="checkbox" id="einheritedCheck{{ $elevel4->id }}" name="einheritedCheck[]" style="vertical-align:middle; float:right; margin-right:100px"
                                                                                                                                         {{ (is_array(old('einheritedCheck')) and in_array($elevel4->id, old('einheritedCheck'))) ? ' checked' : '' }} value="{{ $elevel4->id }}">   
                                                                                                                                     <span class="pr-2" style="float:right; margin-right:3px">Inherited</span> 
@@ -137,7 +137,7 @@
                                                                                                         <a role="button" data-toggle="collapse" href="#ecollapse-{{ $ebranch->id }}" aria-expanded="false" class="collapsed"
                                                                                                             aria-controls="ecollapse-{{ $ebranch->id }}" data="{{ $ebranch->id }}">
                                                                                                             <span class="pr-2">{{ $ebranch->name }}</span>
-                                                                                                            @if ((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($ebranch->id, $eauthorizedOrgs)))
+                                                                                                            @if (((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($ebranch->id, $eauthorizedOrgs))) && $authorizedLevel <= 3)
                                                                                                                 <input pid="" class="einheritedCheck" type="checkbox" id="einheritedCheck{{ $ebranch->id }}" name="einheritedCheck[]" style="vertical-align:middle; float:right; margin-right:100px"
                                                                                                                     {{ (is_array(old('einheritedCheck')) and in_array($ebranch->id, old('einheritedCheck'))) ? ' checked' : '' }} value="{{ $ebranch->id }}">   
                                                                                                                 <span class="pr-2" style="float:right; margin-right:3px">Inherited</span> 
@@ -161,7 +161,7 @@
                                                                                 <a role="button" data-toggle="collapse" href="#ecollapse-{{ $edivision->id }}" aria-expanded="false" class="collapsed"
                                                                                     aria-controls="ecollapse-{{ $edivision->id }}" data="{{ $edivision->id }}">
                                                                                     <span class="pr-2">{{ $edivision->name }}</span>
-                                                                                    @if ((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($edivision->id, $eauthorizedOrgs)))
+                                                                                    @if (((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($edivision->id, $eauthorizedOrgs))) && $authorizedLevel <= 2)
                                                                                         <input pid="" class="einheritedCheck" type="checkbox" id="einheritedCheck{{ $edivision->id }}" name="einheritedCheck[]" style="vertical-align:middle; float:right; margin-right:100px"
                                                                                             {{ (is_array(old('einheritedCheck')) and in_array($edivision->id, old('einheritedCheck'))) ? ' checked' : '' }} value="{{ $edivision->id }}">   
                                                                                         <span class="pr-2" style="float:right; margin-right:3px">Inherited</span> 
@@ -185,7 +185,7 @@
                                                         <a role="button" data-toggle="collapse" href="#ecollapse-{{ $eprogram->id }}" aria-expanded="false" class="collapsed"
                                                             aria-controls="ecollapse-{{ $eprogram->id }}" data="{{ $eprogram->id }}">
                                                             <span class="pr-2">{{ $eprogram->name }}</span>
-                                                            @if ((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($eprogram->id, $eauthorizedOrgs)))
+                                                            @if (((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($eprogram->id, $eauthorizedOrgs))) && $authorizedLevel <= 1)
                                                                 <input pid="" class="einheritedCheck" type="checkbox" id="einheritedCheck{{ $eprogram->id }}" name="einheritedCheck[]" style="vertical-align:middle; float:right; margin-right:100px"
                                                                     {{ (is_array(old('einheritedCheck')) and in_array($eprogram->id, old('einheritedCheck'))) ? ' checked' : '' }} value="{{ $eprogram->id }}">   
                                                                 <span class="pr-2" style="float:right; margin-right:3px">Inherited</span> 
@@ -209,7 +209,7 @@
                             <h6 class="mb-0">
                                 <a role="button" class="disabled collapsed">
                                     <span class="pr-2">{{ $eorg->name }}</span>
-                                    @if ((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($eorg->id, $eauthorizedOrgs)))
+                                    @if (((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($eorg->id, $eauthorizedOrgs))) && $authorizedLevel <= 0)
                                         <input pid="" class="einheritedCheck" type="checkbox" id="einheritedCheck{{ $eorg->id }}" name="einheritedCheck[]" style="vertical-align:middle; float:right; margin-right:100px"
                                             {{ (is_array(old('einheritedCheck')) and in_array($eorg->id, old('einheritedCheck'))) ? ' checked' : '' }} value="{{ $eorg->id }}">   
                                         <span class="pr-2" style="float:right; margin-right:3px">Inherited</span> 

@@ -666,22 +666,28 @@ class GoalBankController extends Controller
             ->orderBy('orgid')->orderBy('employee_id')
             ->get();
         $empIdsByOrgId = $rows->groupBy('orgid')->all();
+        $authorizedLevel = null;
+        if($request->{$option.'dd_level0'}) { $authorizedLevel = 0; };
+        if($request->{$option.'dd_level1'}) { $authorizedLevel = 1; };
+        if($request->{$option.'dd_level2'}) { $authorizedLevel = 2; };
+        if($request->{$option.'dd_level3'}) { $authorizedLevel = 3; };
+        if($request->{$option.'dd_level4'}) { $authorizedLevel = 4; };
         if($request->ajax()){
             switch ($index) {
                 case 2:
                     $eorgs = $orgs;
                     $ecountByOrg = $countByOrg;
                     $eempIdsByOrgId = $empIdsByOrgId;
-                    return view('shared.goalbank.partials.recipient-tree2', compact('eorgs','ecountByOrg','eempIdsByOrgId') );
+                    return view('shared.goalbank.partials.recipient-tree2', compact('eorgs','ecountByOrg','eempIdsByOrgId', 'authorizedLevel') );
                     break;
                 case 3:
                     $aorgs = $orgs;
                     $acountByOrg = $countByOrg;
                     $aempIdsByOrgId = $empIdsByOrgId;
-                    return view('shared.goalbank.partials.arecipient-tree', compact('aorgs','acountByOrg','aempIdsByOrgId') );
+                    return view('shared.goalbank.partials.arecipient-tree', compact('aorgs','acountByOrg','aempIdsByOrgId', 'authorizedLevel') );
                     break;
                 default:
-                    return view('shared.goalbank.partials.recipient-tree', compact('orgs','countByOrg','empIdsByOrgId') );
+                    return view('shared.goalbank.partials.recipient-tree', compact('orgs','countByOrg','empIdsByOrgId', 'authorizedLevel') );
                     break;
             }
         }
