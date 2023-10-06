@@ -96,7 +96,7 @@
                         {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'u.employee_email', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'Position #', ariaTitle: 'Position #', target: 0, type: 'string', data: 'position_number', name: 'u.position_number', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'Reports To Name', ariaTitle: 'Reports To Name', target: 0, type: 'string', data: 'reporting_to_name', name: 'u.reporting_to_name', searchable: false, className: 'dt-nowrap show-modal'},
-                        {title: 'Reports To Position #', ariaTitle: 'Reports To Position #', target: 0, type: 'string', data: 'supervisor_position_number', name: 'u.supervisor_position_number', searchable: true, className: 'dt-nowrap show-modal'},
+                        {title: 'Reports To Position #', ariaTitle: 'Reports To Position #', target: 0, type: 'string', data: 'reporting_to_position_number', name: 'u.reporting_to_position_number', searchable: true, className: 'dt-nowrap show-modal'},
                         {title: 'Status', ariaTitle: 'Status', target: 0, type: 'string', data: 'employee_status', name: 'u.employee_status', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'Record #', ariaTitle: 'Record #', target: 0, type: 'string', data: 'empl_record', name: 'u.empl_record', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'u.jobcode_desc', searchable: false, className: 'dt-nowrap show-modal'},
