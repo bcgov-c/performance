@@ -713,6 +713,12 @@ class GoalBankController extends Controller
         $empIdsByOrgId = $rows->groupBy('orgid')->all();
         $authId = Auth::id();
         $authorizedOrgs = \DB::table('auth_orgs')->where('auth_id', \DB::raw($authId))->pluck('orgid')->toArray();
+        $authorizedLevel = null;
+        if($request->{$option.'dd_level0'}) { $authorizedLevel = 0; };
+        if($request->{$option.'dd_level1'}) { $authorizedLevel = 1; };
+        if($request->{$option.'dd_level2'}) { $authorizedLevel = 2; };
+        if($request->{$option.'dd_level3'}) { $authorizedLevel = 3; };
+        if($request->{$option.'dd_level4'}) { $authorizedLevel = 4; };
         if($request->ajax()){
             switch ($index) {
                 case 2:
@@ -720,17 +726,17 @@ class GoalBankController extends Controller
                     $ecountByOrg = $countByOrg;
                     $eempIdsByOrgId = $empIdsByOrgId;
                     $eauthorizedOrgs = $authorizedOrgs;
-                    return view('shared.goalbank.partials.recipient-tree2', compact('eorgs','ecountByOrg','eempIdsByOrgId', 'eauthorizedOrgs') );
+                    return view('shared.goalbank.partials.recipient-tree2', compact('eorgs','ecountByOrg','eempIdsByOrgId', 'eauthorizedOrgs', 'authorizedLevel') );
                     break;
                 case 3:
                     $aorgs = $orgs;
                     $acountByOrg = $countByOrg;
                     $aempIdsByOrgId = $empIdsByOrgId;
                     $aauthorizedOrgs = $authorizedOrgs;
-                    return view('shared.goalbank.partials.arecipient-tree', compact('aorgs','acountByOrg','aempIdsByOrgId', 'aauthorizedOrgs') );
+                    return view('shared.goalbank.partials.arecipient-tree', compact('aorgs','acountByOrg','aempIdsByOrgId', 'aauthorizedOrgs', 'authorizedLevel') );
                     break;
                 default:
-                    return view('shared.goalbank.partials.recipient-tree', compact('orgs','countByOrg','empIdsByOrgId', 'authorizedOrgs') );
+                    return view('shared.goalbank.partials.recipient-tree', compact('orgs','countByOrg','empIdsByOrgId', 'authorizedOrgs', 'authorizedLevel') );
                     break;
             }
         }

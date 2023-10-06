@@ -15,13 +15,12 @@
 
         <div class="container-fluid">
                     @if(Session::has('message'))
-                    <div class="col-12">                    
-                        <div class="alert alert-danger" style="display:">
-                            <i class="fa fa-info-circle"></i> {{ Session::get('message') }}
-                        </div>
-                    </div>
+						<div class="col-12">                    
+							<div class="alert alert-danger" style="display:">
+								<i class="fa fa-info-circle"></i> {{ Session::get('message') }}
+							</div>
+						</div>
                     @endif
-
 					<div class="col-12" id="error_msg" style="display:none">                    
                         <div class="alert alert-danger" style="display:">
                             <i class="fa fa-info-circle"></i> There are one or more errors on the page. Please review and try again.
@@ -41,9 +40,9 @@
 					<b> Goal Title </b>
 					<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>
 						<input class="form-control form-control-md" name="title" id="title" autocomplete="off">
-					@if(session()->has('title_miss'))
-                                            <small class="text-danger">The title field is required</small>
-                                        @endif
+						@if(session()->has('title_miss'))
+							<small class="text-danger">The title field is required</small>
+						@endif
 						<span id="title_error" style="display:none" class="text-danger">The title field is required</span>				
 				</div>
 				<div class="col col-md-2">
@@ -56,8 +55,8 @@
 					<i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>."></i>					
 					<x-dropdown :list="$tags" name="tag_ids[]" id="tags" class="tags" multiple/>						
 					@if(session()->has('tags_miss'))
-                                            <small class="text-danger">The tags field is required</small>
-                                        @endif
+						<small class="text-danger">The tags field is required</small>
+					@endif
 					<span id="tags_error" style="display:none" class="text-danger">The tags field is required</span>									
 				</div>		
 			</div>
@@ -115,16 +114,20 @@
 					<div class="row">
 						<div class="col">
 							<label>
-								<input type="radio" id="opt_audience1" name="opt_audience" value="byEmp" checked> Individual(s)
+								<input type="radio" id="opt_audience2" name="opt_audience" value="byOrg" checked> Business Unit(s)
 							</label>
 						</div>
 						<div class="col">
 							<label>
-								<input type="radio" id="opt_audience2" name="opt_audience" value="byOrg"> Business Unit(s)
+								<input type="radio" id="opt_audience1" name="opt_audience" value="byEmp"> Individual(s)
 							</label>
 						</div>
 					</div>
 				</div>
+			</div>
+
+			<div class="px-4">
+				<p><b>Use the filter below to find your organization. Click the "Generate Org Tree" button. Scroll down and select the business unit(s) from the org tree to assign the goal. If using "Static" option, make sure there is a check mark beside each business unit. If using "Inherited" option, make sure there is a check mark beside the top org level only; the goal will cascade down through all levels below automaticaly.</b></p>
 			</div>
 
 			<input type="hidden" id="selected_emp_ids" name="selected_emp_ids" value="">

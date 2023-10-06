@@ -58,8 +58,8 @@
             <div class="form-group row"> </div>
             <div class="form-group row">
                 <span class="float-left float-bottom align-self-end" style="float: left; vertical-align: bottom;">  
-                    <button type="button" class="align-self-end btn btn-primary" id="ebtn_search" name="ebtn_search">Filter</button>
-                    <button type="button" class="align-self-end btn btn-secondary" id="ebtn_search_reset" name="ebtn_reset" value="ebtn_reset">Reset</button>
+                    <button type="button" class="align-self-end btn btn-primary" id="ebtn_search" name="ebtn_search" aria-label="Filter Button">Generate Org Tree</button>
+                    <button type="button" class="align-self-end btn btn-secondary" id="ebtn_search_reset" name="ebtn_reset" value="ebtn_reset" aria-label="Reset Button">Reset</button>
                 </span>
             </div>
         </div>
