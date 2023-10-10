@@ -18,7 +18,7 @@
                     @if ($eorg->children->count() > 0 )    
                         <div class="card-header" id="heading-{{ $eorg->id }}">
                             <h6 class="mb-0">
-                                <a role="button" data-toggle="collapse" href="#ecollapse-{{ $eorg->id }}" aria-expanded="false" class="collapsed"
+                                <a role="button" data-toggle="collapse" href="#ecollapse-{{ $eorg->id }}" aria-expanded="true"
                                     aria-controls="ecollapse-{{ $eorg->id }}">
                                     <span class="pr-2">{{ $eorg->name }}</span> 
                                     @if (((request()->segment(1) == 'sysadmin') || (request()->segment(1) == 'hradmin' && is_array($eauthorizedOrgs) && in_array($eorg->id, $eauthorizedOrgs))) && $authorizedLevel <= 0)
@@ -32,7 +32,7 @@
                                 </a>
                             </h6>
                         </div>
-                        <div id="ecollapse-{{ $eorg->id }}" class="collapse" data-parent="#eaccordion-level0" aria-labelledby="eheading-{{ $eorg->id }}">
+                        <div id="ecollapse-{{ $eorg->id }}" class="collapse show" data-parent="#eaccordion-level0" aria-labelledby="eheading-{{ $eorg->id }}">
                             <div class="card-body">
                                 {{--  Nested PROGRAM - Start  --}}
                                 <div id="eaccordion-1">
