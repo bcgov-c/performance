@@ -1280,18 +1280,10 @@ class GoalBankController extends Controller
                     NOW() AS created_at,
                     NOW() AS updated_at
                 ")
+                ->whereRaw("NOT EXISTS (SELECT 1 FROM dashboard_notifications WHERE dashboard_notifications.user_id = user_demo_jr_view.user_id AND dashboard_notifications.notification_type = 'GB' AND dashboard_notifications.related_id = {$goalBank->id} AND dashboard_notifications.deleted_at IS NULL)")
                 ->get()
                 ->toArray();
-            DashboardNotification::whereNull('deleted_at')
-                ->updateOrCreate([
-                    'user_id' => $data->user_id,
-                    'notification_type' => $data->notification_type,
-                    'related_id' => $data->related_id,
-                ],[
-                    'comment' => $data->comment,
-                    'created_at' => $data->created_at,
-                    'updated_at' => $data->updated_at,
-                ]);
+            DashboardNotification::insert($data);
             $data = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization_key', 'access_organizations.orgid')
                 ->whereIn('user_demo_jr_view.employee_id', $employee_ids_chunk)
                 ->where('access_organizations.allow_inapp_msg', 'Y')
