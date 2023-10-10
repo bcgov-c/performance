@@ -54,8 +54,7 @@
             <label for="esearch_text">Search Text</label>
             <input type="text" id="esearch_text" name="esearch_text" class="form-control" value="" placeholder="Search Text">
         </div>
-        <div class="form-group col-md-2 p-3 float-left float-bottom" style="text-align:left; vertical-align:bottom;">
-            <div class="form-group row"> </div>
+        <div class="form-group col-md-3 px-3 float-left float-bottom" style="text-align:left; vertical-align:bottom;">
             <div class="form-group row">
                 <span class="float-left float-bottom align-self-end" style="float: left; vertical-align: bottom;">  
                     <button type="button" class="align-self-end btn btn-primary" id="ebtn_search" name="ebtn_search" aria-label="Filter Button">Generate Org Tree</button>

@@ -70,12 +70,14 @@
 			<div class="row">
 				<div class="col-md-12">
 					<b>Goal Description</b>
-					<p>
-						Each goal should include a description of <b>WHAT</b>  
-						<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".'> </i> you will accomplish, <b>WHY</b> 
-						<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important, and <b>HOW</b> 
-						<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> you will achieve it. 
-					</p>
+					<div class="px-3">
+						<p>
+							Each goal should include a description of <b>WHAT</b>  
+							<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".'> </i> you will accomplish, <b>WHY</b> 
+							<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important, and <b>HOW</b> 
+							<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> you will achieve it. 
+						</p>
+					</div>
 					<x-textarea id="what" name="what"/>
 					@if(session()->has('what_miss'))
                                             <small class="text-danger">The description field is required</small>
@@ -126,8 +128,8 @@
 				</div>
 			</div>
 
-			<div class="px-4">
-				<p><b>Use the filter below to find your organization. Click the "Generate Org Tree" button. Scroll down and select the business unit(s) from the org tree to assign the goal. If using "Static" option, make sure there is a check mark beside each business unit. If using "Inherited" option, make sure there is a check mark beside the top org level only; the goal will cascade down through all levels below automaticaly.</b></p>
+			<div class="px-3" id="business_instruction">
+				<p>Use the filter below to find your organization. Click the "Generate Org Tree" button. Scroll down and select the business unit(s) from the org tree to assign the goal. If using "Static" option, make sure there is a check mark beside each business unit. If using "Inherited" option, make sure there is a check mark beside the top org level only; the goal will cascade down through all levels below automaticaly.</p>
 			</div>
 
 			<input type="hidden" id="selected_emp_ids" name="selected_emp_ids" value="">
@@ -398,6 +400,8 @@
 						$('#filter2').show();
 						$('#enav-tab').show();
 						$('#enav-tree').show();
+
+						$('#business_instruction').show();
 					} else {
 						$('#filter1').show();
 						$('#nav-tab').show();
@@ -408,6 +412,8 @@
 						$('#filter2').hide();
 						$('#enav-tab').hide();
 						$('#enav-tree').hide();
+
+						$('#business_instruction').hide();
 					}
 				}
 
@@ -698,7 +704,7 @@
 				});
 				$('#edd_level4').change(function (e) {
 					e.preventDefault();
-					$('#ebtn_search').click();
+					// $('#ebtn_search').click();
 				});
 
 				$('#ebtn_search_reset').click(function(e) {
