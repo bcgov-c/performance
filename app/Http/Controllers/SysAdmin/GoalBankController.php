@@ -1045,24 +1045,23 @@ class GoalBankController extends Controller
     public function managegetList(Request $request) {
         if ($request->ajax()) {
             $query = Goal::withoutGlobalScopes()
-                ->join('users as cu', 'cu.id', 'goals.created_by')
+                ->leftjoin('users as cu', 'cu.id', 'goals.created_by')
                 ->leftjoin('employee_demo as ced', 'ced.employee_id', 'cu.employee_id')
                 ->leftjoin('employee_demo_tree as edt', 'edt.id', 'ced.orgid')
-                ->where('is_library', true)
-                ->whereIn('by_admin', [1, 2])
+                ->where('is_library', \DB::raw(1))
+                ->whereIn('by_admin', [\DB::raw(1), \DB::raw(2)])
                 ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
                     return $q->where(function($query) use ($request) { 
-                        return $query->whereRaw("goals.title LIKE '%".$request->search_text."%'")
-                            ->orWhereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%')");
+                        return $query->whereRaw("(goals.title LIKE '%".$request->search_text."%')")
+                            ->orWhereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
                     });
                 })
                 ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
-                    return $q->whereRaw("goals.title LIKE '%".$request->search_text."%'");
+                    return $q->whereRaw("(goals.title LIKE '%".$request->search_text."%')");
                 })
                 ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
-                    return $q->whereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%')");
+                    return $q->whereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
                 })
-                ->orderBy('goals.display_name') 
                 ->select
                     (
                         'goals.id',
@@ -1079,7 +1078,7 @@ class GoalBankController extends Controller
                 ] )
                 ->addSelect(['org_audience' => 
                     GoalBankOrg::whereColumn('goal_id', 'goals.id')
-                        ->where('version', 2)
+                        ->where('version', \DB::raw(2))
                         ->whereNotNull('orgid')
                         ->selectRAW('count(distinct goal_bank_orgs.id)')
                 ] )
