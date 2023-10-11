@@ -1088,23 +1088,23 @@ class GoalBankController extends Controller
     public function managegetList(Request $request) {
         if ($request->ajax()) {
             $ownedgoals = Goal::withoutGlobalScopes()
-                ->leftjoin('users as cu', 'cu.id', 'goals.created_by')
+                ->join('users as cu', 'cu.id', 'goals.created_by')
                 ->leftjoin('employee_demo as ced', 'ced.employee_id', 'cu.employee_id')
                 ->leftjoin('employee_demo_tree as edt', 'edt.id', 'ced.orgid')
-                ->where('is_library', \DB::raw(1))
-                ->where('goals.created_by', \DB::raw(Auth::id()))
-                ->where('by_admin', \DB::raw(2))
+                ->where('is_library', true)
+                ->where('goals.created_by', Auth::id())
+                ->where('by_admin', 2)
                 ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
                     $q->where(function($query) use ($request) {
-                        return $query->whereRaw("(goals.title LIKE '%".$request->search_text."%')")
-                            ->orWhereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
+                        return $query->whereRaw("goals.title LIKE '%".$request->search_text."%'")
+                            ->orWhereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%')");
                     });
                 })
                 ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
-                    return $q->whereRaw("(goals.title LIKE '%".$request->search_text."%')");
+                    return $q->whereRaw("goals.title LIKE '%".$request->search_text."%'");
                 })
                 ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
-                    return $q->whereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
+                    return $q->whereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%')");
                 })
                 ->distinct()
                 ->select
@@ -1123,30 +1123,30 @@ class GoalBankController extends Controller
                 ] )
                 ->addSelect(['org_audience' => 
                     GoalBankOrg::whereColumn('goal_id', 'goals.id')
-                        ->where('version', \DB::raw(2))
+                        ->where('version', 2)
                         ->whereNotNull('orgid')
                         ->selectRAW('count(distinct id)')
                 ] )
                 ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
             $otherHRgoals = Goal::withoutGlobalScopes()
-                ->leftjoin('users as cu', 'cu.id', 'goals.created_by')
+                ->join('users as cu', 'cu.id', 'goals.created_by')
                 ->leftjoin('employee_demo as ced', 'ced.employee_id', 'cu.employee_id')
                 ->leftjoin('employee_demo_tree as edt', 'edt.id', 'ced.orgid')
-                ->where('is_library', \DB::raw(1))
-                ->where('by_admin', \DB::raw(2))
-                ->where('goals.created_by', '<>', \DB::raw(Auth::id()))
+                ->where('is_library', true)
+                ->where('by_admin', 2)
+                ->where('goals.created_by', '<>', Auth::id())
                 ->whereRaw("EXISTS (SELECT 1 FROM auth_orgs AS ao, goal_bank_orgs AS gbo WHERE ao.type = 'HR' AND ao.auth_id = ".Auth::id()." AND ao.orgid = gbo.orgid AND gbo.goal_id = goals.id AND gbo.version = 2 AND gbo.inherited = 0 LIMIT 1)")
                 ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
                     $q->where(function($query) use ($request) {
-                        return $query->whereRaw("(goals.title LIKE '%".$request->search_text."%')")
-                            ->orWhereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
+                        return $query->whereRaw("goals.title LIKE '%".$request->search_text."%'")
+                            ->orWhereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%')");
                     });
                 })
                 ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
-                    return $q->whereRaw("(goals.title LIKE '%".$request->search_text."%')");
+                    return $q->whereRaw("goals.title LIKE '%".$request->search_text."%'");
                 })
                 ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
-                    return $q->whereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
+                    return $q->whereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%')");
                 })
                 ->distinct()
                 ->select
@@ -1165,30 +1165,30 @@ class GoalBankController extends Controller
                 ] )
                 ->addSelect(['org_audience' => 
                     GoalBankOrg::whereColumn('goal_id', 'goals.id')
-                        ->where('version', \DB::raw(2))
+                        ->where('version', 2)
                         ->whereNotNull('orgid')
                         ->selectRAW('count(distinct id)')
                 ] )
                 ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
             $inheritedHRgoals = Goal::withoutGlobalScopes()
-                ->leftjoin('users as cu', 'cu.id', 'goals.created_by')
+                ->join('users as cu', 'cu.id', 'goals.created_by')
                 ->leftjoin('employee_demo as ced', 'ced.employee_id', 'cu.employee_id')
                 ->leftjoin('employee_demo_tree as edt', 'edt.id', 'ced.orgid')
-                ->where('is_library', \DB::raw(1))
-                ->where('by_admin', \DB::raw(2))
-                ->where('goals.created_by', '<>', \DB::raw(Auth::id()))
+                ->where('is_library', true)
+                ->where('by_admin', 2)
+                ->where('goals.created_by', '<>', Auth::id())
                 ->whereRaw("EXISTS (SELECT 1 FROM auth_orgs AS ao, employee_demo_tree AS edt, goal_bank_orgs AS gbo WHERE ao.type = 'HR' AND ao.auth_id = ".Auth::id()." AND ao.orgid = edt.id AND gbo.goal_id = goals.id AND gbo.version = 2 AND gbo.inherited = 1 AND (edt.organization_key = gbo.orgid OR edt.level1_key = gbo.orgid OR edt.level2_key = gbo.orgid OR edt.level3_key = gbo.orgid OR edt.level4_key = gbo.orgid) LIMIT 1)")
                 ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
                     $q->where(function($query) use ($request) {
-                        return $query->whereRaw("(goals.title LIKE '%".$request->search_text."%')")
-                            ->orWhereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
+                        return $query->whereRaw("goals.title LIKE '%".$request->search_text."%'")
+                            ->orWhereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%')");
                     });
                 })
                 ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
-                    return $q->whereRaw("(goals.title LIKE '%".$request->search_text."%')");
+                    return $q->whereRaw("goals.title LIKE '%".$request->search_text."%'");
                 })
                 ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
-                    return $q->whereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
+                    return $q->whereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%')");
                 })
                 ->distinct()
                 ->select
@@ -1207,30 +1207,30 @@ class GoalBankController extends Controller
                 ] )
                 ->addSelect(['org_audience' => 
                     GoalBankOrg::whereColumn('goal_id', 'goals.id')
-                        ->where('version', \DB::raw(2))
+                        ->where('version', 2)
                         ->whereNotNull('orgid')
                         ->selectRAW('count(distinct id)')
                 ] )
                 ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
             $individualgoals = Goal::withoutGlobalScopes()
-                ->leftjoin('users as cu', 'cu.id', 'goals.created_by')
+                ->join('users as cu', 'cu.id', 'goals.created_by')
                 ->leftjoin('employee_demo as ced', 'ced.employee_id', 'cu.employee_id')
                 ->leftjoin('employee_demo_tree as edt', 'edt.id', 'ced.orgid')
-                ->where('is_library', \DB::raw(1))
-                ->where('by_admin', \DB::raw(2))
-                ->where('goals.created_by', '<>', \DB::raw(Auth::id()))
+                ->where('is_library', true)
+                ->where('by_admin', 2)
+                ->where('goals.created_by', '<>', Auth::id())
                 ->whereRaw("EXISTS (SELECT 1 FROM goals_shared_with AS gsw, user_demo_jr_view AS udjv, auth_orgs AS ao WHERE gsw.goal_id = goals.id AND gsw.user_id = udjv.user_id AND ao.type = 'HR' AND ao.auth_id = ".Auth::id()." AND udjv.orgid = ao.orgid LIMIT 1)")
                 ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
                     $q->where(function($query) use ($request) {
-                        return $query->whereRaw("(goals.title LIKE '%".$request->search_text."%')")
-                            ->orWhereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
+                        return $query->whereRaw("goals.title LIKE '%".$request->search_text."%'")
+                            ->orWhereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%')");
                     });
                 })
                 ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
-                    return $q->whereRaw("(goals.title LIKE '%".$request->search_text."%')");
+                    return $q->whereRaw("goals.title LIKE '%".$request->search_text."%'");
                 })
                 ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
-                    return $q->whereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
+                    return $q->whereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%')");
                 })
                 ->distinct()
                 ->select
@@ -1249,7 +1249,7 @@ class GoalBankController extends Controller
                 ] )
                 ->addSelect(['org_audience' => 
                     GoalBankOrg::whereColumn('goal_id', 'goals.id')
-                        ->where('version', \DB::raw(2))
+                        ->where('version', 2)
                         ->whereNotNull('orgid')
                         ->selectRAW('count(distinct id)')
                 ] )
