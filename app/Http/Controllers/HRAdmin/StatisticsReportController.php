@@ -2381,26 +2381,20 @@ class StatisticsReportController extends Controller
         $request->session()->flash('dd_level3', $request->dd_level3);
         $request->session()->flash('dd_level4', $request->dd_level4);
 
-        $sql = User::selectRaw("users.employee_id, users.empl_record, 
-                    employee_name, employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division,
-                    employee_demo_tree.level3_branch, employee_demo_tree.level4,
-                    (CASE WHEN users.excused_flag = 1 OR due_date_paused <> 'N'
+        $sql = UserDemoJrView::selectRaw("employee_id, 
+                                excused_reason_id, excusedtype, reason_name, reason_name, excused_by_name, organization, level1_program, level2_division, level3_branch, level4,
+                                (CASE WHEN reason_id IS NOT NULL
                                     THEN 'Yes' ELSE 'No' END) AS excused")
-                    ->join('employee_demo', function($join) {
-                         $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-                    })
-                    ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-                    ->whereNull('employee_demo.date_deleted')         
-                    ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-                    ->when($request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-                    ->when($request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-                    ->when($request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-                    ->when($request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
-                    ->whereNull('employee_demo.date_deleted')
+                    ->whereNull('date_deleted')        
+                    ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                    ->when($request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                    ->when($request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                    ->when($request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                    ->when($request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
                     ->whereExists(function ($query) {
                         $query->select(DB::raw(1))
                                     ->from('auth_users')
-                                    ->whereColumn('auth_users.user_id', 'users.id')
+                                    ->whereColumn('auth_users.user_id', 'user_id')
                                     ->where('auth_users.type', '=', 'HR')
                                     ->where('auth_users.auth_id', '=', Auth::id());
                     });
@@ -2433,36 +2427,24 @@ class StatisticsReportController extends Controller
 
       $selected_ids = $request->ids ? explode(',', $request->ids) : [];
 
-      $sql = User::selectRaw("users.employee_id, users.email, users.excused_start_date, users.excused_end_date,
-                            users.excused_reason_id, users.reporting_to,users.excused_updated_by, users.excused_updated_at, 
-                    employee_demo.employee_name, employee_demo_tree.organization, employee_demo_tree.level1_program, employee_demo_tree.level2_division, employee_demo_tree.level3_branch, employee_demo_tree.level4,
-                    (CASE WHEN users.excused_flag = 1 OR due_date_paused <> 'N'
-                                    THEN 'Yes' ELSE 'No' END) AS excused")
-                ->join('employee_demo', function($join) {
-                    $join->on('employee_demo.employee_id', '=', 'users.employee_id');
-                })
-                ->when( $request->legend == 'Yes', function($q) use($request) {
-                    $q->whereRaw(" users.due_date_paused = 'Y' ");
-                }) 
-                ->when( $request->legend == 'No', function($q) use($request) {
-                    $q->whereRaw(" users.due_date_paused = 'N' ");
-                })
-                ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-                ->whereNull('employee_demo.date_deleted')         
-                ->when($request->dd_level0, function ($q) use($request) { return $q->where('employee_demo_tree.organization_key', $request->dd_level0); })
-                ->when($request->dd_level1, function ($q) use($request) { return $q->where('employee_demo_tree.level1_key', $request->dd_level1); })
-                ->when($request->dd_level2, function ($q) use($request) { return $q->where('employee_demo_tree.level2_key', $request->dd_level2); })
-                ->when($request->dd_level3, function ($q) use($request) { return $q->where('employee_demo_tree.level3_key', $request->dd_level3); })
-                ->when($request->dd_level4, function ($q) use($request) { return $q->where('employee_demo_tree.level4_key', $request->dd_level4); })
-                ->whereNull('employee_demo.date_deleted')
+      $sql = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email,
+      excused_reason_id, excusedtype, reason_name, reason_name, excused_by_name, created_at_string, organization, level1_program, level2_division, level3_branch, level4,
+      (CASE WHEN reason_id IS NOT NULL THEN 'Yes' ELSE 'No' END) AS excused")
+                ->whereNull('date_deleted')         
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when($request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when($request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when($request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when($request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
+                ->when($request->legend === 'Yes', function ($q) { return $q->having('excused', 'Yes'); }) // Condition for legend 'Yes'
+                ->when($request->legend === 'No', function ($q) { return $q->having('excused', 'No'); }) // Condition for legend 'No'
                 ->whereExists(function ($query) {
                     $query->select(DB::raw(1))
                             ->from('auth_users')
-                            ->whereColumn('auth_users.user_id', 'users.id')
+                            ->whereColumn('auth_users.user_id', 'user_id')
                             ->where('auth_users.type', '=', 'HR')
                             ->where('auth_users.auth_id', '=', Auth::id());
-                })
-                ->with('excuseReason') ;
+                });
 
         $users = $sql->get();
 
@@ -2489,19 +2471,12 @@ class StatisticsReportController extends Controller
             foreach ($users as $user) {
                 $row['Employee ID'] = $user->employee_id;
                 $row['Name'] = $user->employee_name;
-                $row['Email'] = $user->email;
+                $row['Email'] = $user->employee_email;
 
-                $row['Excused'] = $user->excused;
-                $row['Reason'] = $user->excuseReason ? $user->excuseReason->name : '';
-                $excused_by_id = $user->excused_updated_by;
-                if($excused_by_id != ''){
-                    $sql_excused = User::select("name")->where('id', $excused_by_id)->first();
-                    $row['Excused By'] = $sql_excused->name;
-                } else {
-                    $row['Excused By'] = '';
-                }
-                //$row['Excused At'] = $user->excused_start_date;
-                $row['Excused At'] = $user->excused_updated_at;
+                $row['Excused'] = $user->excusedtype ? $user->excusedtype : '';
+                $row['Reason'] = $user->reason_name ? $user->reason_name : '';
+                $row['Excused By'] = $user->excused_by_name ? $user->excused_by_name : '';
+                $row['Excused At'] = $user->created_at_string ? $user->created_at_string : '';
 
                 $row['Organization'] = $user->organization;
                 $row['Level 1'] = $user->level1_program;
