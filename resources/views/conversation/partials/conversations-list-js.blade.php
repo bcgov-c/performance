@@ -3,8 +3,7 @@
             var modal_edit = false;
             var is_viewer = false;
             var after_init = 0;
-            var myTimeout;
-            
+
             var db_info_comment1 = '';
             var db_info_comment2 = '';
             var db_info_comment3 = '';
@@ -1028,12 +1027,17 @@
                 if (!results[2]) return '';
                 return decodeURIComponent(results[2].replace(/\+/g, ' '));
             }
-            
+
+            let myTimeout; // Declare myTimeout variable outside the function            
             
             function setTimeRoll(){
                 const minutes = 20;
                 const SessionTime = 1000 * 60 * minutes;
-                if (myTimeout) { clearInterval(myTimeout) };
+                // Clear the previous interval if it exists
+                if (myTimeout) {
+                    clearInterval(myTimeout);
+                }
+
                 //const myTimeout = setTimeout(sessionWarning, SessionTime);
                 myTimeout = setInterval(function() { 
                     if (modal_open == true) {
@@ -1051,91 +1055,6 @@
                         saveComments();                                
                         alert('You have not saved your work in 20 minutes so the PDP has auto-saved to make sure you don\'t lose any information.');
                         unsave_warning = false;
-
-                        /*
-                        if(isSupervisor == 1) {                               
-                            var info_comment1_data = CKEDITOR.instances['info_comment1'].getData();
-                            var info_comment2_data = CKEDITOR.instances['info_comment2'].getData();
-                            var info_comment3_data = CKEDITOR.instances['info_comment3'].getData();
-                            var info_comment5_data = CKEDITOR.instances['info_comment5'].getData();
-                            var info_comment6_data = CKEDITOR.instances['info_comment6'].getData();
-                            var info_comment11_data = $('#info_comment11').val();
-
-                            if (comment1_changed == true) {
-                                $('#info_area1').html('<span style="color:red">Comment saved</span>');
-                                $('#control-info-comment1').show();
-                                db_info_comment1 = info_comment1_data;
-                                comment1_changed = false;
-                            }
-                            if (comment2_changed == true) {
-                                $('#info_area2').html('<span style="color:red">Comment saved</span>');
-                                $('#control-info-comment2').show();
-                                db_info_comment2 = info_comment2_data;
-                                comment2_changed = false;
-                            }
-                            if (comment3_changed == true) {
-                                $('#info_area3').html('<span style="color:red">Comment saved</span>');
-                                $('#control-info-comment3').show();
-                                db_info_comment3 = info_comment3_data;
-                                comment3_changed = false;
-                            }
-                            if (comment5_changed == true) {
-                                $('#info_area5').html('<span style="color:red">Comment saved</span>');
-                                $('#control-info-comment5').show();
-                                db_info_comment5 = info_comment5_data;
-                                comment5_changed = false;
-                            }
-                            if (comment6_changed == true) {
-                                $('#info_area6').html('<span style="color:red">Comment saved</span>');
-                                $('#control-info-comment6').show();
-                                db_info_comment6 = info_comment6_data;
-                                comment6_changed = false;
-                            }
-                            if (comment11_changed == true) {
-                                $('#info_area11').html('<span style="color:red">Comment saved</span>');
-                                $('#control-info-comment11').show();
-                                db_info_comment11 = info_comment11_data;
-                                comment11_changed = false;
-                            }                                                
-                        } else {
-                            var info_comment4_data = CKEDITOR.instances['info_comment4'].getData();
-                            var info_comment7_data = CKEDITOR.instances['info_comment7'].getData();
-                            var info_comment8_data = CKEDITOR.instances['info_comment8'].getData();
-                            var info_comment9_data = CKEDITOR.instances['info_comment9'].getData();
-                            var info_comment10_data = CKEDITOR.instances['info_comment10'].getData();                        
-                        
-                            if (comment4_changed == true) {
-                                $('#info_area4').html('<span style="color:red">Comment saved</span>');
-                                $('#control-info-comment4').show();
-                                db_info_comment4 = info_comment4_data;
-                                comment4_changed = false;
-                            }
-                            if (comment7_changed == true) {
-                                $('#info_area7').html('<span style="color:red">Comment saved</span>');
-                                $('#control-info-comment7').show();
-                                db_info_comment7 = info_comment7_data;
-                                comment7_changed = false;
-                            }
-                            if (comment8_changed == true) {
-                                $('#info_area8').html('<span style="color:red">Comment saved</span>');
-                                $('#control-info-comment8').show();
-                                db_info_comment8 = info_comment8_data;
-                                comment8_changed = false;
-                            }
-                            if (comment9_changed == true) {
-                                $('#info_area9').html('<span style="color:red">Comment saved</span>');
-                                $('#control-info-comment9').show();
-                                db_info_comment9 = info_comment9_data;
-                                comment9_changed = false;
-                            }
-                            if (comment10_changed == true) {
-                                $('#info_area10').html('<span style="color:red">Comment saved</span>');
-                                $('#control-info-comment10').show();
-                                db_info_comment10 = info_comment10_data;
-                                comment10_changed = false;
-                            }
-                        }       
-                        */
                     }    
                 }, SessionTime);                
             }
