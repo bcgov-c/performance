@@ -865,18 +865,26 @@ class ConversationController extends Controller
 
     public function getReportingTo ($param)
     {
-        $rec = User::leftjoin('employee_supervisor', function($eson) use($param) {
-                    return $eson->on(function($esw) use($param) {
-                        return $esw->whereRaw("employee_supervisor.user_id = {$param}")
-                            ->whereNull('employee_supervisor.deleted_at');
-                });
-            })
-            ->leftjoin('employee_managers', 'employee_managers.employee_id', 'users.employee_id')
-            ->leftjoin('users AS u2', 'u2.employee_id', 'employee_managers.supervisor_emplid')
-            ->selectRaw("CASE WHEN employee_supervisor.user_id IS NULL THEN u2.id ELSE employee_supervisor.supervisor_id END reporting_to")
-            ->whereRaw("users.id = {$param}")
-            ->first();
-        return $rec ? $rec->reporting_to : null;
+        $user = User::findOrFail($param);
+        $user_validPreferredSupervisorID = $user->validPreferredSupervisor();
+        $user_supervisors = $user->supervisorListPrimaryJob();
+        $user_supervisor_id = null;
+        $user_supervisor_default = null;
+        $user_supervisor_default_id = null;
+        foreach($user_supervisors as $user_sup) {
+            if($user_sup->employee_id == $user_validPreferredSupervisorID) {
+                $user_supervisor_id = $user_sup->supervisor_id;
+            }
+            if($user_supervisor_default && $user_sup->employee_id > $user_supervisor_default) {
+                $user_supervisor_default = $user_sup->employee_id;
+                $user_supervisor_default_id = $user_sup->supervisor_id;
+            }
+            if(!$user_supervisor_default) {
+                $user_supervisor_default = $user_sup->employee_id;
+                $user_supervisor_default_id = $user_sup->supervisor_id;
+            }
+        }
+        return $user_supervisor_id ? user_supervisor_id : $user_supervisor_default_id;
     }
 
     /**
@@ -1271,8 +1279,6 @@ class ConversationController extends Controller
         $templates = $query->orderBy('sort')->get();
         $searchValue = $request->search ?? '';
         $conversationMessage = Conversation::warningMessage();
-
-        // dd($user->EmployeeManagerSupervisorsUserProfile()->get());
 
         // $participants = session()->has('original-auth-id') ? User::where('id', Auth::id())->get() : $user->avaliableReportees()->get();
         // $reportingManager = $user->reportingManager()->get();
