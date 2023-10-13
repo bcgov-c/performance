@@ -249,7 +249,8 @@ class PopulateUsersAnnexTable extends Command
                       AND em.position_number = d.position_number
                   LEFT JOIN employee_supervisor AS es
                     USE INDEX (employee_supervisor_user_id_supervisor_id_index)
-                    ON es.user_id = u.id
+                    ON es.user_id = u.id 
+                      AND es.deleted_at IS NULL
                   LEFT JOIN users AS ues
                     USE INDEX (idx_users_id)
                     ON ues.id = es.supervisor_id
