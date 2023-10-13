@@ -1960,13 +1960,20 @@ class StatisticsReportController extends Controller
                         $row['Email'] = $conversation->email;
                         $row['Conversation Topic'] = $conversation->conversation_name;    
                         $participants = DB::table('conversation_participants')
-                                        ->select('users.name')
+                                        ->select('users.name', 'conversation_participants.role')
                                         ->join('users', 'conversation_participants.participant_id', '=', 'users.id')
                                         ->where('conversation_participants.conversation_id', $conversation->id)
                                         ->get();      
                         $participants_arr = array();
                         foreach($participants as $participant){
-                            $participants_arr[] = $participant->name;
+                            if($participant->role == 'mgr') {
+                                $participants_arr[] = $participant->name;
+                            }
+                        }
+                        foreach($participants as $participant){
+                            if($participant->role == 'emp') {
+                                $participants_arr[] = $participant->name;
+                            }
                         }
                         $row['Conversation Participant'] = implode(', ', $participants_arr );
                         $row['Conversation Due Date'] = $conversation->next_due_date;
@@ -2036,13 +2043,20 @@ class StatisticsReportController extends Controller
                             $row['Email'] = $conversation->email;
                             $row['Conversation Topic'] = $conversation->conversation_name;
                             $participants = DB::table('conversation_participants')
-                                        ->select('users.name')
+                                        ->select('users.name', 'conversation_participants.role')
                                         ->join('users', 'conversation_participants.participant_id', '=', 'users.id')
                                         ->where('conversation_participants.conversation_id', $conversation->id)
                                         ->get();  
                             $participants_arr = array();
                             foreach($participants as $participant){
-                                $participants_arr[] = $participant->name;
+                                if($participant->role == 'mgr') {
+                                    $participants_arr[] = $participant->name;
+                                }
+                            }
+                            foreach($participants as $participant){
+                                if($participant->role == 'emp') {
+                                    $participants_arr[] = $participant->name;
+                                }
                             }
                             $row['Conversation Participant'] = implode(', ', $participants_arr );
                             //$row['Conversation Due Date'] = $conversation->next_due_date;
