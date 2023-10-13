@@ -259,7 +259,10 @@ class SupervisorOverridesController extends Controller {
                 u.deptid
             ");
             if($option == '') {
-                $employees = $employees->whereRaw("NOT EXISTS (SELECT 1 FROM employee_supervisor xes WHERE xes.user_id = u.user_id AND xes.deleted_at IS NULL)");
+                $employees = $employees->whereRaw("NOT EXISTS (SELECT 1 FROM employee_supervisor AS xes WHERE xes.user_id = u.user_id AND xes.deleted_at IS NULL)");
+            }
+            if($option == 'e') {
+                $employees = $employees->whereRaw("EXISTS (SELECT 1 FROM model_has_roles AS mhr WHERE mhr.role_id = 2 AND mhr.model_id = u.user_id)");
             }
             switch ($index) {
                 case 2:

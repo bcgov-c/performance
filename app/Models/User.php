@@ -12,6 +12,7 @@ use Spatie\Permission\Traits\HasRoles;
 use App\Models\EmployeeDemo;
 use App\Models\EmployeeDemoJunior;
 use App\Models\PreferredSupervisor;
+use App\Models\EmployeeSupervisor;
 use App\Models\PrimaryJob;
 
 class User extends Authenticatable
@@ -168,9 +169,21 @@ class User extends Authenticatable
     }
     
     public function avaliableReportees() {
-        return $this->reportees()
-                ->join('employee_demo', 'employee_demo.employee_id', '=', 'users.employee_id')
-                ->whereNull('employee_demo.date_deleted');
+        // return $this->reportees()
+        //         ->join('employee_demo', 'employee_demo.employee_id', '=', 'users.employee_id')
+        //         ->whereNull('employee_demo.date_deleted');
+
+        $user = User::find(Auth::id());
+        $override_userids = $user->overrideReportees()->pluck('user_id');
+        $reportee_emplids = $user->EmployeeManagerSupervisorsUserProfile()
+            ->whereRaw("NOT EXISTS (SELECT 1 FROM employee_supervisor, users WHERE employee_supervisor.user_id = users.id AND users.employee_id = employee_managers.employee_id AND employee_supervisor.deleted_at IS NULL)")
+            ->pluck('employee_id');
+        return User::join('employee_demo as ed', 'ed.employee_id', 'users.employee_id')
+            ->where(function($where) use($override_userids, $reportee_emplids) {
+                return $where->whereIn('users.id', $override_userids)
+                    ->orWhereIn('users.employee_id', $reportee_emplids);
+            })
+            ->whereNull('ed.date_deleted');
     }
 
     public function reporteesCount() {
@@ -183,6 +196,127 @@ class User extends Authenticatable
 
     public function hasSupervisorRole() {
         return $this->reportees()->count() > 0;
+    }
+
+    public function EmployeeSupervisor() {
+        return $this->hasOne('App\Models\EmployeeSupervisor', 'user_id')->first();
+    }
+
+    public function overrideReportees() {
+        return $this->hasMany('App\Models\EmployeeSupervisor', 'supervisor_id');
+    }
+
+    public function overrideReporteeUsers() {
+        return $this->hasMany('App\Models\EmployeeSupervisor', 'supervisor_id')
+            ->join('users', 'users.id', 'supervisor_id')
+            ->selectRaw("
+                employee_supervisor.*,
+                users.id users_id,
+                users.name users_name,
+                users.email users_email,
+                users.employee_id users_employee_id,
+                users.empl_record users_empl_record,
+                users.reporting_to users_reporting_to,
+                users.joining_date users_joining_date,
+                users.acctlock users_acctlock,
+                users.last_signon_at users_last_signon_at,
+                users.last_sync_at users_last_sync_at,
+                users.created_at users_created_at,
+                users.updated_at users_updated_at,
+                users.excused_reason_id users_excused_reason_id,
+                users.next_conversation_date users_next_conversation_date,
+                users.due_date_paused users_due_date_paused,
+                users.excused_flag users_excused_flag,
+                users.excused_updated_by users_excused_updated_by,
+                users.excused_updated_at users_excused_updated_at
+            ")
+            ->whereNull('employee_supervisor.deleted_at');
+    }
+
+    public function EmployeeManager() {
+        return $this->hasMany('App\Models\EmployeeManager', 'employee_id', 'employee_id');
+    }
+
+    public function EmployeeManagerUserProfile() {
+        return $this->hasMany('App\Models\EmployeeManager', 'employee_id', 'employee_id')
+            ->join('users', 'users.employee_id', 'employee_managers.employee_id')
+            ->selectRaw("
+                employee_managers.*,
+                users.id users_id,
+                users.name users_name,
+                users.email users_email,
+                users.employee_id users_employee_id,
+                users.empl_record users_empl_record,
+                users.reporting_to users_reporting_to,
+                users.joining_date users_joining_date,
+                users.acctlock users_acctlock,
+                users.last_signon_at users_last_signon_at,
+                users.last_sync_at users_last_sync_at,
+                users.created_at users_created_at,
+                users.updated_at users_updated_at,
+                users.excused_reason_id users_excused_reason_id,
+                users.next_conversation_date users_next_conversation_date,
+                users.due_date_paused users_due_date_paused,
+                users.excused_flag users_excused_flag,
+                users.excused_updated_by users_excused_updated_by,
+                users.excused_updated_at users_excused_updated_at
+            ");
+    }
+
+    public function EmployeeManagerSupervisorProfile() {
+        return $this->hasMany('App\Models\EmployeeManager', 'employee_id', 'employee_id')
+            ->join('users', 'users.employee_id', 'employee_managers.supervisor_emplid')
+            ->selectRaw("
+                employee_managers.*,
+                users.id users_id,
+                users.name users_name,
+                users.email users_email,
+                users.employee_id users_employee_id,
+                users.empl_record users_empl_record,
+                users.reporting_to users_reporting_to,
+                users.joining_date users_joining_date,
+                users.acctlock users_acctlock,
+                users.last_signon_at users_last_signon_at,
+                users.last_sync_at users_last_sync_at,
+                users.created_at users_created_at,
+                users.updated_at users_updated_at,
+                users.excused_reason_id users_excused_reason_id,
+                users.next_conversation_date users_next_conversation_date,
+                users.due_date_paused users_due_date_paused,
+                users.excused_flag users_excused_flag,
+                users.excused_updated_by users_excused_updated_by,
+                users.excused_updated_at users_excused_updated_at
+            ");
+    }
+
+    public function EmployeeManagerSupervisors() {
+        return $this->hasMany('App\Models\EmployeeManager', 'supervisor_emplid', 'employee_id');
+    }
+
+    public function EmployeeManagerSupervisorsUserProfile() {
+        return $this->hasMany('App\Models\EmployeeManager', 'supervisor_emplid', 'employee_id')
+            ->join('users', 'users.employee_id', 'employee_managers.employee_id')
+            ->selectRaw("
+                employee_managers.*,
+                users.id users_id,
+                users.name users_name,
+                users.email users_email,
+                users.employee_id users_employee_id,
+                users.empl_record users_empl_record,
+                users.reporting_to users_reporting_to,
+                users.joining_date users_joining_date,
+                users.acctlock users_acctlock,
+                users.last_signon_at users_last_signon_at,
+                users.last_sync_at users_last_sync_at,
+                users.created_at users_created_at,
+                users.updated_at users_updated_at,
+                users.excused_reason_id users_excused_reason_id,
+                users.next_conversation_date users_next_conversation_date,
+                users.due_date_paused users_due_date_paused,
+                users.excused_flag users_excused_flag,
+                users.excused_updated_by users_excused_updated_by,
+                users.excused_updated_at users_excused_updated_at
+            ");
     }
 
     public function canBeSeenBy($id) {
@@ -321,45 +455,37 @@ class User extends Authenticatable
     }
 
     public function supervisorListPrimaryJob() {
-        $pJob = EmployeeDemo::from('employee_demo AS ed')
-            ->join('users AS u', function($join){
-                return $join->on(function($on){
-                    $on->whereRaw('u.employee_id = ed.employee_id')
-                        ->whereRaw('u.empl_record = ed.empl_record')
-                        ->whereNull('ed.date_deleted');
-                });
-            })
-            ->join('positions AS p', 'ed.position_number', 'p.position_nbr')
-            ->join('employee_demo AS e', 'p.reports_to', 'e.position_number')
-            ->join('users AS v', 'e.employee_id', 'v.employee_id')
+        $pJob = EmployeeSupervisor::from('employee_supervisor')
+            ->join('users AS u', 'u.id', 'employee_supervisor.supervisor_id')
+            ->join('employee_demo AS ed', 'ed.employee_id', 'u.employee_id')
+            ->selectRaw("
+                ed.position_number,
+                u.employee_id,
+                ed.employee_name AS name,
+                employee_supervisor.supervisor_id
+            ")
+            ->whereRaw("employee_supervisor.user_id = {$this->id}")
+            ->whereNull('ed.date_deleted')
             ->distinct()
-            ->select('e.position_number', 'v.employee_id', 'v.name', 'v.id')
-            ->whereNull('e.date_deleted')
-            ->where('ed.employee_id', $this->employee_id)
-            ->orderBy('e.position_number')
-            ->orderBy('v.name')
             ->get();
-        if(!$pJob){
-            $pJob = EmployeeDemo::from('employee_demo AS ed')
-                ->join('users AS u', function($join){
-                    return $join->on(function($on){
-                        $on->whereRaw('u.employee_id = ed.employee_id')
-                            ->whereRaw('u.empl_record = ed.empl_record')
-                            ->whereNull('ed.date_deleted');
-                    });
+        if($pJob->count() == 0){
+            $pJob = \DB::table('employee_managers AS em')
+                ->join('users AS authu', 'authu.employee_id', 'em.employee_id')
+                ->join('employee_demo AS authed', function($join1) {
+                    return $join1->on('authed.employee_id', 'authu.employee_id')
+                        ->on('authed.empl_record', 'authu.empl_record');
                 })
-                ->join('positions AS p', 'ed.position_number', 'p.position_nbr')
-                ->join('positions AS p2', 'p2.position_nbr', 'p.reports_to')
-                ->join('employee_demo AS e', 'p2.reports_to', 'e.position_number')
-                ->join('users AS v', 'e.employee_id', 'v.employee_id')
-                ->distinct()
-                ->select('e.position_number', 'v.employee_id', 'v.name', 'v.id')
-                ->whereNull('e.date_deleted')
-                ->where('ed.employee_id', $this->employee_id)
-                ->orderBy('e.position_number')
-                ->orderBy('v.name')
+                ->join('users AS u', 'u.employee_id', 'em.supervisor_emplid')
+                ->selectRaw("
+                    em.supervisor_position_number AS position_number,
+                    em.supervisor_emplid AS employee_id,
+                    em.supervisor_name AS name,
+                    u.id AS supervisor_id
+                ")
+                ->whereRaw("em.employee_id = '{$this->employee_id}'")
+                ->whereRaw('authed.position_number = em.position_number')
                 ->get();
-            }
+        }
         return $pJob;
     }
 
