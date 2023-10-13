@@ -110,39 +110,20 @@ class ExcuseEmployeesController extends Controller {
             ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(employee_id LIKE '%{$request->search_text}%' OR employee_name LIKE '%{$request->search_text}%' OR j_excusedtype LIKE '%{$request->search_text}%' OR j_excused_reason_desc LIKE '%{$request->search_text}%' OR excused_by_name LIKE '%{$request->search_text}%')"); })
             ->selectRaw ("
                 u.user_id AS id
-                , u.guid
-                , u.user_name
                 , u.employee_id
                 , u.employee_name
-                , u.jobcode
                 , u.jobcode_desc
+                , u.j_excusedtype
+                , u.j_excused_reason_desc
+                , u.excused_by_name
+                , '' as startdate_string
+                , '' as enddate_string
                 , u.organization
                 , u.level1_program
                 , u.level2_division
                 , u.level3_branch
                 , u.level4
                 , u.deptid
-                , u.j_created_at
-                , u.j_excused_type
-                , u.j_updated_by_id
-                , u.j_updated_by_name
-                , u.k_created_at
-                , u.k_excused_type
-                , u.reason_id
-                , u.reason_name
-                , u.j_excusedtype
-                , u.j_excusedtype AS excusedtype
-                , u.j_excusedlink
-                , u.excused_by_name
-                , u.excused_updated_by
-                , u.employee_id_search
-                , u.employee_name_search
-                , u.j_excused_updated_by_name
-                , u.j_excused_reason_id
-                , u.j_excused_reason_desc
-                , '' as created_at_string
-                , '' as startdate_string
-                , '' as enddate_string
                 ");
             return Datatables::of($query)
             ->addIndexColumn()
