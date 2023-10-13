@@ -21,6 +21,8 @@ use App\Http\Requests\Conversation\SignoffRequest;
 use App\Http\Requests\Conversation\UnSignoffRequest;
 use App\Http\Requests\Conversation\ConversationRequest;
 use Illuminate\Support\Facades\Log;
+use App\Models\EmployeeSupervisor;
+use App\Models\EmployeeManager;
 
 class ConversationController extends Controller
 {
@@ -583,11 +585,12 @@ class ConversationController extends Controller
         if(is_array($request->participant_id)){
             foreach ($request->participant_id as $key => $value) {
                 $is_direct = false;
-                $mgrinfo_0 = DB::table('users')                        
-                                        ->select('reporting_to')
-                                        ->where('id', '=', $value)
-                                        ->get();
-                if($mgrinfo_0[0]->reporting_to == $actualOwner){
+                // $mgrinfo_0 = DB::table('users')                        
+                //                         ->select('reporting_to')
+                //                         ->where('id', '=', $value)
+                //                         ->get();
+                // if($mgrinfo_0[0]->reporting_to == $actualOwner){
+                if($this->getReportingTo($value) == $actualOwner){
                     ConversationParticipant::updateOrCreate([
                         'conversation_id' => $conversation->id,
                         'participant_id' => $value,
@@ -603,11 +606,12 @@ class ConversationController extends Controller
                     $is_direct = true;
                 } 
 
-                $mgrinfo_1 = DB::table('users')                        
-                                        ->select('reporting_to')
-                                        ->where('id', '=', $actualOwner)
-                                        ->get();
-                if($mgrinfo_1[0]->reporting_to == $value){
+                // $mgrinfo_1 = DB::table('users')                        
+                //                         ->select('reporting_to')
+                //                         ->where('id', '=', $actualOwner)
+                //                         ->get();
+                // if($mgrinfo_1[0]->reporting_to == $value){
+                if($this->getReportingTo($actualOwner) == $value){
                     ConversationParticipant::updateOrCreate([
                         'conversation_id' => $conversation->id,
                         'participant_id' => $actualOwner,
@@ -671,11 +675,12 @@ class ConversationController extends Controller
         } else {
                 $value = $request->participant_id;
                 $is_direct = false;
-                $mgrinfo_0 = DB::table('users')                        
-                                        ->select('reporting_to')
-                                        ->where('id', '=', $value)
-                                        ->get();
-                if($mgrinfo_0[0]->reporting_to == $actualOwner){
+                // $mgrinfo_0 = DB::table('users')                        
+                //                         ->select('reporting_to')
+                //                         ->where('id', '=', $value)
+                //                         ->get();
+                // if($mgrinfo_0[0]->reporting_to == $actualOwner){
+                if($this->getReportingTo($value) == $actualOwner){
                     ConversationParticipant::updateOrCreate([
                         'conversation_id' => $conversation->id,
                         'participant_id' => $value,
@@ -691,11 +696,12 @@ class ConversationController extends Controller
                     $actualOwnerRole = 'mgr';
                 } 
 
-                $mgrinfo_1 = DB::table('users')                        
-                                        ->select('reporting_to')
-                                        ->where('id', '=', $actualOwner)
-                                        ->get();
-                if($mgrinfo_1[0]->reporting_to == $value){
+                // $mgrinfo_1 = DB::table('users')                        
+                //                         ->select('reporting_to')
+                //                         ->where('id', '=', $actualOwner)
+                //                         ->get();
+                // if($mgrinfo_1[0]->reporting_to == $value){
+                if($this->getReportingTo($actualOwner) == $value){
                     ConversationParticipant::updateOrCreate([
                         'conversation_id' => $conversation->id,
                         'participant_id' => $actualOwner,
@@ -779,7 +785,7 @@ class ConversationController extends Controller
                             $notification->notification_type = 'CA';
                             $notification->comment = $conversation->user->name . ' would like to schedule a performance conversation with you.';
                             $notification->related_id = $conversation->id;
-                $notification->notify_user_id = $value;
+                            $notification->notify_user_id = $value;
                             $notification->send(); 
                 }
 
@@ -816,13 +822,13 @@ class ConversationController extends Controller
                                 ->first();
 
                 if ($user && $user->allow_inapp_notification) {
-                $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                            $notification->user_id = $value;
-                            $notification->notification_type = 'CA';
-                            $notification->comment = $conversation->user->name . ' would like to schedule a performance conversation with you.';
-                            $notification->related_id = $conversation->id;
-                $notification->notify_user_id = $value;
-                            $notification->send(); 
+                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                    $notification->user_id = $value;
+                    $notification->notification_type = 'CA';
+                    $notification->comment = $conversation->user->name . ' would like to schedule a performance conversation with you.';
+                    $notification->related_id = $conversation->id;
+                    $notification->notify_user_id = $value;
+                    $notification->send(); 
                 }
 
                 if ($user && $user->allow_email_notification && $user->userPreference->conversation_setup_flag == 'Y') {                            
@@ -855,6 +861,22 @@ class ConversationController extends Controller
             $conversation_id = $conversation->id;
             return redirect()->route('conversation.upcoming', ['id' => $conversation_id, 'ownerrole'=>$actualOwnerRole]);
         }
+    }
+
+    public function getReportingTo ($param)
+    {
+        $rec = User::leftjoin('employee_supervisor', function($eson) use($param) {
+                    return $eson->on(function($esw) use($param) {
+                        return $esw->whereRaw("employee_supervisor.user_id = {$param}")
+                            ->whereNull('employee_supervisor.deleted_at');
+                });
+            })
+            ->leftjoin('employee_managers', 'employee_managers.employee_id', 'users.employee_id')
+            ->leftjoin('users AS u2', 'u2.employee_id', 'employee_managers.supervisor_emplid')
+            ->selectRaw("CASE WHEN employee_supervisor.user_id IS NULL THEN u2.id ELSE employee_supervisor.supervisor_id END reporting_to")
+            ->whereRaw("users.id = {$param}")
+            ->first();
+        return $rec ? $rec->reporting_to : null;
     }
 
     /**
@@ -1249,9 +1271,35 @@ class ConversationController extends Controller
         $templates = $query->orderBy('sort')->get();
         $searchValue = $request->search ?? '';
         $conversationMessage = Conversation::warningMessage();
-        
-        $participants = session()->has('original-auth-id') ? User::where('id', Auth::id())->get() : $user->avaliableReportees()->get();
-        $reportingManager = $user->reportingManager()->get();
+
+        // dd($user->EmployeeManagerSupervisorsUserProfile()->get());
+
+        // $participants = session()->has('original-auth-id') ? User::where('id', Auth::id())->get() : $user->avaliableReportees()->get();
+        // $reportingManager = $user->reportingManager()->get();
+
+        $override_userids = $user->overrideReportees()->pluck('user_id');
+        $reportee_emplids = $user->EmployeeManagerSupervisorsUserProfile()
+            ->whereRaw("NOT EXISTS (SELECT 1 FROM employee_supervisor, users WHERE employee_supervisor.user_id = users.id AND users.employee_id = employee_managers.employee_id AND employee_supervisor.deleted_at IS NULL)")
+            ->pluck('employee_id');
+        $participants = session()->has('original-auth-id') ? User::where('id', Auth::id())->get() : 
+            User::join('employee_demo as ed', 'ed.employee_id', 'users.employee_id')
+                ->where(function($where) use($override_userids, $reportee_emplids) {
+                    return $where->whereIn('users.id', $override_userids)
+                        ->orWhereIn('users.employee_id', $reportee_emplids);
+                })
+                ->whereNull('ed.date_deleted')
+                ->get();
+
+        $primaryMgrs = $user->supervisorListPrimaryJob();
+        $array_mgrs = [];
+        if ($primaryMgrs->count() > 0) {
+            $array_mgrs = $primaryMgrs->toArray();
+            $array_mgr_ids = array_column($array_mgrs, 'employee_id');
+        }
+        $reportingManager = User::whereIn('users.employee_id', $array_mgr_ids)
+            ->join('employee_demo AS ed', 'ed.employee_id', 'users.employee_id')
+            ->whereNull('ed.date_deleted')
+            ->get();
 
         $sharedProfile = SharedProfile::where('shared_with', Auth::id())
                          ->join('users','users.id','shared_profiles.shared_id')
