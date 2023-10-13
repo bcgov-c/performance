@@ -1514,8 +1514,59 @@ class GoalController extends Controller
             $user = User::findOrFail($goal->user_id);
             $curr_user = User::findOrFail(Auth::id());
 
-            if (($goal->last_supervisor_comment != 'Y') and (session()->get('original-auth-id') != null) and ($user->reporting_to == session()->get('original-auth-id'))) {
-                //update flag
+            $user_validPreferredSupervisorID = $user->validPreferredSupervisor();
+            $user_supervisors = $user->supervisorListPrimaryJob();
+            $user_supervisor_emplid = null;
+            $user_supervisor_id = null;
+            $user_supervisor_default = null;
+            $user_supervisor_default_id = null;
+            foreach($user_supervisors as $user_sup) {
+                if($user_sup->employee_id == $user_validPreferredSupervisorID) {
+                    $user_supervisor_emplid = $user_sup->employee_id;
+                    $user_supervisor_id = $user_sup->supervisor_id;
+                }
+                if($user_supervisor_default && $user_sup->employee_id > $user_supervisor_default) {
+                    $user_supervisor_default = $user_sup->employee_id;
+                    $user_supervisor_default_id = $user_sup->supervisor_id;
+                }
+                if(!$user_supervisor_default) {
+                    $user_supervisor_default = $user_sup->employee_id;
+                    $user_supervisor_default_id = $user_sup->supervisor_id;
+                }
+            }
+            if(!$user_supervisor_emplid) {
+                $user_supervisor_emplid = $user_supervisor_default;
+                $user_supervisor_id = $user_supervisor_default_id;
+            }
+
+            $curr_validPreferredSupervisorID = $curr_user->validPreferredSupervisor();
+            $curr_supervisors = $curr_user->supervisorListPrimaryJob();
+            $curr_supervisor_emplid = null;
+            $curr_supervisor_id = null;
+            $curr_supervisor_default = null;
+            $curr_supervisor_default_id = null;
+            foreach($curr_supervisors as $curr_sup) {
+                if($curr_sup->employee_id == $curr_validPreferredSupervisorID) {
+                    $curr_supervisor_emplid = $curr_sup->employee_id;
+                    $curr_supervisor_id = $curr_sup->supervisor_id;
+                }
+                if($curr_supervisor_default && $curr_sup->employee_id > $curr_supervisor_default) {
+                    $curr_supervisor_default = $curr_sup->employee_id;
+                    $curr_supervisor_default_id = $curr_sup->supervisor_id;
+                }
+                if(!$curr_supervisor_default) {
+                    $curr_supervisor_default = $curr_sup->employee_id;
+                    $curr_supervisor_default_id = $curr_sup->supervisor_id;
+                }
+            }
+            if(!$curr_supervisor_emplid) {
+                $curr_supervisor_emplid = $curr_supervisor_default;
+                $curr_supervisor_id = $curr_supervisor_default_id;
+            }
+
+            // if (($goal->last_supervisor_comment != 'Y') and (session()->get('original-auth-id') != null) and ($user->reporting_to == session()->get('original-auth-id'))) {
+            if (($goal->last_supervisor_comment != 'Y') and (session()->get('original-auth-id') != null) and ($user_supervisor_id == session()->get('original-auth-id'))) {
+                    //update flag
                 $goal->last_supervisor_comment = 'Y';
                 $goal->save();
             }
@@ -1567,8 +1618,9 @@ class GoalController extends Controller
                 // add a message when the commemt was added by Shared with  
                 $is_by_shared_with = $user->sharedWith->contains('shared_with', $comment->user_id);
                                        
-                if ((session()->get('original-auth-id') != null) and ($is_by_shared_with or ($user->reporting_to == session()->get('original-auth-id')))) {
-                    //add dashboard notification
+                // if ((session()->get('original-auth-id') != null) and ($is_by_shared_with or ($user->reporting_to == session()->get('original-auth-id')))) {
+                if ((session()->get('original-auth-id') != null) and ($is_by_shared_with or ($user_supervisor_id == session()->get('original-auth-id')))) {
+                        //add dashboard notification
                     // $newNotify = new DashboardNotification;
                     // $newNotify->user_id = Auth::id();
                     // $newNotify->notification_type = 'GC';
@@ -1609,8 +1661,9 @@ class GoalController extends Controller
             }
 
 
-            if (($curr_user->reporting_to == $goal->user_id) and ($goal->user_id != Auth::id())) {
-                //add notification in Supervisor's Dashboard
+            // if (($curr_user->reporting_to == $goal->user_id) and ($goal->user_id != Auth::id())) {
+            if (($curr_supervisor_id == $goal->user_id) and ($goal->user_id != Auth::id())) {
+                    //add notification in Supervisor's Dashboard
                 // $newNotify = new DashboardNotification;
                 // $newNotify->user_id = $curr_user->reporting_to;
                 // $newNotify->notification_type = 'GC';
@@ -1621,7 +1674,7 @@ class GoalController extends Controller
 
                 if ($curr_user->reportingManager && $curr_user->reportingManager->allow_inapp_notification) {
                     $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                    $notification->user_id = $curr_user->reporting_to;
+                    $notification->user_id = $curr_supervisor_id;
                     $notification->notification_type = 'GC';
                     $notification->comment = $curr_user->name . ' added a comment to your goal.';
                     $notification->related_id = $goal->id;
@@ -1635,7 +1688,7 @@ class GoalController extends Controller
                     $curr_user->reportingManager->userPreference->goal_comment_flag == 'Y') {                
 
                     $sendMail = new SendMail();
-                    $sendMail->toRecipients = array( $curr_user->reporting_to );  
+                    $sendMail->toRecipients = array( $curr_supervisor_id );  
                     $sendMail->sender_id = null;
                     $sendMail->useQueue = true;
                     $sendMail->saveToLog = true;
