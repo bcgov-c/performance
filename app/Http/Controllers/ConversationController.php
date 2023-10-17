@@ -884,7 +884,7 @@ class ConversationController extends Controller
                 $user_supervisor_default_id = $user_sup->supervisor_id;
             }
         }
-        return $user_supervisor_id ? user_supervisor_id : $user_supervisor_default_id;
+        return $user_supervisor_id ? $user_supervisor_id : $user_supervisor_default_id;
     }
 
     /**
@@ -1280,28 +1280,31 @@ class ConversationController extends Controller
         $searchValue = $request->search ?? '';
         $conversationMessage = Conversation::warningMessage();
 
-        // $participants = session()->has('original-auth-id') ? User::where('id', Auth::id())->get() : $user->avaliableReportees()->get();
-        // $reportingManager = $user->reportingManager()->get();
-
-        $override_userids = $user->overrideReportees()->pluck('user_id');
-        $reportee_emplids = $user->EmployeeManagerSupervisorsUserProfile()
-            ->whereRaw("NOT EXISTS (SELECT 1 FROM employee_supervisor, users WHERE employee_supervisor.user_id = users.id AND users.employee_id = employee_managers.employee_id AND employee_supervisor.deleted_at IS NULL)")
-            ->pluck('employee_id');
+        $reportees = User::join('users_annex', function($join) {
+            return $join->on(function ($on) {
+                return $on->on('users_annex.employee_id', 'users.employee_id')
+                    ->on('users_annex.empl_record', 'users.empl_record');
+            });
+        })
+        ->selectRaw("users.id")
+        ->whereRaw("users_annex.reporting_to_userid = {$authId}")
+        ->pluck("users.id");
         $participants = session()->has('original-auth-id') ? User::where('id', Auth::id())->get() : 
             User::join('employee_demo as ed', 'ed.employee_id', 'users.employee_id')
-                ->where(function($where) use($override_userids, $reportee_emplids) {
-                    return $where->whereIn('users.id', $override_userids)
-                        ->orWhereIn('users.employee_id', $reportee_emplids);
-                })
+                ->whereIn('users.id', $reportees)
                 ->whereNull('ed.date_deleted')
                 ->get();
 
-        $primaryMgrs = $user->supervisorListPrimaryJob();
-        $array_mgrs = [];
-        if ($primaryMgrs->count() > 0) {
-            $array_mgrs = $primaryMgrs->toArray();
-            $array_mgr_ids = array_column($array_mgrs, 'employee_id');
-        }
+        $array_mgr_ids = User::join('users_annex', function($join) {
+            return $join->on(function ($on) {
+                return $on->on('users_annex.employee_id', 'users.employee_id')
+                    ->on('users_annex.empl_record', 'users.empl_record');
+            });
+        })
+        ->selectRaw("users_annex.reporting_to_employee_id")
+        ->whereRaw("users.id = {$authId}")
+        ->pluck('reporting_to_employee_id');
+
         $reportingManager = User::whereIn('users.employee_id', $array_mgr_ids)
             ->join('employee_demo AS ed', 'ed.employee_id', 'users.employee_id')
             ->whereNull('ed.date_deleted')
