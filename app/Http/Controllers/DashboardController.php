@@ -334,6 +334,7 @@ class DashboardController extends Controller
         ], [
             'supv_empl_id' => $request->id
         ]);
+        $this->updateSupervisorDetails(Auth::user()->id);
         $supvUser = User::join('employee_demo AS d', 'users.employee_id', 'd.employee_id')
         ->select('users.id')
         ->whereRaw("users.employee_id = '".$request->id."'")
@@ -371,6 +372,7 @@ class DashboardController extends Controller
             'empl_record' => $request->id,
             'updated_by' => $request->session()->get('existing_user_id') ? $request->session()->get('existing_user_id') : Auth::id(),
         ]);
+        $this->updateSupervisorDetails(Auth::user()->id);
         return redirect()->back();
     }
     
@@ -383,4 +385,79 @@ class DashboardController extends Controller
 
         return response()->json(['sessionExpired' => $sessionExpired]);
     }
+
+    public function updateSupervisorDetails($userid) {
+        
+        \DB::statement("
+            UPDATE users_annex AS ua
+            SET 
+                ua.reporting_to_employee_id = NULL,
+                ua.reporting_to_name = NULL,
+                ua.reporting_to_name2 = NULL,
+                ua.reporting_to_email = NULL,
+                ua.reporting_to_position_number = NULL,
+                ua.reporting_to_userid = NULL
+            WHERE ua.user_id = {$userid}
+        ");
+
+        \DB::statement("
+            UPDATE users_annex AS ua,
+                employee_supervisor AS es,
+                users AS u,
+                employee_demo AS ed
+            SET 
+                ua.reporting_to_employee_id = u.employee_id,
+                ua.reporting_to_name = ed.employee_name,
+                ua.reporting_to_name2 = u.name,
+                ua.reporting_to_email = u.email,
+                ua.reporting_to_position_number = ed.position_number,
+                ua.reporting_to_userid = es.supervisor_id
+            WHERE ua.user_id = es.user_id
+                AND ua.reporting_to_employee_id IS NULL
+                AND es.supervisor_id = u.id
+                AND es.deleted_at IS NULL
+                AND u.employee_id = ed.employee_id
+                AND ed.date_deleted IS NULL
+                AND ua.user_id = {$userid}
+        ");
+
+        \DB::statement("
+            UPDATE users_annex AS ua,
+                employee_demo AS ed,
+                employee_managers AS em,
+                preferred_supervisor AS ps
+            SET 
+                ua.reporting_to_employee_id = em.supervisor_emplid,
+                ua.reporting_to_name = em.supervisor_name,
+                ua.reporting_to_name2 = em.supervisor_name2,
+                ua.reporting_to_email = em.supervisor_email,
+                ua.reporting_to_position_number = em.supervisor_position_number,
+                ua.reporting_to_userid = em.supervisor_userid
+            WHERE ua.employee_id = em.employee_id
+                AND ua.reporting_to_employee_id IS NULL
+                AND ua.employee_id = ed.employee_id
+                AND em.employee_id = ps.employee_id
+                AND ed.position_number = ps.position_nbr
+                AND ed.date_deleted IS NULL
+                AND em.supervisor_emplid = ps.supv_empl_id
+                AND ua.user_id = {$userid}
+        ");
+        
+        \DB::statement("
+            UPDATE users_annex AS ua,
+                employee_managers AS em
+            SET 
+                ua.reporting_to_employee_id = em.supervisor_emplid,
+                ua.reporting_to_name = em.supervisor_name,
+                ua.reporting_to_name2 = em.supervisor_name2,
+                ua.reporting_to_email = em.supervisor_email,
+                ua.reporting_to_position_number = em.supervisor_position_number,
+                ua.reporting_to_userid = em.supervisor_userid
+            WHERE ua.employee_id = em.employee_id
+                AND ua.reporting_to_employee_id IS NULL
+                AND ua.user_id = {$userid}
+        ");
+
+    }
+
 }
