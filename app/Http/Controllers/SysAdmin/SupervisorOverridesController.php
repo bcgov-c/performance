@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;   
 use Carbon\Carbon;   
 use App\Models\EmployeeSupervisor;
+use App\Http\Controllers\DashboardController;
 
 
 class SupervisorOverridesController extends Controller {
@@ -164,6 +165,7 @@ class SupervisorOverridesController extends Controller {
             ->first() ;
 
         $reason = $request->input_reason;
+        $action = new DashboardController;
         foreach ($employees as $eeOne) {
             EmployeeSupervisor::updateOrCreate([
                 'user_id' => $eeOne->id,
@@ -172,6 +174,7 @@ class SupervisorOverridesController extends Controller {
                 'reason' => $reason,
                 'updated_by' => Auth::id(),
             ]);
+            $action->updateSupervisorDetails($eeOne->id);
         }   
         return redirect()->route(request()->segment(1).'.supervisoroverrides')
             ->with('success', 'Supervisor override successful.');
@@ -506,14 +509,23 @@ class SupervisorOverridesController extends Controller {
 
     public function deleteOverride(Request $request, $id) {
         EmployeeSupervisor::where('id', $id)->update( [ 'updated_by' => Auth::id() ] );
+        $entry = EmployeeSupervisor::whereRaw("id = {$id}")->first();
+        $item = $entry->user_id;
         EmployeeSupervisor::where('id', $id)->delete();
+        $action = new DashboardController;
+        $action->updateSupervisorDetails($item);
         return redirect()->back();
     }
 
     public function deleteMultiOverride(Request $request, $ids) {
         $decoded = json_decode($ids);
         EmployeeSupervisor::whereIn('id', $decoded)->update( [ 'updated_by' => Auth::id() ] );
+        $entries = EmployeeSupervisor::whereIn('id', $decoded)->select('user_id')->get();
         EmployeeSupervisor::whereIn('id', $decoded)->delete();
+        $action = new DashboardController;
+        foreach($entries AS $entry) {
+            $action->updateSupervisorDetails($entry->user_id);
+        }
         return redirect()->back();
     }
 
