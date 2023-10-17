@@ -10,6 +10,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\EmployeeDemo;
+use App\Models\UsersAnnex;
 use App\Models\EmployeeDemoJunior;
 use App\Models\PreferredSupervisor;
 use App\Models\EmployeeSupervisor;
@@ -461,6 +462,7 @@ class User extends Authenticatable
             ->selectRaw("
                 ed.position_number,
                 u.employee_id,
+                u.name AS user_name,
                 ed.employee_name AS name,
                 employee_supervisor.supervisor_id
             ")
@@ -479,6 +481,7 @@ class User extends Authenticatable
                 ->selectRaw("
                     em.supervisor_position_number AS position_number,
                     em.supervisor_emplid AS employee_id,
+                    u.name AS user_name,
                     em.supervisor_name AS name,
                     u.id AS supervisor_id
                 ")

@@ -15,7 +15,7 @@
                     {{-- <x-profile-pic></x-profile-pic> --}}
                     @if($supervisorListCount <= 1)
                         @foreach($supervisorList as $supv)
-                            {{ $supv ? $supv->name : 'No supervisor' }}
+                            {{ $supv ? $supv->user_name : 'No supervisor' }}
                         @endforeach
                     @else
                         <label for="supervisor_btn">
@@ -26,11 +26,11 @@
                                 @foreach($supervisorList as $supv)
                                     @if(!$preferredSupervisor || $supv->employee_id != $preferredSupervisor->supv_empl_id)
                                         <x-button icon="fas fa-xs fa-fw" value="{{ $supv->employee_id }}" data-id="{{ $supv->employee_id }}" data-name="{{ $supv->name }}" class="dropdown-item change_supervisor" name="change_supervisor" id="change_supervisor">
-                                            {{ $supv->name }}
+                                            {{ $supv->user_name }}
                                         </x-button>
                                     @else
                                         <x-button icon="fas fa-xs fa-fw fa-solid fa-user-check" value="{{ $supv->employee_id }}" data-id="{{ $supv->employee_id }}" data-name="{{ $supv->name }}" class="dropdown-item no_change_supervisor" name="no_change_supervisor" id='no_change_supervisor'>
-                                            {{ $supv->name }}
+                                            {{ $supv->user_name }}
                                         </x-button>
                                     @endif
                                 @endforeach
