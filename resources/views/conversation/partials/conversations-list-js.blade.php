@@ -1031,7 +1031,7 @@
             let myTimeout; // Declare myTimeout variable outside the function            
             
             function setTimeRoll(){
-                const minutes = 20;
+                const minutes = 2;
                 const SessionTime = 1000 * 60 * minutes;
                 // Clear the previous interval if it exists
                 if (myTimeout) {
