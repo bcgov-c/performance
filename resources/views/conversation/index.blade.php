@@ -190,6 +190,7 @@
             var modal_edit = false;
             var is_viewer = false;
             var after_init = 0;
+            var myTimeout;
             
             var db_info_comment1 = '';
             var db_info_comment2 = '';
@@ -1131,15 +1132,11 @@
                 clearTimeout(SessionTime);
             }
             
-            let myTimeout; // Declare myTimeout variable outside the function       
+            
             function setTimeRoll(){
-                const minutes = 2;
+                const minutes = 20;
                 const SessionTime = 1000 * 60 * minutes;
-                // Clear the previous interval if it exists
-                if (myTimeout) {
-                    clearInterval(myTimeout);
-                }
-
+                if (myTimeout) { clearInterval(myTimeout) };
                 //const myTimeout = setTimeout(sessionWarning, SessionTime);
                 myTimeout = setInterval(function() { 
                     if (modal_open == true) {
