@@ -119,6 +119,7 @@ class SyncUserProfile extends Command
                 $query->whereNull('date_updated');
                 $query->orWhere('date_updated', '>=', $last_sync_at );
             })
+            ->orderBy('date_deleted')
             ->orderBy('employee_id')
             ->orderBy('job_indicator', 'desc')
             ->orderBy('empl_record')
@@ -160,55 +161,31 @@ class SyncUserProfile extends Command
 
                     DB::beginTransaction();
                     try {
-                        // $old_values = [ 
-                        //     'table' => 'users',                        
-                        //     'id' => $user->id, 
-                        //     'employee_id' => $user->employee_id, 
-                        //     'name' => $user->name, 
-                        //     'email' => $user->email, 
-                        //     'empl_record' => $user->empl_record, 
-                        //     'joining_date' => date('Y-m-d',strtotime($user->joining_date)),  
-                        //     'acctlock' => $user->acctlock, 
-                        //     'last_sync_at' => $user->last_sync_at
-                        // ];
-                        // $new_values = [ 
-                        //     'table' => 'users',                        
-                        //     'id' => $user->id, 
-                        //     'employee_id' => $employee->employee_id, 
-                        //     'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name, 
-                        //     'email' => $employee->employee_email, 
-                        //     'empl_record' => $employee->empl_record, 
-                        //     'joining_date' => date('Y-m-d',strtotime($employee->position_start_date)),  
-                        //     'acctlock' => $employee->date_deleted ? 1 : 0,  
-                        //     'last_sync_at' => $user->last_sync_at 
-                        // ]; 
- 
-                        // if ($old_values != $new_values) { 
+                        $update_flag = 0;
+                        if (!$employee->date_deleted && $user->name != $employee->employee_first_name . ' ' . $employee->employee_last_name) {
                             $user->name = $employee->employee_first_name . ' ' . $employee->employee_last_name; 
+                            $update_flag = 1;
+                        }
+                        if (!$employee->date_deleted && $user->email != $employee->employee_email) {
                             $user->email = $employee->employee_email; 
-                            $user->employee_id = $employee->employee_id; 
-                            $user->empl_record = $employee->empl_record; 
+                            $update_flag += 10;
+                        }
+                        if (!$employee->date_deleted && date('Y-m-d',strtotime($user->joining_date)) != date('Y-m-d',strtotime($employee->position_start_date))) {
                             $user->joining_date = date('Y-m-d',strtotime($employee->position_start_date)); 
-                            $user->acctlock = $employee->date_deleted ? 1 : 0;  
+                            $update_flag += 100;
+                        }
+                        $active_demo = EmployeeDemo::select(DB::raw(2))->from('employee_demo AS ed2')->whereRaw("ed2.employee_id = {$user->employee_id}")->whereNull('ed2.date_deleted')->first();
+                        $active_found = $active_demo ? 1 : 0;
+                        $acct_locked = $user->acctlock ? 1 : 0;
+                        if ($user->acctlock != $acct_locked) {
+                            $user->acctlock = $active_found ? 0 : 1;  
+                            $update_flag += 1000;
+                        }
+                        if ($update_flag > 0) {
                             $user->last_sync_at = $new_sync_at; 
                             $user->save(); 
-                            // $new_values = [  
-                            //     'table' => 'users',                         
-                            //     'id' => $user->id,  
-                            //     'employee_id' => $employee->employee_id,  
-                            //     'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name,  
-                            //     'email' => $employee->employee_email,  
-                            //     'empl_record' => $employee->empl_record,  
-                            //     'joining_date' => date('Y-m-d',strtotime($employee->position_start_date)),  
-                            //     'acctlock' => $employee->date_deleted ? 1 : 0,  
-                            //     'last_sync_at' => $new_sync_at 
-                            // ]; 
-                            // $audit = new JobDataAudit; 
-                            // $audit->job_sched_id = $audit_id; 
-                            // $audit->old_values = json_encode($old_values); 
-                            // $audit->new_values = json_encode($new_values); 
-                            // $audit->save(); 
-                        // } 
+                            $this->info( "Step 1: Updated user profile ({$user->id}) for EID # {$employee->employee_id}. Update Code: {$update_flag}" ); 
+                        }
 
                         // Grant employee Role
                         if (!$user->hasRole('Employee')) {
@@ -235,8 +212,8 @@ class SyncUserProfile extends Command
             } else {
 
                 $dup_email = User::where('email', $employee->employee_email)
-                ->select('employee_id') 
                 ->where('employee_id', '!=', $employee->employee_id)
+                ->select('employee_id') 
                 ->first();
 
                 if ($dup_email) {
@@ -251,9 +228,6 @@ class SyncUserProfile extends Command
 
                     DB::beginTransaction();
                     try {
-                        // $old_values = [ 
-                        //     'table' => 'users'
-                        // ];
                         $user = User::create([
                             'guid' => $employee->guid,
                             'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name,
@@ -262,26 +236,10 @@ class SyncUserProfile extends Command
                             'empl_record' => $employee->empl_record,
                             'joining_date' => $employee->position_start_date,
                             'password' => $password,
-                            'acctlock' => $employee->date_deleted ? true : false,
+                            'acctlock' => $employee->date_deleted ? 1 : 0,
                             'last_sync_at' => $new_sync_at,
                         ]);
-                        // $new_values = [ 
-                        //     'table' => 'users',                        
-                        //     'guid' => $employee->guid,
-                        //     'employee_id' => $employee->employee_id, 
-                        //     'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name, 
-                        //     'email' => $employee->employee_email, 
-                        //     'empl_record' => $employee->empl_record, 
-                        //     'joining_date' => $employee->position_start_date, 
-                        //     'password' => '********',
-                        //     'acctlock' => $employee->date_deleted ? true : false, 
-                        //     'last_sync_at' => $new_sync_at
-                        // ];
-                        // $audit = new JobDataAudit;
-                        // $audit->job_sched_id = $audit_id;
-                        // $audit->old_values = json_encode($old_values);
-                        // $audit->new_values = json_encode($new_values);
-                        // $audit->save();
+                        $this->info( "Step 1: Created user profile ({$user->id}) for EID # {$employee->employee_id}." ); 
         
                         $user->assignRole('Employee');
 
@@ -301,7 +259,6 @@ class SyncUserProfile extends Command
                     } 
                 }
 
-            //   }
             }
         
         }
@@ -348,8 +305,7 @@ class SyncUserProfile extends Command
                     'employee_email' => $employee->employee_email, 
                     'exception' => 'User not found by employee id, EID # '.$employee->employee_id.'.' 
                 ]); 
-                $this->info('Step 2: User ' . $employee->employee_email . ' - ' .  
-                            $employee->employee_id . ' not found by employee id.'); 
+                $this->info('Step 2: User ' . $employee->employee_email . ' - ' . $employee->employee_id . ' not found by employee id.'); 
             }
           
         }
@@ -358,25 +314,15 @@ class SyncUserProfile extends Command
         $this->info( now() );        
         $this->info('Step 3 - Lock Out Inactivate User account');
 
-        // $users = User::whereIn('guid',function($query) { 
-        //     $query->select('guid')->from('employee_demo')->whereNotNull('date_deleted');
-        //     })->update(['acctlock'=>true, 'last_sync_at' => $new_sync_at]);
-
-        $users = User::from('users')->whereIn('employee_id',function($query) { 
-            $query->from('employee_demo')->select('employee_id')->whereNotNull('date_deleted');
-            })->update(['acctlock'=>true, 'last_sync_at' => $new_sync_at]);
-
-        // // Step 4 : Lock all users except pivot run users
-        // $this->info( now() );        
-        // $this->info('Step 4 - Lock Out Users except Pivot run based on organization');
-
-        // $users = User::whereNotNull('guid')
-        //     ->whereNotIn('guid',function($query) { 
-        //         $query->select('guid')->from('employee_demo')
-        //             ->whereIn('organization', ['BC Public Service Agency',
-        //                                         'Royal BC Museum', 
-        //                                         'Social Development and Poverty Reduction']);
-        // })->update(['acctlock'=>true, 'last_sync_at' => $new_sync_at]);
+        $users = User::where('id', '>', \DB::raw(9999))
+            ->whereRaw("RIGHT(users.email, 20) <> LPAD(CONCAT('<', users.id, '><LOCKED>'), 20, '*')")
+            ->whereExists(function($any_demo) {
+                return $any_demo->select(DB::raw(1))->from('employee_demo AS ed1')->whereRaw("ed1.employee_id = users.employee_id");
+            })
+            ->whereNotExists(function($active_demo) {
+                return $active_demo->select(DB::raw(2))->from('employee_demo AS ed2')->whereRaw("ed2.employee_id = users.employee_id")->whereNull('ed2.date_deleted');
+            })
+            ->update(['users.acctlock' => true, 'users.last_sync_at' => $new_sync_at, 'users.email' => \DB::raw("CONCAT(users.email, LPAD(CONCAT('<', users.id, '><LOCKED>'), 20, '*'))")]);
 
         $this->info( now() );         
  
