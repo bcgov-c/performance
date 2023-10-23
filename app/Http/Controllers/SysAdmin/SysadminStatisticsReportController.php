@@ -2131,8 +2131,8 @@ class SysadminStatisticsReportController extends Controller
         $request->session()->flash('dd_level4', $request->dd_level4);
 
         $sql = UserDemoJrView::selectRaw("employee_id, 
-                                excused_reason_id, excusedtype, reason_name, reason_name, excused_by_name, organization, level1_program, level2_division, level3_branch, level4,
-                                (CASE WHEN reason_id IS NOT NULL
+                                excused_reason_id, excusedtype, reason_name, excused_by_name, organization, level1_program, level2_division, level3_branch, level4,
+                                (CASE WHEN reason_name <> ''
                                     THEN 'Yes' ELSE 'No' END) AS excused")
                     ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
                     ->when($request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
@@ -2171,8 +2171,8 @@ class SysadminStatisticsReportController extends Controller
       $selected_ids = $request->ids ? explode(',', $request->ids) : [];
 
       $sql = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email,
-      excused_reason_id, excusedtype, reason_name, reason_name, excused_by_name, created_at_string, organization, level1_program, level2_division, level3_branch, level4,
-      (CASE WHEN reason_id IS NOT NULL THEN 'Yes' ELSE 'No' END) AS excused")
+      excused_reason_id, excusedtype, reason_name, excused_by_name, created_at_string, organization, level1_program, level2_division, level3_branch, level4,
+      (CASE WHEN reason_name <> '' THEN 'Yes' ELSE 'No' END) AS excused")
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
                 ->when($request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
                 ->when($request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
