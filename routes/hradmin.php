@@ -57,7 +57,7 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('/hradmin/myorg', [MyOrganizationController::class, 'index'])->name('hradmin.myorg');
         Route::get('/hradmin/myorg/myorganization', [MyOrganizationController::class, 'getList'])->name('hradmin.myorg.myorganization');
         Route::post('/hradmin/myorg/myorganization', [MyOrganizationController::class, 'index'])->name('hradmin.myorg.myorganization');
-        Route::get('/hradmin/myorg/reporteeslist/{id}', [MyOrganizationController::class, 'reporteesList'])->name('hradmin.myorg.reporteeslist');
+        Route::get('/hradmin/myorg/reporteeslist/{id}/{posn}', [MyOrganizationController::class, 'reporteesList'])->name('hradmin.myorg.reporteeslist');
     });
 
     //Goal Bank
