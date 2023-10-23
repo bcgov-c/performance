@@ -204,78 +204,82 @@ class PopulateUsersAnnexTable extends Command
 
             $this->info(Carbon::now()->format('c')." - Process Supervisor Overrides...");
             \DB::statement("
-                UPDATE users_annex AS ua,
-                    employee_supervisor AS es,
-                    users AS u,
-                    employee_demo AS ed
+                UPDATE users_annex AS target,
+                    (SELECT ua.id, u.employee_id, ed.employee_name, u.name, u.email, ed.position_number, es.supervisor_id, 
+                        (SELECT 1 FROM users_annex uax WHERE uax.user_id = ua.user_id AND uax.reporting_to_employee_id IS NOT NULL LIMIT 1) AS manager_updated
+                    FROM users_annex AS ua, employee_supervisor AS es, users AS u, employee_demo AS ed
+                    WHERE ua.user_id = es.user_id
+                        AND es.supervisor_id = u.id
+                        AND es.deleted_at IS NULL
+                        AND u.employee_id = ed.employee_id
+                        AND ed.date_deleted IS NULL) AS source
                 SET 
-                    ua.reporting_to_employee_id = u.employee_id,
-                    ua.reporting_to_name = ed.employee_name,
-                    ua.reporting_to_name2 = u.name,
-                    ua.reporting_to_email = u.email,
-                    ua.reporting_to_position_number = ed.position_number,
-                    ua.reporting_to_userid = es.supervisor_id
-                WHERE ua.user_id = es.user_id
-                    AND NOT EXISTS (SELECT 1 FROM (SELECT 1 FROM users_annex uax WHERE uax.user_id = ua.user_id AND uax.reporting_to_employee_id IS NOT NULL) AS uaz)
-                    AND es.supervisor_id = u.id
-                    AND es.deleted_at IS NULL
-                    AND u.employee_id = ed.employee_id
-                    AND ed.date_deleted IS NULL
+                    target.reporting_to_employee_id = source.employee_id,
+                    target.reporting_to_name = source.employee_name,
+                    target.reporting_to_name2 = source.name,
+                    target.reporting_to_email = source.email,
+                    target.reporting_to_position_number = source.position_number,
+                    target.reporting_to_userid = source.supervisor_id
+                WHERE target.id = source.id
+                    AND source.manager_updated IS NULL
             ");
 
             $this->info(Carbon::now()->format('c')." - Process Preferred Supervisors...");
             \DB::statement("
-                UPDATE users_annex AS ua,
-                    employee_demo AS ed,
-                    employee_managers AS em,
-                    preferred_supervisor AS ps
+                UPDATE users_annex AS target,
+                    (SELECT ua.id, em.supervisor_emplid, em.supervisor_name, em.supervisor_name2, em.supervisor_email, em.supervisor_position_number, em.supervisor_userid,
+                        (SELECT 1 FROM users_annex uax WHERE uax.user_id = ua.user_id AND uax.reporting_to_employee_id IS NOT NULL LIMIT 1) AS manager_updated
+                    FROM users_annex AS ua, employee_demo AS ed, employee_managers AS em, preferred_supervisor AS ps
+                    WHERE ua.employee_id = em.employee_id
+                        AND ua.employee_id = ed.employee_id
+                        AND ua.empl_record = ed.empl_record
+                        AND em.employee_id = ps.employee_id
+                        AND ed.position_number = ps.position_nbr
+                        AND ed.date_deleted IS NULL
+                        AND em.supervisor_emplid = ps.supv_empl_id) AS source
                 SET 
-                    ua.reporting_to_employee_id = em.supervisor_emplid,
-                    ua.reporting_to_name = em.supervisor_name,
-                    ua.reporting_to_name2 = em.supervisor_name2,
-                    ua.reporting_to_email = em.supervisor_email,
-                    ua.reporting_to_position_number = em.supervisor_position_number,
-                    ua.reporting_to_userid = em.supervisor_userid
-                WHERE ua.employee_id = em.employee_id
-                    AND NOT EXISTS (SELECT 1 FROM (SELECT 1 FROM users_annex uax WHERE uax.user_id = ua.user_id AND uax.reporting_to_employee_id IS NOT NULL) AS uaz)
-                    AND ua.employee_id = ed.employee_id
-                    AND ua.empl_record = ed.empl_record
-                    AND em.employee_id = ps.employee_id
-                    AND ed.position_number = ps.position_nbr
-                    AND ed.date_deleted IS NULL
-                    AND em.supervisor_emplid = ps.supv_empl_id
+                    target.reporting_to_employee_id = source.supervisor_emplid,
+                    target.reporting_to_name = source.supervisor_name,
+                    target.reporting_to_name2 = source.supervisor_name2,
+                    target.reporting_to_email = source.supervisor_email,
+                    target.reporting_to_position_number = source.supervisor_position_number,
+                    target.reporting_to_userid = source.supervisor_userid
+                WHERE target.id = source.id
+                    AND source.manager_updated IS NULL
             ");
             
             $this->info(Carbon::now()->format('c')." - Process Supervisors...");
             \DB::statement("
-                UPDATE users_annex AS ua,
-                    employee_demo AS ed,
-                    employee_managers AS em
+                UPDATE users_annex AS target,
+                    (SELECT ua.id, em.supervisor_emplid, em.supervisor_name, em.supervisor_name2, em.supervisor_email, em.supervisor_position_number, em.supervisor_userid,
+                        (SELECT 1 FROM users_annex uax WHERE uax.user_id = ua.user_id AND uax.reporting_to_employee_id IS NOT NULL LIMIT 1) AS manager_updated
+                    FROM users_annex AS ua, employee_demo AS ed, employee_managers AS em
+                    WHERE ua.employee_id = ed.employee_id
+                        AND ua.empl_record = ed.empl_record
+                        AND ua.employee_id = em.employee_id
+                        AND ed.position_number = em.position_number) AS source
                 SET 
-                    ua.reporting_to_employee_id = em.supervisor_emplid,
-                    ua.reporting_to_name = em.supervisor_name,
-                    ua.reporting_to_name2 = em.supervisor_name2,
-                    ua.reporting_to_email = em.supervisor_email,
-                    ua.reporting_to_position_number = em.supervisor_position_number,
-                    ua.reporting_to_userid = em.supervisor_userid
-                WHERE ua.employee_id = ed.employee_id
-                    AND ua.empl_record = ed.empl_record
-                    AND ua.employee_id = em.employee_id
-                    AND ed.position_number = em.position_number
-                    AND NOT EXISTS (SELECT 1 FROM (SELECT 1 FROM users_annex uax WHERE uax.user_id = ua.user_id AND uax.reporting_to_employee_id IS NOT NULL) AS uaz)
+                    target.reporting_to_employee_id = source.supervisor_emplid,
+                    target.reporting_to_name = source.supervisor_name,
+                    target.reporting_to_name2 = source.supervisor_name2,
+                    target.reporting_to_email = source.supervisor_email,
+                    target.reporting_to_position_number = source.supervisor_position_number,
+                    target.reporting_to_userid = source.supervisor_userid
+                WHERE target.id = source.id
+                    AND source.manager_updated IS NULL
             ");
 
             $this->info(Carbon::now()->format('c')." - Process Reportee Count...");
             \DB::statement("
                 UPDATE 
-                    users_annex AS upd_ua,
+                    users_annex AS target,
                     employee_demo AS upd_ed,
                     users_annex_reportees_view  AS upd_uarv
                 SET 
-                    upd_ua.reportees = upd_uarv.reportees
+                    target.reportees = upd_uarv.reportees
                 WHERE 
-                    upd_ua.employee_id = upd_ed.employee_id
-                    AND upd_ua.empl_record = upd_ed.empl_record
+                    target.employee_id = upd_ed.employee_id
+                    AND target.empl_record = upd_ed.empl_record
                     AND upd_uarv.employee_id = upd_ed.employee_id
                     AND upd_uarv.position_number = upd_ed.position_number
             ");
