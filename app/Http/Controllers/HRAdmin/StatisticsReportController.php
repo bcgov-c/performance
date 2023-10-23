@@ -2397,8 +2397,8 @@ class StatisticsReportController extends Controller
         $request->session()->flash('dd_level4', $request->dd_level4);
 
         $sql = UserDemoJrView::selectRaw("employee_id, 
-                                excused_reason_id, excusedtype, reason_name, reason_name, excused_by_name, organization, level1_program, level2_division, level3_branch, level4,
-                                (CASE WHEN reason_id IS NOT NULL
+                                excused_reason_id, excusedtype, reason_name, excused_by_name, organization, level1_program, level2_division, level3_branch, level4,
+                                (CASE WHEN reason_name <> '' 
                                     THEN 'Yes' ELSE 'No' END) AS excused")
                     ->join('auth_users', 'user_demo_jr_view.user_id', 'auth_users.user_id')
                     ->whereNull('user_demo_jr_view.date_deleted') 
@@ -2439,20 +2439,23 @@ class StatisticsReportController extends Controller
       $selected_ids = $request->ids ? explode(',', $request->ids) : [];
 
       $sql = UserDemoJrView::selectRaw("employee_id, employee_name, employee_email,
-      excused_reason_id, excusedtype, reason_name, reason_name, excused_by_name, created_at_string, organization, level1_program, level2_division, level3_branch, level4,
-      (CASE WHEN reason_id IS NOT NULL THEN 'Yes' ELSE 'No' END) AS excused")
-                ->whereNull('date_deleted')   
-                ->join('auth_users', 'user_demo_jr_view.user_id', 'auth_users.user_id')
-                    ->whereNull('user_demo_jr_view.date_deleted') 
-                    ->where('auth_users.type', 'HR')
-                    ->where('auth_users.auth_id', Auth::id())            
-                    ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
-                    ->when($request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
-                    ->when($request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
-                    ->when($request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
-                    ->when($request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
-                    ->when($request->legend === 'Yes', function ($q) { return $q->having('excused', 'Yes'); }) // Condition for legend 'Yes'
-                    ->when($request->legend === 'No', function ($q) { return $q->having('excused', 'No'); }); // Condition for legend 'No'
+      excused_reason_id, excusedtype, reason_name, excused_by_name, created_at_string, organization, level1_program, level2_division, level3_branch, level4,
+      (CASE WHEN reason_name <> '' THEN 'Yes' ELSE 'No' END) AS excused")
+                ->whereNull('date_deleted')         
+                ->when($request->dd_level0, function ($q) use($request) { return $q->where('organization_key', $request->dd_level0); })
+                ->when($request->dd_level1, function ($q) use($request) { return $q->where('level1_key', $request->dd_level1); })
+                ->when($request->dd_level2, function ($q) use($request) { return $q->where('level2_key', $request->dd_level2); })
+                ->when($request->dd_level3, function ($q) use($request) { return $q->where('level3_key', $request->dd_level3); })
+                ->when($request->dd_level4, function ($q) use($request) { return $q->where('level4_key', $request->dd_level4); })
+                ->when($request->legend === 'Yes', function ($q) { return $q->having('excused', 'Yes'); }) // Condition for legend 'Yes'
+                ->when($request->legend === 'No', function ($q) { return $q->having('excused', 'No'); }) // Condition for legend 'No'
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                            ->from('auth_users')
+                            ->whereColumn('auth_users.user_id', 'user_id')
+                            ->where('auth_users.type', '=', 'HR')
+                            ->where('auth_users.auth_id', '=', Auth::id());
+                });
 
         $users = $sql->get();
 
