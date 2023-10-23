@@ -22,7 +22,7 @@ class CreateUsersAnnexReporteesView extends Migration
                 COUNT(`d_ed`.`employee_id`) AS `reportees`
             FROM
                 (`employee_demo` `d_ed` USE INDEX (EMPLOYEE_DEMO_EMPLOYEE_ID_EMPL_RECORD_UNIQUE)
-                JOIN `users_annex` `d_ua` USE INDEX (IDX_USERS_ANNEX_USER_ID_REPORTING_TO_EMPLOYEE_ID))
+                JOIN `users_annex` `d_ua` USE INDEX (IDX_USERS_ANNEX_REPORTING_TO_EMPLOYEE_ID_POSITION_NUMBER))
             WHERE
                 ((`d_ed`.`employee_id` = `d_ua`.`employee_id`)
                     AND (`d_ed`.`empl_record` = `d_ua`.`empl_record`)
