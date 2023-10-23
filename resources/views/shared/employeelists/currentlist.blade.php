@@ -134,6 +134,52 @@
                     window.location.href = _url;
                 });
 
+                $('#reportees-modal').on('show.bs.modal', function(event) {
+                    var button = $(event.relatedTarget);
+                    var user_id = button.data('user_id');
+                    var employee_name = button.data('employee_name');
+                    var position_number = button.data('position_number');
+                    $('#reporteesTitle').text('Direct / Shared Reports for '+employee_name);
+                    if($.fn.DataTable.isDataTable( "#reporteesTable" )) {
+                        $('#reporteesTable').DataTable().clear().destroy();
+                    };
+                    $('#reporteesTable').DataTable({
+                        serverSide: true,
+                        searching: false,
+                        processing: true,
+                        paging: true,
+                        deferRender: true,
+                        retrieve: true,
+                        scrollCollapse: true,
+                        scroller: true,
+                        scrollX: true,
+                        stateSave: false,
+                        ajax: {
+                            type: 'GET',
+                            url: "/sysadmin/employeelists/reporteeslist/"+user_id+"/"+position_number,
+                        },                    
+                        fnDrawCallback: function() {
+                        },
+                        fnRowCallback: function( row, data ) {
+                        },
+                        columns: [
+                            {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', searchable: true},
+                            {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', searchable: true},
+                            {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'employee_email', searchable: true},
+                            {title: 'Type <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="<b>Direct Reports</b> are employees that report directly to you in PeopleSoft. <br><br><b>Delegated Reports</b> are employees that report to a vacant position in PeopleSoft and have therefore been delegated to you as the next level supervisor in the org hierarchy. <br><br><b>Shared Reports</b> are employees that have been shared with you by another supervisor or administrator in the PDP. This is separate from any PeopleSoft data." ></i>', ariaTitle: 'Type', target: 0, type: 'string', data: 'reporteetype', name: 'reporteetype', searchable: true},
+                        ],  
+                    });
+                });
+
+                $(window).on('beforeunload', function(){
+                    $('#pageLoader').show();
+                });
+
+                $('body').popover({
+                    selector: '[data-toggle]',
+                    trigger: 'hover',
+                });
+
             } );
         </script>
     @endpush

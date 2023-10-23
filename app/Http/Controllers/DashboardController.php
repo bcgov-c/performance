@@ -413,7 +413,7 @@ class DashboardController extends Controller
                 ua.reporting_to_position_number = ed.position_number,
                 ua.reporting_to_userid = es.supervisor_id
             WHERE ua.user_id = es.user_id
-                AND ua.reporting_to_employee_id IS NULL
+                AND NOT EXISTS (SELECT 1 FROM (SELECT 1 FROM users_annex uax WHERE uax.user_id = ua.user_id AND uax.reporting_to_employee_id IS NOT NULL) AS uaz)
                 AND es.supervisor_id = u.id
                 AND es.deleted_at IS NULL
                 AND u.employee_id = ed.employee_id
@@ -434,8 +434,9 @@ class DashboardController extends Controller
                 ua.reporting_to_position_number = em.supervisor_position_number,
                 ua.reporting_to_userid = em.supervisor_userid
             WHERE ua.employee_id = em.employee_id
-                AND ua.reporting_to_employee_id IS NULL
+                AND NOT EXISTS (SELECT 1 FROM (SELECT 1 FROM users_annex uax WHERE uax.user_id = ua.user_id AND uax.reporting_to_employee_id IS NOT NULL) AS uaz)
                 AND ua.employee_id = ed.employee_id
+                AND ua.empl_record = ed.empl_record
                 AND em.employee_id = ps.employee_id
                 AND ed.position_number = ps.position_nbr
                 AND ed.date_deleted IS NULL
@@ -445,6 +446,7 @@ class DashboardController extends Controller
         
         \DB::statement("
             UPDATE users_annex AS ua,
+                employee_demo AS ed,
                 employee_managers AS em
             SET 
                 ua.reporting_to_employee_id = em.supervisor_emplid,
@@ -453,8 +455,11 @@ class DashboardController extends Controller
                 ua.reporting_to_email = em.supervisor_email,
                 ua.reporting_to_position_number = em.supervisor_position_number,
                 ua.reporting_to_userid = em.supervisor_userid
-            WHERE ua.employee_id = em.employee_id
-                AND ua.reporting_to_employee_id IS NULL
+            WHERE ua.employee_id = ed.employee_id
+                AND ua.empl_record = ed.empl_record
+                AND ua.employee_id = em.employee_id
+                AND ed.position_number = em.position_number
+                AND NOT EXISTS (SELECT 1 FROM (SELECT 1 FROM users_annex uax WHERE uax.user_id = ua.user_id AND uax.reporting_to_employee_id IS NOT NULL) AS uaz)
                 AND ua.user_id = {$userid}
         ");
 
