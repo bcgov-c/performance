@@ -4,6 +4,7 @@
             <h3>My Organization</h3>
         </div>
     </div>
+    @include('hradmin.myorg.partials.reportees-modal') 
 
     <div class="card">
         <div class="card-body">    
@@ -106,7 +107,7 @@
                                 {title: 'Next Conversation', ariaTitle: 'Next Conversation', target: 0, type: 'date', data: 'nextConversationDue', name: 'u.next_conversation_date', searchable: false, className: 'dt-nowrap'},
                                 {title: 'Excused', ariaTitle: 'Excused', target: 0, type: 'string', data: 'excusedtype', name: 'excusedtype', searchable: true, className: 'dt-nowrap'},
                                 {title: 'Shared', ariaTitle: 'Shared', target: 0, type: 'string', data: 'shared', name: 'shared', searchable: false, className: 'dt-nowrap'},
-                                {title: 'Direct / Shared Reports', ariaTitle: 'Direct / Shared Reports', target: 0, type: 'string', data: 'reportees', name: 'reportees', searchable: false, className: 'dt-nowrap'},
+                                {title: 'Direct / Shared Reports', ariaTitle: 'Direct / Shared Reports', target: 0, type: 'string', data: 'reportees', name: 'reportees', searchable: false, className: 'dt-nowrap show-modal'},
                                 {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'num', data: 'user_id', name: 'user_id', searchable: true, visible: false, className: 'dt-nowrap'},
                             ]
                         }
@@ -117,6 +118,7 @@
                     var button = $(event.relatedTarget);
                     var user_id = button.data('user_id');
                     var employee_name = button.data('employee_name');
+                    var position_number = button.data('position_number');
                     $('#reporteesTitle').text('Direct / Shared Reports for '+employee_name);
                     if($.fn.DataTable.isDataTable( "#reporteesTable" )) {
                         $('#reporteesTable').DataTable().clear().destroy();
@@ -134,7 +136,7 @@
                         stateSave: false,
                         ajax: {
                             type: 'GET',
-                            url: "/hradmin/myorg/reporteeslist/"+user_id,
+                            url: "/hradmin/myorg/reporteeslist/"+user_id+"/"+position_number,
                         },                    
                         fnDrawCallback: function() {
                         },

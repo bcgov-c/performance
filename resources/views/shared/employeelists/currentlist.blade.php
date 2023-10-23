@@ -138,6 +138,7 @@
                     var button = $(event.relatedTarget);
                     var user_id = button.data('user_id');
                     var employee_name = button.data('employee_name');
+                    var position_number = button.data('position_number');
                     $('#reporteesTitle').text('Direct / Shared Reports for '+employee_name);
                     if($.fn.DataTable.isDataTable( "#reporteesTable" )) {
                         $('#reporteesTable').DataTable().clear().destroy();
@@ -155,7 +156,7 @@
                         stateSave: false,
                         ajax: {
                             type: 'GET',
-                            url: "/sysadmin/employeelists/reporteeslist/"+user_id,
+                            url: "/sysadmin/employeelists/reporteeslist/"+user_id+"/"+position_number,
                         },                    
                         fnDrawCallback: function() {
                         },
