@@ -10,6 +10,8 @@ use App\Models\EmployeeDemoJunior;
 use App\Models\EmployeeDemoTree;
 use App\Models\SharedProfile;
 use App\Models\UserDemoJrView;
+use App\Models\Position;
+use App\Models\EmployeeDemo;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -172,6 +174,59 @@ class EmployeeListController extends Controller {
                     u.reportees,
                     (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active' AND g.is_library = 0 AND g.deleted_at IS NULL) AS activeGoals
                 ");
+            return Datatables::of($query)
+                ->addIndexColumn()
+                ->editColumn('reportees', function($row) {
+                    $text = $row->reportees;
+                    return view('shared.employeelists.partials.link', compact(["row", 'text']));
+                })
+                ->rawColumns(['reportees'])
+                ->make(true);
+        }
+    }
+
+    public function reporteesList(Request $request, $id, $posn) {
+        $user = UserDemoJrView::whereRaw("user_id = {$id}")
+            ->where("position_number", $posn)
+            ->first();
+        if ($request->ajax()) {
+            $reportees = EmployeeDemo::join(\DB::raw('users_annex AS d_ua USE INDEX (users_annex_employee_id_record_index)'), function($join){
+                    return $join->on(function($on){
+                        return $on->whereRaw("employee_demo.employee_id = d_ua.employee_id")
+                            ->whereRaw("employee_demo.empl_record = d_ua.empl_record")
+                            ->whereNull('employee_demo.date_deleted');
+                    });
+                })
+                ->join(\DB::raw('employee_managers AS d_um USE INDEX (idx_employee_managers_supervisor_emplid_employee_id)'), function($join) use($user, $posn) {
+                    return $join->on(function($on) use($user, $posn) {
+                        return $on->whereRaw("d_um.supervisor_emplid = '{$user->employee_id}'")
+                            ->whereRaw("d_um.employee_id = employee_demo.employee_id")
+                            ->whereRaw("d_um.supervisor_position_number = '{$posn}'");
+                    });
+                })
+                ->where('d_ua.reporting_to_employee_id', $user->employee_id)
+                ->where('d_ua.reporting_to_position_number', $posn)
+                ->selectRaw("
+                    employee_demo.employee_id AS employee_id, 
+                    employee_demo.employee_name AS employee_name, 
+                    employee_demo.employee_email AS employee_email, 
+                    CASE WHEN d_um.source IN ('Posn', 'ODS') THEN 'Direct' WHEN d_um.source IN ('Posn Next', 'ODS Next') THEN 'Delegated' END AS reporteetype
+                ");
+            $shared = \DB::table('shared_profiles AS sp')
+                ->whereRaw("sp.shared_with = ".$user->user_id)
+                ->join(\DB::raw('users AS u USE INDEX (IDX_USERS_ID)'), 'sp.shared_id', 'u.id')
+                ->join(\DB::raw('employee_demo AS dmo USE INDEX (IDX_EMPLOYEE_DEMO_EMPLOYEEID_RECORD)'), function ($join) {
+                    $join->on('u.employee_id', 'dmo.employee_id');
+                    $join->on('u.empl_record', 'dmo.empl_record');
+                })
+                ->whereNull('dmo.date_deleted')
+                ->selectRaw("
+                    dmo.employee_id AS employee_id, 
+                    dmo.employee_name AS employee_name, 
+                    dmo.employee_email AS employee_email, 
+                    'Shared' AS reporteetype
+                ");
+            $query = $reportees->union($shared);
             return Datatables::of($query)
                 ->addIndexColumn()
                 ->make(true);
