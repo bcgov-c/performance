@@ -1268,33 +1268,40 @@ class GoalBankController extends Controller
     protected function notify_on_dashboard($goalBank, $employee_ids) {
         foreach(array_chunk($employee_ids, 1000) as $employee_ids_chunk) {
             // Filter out the employee based on the Organization level and individual user preferences. 
-            $data = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization_key', 'access_organizations.orgid')
-                ->whereIn('user_demo_jr_view.employee_id', $employee_ids_chunk)
-                ->where('access_organizations.allow_inapp_msg', 'Y')
+            $core = User::whereIn('users.employee_id', $employee_ids_chunk)
+                ->whereExists(function($exists){
+                    return $exists->selectRaw(\DB::raw(1))
+                        ->from('users_annex AS ua')
+                        ->join('access_organizations AS ao', 'ao.orgid', 'ua.organization_key')
+                        ->whereRaw('ua.user_id = users.id')
+                        ->where('ao.allow_inapp_msg', \DB::raw("'Y'"))
+                        ->limit(1);
+                });
+            $data = $core->whereRaw("NOT EXISTS (SELECT 1 FROM dashboard_notifications AS dn WHERE dn.user_id = users.id AND dn.notification_type = 'GB' AND dn.related_id = {$goalBank->id} AND dn.deleted_at IS NULL)")
                 ->selectRaw("
-                    user_demo_jr_view.user_id, 
+                    users.id AS user_id, 
                     'GB' AS notification_type,
                     '".($goalBank->display_name ? $goalBank->display_name : $goalBank->user->name)." added a new goal to your goal bank.' AS comment,
                     ".$goalBank->id." AS related_id,
                     NOW() AS created_at,
                     NOW() AS updated_at
                 ")
-                ->whereRaw("NOT EXISTS (SELECT 1 FROM dashboard_notifications WHERE dashboard_notifications.user_id = user_demo_jr_view.user_id AND dashboard_notifications.notification_type = 'GB' AND dashboard_notifications.related_id = {$goalBank->id} AND dashboard_notifications.deleted_at IS NULL)")
-                ->distinct()
                 ->get()
+                ->makeHidden('is_goal_shared_with_auth_user')
+                ->makeHidden('is_conversation_shared_with_auth_user')
+                ->makeHidden('is_shared')
+                ->makeHidden('allow_inapp_notification')
+                ->makeHidden('allow_email_notification')
                 ->toArray();
             DashboardNotification::insert($data);
-            $data = UserDemoJrView::join('access_organizations', 'user_demo_jr_view.organization_key', 'access_organizations.orgid')
-                ->whereIn('user_demo_jr_view.employee_id', $employee_ids_chunk)
-                ->where('access_organizations.allow_inapp_msg', 'Y')
-                ->selectRaw("
+            $data = $core->selectRaw("
                     ' ' AS recipients,
                     0 AS sender_id,
                     '".($goalBank->display_name ? $goalBank->display_name : $goalBank->user->name)." added a new goal to your goal bank.' AS subject,
                     '' AS description,
                     'N' AS alert_type,
                     'A' AS alert_format,
-                    user_demo_jr_view.user_id AS notify_user_id,
+                    users.id AS notify_user_id,
                     NULL AS overdue_user_id,
                     NULL AS notify_due_date,
                     NULL AS notify_for_days,
@@ -1303,8 +1310,12 @@ class GoalBankController extends Controller
                     NOW() AS created_at,
                     NOW() AS updated_at
                 ")
-                ->distinct()
                 ->get()
+                ->makeHidden('is_goal_shared_with_auth_user')
+                ->makeHidden('is_conversation_shared_with_auth_user')
+                ->makeHidden('is_shared')
+                ->makeHidden('allow_inapp_notification')
+                ->makeHidden('allow_email_notification')
                 ->toArray();
             NotificationLog::insert($data);
         }
