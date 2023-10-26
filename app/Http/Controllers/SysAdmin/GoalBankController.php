@@ -1280,6 +1280,7 @@ class GoalBankController extends Controller
                     NOW() AS updated_at
                 ")
                 ->whereRaw("NOT EXISTS (SELECT 1 FROM dashboard_notifications WHERE dashboard_notifications.user_id = user_demo_jr_view.user_id AND dashboard_notifications.notification_type = 'GB' AND dashboard_notifications.related_id = {$goalBank->id} AND dashboard_notifications.deleted_at IS NULL)")
+                ->distinct()
                 ->get()
                 ->toArray();
             DashboardNotification::insert($data);
@@ -1302,6 +1303,7 @@ class GoalBankController extends Controller
                     NOW() AS created_at,
                     NOW() AS updated_at
                 ")
+                ->distinct()
                 ->get()
                 ->toArray();
             NotificationLog::insert($data);
