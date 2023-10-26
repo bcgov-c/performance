@@ -126,13 +126,16 @@
     $(function() {
         // Datatables
         var oTable = $('#accessorgs-table').DataTable({
-            "scrollX": true,
-            retrieve: true,
-            "searching": true,
-            processing: true,
             serverSide: true,
-            // select: true,
-            fixedHeader: true,    
+            searching: true,
+            processing: true,
+            paging: true,
+            deferRender: true,
+            retrieve: true,
+            scrollCollapse: true,
+            scroller: true,
+            scrollX: true,
+            stateSave: true,
             pageLength: 10,
             dom: '<"toolbar">frtip',
             ajax: {
@@ -167,11 +170,10 @@
                 }
             },
             columns: [
-                {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', visible: false, className: "dt-nowrap" },
                 {title: '<input name="select_all" value="1" id="employee-list-select-all" type="checkbox" />', ariaTitle: 'employee-list-select-all', target: 0, type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
-                {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', className: "dt-nowrap" },
-                {title: 'No. Of Employees', ariaTitle: 'No. Of Employees', target: 0, type: 'string', data: 'active_employee_ids_count', className: 'dt-center'},
-                {title: 'Allow Login', ariaTitle: 'Allow Login', target: 0, type: 'string', data: 'allow_login', className: 'dt-center', render: function ( data, type, row, meta ) {
+                {title: 'Organization', ariaTitle: 'Organization', target: 1, orderData: [1, 9], type: 'string', data: 'organization', name: 'organization', className: "dt-nowrap" },
+                {title: 'No. Of Employees', ariaTitle: 'No. Of Employees', target: 2, orderData: [2, 1, 9], type: 'string', data: 'active_employee_ids_count', className: 'dt-center'},
+                {title: 'Allow Login', ariaTitle: 'Allow Login', target: 3, orderData: [3, 1, 9], type: 'string', data: 'allow_login', className: 'dt-center', render: function ( data, type, row, meta ) {
                         if(data == 'Y') {
                             return '<i class="fa fa-user-check fa-lg text-primary"</i>';
                         } else {
@@ -179,7 +181,7 @@
                         }
                     }
                 },
-                {title: 'Allow In-App Message', ariaTitle: 'Allow In-App Message', target: 0, type: 'string', data: 'allow_inapp_msg', className: 'dt-center', render: function ( data, type, row, meta ) {
+                {title: 'Allow In-App Message', ariaTitle: 'Allow In-App Message', target: 4, orderData: [4, 1, 9], type: 'string', data: 'allow_inapp_msg', className: 'dt-center', render: function ( data, type, row, meta ) {
                         if(data == 'Y') {
                             return '<i class="fa fa-check fa-lg text-primary"> </i>';
                         } else {
@@ -187,7 +189,7 @@
                         }
                     }
                 },
-                {title: 'Allow eMail Message', ariaTitle: 'Allow eMail Message', target: 0, type: 'string', data: 'allow_email_msg', className: 'dt-center', render: function ( data, type, row, meta ) {
+                {title: 'Allow eMail Message', ariaTitle: 'Allow eMail Message', target: 5, orderData: [5, 1, 9], type: 'string', data: 'allow_email_msg', className: 'dt-center', render: function ( data, type, row, meta ) {
                         if(data == 'Y') {
                             return '<i class="fa fa-check fa-lg text-primary"> </i>';
                         } else {
@@ -195,11 +197,11 @@
                         }
                     }
                 },
-                {title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false, className: "dt-nowrap"},
-                {title: 'Created By', ariaTitle: 'Created By', target: 0, type: 'string', data: 'created_by.name', name: 'created_by.name', defaultContent: '', orderable: false, searchable: false, className: "dt-nowrap"},
-                {title: 'Updated By', ariaTitle: 'Updated By', target: 0, type: 'string', data: 'updated_by.name', name: 'updated_by.name', defaultContent: '', orderable: false, searchable: false, className: "dt-nowrap"},
-                {title: 'Created At', ariaTitle: 'Created At', target: 0, type: 'string', data: 'created_at', name: 'created_at', orderable: false, searchable: false, className: "dt-nowrap"},
-                {title: 'Updated At', ariaTitle: 'Updated At', target: 0, type: 'string', data: 'updated_at', name: 'updated_at', orderable: false, searchable: false, className: "dt-nowrap"},
+                {title: 'Action', ariaTitle: 'Action', target: 6, orderData: [6, 1, 9], type: 'string', data: 'action', name: 'action', orderable: false, searchable: false, className: "dt-nowrap"},
+                {title: 'Created By', ariaTitle: 'Created By', target: 7, orderData: [7, 1, 9], type: 'string', data: 'created_by.name', name: 'created_by.name', defaultContent: '', orderable: false, searchable: false, className: "dt-nowrap"},
+                {title: 'Updated By', ariaTitle: 'Updated By', target: 8, orderData: [8, 1, 9], type: 'string', data: 'updated_by.name', name: 'updated_by.name', defaultContent: '', orderable: false, searchable: false, className: "dt-nowrap"},
+                {title: 'Created At', ariaTitle: 'Created At', target: 9, orderData: [9, 1], type: 'string', data: 'created_at', name: 'created_at', orderable: false, searchable: false, className: "dt-nowrap"},
+                {title: 'Updated At', ariaTitle: 'Updated At', target: 10, orderData: [10, 1, 9], type: 'string', data: 'updated_at', name: 'updated_at', orderable: false, searchable: false, className: "dt-nowrap"},
             ],
         });
 
