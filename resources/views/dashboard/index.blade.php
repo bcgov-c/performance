@@ -51,7 +51,9 @@
                                 {{-- <x-profile-pic></x-profile-pic> --}}
                                 {{$sharedList[0]->sharedWithUser->name}}
                                 @if(count($sharedList) > 1)
-                                    and {{count($sharedList) - 1}} Others. 
+                                    and {{count($sharedList) - 1}} Others.
+                                @else
+                                    .     
                                 @endif
                                 Click to view more details.
                                 <div class="flex-fill"></div>
