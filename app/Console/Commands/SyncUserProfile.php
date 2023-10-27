@@ -119,6 +119,8 @@ class SyncUserProfile extends Command
                 $query->whereNull('date_updated');
                 $query->orWhere('date_updated', '>=', $last_sync_at );
             })
+            // Line below is for testing only.
+            // ->whereRaw("employee_id = 'XXXXXX'")
             ->orderBy('date_deleted')
             ->orderBy('employee_id')
             ->orderBy('job_indicator', 'desc')
@@ -174,10 +176,17 @@ class SyncUserProfile extends Command
                             $user->joining_date = date('Y-m-d',strtotime($employee->position_start_date)); 
                             $update_flag += 100;
                         }
-                        $active_demo = EmployeeDemo::select(DB::raw(2))->from('employee_demo AS ed2')->whereRaw("ed2.employee_id = {$user->employee_id}")->whereNull('ed2.date_deleted')->first();
+                        $active_demo = EmployeeDemo::from('employee_demo AS ed2')
+                            ->join('employee_demo_tree AS edt', 'edt.id', 'ed2.orgid')
+                            ->join('access_organizations AS ao', 'ao.orgid', 'edt.organization_key')
+                            ->whereRaw("ao.allow_login = 'Y'")
+                            ->whereRaw("ed2.employee_id = {$user->employee_id}")
+                            ->whereNull('ed2.date_deleted')
+                            ->select(DB::raw(2))
+                            ->first();
                         $active_found = $active_demo ? 1 : 0;
                         $acct_locked = $user->acctlock ? 1 : 0;
-                        if ($user->acctlock != $acct_locked) {
+                        if ($active_found == $acct_locked) {
                             $user->acctlock = $active_found ? 0 : 1;  
                             $update_flag += 1000;
                         }
