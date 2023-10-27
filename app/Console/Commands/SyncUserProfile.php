@@ -180,7 +180,7 @@ class SyncUserProfile extends Command
                             ->join('employee_demo_tree AS edt', 'edt.id', 'ed2.orgid')
                             ->join('access_organizations AS ao', 'ao.orgid', 'edt.organization_key')
                             ->whereRaw("ao.allow_login = 'Y'")
-                            ->whereRaw("ed2.employee_id = {$user->employee_id}")
+                            ->whereRaw("ed2.employee_id = {$employee->employee_id}")
                             ->whereNull('ed2.date_deleted')
                             ->select(DB::raw(2))
                             ->first();
@@ -237,6 +237,16 @@ class SyncUserProfile extends Command
 
                     DB::beginTransaction();
                     try {
+                        $active_demo = EmployeeDemo::from('employee_demo AS ed2')
+                            ->join('employee_demo_tree AS edt', 'edt.id', 'ed2.orgid')
+                            ->join('access_organizations AS ao', 'ao.orgid', 'edt.organization_key')
+                            ->whereRaw("ao.allow_login = 'Y'")
+                            ->whereRaw("ed2.employee_id = {$employee->employee_id}")
+                            ->whereNull('ed2.date_deleted')
+                            ->select(DB::raw(2))
+                            ->first();
+                        $active_found = $active_demo ? 1 : 0;
+
                         $user = User::create([
                             'guid' => $employee->guid,
                             'name' => $employee->employee_first_name . ' ' . $employee->employee_last_name,
@@ -245,7 +255,7 @@ class SyncUserProfile extends Command
                             'empl_record' => $employee->empl_record,
                             'joining_date' => $employee->position_start_date,
                             'password' => $password,
-                            'acctlock' => $employee->date_deleted ? 1 : 0,
+                            'acctlock' => $active_found ? 0 : 1,
                             'last_sync_at' => $new_sync_at,
                         ]);
                         $this->info( "Step 1: Created user profile ({$user->id}) for EID # {$employee->employee_id}." ); 
