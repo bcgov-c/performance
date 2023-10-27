@@ -176,9 +176,9 @@ class SyncUserProfile extends Command
                             $user->joining_date = date('Y-m-d',strtotime($employee->position_start_date)); 
                             $update_flag += 100;
                         }
-                        $active_demo = EmployeeDemo::from('employee_demo AS ed2')
-                            ->join('employee_demo_tree AS edt', 'edt.id', 'ed2.orgid')
-                            ->join('access_organizations AS ao', 'ao.orgid', 'edt.organization_key')
+                        $active_demo = EmployeeDemo::from(\DB::raw('employee_demo AS ed2 USE INDEX (idx_employee_demo_employee_id_date_deleted)'))
+                            ->join(\DB::raw('employee_demo_tree AS edt USE INDEX (employee_demo_tree_id_unique)'), 'edt.id', 'ed2.orgid')
+                            ->join(\DB::raw('access_organizations AS ao USE INDEX (access_organizations_orgid_unique)'), 'ao.orgid', 'edt.organization_key')
                             ->whereRaw("ao.allow_login = 'Y'")
                             ->whereRaw("ed2.employee_id = {$employee->employee_id}")
                             ->whereNull('ed2.date_deleted')
@@ -237,9 +237,9 @@ class SyncUserProfile extends Command
 
                     DB::beginTransaction();
                     try {
-                        $active_demo = EmployeeDemo::from('employee_demo AS ed2')
-                            ->join('employee_demo_tree AS edt', 'edt.id', 'ed2.orgid')
-                            ->join('access_organizations AS ao', 'ao.orgid', 'edt.organization_key')
+                        $active_demo = EmployeeDemo::from(\DB::raw('employee_demo AS ed2 USE INDEX (idx_employee_demo_employee_id_date_deleted)'))
+                            ->join(\DB::raw('employee_demo_tree AS edt USE INDEX (employee_demo_tree_id_unique)'), 'edt.id', 'ed2.orgid')
+                            ->join(\DB::raw('access_organizations AS ao USE INDEX (access_organizations_orgid_unique)'), 'ao.orgid', 'edt.organization_key')
                             ->whereRaw("ao.allow_login = 'Y'")
                             ->whereRaw("ed2.employee_id = {$employee->employee_id}")
                             ->whereNull('ed2.date_deleted')
