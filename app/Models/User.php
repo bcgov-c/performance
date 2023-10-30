@@ -170,20 +170,11 @@ class User extends Authenticatable
     }
     
     public function avaliableReportees() {
-        // return $this->reportees()
-        //         ->join('employee_demo', 'employee_demo.employee_id', '=', 'users.employee_id')
-        //         ->whereNull('employee_demo.date_deleted');
-
-        $user = User::find(Auth::id());
-        $override_userids = $user->overrideReportees()->pluck('user_id');
-        $reportee_emplids = $user->EmployeeManagerSupervisorsUserProfile()
-            ->whereRaw("NOT EXISTS (SELECT 1 FROM employee_supervisor, users WHERE employee_supervisor.user_id = users.id AND users.employee_id = employee_managers.employee_id AND employee_supervisor.deleted_at IS NULL)")
+        $reportee_emplids = [];
+        $reportee_emplids = UsersAnnex::whereRaw("reporting_to_employee_id = {$this->employee_id}")
             ->pluck('employee_id');
         return User::join('employee_demo as ed', 'ed.employee_id', 'users.employee_id')
-            ->where(function($where) use($override_userids, $reportee_emplids) {
-                return $where->whereIn('users.id', $override_userids)
-                    ->orWhereIn('users.employee_id', $reportee_emplids);
-            })
+            ->whereIn('users.employee_id', $reportee_emplids)
             ->whereNull('ed.date_deleted');
     }
 
