@@ -86,6 +86,19 @@ RUN docker-php-ext-install pdo pdo_mysql opcache
 COPY --chown=www-data:www-data --from=composer /app /var/www/html
 
 
+# Set the working directory
+WORKDIR /var/www/html
+
+# Set appropriate permissions for the /storage/app/public directory
+RUN chown -R www-data:www-data /var/www/html/storage/app/public
+RUN chmod -R 755 /var/www/html/storage/app/public
+
+# Run php artisan storage:link to create the symbolic link
+RUN php artisan storage:link
+
+#Switch back to the root folder
+WORKDIR /
+
 # Copy Server Config files (Apache / PHP)
 COPY --chown=www-data:www-data server_files/apache2.conf /etc/apache2/apache2.conf
 COPY --chown=www-data:www-data server_files/ports.conf /etc/apache2/ports.conf
