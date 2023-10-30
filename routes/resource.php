@@ -9,3 +9,4 @@ Route::get('resources/goal-setting', [ResourceController::class, 'goalsetting'])
 Route::get('resources/conversations', [ResourceController::class, 'conversations'])->name('resource.conversations');
 Route::get('resources/contact', [ResourceController::class, 'contact'])->name('resource.contact');
 Route::get('resources/faq', [ResourceController::class, 'faq'])->name('resource.faq');
+Route::get('resources/hr-admin', [ResourceController::class, 'hradmin'])->name('resource.hr-admin');

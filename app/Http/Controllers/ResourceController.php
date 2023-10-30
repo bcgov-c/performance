@@ -57,6 +57,15 @@ class ResourceController extends Controller
       return view('resource.faq', compact('data', 't'));
     }
 
+
+    public function hradmin(Request $request)
+    {   
+        $t = $request->t;
+        $data = $this->pullContent('hr-admin');             
+
+        return view('resource.hr-admin', compact('data', 't'));
+    }
+
     private function pullContent($category){
         $resourceData = DB::table('resource_content')
             ->select('question', 'answer', 'answer_file')
