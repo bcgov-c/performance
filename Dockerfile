@@ -96,7 +96,7 @@ WORKDIR /var/www/html
 # Set appropriate permissions for the /storage/app/public directory
 RUN chown -R www-data:www-data /var/www/html/storage/app/public
 # Copy the contents from your local ./storage/app/public directory to the target directory
-COPY ./app/public /var/www/html/storage/app/public
+COPY ./storage/app/public /var/www/html/storage/app/public
 # Set permissions for the copied files and directories
 RUN chmod -R 755 /var/www/html/storage/app/public
 
