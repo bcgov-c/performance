@@ -86,6 +86,10 @@ RUN docker-php-ext-install pdo pdo_mysql opcache
 COPY --chown=www-data:www-data --from=composer /app /var/www/html
 
 
+# Create the "public" folder in /storage/app
+WORKDIR /
+RUN mkdir -p /var/www/html/storage/app/public
+
 # Set the working directory
 WORKDIR /var/www/html
 
