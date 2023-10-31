@@ -171,10 +171,19 @@ class User extends Authenticatable
     
     public function avaliableReportees() {
         $reportee_emplids = [];
-        $reportee_emplids = UsersAnnex::whereRaw("reporting_to_employee_id = {$this->employee_id}")
-            ->pluck('employee_id');
-        return User::join('employee_demo as ed', 'ed.employee_id', 'users.employee_id')
-            ->whereIn('users.employee_id', $reportee_emplids)
+        $reportee_emplids = UsersAnnex::whereRaw("reporting_to_employee_id = '{$this->employee_id}'")
+            ->join('users', function ($on) {
+                return $on->on('users.employee_id', 'users_annex.employee_id')
+                    ->on('users.empl_record', 'users_annex.empl_record');
+            })
+            ->selectRaw("CONCAT(users_annex.employee_id, '-', users_annex.empl_record) AS combo_id")
+            ->pluck('combo_id');
+        return User::join('employee_demo as ed', function ($on) {
+                return $on->on('ed.employee_id', 'users.employee_id')
+                    ->on('ed.empl_record', 'users.empl_record')
+                    ->whereNull('ed.date_deleted');
+            })
+            ->whereIn(\DB::raw("CONCAT(users.employee_id, '-', users.empl_record)"), $reportee_emplids)
             ->whereNull('ed.date_deleted');
     }
 
