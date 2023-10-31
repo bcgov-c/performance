@@ -177,12 +177,16 @@ class SyncUserProfile extends Command
                             $update_flag += 100;
                         }
                         $active_demo = EmployeeDemo::from(\DB::raw('employee_demo AS ed2 USE INDEX (idx_employee_demo_employee_id_date_deleted)'))
-                            ->join(\DB::raw('employee_demo_tree AS edt USE INDEX (employee_demo_tree_id_unique)'), 'edt.id', 'ed2.orgid')
-                            ->join(\DB::raw('access_organizations AS ao USE INDEX (access_organizations_orgid_unique)'), 'ao.orgid', 'edt.organization_key')
-                            ->whereRaw("ao.allow_login = 'Y'")
-                            ->whereRaw("ed2.employee_id = {$employee->employee_id}")
-                            ->whereNull('ed2.date_deleted')
-                            ->select(DB::raw(2))
+                            ->join(\DB::raw('employee_demo_tree AS edt USE INDEX (employee_demo_tree_id_unique)'), function ($on1) {
+                                return $on1->on('edt.id', 'ed2.orgid')
+                                    ->whereNull('ed2.date_deleted');
+                            })
+                            ->join(\DB::raw('access_organizations AS ao USE INDEX (access_organizations_orgid_unique)'), function ($on2) {
+                                return $on2->on('ao.orgid', 'edt.organization_key')
+                                    ->on('ao.allow_login', \DB::raw("'Y'"));
+                            })
+                            ->where('ed2.employee_id', \DB::raw("'{$employee->employee_id}'"))
+                            ->select(DB::raw(1))
                             ->first();
                         $active_found = $active_demo ? 1 : 0;
                         $acct_locked = $user->acctlock ? 1 : 0;
@@ -238,12 +242,16 @@ class SyncUserProfile extends Command
                     DB::beginTransaction();
                     try {
                         $active_demo = EmployeeDemo::from(\DB::raw('employee_demo AS ed2 USE INDEX (idx_employee_demo_employee_id_date_deleted)'))
-                            ->join(\DB::raw('employee_demo_tree AS edt USE INDEX (employee_demo_tree_id_unique)'), 'edt.id', 'ed2.orgid')
-                            ->join(\DB::raw('access_organizations AS ao USE INDEX (access_organizations_orgid_unique)'), 'ao.orgid', 'edt.organization_key')
-                            ->whereRaw("ao.allow_login = 'Y'")
-                            ->whereRaw("ed2.employee_id = {$employee->employee_id}")
-                            ->whereNull('ed2.date_deleted')
-                            ->select(DB::raw(2))
+                            ->join(\DB::raw('employee_demo_tree AS edt USE INDEX (employee_demo_tree_id_unique)'), function ($on1) {
+                                return $on1->on('edt.id', 'ed2.orgid')
+                                    ->whereNull('ed2.date_deleted');
+                            })
+                            ->join(\DB::raw('access_organizations AS ao USE INDEX (access_organizations_orgid_unique)'), function ($on2) {
+                                return $on2->on('ao.orgid', 'edt.organization_key')
+                                    ->on('ao.allow_login', \DB::raw("'Y'"));
+                            })
+                            ->where('ed2.employee_id', \DB::raw("'{$employee->employee_id}'"))
+                            ->select(DB::raw(1))
                             ->first();
                         $active_found = $active_demo ? 1 : 0;
 
