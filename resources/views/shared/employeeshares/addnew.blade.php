@@ -448,7 +448,22 @@
                     var id = this.value;
                     var index = $.inArray(id, g_selected_employees);
                     if(this.checked) {
-                        g_selected_employees.push( id );
+
+                        //#1148-Temp disable multi-select
+                        list = ( $('#employee-list-table input:checkbox') );
+                        $.each(list, function( index, item ) {
+                            if (item.value == id) {
+                                g_selected_employees.push( id );
+                                $(item).prop('checked', true); // checked
+                            } else {
+                                if (item.checked) {
+                                    g_selected_employees.splice( index, 1 );
+                                    document.getElementById(item.id).click();
+                                }
+                            }
+                        });
+
+                        // g_selected_employees.push( id );
                     } else {
                         g_selected_employees.splice( index, 1 );
                     }
@@ -464,6 +479,7 @@
                         $('#employee-list-select-all').prop("checked", false);
                         $('#employee-list-select-all').prop("indeterminate", true);    
                     }
+
                 });
 
                 $('#eemployee-list-table tbody').on( 'click', 'input:checkbox', function () {
@@ -471,7 +487,22 @@
                     var id = this.value;
                     var index = $.inArray(id, eg_selected_employees);
                     if(this.checked) {
-                        eg_selected_employees.push( id );
+
+                        //#1148-Temp disable multi-select
+                        list = ( $('#eemployee-list-table input:checkbox') );
+                        $.each(list, function( index, item ) {
+                            if (item.value == id) {
+                                eg_selected_employees.push( id );
+                                $(item).prop('checked', true); // checked
+                            } else {
+                                if (item.checked) {
+                                    eg_selected_employees.splice( index, 1 );
+                                    document.getElementById(item.id).click();
+                                }
+                            }
+                        });
+
+                        // eg_selected_employees.push( id );
                     } else {
                         eg_selected_employees.splice( index, 1 );
                     }
@@ -493,7 +524,6 @@
                     e.preventDefault();
                     $('#employee-list-table').DataTable().rows().invalidate().draw();
                 });
-
 
                 $('#ebtn_search').click(function(e) {
                     e.preventDefault();
