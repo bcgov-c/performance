@@ -254,7 +254,7 @@
             function confirmSaveAllModal(){
                 countProf = g_selected_employees.length;
                 countUsers = eg_selected_employees.length;
-                $('#saveAllModal .modal-body p').html('Are you sure you want to share the '+countProf+' selected profile(s) with '+countUsers+' user(s)?');
+                $('#saveAllModal .modal-body p').html('Are you sure you want to share the <b>'+countProf+'</b> selected employee(s) with the <b>'+countUsers+'</b> selected shared supervisor(s)?');
 				$('#saveAllModal').modal();
 			}
 
