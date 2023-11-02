@@ -252,7 +252,9 @@
 
 
             function confirmSaveAllModal(){
-				$('#saveAllModal .modal-body p').html('Are you sure you want to share the selected profile(s)?');
+                countProf = g_selected_employees.length;
+                countUsers = eg_selected_employees.length;
+                $('#saveAllModal .modal-body p').html('Are you sure you want to share the <b>'+countProf+'</b> selected employee(s) with the <b>'+countUsers+'</b> selected shared supervisor(s)?');
 				$('#saveAllModal').modal();
 			}
 
@@ -334,19 +336,20 @@
                     "rowCallback": function( row, data ) {
                     },
                     columns: [
-                        {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'string', data: 'user_id', name: 'user_id', className: 'dt-nowrap', visible: false},
-                        {title: '<input name="select_all" value="1" id="employee-list-select-all" type="checkbox" />', ariaTitle: 'employee-list-select-all', target: 0, type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
-                        {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', className: 'dt-nowrap'},
-                        {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', className: 'dt-nowrap'},
-                        {title: 'Shared', ariaTitle: 'Shared', target: 0, type: 'string', data: 'shared_status', name: 'shared_status', className: 'dt-nowrap'},
-                        {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', className: 'dt-nowrap'},
+                        // {title: '<input name="select_all" value="1" id="employee-list-select-all" type="checkbox" />', ariaTitle: 'employee-list-select-all', target: 1, orderData: [1, 2], type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
+                        {title: '', ariaTitle: 'employee-list-select-all', target: 0, type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
+                        {title: 'ID', ariaTitle: 'ID', target: 1, orderData: [1, 0], type: 'string', data: 'employee_id', name: 'employee_id', className: 'dt-nowrap'},
+                        {title: 'Name', ariaTitle: 'Name', target: 2, orderData: [2, 2], type: 'string', data: 'employee_name', name: 'employee_name', className: 'dt-nowrap'},
+                        {title: 'Shared', ariaTitle: 'Shared', target: 3, orderData: [3, 2], type: 'string', data: 'shared_status', name: 'shared_status', className: 'dt-nowrap'},
+                        {title: 'Classification', ariaTitle: 'Classification', target: 4, orderData: [4, 2], type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', className: 'dt-nowrap'},
                         // {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'employee_email', className: 'dt-nowrap'},
-                        {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', className: 'dt-nowrap'},
-                        {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', className: 'dt-nowrap'},
-                        {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', className: 'dt-nowrap'},
-                        {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', className: 'dt-nowrap'},
-                        {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', className: 'dt-nowrap'},
-                        {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', name: 'deptid', className: 'dt-nowrap'},
+                        {title: 'Organization', ariaTitle: 'Organization', target: 5, orderData: [5, 2], type: 'string', data: 'organization', name: 'organization', className: 'dt-nowrap'},
+                        {title: 'Level 1', ariaTitle: 'Level 1', target: 6, orderData: [6, 2], type: 'string', data: 'level1_program', name: 'level1_program', className: 'dt-nowrap'},
+                        {title: 'Level 2', ariaTitle: 'Level 2', target: 7, orderData: [7, 2], type: 'string', data: 'level2_division', name: 'level2_division', className: 'dt-nowrap'},
+                        {title: 'Level 3', ariaTitle: 'Level 3', target: 8, orderData: [8, 2], type: 'string', data: 'level3_branch', name: 'level3_branch', className: 'dt-nowrap'},
+                        {title: 'Level 4', ariaTitle: 'Level 4', target: 9, orderData: [9, 2], type: 'string', data: 'level4', name: 'level4', className: 'dt-nowrap'},
+                        {title: 'Dept', ariaTitle: 'Dept', target: 10, orderData: [10, 2], type: 'string', data: 'deptid', name: 'deptid', className: 'dt-nowrap'},
+                        {title: 'User ID', ariaTitle: 'User ID', target: 11, orderData: [11, 2], type: 'string', data: 'user_id', name: 'user_id', className: 'dt-nowrap', visible: false},
                     ],
                 });
 
@@ -395,17 +398,18 @@
                     "rowCallback": function( row, data ) {
                     },
                     columns: [
-                        {title: '<input name="eselect_all" value="1" id="eemployee-list-select-all" type="checkbox" />', ariaTitle: 'eemployee-list-select-all', target: 0, type: 'string', data: 'eselect_users', name: 'eselect_users', orderable: false, searchable: false},
-                        {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', className: 'dt-nowrap'},
-                        {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', className: 'dt-nowrap'},
-                        {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', className: 'dt-nowrap'},
+                        // {title: '<input name="eselect_all" value="1" id="eemployee-list-select-all" type="checkbox" />', ariaTitle: 'eemployee-list-select-all', target: 0, type: 'string', data: 'eselect_users', name: 'eselect_users', orderable: false, searchable: false},
+                        {title: '', ariaTitle: 'eemployee-list-select-all', target: 0, type: 'string', data: 'eselect_users', name: 'eselect_users', orderable: false, searchable: false},
+                        {title: 'ID', ariaTitle: 'ID', target: 1, orderData: [1], type: 'string', data: 'employee_id', name: 'employee_id', className: 'dt-nowrap'},
+                        {title: 'Name', ariaTitle: 'Name', target: 2, orderData: [2, 1], type: 'string', data: 'employee_name', name: 'employee_name', className: 'dt-nowrap'},
+                        {title: 'Classification', ariaTitle: 'Classification', target: 3, orderData: [3, 1], type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', className: 'dt-nowrap'},
                         // {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'eemployee_email', name: 'eemployee_email', className: 'dt-nowrap'},
-                        {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', className: 'dt-nowrap'},
-                        {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', className: 'dt-nowrap'},
-                        {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', className: 'dt-nowrap'},
-                        {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', className: 'dt-nowrap'},
-                        {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', className: 'dt-nowrap'},
-                        {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', name: 'deptid', className: 'dt-nowrap'},
+                        {title: 'Organization', ariaTitle: 'Organization', target: 4, orderData: [4, 1], type: 'string', data: 'organization', name: 'organization', className: 'dt-nowrap'},
+                        {title: 'Level 1', ariaTitle: 'Level 1', target: 5, orderData: [5, 1], type: 'string', data: 'level1_program', name: 'level1_program', className: 'dt-nowrap'},
+                        {title: 'Level 2', ariaTitle: 'Level 2', target: 6, orderData: [6, 1], type: 'string', data: 'level2_division', name: 'level2_division', className: 'dt-nowrap'},
+                        {title: 'Level 3', ariaTitle: 'Level 3', target: 7, orderData: [7, 1], type: 'string', data: 'level3_branch', name: 'level3_branch', className: 'dt-nowrap'},
+                        {title: 'Level 4', ariaTitle: 'Level 4', target: 8, orderData: [8, 1], type: 'string', data: 'level4', name: 'level4', className: 'dt-nowrap'},
+                        {title: 'Dept', ariaTitle: 'Dept', target: 9, orderData: [9, 1], type: 'string', data: 'deptid', name: 'deptid', className: 'dt-nowrap'},
                     ],
                 });
 

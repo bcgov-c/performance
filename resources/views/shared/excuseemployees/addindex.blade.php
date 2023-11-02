@@ -330,6 +330,19 @@
 							while (pid);
 						}
 					});
+
+                    // update the check all checkbox status 
+                    if (g_selected_employees.length == 0) {
+                        $('#employee-list-select-all').prop("checked", false);
+                        $('#employee-list-select-all').prop("indeterminate", false);   
+                    } else if (g_selected_employees.length == g_matched_employees.length) {
+                        $('#employee-list-select-all').prop("checked", true);
+                        $('#employee-list-select-all').prop("indeterminate", false);   
+                    } else {
+                        $('#employee-list-select-all').prop("checked", false);
+                        $('#employee-list-select-all').prop("indeterminate", true);    
+                    }
+
 				}
 
 				function eredrawTreeCheckboxes() {
