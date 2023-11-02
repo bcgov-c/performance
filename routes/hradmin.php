@@ -147,6 +147,8 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
 
         Route::get('/hradmin/excuseemployees/org-tree/{index}', [ExcuseEmployeesController::class,'loadOrganizationTree']);
         Route::get('/hradmin/excuseemployees/employees/{id}', [ExcuseEmployeesController::class,'getEmployees']);
+
+        Route::get('/hradmin/excuseemployees/getfilteredlist', [ExcuseEmployeesController::class, 'getFilteredList'])->name('hradmin.excuseemployees.getfilteredlist');
     });
 
   

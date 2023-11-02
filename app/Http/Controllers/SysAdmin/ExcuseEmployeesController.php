@@ -34,8 +34,23 @@ class ExcuseEmployeesController extends Controller {
         $request->session()->flash('dd_level3', $request->dd_level3);
         $request->session()->flash('dd_level4', $request->dd_evel4);
         $request->session()->flash('userCheck', $request->userCheck);  // Dynamic load 
-        // Matched Employees 
-        $demoWhere = $this->baseFilteredWhere($request);
+        $matched_emp_ids = [];
+        $criteriaList = $this->search_criteria_list();
+        $reasons = ExcusedReason::where('id', '>', 2)->get();
+        $reasons2 = ExcusedReason::where('id', '<=', 2)->get();
+        $yesOrNo = [
+            [ "id" => 0, "name" => 'No' ],
+            [ "id" => 1, "name" => 'Yes' ],
+        ];
+        $yesOrNo2 = [
+            [ "id" => 0, "name" => 'No' ],
+            [ "id" => 1, "name" => 'Yes' ],
+        ];
+        return view('shared.excuseemployees.addindex', compact('criteriaList','matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'reasons', 'reasons2', 'yesOrNo', 'yesOrNo2') );
+    }
+
+    public function getFilteredList(Request $request) {
+        $demoWhere = $this->baseFilteredWhere($request, $request->option);
         $sql = clone $demoWhere; 
         $matched_emp_ids = $sql->select([ 
                 'u.employee_id', 
@@ -50,19 +65,8 @@ class ExcuseEmployeesController extends Controller {
                 'u.deptid', 
                 'u.jobcode_desc'
             ])
-            ->pluck('u.employee_id');        
-        $criteriaList = $this->search_criteria_list();
-        $reasons = ExcusedReason::where('id', '>', 2)->get();
-        $reasons2 = ExcusedReason::where('id', '<=', 2)->get();
-        $yesOrNo = [
-            [ "id" => 0, "name" => 'No' ],
-            [ "id" => 1, "name" => 'Yes' ],
-        ];
-        $yesOrNo2 = [
-            [ "id" => 0, "name" => 'No' ],
-            [ "id" => 1, "name" => 'Yes' ],
-        ];
-        return view('shared.excuseemployees.addindex', compact('criteriaList','matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'reasons', 'reasons2', 'yesOrNo', 'yesOrNo2') );
+            ->pluck('u.employee_id');    
+        return $matched_emp_ids;
     }
 
     public function managehistory(Request $request) {
@@ -362,14 +366,14 @@ public function getDatatableEmployees(Request $request) {
 
     protected function baseFilteredWhere($request, $option = null) {
         return UserDemoJrView::from('user_demo_jr_view AS u')
-        ->whereNull('u.date_deleted')
-        ->when("{$request->{$option.'dd_level0'}}", function($q) use($request, $option) { return $q->whereRaw("u.organization_key = {$request->{$option.'dd_level0'}}"); })
-        ->when("{$request->{$option.'dd_level1'}}", function($q) use($request, $option) { return $q->whereRaw("u.level1_key = {$request->{$option.'dd_level1'}}"); })
-        ->when("{$request->{$option.'dd_level2'}}", function($q) use($request, $option) { return $q->whereRaw("u.level2_key = {$request->{$option.'dd_level2'}}"); })
-        ->when("{$request->{$option.'dd_level3'}}", function($q) use($request, $option) { return $q->whereRaw("u.level3_key = {$request->{$option.'dd_level3'}}"); })
-        ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); })
-        ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); })
-        ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(employee_id LIKE '%{$request->{$option.'search_text'}}%' OR employee_name LIKE '%{$request->{$option.'search_text'}}%' OR excusedtype LIKE '%{$request->{$option.'search_text'}}%' OR reason_name LIKE '%{$request->{$option.'search_text'}}%' OR excused_by_name LIKE '%{$request->{$option.'search_text'}}%')"); });
+            ->whereNull('u.date_deleted')
+            ->when("{$request->{$option.'dd_level0'}}", function($q) use($request, $option) { return $q->whereRaw("u.organization_key = {$request->{$option.'dd_level0'}}"); })
+            ->when("{$request->{$option.'dd_level1'}}", function($q) use($request, $option) { return $q->whereRaw("u.level1_key = {$request->{$option.'dd_level1'}}"); })
+            ->when("{$request->{$option.'dd_level2'}}", function($q) use($request, $option) { return $q->whereRaw("u.level2_key = {$request->{$option.'dd_level2'}}"); })
+            ->when("{$request->{$option.'dd_level3'}}", function($q) use($request, $option) { return $q->whereRaw("u.level3_key = {$request->{$option.'dd_level3'}}"); })
+            ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); })
+            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); })
+            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(employee_id LIKE '%{$request->{$option.'search_text'}}%' OR employee_name LIKE '%{$request->{$option.'search_text'}}%' OR excusedtype LIKE '%{$request->{$option.'search_text'}}%' OR reason_name LIKE '%{$request->{$option.'search_text'}}%' OR excused_by_name LIKE '%{$request->{$option.'search_text'}}%')"); });
     }
 
     protected function baseFilteredSQLs($request, $option = null) {
