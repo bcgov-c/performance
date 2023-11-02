@@ -462,6 +462,14 @@
                                 }
                             }
                         });
+                        var i = 0;
+                        while (i < g_selected_employees.length) {
+                            if (g_selected_employees[i] == id) {
+                                ++i;
+                            } else {
+                                g_selected_employees.splice( i, 1 )
+                            }
+                        }
 
                         // g_selected_employees.push( id );
                     } else {
@@ -501,6 +509,14 @@
                                 }
                             }
                         });
+                        var i = 0;
+                        while (i < eg_selected_employees.length) {
+                            if (eg_selected_employees[i] == id) {
+                                ++i;
+                            } else {
+                                eg_selected_employees.splice( i, 1 )
+                            }
+                        }
 
                         // eg_selected_employees.push( id );
                     } else {
