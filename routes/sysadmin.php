@@ -154,6 +154,8 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
 
         Route::get('/sysadmin/excuseemployees/org-tree/{index}', [ExcuseEmployeesController::class,'loadOrganizationTree']);
         Route::get('/sysadmin/excuseemployees/employees/{id}', [ExcuseEmployeesController::class,'getEmployees']);
+
+        Route::get('/sysadmin/excuseemployees/getfilteredlist', [ExcuseEmployeesController::class, 'getFilteredList'])->name('sysadmin.excuseemployees.getfilteredlist');
     });
 
     //Notifications

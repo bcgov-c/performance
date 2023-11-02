@@ -34,11 +34,7 @@ class ExcuseEmployeesController extends Controller {
         $request->session()->flash('dd_level3', $request->dd_level3);
         $request->session()->flash('dd_level4', $request->dd_level4);
         $request->session()->flash('userCheck', $request->userCheck);  // Dynamic load 
-        // Matched Employees 
-        $demoWhere = $this->baseFilteredWhere($request, "");
-        $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql
-            ->pluck('u.employee_id');        
+        $matched_emp_ids = [];
         $criteriaList = $this->search_criteria_list();
         $reasons = ExcusedReason::where('id', '>', 2)->get();
         $reasons2 = ExcusedReason::where('id', '<=', 2)->get();
@@ -51,6 +47,26 @@ class ExcuseEmployeesController extends Controller {
                 [ "id" => 1, "name" => 'Yes' ],
             ];
         return view('shared.excuseemployees.addindex', compact('criteriaList','matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'reasons', 'reasons2', 'yesOrNo', 'yesOrNo2') );
+    }
+
+    public function getFilteredList(Request $request) {
+        $demoWhere = $this->baseFilteredWhere($request, $request->option);
+        $sql = clone $demoWhere; 
+        $matched_emp_ids = $sql->select([ 
+                'u.employee_id', 
+                'u.employee_name', 
+                'u.jobcode_desc', 
+                'u.employee_email', 
+                'u.organization', 
+                'u.level1_program', 
+                'u.level2_division', 
+                'u.level3_branch',
+                'u.level4',
+                'u.deptid', 
+                'u.jobcode_desc'
+            ])
+            ->pluck('u.employee_id');    
+        return $matched_emp_ids;
     }
 
     public function managehistory(Request $request) {
