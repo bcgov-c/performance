@@ -279,7 +279,6 @@
                     $.ajax({
                         url: "{{ route(request()->segment(1).'.employeeshares.profile-shared-with', 'xxx')}}".replace('xxx', userId), 
                         success: function (response) {
-                            // console.log(response);
                             $modal.find('.shared-with-list').html(response);
                             $(".items-to-share-edit").multiselect({
                                 allSelectedText: 'All',
@@ -311,7 +310,7 @@
                             d.search_text = $('#search_text').val();
                         }
                     },
-                    "fnDrawCallback": function() {
+                    "fnDrawCallback": function(data) {
                         list = ( $('#employee-list-table input:checkbox') );
                         $.each(list, function( index, item ) {
                             var index = $.inArray( item.value , g_selected_employees);
@@ -332,17 +331,37 @@
                             $('#employee-list-select-all').prop("checked", false);
                             $('#employee-list-select-all').prop("indeterminate", true);    
                         }
+                        // Get all selection
+                        $.ajax({
+                            url: '{{ "/" . request()->segment(1) . "/employeeshares/getfilteredlist" }}',
+                            data: {
+                                dd_level0 : $('#dd_level0').val(),
+                                dd_level1 : $('#dd_level1').val(),
+                                dd_level2 : $('#dd_level2').val(),
+                                dd_level3 : $('#dd_level3').val(),
+                                dd_level4 : $('#dd_level4').val(),
+                                criteria : $('#criteria').val(),
+                                search_text : $('#search_text').val(),
+                                option : '',
+                            },
+                            type: 'GET',
+                            success: function (data) {
+                                g_matched_employees = data;
+                            },
+                            error: function (error) {
+                                console.log('Unable to GET Select All values.');
+                            }
+                        });
                     },
                     "rowCallback": function( row, data ) {
                     },
                     columns: [
-                        // {title: '<input name="select_all" value="1" id="employee-list-select-all" type="checkbox" />', ariaTitle: 'employee-list-select-all', target: 1, orderData: [1, 2], type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
-                        {title: '', ariaTitle: 'employee-list-select-all', target: 0, type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
+                        {title: '<input name="select_all" value="1" id="employee-list-select-all" type="checkbox" />', ariaTitle: 'employee-list-select-all', target: 0, orderData: [0, 2], type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
+                        // {title: '', ariaTitle: 'employee-list-select-all', target: 0, type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
                         {title: 'ID', ariaTitle: 'ID', target: 1, orderData: [1, 0], type: 'string', data: 'employee_id', name: 'employee_id', className: 'dt-nowrap'},
                         {title: 'Name', ariaTitle: 'Name', target: 2, orderData: [2, 2], type: 'string', data: 'employee_name', name: 'employee_name', className: 'dt-nowrap'},
                         {title: 'Shared', ariaTitle: 'Shared', target: 3, orderData: [3, 2], type: 'string', data: 'shared_status', name: 'shared_status', className: 'dt-nowrap'},
                         {title: 'Classification', ariaTitle: 'Classification', target: 4, orderData: [4, 2], type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', className: 'dt-nowrap'},
-                        // {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'employee_email', className: 'dt-nowrap'},
                         {title: 'Organization', ariaTitle: 'Organization', target: 5, orderData: [5, 2], type: 'string', data: 'organization', name: 'organization', className: 'dt-nowrap'},
                         {title: 'Level 1', ariaTitle: 'Level 1', target: 6, orderData: [6, 2], type: 'string', data: 'level1_program', name: 'level1_program', className: 'dt-nowrap'},
                         {title: 'Level 2', ariaTitle: 'Level 2', target: 7, orderData: [7, 2], type: 'string', data: 'level2_division', name: 'level2_division', className: 'dt-nowrap'},
@@ -373,7 +392,7 @@
                             d.esearch_text = $('#esearch_text').val();
                         }
                     },
-                    "fnDrawCallback": function() {
+                    "fnDrawCallback": function(data) {
                         list = ( $('#eemployee-list-table input:checkbox') );
                         $.each(list, function( index, item ) {
                             var index = $.inArray( item.value , eg_selected_employees);
@@ -394,16 +413,36 @@
                             $('#eemployee-list-select-all').prop("checked", false);
                             $('#eemployee-list-select-all').prop("indeterminate", true);    
                         }
+                        // Get all selection
+                        $.ajax({
+                            url: '{{ "/" . request()->segment(1) . "/employeeshares/getfilteredlist" }}',
+                            data: {
+                                edd_level0 : $('#dd_level0').val(),
+                                edd_level1 : $('#dd_level1').val(),
+                                edd_level2 : $('#dd_level2').val(),
+                                edd_level3 : $('#dd_level3').val(),
+                                edd_level4 : $('#dd_level4').val(),
+                                ecriteria : $('#criteria').val(),
+                                esearch_text : $('#search_text').val(),
+                                option : 'e',
+                            },
+                            type: 'GET',
+                            success: function (data) {
+                                eg_matched_employees = data;
+                            },
+                            error: function (error) {
+                                console.log('Unable to GET Select All values.');
+                            }
+                        });
                     },
                     "rowCallback": function( row, data ) {
                     },
                     columns: [
-                        // {title: '<input name="eselect_all" value="1" id="eemployee-list-select-all" type="checkbox" />', ariaTitle: 'eemployee-list-select-all', target: 0, type: 'string', data: 'eselect_users', name: 'eselect_users', orderable: false, searchable: false},
-                        {title: '', ariaTitle: 'eemployee-list-select-all', target: 0, type: 'string', data: 'eselect_users', name: 'eselect_users', orderable: false, searchable: false},
+                        {title: '<input name="eselect_all" value="1" id="eemployee-list-select-all" type="checkbox" />', ariaTitle: 'eemployee-list-select-all', target: 0, orderData: [0, 1], type: 'string', data: 'eselect_users', name: 'eselect_users', orderable: false, searchable: false},
+                        // {title: '', ariaTitle: 'eemployee-list-select-all', target: 0, type: 'string', data: 'eselect_users', name: 'eselect_users', orderable: false, searchable: false},
                         {title: 'ID', ariaTitle: 'ID', target: 1, orderData: [1], type: 'string', data: 'employee_id', name: 'employee_id', className: 'dt-nowrap'},
                         {title: 'Name', ariaTitle: 'Name', target: 2, orderData: [2, 1], type: 'string', data: 'employee_name', name: 'employee_name', className: 'dt-nowrap'},
                         {title: 'Classification', ariaTitle: 'Classification', target: 3, orderData: [3, 1], type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', className: 'dt-nowrap'},
-                        // {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'eemployee_email', name: 'eemployee_email', className: 'dt-nowrap'},
                         {title: 'Organization', ariaTitle: 'Organization', target: 4, orderData: [4, 1], type: 'string', data: 'organization', name: 'organization', className: 'dt-nowrap'},
                         {title: 'Level 1', ariaTitle: 'Level 1', target: 5, orderData: [5, 1], type: 'string', data: 'level1_program', name: 'level1_program', className: 'dt-nowrap'},
                         {title: 'Level 2', ariaTitle: 'Level 2', target: 6, orderData: [6, 1], type: 'string', data: 'level2_division', name: 'level2_division', className: 'dt-nowrap'},
@@ -418,11 +457,11 @@
                     // Check/uncheck all checkboxes in the table
                     $('#employee-list-table tbody input:checkbox').prop('checked', this.checked);
                     if (this.checked) {
-                        g_selected_employees = g_matched_employees.map((x) => x);
+                        g_selected_employees = g_selected_employees.concat(g_matched_employees);
                         $('#employee-list-select-all').prop("checked", true);
                         $('#employee-list-select-all').prop("indeterminate", false);    
                     } else {
-                        g_selected_employees = [];
+                        g_selected_employees = g_selected_employees.filter(x => ($.inArray( x , g_matched_employees) === -1))
                         $('#employee-list-select-all').prop("checked", false);
                         $('#employee-list-select-all').prop("indeterminate", false);    
                     }    
@@ -433,11 +472,11 @@
                     // Check/uncheck all checkboxes in the table
                     $('#eemployee-list-table tbody input:checkbox').prop('checked', this.checked);
                     if (this.checked) {
-                        eg_selected_employees = eg_matched_employees.map((x) => x);
+                        eg_selected_employees = eg_selected_employees.concat(eg_matched_employees);
                         $('#eemployee-list-select-all').prop("checked", true);
                         $('#eemployee-list-select-all').prop("indeterminate", false);    
                     } else {
-                        eg_selected_employees = [];
+                        eg_selected_employees = eg_selected_employees.filter(x => ($.inArray( x , eg_matched_employees) === -1))
                         $('#eemployee-list-select-all').prop("checked", false);
                         $('#eemployee-list-select-all').prop("indeterminate", false);    
                     }    
@@ -448,34 +487,10 @@
                     var id = this.value;
                     var index = $.inArray(id, g_selected_employees);
                     if(this.checked) {
-
-                        //#1148-Temp disable multi-select
-                        list = ( $('#employee-list-table input:checkbox') );
-                        $.each(list, function( index, item ) {
-                            if (item.value == id) {
-                                g_selected_employees.push( id );
-                                $(item).prop('checked', true); // checked
-                            } else {
-                                g_selected_employees.splice( index, 1 );
-                                if (item.checked) {
-                                    document.getElementById(item.id).click();
-                                }
-                            }
-                        });
-                        var i = 0;
-                        while (i < g_selected_employees.length) {
-                            if (g_selected_employees[i] == id) {
-                                ++i;
-                            } else {
-                                g_selected_employees.splice( i, 1 )
-                            }
-                        }
-
-                        // g_selected_employees.push( id );
+                        g_selected_employees.push( id );
                     } else {
                         g_selected_employees.splice( index, 1 );
                     }
-
                     // update the check all checkbox status 
                     if (g_selected_employees.length == 0) {
                         $('#employee-list-select-all').prop("checked", false);
@@ -487,7 +502,6 @@
                         $('#employee-list-select-all').prop("checked", false);
                         $('#employee-list-select-all').prop("indeterminate", true);    
                     }
-
                 });
 
                 $('#eemployee-list-table tbody').on( 'click', 'input:checkbox', function () {
@@ -495,34 +509,10 @@
                     var id = this.value;
                     var index = $.inArray(id, eg_selected_employees);
                     if(this.checked) {
-
-                        //#1148-Temp disable multi-select
-                        list = ( $('#eemployee-list-table input:checkbox') );
-                        $.each(list, function( index, item ) {
-                            if (item.value == id) {
-                                eg_selected_employees.push( id );
-                                $(item).prop('checked', true); // checked
-                            } else {
-                                eg_selected_employees.splice( index, 1 );
-                                if (item.checked) {
-                                    document.getElementById(item.id).click();
-                                }
-                            }
-                        });
-                        var i = 0;
-                        while (i < eg_selected_employees.length) {
-                            if (eg_selected_employees[i] == id) {
-                                ++i;
-                            } else {
-                                eg_selected_employees.splice( i, 1 )
-                            }
-                        }
-
-                        // eg_selected_employees.push( id );
+                        eg_selected_employees.push( id );
                     } else {
                         eg_selected_employees.splice( index, 1 );
                     }
-
                     // update the check all checkbox status 
                     if (eg_selected_employees.length == 0) {
                         $('#eemployee-list-select-all').prop("checked", false);
@@ -706,6 +696,18 @@
                         }
                     });
 
+                    // update the check all checkbox status 
+                    if (g_selected_employees.length == 0) {
+                        $('#employee-list-select-all').prop("checked", false);
+                        $('#employee-list-select-all').prop("indeterminate", false);   
+                    } else if (g_selected_employees.length == g_matched_employees.length) {
+                        $('#employee-list-select-all').prop("checked", true);
+                        $('#employee-list-select-all').prop("indeterminate", false);   
+                    } else {
+                        $('#employee-list-select-all').prop("checked", false);
+                        $('#employee-list-select-all').prop("indeterminate", true);    
+                    }
+
                 }
 
                 function eredrawTreeCheckboxes() {
@@ -753,6 +755,19 @@
                             while (pid);
                         }
                     });
+
+                    // update the check all checkbox status 
+                    if (eg_selected_employees.length == 0) {
+                        $('#eemployee-list-select-all').prop("checked", false);
+                        $('#eemployee-list-select-all').prop("indeterminate", false);   
+                    } else if (eg_selected_employees.length == eg_matched_employees.length) {
+                        $('#eemployee-list-select-all').prop("checked", true);
+                        $('#eemployee-list-select-all').prop("indeterminate", false);   
+                    } else {
+                        $('#eemployee-list-select-all').prop("checked", false);
+                        $('#eemployee-list-select-all').prop("indeterminate", true);    
+                    }
+
                 }
 
                 // Set parent checkbox
