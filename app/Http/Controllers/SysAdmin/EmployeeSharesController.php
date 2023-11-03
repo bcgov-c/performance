@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Models\SharedElement;
 use App\Models\SharedProfile;
 use App\Models\UserDemoJrView;
+use App\Models\UsersAnnex;
 use App\Models\EmployeeDemoTree;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
@@ -167,9 +168,9 @@ class EmployeeSharesController extends Controller {
         foreach ($eeToShare as $eeOne) {
             foreach ($shareTo as $toOne) {                
                 //not allow direct team members be shared to their manager
-                $get_direct = User::select('id')
-                           ->where('id', '=', $eeOne->id)
-                           ->where('reporting_to', '=', $toOne->id)
+                $get_direct = UsersAnnex::select('id')
+                           ->where('user_id', '=', $eeOne->id)
+                           ->where('reporting_to_userid', '=', $toOne->id)
                            ->count();                 
                 if($get_direct > 0){
                     return redirect()->route(request()->segment(1).'.employeeshares')
