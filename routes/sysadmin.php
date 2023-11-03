@@ -238,6 +238,8 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::post('/sysadmin/employeeshares/share-profile', [EmployeeSharesController::class, 'shareProfile'])->name('sysadmin.employeeshares.share-profile'); 
         Route::get('/sysadmin/employeeshares/{user_id}', [EmployeeSharesController::class, 'getProfileSharedWith'])->name('sysadmin.employeeshares.profile-shared-with'); 
         Route::post('/sysadmin/employeeshares/{shared_profile_id}', [EmployeeSharesController::class, 'updateProfileSharedWith'])->name('sysadmin.employeeshares.profile-shared-with.update'); 
+
+        Route::get('/sysadmin/employeeshares/getfilteredlist', [EmployeeSharesController::class, 'getFilteredList'])->name('sysadmin.employeeshares.getfilteredlist');
     });
 
     //Access and Permissions

@@ -104,9 +104,19 @@ class EmployeeSharesController extends Controller {
         $request->session()->flash('edd_level3', $request->edd_level3);
         $request->session()->flash('edd_level4', $request->edd_level4);
         $request->session()->flash('euserCheck', $request->euserCheck);  // Dynamic load 
-        // Matched Employees 
-        $demoWhere = $this->baseFilteredWhere($request, "");
-        $edemoWhere = $this->baseFilteredWhere($request, "e");
+        $matched_emp_ids = [];
+        $ematched_emp_ids = [];
+        $criteriaList = $this->search_criteria_list();
+        $ecriteriaList = $this->search_criteria_list();
+        $yesOrNo = [
+            [ "id" => 0, "name" => 'No' ],
+            [ "id" => 1, "name" => 'Yes' ],
+        ];
+        return view('shared.employeeshares.addnew', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes', 'yesOrNo') );
+    }
+
+    public function getFilteredList(Request $request) {
+        $demoWhere = $this->baseFilteredWhere($request, $request->option);
         $sql = clone $demoWhere; 
         $matched_emp_ids = $sql->select([ 
                 'u.employee_id', 
@@ -115,20 +125,14 @@ class EmployeeSharesController extends Controller {
                 'u.employee_email', 
                 'u.organization', 
                 'u.level1_program', 
-                'u.level2_division',
+                'u.level2_division', 
                 'u.level3_branch',
-                'u.level4', 
-                'u.deptid'
+                'u.level4',
+                'u.deptid', 
+                'u.jobcode_desc'
             ])
-            ->pluck('u.employee_id');        
-        $ematched_emp_ids = clone $matched_emp_ids;
-        $criteriaList = $this->search_criteria_list();
-        $ecriteriaList = $this->search_criteria_list();
-        $yesOrNo = [
-            [ "id" => 0, "name" => 'No' ],
-            [ "id" => 1, "name" => 'Yes' ],
-        ];
-        return view('shared.employeeshares.addnew', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes', 'yesOrNo') );
+            ->pluck('u.employee_id');    
+        return $matched_emp_ids;
     }
 
     public function saveall(Request $request) {
