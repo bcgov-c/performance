@@ -456,8 +456,8 @@
                                 g_selected_employees.push( id );
                                 $(item).prop('checked', true); // checked
                             } else {
-                                g_selected_employees.splice( index, 1 );
                                 if (item.checked) {
+                                    g_selected_employees.splice( index, 1 );
                                     document.getElementById(item.id).click();
                                 }
                             }
@@ -495,8 +495,8 @@
                                 eg_selected_employees.push( id );
                                 $(item).prop('checked', true); // checked
                             } else {
-                                eg_selected_employees.splice( index, 1 );
                                 if (item.checked) {
+                                    eg_selected_employees.splice( index, 1 );
                                     document.getElementById(item.id).click();
                                 }
                             }
