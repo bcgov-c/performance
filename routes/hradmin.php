@@ -122,11 +122,13 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('/hradmin/employeeshares/removeallshare/{id}', [EmployeeSharesController::class, 'removeAllShare'])->name('hradmin.employeeshares.removeallshareget');
         Route::delete('/hradmin/employeeshares/removeallshare/{id}', [EmployeeSharesController::class, 'removeAllShare'])->name('hradmin.employeeshares.removeallshare');
 
+        Route::get('/hradmin/employeeshares/getfilteredlist', [EmployeeSharesController::class, 'getFilteredList'])->name('hradmin.employeeshares.getfilteredlist');
+
         Route::get('/hradmin/profile-shared-with/{user_id}', [EmployeeSharesController::class, 'getProfileSharedWith'])->name('hradmin.employeeshares.profile-shared-with');
         Route::post('/hradmin/profile-shared-with/{shared_profile_id}', [EmployeeSharesController::class, 'updateProfileSharedWith'])->name('hradmin.employeeshares.profile-shared-with.update');
 
         Route::post('/hradmin/employeeshares/share-profile', [EmployeeSharesController::class, 'shareProfile'])->name('hradmin.employeeshares.share-profile'); 
-        Route::get('/hradmin/employeeshares/{user_id}', [EmployeeSharesController::class, 'getProfileSharedWith'])->name('hradmin.employeeshares.profile-shared-with'); 
+        // Route::get('/hradmin/employeeshares/{user_id}', [EmployeeSharesController::class, 'getProfileSharedWith'])->name('hradmin.employeeshares.profile-shared-with'); 
         Route::post('/hradmin/employeeshares/{shared_profile_id}', [EmployeeSharesController::class, 'updateProfileSharedWith'])->name('hradmin.employeeshares.profile-shared-with.update'); 
     });
 
