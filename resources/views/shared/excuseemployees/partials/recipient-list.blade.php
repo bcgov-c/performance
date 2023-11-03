@@ -103,14 +103,11 @@
                         type: 'GET',
                         success: function (data) {
                             g_matched_employees = data;
-                            // console.log(data.length);
                         },
                         error: function (error) {
                             console.log('Unable to GET Select All values.');
                         }
                     });
-
-                    // console.log($('#employee-list-table').DataTable().columns());
                 },
                 "rowCallback": function( row, data ) {
                 },
@@ -156,16 +153,17 @@
                     $('#employee-list-select-all').prop("indeterminate", true);    
                 }
             });
+
             // Handle click on "Select all" control
             $('#employee-list-select-all').on('click', function() {
                 // Check/uncheck all checkboxes in the table
                 $('#employee-list-table tbody input:checkbox').prop('checked', this.checked);
                 if (this.checked) {
-                    g_selected_employees = g_matched_employees.map((x) => x);
+                    g_selected_employees = g_selected_employees.concat(g_matched_employees);
                     $('#employee-list-select-all').prop("checked", true);
                     $('#employee-list-select-all').prop("indeterminate", false);    
                 } else {
-                    g_selected_employees = [];
+                    g_selected_employees = g_selected_employees.filter(x => ($.inArray( x , g_matched_employees) === -1))
                     $('#employee-list-select-all').prop("checked", false);
                     $('#employee-list-select-all').prop("indeterminate", false);    
                 }    
