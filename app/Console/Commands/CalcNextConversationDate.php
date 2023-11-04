@@ -11,6 +11,7 @@ use App\Models\EmployeeDemoJunior;
 use App\Models\ExcusedClassification;
 use App\Models\JobSchedAudit;
 use App\Models\JobDataAudit;
+use App\Models\ExcusedDepartment;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -99,6 +100,7 @@ class CalcNextConversationDate extends Command
         $counter = 0;
         $updatecounter = 0;
         $ClassificationArray = ExcusedClassification::select('jobcode')->pluck('jobcode')->toArray();
+        $ExcusedDepartmentArray = ExcusedDepartment::select('deptid')->pluck('deptid')->toArray();
         EmployeeDemo::whereNull('employee_demo.date_deleted')
         ->leftjoin('users', 'users.employee_id', 'employee_demo.employee_id')
         ->leftjoin('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
@@ -119,12 +121,13 @@ class CalcNextConversationDate extends Command
         ->distinct()
         ->orderBy('employee_demo.employee_id')
         ->orderBy('employee_demo.empl_record')
-        ->chunk(10000, function($employeeDemo) use (&$counter, &$updatecounter, $ClassificationArray, $DefaultCreatorName, $audit_id) {
+        ->chunk(10000, function($employeeDemo) use (&$counter, &$updatecounter, $ClassificationArray, $ExcusedDepartmentArray, $DefaultCreatorName, $audit_id) {
             foreach ($employeeDemo as $demo) {
                 $changeType = 'noChange';
                 $new_last_employee_status = null;
                 $new_last_classification = null;
                 $new_last_classification_descr = null;
+                $new_last_deptid = null;
                 $new_last_manual_excuse = 'N';
                 $excuseType = null;
                 $lastConversationDate = null;
@@ -230,6 +233,7 @@ class CalcNextConversationDate extends Command
                         $initLastConversationDate = $lastConversationDate;
                     }
                     $demo_inarray = in_array($demo->jobcode, $ClassificationArray);
+                    $demo_in_deptarray = in_array($demo->deptid, $ExcusedDepartmentArray);
                     // get last stored detail in junior table
                     $jr = EmployeeDemoJunior::where('employee_id', '=', $demo->employee_id)->orderBy('id', 'desc')->first();
                     if ($jr) {
@@ -237,6 +241,7 @@ class CalcNextConversationDate extends Command
                         $new_last_employee_status = $jr->current_employee_status;
                         $new_last_classification = $jr->current_classification;
                         $new_last_classification_descr = $jr->current_classification_descr;
+                        $new_last_deptid = $jr->current_deptid;
                         $new_last_manual_excuse = $jr->current_manual_excuse ?? 'N';
                         if ($jr->current_employee_status == 'A' 
                             && $demo->employee_status != 'A') {
@@ -263,6 +268,17 @@ class CalcNextConversationDate extends Command
                             $excused_reason_id = 2;
                             $excused_reason_desc = 'Classification';
                         }
+                        $jr_in_deptarray = in_array($jr->current_deptid, $ExcusedDepartmentArray);
+                        if ($jr->current_employee_status == 'A' 
+                            && $demo->employee_status == 'A'
+                            && $jr_in_deptarray == false
+                            && $demo_in_deptarray) {
+                            // DEPTID CHANGE
+                            $changeType = 'deptStartExcuse';
+                            $excuseType = 'A';
+                            $excused_reason_id = 0;
+                            $excused_reason_desc = 'Department';
+                        }
                         if ($jr->current_employee_status == 'A' 
                             && $demo->employee_status == 'A'
                             && $jr_inarray 
@@ -271,9 +287,18 @@ class CalcNextConversationDate extends Command
                             $changeType = 'classEndExcuse';
                         }
                         if ($jr->current_employee_status == 'A' 
+                            && $demo->employee_status == 'A'
+                            && $jr_in_deptarray 
+                            && $demo_in_deptarray == false) {
+                            // DEPTID CHANGE
+                            $changeType = 'deptEndExcuse';
+                        }
+                        if ($jr->current_employee_status == 'A' 
                             && $demo->employee_status == 'A' 
                             && $jr_inarray == false
                             && $demo_inarray == false
+                            && $jr_in_deptarray == false
+                            && $demo_in_deptarray == false
                             && (!$jr->current_manual_excuse || $jr->current_manual_excuse == 'N') 
                             && $demo->excused_flag == 1) {
                             // MANUAL CHANGE
@@ -288,6 +313,8 @@ class CalcNextConversationDate extends Command
                             && $demo->employee_status == 'A'
                             && $jr_inarray == false
                             && $demo_inarray == false
+                            && $jr_in_deptarray == false
+                            && $demo_in_deptarray == false
                             && $jr->current_manual_excuse == 'Y' 
                             // && (!$demo->excused_flag || $demo->excused_flag == 0)) {
                             && !$demo->excused_flag) {
@@ -296,7 +323,7 @@ class CalcNextConversationDate extends Command
                             $excused_updated_by = $demo->excused_updated_by;
                             $excused_updated_at = $demo->excused_updated_at;
                         }
-                        if (in_array($changeType, ['statusEndExcuse', 'classEndExcuse', 'manualEndExcuse', 'noChange'])) {
+                        if (in_array($changeType, ['statusEndExcuse', 'classEndExcuse', 'deptEndExcuse', 'manualEndExcuse', 'noChange'])) {
                             // re-calc next conversation date
                             // get historical dates
                             $allDates = EmployeeDemoJunior::from('employee_demo_jr as j')
@@ -397,23 +424,30 @@ class CalcNextConversationDate extends Command
                                 $excused_reason_id = 2;
                                 $excused_reason_desc = 'Classification';
                             } else {
-                                if ($demo->excused_flag) {
-                                    $changeType = 'manualNewExcuse';
-                                    $excuseType = 'M';
-                                    $excused_updated_by = $demo->excused_updated_by;
-                                    $excused_updated_at = $demo->excused_updated_at;
-                                    $excused_reason_id = $demo->users->excused_reason_id;
-                                    $excused_reason_desc = ExcusedReason::whereRaw('id ='.$demo->users->excused_reason_id)->first()->name;
+                                if ($demo_inarray) {
+                                    $changeType = 'deptNewExcuse';
+                                    $excuseType = 'A';
+                                    $excused_reason_id = 0;
+                                    $excused_reason_desc = 'Department';
                                 } else {
-                                    $changeType = 'noExcuse';
-                                    $excuseType = null;
+                                    if ($demo->excused_flag) {
+                                        $changeType = 'manualNewExcuse';
+                                        $excuseType = 'M';
+                                        $excused_updated_by = $demo->excused_updated_by;
+                                        $excused_updated_at = $demo->excused_updated_at;
+                                        $excused_reason_id = $demo->users->excused_reason_id;
+                                        $excused_reason_desc = ExcusedReason::whereRaw('id ='.$demo->users->excused_reason_id)->first()->name;
+                                    } else {
+                                        $changeType = 'noExcuse';
+                                        $excuseType = null;
+                                    }
                                 }
                             }
                         }
                     }
                     $updated_by_rec = User::where('id', $excused_updated_by)->first();
                     $updated_by_name = $updated_by_rec ? $updated_by_rec->name : null;
-                    $excusedArrayTypes = ['statusStartExcuse', 'classStartExcuse', 'manualStartExcuse', 'statusNewExcuse', 'classNewExcuse', 'manualNewExcuse'];
+                    $excusedArrayTypes = ['statusStartExcuse', 'classStartExcuse', 'deptStartExcuse', 'manualStartExcuse', 'statusNewExcuse', 'classNewExcuse', 'deptNewExcuse', 'manualNewExcuse'];
                     if ($changeType != 'noChange') {
                         $newJr = new EmployeeDemoJunior;
                         $newJr->guid = $demo->guid;
@@ -421,11 +455,13 @@ class CalcNextConversationDate extends Command
                         $newJr->current_employee_status = $demo->employee_status;
                         $newJr->current_classification = $demo->jobcode;
                         $newJr->current_classification_descr = $demo->jobcode_desc;
+                        $newJr->current_deptid = $demo->deptid;
                         $newJr->current_manual_excuse = $demo->excused_flag ? 'Y' : 'N';
                         $newJr->due_date_paused = in_array($changeType, $excusedArrayTypes) ? 'Y' : 'N';
                         $newJr->last_employee_status = $new_last_employee_status;
                         $newJr->last_classification = $new_last_classification;
                         $newJr->last_classification_descr = $new_last_classification_descr;
+                        $newJr->last_deptid = $new_last_deptid;
                         $newJr->last_manual_excuse = $new_last_manual_excuse;
                         $newJr->excused_type = $excuseType;
                         $newJr->last_conversation_date = $lastConversationDate ? Carbon::parse($lastConversationDate) : null;
@@ -450,11 +486,13 @@ class CalcNextConversationDate extends Command
                             $newJr->current_employee_status = $jr->current_employee_status;
                             $newJr->current_classification = $jr->current_classification;
                             $newJr->current_classification_descr = $jr->current_classification_descr;
+                            $newJr->current_deptid = $jr->current_deptid;
                             $newJr->current_manual_excuse = $jr->current_manual_excuse;
                             $newJr->due_date_paused = $jr->due_date_paused;
                             $newJr->last_employee_status = $jr->last_employee_status;
                             $newJr->last_classification = $jr->last_classification;
                             $newJr->last_classification_descr = $jr->last_classification_descr;
+                            $newJr->last_deptid = $jr->last_deptid;
                             $newJr->last_manual_excuse = $jr->last_manual_excuse;
                             $newJr->excused_type = $jr->excused_type;
                             $newJr->last_conversation_date = $jr->last_conversation_date;
@@ -464,7 +502,7 @@ class CalcNextConversationDate extends Command
                             $newJr->updated_by_name = $jr->updated_by_name;
                             $newJr->excused_reason_id = $jr->excused_reason_id;
                             $newJr->excused_reason_desc = $jr->excused_reason_desc;
-                            $newJr->created_at = $jr->created_at;
+                            // $newJr->created_at = $jr->created_at;
                             $newJr->updated_at = $jr->updated_at;
                             $newJr->save();
                             $updatecounter += 1;
