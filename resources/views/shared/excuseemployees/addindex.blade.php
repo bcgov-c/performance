@@ -513,7 +513,7 @@
                 $("#editModal").find("select[name=excused_flag2]").attr('disabled', true);
                 $("#editModal").find("select[name=excused_reason_id2]").attr('disabled', true);
                 if (excused_type == 'A') {
-                    $("#editModal").find("select[name=excused_reason_id2]").val(current_status == 'A' ? 2 : 1);
+                    $("#editModal").find("select[name=excused_reason_id2]").val(current_status == 'A' ? excused_reason_id2 : 1);
                     $("#editModal").find("select[name=excused_reason_id]").attr('disabled', true);
                     $("#divReason1").hide();
                     $("#divReason2").show();

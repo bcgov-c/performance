@@ -290,10 +290,10 @@ class ExcuseEmployeesController extends Controller {
                 ->editColumn('excusedlink', function($row) {
                     $text = $row->excusedlink;
                     $excused_type = $row->excused_type;
-                    $current_status = $row->current_employee_status;
+                    $current_status = $row->employee_status;
                     $excused = json_encode([
                         'excused_flag' => $row->excused_flag,
-                        'reason_id' => $row->excused_reason_id
+                        'reason_id' => $row->reason_id
                     ]);
                     $reasons = ExcusedReason::where('id', '>', 2)->get();
                     $reasons2 = ExcusedReason::where('id', '<=', 2)->get();
