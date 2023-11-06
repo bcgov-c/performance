@@ -138,6 +138,7 @@
                 var index = $.inArray(id, g_selected_employees);
                 if(this.checked) {
                     g_selected_employees.push( id );
+                    g_selected_employees = [...new Set(g_selected_employees)];
                 } else {
                     g_selected_employees.splice( index, 1 );
                 }
@@ -160,6 +161,7 @@
                 $('#employee-list-table tbody input:checkbox').prop('checked', this.checked);
                 if (this.checked) {
                     g_selected_employees = g_selected_employees.concat(g_matched_employees);
+                    g_selected_employees = [...new Set(g_selected_employees)];
                     $('#employee-list-select-all').prop("checked", true);
                     $('#employee-list-select-all').prop("indeterminate", false);    
                 } else {
