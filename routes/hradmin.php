@@ -129,7 +129,7 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
 
         Route::post('/hradmin/employeeshares/share-profile', [EmployeeSharesController::class, 'shareProfile'])->name('hradmin.employeeshares.share-profile'); 
         // Route::get('/hradmin/employeeshares/{user_id}', [EmployeeSharesController::class, 'getProfileSharedWith'])->name('hradmin.employeeshares.profile-shared-with'); 
-        Route::post('/hradmin/employeeshares/{shared_profile_id}', [EmployeeSharesController::class, 'updateProfileSharedWith'])->name('hradmin.employeeshares.profile-shared-with.update'); 
+        // Route::post('/hradmin/employeeshares/{shared_profile_id}', [EmployeeSharesController::class, 'updateProfileSharedWith'])->name('hradmin.employeeshares.profile-shared-with.update'); 
     });
 
     //Excuse Employees
