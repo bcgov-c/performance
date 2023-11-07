@@ -1,6 +1,12 @@
 @extends('resource.layout')
 @section('tab-content')
 
+<style>
+.card a {
+  text-decoration: underline;
+}
+</style>
+
 <div id="accordion">
 	@foreach($data as $index=> $question)
 
