@@ -118,6 +118,8 @@ class CalcNextConversationDate extends Command
                     )
             )
         ")
+        // Parameter below is for testing purposes only
+        // ->where('employee_demo.employee_id', \DB::raw('XXXXXX'))
         ->distinct()
         ->orderBy('employee_demo.employee_id')
         ->orderBy('employee_demo.empl_record')
@@ -257,7 +259,10 @@ class CalcNextConversationDate extends Command
                             $changeType = 'statusEndExcuse';
                         }
                         $jr_inarray = in_array($jr->current_classification, $ClassificationArray);
-                        $excused = ($demo->employee_status != 'A' || $demo_inarray || $demo->excused_flag);
+                        $excused = ($demo->employee_status != 'A' 
+                            || $demo_inarray 
+                            || $demo_in_deptarray 
+                            || $demo->excused_flag);
                         if ($jr->current_employee_status == 'A' 
                             && $demo->employee_status == 'A'
                             && $jr_inarray == false
@@ -281,14 +286,16 @@ class CalcNextConversationDate extends Command
                         }
                         if ($jr->current_employee_status == 'A' 
                             && $demo->employee_status == 'A'
-                            && $jr_inarray 
+                            && $jr->excused_type == 'A'
+                            && $jr->excused_reason_id == 2
                             && $demo_inarray == false) {
                             // CLASSIFICATION CHANGE
                             $changeType = 'classEndExcuse';
                         }
                         if ($jr->current_employee_status == 'A' 
                             && $demo->employee_status == 'A'
-                            && $jr_in_deptarray 
+                            && $jr->excused_type == 'A'
+                            && $jr->excused_reason_id == 0
                             && $demo_in_deptarray == false) {
                             // DEPTID CHANGE
                             $changeType = 'deptEndExcuse';
@@ -299,7 +306,8 @@ class CalcNextConversationDate extends Command
                             && $demo_inarray == false
                             && $jr_in_deptarray == false
                             && $demo_in_deptarray == false
-                            && (!$jr->current_manual_excuse || $jr->current_manual_excuse == 'N') 
+                            && (!$jr->current_manual_excuse 
+                                || $jr->current_manual_excuse == 'N') 
                             && $demo->excused_flag == 1) {
                             // MANUAL CHANGE
                             $changeType = 'manualStartExcuse';
@@ -347,7 +355,8 @@ class CalcNextConversationDate extends Command
                                     //     echo $demo->employee_id.': First row found excused date '.$prevDate.'. Status:'.$prevPause.'.'; echo "\r\n";
                                     // }
                                 } else {
-                                    if ($prevPause == 'Y' && $oneDay->due_date_paused == 'N') {
+                                    if ($prevPause == 'Y' 
+                                        && $oneDay->due_date_paused == 'N') {
                                         $calcDays = 0;
                                         $calcDate = Carbon::parse($oneDay->created_at->toDateString()); 
                                         $currDate = Carbon::now()->toDateString();
@@ -364,7 +373,8 @@ class CalcNextConversationDate extends Command
                                         } else {
                                             $usedate2 = $initNextConversationDate;
                                         }
-                                        if ($usedate1 != $usedate2 && $usedate2 > $initLastConversationDate) {
+                                        if ($usedate1 != $usedate2 
+                                            && $usedate2 > $initLastConversationDate) {
                                             $calcDays = abs(Carbon::parse($usedate2)->diffInDays($usedate1));
                                         } else {
                                             $calcDays = 0;
@@ -374,7 +384,8 @@ class CalcNextConversationDate extends Command
                                         $prevPause = 'N';
                                         echo $demo->employee_id.': End excused period for '.$usedate1.' to '.$usedate2.'. '.$calcDays.' days.'; echo "\r\n";
                                     } else {
-                                        if ($prevPause == 'N' && $oneDay->due_date_paused == 'Y') {
+                                        if ($prevPause == 'N' 
+                                            && $oneDay->due_date_paused == 'Y') {
                                             $prevDate = $oneDay->created_at->toDateString();
                                             $prevPause = $oneDay->due_date_paused;
                                             $lastDateCalculated = false;
@@ -383,7 +394,9 @@ class CalcNextConversationDate extends Command
                                     }
                                 }
                             }
-                            if ($lastDateCalculated == false && $excused == false && $prevPause == 'Y') {
+                            if ($lastDateCalculated == false 
+                                && $excused == false 
+                                && $prevPause == 'Y') {
                                 $calcDays = 0;
                                 if ($prevDate > $initLastConversationDate) {
                                     $usedate1 = $prevDate;
@@ -392,7 +405,8 @@ class CalcNextConversationDate extends Command
                                 }
                                 $currDate = Carbon::now()->toDateString();
                                 $usedate2 = $currDate;
-                                if ($usedate1 != $usedate2 && $usedate2 > $initLastConversationDate) {
+                                if ($usedate1 != $usedate2 
+                                    && $usedate2 > $initLastConversationDate) {
                                     $calcDays = abs(Carbon::parse($usedate2)->diffInDays($usedate1));
                                 } else {
                                     $calcDays = 0;
@@ -418,19 +432,24 @@ class CalcNextConversationDate extends Command
                             $excused_reason_id = 1;
                             $excused_reason_desc = 'PeopleSoft Status';
                         } else {
-                            if ($demo_inarray) {
+                            if ($demo->employee_status == 'A' 
+                                && $demo_inarray) {
                                 $changeType = 'classNewExcuse';
                                 $excuseType = 'A';
                                 $excused_reason_id = 2;
                                 $excused_reason_desc = 'Classification';
                             } else {
-                                if ($demo_inarray) {
+                                if ($demo->employee_status == 'A' 
+                                    && $demo_in_deptarray) {
                                     $changeType = 'deptNewExcuse';
                                     $excuseType = 'A';
                                     $excused_reason_id = 0;
                                     $excused_reason_desc = 'Department';
                                 } else {
-                                    if ($demo->excused_flag) {
+                                    if ($demo->employee_status == 'A' 
+                                        && $demo_inarray == false 
+                                        && $demo_in_deptarray == false 
+                                        && $demo->excused_flag) {
                                         $changeType = 'manualNewExcuse';
                                         $excuseType = 'M';
                                         $excused_updated_by = $demo->excused_updated_by;
@@ -478,7 +497,11 @@ class CalcNextConversationDate extends Command
                         $updatecounter += 1;
                         echo '$changeType '.$changeType.'.  EMPLID '.$demo->employee_id.'.  newDueDate '.$newJr->next_conversation_date.'.  '; echo "\r\n";
                     } else {
-                        if ($jr && $jr->next_conversation_date && $initNextConversationDate && $jr->next_conversation_date <> $initNextConversationDate) {
+                        if ($jr 
+                            && $jr->excused_type 
+                            && $jr->next_conversation_date 
+                            && $initNextConversationDate 
+                            && $jr->next_conversation_date <> $initNextConversationDate) {
                             // save new next conversation due date;
                             $newJr = new EmployeeDemoJunior;
                             $newJr->guid = $jr->guid;
