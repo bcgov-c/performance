@@ -108,7 +108,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Confirmation</h5>
+                        <h5 class="modal-title"><i class="fa fa-exclamation-triangle fa-2x" style="color:red"></i>&nbsp &nbsp Confirmation</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -253,9 +253,9 @@
 
             function confirmSaveAllModal(){
                 countProf = g_selected_employees.length;
-                countUsers = eg_selected_employees.length;
-                $('#saveAllModal .modal-body p').html('Are you sure you want to share the <b>'+countProf+'</b> selected employee(s) with the <b>'+countUsers+'</b> selected shared supervisor(s)?');
-				$('#saveAllModal').modal();
+                countSupv = eg_selected_employees.length;
+                $('#saveAllModal .modal-body p').html('Are you sure you want to share <b>'+countProf+'</b> profile(s) with <b>'+countSupv+'</b> supervisor(s)? <br>This will allow the supervisor(s) to view, comment, and sign-off on the shared profiles.<br><br>Note: Some employees may have more than one profile if they hold more than one concurrent active job with the BC Public Service. Therefore the employee count and the profile count may differ slightly.');
+                $('#saveAllModal').modal();
 			}
 
             $(document).ready(function(){
@@ -347,6 +347,7 @@
                             type: 'GET',
                             success: function (data) {
                                 g_matched_employees = data;
+                                document.getElementById('employee-list-select-all').disabled = false;
                             },
                             error: function (error) {
                                 console.log('Unable to GET Select All values.');
@@ -429,6 +430,7 @@
                             type: 'GET',
                             success: function (data) {
                                 eg_matched_employees = data;
+                                document.getElementById('eemployee-list-select-all').disabled = false;
                             },
                             error: function (error) {
                                 console.log('Unable to GET Select All values.');
@@ -532,11 +534,13 @@
 
                 $('#btn_search').click(function(e) {
                     e.preventDefault();
+                    document.getElementById('employee-list-select-all').disabled = true;
                     $('#employee-list-table').DataTable().rows().invalidate().draw();
                 });
 
                 $('#ebtn_search').click(function(e) {
                     e.preventDefault();
+                    document.getElementById('eemployee-list-select-all').disabled = true;
                     $('#eemployee-list-table').DataTable().rows().invalidate().draw();
                 });
 
