@@ -415,12 +415,20 @@ class User extends Authenticatable
             return false;
         }
 
-        $organization = EmployeeDemo::join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
-            ->join('access_organizations', 'employee_demo_tree.organization_key', 'access_organizations.orgid')
-            ->where('access_organizations.allow_email_msg', 'Y')
-            ->where('employee_demo.employee_id', $this->employee_id)
-            ->select('employee_demo.guid', 'access_organizations.organization')
-            ->first(); 
+        // $organization = EmployeeDemo::join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
+        //     ->join('access_organizations', 'employee_demo_tree.organization_key', 'access_organizations.orgid')
+        //     ->where('access_organizations.allow_email_msg', 'Y')
+        //     ->where('employee_demo.employee_id', $this->employee_id)
+        //     ->select('employee_demo.guid', 'access_organizations.organization')
+        //     ->first(); 
+
+        $organization = UsersAnnex::join(\DB::raw('access_organizations USE INDEX (access_organizations_orgid_unique)', function ($on1) {
+                return $on1->on('access_organizations.orgid', 'usersannex.organization_key')
+                    ->where('access_organizations.allow_email_msg', \DB::raw('Y'));
+            }))
+            ->where('usersannex.employee_id', \DB::raw($this->employee_id))
+            ->whereNull('usersannex.jr_excused_type')
+            ->first();
 
         return ($organization ? true : false);                            
 
