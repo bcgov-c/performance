@@ -103,6 +103,7 @@
                         type: 'GET',
                         success: function (data) {
                             g_matched_employees = data;
+                            document.getElementById('employee-list-select-all').disabled = false;
                         },
                         error: function (error) {
                             console.log('Unable to GET Select All values.');
