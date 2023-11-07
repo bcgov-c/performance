@@ -31,7 +31,7 @@
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title">Confirmation</h5>
+						<h5 class="modal-title"><i class="fa fa-exclamation-triangle fa-2x" style="color:red"></i>&nbsp &nbsp Confirmation</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						    <span aria-hidden="true">&times;</span>
 						</button>
@@ -40,7 +40,7 @@
 						<p>Are you sure to send out this message ?</p>
 					</div>
 					<div class="modal-footer">
-						<button class="btn btn-primary mt-2" type="submit" name="btn_send" value="btn_send">Excuse</button>
+						<button class="btn btn-primary mt-2" type="submit" id="modal_btn_send" name="modal_btn_send" value="modal_btn_send">Excuse</button>
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
 					</div>
 					
@@ -186,9 +186,11 @@
 			function confirmSaveExcuseModal(){
 				count = g_selected_employees.length;
 				if (count == 0) {
-					$('#saveExcuseModal .modal-body p').html('<p>Are you sure you want to excuse employee?</p><p>Note: The change may not reflect until the next day.</p>');
+					$('#modal_btn_send').attr('disabled',true);
+					$('#saveExcuseModal .modal-body p').html('<p>There are no employees selected.</p>');
 				} else {
-					$('#saveExcuseModal .modal-body p').html('<p>Are you sure you want to excuse ' + count + ' selected users?</p><p>Note: The change may not reflect until the next day.</p>');
+					$('#modal_btn_send').removeAttr('disabled');
+					$('#saveExcuseModal .modal-body p').html('<p>Are you sure you want to excuse the <b>' + count + '</b> selected employee(s)? <br>This will pause their next conversation due date and remove them from PDP reporting.</p><p>Note: Excuse status may not update until the next day.</p>');
 				}
 				$('#saveExcuseModal').modal();
 			}
@@ -290,6 +292,7 @@
 				$('#btn_search').click(function(e) {
 					e.preventDefault();
 					if (navListActive()) {
+						document.getElementById('employee-list-select-all').disabled = true;
 						$('#employee-list-table').DataTable().rows().invalidate().draw();
 					}
 					if (navTreeActive()) {
