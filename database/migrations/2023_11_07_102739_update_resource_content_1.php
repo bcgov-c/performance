@@ -24,7 +24,7 @@ class UpdateResourceContent1 extends Migration
                                 <li><a href=\"/storage/Guide to Creating Org Goals in PDP.pdf\" target=\"_blank\">Guide to Creating Org Goals in PDP.pdf</a></li>
                             </ul>
                         </li>'
-            where category = 'File Down Load Link';
+            where question = 'File Down Load Link';
         ");
 
     }
