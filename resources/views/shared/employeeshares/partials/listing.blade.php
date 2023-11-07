@@ -67,7 +67,7 @@
             select: true,
             order: [[1, 'asc']],
             ajax: {
-                url: '/'+'{{ request()->segment(1) }}'+'/employeeshares/employee-list/1'),
+                url: '/'+'{{ request()->segment(1) }}'+'/employeeshares/employee-list/1',
                 data: function (d) {
                     d.dd_level0 = $('#dd_level0').val();
                     d.dd_level1 = $('#dd_level1').val();
@@ -128,48 +128,48 @@
         });
 
 
-        $('#employee-list-table tbody').on( 'click', 'input:checkbox', function () {
+        // $('#employee-list-table tbody').on( 'click', 'input:checkbox', function () {
 
-            // if the input checkbox is selected 
-            var id = this.value;
-            var index = $.inArray(id, g_selected_employees);
-            if(this.checked) {
-                g_selected_employees.push( id );
-            } else {
-                g_selected_employees.splice( index, 1 );
-            }
+        //     // if the input checkbox is selected 
+        //     var id = this.value;
+        //     var index = $.inArray(id, g_selected_employees);
+        //     if(this.checked) {
+        //         g_selected_employees.push( id );
+        //     } else {
+        //         g_selected_employees.splice( index, 1 );
+        //     }
 
-            // update the check all checkbox status 
-            if (g_selected_employees.length == 0) {
-                $('#employee-list-select-all').prop("checked", false);
-                $('#employee-list-select-all').prop("indeterminate", false);   
-            } else if (g_selected_employees.length == g_matched_employees.length) {
-                $('#employee-list-select-all').prop("checked", true);
-                $('#employee-list-select-all').prop("indeterminate", false);   
-            } else {
-                $('#employee-list-select-all').prop("checked", false);
-                $('#employee-list-select-all').prop("indeterminate", true);    
-            }
-        });
+        //     // update the check all checkbox status 
+        //     if (g_selected_employees.length == 0) {
+        //         $('#employee-list-select-all').prop("checked", false);
+        //         $('#employee-list-select-all').prop("indeterminate", false);   
+        //     } else if (g_selected_employees.length == g_matched_employees.length) {
+        //         $('#employee-list-select-all').prop("checked", true);
+        //         $('#employee-list-select-all').prop("indeterminate", false);   
+        //     } else {
+        //         $('#employee-list-select-all').prop("checked", false);
+        //         $('#employee-list-select-all').prop("indeterminate", true);    
+        //     }
+        // });
 
-        // Handle click on "Select all" control
-        $('#employee-list-select-all').on('click', function() {
+        // // Handle click on "Select all" control
+        // $('#employee-list-select-all').on('click', function() {
             
-            //g_selected_employees = g_matched_employees.map((x) => x);
+        //     //g_selected_employees = g_matched_employees.map((x) => x);
 
-            // Check/uncheck all checkboxes in the table
-            $('#employee-list-table tbody input:checkbox').prop('checked', this.checked);
-            if (this.checked) {
-                g_selected_employees = g_matched_employees.map((x) => x);
-                $('#employee-list-select-all').prop("checked", true);
-                $('#employee-list-select-all').prop("indeterminate", false);    
-            } else {
-                g_selected_employees = [];
-                $('#employee-list-select-all').prop("checked", false);
-                $('#employee-list-select-all').prop("indeterminate", false);    
-            }    
+        //     // Check/uncheck all checkboxes in the table
+        //     $('#employee-list-table tbody input:checkbox').prop('checked', this.checked);
+        //     if (this.checked) {
+        //         g_selected_employees = g_matched_employees.map((x) => x);
+        //         $('#employee-list-select-all').prop("checked", true);
+        //         $('#employee-list-select-all').prop("indeterminate", false);    
+        //     } else {
+        //         g_selected_employees = [];
+        //         $('#employee-list-select-all').prop("checked", false);
+        //         $('#employee-list-select-all').prop("indeterminate", false);    
+        //     }    
               
-        });
+        // });
 
     });
 
