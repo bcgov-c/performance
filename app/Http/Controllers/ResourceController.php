@@ -61,8 +61,8 @@ class ResourceController extends Controller
     public function hradmin(Request $request)
     {   
         $t = $request->t;
-        $data = $this->pullContent('hr-admin');             
-
+        $data = $this->pullContent('hr-admin');  
+        
         return view('resource.hr-admin', compact('data', 't'));
     }
 
