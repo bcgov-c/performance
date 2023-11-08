@@ -424,7 +424,7 @@ class User extends Authenticatable
 
         $organization = UsersAnnex::join(\DB::raw('access_organizations USE INDEX (access_organizations_orgid_unique)', function ($on1) {
                 return $on1->on('access_organizations.orgid', 'usersannex.organization_key')
-                    ->where('access_organizations.allow_email_msg', \DB::raw('Y'));
+                    ->whereRaw("access_organizations.allow_email_msg = 'Y'");
             }))
             ->where('usersannex.employee_id', \DB::raw($this->employee_id))
             ->whereNull('usersannex.jr_excused_type')
