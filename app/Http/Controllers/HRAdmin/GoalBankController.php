@@ -1507,12 +1507,12 @@ class GoalBankController extends Controller
         // Filter out the employee based on the Organization level and individual user preferences. 
         $filtered_ee_ids = UserDemoJrForGoalbankView::join(\DB::raw('access_organizations USE INDEX (access_organizations_orgid_unique)'), function ($on1) {
                 return $on1->on('access_organizations.orgid', 'user_demo_jr_for_goalbank_view.organization_key')
-                    ->where('access_organizations.allow_email_msg', \DB::raw('Y'));
+                    ->whereRaw("access_organizations.allow_email_msg = 'Y'");
             })
             ->leftjoin(\DB::raw('user_preferences USE INDEX (user_preferences_user_id_index)'), function ($on2) {
                 return $on2->on('user_preferences.user_id', 'user_demo_jr_for_goalbank_view.user_id')
                     ->on(function ($where2){
-                        return $where2->where('user_preferences.goal_bank_flag', \DB::raw('Y'))
+                        return $where2->whereRaw("user_preferences.goal_bank_flag = 'Y'")
                             ->orWhereNull('user_preferences.goal_bank_flag');
                     });
             })
