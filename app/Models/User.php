@@ -426,7 +426,7 @@ class User extends Authenticatable
                 return $on1->on('access_organizations.orgid', 'usersannex.organization_key')
                     ->whereRaw("access_organizations.allow_email_msg = 'Y'");
             }))
-            ->where('usersannex.employee_id', \DB::raw($this->employee_id))
+            ->where('usersannex.employee_id', $this->employee_id)
             ->whereNull('usersannex.jr_excused_type')
             ->first();
 
