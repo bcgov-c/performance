@@ -135,6 +135,8 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/goalbank/managegetlist', [GoalBankController::class, 'managegetList'])->name('sysadmin.goalbank.managegetlist');
         Route::get('/sysadmin/goalbank/getgoalorgs/{goal_id}', [GoalBankController::class, 'getgoalorgs'])->name('sysadmin.goalbank.getgoalorgs');
         Route::get('/sysadmin/goalbank/getgoalinds/{goal_id}', [GoalBankController::class, 'getgoalinds'])->name('sysadmin.goalbank.getgoalinds');
+
+        Route::get('/sysadmin/goalbank/getfilteredlist', [GoalBankController::class, 'getFilteredList'])->name('sysadmin.goalbank.getfilteredlist');
     });
 
     //Excuse Employees

@@ -96,6 +96,8 @@ Route::group(['middleware' => ['role:HR Admin']], function ()
         Route::get('/hradmin/goalbank/managegetlist', [GoalBankController::class, 'managegetList'])->name('hradmin.goalbank.managegetlist');
         Route::get('/hradmin/goalbank/getgoalorgs/{goal_id}', [GoalBankController::class, 'getgoalorgs'])->name('hradmin.goalbank.getgoalorgs');
         Route::get('/hradmin/goalbank/getgoalinds/{goal_id}', [GoalBankController::class, 'getgoalinds'])->name('hradmin.goalbank.getgoalinds');
+
+        Route::get('/hradmin/goalbank/getfilteredlist', [GoalBankController::class, 'getFilteredList'])->name('hradmin.goalbank.getfilteredlist');
     });
 
 
