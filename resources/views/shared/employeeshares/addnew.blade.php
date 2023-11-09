@@ -310,7 +310,10 @@
                             d.search_text = $('#search_text').val();
                         }
                     },
-                    "fnDrawCallback": function(data) {
+                    preDrawCallback: function ( settings ) {
+                        document.getElementById('employee-list-select-all').disabled = true;
+                    },
+                    drawCallback: function ( settings ) {
                         list = ( $('#employee-list-table input:checkbox') );
                         $.each(list, function( index, item ) {
                             var index = $.inArray( item.value , g_selected_employees);
@@ -354,7 +357,7 @@
                             }
                         });
                     },
-                    "rowCallback": function( row, data ) {
+                    rowCallback: function ( row, data, displayNum, displayIndex, dataIndex ) {
                     },
                     columns: [
                         {title: '<input name="select_all" value="1" id="employee-list-select-all" type="checkbox" />', ariaTitle: 'employee-list-select-all', target: 0, orderData: [0, 2], type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
@@ -393,7 +396,10 @@
                             d.esearch_text = $('#esearch_text').val();
                         }
                     },
-                    "fnDrawCallback": function(data) {
+                    preDrawCallback: function ( settings ) {
+                        document.getElementById('eemployee-list-select-all').disabled = true;
+                    },
+                    drawCallback: function ( settings ) {
                         list = ( $('#eemployee-list-table input:checkbox') );
                         $.each(list, function( index, item ) {
                             var index = $.inArray( item.value , eg_selected_employees);
@@ -437,7 +443,7 @@
                             }
                         });
                     },
-                    "rowCallback": function( row, data ) {
+                    rowCallback: function ( row, data, displayNum, displayIndex, dataIndex ) {
                     },
                     columns: [
                         {title: '<input name="eselect_all" value="1" id="eemployee-list-select-all" type="checkbox" />', ariaTitle: 'eemployee-list-select-all', target: 0, orderData: [0, 1], type: 'string', data: 'eselect_users', name: 'eselect_users', orderable: false, searchable: false},
@@ -534,13 +540,11 @@
 
                 $('#btn_search').click(function(e) {
                     e.preventDefault();
-                    document.getElementById('employee-list-select-all').disabled = true;
                     $('#employee-list-table').DataTable().rows().invalidate().draw();
                 });
 
                 $('#ebtn_search').click(function(e) {
                     e.preventDefault();
-                    document.getElementById('eemployee-list-select-all').disabled = true;
                     $('#eemployee-list-table').DataTable().rows().invalidate().draw();
                 });
 
