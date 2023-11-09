@@ -1950,5 +1950,31 @@ class GoalController extends Controller
         return $this->respondeWith($user_query);
     }
     
-    
+    public function getAllUsersOptions(Request $request)
+    {
+        $current_user = '';
+        if(session()->has('checking_user') && session()->get('checking_user') != '') {
+            $current_user = session()->get('checking_user');
+        }
+        
+        
+        $search = $request->search;
+        
+        if ($current_user == '') {
+            $user_query = User::where('name', 'LIKE', "%{$search}%")
+                          ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
+                          ->whereNull('employee_demo.date_deleted')  
+                          ->groupBy('id', 'name', 'email')
+                          ->paginate();
+        } else {
+            $user_query = User::where('name', 'LIKE', "%{$search}%")
+                          ->where('id', '<>', $current_user)
+                          ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
+                          ->whereNull('employee_demo.date_deleted')  
+                          ->groupBy('id', 'name', 'email')
+                          ->paginate();
+        }
+        
+        return $this->respondeWith($user_query);
+    }
 }
