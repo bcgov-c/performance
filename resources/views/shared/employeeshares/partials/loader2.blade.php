@@ -100,27 +100,22 @@
 
             $('#edd_level0').change(function (e){
                 e.preventDefault();
-                document.getElementById('eemployee-list-select-all').disabled = true;
             });
 
             $('#edd_level1').change(function (e){
                 e.preventDefault();
-                document.getElementById('eemployee-list-select-all').disabled = true;
             });
 
             $('#edd_level2').change(function (e){
                 e.preventDefault();
-                document.getElementById('eemployee-list-select-all').disabled = true;
             });
 
             $('#edd_level3').change(function (e){
                 e.preventDefault();
-                document.getElementById('eemployee-list-select-all').disabled = true;
             });
 
             $('#edd_level4').change(function (e){
                 e.preventDefault();
-                document.getElementById('eemployee-list-select-all').disabled = true;
                 $('#ebtn_search').click();
             });
 
