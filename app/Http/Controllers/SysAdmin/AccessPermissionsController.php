@@ -67,27 +67,19 @@ class AccessPermissionsController extends Controller
         $request->session()->flash('edd_level2', $request->edd_level2);
         $request->session()->flash('edd_level3', $request->edd_level3);
         $request->session()->flash('edd_level4', $request->edd_level4);
-        // Matched Employees 
-        $demoWhere = $this->baseFilteredWhere($request, "");
-        $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql->selectRaw("
-            u.employee_id, 
-            u.display_name, 
-            u.jobcode_desc, 
-            u.user_email, 
-            u.organization, 
-            u.level1_program, 
-            u.level2_division, 
-            u.level3_branch, 
-            u.level4, 
-            u.deptid
-        ")      
-        ->pluck('u.employee_id');
+        $matched_emp_ids = [];
         $criteriaList = $this->search_criteria_list();
         $roles = DB::table('roles')
-        ->whereIntegerInRaw('id', [3, 4, 5])
-        ->pluck('longname', 'id');
+            ->whereIntegerInRaw('id', [3, 4, 5])
+            ->pluck('longname', 'id');
         return view('sysadmin.accesspermissions.index', compact('criteriaList','matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'old_selected_inherited', 'roles') );
+    }
+
+    public function getFilteredList(Request $request) {
+        $demoWhere = $this->baseFilteredWhere($request, $request->option);
+        $sql = clone $demoWhere; 
+        $matched_emp_ids = $sql->select([ 'u.employee_id' ])->pluck('u.employee_id');    
+        return $matched_emp_ids;
     }
 
     public function loadOrganizationTree(Request $request, $index) {
