@@ -191,7 +191,7 @@
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title">Confirmation</h5>
+						<h5 class="modal-title"><i class="fa fa-exclamation-triangle fa-2x" style="color:red"></i>&nbsp &nbsp Confirmation</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -346,17 +346,22 @@
 				} else {   					
 					$('#obtn_send').prop('disabled',true);
 								
-					let count = 0;
+					let countPeople = 0;
 					if($('#opt_audience1').prop('checked')) {
-						count = g_selected_employees.length;
+						countPeople = g_selected_employees.length;
 					};
+					let countOrganizations = 0;
 					if($('#opt_audience2').prop('checked')) {
-						count = g_selected_orgnodes.length + eg_selected_inherited.length;
+						countOrganizations = g_selected_orgnodes.length + eg_selected_inherited.length;
 					};
-					if (count == 0) {
+					if (countPeople > 0) {
+						$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal and assign to <b>'+countPeople+'</b> employees?<br><br>Only click \"Add New Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
+					}
+					if (countOrganizations > 0) {
+						$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal and assign to the selected <b>'+countOrganizations+'</b> organizations?<br><br>Only click \"Add New Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
+					}
+					if (countPeople == 0 && countOrganizations == 0) {
 						$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal without an audience?<br><br>Only click \"Add New Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
-					} else {
-						$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal and assign to the selected audience?<br><br>Only click \"Add New Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
 					}
 									
 					$('#saveGoalModal').modal();
@@ -672,20 +677,20 @@
 					}
 				}
 
-				// Handle click on "Select all" control
-				$('#employee-list-select-all').on('click', function() {
-					// Check/uncheck all checkboxes in the table
-					$('#employee-list-table tbody input:checkbox').prop('checked', this.checked);
-					if (this.checked) {
-						g_selected_employees = g_matched_employees.map((x) => x);
-						$('#employee-list-select-all').prop("checked", true);
-						$('#employee-list-select-all').prop("indeterminate", false);    
-					} else {
-						g_selected_employees = [];
-						$('#employee-list-select-all').prop("checked", false);
-						$('#employee-list-select-all').prop("indeterminate", false);    
-					}    
-				});
+				// // Handle click on "Select all" control
+				// $('#employee-list-select-all').on('click', function() {
+				// 	// Check/uncheck all checkboxes in the table
+				// 	$('#employee-list-table tbody input:checkbox').prop('checked', this.checked);
+				// 	if (this.checked) {
+				// 		g_selected_employees = g_matched_employees.map((x) => x);
+				// 		$('#employee-list-select-all').prop("checked", true);
+				// 		$('#employee-list-select-all').prop("indeterminate", false);    
+				// 	} else {
+				// 		g_selected_employees = [];
+				// 		$('#employee-list-select-all').prop("checked", false);
+				// 		$('#employee-list-select-all').prop("indeterminate", false);    
+				// 	}    
+				// });
 
 				$('#edd_level0').change(function (e) {
 					e.preventDefault();

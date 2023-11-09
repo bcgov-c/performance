@@ -149,6 +149,28 @@ class GoalBankController extends Controller
         return view('shared.goalbank.createindex', compact('criteriaList', 'ecriteriaList', 'matched_emp_ids', 'ematched_emp_ids', 'old_selected_emp_ids', 'eold_selected_emp_ids', 'old_selected_org_nodes', 'eold_selected_org_nodes', 'old_selected_inherited', 'eold_selected_inherited', 'goalTypes', 'mandatoryOrSuggested', 'tags', 'type_desc_str', 'currentView', 'supervisorList') );
     }
 
+    public function getFilteredList(Request $request) {
+        $demoWhere = $this->baseFilteredWhere($request, $request->option);
+        $sql = clone $demoWhere; 
+        $matched_emp_ids = $sql->select([ 
+                'u.employee_id', 
+                'u.employee_name', 
+                'u.jobcode_desc', 
+                'u.employee_email', 
+                'u.organization', 
+                'u.level1_program', 
+                'u.level2_division', 
+                'u.level3_branch',
+                'u.level4',
+                'u.deptid', 
+                'u.jobcode_desc'
+            ])
+            ->when($request->{$request->option.'dd_superv'} == 'sup', function($q) { return $q->whereRaw("(u.isSupervisor = 1 OR u.isDelegate = 1)"); }) 
+            ->when($request->{$request->option.'dd_superv'} == 'non', function($q) { return $q->whereRaw("NOT u.isSupervisor = 1 AND NOT u.isDelegate = 1"); })
+            ->pluck('u.employee_id');    
+        return $matched_emp_ids;
+    }
+
     public function index(Request $request) {
         $goalTypes = GoalType::all()->toArray();
         $this->getDropdownValues($mandatoryOrSuggested);
