@@ -219,27 +219,22 @@
             
             $('#dd_level0').change(function (e){
                 e.preventDefault();
-                document.getElementById('employee-list-select-all').disabled = true;
             });
 
             $('#dd_level1').change(function (e){
                 e.preventDefault();
-                document.getElementById('employee-list-select-all').disabled = true;
             });
 
             $('#dd_level2').change(function (e){
                 e.preventDefault();
-                document.getElementById('employee-list-select-all').disabled = true;
             });
 
             $('#dd_level3').change(function (e){
                 e.preventDefault();
-                document.getElementById('employee-list-select-all').disabled = true;
             });
 
             $('#dd_level4').change(function (e){
                 e.preventDefault();
-                document.getElementById('employee-list-select-all').disabled = true;
                 $('#btn_search').click();
             });
 
