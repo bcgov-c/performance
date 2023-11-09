@@ -292,7 +292,6 @@
 				$('#btn_search').click(function(e) {
 					e.preventDefault();
 					if (navListActive()) {
-						document.getElementById('employee-list-select-all').disabled = true;
 						$('#employee-list-table').DataTable().rows().invalidate().draw();
 					}
 					if (navTreeActive()) {
