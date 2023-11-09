@@ -516,7 +516,7 @@ $(".share-with-users").select2({
                         },
     width: '100%',
     ajax: {
-        url: '{{ route("goal.get-all-users") }}',
+        url: '{{ route("get-all-user-options") }}',
         dataType: 'json',
         data: function (params) {
             const query = {

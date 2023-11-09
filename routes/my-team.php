@@ -72,5 +72,6 @@ Route::group(['middleware' => ['ViewAsPermission']], function () {
 
 Route::group(['middleware' => ['role:Sys Admin|HR Admin|Supervisor']], function () {
     Route::get('users', [MyTeamController::class, 'userList'])->name('users-list');
+    Route::get('user-options', [MyTeamController::class, 'userList'])->name('users-list');
 });
 

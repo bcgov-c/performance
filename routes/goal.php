@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('goal/get_allusers', [GoalController::class, 'getAllUsers'])->name('goal.get-all-users');
+Route::get('goal/get_alluser_options', [GoalController::class, 'getAllUsersOptions'])->name('goal.get-all-user-options');
 Route::get('goal/current', [GoalController::class, 'index'])->name('goal.current');
 Route::get('goal/past', [GoalController::class, 'index'])->name('goal.past');
 Route::get('goal/share', [GoalController::class, 'index'])->name('goal.share');

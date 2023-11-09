@@ -913,7 +913,7 @@
                         },
                 width: '100%',
                 ajax: {
-                    url: '/users',
+                    url: '/user-options',
                     dataType: 'json',
                     data: function (params) {
                         const query = {
