@@ -271,6 +271,8 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::delete('/sysadmin/accesspermissions/deleteitem/{item_id}', [AccessPermissionsController::class, 'deleteitem'])->name('sysadmin.accesspermissions.deleteitem');
         Route::get('/sysadmin/accesspermissions/deletemultiorgs/{item_ids}', [AccessPermissionsController::class, 'deleteMultiOrgs'])->name('sysadmin.accesspermissions.deletemultiorgsget');
         Route::delete('/sysadmin/accesspermissions/deletemultiorgs/{item_ids}', [AccessPermissionsController::class, 'deleteMultiOrgs'])->name('sysadmin.accesspermissions.deletemultiorgs');
+
+        Route::get('/sysadmin/accesspermissions/getfilteredlist', [AccessPermissionsController::class, 'getFilteredList'])->name('sysadmin.accesspermissions.getfilteredlist');
     });
 
     //Welcome Message Editor
