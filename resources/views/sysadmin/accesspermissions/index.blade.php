@@ -24,7 +24,7 @@
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title">Confirmation</h5>
+						<h5 class="modal-title"><i class="fa fa-exclamation-triangle fa-2x" style="color:red"></i>&nbsp &nbsp Confirmation</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						    <span aria-hidden="true">&times;</span>
 						</button>
@@ -194,7 +194,7 @@
 				if (count == 0) {
 					$('#saveAccessModal .modal-body p').html('Are you sure you want to grant administrator access ?');
 				} else {
-					$('#saveAccessModal .modal-body p').html('Are you sure you want to grant administrator access to ' + count + ' selected employee(s)?');
+					$('#saveAccessModal .modal-body p').html('Are you sure you want to grant administrator access to <b>' + count + '</b> selected employee(s)?');
 				}
 				$('#saveAccessModal').modal();
 			}
