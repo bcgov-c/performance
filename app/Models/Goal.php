@@ -95,7 +95,9 @@ class Goal extends Model implements Auditable
   public function comments()
   {
     // TODO: Order of comments
-    return $this->hasMany('App\Models\GoalComment')->whereNull('parent_id')->withTrashed()->orderBy('created_at','ASC')->limit(10);
+    //return $this->hasMany('App\Models\GoalComment')->whereNull('parent_id')->withTrashed()->orderBy('created_at','ASC')->limit(10);
+
+    return $this->hasMany('App\Models\GoalComment')->whereNull('parent_id')->withTrashed()->orderBy('created_at','ASC');
   }
 
   public function getStartDateHumanAttribute() {
