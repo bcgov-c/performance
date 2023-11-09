@@ -52,7 +52,7 @@
                 stateSave: true,
                 ajax: {
                     url: '{{ route(request()->segment(1).'.excuseemployees.employee.list') }}',
-                    data: function (d) {
+                    data: function ( d ) {
                         d.dd_level0 = $('#dd_level0').val();
                         d.dd_level1 = $('#dd_level1').val();
                         d.dd_level2 = $('#dd_level2').val();
@@ -62,10 +62,11 @@
                         d.search_text = $('#search_text').val();
                     }
                 },
-                "fnDrawCallback": function(data) {
-
+                preDrawCallback: function ( settings ) {
+                    document.getElementById('employee-list-select-all').disabled = true;
+                },
+                drawCallback: function ( settings ) {
                     list = ( $('#employee-list-table input:checkbox') );
-
                     $.each(list, function( index, item ) {
                         var index = $.inArray( item.value , g_selected_employees);
                         if ( index === -1 ) {
@@ -74,7 +75,6 @@
                             $(item).prop('checked', true);  // checked 
                         }
                     });
-
                     // update the check all checkbox status 
                     if (g_selected_employees.length == 0) {
                         $('#employee-list-select-all').prop("checked", false);
@@ -86,7 +86,6 @@
                         $('#employee-list-select-all').prop("checked", false);
                         $('#employee-list-select-all').prop("indeterminate", true);    
                     }
-
                     // Get all selection
                     $.ajax({
                         url: '{{ "/" . request()->segment(1) . "/excuseemployees/getfilteredlist" }}',
@@ -101,7 +100,7 @@
                             option : '',
                         },
                         type: 'GET',
-                        success: function (data) {
+                        success: function ( data ) {
                             g_matched_employees = data;
                             document.getElementById('employee-list-select-all').disabled = false;
                         },
@@ -110,7 +109,7 @@
                         }
                     });
                 },
-                "rowCallback": function( row, data ) {
+                rowCallback: function( row, data, displayNum, displayIndex, dataIndex ) {
                 },
                 columns: [
                     {title: '<input name="select_all" value="1" id="employee-list-select-all" type="checkbox" />', ariaTitle: 'employee-list-select-all', target: 0, orderData: [0, 1], type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
