@@ -170,7 +170,10 @@ class DashboardController extends Controller
         }
 
         $tab = (Route::current()->getName() == 'dashboard.notifications') ? 'notifications' : 'notifications';
-        $supervisorTooltip = 'If your current supervisor in the Performance Development Platform is incorrect, please have your supervisor submit a service request through AskMyHR and choose the category: <span class="text-primary">My Team or Organization > HR Software Systems Support > Position / Reporting Updates</span>';        
+        $supervisorTooltip = 'If you have a dropdown menu below it means that there are multiple people sharing your supervisor\'s position #. Please select the correct supervisor from the list. This may take up to 5 seconds to process.
+            <br><br>
+            If your current supervisor is not visible below, please have your actual supervisor submit a service request through AskMyHR and choose the category: <span class="text-primary">My Team or Organization > HR Software Systems Support > Position / Reporting Updates</span>.
+        ';        
         
         $sharedList = SharedProfile::where('shared_id', Auth::id())
                     ->join('users','users.id','shared_profiles.shared_with')
@@ -195,7 +198,10 @@ class DashboardController extends Controller
         $preferredSupervisor = Auth::user()->preferredSupervisor();
         $primaryJob = Auth::user()->primaryJob();
         $jobList = Auth::user()->jobList();
-        $jobTooltip = 'This option only appears for employees that have more than one active position with BC Public Service. Please select the position that you would like to link to your PDP profile.';        
+        $jobTooltip = 'This option only appears for employees that have more than one active position with the BC Public Service. Please select a position to connect with the appropriate supervisor.
+            <br><br>
+            This may take up to 5 seconds to process.
+        ';        
 
         return view('dashboard.index', compact('greetings', 'tab', 'supervisorTooltip', 'sharedList', 'profilesharedTooltip', 
                     // 'notifications', 'notifications_unread', 
