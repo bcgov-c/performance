@@ -188,7 +188,7 @@
 				if (count == 0) {
 					$('#saveGoalModal .modal-body p').html('Are you sure you want to update goal without additional audience?<br><br>Only click \"Update Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
 				} else {
-					$('#saveGoalModal .modal-body p').html('Are you sure you want to create the goal and assign to <b>'+count+'</b> employees?<br><br>Only click \"Add New Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
+					$('#saveGoalModal .modal-body p').html('Are you sure you want to assign this goal to <b>'+count+'</b> additional employees?<br><br>Only click \"Update Goal\" one time. It can take up to 30 seconds to process. Clicking multiple times will generate multiple copies of the goal and all notifications.');
 				}
 				$('#saveGoalModal').modal();
 			}
@@ -215,19 +215,19 @@
 						}
 					},
 					columns: [
-						{title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_id', searchable: true, className: 'dt-nowrap'},
-						{title: 'Name', ariaTitle: 'Employee Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', searchable: true, className: 'dt-nowrap'},
-						{title: 'Supervisor', ariaTitle: 'Supervisor', target: 0, type: 'string', data: 'isSupervisor', name: 'isSupervisor', searchable: true, className: 'dt-nowrap'},
-						{title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', searchable: true, className: 'dt-nowrap'},
-						{title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'organization', searchable: true, className: 'dt-nowrap'},
-						{title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'level1_program', searchable: true, className: 'dt-nowrap'},
-						{title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'level2_division', searchable: true, className: 'dt-nowrap'},
-						{title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'level3_branch', searchable: true, className: 'dt-nowrap'},
-						{title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'level4', searchable: true, className: 'dt-nowrap'},
-						{title: 'Dept ID', ariaTitle: 'Dept ID', target: 0, type: 'string', data: 'deptid', name: 'deptid', searchable: true, className: 'dt-nowrap'},
-						{title: 'Action', ariaTitle: 'Action', target: 0, type: 'string', data: 'action', name: 'action', orderable: false, searchable: false, className: 'dt-nowrap'},
-						{title: 'Goal ID', ariaTitle: 'Goal ID', target: 0, type: 'num', data: 'goal_id', name: 'goal_id', searchable: false, visible: false, className: 'dt-nowrap'},
-						{title: 'ID', ariaTitle: 'ID', target: 0, type: 'num', data: 'share_id', name: 'share_id', searchable: false, visible: false, className: 'dt-nowrap'},
+						{title: 'ID', ariaTitle: 'ID', target: 0, orderData: [0, 12], type: 'string', data: 'employee_id', name: 'employee_id', searchable: true, className: 'dt-nowrap'},
+						{title: 'Name', ariaTitle: 'Employee Name', target: 1, orderData: [1, 12], type: 'string', data: 'employee_name', name: 'employee_name', searchable: true, className: 'dt-nowrap'},
+						{title: 'Supervisor', ariaTitle: 'Supervisor', target: 2, orderData: [2, 12], type: 'string', data: 'isSupervisor', name: 'isSupervisor', searchable: true, className: 'dt-nowrap'},
+						{title: 'Classification', ariaTitle: 'Classification', target: 3, orderData: [3, 12], type: 'string', data: 'jobcode_desc', name: 'jobcode_desc', searchable: true, className: 'dt-nowrap'},
+						{title: 'Organization', ariaTitle: 'Organization', target: 4, orderData: [4, 12], type: 'string', data: 'organization', name: 'organization', searchable: true, className: 'dt-nowrap'},
+						{title: 'Level 1', ariaTitle: 'Level 1', target: 5, orderData: [5, 12], type: 'string', data: 'level1_program', name: 'level1_program', searchable: true, className: 'dt-nowrap'},
+						{title: 'Level 2', ariaTitle: 'Level 2', target: 6, orderData: [6, 12], type: 'string', data: 'level2_division', name: 'level2_division', searchable: true, className: 'dt-nowrap'},
+						{title: 'Level 3', ariaTitle: 'Level 3', target: 7, orderData: [7, 12], type: 'string', data: 'level3_branch', name: 'level3_branch', searchable: true, className: 'dt-nowrap'},
+						{title: 'Level 4', ariaTitle: 'Level 4', target: 8, orderData: [8, 12], type: 'string', data: 'level4', name: 'level4', searchable: true, className: 'dt-nowrap'},
+						{title: 'Dept ID', ariaTitle: 'Dept ID', target: 9, orderData: [9, 12], type: 'string', data: 'deptid', name: 'deptid', searchable: true, className: 'dt-nowrap'},
+						{title: 'Action', ariaTitle: 'Action', target: 10, orderData: [10, 12], type: 'string', data: 'action', name: 'action', orderable: false, searchable: false, className: 'dt-nowrap'},
+						{title: 'Goal ID', ariaTitle: 'Goal ID', target: 1, orderData: [11, 12], type: 'num', data: 'goal_id', name: 'goal_id', searchable: false, visible: false, className: 'dt-nowrap'},
+						{title: 'ID', ariaTitle: 'ID', target: 12, orderData: [12], type: 'num', data: 'share_id', name: 'share_id', searchable: false, visible: false, className: 'dt-nowrap'},
 						]
 				} );
 
@@ -242,7 +242,6 @@
 
 				$('#btn_search').click(function(e) {
 					e.preventDefault();
-					//List
 					$('#currenttable').DataTable().rows().invalidate().draw();
 				});
 

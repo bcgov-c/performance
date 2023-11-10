@@ -21,10 +21,10 @@ class DataFix_1138_Setup_Excused_Departments extends Seeder
     public function run()
     {
         $this->command->info(Carbon::now()." - Setup Excused Departments Start");
-        ExcusedDepartment::create(['deptid' => '105-0751', 'updated_by' => 'Setup']);
+        // ExcusedDepartment::create(['deptid' => '105-0751', 'updated_by' => 'Setup']);
         ExcusedDepartment::create(['deptid' => '105-1115', 'updated_by' => 'Setup']);
-        ExcusedDepartment::create(['deptid' => '105-1120', 'updated_by' => 'Setup']);
-        ExcusedDepartment::create(['deptid' => '105-1125', 'updated_by' => 'Setup']);
+        // ExcusedDepartment::create(['deptid' => '105-1120', 'updated_by' => 'Setup']);
+        // ExcusedDepartment::create(['deptid' => '105-1125', 'updated_by' => 'Setup']);
         ExcusedDepartment::create(['deptid' => '105-1200', 'updated_by' => 'Setup']);
         $this->command->info(Carbon::now()." - Setup Excused Departments End");
     }
