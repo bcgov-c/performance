@@ -165,7 +165,6 @@
                     return query;
                 }
                 , processResults: function(data) {
-                    console.log('$(#add_level2).select2({');
                     return {
                         results: data
                         };
@@ -270,7 +269,6 @@
 
         $('#abtn_search_reset').click(function(e) {
         	e.preventDefault();
-            console.log('$(#abtn_search_reset).click(function(e) {');
         	$('#acriteria').val('all');
         	$('#asearch_text').val(null);
         	$('#add_superv').val('all');
