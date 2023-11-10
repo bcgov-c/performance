@@ -569,7 +569,7 @@ class GoalBankController extends Controller
         $employee_ids = ($request->userCheck) ? $request->userCheck : [];
         $notify_audiences = [];
         if($request->opt_audience == "byEmp") {
-            $selected_emp_ids = $request->userCheck ? $request->userCheck : [];
+            $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
             $toRecipients = EmployeeDemo::from('employee_demo AS d')
                 ->select('u.id')
                 ->join('users AS u', 'd.employee_id', 'u.employee_id')
@@ -871,7 +871,7 @@ class GoalBankController extends Controller
         $aselected_org_nodes = $request->aselected_org_nodes ? json_decode($request->aselected_org_nodes) : [];
         $current_user = Auth::id();
         $resultrec = Goal::withoutGlobalScopes()->findorfail( $id );
-        $aemployee_ids = ($request->auserCheck) ? $request->auserCheck : [];
+        $aemployee_ids = ($request->aselected_emp_ids) ? json_decode($request->aselected_emp_ids) : [];
         $toRecipients = EmployeeDemo::select('users.id')
             ->join('users', 'employee_demo.employee_id', 'users.employee_id')
             ->whereIn('employee_demo.employee_id', $aselected_emp_ids)
