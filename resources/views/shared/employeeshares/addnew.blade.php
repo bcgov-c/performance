@@ -254,7 +254,7 @@
             function confirmSaveAllModal(){
                 countProf = g_selected_employees.length;
                 countSupv = eg_selected_employees.length;
-                $('#saveAllModal .modal-body p').html('Are you sure you want to share <b>'+countProf+'</b> profile(s) with <b>'+countSupv+'</b> supervisor(s)?<br>This will allow the supervisor(s) to view, comment, and sign-off on the shared profiles.<br><br>Note: If you have any concerns about the employee count, please cancel and reach out to your ministry contact.');
+                $('#saveAllModal .modal-body p').html('Are you sure you want to share <b>'+countProf+'</b> employee(s) with <b>'+countSupv+'</b> supervisor(s)?<br>This will allow the supervisor(s) to view, comment, and sign-off on the shared profiles.<br><br>Note: If you have any concerns about the employee count, please cancel and reach out to your <a href="/resources/contact" target="_blank">ministry contact</a>.');
                 $('#saveAllModal').modal();
 			}
 
