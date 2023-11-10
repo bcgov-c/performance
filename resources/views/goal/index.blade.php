@@ -510,13 +510,17 @@
 <script>
 $(".share-with-users").select2({
     language: {
-                        errorLoading: function () {
-                            return "Searching for results.";
-                        }
-                        },
+        errorLoading: function () {
+            return "Searching for results.";
+        }
+    },
     width: '100%',
+    data: [{
+        id: '',
+        text: '--- Select the employee ---'
+    }],
     ajax: {
-        url: '{{ route("goal.get-all-users") }}',
+        url: '{{ route("goal.get-all-user-options") }}',
         dataType: 'json',
         data: function (params) {
             const query = {
@@ -526,17 +530,21 @@ $(".share-with-users").select2({
             return query;
         },
         processResults: function (response, params) {
+            const results = $.map(response.data.data, function (item) {
+                return {
+                    text: item.name + (item.employee_email ? ' - ' + item.employee_email : ''),
+                    id: item.id
+                };
+            });
+            // Add the empty option to the beginning of the results
+            results.unshift({ id: '', text: '--- Select the employee ---' });
+
             return {
-                results: $.map(response.data.data, function (item) {
-                    return {
-                        text: item.name+(item.employee_email ? ' - '+item.employee_email : '')+(item.deptid ? ' - ['+item.deptid + ']' : ''),
-                        id: item.id
-                    }
-                }),
+                results: results,
                 pagination: {
                     more: response.data.current_page !== response.data.last_page
                 }
-            }
+            };
         }
     }
 });
