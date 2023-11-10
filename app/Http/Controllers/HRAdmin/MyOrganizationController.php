@@ -9,6 +9,7 @@ use App\Models\SharedProfile;
 use App\Models\HRUserDemoJrView;
 use App\Models\Position;
 use App\Models\UserDemoJrView;
+use App\Models\EmployeeDemo;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -100,8 +101,8 @@ class MyOrganizationController extends Controller {
                     excusedtype,
                     CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
                     CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
-                    CONCAT (u.reportees, ' / ', (SELECT COUNT(1) FROM shared_profiles AS sp USE INDEX (SHARED_PROFILES_SHARED_WITH_FOREIGN) WHERE sp.shared_with IS NOT NULL AND sp.shared_with = u.user_id)) AS reportees,
-                    (SELECT COUNT(g.id) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active') AS activeGoals
+                    CONCAT (u.reportees, ' / ', (SELECT COUNT(1) FROM shared_profiles AS sp USE INDEX (SHARED_PROFILES_SHARED_WITH_FOREIGN), user_demo_jr_view AS u2 WHERE sp.shared_with IS NOT NULL AND sp.shared_with = u.user_id AND sp.shared_id = u2.user_id AND u2.date_deleted IS NULL)) AS reportees,
+                    (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active' AND g.is_library = 0 AND g.deleted_at IS NULL) AS activeGoals
                 ");
             return Datatables::of($query)->addIndexColumn()
                 ->addIndexColumn()
@@ -114,40 +115,46 @@ class MyOrganizationController extends Controller {
         }
     }
 
-    public function reporteesList(Request $request, $id) {
+    public function reporteesList(Request $request, $id, $posn) {
         $user = UserDemoJrView::where('user_id', $id)->first();
         if ($request->ajax()) {
-            $direct = Position::from('positions AS posn')
-                ->join('employee_demo AS dmo', 'posn.position_nbr', 'dmo.position_number')
-                ->whereNull('dmo.date_deleted')
-                ->where('posn.reports_to', $user->position_number)
+            $reportees = EmployeeDemo::join(\DB::raw('users_annex AS d_ua USE INDEX (users_annex_employee_id_record_index)'), function($join){
+                    return $join->on(function($on){
+                        return $on->whereRaw("employee_demo.employee_id = d_ua.employee_id")
+                            ->whereRaw("employee_demo.empl_record = d_ua.empl_record")
+                            ->whereNull('employee_demo.date_deleted');
+                    });
+                })
+                ->join(\DB::raw('employee_managers AS d_um USE INDEX (idx_employee_managers_supervisor_emplid_employee_id)'), function($join) use($user, $posn) {
+                    return $join->on(function($on) use($user, $posn) {
+                        return $on->whereRaw("d_um.supervisor_emplid = '{$user->employee_id}'")
+                            ->whereRaw("d_um.employee_id = employee_demo.employee_id")
+                            ->whereRaw("d_um.supervisor_position_number = '{$posn}'");
+                    });
+                })
+                ->where('d_ua.reporting_to_employee_id', $user->employee_id)
+                ->where('d_ua.reporting_to_position_number', $posn)
                 ->selectRaw("
-                    dmo.employee_id AS employee_id, 
-                    dmo.employee_name AS employee_name, 
-                    'Direct Report' AS reporteetype
+                    employee_demo.employee_id AS employee_id, 
+                    employee_demo.employee_name AS employee_name, 
+                    employee_demo.employee_email AS employee_email, 
+                    CASE WHEN d_um.source IN ('Posn', 'ODS') THEN 'Direct' WHEN d_um.source IN ('Posn Next', 'ODS Next') THEN 'Delegated' END AS reporteetype
                 ");
-            $elevated = Position::from('positions AS sspn')
-                ->join('positions AS spn', 'sspn.position_nbr', 'spn.reports_to')
-                ->join('employee_demo AS dmo', 'spn.position_nbr', 'dmo.position_number')
-                ->whereNull('dmo.date_deleted')
-                ->where('sspn.reports_to', $user->position_number)
-                ->whereRaw("NOT EXISTS (SELECT 1 FROM employee_demo AS non WHERE non.position_number = sspn.position_nbr AND non.date_deleted IS NULL LIMIT 1)")
-                ->selectRaw("
-                    dmo.employee_id AS employee_id, 
-                    dmo.employee_name AS employee_name, 
-                    'Direct Report*' AS reporteetype
-                ");
-            $shared = SharedProfile::from('shared_profiles AS sp')
+            $shared = \DB::table('shared_profiles AS sp')
                 ->whereRaw("sp.shared_with = ".$user->user_id)
-                ->join('user_demo_jr_view AS u', 'sp.shared_id', 'u.user_id')
-                ->whereNull('u.date_deleted')
+                ->join(\DB::raw('users AS u USE INDEX (IDX_USERS_ID)'), 'sp.shared_id', 'u.id')
+                ->join(\DB::raw('employee_demo AS dmo USE INDEX (IDX_EMPLOYEE_DEMO_EMPLOYEEID_RECORD)'), function ($join) {
+                    $join->on('u.employee_id', 'dmo.employee_id');
+                    $join->on('u.empl_record', 'dmo.empl_record');
+                })
+                ->whereNull('dmo.date_deleted')
                 ->selectRaw("
-                    u.employee_id AS employee_id, 
-                    u.employee_name AS employee_name, 
+                    dmo.employee_id AS employee_id, 
+                    dmo.employee_name AS employee_name, 
+                    dmo.employee_email AS employee_email, 
                     'Shared' AS reporteetype
                 ");
-            $query = $direct->union($elevated);
-            $query = $query->union($shared);
+            $query = $reportees->union($shared);
             return Datatables::of($query)
                 ->addIndexColumn()
                 ->make(true);
