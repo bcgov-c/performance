@@ -165,6 +165,7 @@
                     return query;
                 }
                 , processResults: function(data) {
+                    console.log('$(#add_level2).select2({');
                     return {
                         results: data
                         };
@@ -224,34 +225,52 @@
             }
         });
         
-        $('#add_level0').on('select2:select', function (e) {
-            // Do something
-            $('#add_level1').val(null).trigger('change');
-            $('#add_level2').val(null).trigger('change');
-            $('#add_level3').val(null).trigger('change');
-            $('#add_level4').val(null).trigger('change');
+        $('#add_level0').change(function (e){
+            e.preventDefault();
         });
 
-        $('#add_level1').on('select2:select', function (e) {
-            // Do something
-            $('#add_level2').val(null).trigger('change');
-            $('#add_level3').val(null).trigger('change');
-            $('#add_level4').val(null).trigger('change');
+        $('#add_level1').change(function (e){
+            e.preventDefault();
         });
 
-        $('#add_level2').on('select2:select', function (e) {
-            // Do something
-            $('#add_level3').val(null).trigger('change');
-            $('#add_level4').val(null).trigger('change');
+        $('#add_level2').change(function (e){
+            e.preventDefault();
         });
 
-        $('#add_level3').on('select2:select', function (e) {
-            // Do something
-            $('#add_level4').val(null).trigger('change');
+        $('#add_level3').change(function (e){
+            e.preventDefault();
+        });
+
+        $('#add_level4').change(function (e){
+            e.preventDefault();
+            $('#abtn_search').click();
+        });
+
+        $('#add_superv').change(function (e){
+            e.preventDefault();
+            $('#abtn_search').click();
+        });
+
+        $('#acriteria').change(function (e){
+            e.preventDefault();
+            $('#abtn_search').click();
+        });
+
+        $('#asearch_text').change(function (e){
+            e.preventDefault();
+            $('#abtn_search').click();
+        });
+
+        $('#asearch_text').keydown(function (e){
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                $('#abtn_search').click();
+            }
         });
 
         $('#abtn_search_reset').click(function(e) {
         	e.preventDefault();
+            console.log('$(#abtn_search_reset).click(function(e) {');
         	$('#acriteria').val('all');
         	$('#asearch_text').val(null);
         	$('#add_superv').val('all');
@@ -260,6 +279,72 @@
         	$('#add_level2').val(null);
         	$('#add_level3').val(null);
         	$('#add_level4').val(null);
+        });
+
+        $('#add_level0').on('select2:select', function (e) {
+            e.preventDefault();
+            $('#add_level1').val(null).trigger('change');
+            $('#add_level2').val(null).trigger('change');
+            $('#add_level3').val(null).trigger('change');
+            $('#add_level4').val(null).trigger('change');
+        });
+
+        $('#add_level1').on('select2:select', function (e) {
+            e.preventDefault();
+            $('#add_level2').val(null).trigger('change');
+            $('#add_level3').val(null).trigger('change');
+            $('#add_level4').val(null).trigger('change');
+        });
+
+        $('#add_level2').on('select2:select', function (e) {
+            e.preventDefault();
+            $('#add_level3').val(null).trigger('change');
+            $('#add_level4').val(null).trigger('change');
+        });
+
+        $('#add_level3').on('select2:select', function (e) {
+            e.preventDefault();
+            $('#add_level4').val(null).trigger('change');
+        });
+
+        $('#add_level4').on('select2:select', function (e) {
+            e.preventDefault();
+        });
+
+        $('#add_level0').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#add_level0').val(null).trigger('change');
+            $('#add_level1').val(null).trigger('change');
+            $('#add_level2').val(null).trigger('change');
+            $('#add_level3').val(null).trigger('change');
+            $('#add_level4').val(null).trigger('change');
+        });
+
+        $('#add_level1').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('a#dd_level1').val(null).trigger('change');
+            $('a#dd_level2').val(null).trigger('change');
+            $('a#dd_level3').val(null).trigger('change');
+            $('a#dd_level4').val(null).trigger('change');
+        });
+
+        $('#add_level2').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#add_level2').val(null).trigger('change');
+            $('#add_level3').val(null).trigger('change');
+            $('#add_level4').val(null).trigger('change');
+        });
+
+        $('#add_level3').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#add_level3').val(null).trigger('change');
+            $('#add_level4').val(null).trigger('change');
+        });
+
+        $('#add_level4').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#add_level4').val(null).trigger('change');
+            $('#abtn_search').click();
         });
 
     </script>
