@@ -9,6 +9,6 @@ class UsersAnnex extends Model
 
     public $table = 'users_annex'; 
     public $timestamps = true;
-    public $incrementing = true;
+    public $incrementing = true; 
 
 }
