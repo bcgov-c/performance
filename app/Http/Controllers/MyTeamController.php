@@ -360,19 +360,19 @@ class MyTeamController extends Controller
         $search = $request->search;
         
         if ($current_user == '') {
-            $user_query = User::select('id', 'name', 'email')
+            $user_query = User::select('id', 'name', 'employee_demo.employee_email')
                           ->where('name', 'LIKE', "%{$search}%")
                           ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
                           ->whereNull('employee_demo.date_deleted')  
-                          ->groupBy('id', 'name', 'email')
+                          ->groupBy('id', 'name', 'employee_demo.employee_email')
                           ->paginate();
         } else {
-            $user_query = User::select('id', 'name', 'email')
+            $user_query = User::select('id', 'name', 'employee_demo.employee_email')
                           ->where('name', 'LIKE', "%{$search}%")
                           ->where('id', '<>', $current_user)
                           ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
                           ->whereNull('employee_demo.date_deleted')  
-                          ->groupBy('id', 'name', 'email')
+                          ->groupBy('id', 'name', 'employee_demo.employee_email')
                           ->paginate();
         }
         
