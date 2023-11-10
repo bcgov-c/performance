@@ -254,7 +254,7 @@
             function confirmSaveAllModal(){
                 countProf = g_selected_employees.length;
                 countSupv = eg_selected_employees.length;
-                $('#saveAllModal .modal-body p').html('Are you sure you want to share <b>'+countProf+'</b> profile(s) with <b>'+countSupv+'</b> supervisor(s)?<br>This will allow the supervisor(s) to view, comment, and sign-off on the shared profiles.<br><br>Note: If you have any concerns about the employee count, please cancel and reach out to your ministry contact.');
+                $('#saveAllModal .modal-body p').html('Are you sure you want to share <b>'+countProf+'</b> profile(s) with <b>'+countSupv+'</b> supervisor(s)? <br>This will allow the supervisor(s) to view, comment, and sign-off on the shared profiles.<br><br>Note: Some employees may have more than one profile if they hold more than one concurrent active job with the BC Public Service. Therefore the employee count and the profile count may differ slightly.');
                 $('#saveAllModal').modal();
 			}
 
