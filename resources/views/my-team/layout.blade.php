@@ -105,7 +105,7 @@
                             results: $.map(response.data.data, function (item) {
                                 console.log(item);
                                 return {
-                                    text: item.name+(item.email ? ' - '+item.email : ''),
+                                    text: item.name+(item.employee_email ? ' - '+item.employee_email : ''),
                                     id: item.id
                                 }
                             }),
