@@ -926,7 +926,7 @@
                         return {
                             results: $.map(response.data.data, function (item) {
                                 return {
-                                    text: item.name+(item.email ? ' - '+item.email : '')+(item.deptid ? ' - ['+item.deptid + ']' : ''),
+                                    text: item.name+(item.employee_email ? ' - '+item.employee_email : ''),
                                     id: item.id
                                 }
                             }),
