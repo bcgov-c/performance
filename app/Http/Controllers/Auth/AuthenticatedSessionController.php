@@ -129,6 +129,8 @@ class AuthenticatedSessionController extends Controller
         // User was found, then update the signin information
         if ($isUser || str_contains( $auth_user->email, '@example.com') ) {
             return true;
+        } if ($isUser || str_contains( $auth_user->email, '@gov.bc.ca') ) {
+            return true;
         } else {
             return false;
         }
