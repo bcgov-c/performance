@@ -19,6 +19,7 @@ use App\Http\Controllers\SysAdmin\AccessOrganizationsController;
 use App\Http\Controllers\SysAdmin\SysadminStatisticsReportController;
 use App\Http\Controllers\SysAdmin\SupervisorOverridesController;
 use App\Http\Controllers\SysAdmin\ResourceManageController;
+use App\Http\Controllers\SysAdmin\QueueStatusController;
 // use Illuminate\Http\Request;
 
 
@@ -306,6 +307,14 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/supervisoroverrides/employee-list/{index}', [SupervisorOverridesController::class, 'getDatatableEmployees']);
         Route::get('/sysadmin/supervisoroverrides/employees/{id}/{index}', [SupervisorOverridesController::class,'getEmployees']);
     });
+
+
+    //system queue monitor
+    Route::group(['middleware' => ['auth']], function() {    
+        Route::get('/sysadmin/queue/status', [QueueStatusController::class, 'show']);
+        Route::get('/sysadmin/queue/processes', [QueueStatusController::class, 'processes']);
+    });
+
 
     Route::get('/sysadmin/level0', 'App\Http\Controllers\SysadminController@getOrgLevel0')->name('sysadmin.level0');
     Route::get('/sysadmin/level1/{id0}', 'App\Http\Controllers\SysadminController@getOrgLevel1')->name('sysadmin.level1');
