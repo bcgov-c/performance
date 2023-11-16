@@ -24,6 +24,7 @@ class SysAdminSharedController extends Controller
                 $option = '';
                 break;
         } 
+
         return response()->json(EmployeeDemoTree::where('employee_demo_tree.level', \DB::raw($level))
             ->when($request->q, function ($q) use($request) { return $q->whereRaw("employee_demo_tree.name LIKE '%{$request->q}%'"); })
             ->when($level > 0 && "{$request->{$option.'level0'}}", function ($q) use($request, $option) { return $q->whereRaw('employee_demo_tree.organization_key = '."{$request->{$option.'level0'}}"); })

@@ -201,6 +201,7 @@
 					scrollX: true,
 					stateSave: true,
 					deferRender: true,
+					searching: false,
 					ajax: {
 						url: "{{ route(request()->segment(1).'.goalbank.getgoalinds', $goaldetail->id) }}",
 						data: function(d) {
@@ -572,17 +573,17 @@
 				});
 				$('#add_level4').change(function (e) {
 					e.preventDefault();
-					$('#abtn_search').click();
+					//$('#abtn_search').click();
 				});
 
 				$('#acriteria').change(function (e){
 					e.preventDefault();
-					$('#abtn_search').click();
+					//$('#abtn_search').click();
 				});
 
 				$('#asearch_text').change(function (e){
 					e.preventDefault();
-					$('#abtn_search').click();
+					//$('#abtn_search').click();
 				});
 
 				$('#asearch_text').keydown(function (e){
@@ -592,22 +593,10 @@
 					}
 				});
 
-				$('#abtn_search_reset').click(function(e) {
-					e.preventDefault();
-					$('#add_superv').val('all');
-					$('#acriteria').val('all');
-					$('#asearch_text').val(null);
-					$('#add_level0').val(null);
-					$('#add_level1').val(null);
-					$('#add_level2').val(null);
-					$('#add_level3').val(null);
-					$('#add_level4').val(null);
-					$('#abtn_search').click();
-				});
 
 				$('#add_superv').change(function (e){
 					e.preventDefault();
-					$('#abtn_search').click();
+					//$('#abtn_search').click();
 				});
 
 				$(window).on('beforeunload', function(){
