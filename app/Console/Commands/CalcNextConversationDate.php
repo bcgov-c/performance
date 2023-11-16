@@ -99,6 +99,7 @@ class CalcNextConversationDate extends Command
         //Process all employees;
         $counter = 0;
         $updatecounter = 0;
+        $updateemp = array();
         $ClassificationArray = ExcusedClassification::select('jobcode')->pluck('jobcode')->toArray();
         $ExcusedDepartmentArray = ExcusedDepartment::select('deptid')->pluck('deptid')->toArray();
         EmployeeDemo::whereNull('employee_demo.date_deleted')
@@ -123,7 +124,7 @@ class CalcNextConversationDate extends Command
         ->distinct()
         ->orderBy('employee_demo.employee_id')
         ->orderBy('employee_demo.empl_record')
-        ->chunk(10000, function($employeeDemo) use (&$counter, &$updatecounter, $ClassificationArray, $ExcusedDepartmentArray, $DefaultCreatorName, $audit_id) {
+        ->chunk(10000, function($employeeDemo) use (&$counter, &$updatecounter, $updateemp, $ClassificationArray, $ExcusedDepartmentArray, $DefaultCreatorName, $audit_id) {
             foreach ($employeeDemo as $demo) {
                 $changeType = 'noChange';
                 $new_last_employee_status = null;
@@ -150,6 +151,7 @@ class CalcNextConversationDate extends Command
                 $currDate = Carbon::now()->toDateString();
                 $excused_reason_id = null;
                 $excused_reason_desc = null;
+
                 if ($demo->guid) {
                     // YES GUID
                     // get last conversation details
@@ -169,12 +171,16 @@ class CalcNextConversationDate extends Command
                     ->where('signoff_user_id', $demo->users->id)
                     ->orderBy('conversations.sign_off_time', 'desc')
                     ->first();
+                    
                     if ($lastConv) {
                         // use last conversation + 4 months as initial next conversation date
                         // $lastConversationDate = $lastConv->getLastSignOffDateAttribute()->format('M d, Y');
                         // $initNextConversationDate = $lastConv->getLastSignOffDateAttribute()->addMonth(4)->format('M d, Y');
+                        
                         $lastConversationDate = $lastConv->getLastSignOffDateAttribute()->toDateString();
-                        $initNextConversationDate = $lastConv->getLastSignOffDateAttribute()->addMonth(4)->toDateString();
+                        //$initNextConversationDate = $lastConv->getLastSignOffDateAttribute()->addMonth(4)->toDateString();
+                        //clone instance to avoid duplicate calling from same instance
+                        $initNextConversationDate = $lastConv->getLastSignOffDateAttribute()->clone()->addMonth(4)->toDateString();
                         // echo 'Last Conversation Date:'.$lastConversationDate; echo "\r\n";
                     } else {
                         // no last conversation, use randomizer to assign initial next conversation date
@@ -201,7 +207,8 @@ class CalcNextConversationDate extends Command
                             if ($virtualHardDate->gt($initNextConversationDate)) {
                                 // distribute next conversation date, based on last digit of employee ID
                                 $DDt = (int) (($demo->employee_id % 100) * 71 / 100);
-                                $initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
+                                //$initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
+                                $initNextConversationDate = $virtualHardDate->clone()->addDays($DDt)->toDateString(); // Clone the instance
                             }
                             break;
                         case 2:
@@ -209,7 +216,8 @@ class CalcNextConversationDate extends Command
                             if ($virtualHardDate->gt($initNextConversationDate)) {
                                 // distribute next conversation date, based on last digit of employee ID
                                 $DDt = (int) (($demo->employee_id % 100) * 52 / 100);
-                                $initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
+                                //$initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
+                                $initNextConversationDate = $virtualHardDate->clone()->addDays($DDt)->toDateString(); // Clone the instance
                             }
                             break;
                         case 1:
@@ -217,7 +225,8 @@ class CalcNextConversationDate extends Command
                             if ($virtualHardDate->gt($initNextConversationDate)) {
                                 // distribute next conversation date, based on last digit of employee ID
                                 $DDt = abs (($demo->employee_id % 10) - 1) * 5 + (($demo->employee_id % 5));
-                                $initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
+                                //$initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
+                                $initNextConversationDate = $virtualHardDate->clone()->addDays($DDt)->toDateString(); // Clone the instance
                             }
                             break;
                         default:
@@ -225,12 +234,14 @@ class CalcNextConversationDate extends Command
                             if ($virtualHardDate->gt($initNextConversationDate)) {
                                 // distribute next conversation date, based on last digit of employee ID
                                 $DDt = (int) (($demo->employee_id % 100) * 71 / 100);
-                                $initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
+                                //$initNextConversationDate = $virtualHardDate->addDays($DDt)->toDateString();
+                                $initNextConversationDate = $virtualHardDate->clone()->addDays($DDt)->toDateString(); // Clone the instance
                             }
                             break;
                     }
                     // calcualte initial last conversation date; init next conversation minus 4 months
-                    $initLastConversationDate = Carbon::parse($initNextConversationDate)->subMonth(4)->toDateString();
+                    //$initLastConversationDate = Carbon::parse($initNextConversationDate)->subMonth(4)->toDateString();
+                    $initLastConversationDate = Carbon::parse($initNextConversationDate)->clone()->subMonth(4)->toDateString(); // Clone the instance
                     if ($lastConversationDate && Carbon::parse($lastConversationDate)->gt($initLastConversationDate)) {
                         $initLastConversationDate = $lastConversationDate;
                     }
@@ -419,7 +430,7 @@ class CalcNextConversationDate extends Command
                             if ($diffInDays < 0) {
                                 $diffInDays = 0;
                             }
-                            $newEndDate = Carbon::parse($initNextConversationDate)->addDays($diffInDays)->toDateString();
+                            $newEndDate = Carbon::parse($initNextConversationDate)->clone()->addDays($diffInDays)->toDateString();
                             if ($newEndDate > $initNextConversationDate) {
                                 $initNextConversationDate = $newEndDate;
                             }
@@ -495,10 +506,11 @@ class CalcNextConversationDate extends Command
                         }
                         $newJr->save();
                         $updatecounter += 1;
+                        $updateemp[] = $demo->employee_id;
                         echo '$changeType '.$changeType.'.  EMPLID '.$demo->employee_id.'.  newDueDate '.$newJr->next_conversation_date.'.  '; echo "\r\n";
                     } else {
                         if ($jr 
-                            && $jr->excused_type 
+                            //&& $jr->excused_type 
                             && $jr->next_conversation_date 
                             && $initNextConversationDate 
                             && $jr->next_conversation_date <> $initNextConversationDate) {
@@ -529,6 +541,20 @@ class CalcNextConversationDate extends Command
                             $newJr->updated_at = $jr->updated_at;
                             $newJr->save();
                             $updatecounter += 1;
+                            $updateemp[] = $demo->employee_id;
+
+                            $js_next_conversation_date = $initNextConversationDate ? Carbon::parse($initNextConversationDate)->toDateString() : null;
+                            \DB::beginTransaction();
+                            \DB::statement("
+                                UPDATE 
+                                    users_annex 
+                                SET 
+                                    jr_next_conversation_date = '$js_next_conversation_date'
+                                WHERE 
+                                    employee_id = '$jr->employee_id'
+                            ");
+                            \DB::commit();
+
                             echo '$changeType updateDueDate.  EMPLID '.$demo->employee_id.'.  oldDueDate '.$jr->next_conversation_date.'.  newDueDate '.$initNextConversationDate.'.  '; echo "\r\n";
                         } else {
                             // SKIP if no change
@@ -577,6 +603,7 @@ class CalcNextConversationDate extends Command
         );
         $this->info(Carbon::now()->format('c').' - Last Run Date Updated to: '.$start_time);
         $end_time = Carbon::now();
+        $updated_employees = json_encode($updateemp);
         DB::table('job_sched_audit')->updateOrInsert(
             [
                 'id' => $audit_id
