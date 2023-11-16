@@ -592,18 +592,6 @@
 					}
 				});
 
-				$('#abtn_search_reset').click(function(e) {
-					e.preventDefault();
-					$('#add_superv').val('all');
-					$('#acriteria').val('all');
-					$('#asearch_text').val(null);
-					$('#add_level0').val(null);
-					$('#add_level1').val(null);
-					$('#add_level2').val(null);
-					$('#add_level3').val(null);
-					$('#add_level4').val(null);
-					$('#abtn_search').click();
-				});
 
 				$('#add_superv').change(function (e){
 					e.preventDefault();
