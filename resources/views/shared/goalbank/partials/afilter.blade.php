@@ -104,6 +104,8 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
+
+    $(document).ready(function() {
         $('#add_level0').select2({
             placeholder: 'Select Organization',
             allowClear: true,
@@ -127,26 +129,26 @@
         });
         
         $('#add_level1').select2({
-            placeholder: 'Select Level 1',
-            allowClear: true,
-            ajax: {
-                url: '{{ "/".request()->segment(1)."/org-list/3/1" }}'
-                , dataType: 'json'
-                , delay: 250
-                , data: function(params) {
-                    var query = {
-                        'q': params.term,
-                        'alevel0': $('#add_level0').children("option:selected").val()
-                    , }
-                    return query;
+                placeholder: 'Select Level 1',
+                allowClear: true,
+                ajax: {
+                    url: '{{ "/".request()->segment(1)."/org-list/3/1" }}'
+                    , dataType: 'json'
+                    , delay: 250
+                    , data: function(params) {
+                        var query = {
+                            'q': params.term,
+                            'alevel0': $('#add_level0').children("option:selected").val()
+                        , }
+                        return query;
+                    }
+                    , processResults: function(data) {
+                        return {
+                            results: data
+                            };
+                    }
+                    , cache: false
                 }
-                , processResults: function(data) {
-                    return {
-                        results: data
-                        };
-                }
-                , cache: false
-            }
         });
 
         $('#add_level2').select2({
@@ -159,8 +161,8 @@
                 , data: function(params) {
                     var query = {
                         'q': params.term,
-                        'alevel0': $('add_level0').children("option:selected").val(),
-                        'alevel1': $('add_level1').children("option:selected").val()
+                        'alevel0': $('#add_level0').children("option:selected").val(),
+                        'alevel1': $('#add_level1').children("option:selected").val()
                     , }
                     return query;
                 }
@@ -242,22 +244,22 @@
 
         $('#add_level4').change(function (e){
             e.preventDefault();
-            $('#abtn_search').click();
+            //$('#abtn_search').click();
         });
 
         $('#add_superv').change(function (e){
             e.preventDefault();
-            $('#abtn_search').click();
+            //$('#abtn_search').click();
         });
 
         $('#acriteria').change(function (e){
             e.preventDefault();
-            $('#abtn_search').click();
+            //$('#abtn_search').click();
         });
 
         $('#asearch_text').change(function (e){
             e.preventDefault();
-            $('#abtn_search').click();
+            //$('#abtn_search').click();
         });
 
         $('#asearch_text').keydown(function (e){
@@ -269,14 +271,19 @@
 
         $('#abtn_search_reset').click(function(e) {
         	e.preventDefault();
-        	$('#acriteria').val('all');
-        	$('#asearch_text').val(null);
-        	$('#add_superv').val('all');
-        	$('#add_level0').val(null);
-        	$('#add_level1').val(null);
-        	$('#add_level2').val(null);
-        	$('#add_level3').val(null);
-        	$('#add_level4').val(null);
+                $('#add_superv').val('all');
+                $('#acriteria').val('all');
+                $('#asearch_text').val(null);
+                $('#add_level0').val(null).trigger('change');
+                $('#add_level1').val(null).trigger('change');
+                $('#add_level2').val(null).trigger('change');
+                $('#add_level3').val(null).trigger('change');
+                $('#add_level4').val(null).trigger('change');
+
+                var dataTable = $('#aemployee-list-table').DataTable();
+                // Reload the DataTable
+                dataTable.ajax.reload();
+                $("#anav-list-tab").click();
         });
 
         $('#add_level0').on('select2:select', function (e) {
@@ -342,9 +349,9 @@
         $('#add_level4').on('select2:unselect', function (e) {
             e.preventDefault();
             $('#add_level4').val(null).trigger('change');
-            $('#abtn_search').click();
+            //$('#abtn_search').click();
         });
-
+    } );
     </script>
 
 @endpush
