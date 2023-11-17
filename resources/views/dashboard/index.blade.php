@@ -14,9 +14,13 @@
                 <div class="bg-white border-b rounded p-2 mt-2 shadow-sm">
                     {{-- <x-profile-pic></x-profile-pic> --}}
                     @if($supervisorListCount <= 1)
-                        @foreach($supervisorList as $supv)
-                            {{ $supv ? $supv->user_name : 'No supervisor' }}
-                        @endforeach
+                        @if($supervisorListCount == 1)
+                            @foreach($supervisorList as $supv)
+                                {{ $supv ? $supv->user_name : 'No supervisor' }}
+                            @endforeach
+                        @else
+                            Vacant
+                        @endif
                     @else
                         <label for="supervisor_btn">
                             <button type="button" icon="fas fa-xs fa-ellipsis-v" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
