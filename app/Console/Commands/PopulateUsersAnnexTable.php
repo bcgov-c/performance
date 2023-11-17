@@ -291,17 +291,10 @@ class PopulateUsersAnnexTable extends Command
              //add a step 7 that displays supervisor name = "Vacant" if all of the above return no data?
              $this->info(Carbon::now()->format('c')." - Process vacant supervisors...");
              \DB::statement("
-             UPDATE users_annex AS target,
-                    (SELECT ua.id, em.supervisor_emplid, em.supervisor_name, em.supervisor_name2, em.supervisor_email, em.supervisor_position_number, em.supervisor_userid,
-                        (SELECT 1 FROM users_annex uax WHERE uax.user_id = ua.user_id AND uax.reporting_to_employee_id IS NOT NULL LIMIT 1) AS manager_updated
-                    FROM users_annex AS ua, employee_demo AS ed, employee_managers AS em
-                    WHERE ua.employee_id = ed.employee_id
-                        AND ua.empl_record = ed.empl_record
-                        AND ua.employee_id = em.employee_id
-                        AND ed.position_number = em.position_number) AS source
+             UPDATE users_annex as target
                 SET 
                     target.reporting_to_name = 'Vacant'
-                WHERE target.id = source.id
+                WHERE 1 = 1
                     AND (target.reporting_to_name IS NULL OR target.reporting_to_name = '')
              ");
             
