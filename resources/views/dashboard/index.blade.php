@@ -20,7 +20,7 @@
                             @endforeach
                         @else
                             Vacant
-                        @if
+                        @endif
                     @else
                         <label for="supervisor_btn">
                             <button type="button" icon="fas fa-xs fa-ellipsis-v" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
