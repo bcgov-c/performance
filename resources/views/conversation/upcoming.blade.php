@@ -254,6 +254,7 @@ i {
         </div>
         @endif
     </div> 
+
     
 
     @include('conversation.partials.view-conversation-modal')
@@ -320,6 +321,7 @@ i {
   var sup_supervisor_signed = $('#sup_supervisor_signed').val();
   var unsave_warning = false;
   
+  var comment_changed = false;
   var comment1_changed = false;
   var comment2_changed = false;
   var comment3_changed = false;
