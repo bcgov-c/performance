@@ -2,6 +2,8 @@ function updateConversation(conversation_id) {
                 $.ajax({
                     url: '/conversation/' + conversation_id
                     , success: function(result) {
+                        comment_changed = false;
+                        console.log('comment_changed ' + comment_changed);
                         modal_open=true;
                         is_viewer = result.is_viewer;
                         isSupervisor = result.view_as_supervisor;
@@ -136,6 +138,12 @@ function updateConversation(conversation_id) {
                             $("input[name=check_two_][value=0]").prop('checked', true);
                         }
                         
+
+                        if (!isSupervisor) {
+                            $('.empSaveAllComments').show();
+                        } else {
+                            $('.supSaveAllComments').show();
+                        }  
 
                         $("#locked-message").addClass("d-none");
                         
