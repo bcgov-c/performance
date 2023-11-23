@@ -16,6 +16,7 @@ use App\Models\DashboardNotification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Yajra\Datatables\Datatables;
+use Illuminate\Support\Facades\Http;
 
 class DashboardController extends Controller
 {
@@ -462,6 +463,52 @@ class DashboardController extends Controller
                 AND target.user_id = {$userid}
         ");
 
+    }
+
+    public function checkApi(){
+        //$URL = "https://gbchruatd.chips.gov.bc.ca:7001/PSIGW/RESTListeningConnector/GBCHRUAT/PTLOOKUPXLAT_REST.v1/XLAT_Lookup/HR_STATUS/ENG/2023-01-01/?fieldVal=A";
+       
+        $URL = "https://gbchruatd.chips.gov.bc.ca:7001/PSIGW/RESTListeningConnector/GBCHRUAT/PTLOOKUPXLAT_REST.v1/XLAT_Lookup/EMPL_STATUS///?fieldVal=";
+        
+        // Initialize cURL
+        $ch = curl_init($URL);
+
+        // Set cURL options
+        curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'DEFAULT@SECLEVEL=1');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        // Execute cURL and get the response
+        $response = curl_exec($ch);
+
+        // Check for cURL errors
+        $error = curl_errno($ch);
+        $errorMessage = curl_error($ch);
+
+        // Close the cURL session
+        curl_close($ch);
+
+        // Check if there are cURL errors
+        if ($error) {
+            // Handle cURL error
+            echo "cURL Error: $errorMessage";
+            return;
+        }
+
+        // Load XML string directly into SimpleXMLElement
+        $xml = simplexml_load_string($response);
+
+        // Check if XML parsing is successful
+        if ($xml === false) {
+            // Handle XML parsing error
+            echo "Error parsing XML";
+            return;
+        }
+
+        // Convert SimpleXMLElement to array
+        $data = json_decode(json_encode($xml), true);
+
+        // Use $data as needed (this is an array representation of the XML)
+        dd($data);
     }
 
 }
