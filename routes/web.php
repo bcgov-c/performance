@@ -38,6 +38,7 @@ use App\Http\Controllers\UserPreferenceController;
             require __DIR__ . '/hradmin.php';
             require __DIR__ . '/sysadmin.php';
         });
+        Route::get('/dashboard/check-api',[DashboardController::class, 'checkApi'])->middleware(['auth'])->name('dashboard.check-api');
     });
 
     Route::get('/my-performance', function () {
