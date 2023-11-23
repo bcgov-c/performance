@@ -201,6 +201,7 @@
 					scrollX: true,
 					stateSave: true,
 					deferRender: true,
+					searching: false,
 					ajax: {
 						url: "{{ route(request()->segment(1).'.goalbank.getgoalinds', $goaldetail->id) }}",
 						data: function(d) {
@@ -572,17 +573,17 @@
 				});
 				$('#add_level4').change(function (e) {
 					e.preventDefault();
-					$('#abtn_search').click();
+					//$('#abtn_search').click();
 				});
 
 				$('#acriteria').change(function (e){
 					e.preventDefault();
-					$('#abtn_search').click();
+					//$('#abtn_search').click();
 				});
 
 				$('#asearch_text').change(function (e){
 					e.preventDefault();
-					$('#abtn_search').click();
+					//$('#abtn_search').click();
 				});
 
 				$('#asearch_text').keydown(function (e){
@@ -595,7 +596,7 @@
 
 				$('#add_superv').change(function (e){
 					e.preventDefault();
-					$('#abtn_search').click();
+					//$('#abtn_search').click();
 				});
 
 				$(window).on('beforeunload', function(){

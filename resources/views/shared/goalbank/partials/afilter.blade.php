@@ -244,22 +244,22 @@
 
         $('#add_level4').change(function (e){
             e.preventDefault();
-            $('#abtn_search').click();
+            //$('#abtn_search').click();
         });
 
         $('#add_superv').change(function (e){
             e.preventDefault();
-            $('#abtn_search').click();
+            //$('#abtn_search').click();
         });
 
         $('#acriteria').change(function (e){
             e.preventDefault();
-            $('#abtn_search').click();
+            //$('#abtn_search').click();
         });
 
         $('#asearch_text').change(function (e){
             e.preventDefault();
-            $('#abtn_search').click();
+            //$('#abtn_search').click();
         });
 
         $('#asearch_text').keydown(function (e){
@@ -279,6 +279,11 @@
                 $('#add_level2').val(null).trigger('change');
                 $('#add_level3').val(null).trigger('change');
                 $('#add_level4').val(null).trigger('change');
+
+                var dataTable = $('#aemployee-list-table').DataTable();
+                // Reload the DataTable
+                dataTable.ajax.reload();
+                $("#anav-list-tab").click();
         });
 
         $('#add_level0').on('select2:select', function (e) {
@@ -344,7 +349,7 @@
         $('#add_level4').on('select2:unselect', function (e) {
             e.preventDefault();
             $('#add_level4').val(null).trigger('change');
-            $('#abtn_search').click();
+            //$('#abtn_search').click();
         });
     } );
     </script>
