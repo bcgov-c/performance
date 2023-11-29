@@ -585,6 +585,7 @@ class ConversationController extends Controller
         if(is_array($request->participant_id)){
             foreach ($request->participant_id as $key => $value) {
                 $is_direct = false;
+                $switch = false;
                 // $mgrinfo_0 = DB::table('users')                        
                 //                         ->select('reporting_to')
                 //                         ->where('id', '=', $value)
@@ -604,6 +605,7 @@ class ConversationController extends Controller
                     ]);
                     $actualOwnerRole = 'mgr';
                     $is_direct = true;
+                    $switch = true;
                 } 
 
                 // $mgrinfo_1 = DB::table('users')                        
@@ -624,7 +626,52 @@ class ConversationController extends Controller
                         'role' => 'mgr',
                     ]);
                     $is_direct = true;
+                    $switch = true;
                 }
+
+                if(!$switch){
+                    $mgrinfo_0 = DB::table('users')                        
+                                     ->select('reporting_to')
+                                     ->where('id', '=', $value)
+                                     ->get();
+                    if($mgrinfo_0[0]->reporting_to == $actualOwner){
+                        ConversationParticipant::updateOrCreate([
+                            'conversation_id' => $conversation->id,
+                            'participant_id' => $value,
+                            'role' => 'emp',
+                        ]);
+    
+                        ConversationParticipant::updateOrCreate([
+                            'conversation_id' => $conversation->id,
+                            'participant_id' => $actualOwner,
+                            'role' => 'mgr',
+                        ]);
+                        $actualOwnerRole = 'mgr';
+                        $is_direct = true;
+                        $switch = true;
+                    }    
+
+                    $mgrinfo_1 = DB::table('users')                        
+                                     ->select('reporting_to')
+                                     ->where('id', '=', $actualOwner)
+                                     ->get();
+                    if($mgrinfo_1[0]->reporting_to == $value){
+                        ConversationParticipant::updateOrCreate([
+                            'conversation_id' => $conversation->id,
+                            'participant_id' => $actualOwner,
+                            'role' => 'emp',
+                        ]);
+    
+                        ConversationParticipant::updateOrCreate([
+                            'conversation_id' => $conversation->id,
+                            'participant_id' => $value,
+                            'role' => 'mgr',
+                        ]);
+                        $is_direct = true;
+                        $switch = true;
+                    }
+                }
+
 
                 if (!$is_direct) {
                    $shareinfo_0 = DB::table('shared_profiles')                        
@@ -675,6 +722,7 @@ class ConversationController extends Controller
         } else {
                 $value = $request->participant_id;
                 $is_direct = false;
+                $switch = false;
                 // $mgrinfo_0 = DB::table('users')                        
                 //                         ->select('reporting_to')
                 //                         ->where('id', '=', $value)
@@ -694,6 +742,8 @@ class ConversationController extends Controller
                     ]);
                     $is_direct = true;
                     $actualOwnerRole = 'mgr';
+
+                    $switch = true;
                 } 
 
                 // $mgrinfo_1 = DB::table('users')                        
@@ -714,7 +764,54 @@ class ConversationController extends Controller
                         'role' => 'mgr',
                     ]);
                     $is_direct = true;
+
+                    $switch = true;
                 }
+
+                if (!$switch) {
+                    $mgrinfo_0 = DB::table('users')                        
+                                         ->select('reporting_to')
+                                         ->where('id', '=', $value)
+                                         ->get();
+                    if($mgrinfo_0[0]->reporting_to == $actualOwner){
+                        ConversationParticipant::updateOrCreate([
+                            'conversation_id' => $conversation->id,
+                            'participant_id' => $value,
+                            'role' => 'emp',
+                        ]);
+    
+                        ConversationParticipant::updateOrCreate([
+                            'conversation_id' => $conversation->id,
+                            'participant_id' => $actualOwner,
+                            'role' => 'mgr',
+                        ]);
+                        $is_direct = true;
+                        $actualOwnerRole = 'mgr';
+    
+                        $switch = true;
+                    } 
+                    
+                    $mgrinfo_1 = DB::table('users')                        
+                                         ->select('reporting_to')
+                                         ->where('id', '=', $actualOwner)
+                                         ->get();
+                    if($mgrinfo_1[0]->reporting_to == $value){
+                        ConversationParticipant::updateOrCreate([
+                            'conversation_id' => $conversation->id,
+                            'participant_id' => $actualOwner,
+                            'role' => 'emp',
+                        ]);
+    
+                        ConversationParticipant::updateOrCreate([
+                            'conversation_id' => $conversation->id,
+                            'participant_id' => $value,
+                            'role' => 'mgr',
+                        ]);
+                        $is_direct = true;
+                        $switch = true;
+                    }
+                }
+
 
                 if (!$is_direct) {
                    $shareinfo_0 = DB::table('shared_profiles')                        
