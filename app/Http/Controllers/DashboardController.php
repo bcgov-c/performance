@@ -22,6 +22,9 @@ class DashboardController extends Controller
     public function index(Request $request) {
         $user = Auth::user();
         Log::info('user id:' . Auth::id());
+        if($user->hasRole('Supervisor')){
+            Log::info('user id:' . Auth::id() . ' is supervisor.');
+        }
         
         if ($user->hasRole('Service Representative')) {
             session()->put('sr_user', true);
