@@ -16,6 +16,8 @@ use App\Models\DashboardNotification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Yajra\Datatables\Datatables;
+use Illuminate\Support\Facades\Http;
+use App\Models\UserDemoJrView;
 
 class DashboardController extends Controller
 {
@@ -25,6 +27,25 @@ class DashboardController extends Controller
         if ($user->hasRole('Service Representative')) {
             session()->put('sr_user', true);
         } 
+        
+        //temp solution for #1168 (need Dennis' help to address the root reason)
+        $user_id = Auth::id();
+        if($user_id == 22507) {
+            $user_info = UserDemoJrView::whereRaw("user_id = {$user_id}")->first();
+            if ($user_info->reportees > 0) {
+                $result = DB::table('model_has_roles')
+                            ->updateOrInsert(
+                                [
+                                    'model_id' => $user_id,
+                                    'role_id' => 2,
+                                    'model_type' => 'App\\Models\\User'
+                                ],
+                                [
+                                    'reason' => '' 
+                                ]
+                            );
+            }
+        }
 
         $notifications = DashboardNotification::where('user_id', Auth::id())
                         ->where(function ($q)  {
