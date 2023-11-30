@@ -29,6 +29,11 @@
             HR Admin Access
         </x-button>
     </div>
+    <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'resource.access-performance' ? 'border-primary' : ''}}">
+        <x-button :href="route('resource.access-performance')" style="">
+            Accessing MyPerformance
+        </x-button>
+    </div>
     <div class="px-4 py-1 mr-2 border-bottom {{Route::current()->getName() == 'resource.contact' ? 'border-primary' : ''}}">
         <x-button :href="route('resource.contact')" style="">
             Contact Us

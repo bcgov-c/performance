@@ -66,6 +66,16 @@ class ResourceController extends Controller
         return view('resource.hr-admin', compact('data', 't'));
     }
 
+
+    public function accessPerformance(Request $request)
+    {   
+        $t = $request->t;
+        $data = $this->pullContent('access-performance');  
+        
+        return view('resource.access-performance', compact('data', 't'));
+    }
+
+
     private function pullContent($category){
         $resourceData = DB::table('resource_content')
             ->select('question', 'answer', 'answer_file')
