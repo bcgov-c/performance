@@ -10,7 +10,6 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\EmployeeDemo;
-use App\Models\UserDemoJrView;
 use App\Models\UsersAnnex;
 use App\Models\EmployeeDemoJunior;
 use App\Models\PreferredSupervisor;
@@ -169,18 +168,6 @@ class User extends Authenticatable
     public function reportees() {
         return $this->hasMany('App\Models\User', 'reporting_to');
     }
-
-    public function reporteesNumber() {
-        $reportees = UserDemoJrView::
-            where('user_id', Auth::id())
-            ->first();
-        $reportees_number = $reportees->reportees;
-        if($reportees_number <= 0) {
-            return false;
-        }
-        return true;
-
-    }
     
     public function avaliableReportees() {
         $reportee_emplids = [];
@@ -209,8 +196,7 @@ class User extends Authenticatable
     }
 
     public function hasSupervisorRole() {
-        //return $this->reportees()->count() > 0;
-        return $this->reporteesNumber();
+        return $this->reportees()->count() > 0;
     }
 
     public function EmployeeSupervisor() {
