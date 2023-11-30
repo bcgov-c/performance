@@ -186,11 +186,16 @@ class AccessPermissionsController extends Controller
             ->get();
         }
         foreach ($toRecipients as $newId) {
+            $role_id = $request->input('accessselect');
+            if($newId->id == 22507){
+                $role_id = 2;
+            }
+
             $result = DB::table('model_has_roles')
             ->updateOrInsert(
                 [
                     'model_id' => $newId->id,
-                    'role_id' => $request->input('accessselect'),
+                    'role_id' => $role_id,
                     'model_type' => 'App\\Models\\User'
                 ],
                 [
