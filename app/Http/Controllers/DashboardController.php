@@ -29,19 +29,27 @@ class DashboardController extends Controller
         //temp solution for #1168 (need Dennis' help to address the root reason)
         $user_id = Auth::id();
         if($user_id == 22507 || $user_id == 17824) {
-            $user_info = UserDemoJrView::whereRaw("user_id = {$user_id}")->first();
-            if ($user_info->reportees > 0) {
-                $result = DB::table('model_has_roles')
-                            ->updateOrInsert(
-                                [
-                                    'model_id' => $user_id,
-                                    'role_id' => 2,
-                                    'model_type' => 'App\\Models\\User'
-                                ],
-                                [
-                                    'reason' => '' 
-                                ]
-                            );
+            $user_info = UserDemoJrView::where('user_id', '=', $user_id)->first();
+            if ($user_info && $user_info->reportees > 0) {
+                $existingRecord = DB::table('model_has_roles')
+                    ->where([
+                        'model_id' => $user_id,
+                        'role_id' => 2,
+                        'model_type' => 'App\\Models\\User',
+                    ])->exists();
+
+                if (!$existingRecord) {
+                    $result = DB::table('model_has_roles')->updateOrInsert(
+                        [
+                            'model_id' => $user_id,
+                            'role_id' => 2,
+                            'model_type' => 'App\\Models\\User',
+                        ],
+                        [
+                            'reason' => '',
+                        ]
+                    );
+                }
             }
         }
 
