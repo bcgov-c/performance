@@ -16,6 +16,7 @@ use App\Models\DashboardNotification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Yajra\Datatables\Datatables;
+use App\Models\UserDemoJrView;
 
 class DashboardController extends Controller
 {
