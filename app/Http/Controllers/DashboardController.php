@@ -28,6 +28,26 @@ class DashboardController extends Controller
         if ($user->hasRole('Service Representative')) {
             session()->put('sr_user', true);
         } 
+
+
+            $user_id = Auth::id();
+        
+            $user_info = UsersAnnex::where('user_id', '=', $user_id)->first();
+            if ($user_info && $user_info->reportees > 0) {
+                $existingRecord = DB::table('model_has_roles')
+                    ->where([
+                        'model_id' => $user_id,
+                        'role_id' => 2,
+                        'model_type' => 'App\\Models\\User',
+                    ])->exists();
+                if (!$existingRecord) {
+                        $result = DB::table('model_has_roles')->insert([
+                            'model_id' => $user_id,
+                            'role_id' => 2,
+                            'model_type' => 'App\\Models\\User',
+                        ]);
+                  }
+            }
         
         $notifications = DashboardNotification::where('user_id', Auth::id())
                         ->where(function ($q)  {
@@ -372,6 +392,11 @@ class DashboardController extends Controller
                 INSERT INTO model_has_roles (role_id, model_type, model_id)
                 VALUES (2, 'App\Models\User', '".$supvUser->id."');
                 ");
+
+                \DB::statement("
+                UPDATE users_annex SET isSupervisor = 1 WHERE user_id = '".$supvUser->id."';
+                ");
+
             } 
         }
         return redirect()->back();
