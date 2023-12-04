@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Session;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\Http;
 use App\Models\UserDemoJrView;
+use App\Models\UsersAnnex;
 
 class DashboardController extends Controller
 {
@@ -27,11 +28,11 @@ class DashboardController extends Controller
         if ($user->hasRole('Service Representative')) {
             session()->put('sr_user', true);
         } 
+
+
+            $user_id = Auth::id();
         
-        //temp solution for #1168 (need Dennis' help to address the root reason)
-        $user_id = Auth::id();
-        if($user_id == 22507 || $user_id == 17824) {
-            $user_info = UserDemoJrView::where('user_id', '=', $user_id)->first();
+            $user_info = UsersAnnex::where('user_id', '=', $user_id)->first();
             if ($user_info && $user_info->reportees > 0) {
                 $existingRecord = DB::table('model_has_roles')
                     ->where([
@@ -39,22 +40,15 @@ class DashboardController extends Controller
                         'role_id' => 2,
                         'model_type' => 'App\\Models\\User',
                     ])->exists();
-
                 if (!$existingRecord) {
-                    $result = DB::table('model_has_roles')->updateOrInsert(
-                        [
+                        $result = DB::table('model_has_roles')->insert([
                             'model_id' => $user_id,
                             'role_id' => 2,
                             'model_type' => 'App\\Models\\User',
-                        ],
-                        [
-                            'reason' => '',
-                        ]
-                    );
-                }
+                        ]);
+                  }
             }
-        }
-
+        
         $notifications = DashboardNotification::where('user_id', Auth::id())
                         ->where(function ($q)  {
                             $q->whereExists(function ($query) {
@@ -385,6 +379,25 @@ class DashboardController extends Controller
             ], [ 
                 'reporting_to_id' => $supvUser->id 
             ]);
+            //also update supervisor role for supvUser
+            //check if user sup role is existing
+            $supModel = User::join('model_has_roles AS mr', 'users.id', 'mr.model_id')
+                        ->select('users.id')
+                        ->whereNull('users.date_deleted')
+                        ->where('mr.model_id', $supvUser->id)
+                        ->where('mr.role_id', 2)
+                        ->count();
+            if($supModel <= 0) {
+                \DB::statement("
+                INSERT INTO model_has_roles (role_id, model_type, model_id)
+                VALUES (2, 'App\Models\User', '".$supvUser->id."');
+                ");
+
+                \DB::statement("
+                UPDATE users_annex SET isSupervisor = 1 WHERE user_id = '".$supvUser->id."';
+                ");
+
+            } 
         }
         return redirect()->back();
     }
@@ -412,6 +425,23 @@ class DashboardController extends Controller
 
     public function updateSupervisorDetails($userid) {
         
+
+        //if this user is the only employee for the supervisor. remove supervsior role from his current supervisor
+        $supervisor = UsersAnnex::select('reporting_to_employee_id')
+                    ->where('user_id', $userid)
+                    ->value('reporting_to_employee_id');
+
+        $supervisor_detail = UsersAnnex::select('user_id', 'reportees')
+                            ->where('employee_id', $supervisor)
+                            ->first();
+
+        if ($supervisor_detail && $supervisor_detail->reportees <= 0) {
+                \DB::statement("
+                    DELETE FROM model_has_roles 
+                    WHERE role_id = 2 AND model_id = '".$supervisor_detail->user_id."';
+                ");
+        }
+
         \DB::statement("
             UPDATE users_annex AS ua
             SET 
@@ -490,6 +520,7 @@ class DashboardController extends Controller
                 AND source.manager_updated IS NULL
                 AND target.user_id = {$userid}
         ");
+        
 
     }
 
