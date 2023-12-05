@@ -187,7 +187,7 @@
             trigger: 'click',
         });
         
-        const minutes = 1;
+        const minutes = 15;
         const SessionTime = 1000 * 60 * minutes;
         
         $(document).ready(function () { 

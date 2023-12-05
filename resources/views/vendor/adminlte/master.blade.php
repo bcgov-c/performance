@@ -195,7 +195,7 @@
 
     <script>
         // Check session expiration status every minute (adjust as needed)
-        const minutes = 2;
+        const minutes = 120;
         const SessionTime = 1000 * 60 * minutes;
         setInterval(checkSessionExpiration, SessionTime);
 

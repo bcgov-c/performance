@@ -146,7 +146,7 @@
             $('.text-danger').html('');
             $('.form-control').removeClass('is-invalid');
             
-            const minutes = 1;
+            const minutes = 15;
             const SessionTime = 1000 * 60 * minutes;
             const myTimeout = setTimeout(sessionWarning, SessionTime);    
             
