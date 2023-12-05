@@ -492,7 +492,7 @@
         });
            
         function setTimeRoll(){
-                const minutes = 15;
+                const minutes = 1;
                 const SessionTime = 1000 * 60 * minutes;
                 if (myTimeout) { clearInterval(myTimeout) };
                 //const myTimeout = setTimeout(sessionWarning, SessionTime);
