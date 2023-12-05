@@ -64,12 +64,14 @@ class UpdateGUIDByEmployeeId extends Command
         //Process users with new GUID in employee_demo table;
         $counter = 0;
         $updatecounter = 0;
-        $userList = User::select('id')
+        $userList = User::select('id', 'employee_id', 'name')
         ->whereRaw("EXISTS (SELECT 1 FROM employee_demo WHERE employee_demo.employee_id = users.employee_id and employee_demo.guid <> users.guid AND NOT employee_demo.guid IS NULL AND TRIM(employee_demo.guid) <> '' AND employee_demo.date_updated = (SELECT MAX(ed.date_updated) FROM employee_demo ed WHERE ed.employee_id = employee_demo.employee_id))")
         ->distinct()
         ->orderBy('users.employee_id')
         ->orderBy('users.empl_record')
         ->get();
+
+        $log_content = '';
         foreach ($userList as $item) {
             DB::beginTransaction();
             try {
@@ -101,6 +103,8 @@ class UpdateGUIDByEmployeeId extends Command
                 DB::commit();
                 $updatecounter += 1;
                 echo 'Processed UID '.$item->id.'. Updated GUID '.$old_guid.' to '.$new_guid.'.'; echo "\r\n";
+                
+                $log_content .= '<br/> Processed UID: '.$item->id.', EMPLOYEE ID: '. $item->employee_id .', Name: '. $item->name .'. Updated GUID '.$old_guid.' to '.$new_guid.'.';
             } catch (Exception $e) {
                 echo 'Unable to update UID '.$item->id.' from '.$old_guid.' to '.$new_guid.'.'; echo "\r\n";
                 DB::rollback();
@@ -118,7 +122,7 @@ class UpdateGUIDByEmployeeId extends Command
                 'start_time' => date('Y-m-d H:i:s',strtotime($start_time)),
                 'end_time' => date('Y-m-d H:i:s',strtotime($end_time)),
                 'status' => 'Completed',
-                'details' => 'Processed '.$counter.' and Updated '.$updatecounter.' rows.',
+                'details' => 'Processed '.$counter.' and Updated '.$updatecounter.' rows.' . '<br/> ' . $log_content,
             ]
         );
         $this->info('CalcNextConversationDate, Completed: '.$end_time);
