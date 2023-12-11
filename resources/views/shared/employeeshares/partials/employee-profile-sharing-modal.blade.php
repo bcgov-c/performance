@@ -15,7 +15,7 @@
                     <div class="shared-with-list">None</div> 
                 <strong>Share this profile with another user</strong> 
                 <p>Supervisors and administrators may share an employee's PDP profile with another supervisor or staff for a legitimate business reason. The profile should only be shared with people who normally handle employees' permanent personnel records (i.e. Public Service Agency or co-supervisors). An employee may also wish to share their profile with someone other than a direct supervisor (for example, a hiring manager). In order to do this - the employee's consent is required.</p> 
-                <form id="share-profile-form" action=" {{ route(request()->segment(1).'.employeeshares.share-profile') }}" method="POST" onsubmit="confirm('Are you sure you want to share the selected profile(s)?')">  
+                <form id="share-profile-form" action=" {{ route(request()->segment(1).'.employeeshares.share-profile') }}" method="POST">
                     @csrf 
                     <input type="hidden" name="shared_id"> 
                     <div class="row"> 
