@@ -162,7 +162,12 @@
         $('form').on('submit', () => {
             window.isDirty = false;
             if (no_msg == false) {
-                confirm('Are you sure you want to update Goal ?');
+                // Display a confirmation dialog
+                const userConfirmed = confirm('Are you sure you want to update Goal ?');                
+                // Cancel the form submission if the user did not confirm
+                if (!userConfirmed) {
+                    event.preventDefault();
+                }
             }
         });
         let originalData = $('form').serialize();
