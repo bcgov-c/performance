@@ -640,7 +640,7 @@ $(".share-with-users").select2({
                                 if(result.success){
                                     autosave = false;
                                     no_warning = true;
-                                    alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');
+                                    alert('You have not saved your work in 20 minutes. To protect your work, it has been automatically saved.');
                                     //window.location.href= '/goal';
                                     $('.alert-danger').show();
                                     $('.alert-danger').html('Your goal has been saved.');
