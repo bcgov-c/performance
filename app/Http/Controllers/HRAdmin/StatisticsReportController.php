@@ -43,7 +43,10 @@ class StatisticsReportController extends Controller
         ];
 
         $this->overdue_groups = [
-            'overdue' => [-999999,0],
+            //'overdue' => [-999999,0],
+            'overdue < 1 month' => [-30, 0],
+            'overdue: 1 month to 4 months' => [-120, -31],
+            'overdue: > 4 months' => [-999999, -121],
             '< 1 week' => [1,7],
             '1 week to 1 month' => [8,30],
             '> 1 month' => [31,999999],
