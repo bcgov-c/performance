@@ -205,7 +205,7 @@
             no_msg = true;    
             $('#datatype').val('auto');
             $(".btn-primary").trigger("click");
-            alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');    
+            alert('You have not saved your work in 20 minutes. To protect your work, it has been automatically saved.');    
         } 
 
     </script>
