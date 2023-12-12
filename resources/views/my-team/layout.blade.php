@@ -176,6 +176,7 @@
                 // Cancel the form submission if the user did not confirm
                 if (!userConfirmed) {
                     event.preventDefault();
+                    window.location.reload(true);
                 } else {
                     $.ajax({
                         url: $form.attr('action'),
@@ -206,6 +207,10 @@
                         }
                     });
                 }                
+            });
+
+            $('#employee-profile-sharing-modal').on('hidden.bs.modal', function () {
+                window.location.reload(true);
             });
 
             $(document).on('change', '.is-shared', function (e) {
