@@ -49,9 +49,9 @@ class SysadminStatisticsReportController extends Controller
 
         $this->overdue_groups = [
             //'overdue' => [-999999,0],
-            'overdue: < 1 month' => [-30, 0],
-            'overdue: 1-4 months' => [-120, -31],
-            'overdue: > 4 months' => [-999999, -121],
+            'Overdue: < 1 month' => [-30, 0],
+            'Overdue: 1-4 months' => [-120, -31],
+            'Overdue: > 4 months' => [-999999, -121],
             'Upcoming: < 1 week' => [1,7],
             'Upcoming: 1 week to 1 month' => [8,30],
             'Upcoming: > 1 month' => [31,999999],
