@@ -32,20 +32,39 @@ class DashboardController extends Controller
             $user_id = Auth::id();
         
             $user_info = UsersAnnex::where('user_id', '=', $user_id)->first();
-            if ($user_info && $user_info->reportees > 0) {
-                $existingRecord = DB::table('model_has_roles')
-                    ->where([
-                        'model_id' => $user_id,
-                        'role_id' => 2,
-                        'model_type' => 'App\\Models\\User',
-                    ])->exists();
-                if (!$existingRecord) {
-                        $result = DB::table('model_has_roles')->insert([
+            if ($user_info){
+                if($user_info->reportees > 0) {
+                    $existingRecord = DB::table('model_has_roles')
+                        ->where([
                             'model_id' => $user_id,
                             'role_id' => 2,
                             'model_type' => 'App\\Models\\User',
-                        ]);
-                  }
+                        ])->exists();
+                    if (!$existingRecord) {
+                            $result = DB::table('model_has_roles')->insert([
+                                'model_id' => $user_id,
+                                'role_id' => 2,
+                                'model_type' => 'App\\Models\\User',
+                            ]);
+                    }
+                } else {
+                    $reportings = User::select('id')->where('reporting_to', $user_id)->count();
+                    if($reportings > 0) {
+                        $existingRecord = DB::table('model_has_roles')
+                            ->where([
+                                'model_id' => $user_id,
+                                'role_id' => 2,
+                                'model_type' => 'App\\Models\\User',
+                            ])->exists();
+                        if (!$existingRecord) {
+                                $result = DB::table('model_has_roles')->insert([
+                                    'model_id' => $user_id,
+                                    'role_id' => 2,
+                                    'model_type' => 'App\\Models\\User',
+                                ]);
+                        }
+                    }
+                }
             }
         
         $notifications = DashboardNotification::where('user_id', Auth::id())
