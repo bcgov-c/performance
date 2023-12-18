@@ -64,6 +64,6 @@ class QueueStatusController extends Controller
             }
         }            
 
-
+        echo "Employees' roles updated.";
     }
 }
