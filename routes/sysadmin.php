@@ -313,6 +313,7 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
     Route::group(['middleware' => ['auth']], function() {    
         Route::get('/sysadmin/queue/status', [QueueStatusController::class, 'show']);
         Route::get('/sysadmin/queue/processes', [QueueStatusController::class, 'processes']);
+        Route::get('/sysadmin/queue/fixmodle', [QueueStatusController::class, 'fixModle']);
     });
 
 
