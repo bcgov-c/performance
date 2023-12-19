@@ -868,6 +868,9 @@ class GoalBankController extends Controller
 
     public function updategoalone(Request $request, $id) {
         $emailit = true;
+        if($request->input('emailit') == 'false'){
+            $emailit = false;
+        }
         
         $aselected_emp_ids = $request->auserCheck ? $request->auserCheck : [];
         // Get the old employees listing 
