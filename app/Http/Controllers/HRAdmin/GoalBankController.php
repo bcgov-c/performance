@@ -919,6 +919,9 @@ class GoalBankController extends Controller
         $aselected_emp_ids = $request->auserCheck ? $request->auserCheck : [];
 
         $emailit = true;
+        if($request->input('emailit') == 'false'){
+            $emailit = false;
+        }
 
         // Get the old employees listing 
         $old_ee_ids =  GoalSharedWith::join('users', 'goals_shared_with.user_id', 'users.id')
