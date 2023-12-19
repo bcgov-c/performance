@@ -156,15 +156,16 @@
             $('.change_supervisor').on('click', function(e) {
                 e.preventDefault();
                 var check = confirm("Are you sure you want to change supervisor?");
-                if(check == true){
+                if (check == true) {
                     // alert($(this).data('id'));
                     $.ajax({
                         url: "{{ route('dashboard.updateSupervisor') }}",
                         type: 'POST',
                         dataType: 'json',
-                        data: { id : $(this).data('id'), 
+                        data: { 
+                            id: $(this).data('id'),
                         },
-                        success: function (data) {
+                        complete: function () {
                             window.location.reload();
                         }
                     });
