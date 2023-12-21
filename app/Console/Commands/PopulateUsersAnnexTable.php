@@ -298,8 +298,13 @@ class PopulateUsersAnnexTable extends Command
                     AND (target.reporting_to_name IS NULL OR target.reporting_to_name = '')
              ");
             
-             \DB::commit();       
+             \DB::commit();
 
+             //#1186 sync users reporting_to with users_annex reporting_to_userid       
+             $this->info(Carbon::now()->format('c')." - Process users table reporting_to...");
+             \DB::table('users')
+             ->join('users_annex', 'users.employee_id', '=', 'users_annex.employee_id')
+             ->update(['users.reporting_to' => \DB::raw('users_annex.reporting_to_userid')]);
 
             $this->info(Carbon::now()->format('c')." - Commit all...");
         } catch (Exception $e) {
