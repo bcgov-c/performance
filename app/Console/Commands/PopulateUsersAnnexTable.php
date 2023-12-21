@@ -302,9 +302,13 @@ class PopulateUsersAnnexTable extends Command
 
              //#1186 sync users reporting_to with users_annex reporting_to_userid       
              $this->info(Carbon::now()->format('c')." - Process users table reporting_to...");
-             \DB::table('users')
-             ->join('users_annex', 'users.employee_id', '=', 'users_annex.employee_id')
-             ->update(['users.reporting_to' => \DB::raw('users_annex.reporting_to_userid')]);
+             DB::statement("
+                UPDATE users
+                JOIN users_annex ON users.employee_id = users_annex.employee_id
+                SET users.reporting_to = users_annex.reporting_to_userid
+                WHERE users.reporting_to <> users_annex.reporting_to_userid
+            ");
+            \DB::commit();
 
             $this->info(Carbon::now()->format('c')." - Commit all...");
         } catch (Exception $e) {
