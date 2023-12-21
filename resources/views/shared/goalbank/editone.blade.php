@@ -91,13 +91,13 @@
 				<div class="row">		
 					<div class="col-md-12 mb-12">		
 						<div class="form-check">
-							<input class="form-check-input" type="radio" name="emailit" id="emailit1" value="true">
+							<input class="form-check-input" type="radio" name="emailit" id="emailit1" value="1">
 							<label class="form-check-label" for="emailit1">
 								Yes
 							</label>
 						</div>
 						<div class="form-check">
-							<input class="form-check-input" type="radio" name="emailit" id="emailit2" value="false" checked>
+							<input class="form-check-input" type="radio" name="emailit" id="emailit2" value="0" checked>
 							<label class="form-check-label" for="emailit2">
 								No
 							</label>

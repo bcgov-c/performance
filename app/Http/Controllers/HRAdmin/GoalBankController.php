@@ -594,7 +594,7 @@ class GoalBankController extends Controller
         $current_user = User::find(Auth::id());
 
         $emailit = true;
-        if($request->input('emailit') == 'false'){
+        if($request->input('emailit') == '0'){
             $emailit = false;
         }
         
@@ -858,6 +858,9 @@ class GoalBankController extends Controller
         $current_user = Auth::id();
 
         $emailit = true;
+        if($request->input('emailit') == '0'){
+            $emailit = false;
+        }
 
         $organizationList = EmployeeDemoTree::select('id')
             ->whereIn('id', $selected_org_nodes)
@@ -919,7 +922,7 @@ class GoalBankController extends Controller
         $aselected_emp_ids = $request->auserCheck ? $request->auserCheck : [];
 
         $emailit = true;
-        if($request->input('emailit') == 'false'){
+        if($request->input('emailit') == '0'){
             $emailit = false;
         }
 
