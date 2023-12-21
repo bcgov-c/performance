@@ -550,7 +550,7 @@ class GoalBankController extends Controller
         $current_user = User::find(Auth::id());
 
         $emailit = true;
-        if($request->input('emailit') == 'false'){
+        if($request->input('emailit') == '0'){
             $emailit = false;
         }
 
@@ -798,6 +798,9 @@ class GoalBankController extends Controller
 
     public function updategoal(Request $request) {
         $emailit = true;
+        if($request->input('emailit') == '0'){
+            $emailit = false;
+        }
 
         $selected_org_nodes = $request->selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
         $selected_inherited = $request->selected_inherited ? json_decode($request->selected_inherited) : [];
@@ -868,7 +871,7 @@ class GoalBankController extends Controller
 
     public function updategoalone(Request $request, $id) {
         $emailit = true;
-        if($request->input('emailit') == 'false'){
+        if($request->input('emailit') == '0'){
             $emailit = false;
         }
         

@@ -67,6 +67,32 @@
 
 		<br>
 		<h6 class="text-bold">Step 2. Finish</h6>
+		<div class="card col-md-12">
+			<div class="card-body">
+				<div class="row">
+					<div class="col">
+						<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="All employees will receive a notification on their PDP homepage about the goal. By selecting &quot;Yes&quot; to this question, you will also send an alert to their email prompting them to log in and view the new goal."> </i>
+						<b>Send an email notification to all employees about the new goal?</b>
+					</div>
+				</div>
+				<div class="row">		
+					<div class="col-md-12 mb-12">		
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="emailit" id="emailit1" value="1">
+							<label class="form-check-label" for="emailit1">
+								Yes
+							</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="emailit" id="emailit2" value="1" checked>
+							<label class="form-check-label" for="emailit2">
+								No
+							</label>
+						</div>				
+					</div>
+				</div>
+			</div>
+		</div>	
 		<br>
 		<div class="col-md-3 mb-2">
 			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveChangesModal()" id="obtn_send" name="obtn_send" value="btn_send">Save Changes</button>
