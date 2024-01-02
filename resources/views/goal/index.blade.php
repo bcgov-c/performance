@@ -101,6 +101,25 @@
 
 @include('goal.partials.supervisor-goal')
 @include('goal.partials.goal-detail-modal')
+
+<div class="modal fade" id="unsavedChangesModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:1060"> 
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Unsaved Changes</h5>
+            </div>
+            <div class="modal-body">
+                <p>Save changes to this goal?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
+                <button type="button" class="btn btn-secondary" id="discardChangesBtn">Don't Save</button>
+                <button type="button" class="btn btn-secondary" id="cancelChangesBtn">Cancel</button>
+            </div>
+            </div>
+        </div>
+</div>
+
 <div class="modal fade" id="addGoalModal"  aria-labelledby="addModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
@@ -194,6 +213,10 @@
     </div>
   </div>
 </div>
+
+
+
+
     @push('css')
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
         <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}">
@@ -242,6 +265,7 @@
         var autosave = true;
         var no_warning = false;
         var myTimeout;
+        var saved = false;
         $('body').popover({
             selector: '[data-toggle]',
             trigger: 'click',
@@ -315,31 +339,81 @@
         $('#target_date').prop("readonly",true);
     });
     $(document).on('hide.bs.modal', '#addGoalModal', function(e) {
+        var title = $('#goal_title').val();
+        var isContentModified = false;
+        if(!saved) {
+                if (title.trim() !== '') {
+                    isContentModified = true;
+                }
+        } 
         modal_open = false;
-        const isContentModified = () => {
-            if ($('#what').val() !== '' || $('#measure_of_success').val() !== ''
-                 || $("#goal_title").val() !== '' || $('input[name=goal_type_id]').val() != 1 
-                 || $("input[name=start_date]").val() !== '' || $("input[name=target_date]").val() != ''
-                 ) {
-                return true;
-            } 
-            return false;
-        };
+        if (isContentModified) {
+            e.preventDefault();
+            $('#unsavedChangesModal').modal('show');
+        } else {
+            location.reload();
+        }    
+    });
+
+    $(document).on('click', '#saveChangesBtn', function(e){
         for (var i in CKEDITOR.instances){
             CKEDITOR.instances[i].updateElement();
         };
-        if(no_warning == false) {
-            if (isContentModified() && !confirm("If you continue you will lose any unsaved changes.")) {                
-                e.preventDefault();
-            } else {
-                location.reload();
-            } 
-        } else {
-            localStorage.setItem('savemsg', 'Your goal is saved');
-            alert('Your goal is saved');
-            location.reload();            
-        }
+        $.ajax({
+            url:'/goal',
+            type : 'POST',
+            data: $('#goal_form').serialize(),
+            success: function (result) {
+                console.log(result);
+                need_fresh = true;
+                if(result.success){
+                    //window.location.href= '/goal';
+                    $('.alert-danger').show();
+                    $('.alert-danger').html('Your goal has been saved.');
+                    $('.btn-submit').hide();
+                    $('.text-danger').hide();
+                    $('.form-control').removeClass('is-invalid');  
+                    saved = true;
+                }
+            },
+            error: function (error){
+                    console.log(error);
+                    need_fresh = false;
+                    autosave =  true;
+                    $('.btn-submit').show();
+                    $('.btn-submit').prop('disabled',false);
+                    $('.btn-submit').html('Save Changes');
+                    $('.alert-danger').html('<i class="fa fa-info-circle"></i> There are one or more errors on the page. Please review and try again.');
+                    $('.alert-danger').show();
+                    $('.modal-body').animate({scrollTop: 0},100);
+                    var errors = error.responseJSON.errors;
+                    $('.text-danger').each(function(i, obj) {
+                        $('.text-danger').text('');
+                    });
+                    Object.entries(errors).forEach(function callback(value, index) {
+                        var className = '.error-' + value[0];
+                        $('#addGoalModal input[name='+value[0]+']').addClass('is-invalid');
+                        $(className).text(value[1]);
+                    });
+                    //alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');
+                }
+        });       
+        $('#unsavedChangesModal').modal('hide');
     });
+
+
+    $(document).on('click', '#discardChangesBtn', function(e){
+        location.reload();
+        e.preventDefault();
+    });
+
+    $(document).on('click', '#cancelChangesBtn', function(e){
+        $('#unsavedChangesModal').modal('hide');
+        modal_open = true;
+        e.preventDefault();
+    });
+
+
 
     $(document).on('click', '.btn-submit', function(e){
         $('.btn-submit').prop('disabled',true);
@@ -620,7 +694,7 @@ $(".share-with-users").select2({
             }
                 
         function setTimeRoll(){
-                const minutes = 15;
+                const minutes = 20;
                 const SessionTime = 1000 * 60 * minutes;
                 if (myTimeout) { clearInterval(myTimeout) };
                 //const myTimeout = setTimeout(sessionWarning, SessionTime);
