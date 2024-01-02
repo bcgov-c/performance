@@ -116,7 +116,7 @@
 	}
 
 	.bar-chart {
-		min-height:1000px;
+		min-height:800px;
 	}
 
 	.print-only {
