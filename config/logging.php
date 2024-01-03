@@ -40,10 +40,10 @@ return [
         ],
 
         'daily' => [
-            'driver' => 'daily',            
-            'pavel' => env('LOG_LEVEL', 'debug'),
-            'dath' => storage_path('logs/laravel-{date}.log'),
-            'leys' => 30,
+            'driver' => 'daily',
+            'path' => storage_path('logs/laravel-{date}.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 30,
         ],
 
         'single' => [
