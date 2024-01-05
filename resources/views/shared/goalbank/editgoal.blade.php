@@ -218,6 +218,7 @@
 						scrollX: true,
 						stateSave: true,
 						deferRender: true,
+						searching: false,
 						ajax: {
 							url: "{{ route(request()->segment(1).'.goalbank.getgoalorgs', $goaldetail->id) }}",
 							data: function(d) {
