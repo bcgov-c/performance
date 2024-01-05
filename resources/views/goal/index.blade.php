@@ -342,23 +342,19 @@
         var title = $('#goal_title').val();
         var isContentModified = false;
         if(!saved) {
-                if (title.trim() !== '') {
-                    isContentModified = true;
-                }
-        } 
-        modal_open = false;
-        if (isContentModified) {
             e.preventDefault();
             $('#unsavedChangesModal').modal('show');
         } else {
             location.reload();
-        }    
+        }   
     });
 
     $(document).on('click', '#saveChangesBtn', function(e){
         for (var i in CKEDITOR.instances){
             CKEDITOR.instances[i].updateElement();
         };
+        const whatInput = CKEDITOR.instances['what'];
+        var what_value = whatInput.getData();
         $.ajax({
             url:'/goal',
             type : 'POST',
@@ -373,6 +369,7 @@
                     $('.btn-submit').hide();
                     $('.text-danger').hide();
                     $('.form-control').removeClass('is-invalid');  
+                    
                     saved = true;
                 }
             },
@@ -721,7 +718,8 @@ $(".share-with-users").select2({
                                     $('.btn-submit').hide();
                                     $('.text-danger').hide();
                                     $('.form-control').removeClass('is-invalid');                                    
-                                    $('#addGoalModal').modal('toggle');
+                                    //$('#addGoalModal').modal('toggle');
+                                    location.reload();
                                 }
                             },
                             error: function (error){
