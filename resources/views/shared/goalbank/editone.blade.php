@@ -85,7 +85,7 @@
 				<div class="row">
 					<div class="col">
 						<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="All employees will receive a notification on their PDP homepage about the goal. By selecting &quot;Yes&quot; to this question, you will also send an alert to their email prompting them to log in and view the new goal."> </i>
-						<b>Send an email notification to all employees about the new goal?</b>
+						<b>Send an email notification to new employees about this existing goal?</b>
 					</div>
 				</div>
 				<div class="row">		
