@@ -24,6 +24,7 @@ class CreateGoalRequest extends FormRequest
     public function rules()
     {
         return [
+            'created_goal_id' => 'nullable',
             'title' => 'required',
             'start_date' => 'nullable',
             'target_date' => 'nullable',

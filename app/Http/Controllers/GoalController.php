@@ -261,16 +261,27 @@ class GoalController extends Controller
         $tags = '';
         $input['user_id'] = Auth::id();
         
+        error_log(print_r($input,true));
+
         if(isset($input['tag_ids'])) {
             $tags = $input['tag_ids'];
             unset($input['tag_ids']);
         }
+        if($input["created_goal_id"] == 0) {
+            $goal = Goal::create($input);
+            // Retrieve the goal_id after creating the Goal
+            $goal_id = $goal->id;
+        } else {
+            $goal_id = $input["created_goal_id"];
+            $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->findOrFail($goal_id); 
+            $goal->update($input);
+        }
+        
 
-        $goal = Goal::create($input);
         if ($tags != '') {
             $goal->tags()->sync($tags);
         }
-        return response()->json(['success' => true, 'message' => 'Goal Created successfully']);
+        return response()->json(['success' => true, 'message' => 'Goal Created successfully', 'goal_id' => $goal_id]);
     }
 
     /**
@@ -373,7 +384,7 @@ class GoalController extends Controller
     * @param  int  $id
     * @return \Illuminate\Http\Response
     */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, $is_ajax = false)
     {        
         $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->findOrFail($id); 
         if ($request->title == '' || $request->tag_ids== '') {
@@ -410,12 +421,15 @@ class GoalController extends Controller
         } else {
             DB::table('goal_tags')->where('goal_id', $id)->delete();
         }
-
-        if ($request->datatype != "auto") {
-            return redirect()->route($goal->is_library ? 'goal.library' : 'goal.index');
+        if(is_ajax){
+            return response()->json(['success' => true, 'message' => 'Goal Updated successfully']);
         } else {
-            //return \Redirect::route('goal.edit', [$id]);
-            return \Redirect::route('goal.edit', [$id])->with('autosave', " Goal updated.");
+            if ($request->datatype != "auto") {
+                return redirect()->route($goal->is_library ? 'goal.library' : 'goal.index');
+            } else {
+                //return \Redirect::route('goal.edit', [$id]);
+                return \Redirect::route('goal.edit', [$id])->with('autosave', " Goal updated.");
+            }
         }
     }
 
