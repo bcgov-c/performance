@@ -1527,6 +1527,7 @@ class GoalController extends Controller
 
             $user = User::findOrFail($goal->user_id);
             $curr_user = User::findOrFail(Auth::id());
+            $comment_user = User::findOrFail($comment->user_id);
 
             $user_validPreferredSupervisorID = $user->validPreferredSupervisor();
             $user_supervisors = $user->supervisorListPrimaryJob();
@@ -1601,7 +1602,7 @@ class GoalController extends Controller
                         $notification = new \App\MicrosoftGraph\SendDashboardNotification();
                         $notification->user_id = Auth::id();
                         $notification->notification_type = 'GR';
-                        $notification->comment = $user->name . ' replied to your Goal comment.';
+                        $notification->comment = $comment_user->name . ' replied to your Goal comment.';
                         $notification->related_id = $goal->id;
                         $notification->notify_user_id = Auth::id();
                         $notification->send(); 
@@ -1619,7 +1620,7 @@ class GoalController extends Controller
                         $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
 
                         array_push($sendMail->bindvariables, $goal->user->name);    // %1 Recipient of the email
-                        array_push($sendMail->bindvariables,  $user->name );        // %2 Person who added the comment
+                        array_push($sendMail->bindvariables,  $comment_user->name );        // %2 Person who added the comment
                         array_push($sendMail->bindvariables, $goal->title);         // %3 Goal title
                         array_push($sendMail->bindvariables, $comment->comment );   // %4 added comment
                         $response = $sendMail->sendMailWithGenericTemplate();
@@ -1647,7 +1648,7 @@ class GoalController extends Controller
                         $notification = new \App\MicrosoftGraph\SendDashboardNotification();
                         $notification->user_id = Auth::id();
                         $notification->notification_type = 'GC';
-                        $notification->comment =  $comment->user->name . ' added a comment to your goal.';
+                        $notification->comment =  $comment_user->name . ' added a comment to your goal.';
                         $notification->related_id = $goal->id;
                         $notification->notify_user_id = Auth::id();
                         $notification->send(); 
@@ -1666,7 +1667,7 @@ class GoalController extends Controller
                         $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
 
                         array_push($sendMail->bindvariables, $goal->user->name);
-                        array_push($sendMail->bindvariables,  $comment->user->name );    // %2 Person who added the comment
+                        array_push($sendMail->bindvariables,  $comment_user->name );    // %2 Person who added the comment
                         array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
                         array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
                         $response = $sendMail->sendMailWithGenericTemplate();
@@ -1690,7 +1691,7 @@ class GoalController extends Controller
                     $notification = new \App\MicrosoftGraph\SendDashboardNotification();
                     $notification->user_id = $curr_supervisor_id;
                     $notification->notification_type = 'GC';
-                    $notification->comment = $curr_user->name . ' added a comment to your goal.';
+                    $notification->comment = $comment_user->name . ' added a comment to your goal.';
                     $notification->related_id = $goal->id;
                     $notification->notify_user_id = Auth::id();
                     $notification->send(); 
@@ -1711,7 +1712,7 @@ class GoalController extends Controller
 
                 $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
                 array_push($sendMail->bindvariables, $curr_user->reportingManager->name);  // %1 Recipient of the email
-                array_push($sendMail->bindvariables, $curr_user->name);    // %2 Person who added the comment
+                array_push($sendMail->bindvariables, $comment_user->name);    // %2 Person who added the comment
                 array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
                 array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
                 $response = $sendMail->sendMailWithGenericTemplate();
@@ -1732,7 +1733,7 @@ class GoalController extends Controller
                     $notification = new \App\MicrosoftGraph\SendDashboardNotification();
                     $notification->user_id = $shared->user_id;
                     $notification->notification_type = 'GK';
-                    $notification->comment = $curr_user->name . ' added a comment to a shared goal.';
+                    $notification->comment = $comment_user->name . ' added a comment to a shared goal.';
                     $notification->related_id = $goal->id;
                     $notification->notify_user_id = $shared->user_id;
                     $notification->send(); 
@@ -1747,7 +1748,7 @@ class GoalController extends Controller
                     $sendMail->alert_format = 'E';
                     $sendMail->template = 'GOAL_COMMENT_SHARED';
                     array_push($sendMail->bindvariables, $shared->name);  // %1 Recipient of the email
-                    array_push($sendMail->bindvariables, $curr_user->name);    // %2 Person who added the comment
+                    array_push($sendMail->bindvariables, $comment_user->name);    // %2 Person who added the comment
                     array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
                     array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
                     $response = $sendMail->sendMailWithGenericTemplate();
