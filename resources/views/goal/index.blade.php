@@ -886,49 +886,98 @@ $(".share-with-users").select2({
                         for (var i in CKEDITOR.instances){
                             CKEDITOR.instances[i].updateElement();
                         };
-                        $.ajax({
-                            url:'/goal',
-                            type : 'POST',
-                            data: $('#goal_form').serialize(),
-                            success: function (result) {
-                                console.log(result);
-                                need_fresh = true;
-                                if(result.success){
-                                    autosave = false;
-                                    no_warning = true;
-                                    alert('You have not saved your work in 20 minutes. To protect your work, it has been automatically saved.');
-                                    //window.location.href= '/goal';
-                                    $('.alert-danger').show();
-                                    $('.alert-danger').html('Your goal has been saved.');
-                                    $('.btn-submit').hide();
-                                    $('.text-danger').hide();
-                                    $('.form-control').removeClass('is-invalid');                                    
-                                    //$('#addGoalModal').modal('toggle');
-                                    location.reload();
-                                }
-                            },
-                            error: function (error){
-                                console.log(error);
-                                need_fresh = false;
-                                autosave =  true;
-                                $('.btn-submit').show();
-                                $('.btn-submit').prop('disabled',false);
-                                $('.btn-submit').html('Save Changes');
-                                $('.alert-danger').html('<i class="fa fa-info-circle"></i> There are one or more errors on the page. Please review and try again.');
-                                $('.alert-danger').show();
-                                $('.modal-body').animate({scrollTop: 0},100);
-                                var errors = error.responseJSON.errors;
-                                $('.text-danger').each(function(i, obj) {
-                                    $('.text-danger').text('');
-                                });
-                                Object.entries(errors).forEach(function callback(value, index) {
-                                    var className = '.error-' + value[0];
-                                    $('#addGoalModal input[name='+value[0]+']').addClass('is-invalid');
-                                    $(className).text(value[1]);
-                                });
-                                //alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');
-                            }
-                        });
+                        if(saved) {
+                            console.log('update existing goal');
+                            $(this).prop('disabled', true);
+                            $.ajax({
+                                url:'/goal',
+                                type : 'POST',
+                                data: $('#goal_form').serialize(),
+                                success: function (result) {
+                                    console.log(result);
+                                    need_fresh = true;
+                                    if(result.success){
+                                        //window.location.href= '/goal';
+                                        $('.alert-danger').show();
+                                        $('.alert-danger').html('Your goal has been updated.');
+                                        $('.btn-submit').hide();
+                                        $('.text-danger').hide();
+                                        $('.form-control').removeClass('is-invalid');  
+                                        
+                                        saved = true;
+                                        isContentModified = false;
+                                    }
+                                },
+                                error: function (error){
+                                        console.log(error);
+                                        need_fresh = false;
+                                        autosave =  true;
+                                        $('.btn-submit').show();
+                                        $('.btn-submit').prop('disabled',false);
+                                        $('.btn-submit').html('Save Changes');
+                                        $('.alert-danger').html('<i class="fa fa-info-circle"></i> There are one or more errors on the page. Please review and try again.');
+                                        $('.alert-danger').show();
+                                        $('.modal-body').animate({scrollTop: 0},100);
+                                        var errors = error.responseJSON.errors;
+                                        $('.text-danger').each(function(i, obj) {
+                                            $('.text-danger').text('');
+                                        });
+                                        Object.entries(errors).forEach(function callback(value, index) {
+                                            var className = '.error-' + value[0];
+                                            $('#addGoalModal input[name='+value[0]+']').addClass('is-invalid');
+                                            $(className).text(value[1]);
+                                        });
+                                        //alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');
+                                    }
+                            });   
+                            $(this).prop('disabled', false);
+                        } else {
+                            console.log('create new goal');
+                            $.ajax({
+                                url:'/goal',
+                                type : 'POST',
+                                data: $('#goal_form').serialize(),
+                                success: function (result) {
+                                    console.log(result);
+                                    need_fresh = true;
+                                    if(result.success){
+                                        saved = true;
+                                        saved_id = result.goal_id;
+                                        //window.location.href= '/goal';
+                                        $('#addGoalModalLabel').html('Update Current Goal');
+                                        $('#created_goal_id').val(saved_id);
+                                        $('.alert-danger').show();
+                                        $('.alert-danger').html('Your goal has been saved.');
+                                        $('.btn-submit').hide();
+                                        $('.text-danger').hide();
+                                        $('.form-control').removeClass('is-invalid');  
+                                    }
+                                },
+                                error: function (error){
+                                        console.log(error);
+                                        need_fresh = false;
+                                        autosave =  true;
+                                        $('.btn-submit').show();
+                                        $('.btn-submit').prop('disabled',false);
+                                        $('.btn-submit').html('Save Changes');
+                                        $('.alert-danger').html('<i class="fa fa-info-circle"></i> There are one or more errors on the page. Please review and try again.');
+                                        $('.alert-danger').show();
+                                        $('.modal-body').animate({scrollTop: 0},100);
+                                        var errors = error.responseJSON.errors;
+                                        $('.text-danger').each(function(i, obj) {
+                                            $('.text-danger').text('');
+                                        });
+                                        Object.entries(errors).forEach(function callback(value, index) {
+                                            var className = '.error-' + value[0];
+                                            $('#addGoalModal input[name='+value[0]+']').addClass('is-invalid');
+                                            $(className).text(value[1]);
+                                        });
+                                        //alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');
+                                    }
+                            });   
+                            $(this).prop('disabled', false);
+
+                        }
                     }    
                 }, SessionTime);                
             }
