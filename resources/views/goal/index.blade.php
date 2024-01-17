@@ -381,6 +381,7 @@
     });
 
     $(document).on('click', '#saveChangesBtn', function(e){
+        isContentModified = false;
         for (var i in CKEDITOR.instances){
             CKEDITOR.instances[i].updateElement();
         };
@@ -479,6 +480,7 @@
     });
 
     $(document).on('click', '#saveGoalBtn', function(e){
+        isContentModified = false;
         $(this).prop('disabled', true);
         for (var i in CKEDITOR.instances){
             CKEDITOR.instances[i].updateElement();
@@ -882,6 +884,7 @@ $(".share-with-users").select2({
                 //const myTimeout = setTimeout(sessionWarning, SessionTime);
                 myTimeout = setInterval(function() { 
                     if (modal_open == true && autosave == true) {
+                        isContentModified = false;
                         //$(".btn-submit").trigger("click");  
                         for (var i in CKEDITOR.instances){
                             CKEDITOR.instances[i].updateElement();
@@ -899,13 +902,14 @@ $(".share-with-users").select2({
                                     if(result.success){
                                         //window.location.href= '/goal';
                                         $('.alert-danger').show();
-                                        $('.alert-danger').html('Your goal has been updated.');
+                                        $('.alert-danger').html('Your goal has been saved.');
                                         $('.btn-submit').hide();
                                         $('.text-danger').hide();
                                         $('.form-control').removeClass('is-invalid');  
                                         
                                         saved = true;
                                         isContentModified = false;
+                                        alert('You have not saved your work in 20 minutes. To protect your work, it has been automatically saved.');
                                     }
                                 },
                                 error: function (error){
