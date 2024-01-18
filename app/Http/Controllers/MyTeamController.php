@@ -468,8 +468,11 @@ class MyTeamController extends Controller
         $userReportingTos = DB::table('user_reporting_tos')->where('user_id', $id)->pluck('reporting_to_id')->toArray();
         $can_access = false;
         
-        if(in_array(Auth::id(), $userReportingTos)) {
-            $can_access = true;
+        $employees = $this->myEmployeesAjax();
+        foreach($employees as $employee) {
+            if($id == $employee->id){
+                $can_access = true;
+            }
         }
 
         if($can_access) {
