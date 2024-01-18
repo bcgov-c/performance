@@ -955,6 +955,7 @@ $(".share-with-users").select2({
                                         $('.btn-submit').hide();
                                         $('.text-danger').hide();
                                         $('.form-control').removeClass('is-invalid');  
+                                        alert('You have not saved your work in 20 minutes. To protect your work, it has been automatically saved.');
                                     }
                                 },
                                 error: function (error){
