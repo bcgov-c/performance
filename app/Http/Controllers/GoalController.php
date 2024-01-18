@@ -288,31 +288,65 @@ class GoalController extends Controller
         ->with('comments')
         ->firstOrFail();
 
-
-        $linkedGoalsIds = LinkedGoal::where('user_goal_id', $id)->pluck('supervisor_goal_id');
-
-        /* $supervisorGoals = Goal::whereIn('id', [997, 998, 999])->with('goalType')
-        ->whereNotIn('id', $linkedGoalsIds)
-        ->with('comments')->get(); */
-        $linkedGoals
-        = Goal::with('goalType', 'comments')
-        ->whereIn('id', $linkedGoalsIds)
-        ->get();
+        //get user info and check if user comes from supervisor, employee, manager shared with employee, or goal shared with
+        $authId = Auth::id();
+        $can_access = false;
+        if($authId == $goal->user_id) {
+            $can_access = true;
+        } 
 
         $user = User::findOrFail($goal->user_id);
-        if (($goal->last_supervisor_comment == 'Y') and (($goal->user_id == session()->get('original-auth-id')) or (session()->get('original-auth-id') == null))) {
+        if($user->reporting_to == $authId) {
+            $can_access = true;
+        }         
+        $shared_info = SharedProfile::select('shared_with')
+                        ->where('shared_id', Auth::id())
+                        ->where('shared_item', 'like', '%1%')
+                        ->get();
 
-            $goal->last_supervisor_comment = 'N';
-            $goal->save();
-        };
+        $shared_with = $shared_info->pluck('shared_with')->toArray();
+        if(in_array($authId, $shared_with)){
+            $can_access = true;
+        }
 
-        // Commented by JP to avoid the new added message always marked as 'READ'
-        // $affected = DashboardNotification::wherein('notification_type', ['GC', 'GR'])
-        // ->where('related_id', $goal->id)
-        // ->wherenull('status')
-        // ->update(['status' => 'R']);
 
-        return view('goal.show', compact('goal', 'linkedGoals'));
+        $goal_sharedWithList = GoalSharedWith::from('goals_shared_with AS gsw')
+                ->where('gsw.goal_id', $goal->id)
+                ->get();
+        $goal_sharedWith = $goal_sharedWithList->pluck('user_id')->toArray();
+        if(in_array($authId, $goal_sharedWith)){
+            $can_access = true;
+        }
+
+
+        if($can_access) {
+            $linkedGoalsIds = LinkedGoal::where('user_goal_id', $id)->pluck('supervisor_goal_id');
+
+            /* $supervisorGoals = Goal::whereIn('id', [997, 998, 999])->with('goalType')
+            ->whereNotIn('id', $linkedGoalsIds)
+            ->with('comments')->get(); */
+            $linkedGoals
+            = Goal::with('goalType', 'comments')
+            ->whereIn('id', $linkedGoalsIds)
+            ->get();
+
+            
+            if (($goal->last_supervisor_comment == 'Y') and (($goal->user_id == session()->get('original-auth-id')) or (session()->get('original-auth-id') == null))) {
+
+                $goal->last_supervisor_comment = 'N';
+                $goal->save();
+            };
+
+            // Commented by JP to avoid the new added message always marked as 'READ'
+            // $affected = DashboardNotification::wherein('notification_type', ['GC', 'GR'])
+            // ->where('related_id', $goal->id)
+            // ->wherenull('status')
+            // ->update(['status' => 'R']);
+
+            return view('goal.show', compact('goal', 'linkedGoals'));
+        } else {
+            echo "You don't have the right permission to access this goal.";
+        }
     }
 
     public function getSupervisorGoals($id) {
