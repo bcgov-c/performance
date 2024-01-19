@@ -436,8 +436,16 @@ class MyTeamController extends Controller
     public function viewProfileAs($id, $landingPage = null) {
         $actualAuthId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
         //$hasAccess = User::with('reportingManagerRecursive')->find($id)->canBeSeenBy($actualAuthId);
-        $hasAccess = true;
+        //$hasAccess = true;
         // If it is shared with Logged In user.
+        $hasAccess = false;
+        
+        $employees = $this->myEmployeesAjax();
+        foreach($employees as $employee) {
+            if($id == $employee->id){
+                $hasAccess = true;
+            }
+        }
 
         if($hasAccess || SharedProfile::where('shared_with', $actualAuthId)->where('shared_id', $id)->count() >= 1) {
             session()->put('view-profile-as', $id);
@@ -456,13 +464,16 @@ class MyTeamController extends Controller
                 session()->put('GOALS_ALLOWED', true);
                 session()->put('CONVERSATION_ALLOWED', true);
             }
+            if ($landingPage) {
+                return redirect()->route($landingPage);
+            }
+            return (url()->previous() === Route('my-team.my-employee') || url()->previous() === Route('my-team.view-profile-as.direct-report', User::find($id)->reportingManager->id))
+                ? ((session()->has('GOALS_ALLOWED') && session()->get('GOALS_ALLOWED')) ? redirect()->route('goal.current') : redirect()->route('conversation.upcoming'))
+                : redirect()->back();
+        } else {
+            echo "You don't have the right permission to access this employee's file.";
         }
-        if ($landingPage) {
-            return redirect()->route($landingPage);
-        }
-        return (url()->previous() === Route('my-team.my-employee') || url()->previous() === Route('my-team.view-profile-as.direct-report', User::find($id)->reportingManager->id))
-            ? ((session()->has('GOALS_ALLOWED') && session()->get('GOALS_ALLOWED')) ? redirect()->route('goal.current') : redirect()->route('conversation.upcoming'))
-            : redirect()->back();
+        
     }
     public function viewDirectReport($id, Request $request) {
         $userReportingTos = DB::table('user_reporting_tos')->where('user_id', $id)->pluck('reporting_to_id')->toArray();
