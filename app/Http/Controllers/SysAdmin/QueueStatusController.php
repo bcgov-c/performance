@@ -34,36 +34,49 @@ class QueueStatusController extends Controller
     }
 
     public function fixModle(){
-        $result = DB::table('model_has_roles as mhr')
-                    ->join('users_annex as ua', 'mhr.model_id', '=', 'ua.user_id')
-                    ->where('ua.reportees', '>', 0)
-                    ->where('mhr.role_id', 1)
-                    ->whereNotExists(function ($query) {
-                        $query->select(DB::raw(1))
-                            ->from('model_has_roles as mhr2')
-                            ->whereRaw('mhr2.model_id = mhr.model_id')
-                            ->where('mhr2.role_id', 2);
-                    })
-                    ->select('ua.user_id')
-                    ->get();
+        //#1206 Information from ODS (supervisor info) doesn't sync with PDP user annex table
+        $employeeId = '188978';
+        $reportingToEmployeeId = '132126';
+        $reportingToPositionNumber = '00133674';
+        $reportingToName = 'Warren,Bryna Elita Mae';
+        $reportingToEmail = 'Bryna.Warren@gov.bc.ca';
+        $reportingToUserId = '20985';
 
-        foreach($result as $r) {
-            $user_id = $r->user_id;
-            $existingRecord = DB::table('model_has_roles')
-                        ->where([
-                            'model_id' => $user_id,
-                            'role_id' => 2,
-                            'model_type' => 'App\\Models\\User',
-                        ])->exists();
-            if (!$existingRecord) {
-                        $result = DB::table('model_has_roles')->insert([
-                                'model_id' => $user_id,
-                                'role_id' => 2,
-                                'model_type' => 'App\\Models\\User',
-                            ]);
-            }
-        }            
+        // Run the update query
+        DB::table('users_annex')
+            ->where('employee_id', $employeeId)
+            ->update([
+                'reporting_to_employee_id' => $reportingToEmployeeId,
+                'reporting_to_position_number' => $reportingToPositionNumber,
+                'reporting_to_name' => $reportingToName,
+                'reporting_to_email' => $reportingToEmail,
+            ]);
 
-        echo "Employees' roles updated.";
+        DB::table('employee_managers')
+            ->where('employee_id', $employeeId)
+            ->update([
+                'supervisor_emplid' => $reportingToEmployeeId,
+                'supervisor_position_number' => $reportingToPositionNumber,
+                'supervisor_name' => $reportingToName,
+                'supervisor_email' => $reportingToEmail,
+                'supervisor_userid' => $reportingToUserId,
+            ]);    
+
+        DB::table('users')
+            ->where('employee_id', $employeeId)
+            ->update([
+                'reporting_to' => $reportingToUserId,
+            ]); 
+
+        DB::table('users')
+            ->where('employee_id', '169412')
+            ->update([
+                'empl_record' => 0,
+            ]); 
+
+
+        echo "Employees updated.";
+
+        
     }
 }
