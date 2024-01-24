@@ -403,7 +403,6 @@ class DashboardController extends Controller
             //check if user sup role is existing
             $supModel = User::join('model_has_roles AS mr', 'users.id', 'mr.model_id')
                         ->select('users.id')
-                        ->whereNull('users.date_deleted')
                         ->where('mr.model_id', $supvUser->id)
                         ->where('mr.role_id', 2)
                         ->count();
