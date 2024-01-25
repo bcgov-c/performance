@@ -878,7 +878,7 @@ $(".share-with-users").select2({
             }
                 
         function setTimeRoll(){
-                const minutes = 4;
+                const minutes = 20;
                 const SessionTime = 1000 * 60 * minutes;
                 if (myTimeout) { clearInterval(myTimeout) };
                 //const myTimeout = setTimeout(sessionWarning, SessionTime);

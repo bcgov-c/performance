@@ -192,7 +192,7 @@
             trigger: 'click',
         });
         
-        const minutes = 15;
+        const minutes = 20;
         const SessionTime = 1000 * 60 * minutes;
         
         $(document).ready(function () { 
