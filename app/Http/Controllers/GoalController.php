@@ -455,7 +455,7 @@ class GoalController extends Controller
         } else {
             DB::table('goal_tags')->where('goal_id', $id)->delete();
         }
-        if(is_ajax){
+        if($is_ajax){
             return response()->json(['success' => true, 'message' => 'Goal Updated successfully']);
         } else {
             if ($request->datatype != "auto") {
