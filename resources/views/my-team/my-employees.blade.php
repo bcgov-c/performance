@@ -53,9 +53,7 @@
                         $(this).popover('hide');
                     }
                 });
-            });
-        
-
+            });        
     </script>
 @endpush
 

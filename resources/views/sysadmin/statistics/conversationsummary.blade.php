@@ -23,7 +23,7 @@
 <span id="pdf-output">
 
   <div class="row justify-content-center">
-		<div class="col-sm-12 col-md-10 col-lg-4">
+		<div class="col-sm-12 col-md-12 col-lg-6">
 			<div class="card">
 				<div class="card-body">
 					<div class="chart has-fixed-height" id="pie_basic_1">
@@ -33,7 +33,7 @@
 			</div>
 		</div>
               
-                <div class="col-sm-12 col-md-10 col-lg-4">
+        <div class="col-sm-12 col-md-12 col-lg-6">
 			<div class="card">
 				<div class="card-body">
 					<div class="chart has-fixed-height" id="pie_basic_4">
@@ -242,6 +242,11 @@ $(function() {
 					fontWeight: 'bold',
 					edgeDistance: 3,
 					lineHeight: 20,
+					emphasis: {
+						show: true,
+						fontWeight: 'bold',
+						formatter: '{b}: \n {c} ({d}%)',
+					},
 					// verticalAlign: 'bottom',
 					rich: {
 						name: {

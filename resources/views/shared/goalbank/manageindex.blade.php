@@ -118,6 +118,7 @@
                     scrollX: true,
                     stateSave: true,
                     deferRender: true,
+                    searching: false,
                     ajax: 
                     {
                         url: "managegetlist",

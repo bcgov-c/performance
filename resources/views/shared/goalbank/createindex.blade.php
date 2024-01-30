@@ -52,7 +52,7 @@
 			<div class="row">
 				<div class="col-md-4">
 					<b>Tags</b>
-					<i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>."></i>					
+					<i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resources/goal-setting?t=8' target=\'_blank\'><u>View full list of tag descriptions.</u></a><br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>."></i>					
 					<x-dropdown :list="$tags" name="tag_ids[]" id="tags" class="tags" multiple/>						
 					@if(session()->has('tags_miss'))
 						<small class="text-danger">The tags field is required</small>
@@ -177,7 +177,33 @@
         <div class="container-fluid">
 			<br>
 			<h6 class="text-bold">Step 3. Finish</h6>
-			<br>
+
+			<div class="card col-md-12">
+				<div class="card-body">
+					<div class="row">
+						<div class="col">
+							<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="All employees will receive a notification on their PDP homepage about the goal. By selecting &quot;Yes&quot; to this question, you will also send an alert to their email prompting them to log in and view the new goal."> </i>
+							<b>Send an email notification to all employees about the new goal?</b>
+						</div>
+					</div>
+					<div class="row">		
+						<div class="col-md-12 mb-12">		
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="emailit" id="emailit1" value="1">
+								<label class="form-check-label" for="emailit1">
+									Yes
+								</label>
+							</div>
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="emailit" id="emailit2" value="0" checked>
+								<label class="form-check-label" for="emailit2">
+									No
+								</label>
+							</div>				
+						</div>
+					</div>
+				</div>
+			</div>
 			<div class="row">
 				<div class="col-md-3 mb-2">
 					<button class="btn btn-primary mt-2" id="obtn_send" type="button" onclick="confirmSaveChangesModal()" name="btn_confirm" value="btn_confirm">Add Goal</button>

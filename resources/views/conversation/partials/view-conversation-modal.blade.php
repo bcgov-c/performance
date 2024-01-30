@@ -94,13 +94,37 @@
                 
                 <!-----employee comments: 4,7,8,9,10--------->
                 <!-----supervisor comments: 1,2,3,5,6,11--------->
+
+                
+
+                @if ($type == 'upcoming')
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="alert alert-success sup-comment-save-info-top" attr-loc="top"  role="alert" style="display:none">
+                                Comments are saved.
+                            </div>
+                            <div class="alert alert-success emp-comment-save-info-top" attr-loc="top"  role="alert" style="display:none">
+                                Comments are saved.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="button" class="btn btn-primary float-right supSaveAllComments" attr-loc="top" style="display:none">Save Comments</button>
+                            <button type="button" class="btn btn-primary float-left empSaveAllComments" attr-loc="top"  style="display:none">Save Comments</button>
+                        </div>
+                    </div>
+                    <hr>
+                @endif   
+
+
                 
                 <div class="row">
                     <div class="col-6">
                         <div class="card">
                                 <div class="card-header panel-heading bg-primary">
                                 Employee Comments
-                                </div>
+                                </div>                                
 
                                 <div class="card-body">
                                     <div id="div-info-comment4">
@@ -159,7 +183,21 @@
                                     </div>
                                 </div>
                         </div>
-                        
+                        @if ($type == 'upcoming')
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="alert alert-success emp-comment-save-info" attr-loc="bottom" role="alert" style="display:none">
+                                    Comments are saved.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-primary float-left empSaveAllComments" attr-loc="bottom" style="display:none">Save Comments</button>
+                            </div>
+                        </div>
+                        <hr>
+                        @endif    
                     </div>
                 
                     <div class="col-6">
@@ -247,11 +285,25 @@
                                         </div> 
                                     </div>
                                 </div>
-                        </div>
-                        
-                    </div>
-                
+                        </div>                                 
+                        @if ($type == 'upcoming')
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="alert alert-success sup-comment-save-info" attr-loc="bottom" role="alert" style="display:none">
+                                        Comments are saved.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <button type="button" class="btn btn-primary float-right supSaveAllComments" attr-loc="bottom" style="display:none">Save Comments</button>
+                                </div>
+                            </div>
+                            <hr>
+                        @endif             
+                    </div>                                      
                 </div>
+                
                 
                 <div id="sign-off-block">
                 <form id="employee-sign_off_form" method="post">
@@ -390,6 +442,25 @@
                 </form>    
                 </div>   
                 
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="unsavedChangesModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:99"> 
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Unsaved Changes</h5>
+            </div>
+            <div class="modal-body">
+                <p>Save changes to this conversation?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
+                <button type="button" class="btn btn-secondary" id="discardChangesBtn">Don't Save</button>
+                <button type="button" class="btn btn-secondary" id="cancelChangesBtn">Cancel</button>
+            </div>
             </div>
         </div>
     </div>

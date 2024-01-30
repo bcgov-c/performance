@@ -196,34 +196,45 @@
             $(document).on('submit', '#share-profile-form', function (e) {
                 e.preventDefault();
                 const $form = $(this);
-                $.ajax({
-                    url: $form.attr('action'),
-                    type : 'POST',
-                    data: $form.serialize(),
-                    success: function (result) {
-                        if(result.success){
-                            // window.location.href= '/goal';
-                            //$("#employee-profile-sharing-modal").modal('hide');
-                            alert("Successfully shared");
-                            window.location.reload(true);
-                        } else {
-                            alert(result.message);
-                        }
-                    },
-                    beforeSend: function() {
-                        $form.find('.text-danger').each(function(i, obj) {
-                            $('.text-danger').text('');
-                        });
-                    },
-                    error: function (error){
-                        var errors = error.responseJSON.errors;
+                const userConfirmed = confirm('Are you sure you want to share the selected profile(s)?');                
+                // Cancel the form submission if the user did not confirm
+                if (!userConfirmed) {
+                    event.preventDefault();
+                    window.location.reload(true);
+                } else {
+                    $.ajax({
+                        url: $form.attr('action'),
+                        type : 'POST',
+                        data: $form.serialize(),
+                        success: function (result) {
+                            if(result.success){
+                                // window.location.href= '/goal';
+                                //$("#employee-profile-sharing-modal").modal('hide');
+                                alert("Successfully shared");
+                                window.location.reload(true);
+                            } else {
+                                alert(result.message);
+                            }
+                        },
+                        beforeSend: function() {
+                            $form.find('.text-danger').each(function(i, obj) {
+                                $('.text-danger').text('');
+                            });
+                        },
+                        error: function (error){
+                            var errors = error.responseJSON.errors;
 
-                        Object.entries(errors).forEach(function callback(value, index) {
-                            var className = '.error-' + value[0];
-                            $form.find(className).text(value[1]);
-                        });
-                    }
-                });
+                            Object.entries(errors).forEach(function callback(value, index) {
+                                var className = '.error-' + value[0];
+                                $form.find(className).text(value[1]);
+                            });
+                        }
+                    });
+                }                  
+            });
+
+            $('#employee-profile-sharing-modal').on('hidden.bs.modal', function () {
+                window.location.reload(true);
             });
 
             function loadSharedProfileData(userId, $modal) {

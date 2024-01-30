@@ -2,6 +2,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserPreferenceController;
+use App\Http\Controllers\LoadTestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +39,7 @@ use App\Http\Controllers\UserPreferenceController;
             require __DIR__ . '/hradmin.php';
             require __DIR__ . '/sysadmin.php';
         });
+        Route::get('/dashboard/check-api',[DashboardController::class, 'checkApi'])->middleware(['auth'])->name('dashboard.check-api');
     });
 
     Route::get('/my-performance', function () {
@@ -55,3 +57,7 @@ use App\Http\Controllers\UserPreferenceController;
     
     Route::get('check-session-expiration', [DashboardController::class, 'checkExpiration'])->name('check-session-expiration');
     Route::view('session-expired', 'session-expired')->name('session-expired');
+
+
+    Route::get('/load-test', [LoadTestController::class, 'loadTest']);
+    Route::post('/simulate-load', [LoadTestController::class, 'simulateLoad']);

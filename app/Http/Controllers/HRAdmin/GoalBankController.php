@@ -592,6 +592,13 @@ class GoalBankController extends Controller
             return \Redirect::route('hradmin.goalbank')->with('message', " There are one or more errors on the page. Please review and try again.");
         }       
         $current_user = User::find(Auth::id());
+
+        $emailit = true;
+        if($request->input('emailit') == '0'){
+            $emailit = false;
+        }
+        
+
         $resultrec = Goal::withoutGlobalScopes()
         ->create(
             [ 'goal_type_id' => $request->input('goal_type_id')
@@ -686,7 +693,7 @@ class GoalBankController extends Controller
             $notify_audiences = array_unique(array_merge($notify_audiences_static, $notify_audiences_inherited), SORT_REGULAR);
         }
         // notify_on_dashboard when new goal added
-        $this->notify_on_dashboard($resultrec, $notify_audiences);
+        $this->notify_on_dashboard($resultrec, $notify_audiences, $emailit);
         return redirect()->route(request()->segment(1).'.goalbank')
             ->with('success', 'Create new goal bank successful.');
     }
@@ -849,6 +856,12 @@ class GoalBankController extends Controller
                     ->pluck('u.employee_id')
                     ->toArray(); 
         $current_user = Auth::id();
+
+        $emailit = true;
+        if($request->input('emailit') == '0'){
+            $emailit = false;
+        }
+
         $organizationList = EmployeeDemoTree::select('id')
             ->whereIn('id', $selected_org_nodes)
             ->orWhereIn('level4_key', $selected_org_nodes)
@@ -900,13 +913,19 @@ class GoalBankController extends Controller
         $new_org_ee_ids_inherited = $this->get_employees_by_selected_inherited($selected_inherited);
         $new_org_ee_ids = array_unique(array_merge($new_org_ee_ids_static, $new_org_ee_ids_inherited), SORT_REGULAR);
         $notify_audiences = array_diff($new_org_ee_ids, $old_ee_ids, $old_org_ee_ids);        
-        $this->notify_on_dashboard($resultrec, $notify_audiences);   
+        $this->notify_on_dashboard($resultrec, $notify_audiences, $emailit); 
         return redirect()->route(request()->segment(1).'.goalbank.manageindex')
             ->with('success', 'Goal update successful.');
     }
 
     public function updategoalone(Request $request, $id) {
         $aselected_emp_ids = $request->auserCheck ? $request->auserCheck : [];
+
+        $emailit = true;
+        if($request->input('emailit') == '0'){
+            $emailit = false;
+        }
+
         // Get the old employees listing 
         $old_ee_ids =  GoalSharedWith::join('users', 'goals_shared_with.user_id', 'users.id')
                                 ->where('goal_id', $id)->distinct()->pluck('users.employee_id')->toArray();
@@ -937,7 +956,7 @@ class GoalBankController extends Controller
         }
         // call notify_on_dashboard for the newly added emplid of the goal 
         $notify_audiences = array_diff($aselected_emp_ids, $old_ee_ids, $old_org_ee_ids);
-        $this->notify_on_dashboard($resultrec, $notify_audiences);
+        $this->notify_on_dashboard($resultrec, $notify_audiences, $emailit);
         return redirect()->route(request()->segment(1).'.goalbank.manageindex')
             ->with('success', 'Goal update successful.');
     }
@@ -1466,7 +1485,7 @@ class GoalBankController extends Controller
         return ($employees ? $employees->toArray() : []); 
     }
 
-    protected function notify_on_dashboard($goalBank, $employee_ids) {
+    protected function notify_on_dashboard($goalBank, $employee_ids, $emailit) {
         foreach(array_chunk($employee_ids, 1000) as $employee_ids_chunk) {
             // Filter out the employee based on the Organization level and individual user preferences. 
             $core = User::whereIn('users.employee_id', $employee_ids_chunk)
@@ -1521,7 +1540,10 @@ class GoalBankController extends Controller
             NotificationLog::insert($data);
         }
         // Additional Step -- sent out email message if required
-        $this->notify_employees($goalBank, $employee_ids);
+        if($emailit){
+            $this->notify_employees($goalBank, $employee_ids);
+        }
+        
     }
 
     protected function notify_employees($goalBank, $employee_ids) {

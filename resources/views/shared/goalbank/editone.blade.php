@@ -80,6 +80,33 @@
 
 		<br>
 		<h6 class="text-bold">Step 2. Finish</h6>
+		<div class="card col-md-12">
+			<div class="card-body">
+				<div class="row">
+					<div class="col">
+						<i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="All employees will receive a notification on their PDP homepage about the goal. By selecting &quot;Yes&quot; to this question, you will also send an alert to their email prompting them to log in and view the new goal."> </i>
+						<b>Send an email notification to new employees about this existing goal?</b>
+					</div>
+				</div>
+				<div class="row">		
+					<div class="col-md-12 mb-12">		
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="emailit" id="emailit1" value="1">
+							<label class="form-check-label" for="emailit1">
+								Yes
+							</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="emailit" id="emailit2" value="0" checked>
+							<label class="form-check-label" for="emailit2">
+								No
+							</label>
+						</div>				
+					</div>
+				</div>
+			</div>
+		</div>				
+
 		<br>
 		<div class="col-md-3 mb-2">
 			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveChangesModal()" id="obtn_send" name="obtn_send" value="btn_send">Save Changes</button>
@@ -201,6 +228,7 @@
 					scrollX: true,
 					stateSave: true,
 					deferRender: true,
+					searching: false,
 					ajax: {
 						url: "{{ route(request()->segment(1).'.goalbank.getgoalinds', $goaldetail->id) }}",
 						data: function(d) {
@@ -572,17 +600,17 @@
 				});
 				$('#add_level4').change(function (e) {
 					e.preventDefault();
-					$('#abtn_search').click();
+					//$('#abtn_search').click();
 				});
 
 				$('#acriteria').change(function (e){
 					e.preventDefault();
-					$('#abtn_search').click();
+					//$('#abtn_search').click();
 				});
 
 				$('#asearch_text').change(function (e){
 					e.preventDefault();
-					$('#abtn_search').click();
+					//$('#abtn_search').click();
 				});
 
 				$('#asearch_text').keydown(function (e){
@@ -592,22 +620,10 @@
 					}
 				});
 
-				$('#abtn_search_reset').click(function(e) {
-					e.preventDefault();
-					$('#add_superv').val('all');
-					$('#acriteria').val('all');
-					$('#asearch_text').val(null);
-					$('#add_level0').val(null);
-					$('#add_level1').val(null);
-					$('#add_level2').val(null);
-					$('#add_level3').val(null);
-					$('#add_level4').val(null);
-					$('#abtn_search').click();
-				});
 
 				$('#add_superv').change(function (e){
 					e.preventDefault();
-					$('#abtn_search').click();
+					//$('#abtn_search').click();
 				});
 
 				$(window).on('beforeunload', function(){

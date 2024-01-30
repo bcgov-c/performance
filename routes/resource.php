@@ -10,3 +10,4 @@ Route::get('resources/conversations', [ResourceController::class, 'conversations
 Route::get('resources/contact', [ResourceController::class, 'contact'])->name('resource.contact');
 Route::get('resources/faq', [ResourceController::class, 'faq'])->name('resource.faq');
 Route::get('resources/hr-admin', [ResourceController::class, 'hradmin'])->name('resource.hr-admin');
+Route::get('resources/access-performance', [ResourceController::class, 'accessPerformance'])->name('resource.access-performance');

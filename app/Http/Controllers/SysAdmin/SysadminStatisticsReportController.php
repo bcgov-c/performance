@@ -48,10 +48,13 @@ class SysadminStatisticsReportController extends Controller
         ];
 
         $this->overdue_groups = [
-            'overdue' => [-999999,0],
-            '< 1 week' => [1,7],
-            '1 week to 1 month' => [8,30],
-            '> 1 month' => [31,999999],
+            //'overdue' => [-999999,0],
+            'Overdue: < 1 month' => [-30, 0],
+            'Overdue: 1-4 months' => [-120, -31],
+            'Overdue: > 4 months' => [-999999, -121],
+            'Upcoming: < 1 week' => [1,7],
+            'Upcoming: 1 week to 1 month' => [8,30],
+            'Upcoming: > 1 month' => [31,999999],
         ];
 
         set_time_limit(120);    // 3 mins
@@ -1512,7 +1515,6 @@ class SysadminStatisticsReportController extends Controller
                             ->orWhereNull('users.excused_flag');
                     });
                 }) ;
-                
             
         // SQL - Chart 4
         $sql_chart4 = ConversationParticipant::selectRaw("conversations.*, conversation_topics.name as conversation_name, users.employee_id, employee_name, users.email,
@@ -1585,8 +1587,6 @@ class SysadminStatisticsReportController extends Controller
             ->when( $request->topic_id, function($q) use($request) {
                 $q->where('conversations.conversation_topic_id', $request->topic_id);
             });        
-                   
-            
 
         // Generating Output file 
         $filename = 'Conversations.xlsx';
@@ -1618,7 +1618,6 @@ class SysadminStatisticsReportController extends Controller
                     fputcsv($file, $columns);
         
                     foreach ($users as $user) {
-
                         $group_name = '';
                         foreach ($this->overdue_groups as $key => $range) {
                             if (($user->overdue_in_days >= $range[0] ) && ( $user->overdue_in_days <= $range[1])) {

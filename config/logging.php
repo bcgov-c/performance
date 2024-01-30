@@ -16,9 +16,7 @@ return [
     | one of the channels defined in the "channels" configuration array.
     |
     */
-
-    'default' => env('LOG_CHANNEL', 'daily'),
-
+    'default'=>env('LOG_CHANNEL', 'daily'),
     /*
     |--------------------------------------------------------------------------
     | Log Channels
@@ -41,17 +39,17 @@ return [
             'ignore_exceptions' => false,
         ],
 
+        'daily' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/laravel-{date}.log'),
+            'level' => 'debug',
+            'days' => 7,
+        ],
+
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
-        ],
-
-        'daily' => [
-            'driver' => 'daily',
-            'path' => storage_path('logs/laravel-{date}.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
-            'days' => 30,
         ],
 
         'slack' => [

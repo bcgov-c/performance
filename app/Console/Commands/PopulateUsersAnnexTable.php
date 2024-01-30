@@ -286,6 +286,30 @@ class PopulateUsersAnnexTable extends Command
             
             \DB::commit();
 
+
+             //#1158 Employees with no supervisor in ODS data are not displayed properly in PDP       
+             //add a step 7 that displays supervisor name = "Vacant" if all of the above return no data?
+             $this->info(Carbon::now()->format('c')." - Process vacant supervisors...");
+             \DB::statement("
+             UPDATE users_annex as target
+                SET 
+                    target.reporting_to_name = 'Vacant'
+                WHERE 1 = 1
+                    AND (target.reporting_to_name IS NULL OR target.reporting_to_name = '')
+             ");
+            
+             \DB::commit();
+
+             //#1186 sync users reporting_to with users_annex reporting_to_userid       
+             $this->info(Carbon::now()->format('c')." - Process users table reporting_to...");
+             DB::statement("
+                UPDATE users
+                JOIN users_annex ON users.employee_id = users_annex.employee_id
+                SET users.reporting_to = users_annex.reporting_to_userid
+                WHERE users.reporting_to <> users_annex.reporting_to_userid
+            ");
+            \DB::commit();
+
             $this->info(Carbon::now()->format('c')." - Commit all...");
         } catch (Exception $e) {
             echo 'Unable to populate users_annex table.'; echo "\r\n";

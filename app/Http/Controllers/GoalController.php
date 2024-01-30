@@ -261,16 +261,27 @@ class GoalController extends Controller
         $tags = '';
         $input['user_id'] = Auth::id();
         
+        error_log(print_r($input,true));
+
         if(isset($input['tag_ids'])) {
             $tags = $input['tag_ids'];
             unset($input['tag_ids']);
         }
+        if($input["created_goal_id"] == 0) {
+            $goal = Goal::create($input);
+            // Retrieve the goal_id after creating the Goal
+            $goal_id = $goal->id;
+        } else {
+            $goal_id = $input["created_goal_id"];
+            $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->findOrFail($goal_id); 
+            $goal->update($input);
+        }
+        
 
-        $goal = Goal::create($input);
         if ($tags != '') {
             $goal->tags()->sync($tags);
         }
-        return response()->json(['success' => true, 'message' => 'Goal Created successfully']);
+        return response()->json(['success' => true, 'message' => 'Goal Created successfully', 'goal_id' => $goal_id]);
     }
 
     /**
@@ -288,31 +299,65 @@ class GoalController extends Controller
         ->with('comments')
         ->firstOrFail();
 
-
-        $linkedGoalsIds = LinkedGoal::where('user_goal_id', $id)->pluck('supervisor_goal_id');
-
-        /* $supervisorGoals = Goal::whereIn('id', [997, 998, 999])->with('goalType')
-        ->whereNotIn('id', $linkedGoalsIds)
-        ->with('comments')->get(); */
-        $linkedGoals
-        = Goal::with('goalType', 'comments')
-        ->whereIn('id', $linkedGoalsIds)
-        ->get();
+        //get user info and check if user comes from supervisor, employee, manager shared with employee, or goal shared with
+        $authId = Auth::id();
+        $can_access = false;
+        if($authId == $goal->user_id) {
+            $can_access = true;
+        } 
 
         $user = User::findOrFail($goal->user_id);
-        if (($goal->last_supervisor_comment == 'Y') and (($goal->user_id == session()->get('original-auth-id')) or (session()->get('original-auth-id') == null))) {
+        if($user->reporting_to == $authId) {
+            $can_access = true;
+        }         
+        $shared_info = SharedProfile::select('shared_with')
+                        ->where('shared_id', Auth::id())
+                        ->where('shared_item', 'like', '%1%')
+                        ->get();
 
-            $goal->last_supervisor_comment = 'N';
-            $goal->save();
-        };
+        $shared_with = $shared_info->pluck('shared_with')->toArray();
+        if(in_array($authId, $shared_with)){
+            $can_access = true;
+        }
 
-        // Commented by JP to avoid the new added message always marked as 'READ'
-        // $affected = DashboardNotification::wherein('notification_type', ['GC', 'GR'])
-        // ->where('related_id', $goal->id)
-        // ->wherenull('status')
-        // ->update(['status' => 'R']);
 
-        return view('goal.show', compact('goal', 'linkedGoals'));
+        $goal_sharedWithList = GoalSharedWith::from('goals_shared_with AS gsw')
+                ->where('gsw.goal_id', $goal->id)
+                ->get();
+        $goal_sharedWith = $goal_sharedWithList->pluck('user_id')->toArray();
+        if(in_array($authId, $goal_sharedWith)){
+            $can_access = true;
+        }
+
+
+        if($can_access) {
+            $linkedGoalsIds = LinkedGoal::where('user_goal_id', $id)->pluck('supervisor_goal_id');
+
+            /* $supervisorGoals = Goal::whereIn('id', [997, 998, 999])->with('goalType')
+            ->whereNotIn('id', $linkedGoalsIds)
+            ->with('comments')->get(); */
+            $linkedGoals
+            = Goal::with('goalType', 'comments')
+            ->whereIn('id', $linkedGoalsIds)
+            ->get();
+
+            
+            if (($goal->last_supervisor_comment == 'Y') and (($goal->user_id == session()->get('original-auth-id')) or (session()->get('original-auth-id') == null))) {
+
+                $goal->last_supervisor_comment = 'N';
+                $goal->save();
+            };
+
+            // Commented by JP to avoid the new added message always marked as 'READ'
+            // $affected = DashboardNotification::wherein('notification_type', ['GC', 'GR'])
+            // ->where('related_id', $goal->id)
+            // ->wherenull('status')
+            // ->update(['status' => 'R']);
+
+            return view('goal.show', compact('goal', 'linkedGoals'));
+        } else {
+            echo "You don't have the right permission to access this goal.";
+        }
     }
 
     public function getSupervisorGoals($id) {
@@ -373,7 +418,7 @@ class GoalController extends Controller
     * @param  int  $id
     * @return \Illuminate\Http\Response
     */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, $is_ajax = false)
     {        
         $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->findOrFail($id); 
         if ($request->title == '' || $request->tag_ids== '') {
@@ -410,12 +455,15 @@ class GoalController extends Controller
         } else {
             DB::table('goal_tags')->where('goal_id', $id)->delete();
         }
-
-        if ($request->datatype != "auto") {
-            return redirect()->route($goal->is_library ? 'goal.library' : 'goal.index');
+        if($is_ajax){
+            return response()->json(['success' => true, 'message' => 'Goal Updated successfully']);
         } else {
-            //return \Redirect::route('goal.edit', [$id]);
-            return \Redirect::route('goal.edit', [$id])->with('autosave', " Goal updated.");
+            if ($request->datatype != "auto") {
+                return redirect()->route($goal->is_library ? 'goal.library' : 'goal.index');
+            } else {
+                //return \Redirect::route('goal.edit', [$id]);
+                return \Redirect::route('goal.edit', [$id])->with('autosave', " Goal updated.");
+            }
         }
     }
 
@@ -1513,6 +1561,7 @@ class GoalController extends Controller
 
             $user = User::findOrFail($goal->user_id);
             $curr_user = User::findOrFail(Auth::id());
+            $comment_user = User::findOrFail($comment->user_id);
 
             $user_validPreferredSupervisorID = $user->validPreferredSupervisor();
             $user_supervisors = $user->supervisorListPrimaryJob();
@@ -1584,31 +1633,35 @@ class GoalController extends Controller
                     // Use Class to create DashboardNotification
 
                     if ($user && $user->allow_inapp_notification) {
-                        $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                        $notification->user_id = Auth::id();
-                        $notification->notification_type = 'GR';
-                        $notification->comment = $user->name . ' replied to your Goal comment.';
-                        $notification->related_id = $goal->id;
-                        $notification->notify_user_id = Auth::id();
-                        $notification->send(); 
+                        if($comment_user->id != Auth::id()) {
+                            $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                            $notification->user_id = Auth::id();
+                            $notification->notification_type = 'GR';
+                            $notification->comment = $comment_user->name . ' replied to your Goal comment.';
+                            $notification->related_id = $goal->id;
+                            $notification->notify_user_id = Auth::id();
+                            $notification->send(); 
+                        }
                     }
 
                     // Send Out email notification
                     if ($user && $user->allow_email_notification && $user->userPreference->goal_comment_flag == 'Y') {
-                        $sendMail = new SendMail();
-                        $sendMail->toRecipients = array( $goal->user_id );  
-                        $sendMail->sender_id = null;
-                        $sendMail->useQueue = true;
-                        $sendMail->saveToLog = true;
-                        $sendMail->alert_type = 'N';
-                        $sendMail->alert_format = 'E';
-                        $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
+                        if($comment_user->id != $goal->user_id) {
+                            $sendMail = new SendMail();
+                            $sendMail->toRecipients = array( $goal->user_id );  
+                            $sendMail->sender_id = null;
+                            $sendMail->useQueue = true;
+                            $sendMail->saveToLog = true;
+                            $sendMail->alert_type = 'N';
+                            $sendMail->alert_format = 'E';
+                            $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
 
-                        array_push($sendMail->bindvariables, $goal->user->name);    // %1 Recipient of the email
-                        array_push($sendMail->bindvariables,  $user->name );        // %2 Person who added the comment
-                        array_push($sendMail->bindvariables, $goal->title);         // %3 Goal title
-                        array_push($sendMail->bindvariables, $comment->comment );   // %4 added comment
-                        $response = $sendMail->sendMailWithGenericTemplate();
+                            array_push($sendMail->bindvariables, $goal->user->name);    // %1 Recipient of the email
+                            array_push($sendMail->bindvariables,  $comment_user->name );        // %2 Person who added the comment
+                            array_push($sendMail->bindvariables, $goal->title);         // %3 Goal title
+                            array_push($sendMail->bindvariables, $comment->comment );   // %4 added comment
+                            $response = $sendMail->sendMailWithGenericTemplate();
+                        }
                     }
 
                 }
@@ -1630,32 +1683,35 @@ class GoalController extends Controller
                     // Use Class to create DashboardNotification
 
                     if ($user && $user->allow_inapp_notification) {
-                        $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                        $notification->user_id = Auth::id();
-                        $notification->notification_type = 'GC';
-                        $notification->comment =  $comment->user->name . ' added a comment to your goal.';
-                        $notification->related_id = $goal->id;
-                        $notification->notify_user_id = Auth::id();
-                        $notification->send(); 
+                        if($comment_user->id != Auth::id()) {
+                            $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                            $notification->user_id = Auth::id();
+                            $notification->notification_type = 'GC';
+                            $notification->comment =  $comment_user->name . ' added a comment to your goal.';
+                            $notification->related_id = $goal->id;
+                            $notification->notify_user_id = Auth::id();
+                            $notification->send(); 
+                        }
                     }
 
                     // Send Out Email Notification to Employee when his supervisor comment his goal
                     if ($user && $user->allow_email_notification && $user->userPreference->goal_comment_flag == 'Y') {
+                        if($comment_user->id != $goal->user_id) {
+                            $sendMail = new SendMail();
+                            $sendMail->toRecipients = array( $goal->user_id );  
+                            $sendMail->sender_id = null;
+                            $sendMail->useQueue = true;
+                            $sendMail->saveToLog = true;
+                            $sendMail->alert_type = 'N';
+                            $sendMail->alert_format = 'E';
+                            $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
 
-                        $sendMail = new SendMail();
-                        $sendMail->toRecipients = array( $goal->user_id );  
-                        $sendMail->sender_id = null;
-                        $sendMail->useQueue = true;
-                        $sendMail->saveToLog = true;
-                        $sendMail->alert_type = 'N';
-                        $sendMail->alert_format = 'E';
-                        $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
-
-                        array_push($sendMail->bindvariables, $goal->user->name);
-                        array_push($sendMail->bindvariables,  $comment->user->name );    // %2 Person who added the comment
-                        array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
-                        array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
-                        $response = $sendMail->sendMailWithGenericTemplate();
+                            array_push($sendMail->bindvariables, $goal->user->name);
+                            array_push($sendMail->bindvariables,  $comment_user->name );    // %2 Person who added the comment
+                            array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
+                            array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
+                            $response = $sendMail->sendMailWithGenericTemplate();
+                        }
                     }
                 }
             }
@@ -1673,34 +1729,37 @@ class GoalController extends Controller
                 // Use Class to create DashboardNotification
 
                 if ($curr_user->reportingManager && $curr_user->reportingManager->allow_inapp_notification) {
-                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                    $notification->user_id = $curr_supervisor_id;
-                    $notification->notification_type = 'GC';
-                    $notification->comment = $curr_user->name . ' added a comment to your goal.';
-                    $notification->related_id = $goal->id;
-                    $notification->notify_user_id = Auth::id();
-                    $notification->send(); 
+                    if($comment_user->id != $curr_supervisor_id) {
+                        $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                        $notification->user_id = $curr_supervisor_id;
+                        $notification->notification_type = 'GC';
+                        $notification->comment = $comment_user->name . ' added a comment to your goal.';
+                        $notification->related_id = $goal->id;
+                        $notification->notify_user_id = Auth::id();
+                        $notification->send(); 
+                    }
                 }
 
                 // Send Out Email Notification to Supervisor when Employee comments his supervisor's goal
                 if ($curr_user->reportingManager && 
                     $curr_user->reportingManager->allow_email_notification && 
                     $curr_user->reportingManager->userPreference->goal_comment_flag == 'Y') {                
+                    if($comment_user->id != $curr_supervisor_id) {
+                        $sendMail = new SendMail();
+                        $sendMail->toRecipients = array( $curr_supervisor_id );  
+                        $sendMail->sender_id = null;
+                        $sendMail->useQueue = true;
+                        $sendMail->saveToLog = true;
+                        $sendMail->alert_type = 'N';
+                        $sendMail->alert_format = 'E';
 
-                    $sendMail = new SendMail();
-                    $sendMail->toRecipients = array( $curr_supervisor_id );  
-                    $sendMail->sender_id = null;
-                    $sendMail->useQueue = true;
-                    $sendMail->saveToLog = true;
-                    $sendMail->alert_type = 'N';
-                    $sendMail->alert_format = 'E';
-
-                $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
-                array_push($sendMail->bindvariables, $curr_user->reportingManager->name);  // %1 Recipient of the email
-                array_push($sendMail->bindvariables, $curr_user->name);    // %2 Person who added the comment
-                array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
-                array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
-                $response = $sendMail->sendMailWithGenericTemplate();
+                        $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
+                        array_push($sendMail->bindvariables, $curr_user->reportingManager->name);  // %1 Recipient of the email
+                        array_push($sendMail->bindvariables, $comment_user->name);    // %2 Person who added the comment
+                        array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
+                        array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
+                        $response = $sendMail->sendMailWithGenericTemplate();
+                    }
                 }
             }
 
@@ -1715,28 +1774,32 @@ class GoalController extends Controller
             foreach($sharedWithList AS $shared) {
                 $userShared = User::with('userPreference')->findOrFail($shared->user_id);
                 if($userShared && $userShared->allow_inapp_notification) {
-                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                    $notification->user_id = $shared->user_id;
-                    $notification->notification_type = 'GK';
-                    $notification->comment = $curr_user->name . ' added a comment to a shared goal.';
-                    $notification->related_id = $goal->id;
-                    $notification->notify_user_id = $shared->user_id;
-                    $notification->send(); 
+                    if($comment_user->id != $shared->user_id) {
+                        $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                        $notification->user_id = $shared->user_id;
+                        $notification->notification_type = 'GK';
+                        $notification->comment = $comment_user->name . ' added a comment to a shared goal.';
+                        $notification->related_id = $goal->id;
+                        $notification->notify_user_id = $shared->user_id;
+                        $notification->send(); 
+                    }
                 }
                 if($userShared && $userShared->allow_email_notification && $userShared->userPreference->goal_comment_flag == 'Y') {
-                    $sendMail = new SendMail();
-                    $sendMail->toRecipients = array( $shared->user_id );  
-                    $sendMail->sender_id = null;
-                    $sendMail->useQueue = true;
-                    $sendMail->saveToLog = true;
-                    $sendMail->alert_type = 'N';
-                    $sendMail->alert_format = 'E';
-                    $sendMail->template = 'GOAL_COMMENT_SHARED';
-                    array_push($sendMail->bindvariables, $shared->name);  // %1 Recipient of the email
-                    array_push($sendMail->bindvariables, $curr_user->name);    // %2 Person who added the comment
-                    array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
-                    array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
-                    $response = $sendMail->sendMailWithGenericTemplate();
+                    if($comment_user->id != $shared->user_id) {
+                        $sendMail = new SendMail();
+                        $sendMail->toRecipients = array( $shared->user_id );  
+                        $sendMail->sender_id = null;
+                        $sendMail->useQueue = true;
+                        $sendMail->saveToLog = true;
+                        $sendMail->alert_type = 'N';
+                        $sendMail->alert_format = 'E';
+                        $sendMail->template = 'GOAL_COMMENT_SHARED';
+                        array_push($sendMail->bindvariables, $shared->name);  // %1 Recipient of the email
+                        array_push($sendMail->bindvariables, $comment_user->name);    // %2 Person who added the comment
+                        array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
+                        array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
+                        $response = $sendMail->sendMailWithGenericTemplate();
+                    }
                 }
             }
             // //Notify Owner

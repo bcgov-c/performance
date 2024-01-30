@@ -42,7 +42,7 @@
                 </div>                
                 <div class="col-sm-6">
                         <b>Tags</b>
-                        <i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resources/goal-setting?t=5' target=\'_blank\'><u>View full list of tag descriptions.</u></a><br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>."></i>				
+                        <i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resources/goal-setting?t=8' target=\'_blank\'><u>View full list of tag descriptions.</u></a><br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>."></i>				
                         <x-xdropdown :list="$tags" name="tag_ids[]"  class="tags" displayField="name" multiple/>
                         <small  class="text-danger error-tag_ids"></small>
                 </div>
@@ -146,7 +146,7 @@
             $('.text-danger').html('');
             $('.form-control').removeClass('is-invalid');
             
-            const minutes = 15;
+            const minutes = 20;
             const SessionTime = 1000 * 60 * minutes;
             const myTimeout = setTimeout(sessionWarning, SessionTime);    
             
