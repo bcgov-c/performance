@@ -257,6 +257,7 @@ class CalcNextConversationDate extends Command
                         $new_last_deptid = $jr->current_deptid;
                         $new_last_manual_excuse = $jr->current_manual_excuse ?? 'N';
                         if ($jr->current_employee_status == 'A' 
+                            && $jr->excused_type <> 'A'
                             && $demo->employee_status != 'A') {
                             // STATUS CHANGE
                             $changeType = 'statusStartExcuse';
@@ -276,7 +277,8 @@ class CalcNextConversationDate extends Command
                             || $demo->excused_flag);
                         if ($jr->current_employee_status == 'A' 
                             && $demo->employee_status == 'A'
-                            && $jr_inarray == false
+                            // && $jr_inarray == false
+                            && $jr->excused_type <> 'A'
                             && $demo_inarray) {
                             // CLASSIFICATION CHANGE
                             $changeType = 'classStartExcuse';
@@ -287,7 +289,8 @@ class CalcNextConversationDate extends Command
                         $jr_in_deptarray = in_array($jr->current_deptid, $ExcusedDepartmentArray);
                         if ($jr->current_employee_status == 'A' 
                             && $demo->employee_status == 'A'
-                            && $jr_in_deptarray == false
+                            // && $jr_in_deptarray == false
+                            && $jr->excused_type <> 'A'
                             && $demo_in_deptarray) {
                             // DEPTID CHANGE
                             $changeType = 'deptStartExcuse';
