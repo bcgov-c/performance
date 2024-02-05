@@ -82,7 +82,7 @@
                         <b>Audience</b><br>                        
                         <select multiple class="form-control items-to-share" id="itemsToShare" name="itemsToShare[]">
                             @foreach ($employees_list as $employee)
-                                <option value="{{ $employee['id'] }}" selected> {{$employee["name"]}}</option>                                
+                                <option value="{{ $employee['id'] }}" > {{$employee["name"]}}</option>                                
                             @endforeach
                         </select>
                     <!-- </label> -->
