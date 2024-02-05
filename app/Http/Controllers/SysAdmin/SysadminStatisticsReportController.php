@@ -254,6 +254,7 @@ class SysadminStatisticsReportController extends Controller
 
         $total_goal_counts = 0; 
         $no_type_count = array();
+        $no_type_count["0"] = 0;
         $no_type_count["1-5"] = 0;
         $no_type_count["6-10"] = 0;        
         $no_type_count[">10"] = 0;
@@ -262,6 +263,10 @@ class SysadminStatisticsReportController extends Controller
         foreach($goals_count_type_array as $item){
             $total_goal_counts = $total_goal_counts + $item["goals_count"];
             if($item["goal_type_id"]){
+                if($item["group_key"] == '0'){
+                    $no_type_count["0"] =  $no_type_count["0"] + $item["goals_count"];
+                    $total_notype_count = $total_notype_count + $item["goals_count"];
+                }
                 if($item["group_key"] == '1-5'){
                     $no_type_count["1-5"] =  $no_type_count["1-5"] + $item["goals_count"];
                     $total_notype_count = $total_notype_count + $item["goals_count"];
@@ -311,6 +316,10 @@ class SysadminStatisticsReportController extends Controller
             foreach($goals_count_type_array as $item){
                 if($type->id){
                     if ($item["goal_type_id"] == $type->id){
+                        if($item["group_key"] == '0'){
+                            $goals_count_array["0"] = $item["goals_count"]; 
+                            $sub_type_total = $sub_type_total + $item["goals_count"];
+                        }
                         if($item["group_key"] == '1-5'){
                             $goals_count_array["1-5"] = $item["goals_count"]; 
                             $sub_type_total = $sub_type_total + $item["goals_count"];
@@ -325,6 +334,7 @@ class SysadminStatisticsReportController extends Controller
                         }
                     }
                 } else {
+                    $goals_count_array["0"] = $no_type_count["0"]; 
                     $goals_count_array["1-5"] = $no_type_count["1-5"]; 
                     $goals_count_array["6-10"] = $no_type_count["6-10"]; 
                     $goals_count_array[">10"] = $no_type_count[">10"]; 
@@ -332,8 +342,6 @@ class SysadminStatisticsReportController extends Controller
                     $sub_type_total = $total_notype_count;
                 }
             }
-            $result_count = $total_goal_counts - $sub_type_total;
-            $goals_count_array["0"] = $result_count;
 
             foreach($this->groups as $key => $range) {
                     $goals_count = 0;
@@ -630,7 +638,6 @@ class SysadminStatisticsReportController extends Controller
 
     public function goalSummaryExport(Request $request)
     {
-
         $level0 = $request->dd_level0 ? EmployeeDemoTree::where('id', $request->dd_level0)->first() : null;
         $level1 = $request->dd_level1 ? EmployeeDemoTree::where('id', $request->dd_level1)->first() : null;
         $level2 = $request->dd_level2 ? EmployeeDemoTree::where('id', $request->dd_level2)->first() : null;
@@ -755,7 +762,7 @@ class SysadminStatisticsReportController extends Controller
                     // ->where( function($query) {
                     //     $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01") ')
                     //           ->where('employee_demo.employee_status', 'A');
-                    // });
+                    // });     
             $users_1 = $sql_1->get();
 
             $from_stmt_2 = $this->goalSummary_from_statement(2);
@@ -975,30 +982,54 @@ class SysadminStatisticsReportController extends Controller
                             "Organization", "Level 1", "Level 2", "Level 3", "Level 4", "Reporting To",
                         ];
 
-            $callback = function() use($users, $columns) {
+            $callback = function() use($users, $columns, $request) {
                 $file = fopen('php://output', 'w');
                 fputcsv($file, $columns);
 
                 foreach ($users as $user) {
-                    $row['Employee ID'] = $user["employee_id"];
-                    $row['Name'] = $user["employee_name"];
-                    $row['Email'] = $user["employee_email"];
                     $goals_count = $user["Active Work Goals Count"] + $user["Active Career Development Goals Count"] + $user["Active Learning Goals Count"] + $user["Active Private Goals Count"];
-                    $row['Active Goals Count'] = $goals_count;
-                    $row['Active Work Goals Count'] = $user["Active Work Goals Count"];
-                    $row['Active Career Development Goals Count'] = $user["Active Career Development Goals Count"];
-                    $row['Active Learning Goals Count'] = $user["Active Learning Goals Count"];
-                    $row['Active Private Goals Count'] = $user["Active Private Goals Count"];
-                    $row['Organization'] = $user["organization"];
-                    $row['Level 1'] = $user["level1_program"];
-                    $row['Level 2'] = $user["level2_division"];
-                    $row['Level 3'] = $user["level3_branch"];
-                    $row['Level 4'] = $user["level4"];
-                    $row['Reporting To'] = $user["Reporting To"];
+                    if($request->range == 0){
+                        if($goals_count == 0) {
+                            $row['Employee ID'] = $user["employee_id"];
+                            $row['Name'] = $user["employee_name"];
+                            $row['Email'] = $user["employee_email"];                    
+                            $row['Active Goals Count'] = $goals_count;
+                            $row['Active Work Goals Count'] = $user["Active Work Goals Count"];
+                            $row['Active Career Development Goals Count'] = $user["Active Career Development Goals Count"];
+                            $row['Active Learning Goals Count'] = $user["Active Learning Goals Count"];
+                            $row['Active Private Goals Count'] = $user["Active Private Goals Count"];
+                            $row['Organization'] = $user["organization"];
+                            $row['Level 1'] = $user["level1_program"];
+                            $row['Level 2'] = $user["level2_division"];
+                            $row['Level 3'] = $user["level3_branch"];
+                            $row['Level 4'] = $user["level4"];
+                            $row['Reporting To'] = $user["Reporting To"];
 
-                    fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], 
-                                $row['Active Goals Count'], $row['Active Work Goals Count'], $row['Active Career Development Goals Count'], $row['Active Learning Goals Count'], $row['Active Private Goals Count'], 
-                                $row['Organization'], $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], $row['Reporting To'] ));
+                            fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], 
+                                        $row['Active Goals Count'], $row['Active Work Goals Count'], $row['Active Career Development Goals Count'], $row['Active Learning Goals Count'], $row['Active Private Goals Count'], 
+                                        $row['Organization'], $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], $row['Reporting To'] ));
+                        }
+                    } else {
+                            $row['Employee ID'] = $user["employee_id"];
+                            $row['Name'] = $user["employee_name"];
+                            $row['Email'] = $user["employee_email"];                    
+                            $row['Active Goals Count'] = $goals_count;
+                            $row['Active Work Goals Count'] = $user["Active Work Goals Count"];
+                            $row['Active Career Development Goals Count'] = $user["Active Career Development Goals Count"];
+                            $row['Active Learning Goals Count'] = $user["Active Learning Goals Count"];
+                            $row['Active Private Goals Count'] = $user["Active Private Goals Count"];
+                            $row['Organization'] = $user["organization"];
+                            $row['Level 1'] = $user["level1_program"];
+                            $row['Level 2'] = $user["level2_division"];
+                            $row['Level 3'] = $user["level3_branch"];
+                            $row['Level 4'] = $user["level4"];
+                            $row['Reporting To'] = $user["Reporting To"];
+
+                            fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], 
+                                        $row['Active Goals Count'], $row['Active Work Goals Count'], $row['Active Career Development Goals Count'], $row['Active Learning Goals Count'], $row['Active Private Goals Count'], 
+                                        $row['Organization'], $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], $row['Reporting To'] ));
+                    }
+                    
                 }
 
                 fclose($file);
