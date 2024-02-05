@@ -86,7 +86,7 @@
 		@media screen  {
 		.chart {
 			/* min-width:  180px;  */
-			min-height: 480px;
+			min-height: 680px
 		}	
 	
 		.print-only {
