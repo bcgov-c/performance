@@ -23,7 +23,7 @@
 <span id="pdf-output">
 
   <div class="row justify-content-center">
-	<div class="col-sm-12 col-md-10 col-lg-4">
+	<div class="col-sm-12 col-md-12 col-lg-6">
 	  <div class="card">
 		<div class="card-body">
 		  <div class="chart has-fixed-height" id="pie_basic_1">
@@ -34,7 +34,7 @@
 	</div>
 	
         
-          <div class="col-sm-12 col-md-10 col-lg-4">
+          <div class="col-sm-12 col-md-12 col-lg-6">
 			<div class="card">
 				<div class="card-body">
 					<div class="chart has-fixed-height" id="pie_basic_4">
@@ -86,7 +86,7 @@
 		@media screen  {
 		.chart {
 			/* min-width:  180px;  */
-			min-height: 480px;
+			min-height: 680px
 		}	
 	
 		.print-only {
