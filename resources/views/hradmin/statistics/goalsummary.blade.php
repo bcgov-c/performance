@@ -219,7 +219,7 @@ $(function()  {
 				bottom: -5,
 				feature: {
 					// mark: { show: true },
-					dataView: { show: true, readOnly: true },
+					dataView: { show: true, title: '', readOnly: true },
 					// restore: { show: true },
 					// saveAsImage: { show: true },
 					myTool1: {
@@ -380,7 +380,7 @@ $(function()  {
 				bottom: -5,
 				feature: {
 					// mark: { show: true },
-					dataView: { show: true, readOnly: true },
+					dataView: { show: true, title: '', readOnly: true },
 					// restore: { show: true },
 					// saveAsImage: { show: true },
 					myTool1: {
@@ -503,7 +503,7 @@ $(function()  {
 				bottom: -5,
 				feature: {
 					// mark: { show: true },
-					dataView: { show: true, readOnly: true },
+					dataView: { show: true,  readOnly: true },
 					// restore: { show: true },
 					// saveAsImage: { show: true },
 					myTool1: {
@@ -560,7 +560,7 @@ $(function()  {
 				}
 			},
 			series: [{
-				name: myData['name'],
+				name: 'Active Goals Per Employee',
 				type: 'pie',
 				// radius: '50%',
 				radius: ['15%', '50%'],
