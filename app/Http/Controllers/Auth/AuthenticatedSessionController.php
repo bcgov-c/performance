@@ -121,6 +121,7 @@ class AuthenticatedSessionController extends Controller
             ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
             ->where('access_organizations.allow_login', 'Y')
             ->whereNull('employee_demo.date_deleted')
+            ->whereRaw('employee_demo.pdp_excluded = 0')
             ->where('users.guid', $guid)
             ->where('users.acctlock', 0)
             ->select('users.*')

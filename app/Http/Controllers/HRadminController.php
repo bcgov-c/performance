@@ -101,7 +101,8 @@ class HRadminController extends Controller
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
             ->from('employee_demo')
-            ->where('employee_demo.deptid', 'deptid');
+            ->where('employee_demo.deptid', 'deptid')
+            ->whereRaw('employee_demo.pdp_excluded = 0');
         })->get();
 
         $level0Value = 'all';
@@ -121,6 +122,7 @@ class HRadminController extends Controller
         ->leftjoin('users', 'goals.user_id', '=', 'users.id')
         ->leftjoin('employee_demo', 'goals.user_id', '=', 'employee_demo.employee_id')
         ->leftjoin('goal_types', 'goals.goal_type_id', '=', 'goal_types.id')
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->select('goals.*', 'users.name', 'employee_demo.deptid', 'employee_demo.level1_program', 'employee_demo.level2_division', 'employee_demo.level3_branch', 'employee_demo.level4',
         DB::raw('(CASE
         WHEN is_mandatory = 0 THEN "Suggested"
@@ -165,7 +167,8 @@ class HRadminController extends Controller
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
             ->from('employee_demo')
-            ->whereColumn('employee_demo.deptid', 'organizations.deptid');
+            ->whereColumn('employee_demo.deptid', 'organizations.deptid')
+            ->whereRaw('employee_demo.pdp_excluded = 0');
         }
         )
         ->groupby('organization')
@@ -177,7 +180,8 @@ class HRadminController extends Controller
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
             ->from('employee_demo')
-            ->whereColumn('employee_demo.deptid', 'organizations.deptid');
+            ->whereColumn('employee_demo.deptid', 'organizations.deptid')
+            ->whereRaw('employee_demo.pdp_excluded = 0');
         }
         )
         ->groupby('level1')
@@ -201,6 +205,7 @@ class HRadminController extends Controller
         $sEmpl = DB::table('goals')
         ->leftjoin('employee_demo', 'employee_demo.employee_id', '=', 'goals.user_id')
         ->where('employee_demo.employee_name', '!=', '')
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->select('goals.user_id', 'employee_demo.employee_name', 'employee_demo.position_title', 'employee_demo.organization', 'employee_demo.level1_program', 'employee_demo.level2_division', 'employee_demo.level3_branch', 'employee_demo.level4')
         ->distinct()
         ->paginate(8);
@@ -228,6 +233,7 @@ class HRadminController extends Controller
         ->join('users', function($join){
             $join->on('employee_Demo.employee_id', '=', 'users.id');
         })
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
         // ->wherenotnull('excused_start_date')
         ;
@@ -334,6 +340,7 @@ class HRadminController extends Controller
         $this->getSearchCriterias($crit);
 
         $query = User::join('employee_demo', 'users.employee_id', 'employee_demo.employee_id')
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
         ->whereNotNull('excused_start_date');
         // ->get();
@@ -436,6 +443,7 @@ class HRadminController extends Controller
             $data = User::select('*');
 
             $query = User::join('employee_demo', 'users.employee_id', 'employee_demo.employee_id')
+            ->whereRaw('employee_demo.pdp_excluded = 0')
             ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
             ->whereNotNull('excused_start_date');
     

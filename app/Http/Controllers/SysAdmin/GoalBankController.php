@@ -576,10 +576,12 @@ class GoalBankController extends Controller
         $notify_audiences = [];
         if($request->opt_audience == "byEmp") {
             $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
-            $toRecipients = EmployeeDemo::from('employee_demo AS d')
+            $toRecipients = EmployeeDemo::withoutGlobalScopes()
+                ->from('employee_demo AS d')
                 ->select('u.id')
                 ->join('users AS u', 'd.employee_id', 'u.employee_id')
                 ->whereIn('d.employee_id', $selected_emp_ids )
+                ->whereRaw('d.pdp_excluded = 0')
                 ->distinct()
                 ->select ('u.id')
                 ->orderBy('d.employee_name')
@@ -1255,49 +1257,65 @@ class GoalBankController extends Controller
     }
 
     protected function get_employees_by_selected_org_nodes($selected_org_nodes) {
-        $employees = EmployeeDemo::from('employee_demo AS d')
+        $employees = EmployeeDemo::withoutGlobalScopes()
+            ->from('employee_demo AS d')
             ->whereIn('d.orgid', $selected_org_nodes)
             ->whereNull('d.date_deleted')
+            ->whereRaw('d.pdp_excluded = 0')
             ->select('d.employee_id')
             ->pluck('d.employee_id'); 
         return ($employees ? $employees->toArray() : []); 
     }
 
     protected function get_employees_by_selected_inherited($selected_inherited) {
-        $employees0 = EmployeeDemo::from('employee_demo AS d')
+        $employees0 = EmployeeDemo::withoutGlobalScopes()
+            ->from('employee_demo AS d')
             ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
             ->whereIn('t.organization_key', $selected_inherited)
             ->whereNull('d.date_deleted')
+            ->whereRaw('d.pdp_excluded = 0')
             ->select('d.employee_id');
-        $employees1 = EmployeeDemo::from('employee_demo AS d')
+        $employees1 = EmployeeDemo::withoutGlobalScopes()
+            ->from('employee_demo AS d')
             ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
             ->whereIn('t.level1_key', $selected_inherited)
             ->whereNull('d.date_deleted')
+            ->whereRaw('d.pdp_excluded = 0')
             ->select('d.employee_id');
-        $employees2 = EmployeeDemo::from('employee_demo AS d')
+        $employees2 = EmployeeDemo::withoutGlobalScopes()
+            ->from('employee_demo AS d')
             ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
             ->whereIn('t.level2_key', $selected_inherited)
             ->whereNull('d.date_deleted')
+            ->whereRaw('d.pdp_excluded = 0')
             ->select('d.employee_id');
-        $employees3 = EmployeeDemo::from('employee_demo AS d')
+        $employees3 = EmployeeDemo::withoutGlobalScopes()
+            ->from('employee_demo AS d')
             ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
             ->whereIn('t.level3_key', $selected_inherited)
             ->whereNull('d.date_deleted')
+            ->whereRaw('d.pdp_excluded = 0')
             ->select('d.employee_id');
-        $employees4 = EmployeeDemo::from('employee_demo AS d')
+        $employees4 = EmployeeDemo::withoutGlobalScopes()
+            ->from('employee_demo AS d')
             ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
             ->whereIn('t.level4_key', $selected_inherited)
             ->whereNull('d.date_deleted')
+            ->whereRaw('d.pdp_excluded = 0')
             ->select('d.employee_id');
-        $employees5 = EmployeeDemo::from('employee_demo AS d')
+        $employees5 = EmployeeDemo::withoutGlobalScopes()
+            ->from('employee_demo AS d')
             ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
             ->whereIn('t.level5_key', $selected_inherited)
             ->whereNull('d.date_deleted')
+            ->whereRaw('d.pdp_excluded = 0')
             ->select('d.employee_id');
-        $employees6 = EmployeeDemo::from('employee_demo AS d')
+        $employees6 = EmployeeDemo::withoutGlobalScopes()
+            ->from('employee_demo AS d')
             ->join('employee_demo_tree AS t', 'd.orgid', 't.id')
             ->whereIn('t.level6_key', $selected_inherited)
             ->whereNull('d.date_deleted')
+            ->whereRaw('d.pdp_excluded = 0')
             ->select('d.employee_id');
         $employees = $employees0->union($employees1)->union($employees2)->union($employees3)->union($employees4)->union($employees5)->union($employees6)->pluck('employee_id');
         return ($employees ? $employees->toArray() : []); 

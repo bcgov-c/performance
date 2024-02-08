@@ -149,6 +149,7 @@ class UnlockConversationController extends Controller
                         ->join('users', 'users.id', 'conversation_participants.participant_id')
                         ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
                         ->join('employee_demo_tree AS u', 'u.id', 'employee_demo.orgid')
+                        ->whereRaw('employee_demo.pdp_excluded = 0')
                         ->when($request->dd_level0, function($q) use($request) { return $q->whereRaw("u.organization_key = {$request->dd_level0}"); })
                         ->when($request->dd_level1, function($q) use($request) { return $q->whereRaw("u.level1_key = {$request->dd_level1}"); })
                         ->when($request->dd_level2, function($q) use($request) { return $q->whereRaw("u.level2_key = {$request->dd_level2}"); })

@@ -220,6 +220,7 @@ class DashboardController extends Controller
                     ->join('users','users.id','shared_profiles.shared_with')
                     ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
                     ->whereNull('employee_demo.date_deleted')
+                    ->whereRaw('employee_demo.pdp_excluded = 0')
                     ->with('sharedWithUser')->get();
         
         
