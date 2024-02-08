@@ -1896,18 +1896,19 @@ class GoalController extends Controller
     public function syncGoals(Request $request) {
         if ($request->has("sync_goal_id") && $request->sync_goal_id) {
             $goal_id = $request->sync_goal_id;
-            if ($request->has("sync_users") && $request->sync_users) {
-                $previousList = GoalSharedWith::where('goal_id', $goal_id)
-                    ->select('user_id')
-                    ->pluck('user_id')
-                    ->toArray();
+
+            //get users who already shared with this goal
+            $previousList = GoalSharedWith::where('goal_id', $goal_id)->pluck('user_id')->toArray();
+            if ($request->has("sync_users") && $request->sync_users) { 
                 if(!is_array($request->sync_users)){                    
                     GoalSharedWith::where('goal_id', $goal_id)->delete();
                     $users_arr = explode(',', $request->sync_users);
                 } else {
                     $users_arr = $request->sync_users;
                 }   
-                if(count($users_arr)>0){
+
+                if(count($users_arr)>0){    
+                    error_log('1111');
                     if(is_numeric($users_arr[0])){
                         GoalSharedWith::where('goal_id', $goal_id)->delete();
                         foreach($users_arr as $userId){
@@ -1927,15 +1928,14 @@ class GoalController extends Controller
                         }
                     }
                     $listDifference = array_diff($users_arr, $previousList);
-                    $last_item = null;
-                    foreach($listDifference as $theOne){ $last_item = $theOne; }
-                    if(is_numeric($last_item)) {
-                        $this->syncGoalNotifications($request, $goal_id, $last_item);
+                    foreach($listDifference as $last_item){ 
+                        if(is_numeric($last_item)) {
+                            $this->syncGoalNotifications($request, $goal_id, $last_item);
+                        }
                     }
                 } else {
                     GoalSharedWith::where('goal_id', $goal_id)->delete();
                 }
-                
             } else {
                 GoalSharedWith::where('goal_id', $goal_id)->delete();
             }
