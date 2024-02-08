@@ -56,6 +56,7 @@ class MyTeamController extends Controller
         ->join('users','users.id','shared_profiles.shared_id')
         ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
         ->whereNull('employee_demo.date_deleted')
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->where('shared_with', '=', Auth::id())
         ->where(function ($sh) {
             $sh->where('shared_item', 'like', '%1%')
@@ -66,6 +67,7 @@ class MyTeamController extends Controller
         $adminemps = User::select('users.*')
         ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
         ->whereNull('employee_demo.date_deleted')
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->whereIn('users.id', $adminShared)->get();
 
         $employees = $employees->merge($adminemps);
@@ -99,6 +101,7 @@ class MyTeamController extends Controller
                     ->join('users', 'users.id', '=', 'shared_profiles.shared_id')
                     ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
                     ->whereNull('employee_demo.date_deleted')
+                    ->whereRaw('employee_demo.pdp_excluded = 0')
                     ->where('shared_profiles.shared_with', Auth::id())
                     ->where('shared_profiles.shared_item', 'like', '%1%')
                     ->get();
@@ -337,12 +340,14 @@ class MyTeamController extends Controller
             $user_query = User::where('name', 'LIKE', "%{$search}%")
                           ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
                           ->whereNull('employee_demo.date_deleted')  
+                          ->whereRaw('employee_demo.pdp_excluded = 0')
                           ->paginate();
         } else {
             $user_query = User::where('name', 'LIKE', "%{$search}%")
                           ->where('id', '<>', $current_user)
                           ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
                           ->whereNull('employee_demo.date_deleted')  
+                          ->whereRaw('employee_demo.pdp_excluded = 0')
                           ->paginate();
         }
         
@@ -364,6 +369,7 @@ class MyTeamController extends Controller
                           ->where('name', 'LIKE', "%{$search}%")
                           ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
                           ->whereNull('employee_demo.date_deleted')  
+                          ->whereRaw('employee_demo.pdp_excluded = 0')
                           ->groupBy('id', 'name', 'employee_demo.employee_email')
                           ->paginate();
         } else {
@@ -372,6 +378,7 @@ class MyTeamController extends Controller
                           ->where('id', '<>', $current_user)
                           ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
                           ->whereNull('employee_demo.date_deleted')  
+                          ->whereRaw('employee_demo.pdp_excluded = 0')
                           ->groupBy('id', 'name', 'employee_demo.employee_email')
                           ->paginate();
         }

@@ -176,7 +176,8 @@ class SyncUserProfile extends Command
                             $user->joining_date = date('Y-m-d',strtotime($employee->position_start_date)); 
                             $update_flag += 100;
                         }
-                        $active_demo = EmployeeDemo::from(\DB::raw('employee_demo AS ed2 USE INDEX (idx_employee_demo_employee_id_date_deleted)'))
+                        $active_demo = EmployeeDemo::withoutGlobalScopes()
+                            ->from(\DB::raw('employee_demo AS ed2 USE INDEX (idx_employee_demo_employee_id_date_deleted)'))
                             ->join(\DB::raw('employee_demo_tree AS edt USE INDEX (employee_demo_tree_id_unique)'), function ($on1) {
                                 return $on1->on('edt.id', 'ed2.orgid')
                                     ->whereNull('ed2.date_deleted');
@@ -186,6 +187,7 @@ class SyncUserProfile extends Command
                                     ->on('ao.allow_login', \DB::raw("'Y'"));
                             })
                             ->where('ed2.employee_id', \DB::raw("'{$employee->employee_id}'"))
+                            ->whereRaw('ed2.pdp_excluded = 0')
                             ->select(DB::raw(1))
                             ->first();
                         $active_found = $active_demo ? 1 : 0;
@@ -241,7 +243,8 @@ class SyncUserProfile extends Command
 
                     DB::beginTransaction();
                     try {
-                        $active_demo = EmployeeDemo::from(\DB::raw('employee_demo AS ed2 USE INDEX (idx_employee_demo_employee_id_date_deleted)'))
+                        $active_demo = EmployeeDemo::withoutGlobalScopes()
+                            ->from(\DB::raw('employee_demo AS ed2 USE INDEX (idx_employee_demo_employee_id_date_deleted)'))
                             ->join(\DB::raw('employee_demo_tree AS edt USE INDEX (employee_demo_tree_id_unique)'), function ($on1) {
                                 return $on1->on('edt.id', 'ed2.orgid')
                                     ->whereNull('ed2.date_deleted');
@@ -251,6 +254,7 @@ class SyncUserProfile extends Command
                                     ->on('ao.allow_login', \DB::raw("'Y'"));
                             })
                             ->where('ed2.employee_id', \DB::raw("'{$employee->employee_id}'"))
+                            ->whereRaw('ed2.pdp_excluded = 0')
                             ->select(DB::raw(1))
                             ->first();
                         $active_found = $active_demo ? 1 : 0;
@@ -349,7 +353,24 @@ class SyncUserProfile extends Command
             ->whereNotExists(function($active_demo) {
                 return $active_demo->select(DB::raw(2))->from('employee_demo AS ed2')->whereRaw("ed2.employee_id = users.employee_id")->whereNull('ed2.date_deleted');
             })
+            ->whereRaw('users.acctlock = 0')
             ->update(['users.acctlock' => true, 'users.last_sync_at' => $new_sync_at, 'users.email' => \DB::raw("CONCAT(users.email, LPAD(CONCAT('<', users.id, '><LOCKED>'), 20, '*'))")]);
+
+        $this->info( now() );         
+ 
+        // Step 4 : Lock Out Users from Excluded Departments
+        $this->info( now() );        
+        $this->info('Step 4 - Lock Out Users from Excluded Departments');
+
+        $users = User::where('id', '>', \DB::raw(9999))
+            ->whereExists(function($any_demo) {
+                return $any_demo->select(DB::raw(1))->from('employee_demo AS ed1')->whereRaw("ed1.employee_id = users.employee_id AND ed1.pdp_excluded = 1");
+            })
+            ->whereNotExists(function($active_demo) {
+                return $active_demo->select(DB::raw(2))->from('employee_demo AS ed2')->whereRaw("ed2.employee_id = users.employee_id AND ed2.pdp_excluded = 0")->whereNull('ed2.date_deleted');
+            })
+            ->whereRaw('users.acctlock = 0')
+            ->update(['users.acctlock' => true, 'users.last_sync_at' => $new_sync_at]);
 
         $this->info( now() );         
  

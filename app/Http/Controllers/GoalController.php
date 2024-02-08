@@ -523,6 +523,7 @@ class GoalController extends Controller
             ->whereIn('goals.by_admin', [1, 2])
             ->where('goals.is_library', true) 
             ->whereNull('goals.deleted_at')        
+            // ->whereRaw('employee_demo.pdp_excluded = 0')  
             ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.id', 'u2.name', 'goals.is_mandatory');
               
         // Admin List filter below
@@ -739,6 +740,7 @@ class GoalController extends Controller
             ->whereIn('goals.by_admin', [1, 2])
             ->where('goals.is_library', true)
             ->whereNull('goals.deleted_at')        
+            // ->whereRaw('employee_demo.pdp_excluded = 0')   
             ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.id', 'u2.name', 'goals.is_mandatory');
               
 
@@ -1028,6 +1030,7 @@ class GoalController extends Controller
             ->whereIn('goals.by_admin', [1, 2])
             ->where('goals.is_library', true)
             ->whereNull('goals.deleted_at')           
+            ->whereRaw('employee_demo.pdp_excluded = 0')       
             ->groupBy('u2.id', 'u2.name', 'goals.display_name');
         
         $all_adminGoalsInherited = Goal::withoutGlobalScopes()
@@ -2001,12 +2004,14 @@ class GoalController extends Controller
             $user_query = User::where('name', 'LIKE', "%{$search}%")
                           ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
                           ->whereNull('employee_demo.date_deleted')  
+                          ->whereRaw('employee_demo.pdp_excluded = 0')
                           ->paginate();
         } else {
             $user_query = User::where('name', 'LIKE', "%{$search}%")
                           ->where('id', '<>', $current_user)
                           ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
                           ->whereNull('employee_demo.date_deleted')  
+                          ->whereRaw('employee_demo.pdp_excluded = 0')
                           ->paginate();
         }
         
@@ -2025,19 +2030,21 @@ class GoalController extends Controller
         
         if ($current_user == '') {
             $user_query = User::select('id', 'name', 'employee_demo.employee_email')
-                          ->where('name', 'LIKE', "%{$search}%")
-                          ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
-                          ->groupBy('id', 'name', 'employee_email')
-                          ->whereNull('employee_demo.date_deleted')  
-                           ->paginate();
+                            ->where('name', 'LIKE', "%{$search}%")
+                            ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
+                            ->groupBy('id', 'name', 'employee_email')
+                            ->whereNull('employee_demo.date_deleted')  
+                            ->whereRaw('employee_demo.pdp_excluded = 0')
+                            ->paginate();
         } else {
             $user_query = User::select('id', 'name', 'employee_demo.employee_email')
-                         ->where('name', 'LIKE', "%{$search}%")
-                          ->where('id', '<>', $current_user)
-                          ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
-                          ->groupBy('id', 'name', 'employee_demo.employee_email')
-                          ->whereNull('employee_demo.date_deleted')  
-                          ->paginate();
+                            ->where('name', 'LIKE', "%{$search}%")
+                            ->where('id', '<>', $current_user)
+                            ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
+                            ->groupBy('id', 'name', 'employee_demo.employee_email')
+                            ->whereNull('employee_demo.date_deleted')  
+                            ->whereRaw('employee_demo.pdp_excluded = 0')
+                            ->paginate();
         }
         
         return $this->respondeWith($user_query);

@@ -316,7 +316,9 @@ class GetODSEmployeeDemographics extends Command
 
         // Update OrgId in employee_demo table
         $this->info(Carbon::now()->format('c').' - Updating Org Ids...');
-        EmployeeDemo::whereRaw("deptid IS NULL OR TRIM(deptid) = ''")
+        EmployeeDemo::withoutGlobalScopes()
+          ->whereRaw("(deptid IS NULL OR TRIM(deptid) = '')")
+          ->whereNotNull('orgid')
           ->update(['orgid' => null]);
         $demoDepts = EmployeeDemo::distinct()
           ->whereNotNull('deptid')
@@ -327,12 +329,65 @@ class GetODSEmployeeDemographics extends Command
           $org = EmployeeDemoTree::where('deptid', $dept->deptid)
             ->select('id')
             ->first();
-          EmployeeDemo::where('deptid', $dept->deptid)
+          EmployeeDemo::withoutGlobalScopes()
+            ->where('deptid', $dept->deptid)
             ->update(['orgid' => $org ? $org->id : null]);
-          ODSEmployeeDemo::where('deptid', $dept->deptid)
+          ODSEmployeeDemo::withoutGlobalScopes()
+            ->where('deptid', $dept->deptid)
             ->update(['orgid' => $org ? $org->id : null]);
         }
         $this->info(Carbon::now()->format('c').' - Org Ids updated.');
+
+        // Update pdp_excluded in employee_demo table
+        $this->info(Carbon::now()->format('c').' - Updating Dept Exclusions...');
+        EmployeeDemo::withoutGlobalScopes()
+        ->whereRaw('employee_demo.pdp_excluded = 1')
+        ->where(function ($q)  {
+            $q->whereNotExists(function ($query) {
+                return $query->select(DB::raw(1))
+                        ->from('excluded_departments')
+                        ->whereColumn('employee_demo.deptid', 'excluded_departments.deptid')
+                        ->whereNull('excluded_departments.deleted_at');
+            });    
+        })
+        ->update(['pdp_excluded' => 0]);
+        EmployeeDemo::withoutGlobalScopes()
+        ->whereNotNull("employee_demo.deptid")
+        ->whereRaw('employee_demo.pdp_excluded = 0')
+        ->where(function ($q)  {
+            $q->whereExists(function ($query) {
+                return $query->select(DB::raw(1))
+                        ->from('excluded_departments')
+                        ->whereColumn('employee_demo.deptid', 'excluded_departments.deptid')
+                        ->whereNull('excluded_departments.deleted_at');
+            });    
+        })
+        ->update(['pdp_excluded' => 1]);
+        // Update pdp_excluded in ods_employee_demo table
+        ODSEmployeeDemo::withoutGlobalScopes()
+        ->whereRaw('ods_employee_demo.pdp_excluded = 1')
+        ->where(function ($q)  {
+            $q->whereNotExists(function ($query) {
+                return $query->select(DB::raw(1))
+                        ->from('excluded_departments')
+                        ->whereColumn('ods_employee_demo.deptid', 'excluded_departments.deptid')
+                        ->whereNull('excluded_departments.deleted_at');
+            });    
+        })
+        ->update(['pdp_excluded' => 0]);
+        ODSEmployeeDemo::withoutGlobalScopes()
+        ->whereNotNull("ods_employee_demo.deptid")
+        ->whereRaw('ods_employee_demo.pdp_excluded = 0')
+        ->where(function ($q)  {
+            $q->whereExists(function ($query) {
+                return $query->select(DB::raw(1))
+                        ->from('excluded_departments')
+                        ->whereColumn('ods_employee_demo.deptid', 'excluded_departments.deptid')
+                        ->whereNull('excluded_departments.deleted_at');
+            });    
+        })
+        ->update(['pdp_excluded' => 1]);
+        $this->info(Carbon::now()->format('c').' - Dept Exclusions updated.');
 
         if(!$nodateupdateoverride) {
             DB::table('stored_dates')->updateOrInsert(
