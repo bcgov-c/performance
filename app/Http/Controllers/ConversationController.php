@@ -1411,6 +1411,7 @@ class ConversationController extends Controller
                          ->join('users','users.id','shared_profiles.shared_id')
                          ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
                          ->whereNull('employee_demo.date_deleted')
+                         ->whereRaw('employee_demo.pdp_excluded = 0')
                          ->with('sharedUser')->where('shared_item', 'like', '%2%')->get()->pluck('sharedUser'); 
 
         $participants = $participants->toBase()->merge($reportingManager)->merge($sharedProfile);
@@ -1419,6 +1420,7 @@ class ConversationController extends Controller
         ->join('users','users.id','shared_profiles.shared_with')
         ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
         ->whereNull('employee_demo.date_deleted')
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->where('shared_id', '=', Auth::id())
         ->where('shared_item', 'like', '%2%')
         ->pluck('shared_with');
@@ -1426,6 +1428,7 @@ class ConversationController extends Controller
         $adminemps = User::select('users.*')
         ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
         ->whereNull('employee_demo.date_deleted')
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->whereIn('users.id', $adminShared)->get('id', 'name');
 
         $participants = $participants->merge($adminemps);

@@ -158,7 +158,9 @@ class User extends Authenticatable
 
     public function reportingManager() {
         return $this->belongsTo('App\Models\User', 'reporting_to')
-        ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')->whereNull('employee_demo.date_deleted');
+        ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
+        ->whereNull('employee_demo.date_deleted')
+        ->whereRaw('employee_demo.pdp_excluded = 0');
     }
 
     public function reportingManagerRecursive() {
@@ -181,7 +183,8 @@ class User extends Authenticatable
         return User::join('employee_demo as ed', function ($on) {
                 return $on->on('ed.employee_id', 'users.employee_id')
                     ->on('ed.empl_record', 'users.empl_record')
-                    ->whereNull('ed.date_deleted');
+                    ->whereNull('ed.date_deleted')
+                    ->whereRaw('ed.pdp_excluded = 0');
             })
             ->whereIn(\DB::raw("CONCAT(users.employee_id, '-', users.empl_record)"), $reportee_emplids)
             ->whereNull('ed.date_deleted');
@@ -435,13 +438,20 @@ class User extends Authenticatable
     }
 
     public function supervisorList() {
-        return EmployeeDemo::join('positions AS p', 'employee_demo.position_number', 'p.position_nbr')
-        ->join('employee_demo AS e', 'p.reports_to', 'e.position_number')
+        return EmployeeDemo::withoutGlobalScopes()
+        ->join('positions AS p', 'employee_demo.position_number', 'p.position_nbr')
+        ->join('employee_demo AS e', function($join1){
+            return $join1->on(function($on1){
+                return $on1->where('p.reports_to', 'e.position_number')
+                ->whereRaw('e.pdp_excluded = 0');
+            });
+        })
         ->join('users AS v', 'e.employee_id', 'v.employee_id')
         ->distinct()
         ->select('e.position_number', 'v.employee_id', 'v.name', 'v.id')
         ->whereNull('e.date_deleted')
         ->where('employee_demo.employee_id', $this->employee_id)
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->orderBy('e.position_number')
         ->orderBy('v.name')
         ->get();
@@ -466,7 +476,12 @@ class User extends Authenticatable
     public function supervisorListPrimaryJob() {
         $pJob = EmployeeSupervisor::from('employee_supervisor')
             ->join('users AS u', 'u.id', 'employee_supervisor.supervisor_id')
-            ->join('employee_demo AS ed', 'ed.employee_id', 'u.employee_id')
+            ->join('employee_demo AS ed', function($join1){
+                return $join1->on(function($on1){
+                    return $on1->where('ed.employee_id', 'u.employee_id')
+                    ->whereRaw('ed.pdp_excluded = 0');
+                });
+            })
             ->selectRaw("
                 ed.position_number,
                 u.employee_id,
@@ -495,6 +510,7 @@ class User extends Authenticatable
                 ")
                 ->whereRaw("em.employee_id = '{$this->employee_id}'")
                 ->whereRaw('authed.position_number = em.position_number')
+                ->whereRaw('authed.pdp_excluded = 0')
                 ->get();
         }
         return $pJob;
@@ -505,12 +521,14 @@ class User extends Authenticatable
     }
 
     public function validPreferredSupervisor() {
-        $row = EmployeeDemo::from('employee_demo AS ed')
+        $row = EmployeeDemo::withoutGlobalScopes()
+            ->from('employee_demo AS ed')
             ->join('users AS u', function($join){
                 return $join->on(function($on){
                     $on->whereRaw('u.employee_id = ed.employee_id')
                         ->whereRaw('u.empl_record = ed.empl_record')
-                        ->whereNull('ed.date_deleted');
+                        ->whereNull('ed.date_deleted')
+                        ->whereRaw('ed.pdp_excluded = 0');
                 });
             })
             ->join('positions AS p', 'ed.position_number', 'p.position_nbr')
@@ -518,6 +536,8 @@ class User extends Authenticatable
             ->select('e.employee_id')
             ->whereNull('e.date_deleted')
             ->where('ed.employee_id', $this->employee_id)
+            ->whereRaw('ed.pdp_excluded = 0')
+            ->whereRaw('e.pdp_excluded = 0')
             ->whereRaw("EXISTS (SELECT 1 FROM preferred_supervisor AS ps WHERE ps.employee_id = ed.employee_id AND ps.position_nbr = ed.position_number AND ps.supv_empl_id = e.employee_id)")
             ->first();
         return $row ? $row->employee_id : '';
@@ -544,7 +564,8 @@ class User extends Authenticatable
                 $join->on(function($on){
                     $on->whereRaw('pj.employee_id = ed.employee_id')
                         ->whereRaw('pj.empl_record = ed.empl_record')
-                        ->whereNull('ed.date_deleted');
+                        ->whereNull('ed.date_deleted')
+                        ->whereRaw('ed.pdp_excluded = 0');
                 });
             })
             ->join('employee_demo_tree AS edt', 'edt.id', 'ed.orgid')
@@ -554,10 +575,12 @@ class User extends Authenticatable
     }
 
     public function jobList() {
-        return EmployeeDemo::from('employee_demo AS ed1')
+        return EmployeeDemo::withoutGlobalScopes()
+            ->from('employee_demo AS ed1')
             ->whereRaw("EXISTS (SELECT 1 FROM employee_demo AS ed2 WHERE ed2.employee_id = ed1.employee_id AND ed2.empl_record <> ed1.empl_record AND ed2.date_deleted IS NULL)")
             ->join('employee_demo_tree AS edt', 'edt.id', 'ed1.orgid')
             ->whereNull('ed1.date_deleted')
+            ->whereRaw('ed1.pdp_excluded = 0')
             ->where('ed1.employee_id', $this->employee_id)
             ->selectRaw("ed1.employee_id, ed1.empl_record, CONCAT(edt.deptid, ' ', ed1.jobcode_desc) AS job")
             ->get();

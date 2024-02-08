@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Scopes\NonPDPExcludedScope;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 
@@ -37,6 +38,13 @@ class ODSEmployeeDemo extends Model
         'orgid'
     ];
 
+    protected static function boot()
+    {
+      parent::boot();
+  
+      static::addGlobalScope(new NonPDPExcludedScope);
+    }
+  
     public function users() {
         return $this->hasOne(User::class, 'employee_id', 'employee_id');
     }

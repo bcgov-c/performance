@@ -132,6 +132,7 @@ class MyTeamStatisticsReportController extends Controller
                         })
                         // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                         // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
+                        ->whereRaw('employee_demo.pdp_excluded = 0')
                         ->where('A.due_date_paused', 'N')                        
                         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                             return $q->where('employee_demo.organization', $level0->name);
@@ -195,6 +196,7 @@ class MyTeamStatisticsReportController extends Controller
                         //$join->on('employee_demo.employee_id', '=', 'A.employee_id');
                         //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
                     })
+                    ->whereRaw('employee_demo.pdp_excluded = 0')
                     // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                     // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                     ->where('A.due_date_paused', 'N')                        
@@ -279,7 +281,7 @@ class MyTeamStatisticsReportController extends Controller
 	    $count_raw .= "     and tag_id = tags.id ";  
         $count_raw .= "     and users.id = goals.user_id ";
         // $count_raw .= "     and users.employee_id = employee_demo.employee_id ";
-        $count_raw .= "     and users.employee_id = employee_demo.employee_id ";
+        $count_raw .= "     and users.employee_id = employee_demo.employee_id and employee_demo.pdp_excluded = 0 ";
         $count_raw .= $level0 ? "     and employee_demo.organization = '". addslashes($level0->name) ."'" : '';
         $count_raw .= $level1 ? "     and employee_demo.level1_program = '". addslashes($level1->name) ."'" : '';
         $count_raw .= $level2 ? "     and employee_demo.level2_division = '". addslashes($level2->name) ."'" : '';
@@ -342,6 +344,7 @@ class MyTeamStatisticsReportController extends Controller
                 //             ->where('admin_org_users.granted_to_id', '=', Auth::id());
                 // });
                 ->where('employee_demo.guid', '<>', '')
+                ->whereRaw('employee_demo.pdp_excluded = 0')
                 // ->where( function($query) {
                 //     $query->whereRaw('date(SYSDATE()) not between IFNULL(users.excused_start_date,"1900-01-01") and IFNULL(users.excused_end_date,"1900-01-01")')
                 //           ->where('employee_demo.employee_status', 'A');
@@ -412,6 +415,7 @@ class MyTeamStatisticsReportController extends Controller
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                 ->where('A.due_date_paused', 'N')                                        
                 ->whereNotNull('A.guid')
+                ->whereRaw('employee_demo.pdp_excluded = 0')
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
                 })
@@ -568,7 +572,7 @@ class MyTeamStatisticsReportController extends Controller
             $count_raw .= "                       where goals.id = goal_tags.goal_id) ";
             
             $count_raw .= "      and goals.deleted_at is null and goals.is_library = 0 ";            
-            $count_raw .= "      and employee_demo.guid <> '' ";
+            $count_raw .= "      and employee_demo.guid <> '' and employee_demo.pdp_excluded = 0 ";
             
             $count_raw .= "     and ( ";
             $count_raw .= "           users.due_date_paused = 'N' ";
@@ -601,6 +605,7 @@ class MyTeamStatisticsReportController extends Controller
                     })
                     // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                     // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
+                    ->whereRaw('employee_demo.pdp_excluded = 0')
                     ->where('users.due_date_paused', 'N')                                            
                     ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                         return $q->where('employee_demo.organization', $level0->name);
@@ -808,6 +813,7 @@ class MyTeamStatisticsReportController extends Controller
                 })
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N')")
+                ->whereRaw('employee_demo.pdp_excluded = 0')
                 ->where('users.due_date_paused', 'N')                        
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
@@ -907,6 +913,7 @@ class MyTeamStatisticsReportController extends Controller
         // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
         // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N')")
         // ->where('users.due_date_paused', 'N')                                
+        ->whereRaw('employee_demo.pdp_excluded = 0')                           
         ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
             return $q->where('employee_demo.organization', $level0->name);
         })
@@ -1057,6 +1064,7 @@ class MyTeamStatisticsReportController extends Controller
         })
         // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
         // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->where(function($query) {
             $query->where(function($query) {
                 $query->whereNotNull('signoff_user_id')
@@ -1212,6 +1220,7 @@ class MyTeamStatisticsReportController extends Controller
                 })
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
+                ->whereRaw('employee_demo.pdp_excluded = 0')
                 ->where('users.due_date_paused', 'N')                                        
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
@@ -1327,6 +1336,7 @@ class MyTeamStatisticsReportController extends Controller
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                 // ->where('users.due_date_paused', 'N')                        
+                ->whereRaw('employee_demo.pdp_excluded = 0')               
                 ->when($level0, function ($q) use($level0, $level1, $level2, $level3, $level4 ) {
                     return $q->where('employee_demo.organization', $level0->name);
                 })
@@ -1435,6 +1445,7 @@ class MyTeamStatisticsReportController extends Controller
                 // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
             })
+            ->whereRaw('employee_demo.pdp_excluded = 0')
             // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
             // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
             // ->where('users.due_date_paused', 'N')                                    
@@ -1764,6 +1775,7 @@ class MyTeamStatisticsReportController extends Controller
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
+                ->whereRaw('employee_demo.pdp_excluded = 0')
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                 ->where('users.due_date_paused', 'N')                                        
@@ -1892,6 +1904,7 @@ class MyTeamStatisticsReportController extends Controller
                 // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                 // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
             })
+            ->whereRaw('employee_demo.pdp_excluded = 0')
             // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
             // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
             ->where('users.due_date_paused', 'N')                        
@@ -2056,6 +2069,7 @@ class MyTeamStatisticsReportController extends Controller
                         // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                         // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                     })
+                    ->whereRaw('employee_demo.pdp_excluded = 0')
                     // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                     // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) ")                 
                     // ->where( function($q) {
@@ -2182,6 +2196,7 @@ class MyTeamStatisticsReportController extends Controller
                     // $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                     // $join->on('employee_demo.empl_record', '=', 'users.empl_record');
                 })
+                ->whereRaw('employee_demo.pdp_excluded = 0')
                 // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
                 // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) ")
                 ->when( $request->legend == 'Yes', function($q) use($request) {
@@ -2328,6 +2343,7 @@ class MyTeamStatisticsReportController extends Controller
                       ->join('employee_demo', function($join) {
                             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                         })
+                      ->whereRaw('employee_demo.pdp_excluded = 0')
                       ->whereColumn('employee_demo.organization', 'organization_trees.organization')
                       ->where( function($query) use($request)  {
                             $query->whereIn('users.id',function($q){
@@ -2383,6 +2399,7 @@ class MyTeamStatisticsReportController extends Controller
                       ->join('employee_demo', function($join) {
                             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                         })
+                      ->whereRaw('employee_demo.pdp_excluded = 0')
                       ->when( $request->level0, function ($q) { 
                                         return $q->whereColumn('employee_demo.organization', 'organization_trees.organization');
                         })
@@ -2449,6 +2466,7 @@ class MyTeamStatisticsReportController extends Controller
                       ->join('employee_demo', function($join) {
                             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                       })
+                      ->whereRaw('employee_demo.pdp_excluded = 0')
                       ->when( $request->level0, function ($q) { 
                             return $q->whereColumn('employee_demo.organization', 'organization_trees.organization');
                       })
@@ -2526,6 +2544,7 @@ class MyTeamStatisticsReportController extends Controller
                       ->join('employee_demo', function($join) {
                             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                       })
+                      ->whereRaw('employee_demo.pdp_excluded = 0')
                       ->when( $request->level0, function ($q) { 
                         return $q->whereColumn('employee_demo.organization', 'organization_trees.organization');
                       })
@@ -2613,6 +2632,7 @@ class MyTeamStatisticsReportController extends Controller
                       ->join('employee_demo', function($join) {
                             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
                       })
+                      ->whereRaw('employee_demo.pdp_excluded = 0')
                       ->when( $request->level0, function ($q) { 
                         return $q->whereColumn('employee_demo.organization', 'organization_trees.organization');
                     })

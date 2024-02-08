@@ -40,10 +40,12 @@ class AccessLogController extends Controller
                                         DB::raw("(Select idir FROM employee_demo
                                             where users.employee_id = employee_demo.employee_id
                                                 and employee_demo.date_deleted is null
+                                                and employee_demo.pdp_excluded = 0
                                             limit 1 ) as idir"),
                                         DB::raw("(Select organization FROM employee_demo
                                                    where users.employee_id = employee_demo.employee_id
                                                      and employee_demo.date_deleted is null
+                                                     and employee_demo.pdp_excluded = 0
                                                 limit 1 ) as organization")
                             );
                             
@@ -79,10 +81,12 @@ class AccessLogController extends Controller
                                         DB::raw("(Select idir FROM employee_demo
                                         where users.employee_id = employee_demo.employee_id
                                             and employee_demo.date_deleted is null
+                                            and employee_demo.pdp_excluded = 0
                                         limit 1 ) as idir"),
                                         DB::raw("(Select organization FROM employee_demo
                                                 where users.employee_id = employee_demo.employee_id
                                                     and employee_demo.date_deleted is null
+                                                    and employee_demo.pdp_excluded = 0
                                                 limit 1 ) as organization")
                             );
 

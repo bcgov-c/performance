@@ -165,6 +165,7 @@ class SysadminController extends Controller
         $sEmpl = DB::table('goals')
         ->leftjoin('employee_demo', 'employee_demo.employee_id', '=', 'goals.user_id')
         ->where('employee_demo.employee_name', '!=', '')
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->select('goals.user_id', 'employee_demo.employee_name', 'employee_demo.position_title', 'employee_demo.organization', 'employee_demo.level1_program', 'employee_demo.level2_division', 'employee_demo.level3_branch', 'employee_demo.level4')
         ->distinct()
         ->paginate(8);
@@ -196,6 +197,7 @@ class SysadminController extends Controller
         ->join('users', function($join){
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
         })
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
         // ->wherenotnull('excused_start_date')
         ;
@@ -278,6 +280,7 @@ class SysadminController extends Controller
         ->join('users', function($join){
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
         })
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
         ->wherenotnull('excused_start_date')
         ;
@@ -357,6 +360,7 @@ class SysadminController extends Controller
         ->join('users', function($join){
             $join->on('employee_Demo.employee_id', '=', 'users.employee_id');
         })
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4')
         // ->wherenotnull('excused_start_date')
         ;
@@ -445,6 +449,7 @@ class SysadminController extends Controller
         ->leftjoin('users', function($join){
             $join->on('employee_demo.employee_id', '=', 'users.employee_id');
         })
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->select('employee_id', 'employee_demo.guid', 'employee_name', 'jobcode_desc', 'organization','level1_program', 'level2_division', 'level3_branch', 'level4', 'excused_start_date', 'excused_end_date')
         // ->wherenotnull('excused_start_date')
         ;
@@ -531,6 +536,7 @@ class SysadminController extends Controller
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
             ->from('employee_demo')
+            ->whereRaw('employee_demo.pdp_excluded = 0')
             ->where('employee_demo.deptid', 'deptid');
         }
         )
@@ -553,6 +559,7 @@ class SysadminController extends Controller
         ->leftjoin('users', 'goals.user_id', '=', 'users.id')
         ->leftjoin('employee_demo', 'goals.user_id', '=', 'employee_demo.employee_id')
         ->leftjoin('goal_types', 'goals.goal_type_id', '=', 'goal_types.id')
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->select('goals.*', 'users.name', 'employee_demo.deptid', 'employee_demo.level1_program', 'employee_demo.level2_division', 'employee_demo.level3_branch', 'employee_demo.level4',
         DB::raw('(CASE
         WHEN is_mandatory = 0 THEN "Suggested"
@@ -604,6 +611,7 @@ class SysadminController extends Controller
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
             ->from('employee_demo')
+            ->whereRaw('employee_demo.pdp_excluded = 0')
             ->whereColumn('employee_demo.deptid', 'organizations.deptid');
         }
         )
@@ -616,6 +624,7 @@ class SysadminController extends Controller
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
             ->from('employee_demo')
+            ->whereRaw('employee_demo.pdp_excluded = 0')
             ->whereColumn('employee_demo.deptid', 'organizations.deptid');
         }
         )
@@ -637,6 +646,7 @@ class SysadminController extends Controller
 
         $openConversations = DB::table('conversations')
         ->leftjoin('employee_demo', 'employee_demo.employee_id', '=', 'conversations.user_id')
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->select('conversations.id', 'conversations.conversation_topic_id', 'conversations.date', 'employee_demo.organization', 'employee_demo.level1_program', 'employee_demo.level2_division', 'employee_demo.level3_branch', 'employee_demo.level4')
         ->where(function ($query) {
             $query->where('conversations.supervisor_signoff_id', null)
@@ -646,6 +656,7 @@ class SysadminController extends Controller
 
         $closedConversations = DB::table('conversations')
         ->leftjoin('employee_demo', 'employee_demo.employee_id', '=', 'conversations.user_id')
+        ->whereRaw('employee_demo.pdp_excluded = 0')
         ->select('conversations.id', 'conversations.conversation_topic_id', 'conversations.date', 'employee_demo.organization', 'employee_demo.level1_program', 'employee_demo.level2_division', 'employee_demo.level3_branch', 'employee_demo.level4')
         ->where('conversations.supervisor_signoff_id', '!=', null)
         ->where('conversations.user_id', '!=', null)
