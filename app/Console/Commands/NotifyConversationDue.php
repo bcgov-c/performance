@@ -114,6 +114,7 @@ class NotifyConversationDue extends Command
             ->where('users.due_date_paused', 'N')
             ->where('access_organizations.allow_inapp_msg', 'Y')
             ->whereNull('employee_demo.date_deleted')
+            ->whereRaw('employee_demo.pdp_excluded = 0')
             ->select('users.*')
             ->orderBy('users.guid')
             ->orderBy('users.id', 'desc');
@@ -256,6 +257,7 @@ class NotifyConversationDue extends Command
             ->join('employee_demo_tree', 'employee_demo_tree.id', 'employee_demo.orgid')
             ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
             ->where('employee_demo.guid','<>','')
+            ->whereRaw('employee_demo.pdp_excluded = 0')
             ->where('users.due_date_paused', 'N')
             ->where('access_organizations.allow_inapp_msg', 'Y')
             ->whereNull('date_deleted')
@@ -309,6 +311,7 @@ class NotifyConversationDue extends Command
                         ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
                         ->where('access_organizations.allow_inapp_msg', 'Y')
                         ->whereNull('date_deleted')                                                
+                        ->whereRaw('employee_demo.pdp_excluded = 0')                                            
                         ->where('users.id',  $manager_id)
                         ->first();
 
@@ -450,6 +453,7 @@ class NotifyConversationDue extends Command
             ->where('employee_demo.guid','<>','')
             ->where('access_organizations.allow_email_msg', 'Y')
             ->whereNull('employee_demo.date_deleted')
+            ->whereRaw('employee_demo.pdp_excluded = 0')
             ->where('users.due_date_paused', 'N')
             ->select('users.*')
             ->orderBy('users.guid')
@@ -597,6 +601,7 @@ class NotifyConversationDue extends Command
             ->where('employee_demo.guid','<>','')
             ->where('access_organizations.allow_email_msg', 'Y')
             ->whereNull('employee_demo.date_deleted')
+            ->whereRaw('employee_demo.pdp_excluded = 0')
             ->where('users.due_date_paused', 'N')
             ->select('users.*')
             ->orderBy('users.guid')
@@ -648,6 +653,7 @@ class NotifyConversationDue extends Command
                         ->join('access_organizations','employee_demo_tree.organization_key','access_organizations.orgid')
                         ->where('access_organizations.allow_email_msg', 'Y')
                         ->whereNull('date_deleted')                                                
+                        ->whereRaw('employee_demo.pdp_excluded = 0')                                             
                         ->where('users.id',  $manager_id)
                         ->select('users.*')
                         ->first();
@@ -783,6 +789,7 @@ class NotifyConversationDue extends Command
                         ->join('users','users.id','shared_profiles.shared_with')
                         ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
                         ->whereNull('employee_demo.date_deleted')
+                        ->whereRaw('employee_demo.pdp_excluded = 0')
                         ->where('shared_item', 'like',  '%"2"%' ) 
                         ->orderBy('users.id')
                         ->pluck('shared_with');

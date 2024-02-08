@@ -148,6 +148,7 @@ class MyOrganizationController extends Controller {
                     $join->on('u.empl_record', 'dmo.empl_record');
                 })
                 ->whereNull('dmo.date_deleted')
+                ->whereRaw('dmo.pdp_excluded = 0')
                 ->selectRaw("
                     dmo.employee_id AS employee_id, 
                     dmo.employee_name AS employee_name, 

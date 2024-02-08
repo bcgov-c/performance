@@ -304,9 +304,11 @@ public function getDatatableEmployees(Request $request) {
             ->withInput();
         }
         $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
-        $selection = EmployeeDemo::from('employee_demo as d')
+        $selection = EmployeeDemo::withoutGlobalScopes()
+            ->from('employee_demo as d')
             ->join('users as u', 'd.employee_id', 'u.employee_id')
             ->whereIn('d.employee_id', $selected_emp_ids )
+            ->whereRaw('d.pdp_excluded = 0')
             ->distinct()
             ->select ('u.id')
             ->get() ;

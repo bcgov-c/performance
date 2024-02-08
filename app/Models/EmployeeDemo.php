@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Scopes\NonPDPExcludedScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 // use Illuminate\Database\Eloquent\Builder;
@@ -44,6 +45,13 @@ class EmployeeDemo extends Model
         'orgid'
     ];
 
+    protected static function boot()
+    {
+      parent::boot();
+  
+      static::addGlobalScope(new NonPDPExcludedScope);
+    }
+  
     public function users() {
         return $this->hasOne(User::class, 'employee_id', 'employee_id');
     }
