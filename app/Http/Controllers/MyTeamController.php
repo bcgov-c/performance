@@ -486,9 +486,31 @@ class MyTeamController extends Controller
         $userReportingTos = DB::table('user_reporting_tos')->where('user_id', $id)->pluck('reporting_to_id')->toArray();
         $can_access = false;
         
-        $employees = $this->myEmployeesAjax();
-        foreach($employees as $employee) {
-            if($id == $employee->id){
+        $reportingHierarchy = DB::select("
+            WITH RECURSIVE ReportingHierarchy AS (
+                SELECT
+                    user_id,
+                    reporting_to_id
+                FROM
+                    user_reporting_tos
+                WHERE
+                user_id = :userId            
+                UNION ALL            
+                SELECT
+                    u.user_id,
+                    u.reporting_to_id
+                FROM
+                    ReportingHierarchy rh
+                INNER JOIN
+                    user_reporting_tos u ON rh.reporting_to_id = u.user_id
+            )
+            SELECT
+                user_id
+            FROM
+                ReportingHierarchy
+        ", ['userId' => $id]);
+        foreach($reportingHierarchy as $employee) {
+            if($id == $employee->user_id){
                 $can_access = true;
             }
         }
