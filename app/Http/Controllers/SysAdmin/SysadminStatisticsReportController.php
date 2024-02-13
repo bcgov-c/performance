@@ -70,12 +70,7 @@ class SysadminStatisticsReportController extends Controller
         if ($goal_type_id != ''){                        
             $from_stmt .= " and goals.goal_type_id =".  $goal_type_id ;
         }    
-        $from_stmt .= ") as goals_count from user_demo_jr_view WHERE 
-        (user_demo_jr_view.excused_flag IS NULL OR user_demo_jr_view.excused_flag <> 1) 
-        AND 
-        (user_demo_jr_view.due_date_paused = 'N' OR user_demo_jr_view.due_date_paused IS NULL) 
-        AND
-        user_demo_jr_view.date_deleted IS NULL
+        $from_stmt .= ") as goals_count from user_demo_jr_view
         ) AS A";
 
         return $from_stmt;
@@ -141,12 +136,6 @@ class SysadminStatisticsReportController extends Controller
                     ->orWhereNull('due_date_paused');
             });
         })
-        ->where(function($query) {
-            $query->where(function($query) {
-                $query->where('excused_flag', '<>', '1')
-                    ->orWhereNull('excused_flag');
-            });
-        })
         ->whereNull('user_demo_jr_view.date_deleted')
         ->whereNull('goals.deleted_at')
         ->where('goals.status','active')
@@ -194,12 +183,6 @@ class SysadminStatisticsReportController extends Controller
                             ->orWhereNull('user_demo_jr_view.due_date_paused');
                     });
                 })
-            ->where(function($query) {
-                    $query->where(function($query) {
-                        $query->where('user_demo_jr_view.excused_flag', '<>', '1')
-                            ->orWhereNull('user_demo_jr_view.excused_flag');
-                    });
-                }) 
             ->whereNull('user_demo_jr_view.date_deleted')     
             //->where('goal_types.name','<>', 'Private')    
             ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
@@ -374,10 +357,6 @@ class SysadminStatisticsReportController extends Controller
                     $query->where('user_demo_jr_view.due_date_paused', '=', 'N')
                         ->orWhereNull('user_demo_jr_view.due_date_paused');
                 })
-                ->where(function ($query) {
-                    $query->where('user_demo_jr_view.excused_flag', '<>', 1)
-                        ->orWhereNull('user_demo_jr_view.excused_flag');
-                })
                 ->whereNull('user_demo_jr_view.date_deleted')
                 //->where('goal_types.name', '<>', 'Private')
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
@@ -408,10 +387,6 @@ class SysadminStatisticsReportController extends Controller
                     $query->where('user_demo_jr_view.due_date_paused', '=', 'N')
                         ->orWhereNull('user_demo_jr_view.due_date_paused');
                 })
-                ->where(function ($query) {
-                    $query->where('user_demo_jr_view.excused_flag', '<>', 1)
-                        ->orWhereNull('user_demo_jr_view.excused_flag');
-                })
                 ->whereNull('user_demo_jr_view.date_deleted')
                 //->where('goal_types.name', '<>', 'Private')
                 ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
@@ -441,10 +416,6 @@ class SysadminStatisticsReportController extends Controller
                 ->where(function ($query) {
                     $query->where('user_demo_jr_view.due_date_paused', '=', 'N')
                         ->orWhereNull('user_demo_jr_view.due_date_paused');
-                })
-                ->where(function ($query) {
-                    $query->where('user_demo_jr_view.excused_flag', '<>', 1)
-                        ->orWhereNull('user_demo_jr_view.excused_flag');
                 })
                 ->whereNull('user_demo_jr_view.date_deleted')
                 //->where('goal_types.name', '<>', 'Private')
@@ -529,12 +500,6 @@ class SysadminStatisticsReportController extends Controller
                                     ->orWhereNull('user_demo_jr_view.due_date_paused');
                             });
                         })
-                ->where(function($query) {
-                        $query->where(function($query) {
-                            $query->where('user_demo_jr_view.excused_flag', '<>', '1')
-                                ->orWhereNull('user_demo_jr_view.excused_flag');
-                        });
-                    }) 
                 ->whereNull('user_demo_jr_view.date_deleted') 
                 //->where('goal_types.name','<>', 'Private')  
                 ->whereNotExists(function ($query) {
@@ -580,12 +545,6 @@ class SysadminStatisticsReportController extends Controller
                                         ->orWhereNull('user_demo_jr_view.due_date_paused');
                                 });
                             })
-                            ->where(function($query) {
-                                    $query->where(function($query) {
-                                        $query->where('user_demo_jr_view.excused_flag', '<>', '1')
-                                            ->orWhereNull('user_demo_jr_view.excused_flag');
-                                    });
-                                }) 
                             ->whereNull('user_demo_jr_view.date_deleted') 
                             ->where('user_demo_jr_view.guid', '<>', '')
                             ->where('goals.status', '=', 'active')
@@ -653,12 +612,6 @@ class SysadminStatisticsReportController extends Controller
                         $join->on('user_demo_jr_view.employee_id', '=', 'A.employee_id');
                         //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
                     })
-                    ->where(function($query) {
-                        $query->where(function($query) {
-                            $query->where('user_demo_jr_view.excused_flag', '<>', '1')
-                                ->orWhereNull('user_demo_jr_view.excused_flag');
-                        });
-                    }) 
                     ->where(function($query) {
                         $query->where(function($query) {
                             $query->where('user_demo_jr_view.due_date_paused', 'N')
@@ -737,12 +690,6 @@ class SysadminStatisticsReportController extends Controller
                     })
                     ->where(function($query) {
                         $query->where(function($query) {
-                            $query->where('user_demo_jr_view.excused_flag', '<>', '1')
-                                ->orWhereNull('user_demo_jr_view.excused_flag');
-                        });
-                    }) 
-                    ->where(function($query) {
-                        $query->where(function($query) {
                             $query->where('user_demo_jr_view.due_date_paused', 'N')
                                 ->orWhereNull('user_demo_jr_view.due_date_paused');
                         });
@@ -755,14 +702,9 @@ class SysadminStatisticsReportController extends Controller
                     ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
                     ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
                     ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })
-                    // ->where('acctlock', 0)
                     ->when( (array_key_exists($request->range, $this->groups)) , function($q) use($request) {
                         return $q->whereBetween('goals_count', $this->groups[$request->range]);
-                    });
-                    // ->where( function($query) {
-                    //     $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01") ')
-                    //           ->where('employee_demo.employee_status', 'A');
-                    // });     
+                    });    
             $users_1 = $sql_1->get();
 
             $from_stmt_2 = $this->goalSummary_from_statement(2);
@@ -771,14 +713,7 @@ class SysadminStatisticsReportController extends Controller
                     ->from(DB::raw( $from_stmt_2 ))                                
                     ->join('user_demo_jr_view', function($join) {
                         $join->on('user_demo_jr_view.employee_id', '=', 'A.employee_id');
-                        //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
                     })
-                    ->where(function($query) {
-                        $query->where(function($query) {
-                            $query->where('user_demo_jr_view.excused_flag', '<>', '1')
-                                ->orWhereNull('user_demo_jr_view.excused_flag');
-                        });
-                    }) 
                     ->where(function($query) {
                         $query->where(function($query) {
                             $query->where('user_demo_jr_view.due_date_paused', 'N')
@@ -786,21 +721,15 @@ class SysadminStatisticsReportController extends Controller
                         });
                     })
                     ->whereNull('user_demo_jr_view.date_deleted')
-                    // ->join('employee_demo_jr as j', 'employee_demo.guid', 'j.guid')
-                    // ->whereRaw("j.id = (select max(j1.id) from employee_demo_jr as j1 where j1.guid = j.guid) and (j.due_date_paused = 'N') ")
                     ->when($request->dd_level0, function ($q) use($request) { return $q->where('user_demo_jr_view.organization_key', $request->dd_level0); })
                     ->when( $request->dd_level1, function ($q) use($request) { return $q->where('user_demo_jr_view.level1_key', $request->dd_level1); })
                     ->when( $request->dd_level2, function ($q) use($request) { return $q->where('user_demo_jr_view.level2_key', $request->dd_level2); })
                     ->when( $request->dd_level3, function ($q) use($request) { return $q->where('user_demo_jr_view.level3_key', $request->dd_level3); })
                     ->when( $request->dd_level4, function ($q) use($request) { return $q->where('user_demo_jr_view.level4_key', $request->dd_level4); })
-                    // ->where('acctlock', 0)
                     ->when( (array_key_exists($request->range, $this->groups)) , function($q) use($request) {
                         return $q->whereBetween('goals_count', $this->groups[$request->range]);
                     });
-                    // ->where( function($query) {
-                    //     $query->whereRaw('date(SYSDATE()) not between IFNULL(A.excused_start_date,"1900-01-01") and IFNULL(A.excused_end_date,"1900-01-01") ')
-                    //           ->where('employee_demo.employee_status', 'A');
-                    // });
+
             $users_2 = $sql_2->get();
 
             $from_stmt_3 = $this->goalSummary_from_statement(3);
@@ -811,12 +740,6 @@ class SysadminStatisticsReportController extends Controller
                         $join->on('user_demo_jr_view.employee_id', '=', 'A.employee_id');
                         //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
                     })
-                    ->where(function($query) {
-                        $query->where(function($query) {
-                            $query->where('user_demo_jr_view.excused_flag', '<>', '1')
-                                ->orWhereNull('user_demo_jr_view.excused_flag');
-                        });
-                    }) 
                     ->where(function($query) {
                         $query->where(function($query) {
                             $query->where('user_demo_jr_view.due_date_paused', 'N')
@@ -849,12 +772,6 @@ class SysadminStatisticsReportController extends Controller
                         $join->on('user_demo_jr_view.employee_id', '=', 'A.employee_id');
                         //$join->on('employee_demo.empl_record', '=', 'A.empl_record');
                     })
-                    ->where(function($query) {
-                        $query->where(function($query) {
-                            $query->where('user_demo_jr_view.excused_flag', '<>', '1')
-                                ->orWhereNull('user_demo_jr_view.excused_flag');
-                        });
-                    }) 
                     ->where(function($query) {
                         $query->where(function($query) {
                             $query->where('user_demo_jr_view.due_date_paused', 'N')
@@ -987,49 +904,25 @@ class SysadminStatisticsReportController extends Controller
                 fputcsv($file, $columns);
 
                 foreach ($users as $user) {
+                    $row['Employee ID'] = $user["employee_id"];
+                    $row['Name'] = $user["employee_name"];
+                    $row['Email'] = $user["employee_email"];
                     $goals_count = $user["Active Work Goals Count"] + $user["Active Career Development Goals Count"] + $user["Active Learning Goals Count"] + $user["Active Private Goals Count"];
-                    if($request->range == 0){
-                        if($goals_count == 0) {
-                            $row['Employee ID'] = $user["employee_id"];
-                            $row['Name'] = $user["employee_name"];
-                            $row['Email'] = $user["employee_email"];                    
-                            $row['Active Goals Count'] = $goals_count;
-                            $row['Active Work Goals Count'] = $user["Active Work Goals Count"];
-                            $row['Active Career Development Goals Count'] = $user["Active Career Development Goals Count"];
-                            $row['Active Learning Goals Count'] = $user["Active Learning Goals Count"];
-                            $row['Active Private Goals Count'] = $user["Active Private Goals Count"];
-                            $row['Organization'] = $user["organization"];
-                            $row['Level 1'] = $user["level1_program"];
-                            $row['Level 2'] = $user["level2_division"];
-                            $row['Level 3'] = $user["level3_branch"];
-                            $row['Level 4'] = $user["level4"];
-                            $row['Reporting To'] = $user["Reporting To"];
+                    $row['Active Goals Count'] = $goals_count;
+                    $row['Active Work Goals Count'] = $user["Active Work Goals Count"];
+                    $row['Active Career Development Goals Count'] = $user["Active Career Development Goals Count"];
+                    $row['Active Learning Goals Count'] = $user["Active Learning Goals Count"];
+                    $row['Active Private Goals Count'] = $user["Active Private Goals Count"];
+                    $row['Organization'] = $user["organization"];
+                    $row['Level 1'] = $user["level1_program"];
+                    $row['Level 2'] = $user["level2_division"];
+                    $row['Level 3'] = $user["level3_branch"];
+                    $row['Level 4'] = $user["level4"];
+                    $row['Reporting To'] = $user["Reporting To"];
 
-                            fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], 
-                                        $row['Active Goals Count'], $row['Active Work Goals Count'], $row['Active Career Development Goals Count'], $row['Active Learning Goals Count'], $row['Active Private Goals Count'], 
-                                        $row['Organization'], $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], $row['Reporting To'] ));
-                        }
-                    } else {
-                            $row['Employee ID'] = $user["employee_id"];
-                            $row['Name'] = $user["employee_name"];
-                            $row['Email'] = $user["employee_email"];                    
-                            $row['Active Goals Count'] = $goals_count;
-                            $row['Active Work Goals Count'] = $user["Active Work Goals Count"];
-                            $row['Active Career Development Goals Count'] = $user["Active Career Development Goals Count"];
-                            $row['Active Learning Goals Count'] = $user["Active Learning Goals Count"];
-                            $row['Active Private Goals Count'] = $user["Active Private Goals Count"];
-                            $row['Organization'] = $user["organization"];
-                            $row['Level 1'] = $user["level1_program"];
-                            $row['Level 2'] = $user["level2_division"];
-                            $row['Level 3'] = $user["level3_branch"];
-                            $row['Level 4'] = $user["level4"];
-                            $row['Reporting To'] = $user["Reporting To"];
-
-                            fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], 
-                                        $row['Active Goals Count'], $row['Active Work Goals Count'], $row['Active Career Development Goals Count'], $row['Active Learning Goals Count'], $row['Active Private Goals Count'], 
-                                        $row['Organization'], $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], $row['Reporting To'] ));
-                    }
-                    
+                    fputcsv($file, array($row['Employee ID'], $row['Name'], $row['Email'], 
+                                $row['Active Goals Count'], $row['Active Work Goals Count'], $row['Active Career Development Goals Count'], $row['Active Learning Goals Count'], $row['Active Private Goals Count'], 
+                                $row['Organization'], $row['Level 1'], $row['Level 2'], $row['Level 3'], $row['Level 4'], $row['Reporting To'] ));
                 }
 
                 fclose($file);
