@@ -1922,7 +1922,6 @@ class GoalController extends Controller
                 }   
 
                 if(count($users_arr)>0){    
-                    error_log('1111');
                     if(is_numeric($users_arr[0])){
                         GoalSharedWith::where('goal_id', $goal_id)->delete();
                         foreach($users_arr as $userId){
