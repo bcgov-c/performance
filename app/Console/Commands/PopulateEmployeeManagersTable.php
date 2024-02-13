@@ -82,7 +82,9 @@ class PopulateEmployeeManagersTable extends Command
                     AND emv_sed3.employee_id IS NOT NULL 
                     AND emv_sed3.employee_id <> '' 
                     AND emv_ed3.date_deleted IS NULL
+                    AND emv_ed3.pdp_excluded = 0
                     AND emv_sed3.date_deleted IS NULL
+                    AND emv_sed3.pdp_excluded = 0
                     AND emv_sed3.employee_id = emv_u3.employee_id
             ");
             
@@ -109,7 +111,9 @@ class PopulateEmployeeManagersTable extends Command
                     AND emv_sp4.reports_to = emv_sed4.position_number
                     AND emv_sed4.employee_id IS NOT NULL 
                     AND emv_ed4.date_deleted IS NULL
+                    AND emv_ed4.pdp_excluded = 0
                     AND emv_sed4.date_deleted IS NULL
+                    AND emv_sed4.pdp_excluded = 0
                     AND emv_sed4.employee_id = emv_u4.employee_id
                     AND NOT EXISTS (
                         SELECT 1 
@@ -122,7 +126,9 @@ class PopulateEmployeeManagersTable extends Command
                             AND emv_sed3.employee_id IS NOT NULL 
                             AND emv_sed3.employee_id <> '' 
                             AND emv_ed3.date_deleted IS NULL
+                            AND emv_ed3.pdp_excluded = 0
                             AND emv_sed3.date_deleted IS NULL
+                            AND emv_sed3.pdp_excluded = 0
                             AND emv_sed3.employee_id = emv_u3.employee_id
                             AND emv_ed3.employee_id = emv_ed4.employee_id
                     )
@@ -148,7 +154,9 @@ class PopulateEmployeeManagersTable extends Command
                     AND emv_ed1.supervisor_emplid IS NOT NULL 
                     AND emv_ed1.supervisor_emplid <> ''
                     AND emv_sed1.date_deleted IS NULL
+                    AND emv_sed1.pdp_excluded = 0
                     AND emv_ed1.date_deleted IS NULL 
+                    AND emv_ed1.pdp_excluded = 0
                     AND emv_sed1.employee_id = emv_u1.employee_id
                     AND NOT EXISTS (
                         SELECT 1 
@@ -161,7 +169,9 @@ class PopulateEmployeeManagersTable extends Command
                             AND emv_sed3.employee_id IS NOT NULL 
                             AND emv_sed3.employee_id <> '' 
                             AND emv_ed3.date_deleted IS NULL
+                            AND emv_ed3.pdp_excluded = 0
                             AND emv_sed3.date_deleted IS NULL
+                            AND emv_sed3.pdp_excluded = 0
                             AND emv_sed3.employee_id = emv_u3.employee_id
                             AND emv_ed3.employee_id = emv_ed1.employee_id
                     )
@@ -177,7 +187,9 @@ class PopulateEmployeeManagersTable extends Command
                             AND emv_sp4.reports_to = emv_sed4.position_number
                             AND emv_sed4.employee_id IS NOT NULL 
                             AND emv_ed4.date_deleted IS NULL
+                            AND emv_ed4.pdp_excluded = 0
                             AND emv_sed4.date_deleted IS NULL
+                            AND emv_sed4.pdp_excluded = 0
                             AND emv_sed4.employee_id = emv_u4.employee_id
                             AND emv_ed4.employee_id = emv_ed1.employee_id
                     )
@@ -201,7 +213,9 @@ class PopulateEmployeeManagersTable extends Command
                     users emv_u2
                 WHERE emv_ed2.supervisor_position_number = emv_sed2.position_number
                     AND emv_ed2.date_deleted IS NULL
+                    AND emv_ed2.pdp_excluded = 0
                     AND emv_sed2.date_deleted IS NULL
+                    AND emv_sed2.pdp_excluded = 0
                     AND emv_sed2.employee_id = emv_u2.employee_id
                     AND NOT EXISTS (
                         SELECT 1 
@@ -214,7 +228,9 @@ class PopulateEmployeeManagersTable extends Command
                             AND emv_sed3.employee_id IS NOT NULL 
                             AND emv_sed3.employee_id <> '' 
                             AND emv_ed3.date_deleted IS NULL
+                            AND emv_ed3.pdp_excluded = 0
                             AND emv_sed3.date_deleted IS NULL
+                            AND emv_sed3.pdp_excluded = 0
                             AND emv_sed3.employee_id = emv_u3.employee_id
                             AND emv_ed3.employee_id = emv_ed2.employee_id
                     )
@@ -230,7 +246,9 @@ class PopulateEmployeeManagersTable extends Command
                             AND emv_sp4.reports_to = emv_sed4.position_number
                             AND emv_sed4.employee_id IS NOT NULL 
                             AND emv_ed4.date_deleted IS NULL
+                            AND emv_ed4.pdp_excluded = 0
                             AND emv_sed4.date_deleted IS NULL
+                            AND emv_sed4.pdp_excluded = 0
                             AND emv_sed4.employee_id = emv_u4.employee_id
                             AND emv_ed4.employee_id = emv_ed2.employee_id
                     )
@@ -243,7 +261,9 @@ class PopulateEmployeeManagersTable extends Command
                             AND emv_ed1.supervisor_emplid IS NOT NULL 
                             AND emv_ed1.supervisor_emplid <> ''
                             AND emv_sed1.date_deleted IS NULL
+                            AND emv_sed1.pdp_excluded = 0
                             AND emv_ed1.date_deleted IS NULL 
+                            AND emv_ed1.pdp_excluded = 0 
                             AND emv_sed1.employee_id = emv_u1.employee_id
                             AND emv_ed1.employee_id = emv_ed2.employee_id
                     )   
