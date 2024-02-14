@@ -492,13 +492,21 @@ class MyTeamController extends Controller
         if(in_array(Auth::id(), $reportingHierarchy)) {
             $can_access = true;
         }
-        /*
-        foreach($reportingHierarchy as $employee) {
-            if($id == $employee->user_id){
-                $can_access = true;
-            }
+        
+        //check supervisor override
+        $supervisor = UsersAnnex::select('reporting_to_employee_id')
+                    ->where('user_id', $id)
+                    ->value('reporting_to_employee_id');
+
+        $supervisor_userid = DB::table('users')
+                    ->select('id')
+                    ->where('employee_id', $supervisor)
+                    ->get();
+        $override_supervisor_userid = $supervisor_userid[0]->id;
+        if(Auth::id() == $override_supervisor_userid) {
+            $can_access = true;
         }
-        */
+
 
         if($can_access) {
             $myEmployeesDataTable = new MyEmployeesDataTable($id);
@@ -543,7 +551,7 @@ class MyTeamController extends Controller
         $tags = '';
         if(isset($input['tag_ids'])) {
             $tags = $input['tag_ids'];
-        unset($input['tag_ids']);
+        unset($input['tag_ids']); 
         }
         
         DB::beginTransaction();
@@ -714,15 +722,16 @@ class MyTeamController extends Controller
 
 
     private function reportingHierarchy($user_id, $reporting_tos){
-        $reporting_to = DB::table('user_reporting_tos')
-                    ->select('reporting_to_id')
+        $reporting_tos = DB::table('users_annex')
+                    ->select('reporting_to_userid')
                     ->where('user_id', $user_id)
-                    ->get();
+                    ->distinct()
+                    ->get() ;
 
-        if(count($reporting_to) > 0) {
-            $reporting_to_id = $reporting_to[0]->reporting_to_id;
-            array_push($reporting_tos, $reporting_to_id);
-            $reporting_tos = $this->reportingHierarchy($reporting_to_id, $reporting_tos);
+        if(count($reporting_tos) > 0) {
+            $supervisor_userid = $reporting_tos[0]->reporting_to_userid;
+            array_push($reporting_tos, $supervisor_userid);
+            $reporting_tos = $this->reportingHierarchy($supervisor_userid, $reporting_tos);
         } 
         return $reporting_tos;
     }
