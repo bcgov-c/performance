@@ -299,10 +299,6 @@ class SysadminStatisticsReportController extends Controller
             foreach($goals_count_type_array as $item){
                 if($type->id){
                     if ($item["goal_type_id"] == $type->id){
-                        if($item["group_key"] == '0'){
-                            $goals_count_array["0"] = $item["goals_count"]; 
-                            $sub_type_total = $sub_type_total + $item["goals_count"];
-                        }
                         if($item["group_key"] == '1-5'){
                             $goals_count_array["1-5"] = $item["goals_count"]; 
                             $sub_type_total = $sub_type_total + $item["goals_count"];
@@ -316,6 +312,8 @@ class SysadminStatisticsReportController extends Controller
                             $sub_type_total = $sub_type_total + $item["goals_count"];
                         }
                     }
+                    $more_than_0 = $total_number_emp - $sub_type_total;
+                    $goals_count_array["0"] = $more_than_0; 
                 } else {
                     $goals_count_array["0"] = $no_type_count["0"]; 
                     $goals_count_array["1-5"] = $no_type_count["1-5"]; 
