@@ -261,8 +261,6 @@ class GoalController extends Controller
         $tags = '';
         $input['user_id'] = Auth::id();
         
-        error_log(print_r($input,true));
-
         if(isset($input['tag_ids'])) {
             $tags = $input['tag_ids'];
             unset($input['tag_ids']);
@@ -1907,7 +1905,7 @@ class GoalController extends Controller
                     $users_arr = $request->sync_users;
                 }   
 
-                if(count($users_arr)>0){    
+                if(count($users_arr)>0){   
                     if(is_numeric($users_arr[0])){
                         GoalSharedWith::where('goal_id', $goal_id)->delete();
                         foreach($users_arr as $userId){
@@ -1927,10 +1925,9 @@ class GoalController extends Controller
                         }
                     }
                     $listDifference = array_diff($users_arr, $previousList);
+                    error_log(print_r($listDifference,true));
                     foreach($listDifference as $last_item){ 
-                        if(is_numeric($last_item)) {
-                            $this->syncGoalNotifications($request, $goal_id, $last_item);
-                        }
+                        $this->syncGoalNotifications($request, $goal_id, $last_item);
                     }
                 } else {
                     GoalSharedWith::where('goal_id', $goal_id)->delete();
@@ -1945,11 +1942,23 @@ class GoalController extends Controller
     }
 
     public function syncGoalNotifications(Request $request, $goal_id, $user_id) {
-        $user = User::with('userPreference')->findOrFail($user_id);
-        $curr_user = User::with('userPreference')->findOrFail(Auth::id());
-        $goal = Goal::findOrFail($goal_id);
-        Log::info('$user->allow_inapp_notification = '.$user->allow_inapp_notification);
+        $user = User::where('id', $user_id)
+                    ->with('userPreference')
+                    ->first();
+        $curr_user = User::where('id',Auth::id())
+                    ->with('userPreference')
+                    ->first();
+        
+        $goal = DB::table('goals')  
+                ->select('title')
+                ->where('id', '=', $goal_id)
+                ->where('status', '=', 'active')
+                ->get();
+                    
+
+        //Log::info('$user->allow_inapp_notification = '.$user->allow_inapp_notification);
         if ($user && $user->allow_inapp_notification) {
+
             $notification = new \App\MicrosoftGraph\SendDashboardNotification();
             $notification->user_id = $user_id;
             $notification->notification_type = 'GS';
@@ -1959,17 +1968,14 @@ class GoalController extends Controller
             $notification->send(); 
         }
         if($user && $user->allow_email_notification && $user->userPreference->goal_bank_flag == 'Y') {
-            $sendMail = new SendMail();
+            $sendMail = new \App\MicrosoftGraph\SendMail();
             $sendMail->toRecipients = array( $user->user_id );  
-            $sendMail->sender_id = null;
+            $sendMail->sender_id = null;  // default sender is System
             $sendMail->useQueue = true;
-            $sendMail->saveToLog = true;
-            $sendMail->alert_type = 'N';
-            $sendMail->alert_format = 'E';
             $sendMail->template = 'GOAL_SHARED';
             array_push($sendMail->bindvariables, $user->name);  // %1 Recipient of the email
             array_push($sendMail->bindvariables, $curr_user->name);    // %2 Person who shared the goal
-            array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
+            array_push($sendMail->bindvariables, $goal[0]->title);        // %3 Goal title
             $response = $sendMail->sendMailWithGenericTemplate();
         }
 
