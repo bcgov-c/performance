@@ -25,6 +25,7 @@ use App\Http\Requests\MyTeams\ShareProfileRequest;
 use App\Http\Requests\MyTeams\UpdateExcuseRequest;
 use App\Http\Requests\Goals\AddGoalToLibraryRequest;
 use App\Http\Requests\MyTeams\UpdateProfileSharedWithRequest;
+use App\Models\UsersAnnex;
 use Carbon\Carbon;
 
 class MyTeamController extends Controller
@@ -485,35 +486,28 @@ class MyTeamController extends Controller
     public function viewDirectReport($id, Request $request) {
         $userReportingTos = DB::table('user_reporting_tos')->where('user_id', $id)->pluck('reporting_to_id')->toArray();
         $can_access = false;
+
+        $reporting_tos = array();
+        $reportingHierarchy = $this->reportingHierarchy($id, $reporting_tos);    
         
-        $reportingHierarchy = DB::select("
-            WITH RECURSIVE ReportingHierarchy AS (
-                SELECT
-                    user_id,
-                    reporting_to_id
-                FROM
-                    user_reporting_tos
-                WHERE
-                user_id = :userId            
-                UNION ALL            
-                SELECT
-                    u.user_id,
-                    u.reporting_to_id
-                FROM
-                    ReportingHierarchy rh
-                INNER JOIN
-                    user_reporting_tos u ON rh.reporting_to_id = u.user_id
-            )
-            SELECT
-                user_id
-            FROM
-                ReportingHierarchy
-        ", ['userId' => $id]);
-        foreach($reportingHierarchy as $employee) {
-            if($id == $employee->user_id){
-                $can_access = true;
-            }
+        if(in_array(Auth::id(), $reportingHierarchy)) {
+            $can_access = true;
         }
+        
+        //check supervisor override
+        $supervisor = UsersAnnex::select('reporting_to_employee_id')
+                    ->where('user_id', $id)
+                    ->value('reporting_to_employee_id');
+
+        $supervisor_userid = DB::table('users')
+                    ->select('id')
+                    ->where('employee_id', $supervisor)
+                    ->get();
+        $override_supervisor_userid = $supervisor_userid[0]->id;
+        if(Auth::id() == $override_supervisor_userid) {
+            $can_access = true;
+        }
+
 
         if($can_access) {
             $myEmployeesDataTable = new MyEmployeesDataTable($id);
@@ -558,7 +552,7 @@ class MyTeamController extends Controller
         $tags = '';
         if(isset($input['tag_ids'])) {
             $tags = $input['tag_ids'];
-        unset($input['tag_ids']);
+        unset($input['tag_ids']); 
         }
         
         DB::beginTransaction();
@@ -725,6 +719,22 @@ class MyTeamController extends Controller
         }
         
         return view($viewName, $viewData);
+    }
+
+
+    private function reportingHierarchy($user_id, $reporting_tos){
+        $reporting_to_userids = DB::table('users_annex')
+                    ->select('reporting_to_userid')
+                    ->where('user_id', $user_id)
+                    ->distinct()
+                    ->get() ;
+
+        if(count($reporting_to_userids) > 0) {
+            $supervisor_userid = $reporting_to_userids[0]->reporting_to_userid;
+            array_push($reporting_tos, $supervisor_userid);
+            $reporting_tos = $this->reportingHierarchy($supervisor_userid, $reporting_tos);
+        } 
+        return $reporting_tos;
     }
 
 }
