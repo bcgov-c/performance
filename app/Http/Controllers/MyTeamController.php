@@ -25,6 +25,7 @@ use App\Http\Requests\MyTeams\ShareProfileRequest;
 use App\Http\Requests\MyTeams\UpdateExcuseRequest;
 use App\Http\Requests\Goals\AddGoalToLibraryRequest;
 use App\Http\Requests\MyTeams\UpdateProfileSharedWithRequest;
+use App\Models\UsersAnnex;
 use Carbon\Carbon;
 
 class MyTeamController extends Controller
