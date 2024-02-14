@@ -722,14 +722,14 @@ class MyTeamController extends Controller
 
 
     private function reportingHierarchy($user_id, $reporting_tos){
-        $reporting_tos = DB::table('users_annex')
+        $reporting_to_userids = DB::table('users_annex')
                     ->select('reporting_to_userid')
                     ->where('user_id', $user_id)
                     ->distinct()
                     ->get() ;
 
-        if(count($reporting_tos) > 0) {
-            $supervisor_userid = $reporting_tos[0]->reporting_to_userid;
+        if(count($reporting_to_userids) > 0) {
+            $supervisor_userid = $reporting_to_userids[0]->reporting_to_userid;
             array_push($reporting_tos, $supervisor_userid);
             $reporting_tos = $this->reportingHierarchy($supervisor_userid, $reporting_tos);
         } 
