@@ -487,12 +487,18 @@ class MyTeamController extends Controller
         $can_access = false;
 
         $reporting_tos = array();
-        $reportingHierarchy = $this->reportingHierarchy($id, $reporting_tos);        
+        $reportingHierarchy = $this->reportingHierarchy($id, $reporting_tos);    
+        
+        if(in_array(Auth::id(), $reportingHierarchy)) {
+            $can_access = true;
+        }
+        /*
         foreach($reportingHierarchy as $employee) {
             if($id == $employee->user_id){
                 $can_access = true;
             }
         }
+        */
 
         if($can_access) {
             $myEmployeesDataTable = new MyEmployeesDataTable($id);
