@@ -19,6 +19,7 @@ use App\Http\Controllers\SysAdmin\AccessOrganizationsController;
 use App\Http\Controllers\SysAdmin\SysadminStatisticsReportController;
 use App\Http\Controllers\SysAdmin\SupervisorOverridesController;
 use App\Http\Controllers\SysAdmin\ResourceManageController;
+use App\Http\Controllers\SysAdmin\ConversationTemplateController;
 use App\Http\Controllers\SysAdmin\QueueStatusController;
 // use Illuminate\Http\Request;
 
@@ -190,6 +191,14 @@ Route::group(['middleware' => ['role:Sys Admin']], function ()
         Route::get('/sysadmin/resource-manage/edit/{id}', [ResourceManageController::class, 'edit'])->name('resource-manage.edit');
         Route::post('/sysadmin/resource-manage/store/{id}', [ResourceManageController::class, 'store'])->name('resource-manage.store');
         Route::post('/sysadmin/resource-manage/new', [ResourceManageController::class, 'new'])->name('resource-manage.new');
+    });
+
+    //ConversationTemplate
+    Route::group(['middleware' => ['auth']], function() {
+        Route::get('/sysadmin/conversation-template', [ConversationTemplateController::class, 'index'])->name('sysadmin.conversation-template');
+        Route::get('/sysadmin/conversation-template/show/{id}', [ConversationTemplateController::class, 'show'])->name('conversation-template.show');
+        Route::get('/sysadmin/conversation-template/edit/{id}', [ConversationTemplateController::class, 'edit'])->name('conversation-template.edit');
+        Route::post('/sysadmin/conversation-template/store/{id}', [ConversationTemplateController::class, 'store'])->name('conversation-template.store');
     });
 
     //  Job Schedule Audit 
