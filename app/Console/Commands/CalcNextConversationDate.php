@@ -229,6 +229,13 @@ class CalcNextConversationDate extends Command
                                 $initNextConversationDate = $virtualHardDate->clone()->addDays($DDt)->toDateString(); // Clone the instance
                             }
                             break;
+                        case 4:
+                            $virtualHardDate = Carbon::createFromDate(2024, 03, 31);
+                            if ($virtualHardDate->gt($initNextConversationDate)) {
+                                // fixed date for all belonging to batch 4
+                                $initNextConversationDate = $virtualHardDate->clone()->addDays($DDt)->toDateString(); // Clone the instance
+                            }
+                            break;
                         default:
                             $virtualHardDate = Carbon::createFromDate(2023, 12, 7);
                             if ($virtualHardDate->gt($initNextConversationDate)) {
