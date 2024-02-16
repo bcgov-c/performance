@@ -81,7 +81,7 @@
                                                 <tbody style="border-collapse: collapse;">
                                                 <tr style="background-color: #efefef">
                                                     <td><a class="btn btn-link ml-2 btn-view-conversation" data-id="{{$template->id}}" data-toggle="modal" data-target="#viewConversationModal">{{$template->name}}</a></td>
-                                                    <td>{{$template->when_to_use}}</td>
+                                                    <td>{!! $template->when_to_use !!}</td>
                                                     <td>
                                                         <select class="form-control w-100 select" style="width:100%; margin-top: 8px;" name="participant_id[]" id="participant_id" required>
                                                             <option value="">None Selected</option>
@@ -153,7 +153,7 @@
                                 @if(strtolower($template->name) !== 'performance check-in')
                                 <tr>
                                     <td><a class="btn btn-link ml-2 btn-view-conversation" data-id="{{$template->id}}" data-toggle="modal" data-target="#viewConversationModal">{{$template->name}}</a></td>
-                                    <td>{{$template->when_to_use}}</td>
+                                    <td>{!! $template->when_to_use !!}</td>
                                     <td>
                                         <select class="form-control w-100 select" style="width:100%; margin-top: 8px;"" name="participant_id_{{$template->id}}[]" id="participant_id_{{$template->id}}" required>
                                             <option value="">None Selected</option>
