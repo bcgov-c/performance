@@ -455,6 +455,13 @@ class MyTeamController extends Controller
             }
         }
 
+        $reporting_tos = array();
+        $reportingHierarchy = $this->reportingHierarchy($id, $reporting_tos);    
+        
+        if(in_array(Auth::id(), $reportingHierarchy)) {
+            $hasAccess = true;
+        }
+
         if($hasAccess || SharedProfile::where('shared_with', $actualAuthId)->where('shared_id', $id)->count() >= 1) {
             session()->put('view-profile-as', $id);
             if (!session()->has('original-auth-id')) {
