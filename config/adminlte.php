@@ -383,6 +383,11 @@ return [
                     'active' => ['sysadmin/resource-manage/*']
                 ],
                 [
+                    'text' => 'Conversations',
+                    'url'  => 'sysadmin/conversation-template',
+                    'active' => ['sysadmin/conversation-template/*']
+                ],
+                [
                     'text' => 'Access and Permissions',
                     'url'  => 'sysadmin/accesspermissions',
                     'active' => ['sysadmin/accesspermissions/*']
