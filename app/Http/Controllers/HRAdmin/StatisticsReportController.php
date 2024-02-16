@@ -675,11 +675,19 @@ class StatisticsReportController extends Controller
             $total_all = $total_works + $total_learning + $total_career + $total_private;
         }                    
                  
-        $average_all = $total_all / $total_number_emp;
-        $average_works = $total_works / $total_number_emp;
-        $average_learning = $total_learning / $total_number_emp;
-        $average_career = $total_career / $total_number_emp;
-        $average_private = $total_private / $total_number_emp;
+        if($total_number_emp) {
+            $average_all = $total_all / $total_number_emp;
+            $average_works = $total_works / $total_number_emp;
+            $average_learning = $total_learning / $total_number_emp;
+            $average_career = $total_career / $total_number_emp;
+            $average_private = $total_private / $total_number_emp;
+        } else {
+            $average_all = 0;
+            $average_works = 0;
+            $average_learning = 0;
+            $average_career = 0;
+            $average_private = 0;
+        }
 
         $average = array();
         $average[''] = $average_all;
