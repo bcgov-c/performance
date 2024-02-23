@@ -60,6 +60,7 @@
                                 ["Bold", "Italic", "Underline"],
                                 ["NumberedList", "BulletedList"],
                                 ["Outdent", "Indent"],
+                                ["Link"],
                             ],
                         });
 
@@ -69,6 +70,7 @@
                                 ["Bold", "Italic", "Underline"],
                                 ["NumberedList", "BulletedList"],
                                 ["Outdent", "Indent"],
+                                ["Link"],
                             ],
                         });
 
@@ -78,6 +80,7 @@
                                 ["Bold", "Italic", "Underline"],
                                 ["NumberedList", "BulletedList"],
                                 ["Outdent", "Indent"],
+                                ["Link"],
                             ],
                         });
 
