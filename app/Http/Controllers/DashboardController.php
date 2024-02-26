@@ -75,7 +75,7 @@ class DashboardController extends Controller
                                         ->from('conversations')
                                         ->whereColumn('dashboard_notifications.related_id', 'conversations.id')
                                         ->whereNull('conversations.deleted_at')
-                                        ->whereIn('dashboard_notifications.notification_type', ['CA', 'CS']);
+                                        ->whereIn('dashboard_notifications.notification_type', ['CA', 'CS', 'CN']);
                         })
                         ->orWhereExists(function ($query) {
                             return $query->select(DB::raw(1))
@@ -137,6 +137,7 @@ class DashboardController extends Controller
                             break;
                         case 'CA':
                         case 'CS':
+                        case 'CN':
                                 $text .= 'Title: '.($notification->conversation ? $notification->conversation->topic->name : '');
                                 $text .= ($text?' | ':'').($notification->created_at?'Date: '.$notification->created_at->format('M d, Y H:i A'):'');
                             break;
@@ -165,7 +166,7 @@ class DashboardController extends Controller
                     if ($notification->related_id) {
                         $link = 'location.href=\''. route("dashboardmessage.show", $notification->id) . '\'" ';
 
-                        if  ( !(in_array($notification->notification_type, ['CA', 'CS'])) ) {
+                        if  ( !(in_array($notification->notification_type, ['CA', 'CS', 'CN'])) ) {
                             $text .= '<button onclick="'. $link . '"' .
                                     'data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Now hover out." '.
                                     'class="notification-modal btn btn-sm btn-primary mt-2" value="'. $notification->id .'">View</button>';
@@ -320,7 +321,7 @@ class DashboardController extends Controller
                                             ->from('conversations')
                                             ->whereColumn('dashboard_notifications.related_id', 'conversations.id')
                                             ->whereNull('conversations.deleted_at')
-                                            ->whereIn('dashboard_notifications.notification_type', ['CA', 'CS']);
+                                            ->whereIn('dashboard_notifications.notification_type', ['CA', 'CS', 'CN']);
                             })
                             ->orWhereExists(function ($query) {
                                 return $query->select(DB::raw(1))
