@@ -23,3 +23,6 @@ Route::get('conversation/disagreement/{conversation}', [ConversationController::
 Route::get('participant', [ParticipantController::class, 'index'])->name('participant.index');
 Route::get('conversation-template/{id}', [ConversationController::class, 'conversationTemplate'])->name('conversation-template.detail');
 
+Route::get('conversation/sendnotification/{id}', [ConversationController::class, 'sendNotification'])->name('conversation.sendnotification');
+
+
