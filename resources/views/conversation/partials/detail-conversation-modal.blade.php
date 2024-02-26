@@ -350,7 +350,9 @@ function updateConversation(conversation_id) {
                             CKEDITOR.instances['info_comment9'].setReadOnly( true );  
                             CKEDITOR.instances['info_comment10'].setReadOnly( true );  
                             $('#info_comment11').prop( 'disabled', true );
-                        }       
+                        } else {
+                            $('.notifyParticipants').show();
+                        }      
                         
                         <?php if ($type == 'past'){ ?>
                         if(is_locked) {

@@ -1476,5 +1476,48 @@ class ConversationController extends Controller
         return
         response()->json(['success' => true, 'data' => $template]);
     }
+
+    public function sendNotification($id)
+    {
+        $authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
+        $userPart = ConversationParticipant::whereRaw("conversation_id = {$id}")
+            ->whereRaw("participant_id = {$authId}")
+            ->select('participant_id')
+            ->first();
+        if ($userPart) {
+            $conversation = Conversation::find($id);
+            $otherPart = ConversationParticipant::whereRaw("conversation_id = {$id}")
+                ->whereRaw("participant_id <> {$authId}")
+                ->select('participant_id')
+                ->get();
+            foreach ($otherPart as $value) {
+                $user = User::where('id', $value->participant_id)
+                                ->with('userPreference')
+                                ->first();
+                if ($user && $user->allow_inapp_notification) {                                
+                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                    $notification->user_id = $value->participant_id;
+                    $notification->notification_type = 'CN';
+                    $notification->comment = "{$conversation->user->name} has made updates to your conversation";
+                    $notification->related_id = $conversation->id;
+                    $notification->notify_user_id = $value->participant_id;
+                    $notification->send(); 
+                }
+                if ($user && $user->allow_email_notification) {                            
+                    $topic = ConversationTopic::find($request->conversation_topic_id);
+                    $sendMail = new \App\MicrosoftGraph\SendMail();
+                    $sendMail->toRecipients = [ $value->participant_id ];
+                    $sendMail->sender_id = null;  // default sender is System
+                    $sendMail->useQueue = true;
+                    $sendMail->template = 'CONVERSATION_CHANGE_NOTIFY';
+                    array_push($sendMail->bindvariables, $user->name);
+                    array_push($sendMail->bindvariables, $conversation->user->name );
+                    array_push($sendMail->bindvariables, $conversation->topic->name );
+                    $response = $sendMail->sendMailWithGenericTemplate();
+                }
+            }       
+        }
+        return null;
+    }
     
 }

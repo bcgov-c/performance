@@ -10,6 +10,26 @@
             </div>
             
             <div class="modal-body p-4">
+                @if ($type == 'upcoming')
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="alert alert-success send-notification-info-top" attr-loc="top"  role="alert" style="display:none">
+                                Sent notifications to other participants.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                    <div class="col-12">
+                            <button type="button" class="btn btn-primary float-right notifyParticipants" attr-loc="top" style="display:none">
+                                <i class="fa fa-info-circle notifyParticipantsInfo" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" 
+                                    data-content="Use this button to alert the other participant that you have made updates to this conversation." 
+                                    data-original-title="" title="" aria-describedby="popover271882"> 
+                                </i>
+                                Send Notification
+                            </button>
+                        </div>
+                    </div>
+                @endif             
                 <div class="row">
                     <div class="col-12">
                         <div class="alert alert-default-danger error-date-alert" style="display:none">

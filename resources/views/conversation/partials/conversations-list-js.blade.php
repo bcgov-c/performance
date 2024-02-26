@@ -721,6 +721,16 @@
             }
             
             
+            function sendNotifications() {
+                $.ajax({
+                    url: '/conversation/sendnotification/' + conversation_id
+                    , type: 'GET'
+                    , data: {
+                        _token: '{{ csrf_token() }}'
+                    }
+                });
+            }
+            
             
             
             /*
@@ -874,6 +884,8 @@
                         $('#info_area10').html('');
                         $('#info_area11').html('');
                         saveComments();                                
+                        $('.notifyParticipants').show();
+                        $('.send-notification-info-top').hide();
                         alert('You have not saved your work in 20 minutes so the PDP has auto-saved to make sure you don\'t lose any information.');
                         unsave_warning = false;
                     }    
@@ -886,6 +898,8 @@
                 var attrLocValue = $(this).attr('attr-loc');
                 e.preventDefault();
                 saveComments();
+                $('.notifyParticipants').show();
+                $('.send-notification-info-top').hide();
                 unsave_warning = false;
                 setTimeRoll();
                 if(attrLocValue == "top"){
@@ -902,6 +916,8 @@
                 var attrLocValue = $(this).attr('attr-loc');
                 e.preventDefault();
                 saveComments();
+                $('.notifyParticipants').show();
+                $('.send-notification-info-top').hide();
                 unsave_warning = false;
                 setTimeRoll();
                 if(attrLocValue == "top"){
@@ -911,6 +927,25 @@
                     $('.sup-comment-save-info-top').hide();
                     $('.sup-comment-save-info').show();
                 }
+            });
+            
+            $(document).on('click', '.notifyParticipants', function(e) {
+                var attrLocValue = $(this).attr('attr-loc');
+                e.preventDefault();
+                sendNotifications();
+                // unsave_warning = false;
+                // setTimeRoll();
+                if(attrLocValue == "top"){
+                    $('.notifyParticipants').hide();
+                    $('.send-notification-info-top').show();
+                // } else {
+                //     $('.sup-comment-save-info-top').hide();
+                //     $('.sup-comment-save-info').show();
+                }
+            });
+            
+            $(document).on('click', '.notifyParticipantsInfo', function(e) {
+                e.preventDefault();
             });
             
         </script>
