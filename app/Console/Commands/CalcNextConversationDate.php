@@ -231,7 +231,9 @@ class CalcNextConversationDate extends Command
                             break;
                         case 4:
                             $virtualHardDate = Carbon::createFromDate(2024, 03, 31);
-                            if ($virtualHardDate->gt($initNextConversationDate)) {
+                            $user_join_date = $demo->users->joining_date->toDateString();
+                            $batch4_default_date = Carbon::createFromDate(2024, 03, 31);
+                            if ($virtualHardDate->gt($initNextConversationDate) || ($batch4_default_date->gte($user_join_date))) {
                                 // fixed date for all belonging to batch 4
                                 $initNextConversationDate = $virtualHardDate->toDateString(); // Clone the instance
                             }
@@ -249,9 +251,22 @@ class CalcNextConversationDate extends Command
                     // calcualte initial last conversation date; init next conversation minus 4 months
                     //$initLastConversationDate = Carbon::parse($initNextConversationDate)->subMonth(4)->toDateString();
                     $initLastConversationDate = Carbon::parse($initNextConversationDate)->clone()->subMonth(4)->toDateString(); // Clone the instance
-                    if ($lastConversationDate && Carbon::parse($lastConversationDate)->gt($initLastConversationDate)) {
-                        $initLastConversationDate = $lastConversationDate;
+                    if ($lastConversationDate) {
+                        if (Carbon::parse($lastConversationDate)->gt($initLastConversationDate)) {
+                            $initLastConversationDate = $lastConversationDate;
+                        }
+                    } else {
+                        // Special rule for Batch 4
+                        if ($demo->conversation_batch == 4) {
+                            if ($batch4_default_date->gte($user_join_date)) {
+                                $initLastConversationDate = Carbon::parse($batch4_default_date)->clone()->subMonth(4)->toDateString();
+                            }
+                        }
                     }
+                    // $initLastConversationDate = Carbon::parse($initNextConversationDate)->clone()->subMonth(4)->toDateString(); // Clone the instance
+                    // if ($lastConversationDate && Carbon::parse($lastConversationDate)->gt($initLastConversationDate)) {
+                    //     $initLastConversationDate = $lastConversationDate;
+                    // }
                     $demo_inarray = in_array($demo->jobcode, $ClassificationArray);
                     $demo_in_deptarray = in_array($demo->deptid, $ExcusedDepartmentArray);
                     // get last stored detail in junior table
