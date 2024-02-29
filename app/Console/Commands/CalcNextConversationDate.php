@@ -456,8 +456,19 @@ class CalcNextConversationDate extends Command
                                 $diffInDays = 0;
                             }
                             $newEndDate = Carbon::parse($initNextConversationDate)->clone()->addDays($diffInDays)->toDateString();
-                            if ($newEndDate > $initNextConversationDate) {
-                                $initNextConversationDate = $newEndDate;
+                            // Special rule for Batch 4
+                            if ($demo->conversation_batch == 4) {
+                                if ($batch4_default_date->gte($user_join_date)) {
+                                    // No change on date
+                                } else {
+                                    if ($newEndDate > $initNextConversationDate) {
+                                        $initNextConversationDate = $newEndDate;
+                                    }
+                                }
+                            } else {
+                                if ($newEndDate > $initNextConversationDate) {
+                                    $initNextConversationDate = $newEndDate;
+                                }
                             }
                         }
                     } else {
