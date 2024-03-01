@@ -96,11 +96,16 @@ class AlterUserDemoJrHistoryView10 extends Migration
                 u.employee_id as employee_id_search,
                 d.employee_name as employee_name_search
             FROM 
-                employee_demo_jr AS j, 
-                employee_demo_jr AS k, 
-                employee_demo AS d,
-                users AS u, 
+                employee_demo_jr AS j
+                    USE INDEX (idx_employee_demo_jr_employeeid_id), 
+                employee_demo_jr AS k
+                    USE INDEX (idx_employee_demo_jr_employeeid_id), 
+                employee_demo AS d
+                    USE INDEX (idx_employee_demo_employeeid_orgid),
+                users AS u
+                    USE INDEX (idx_users_employeeid_emplrecord), 
                 users_annex AS ua
+                    USE INDEX (users_annex_employee_id_record_index)
             WHERE
                 NOT j.excused_type IS NULL
                 AND NOT EXISTS(SELECT 1 FROM employee_demo_jr AS j1 WHERE j1.employee_id = j.employee_id AND j1.excused_type IS NULL AND j1.id = (SELECT MAX(j1j.id) FROM employee_demo_jr AS j1j WHERE j1j.employee_id = j1.employee_id AND j1j.id < j.id))
