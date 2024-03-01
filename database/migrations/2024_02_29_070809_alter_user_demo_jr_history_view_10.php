@@ -89,7 +89,7 @@ class AlterUserDemoJrHistoryView10 extends Migration
 				ua.r_name,
 				ua.reason_id,
 				ua.reason_name,
-                CASE when j.excused_type = 'A' THEN 'Auto' ELSE CASE when u.excused_flag = 1 THEN 'Manual' ELSE 'No' END END AS j_excusedtype,
+                CASE WHEN j.excused_type = 'A' THEN 'Auto' WHEN j.excused_type = 'M' THEN 'Manual' ELSE 'No' END AS j_excusedtype,
 				ua.excusedlink as j_excusedlink,
 				ua.excused_by_name,
 				ua.created_at_string,
