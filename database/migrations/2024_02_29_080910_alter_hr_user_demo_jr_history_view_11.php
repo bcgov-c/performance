@@ -114,6 +114,7 @@ class AlterHrUserDemoJrHistoryView11 extends Migration
                 AND d.employee_id = u.employee_id
                 AND u.id = ua.user_id
                 AND d.pdp_excluded = 0
+                AND au.type = 'HR'
                 AND u.id = au.user_id
         ");
     }
