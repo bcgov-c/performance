@@ -350,7 +350,7 @@ public function getDatatableEmployees(Request $request) {
             'all' => 'All',
             'employee_id' => 'Employee ID', 
             'employee_name'=> 'Employee Name',
-            'excusedtype' => 'Excuse Type', 
+            'CAST(excusedtype AS char)' => 'Excuse Type', 
             'edj_excused_reason_desc' => 'Excuse Reason',
             'excused_by_name' => 'Excused By'
         ];
@@ -376,7 +376,7 @@ public function getDatatableEmployees(Request $request) {
             ->when("{$request->{$option.'dd_level3'}}", function($q) use($request, $option) { return $q->whereRaw("u.level3_key = {$request->{$option.'dd_level3'}}"); })
             ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); })
             ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); })
-            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(employee_id LIKE '%{$request->{$option.'search_text'}}%' OR employee_name LIKE '%{$request->{$option.'search_text'}}%' OR excusedtype LIKE '%{$request->{$option.'search_text'}}%' OR reason_name LIKE '%{$request->{$option.'search_text'}}%' OR excused_by_name LIKE '%{$request->{$option.'search_text'}}%')"); });
+            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(employee_id LIKE '%{$request->{$option.'search_text'}}%' OR employee_name LIKE '%{$request->{$option.'search_text'}}%' OR CAST(excusedtype AS char) LIKE '%{$request->{$option.'search_text'}}%' OR reason_name LIKE '%{$request->{$option.'search_text'}}%' OR excused_by_name LIKE '%{$request->{$option.'search_text'}}%')"); });
     }
 
     protected function baseFilteredSQLs($request, $option = null) {
