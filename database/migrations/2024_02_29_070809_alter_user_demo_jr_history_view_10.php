@@ -103,7 +103,7 @@ class AlterUserDemoJrHistoryView10 extends Migration
                 users_annex AS ua
             WHERE
                 NOT j.excused_type IS NULL
-                AND NOT EXISTS(SELECT 1 FROM employee_demo_jr AS j1 WHERE j1.employee_id = j.employee_id AND NOT j1.excused_type IS NULL AND j1.id = (SELECT MAX(j1j.id) FROM employee_demo_jr AS j1j WHERE j1j.employee_id = j1.employee_id AND j1j.id < j1.id))
+                AND NOT EXISTS(SELECT 1 FROM employee_demo_jr AS j1 WHERE j1.employee_id = j.employee_id AND NOT j1.excused_type IS NULL AND j1.id = (SELECT MAX(j1j.id) FROM employee_demo_jr AS j1j WHERE j1j.employee_id = j1.employee_id AND j1j.id < j.id))
                 AND j.employee_id = k.employee_id
                 AND j.id < k.id
                 AND k.id = (SELECT MIN(k1.id) FROM employee_demo_jr AS k1 WHERE k1.employee_id = k.employee_id AND k1.excused_type IS NULL and k1.id > j.id)
