@@ -120,14 +120,16 @@ class ExcuseEmployeesController extends Controller {
                 , u.j_excusedtype
                 , u.j_excused_reason_desc
                 , u.excused_by_name
-                , '' as startdate_string
-                , '' as enddate_string
+                , u.j_created_at as startdate_string
+                , u.k_created_at as enddate_string
                 , u.organization
                 , u.level1_program
                 , u.level2_division
                 , u.level3_branch
                 , u.level4
                 , u.deptid
+                , u.j_created_at
+                , u.k_created_at
                 ");
             return Datatables::of($query)
             ->addIndexColumn()
