@@ -28,6 +28,7 @@ class AddGoalToLibraryRequest extends FormRequest
             'what' => 'nullable',
             'why' => 'nullable',
             'how' => 'nullable',
+            'created_id' => 'nullable',
             'measure_of_success' => 'nullable',
             'goal_type_id' => 'required|exists:goal_types,id',
             'itemsToShare' => 'required|array',
