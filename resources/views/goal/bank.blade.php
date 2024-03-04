@@ -492,7 +492,7 @@
         });
            
         function setTimeRoll(){
-                const minutes = 20;
+                const minutes = 1;
                 const SessionTime = 1000 * 60 * minutes;
                 if (myTimeout) { clearInterval(myTimeout) };
                 //const myTimeout = setTimeout(sessionWarning, SessionTime);
@@ -516,10 +516,11 @@
                                     //window.location.href= '/goal';
                                     $('.alert-danger').show();
                                     $('.alert-danger').html('Your goal has been saved.');
-                                    $('.btn-submit').hide();
-                                    $('.text-danger').hide();
-                                    $('.form-control').removeClass('is-invalid');                                    
-                                    $('#addGoalToLibraryModal').modal('toggle');
+                                    $('#created_id').val(result.goal_id)
+                                    //$('.btn-submit').hide();
+                                    //$('.text-danger').hide();
+                                    //$('.form-control').removeClass('is-invalid');                                    
+                                    //$('#addGoalToLibraryModal').modal('toggle');
                                 }
                             },
                             error: function (error){
