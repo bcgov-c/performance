@@ -1,3 +1,4 @@
+@include('dashboard.partials.accessibility')
 <script src="https://cdn.ckeditor.com/4.20.1/standard-all/ckeditor.js"></script>
 <style>
     th{
@@ -577,6 +578,21 @@
 @endpush   
 
 <script>
+    function applyAccessibilityRoles() {
+        // Get the checkbox container div
+        var checkboxContainer = $('#goalbanks').closest('.dataTables_wrapper').find('.dataTables_scrollBody');
+
+        // Get the h3 element for grouping label
+        var groupingLabel = $('<h3>').text('Select Goal');
+
+        // Set id attribute for the h3 element
+        var groupId = 'checkbox-group-label';
+        groupingLabel.attr('id', groupId);
+
+        // Add aria-labelledby attribute to the checkbox container div
+        checkboxContainer.attr('aria-labelledby', groupId);
+    }
+
     $(document).ready(function() {
       const json_goalbanks = <?php echo $json_goalbanks;?>;
 
@@ -589,11 +605,11 @@
         data: json_goalbanks,
         columns: [
           {
-            title: "<input type='checkbox' id='checkAll'>",
+            title: "<input type='checkbox' id='checkAll'  aria-label='Select All'>",
             data: null,
             orderable: false, // Disable sorting
             render: function(data, type, row) {
-              return '<input type="checkbox" name="goal_ids[]" value="' + row.id + '" class="row-checkbox goal_ids">';
+              return '<input type="checkbox" name="goal_ids[]" value="' + row.id + '" class="row-checkbox goal_ids" aria-label="Select Goal ID ' + row.id + '">';
             }
           },
           { title: "ID", data: "id" },
@@ -601,7 +617,7 @@
             title: "Goal Title",
             data: null,
             render: function(data, type, row) {
-                return '<a href="#" class="show-goal-detail highlighter" data-id="' + row.id + '">' + data.title + '</a>';
+                return '<a href="#" class="show-goal-detail highlighter" data-id="' + row.id + '" aria-label="View Goal Detail">' + data.title + '</a>';
             }
           },
           { title: "Goal Type", data: "typename" },
@@ -621,7 +637,11 @@
           { title: "Mandatory/Suggested", data: "is_mandatory" }
         ],
         "order": [[0, "desc"]],
-        dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>'
+        dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>',
+        "drawCallback": function(settings) {
+            // Apply accessibility roles after DataTable has been drawn
+            applyAccessibilityRoles();
+        }
       });
 
       goalbanks.column(1).visible(false);
@@ -688,11 +708,11 @@
         data: json_goalbanks_hidden,
         columns: [
           {
-            title: "<input type='checkbox' id='checkAll_hide'>",
+            title: "<input type='checkbox' id='checkAll_hide' aria-label='Select All'>",
             data: null,
             orderable: false, // Disable sorting
             render: function(data, type, row) {
-              return '<input type="checkbox" name="goal_ids_hide[]" value="' + row.id + '" class="row-checkbox goal_ids_hide">';
+              return '<input type="checkbox" name="goal_ids_hide[]" value="' + row.id + '" class="row-checkbox goal_ids_hide" aria-label="Select Goal ID ' + row.id + '" >';
             }
           },
           { title: "ID", data: "id" },
@@ -1071,6 +1091,7 @@
 
 <script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
 <script>
+    var data_save = true;
     $(document).on('click', '#add-goal-to-library-btn', function () {
         modal_open = true;
         $("#addGoalToLibraryModal").modal('show');
@@ -1103,6 +1124,14 @@
                 ],
                 disableNativeSpellChecker: false
             });
+
+            
+        CKEDITOR.instances['what'].on('change', function() {
+            data_save = false;
+        });
+        CKEDITOR.instances['measure_of_success'].on('change', function() {
+            data_save = false;
+        });
     });
     $('#addGoalToLibraryModal').on('hidden.bs.modal', function (e) {
         $('#what').val('');
@@ -1114,8 +1143,7 @@
     })
 </script>
 
-<script>
-
+<script>        
         $('body').popover({
             selector: '[data-toggle]',
             trigger: 'click',
@@ -1178,7 +1206,7 @@
         $(document).on('hide.bs.modal', '#addGoalToLibraryModal', function(e) {
             modal_open = false;
             const isContentModified = () => {
-                if ($('#what').val() !== '' || $('#measure_of_success').val() !== ''
+                if (CKEDITOR.instances['what'].getData() !== '' || CKEDITOR.instances['measure_of_success'].getData() !== ''
                     || $("#goal_title").val() !== '' || $('input[name=goal_type_id]').val() != 1 
                     || $("input[name=start_date]").val() !== '' || $("input[name=target_date]").val() != ''
                     ) {
@@ -1190,7 +1218,7 @@
                 CKEDITOR.instances[i].updateElement();
             };
             if(no_warning == false) {
-                if (isContentModified() && !confirm("If you continue you will lose any unsaved changes.")) {                
+                if (isContentModified() && !data_save && !confirm("If you continue you will lose any unsaved changes.")) {                
                     e.preventDefault();
                 } else {
                     location.reload();
@@ -1217,6 +1245,7 @@
                     if(result.success){
                         $('.alert-danger').hide();
                         window.location.reload();
+                        data_save = true;
                     }
                 },
                 error: function (error){
