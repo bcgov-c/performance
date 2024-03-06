@@ -71,6 +71,11 @@ class Kernel extends ConsoleKernel
             ->sendOutputTo(storage_path('logs/UpdateGUIDByEmployeeId.log'))
             ->dailyAt('00:45');
 
+        $schedule->command('command:AutoRemoveAccess')
+            ->timezone('America/Vancouver')
+            ->sendOutputTo(storage_path('logs/AutoRemoveAccess.log'))
+            ->dailyAt('00:55');
+
         $schedule->command('command:PopulateAuthUsers')
             ->timezone('America/Vancouver')
             ->sendOutputTo(storage_path('logs/PopulateAuthUsers.log'))
