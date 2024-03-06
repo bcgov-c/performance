@@ -603,6 +603,11 @@ class DashboardController extends Controller
             curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
             curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
             curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'DEFAULT@SECLEVEL=1');
+            
+
+            if (curl_errno($ch)) {
+                echo 'Error: ' . curl_error($ch);
+            }
         
             // Execute cURL and get the response
             $response = curl_exec($ch);
