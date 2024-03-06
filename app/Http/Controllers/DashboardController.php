@@ -620,7 +620,7 @@ class DashboardController extends Controller
                 echo "cURL Error: $errorMessage";
                 return;
             }
-        
+            /*
             // Load JSON response into an associative array
             $data = json_decode($response, true);
         
@@ -633,6 +633,8 @@ class DashboardController extends Controller
         
             // Use $data as needed (this is an array representation of the JSON response)
             dd($data);
+            */
+            dd($response);
     }
 
 }
