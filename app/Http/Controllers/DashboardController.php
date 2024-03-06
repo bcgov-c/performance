@@ -545,6 +545,7 @@ class DashboardController extends Controller
     }
 
     public function checkApi(){
+        /*
         //$URL = "https://gbchruatd.chips.gov.bc.ca:7001/PSIGW/RESTListeningConnector/GBCHRUAT/PTLOOKUPXLAT_REST.v1/XLAT_Lookup/HR_STATUS/ENG/2023-01-01/?fieldVal=A";
        
         $URL = "https://gbchruatd.chips.gov.bc.ca:7001/PSIGW/RESTListeningConnector/GBCHRUAT/PTLOOKUPXLAT_REST.v1/XLAT_Lookup/EMPL_STATUS///?fieldVal=";
@@ -588,6 +589,50 @@ class DashboardController extends Controller
 
         // Use $data as needed (this is an array representation of the XML)
         dd($data);
+        */
+
+            $url = "https://bi-api.tssi.ca/apiserver";
+            $username = "bceperform";
+            $password = "7e0dpeP3Ewv9ltJNdm37";
+        
+            // Initialize cURL
+            $ch = curl_init($url);
+        
+            // Set cURL options
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+            curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
+            curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'DEFAULT@SECLEVEL=1');
+        
+            // Execute cURL and get the response
+            $response = curl_exec($ch);
+        
+            // Check for cURL errors
+            $error = curl_errno($ch);
+            $errorMessage = curl_error($ch);
+        
+            // Close the cURL session
+            curl_close($ch);
+        
+            // Check if there are cURL errors
+            if ($error) {
+                // Handle cURL error
+                echo "cURL Error: $errorMessage";
+                return;
+            }
+        
+            // Load JSON response into an associative array
+            $data = json_decode($response, true);
+        
+            // Check if JSON decoding is successful
+            if ($data === null) {
+                // Handle JSON decoding error
+                echo "Error decoding JSON";
+                return;
+            }
+        
+            // Use $data as needed (this is an array representation of the JSON response)
+            dd($data);
     }
 
 }
