@@ -14,6 +14,7 @@ use App\Models\UserListView;
 use Illuminate\Http\Request;
 use App\Models\UserDemoJrView;
 use App\Models\EmployeeDemoTree; 
+use App\Models\ModelHasRoleAudit; 
 use Yajra\Datatables\Datatables; 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -234,6 +235,30 @@ class AccessPermissionsController extends Controller
                 }
                 $this->refreshAdminOrgUsersById($newId->id);
             };  
+            if($request->input('accessselect') == 5) {
+                $demo = EmployeeDemo::withoutGlobalScopes()
+                    ->whereNull('date_deleted')
+                    ->join('users', 'users.employee_id', 'employee_demo.employee_id')
+                    ->whereRaw("users.id = {$newId->id}")
+                    ->selectRaw('employee_demo.deptid, employee_demo.position_number')
+                    ->whereRaw('employee_demo.empl_record = (SELECT MIN(ed1.empl_record) FROM employee_demo AS ed1 WHERE ed1.employee_id = employee_demo.employee_id AND ed1.date_deleted IS NULL)')
+                    ->first();
+                if ($demo) {
+                    $demo_deptid = $demo->deptid;
+                    $demo_posn = $demo->position_number;
+                } else {
+                    $demo_deptid = null;
+                    $demo_posn = null;
+                }
+                ModelHasRoleAudit::updateOrCreate([
+                    'model_id' => $newId->id,
+                    'role_id' => $request->input('accessselect'),
+                ], [
+                    'deptid' => $demo_deptid,
+                    'position_number' => $demo_posn,
+                    'updated_by' => Auth::id(),
+                ]);
+            }
         }
         return redirect()->route('sysadmin.accesspermissions.index')->with('success', 'Create HR/SYS Admin access successful.');
     }
@@ -562,6 +587,16 @@ class AccessPermissionsController extends Controller
             ->delete();
 
             $this->refreshAdminOrgUsersById( $request->input('model_id') );
+        }
+        if ($request->input('role_id') == 5){
+            ModelHasRoleAudit::updateOrCreate([
+                'model_id' => $request->input('model_id'),
+                'role_id' => $request->input('role_id'),
+            ], [
+                'deleted_at' => Carbon::now(),
+                'deleted_by' => Auth::id(),
+            ]);
+
         }
         return redirect()->back();
     }
