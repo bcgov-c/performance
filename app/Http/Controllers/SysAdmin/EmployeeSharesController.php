@@ -328,7 +328,7 @@ class EmployeeSharesController extends Controller {
             return Datatables::of($employees)
                 ->addColumn("{$option}select_users", static function ($employee) use($option) {
                         return '<input pid="1335" type="checkbox" id="'.$option.'userCheck'. 
-                            $employee->employee_id.'" name="'.$option.'userCheck[]" value="'.$employee->employee_id.'" class="dt-body-center">';
+                            $employee->employee_id.'" name="'.$option.'userCheck[]" value="'.$employee->employee_id.'" class="dt-body-center" aria-label="Select Employee ID '.$employee->employee_id.'" >';
                 })
                 ->editColumn('shared_status', function($row) {
                     $text = $row->shared_status;

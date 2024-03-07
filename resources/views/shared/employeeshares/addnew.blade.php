@@ -1,3 +1,4 @@
+@include('dashboard.partials.accessibility')
 <x-side-layout title="{{ __('Share Employees - Performance Development Platform') }}">
     <div name="header" class="container-header p-n2 "> 
         <div class="container-fluid">
@@ -269,6 +270,21 @@
                 $('#saveAllModal').modal();
 			}
 
+            function applyAccessibilityRoles() {
+                // Get the checkbox container div
+                var checkboxContainer = $('#goalbanks').closest('.dataTables_wrapper').find('.dataTables_scrollBody');
+
+                // Get the h3 element for grouping label
+                var groupingLabel = $('<h3>').text('Select Goal');
+
+                // Set id attribute for the h3 element
+                var groupId = 'checkbox-group-label';
+                groupingLabel.attr('id', groupId);
+
+                // Add aria-labelledby attribute to the checkbox container div
+                checkboxContainer.attr('aria-labelledby', groupId);
+            }
+
             $(document).ready(function(){
 
                 $(document).on('show.bs.modal', '#employee-profile-sharing-modal', function (e) {
@@ -371,7 +387,7 @@
                     rowCallback: function ( row, data, displayNum, displayIndex, dataIndex ) {
                     },
                     columns: [
-                        {title: '<input name="select_all" value="1" id="employee-list-select-all" type="checkbox" />', ariaTitle: 'employee-list-select-all', target: 0, orderData: [0, 2], type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
+                        {title: '<input name="select_all" value="1" id="employee-list-select-all" type="checkbox" aria-label="Select All" />', ariaTitle: 'employee-list-select-all', target: 0, orderData: [0, 2], type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
                         // {title: '', ariaTitle: 'employee-list-select-all', target: 0, type: 'string', data: 'select_users', name: 'select_users', orderable: false, searchable: false},
                         {title: 'ID', ariaTitle: 'ID', target: 1, orderData: [1, 0], type: 'string', data: 'employee_id', name: 'employee_id', className: 'dt-nowrap'},
                         {title: 'Name', ariaTitle: 'Name', target: 2, orderData: [2, 2], type: 'string', data: 'employee_name', name: 'employee_name', className: 'dt-nowrap'},
@@ -457,7 +473,7 @@
                     rowCallback: function ( row, data, displayNum, displayIndex, dataIndex ) {
                     },
                     columns: [
-                        {title: '<input name="eselect_all" value="1" id="eemployee-list-select-all" type="checkbox" />', ariaTitle: 'eemployee-list-select-all', target: 0, orderData: [0, 1], type: 'string', data: 'eselect_users', name: 'eselect_users', orderable: false, searchable: false},
+                        {title: '<input name="eselect_all" value="1" id="eemployee-list-select-all" type="checkbox" aria-label="Check All" />', ariaTitle: 'eemployee-list-select-all', target: 0, orderData: [0, 1], type: 'string', data: 'eselect_users', name: 'eselect_users', orderable: false, searchable: false},
                         // {title: '', ariaTitle: 'eemployee-list-select-all', target: 0, type: 'string', data: 'eselect_users', name: 'eselect_users', orderable: false, searchable: false},
                         {title: 'ID', ariaTitle: 'ID', target: 1, orderData: [1], type: 'string', data: 'employee_id', name: 'employee_id', className: 'dt-nowrap'},
                         {title: 'Name', ariaTitle: 'Name', target: 2, orderData: [2, 1], type: 'string', data: 'employee_name', name: 'employee_name', className: 'dt-nowrap'},

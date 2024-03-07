@@ -1,3 +1,5 @@
+@include('dashboard.partials.accessibility')
+
 <x-side-layout title="{{ __('Dashboard - Performance Development Platform') }}" >
     <x-slot name="header">
         <h1 class="font-semibold text-xl text-primary leading-tight" role="banner">

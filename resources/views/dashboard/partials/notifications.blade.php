@@ -7,7 +7,10 @@
                 <div class="pr-3">
                     <label for="employee-list-select-all ">
                         {{-- <input id="master" type="checkbox" name="select_all">&nbsp;&nbsp;Select All --}}
-                        <input id="employee-list-select-all" type="checkbox" name="select_all">&nbsp;&nbsp;Select All
+                        <div class="checkbox-container" role="group" aria-labelledby="checkbox-group-label">
+                            <input id="employee-list-select-all" type="checkbox" name="select_all" role="checkbox" tabindex="0">
+                            <label for="employee-list-select-all" class="checkbox-label">Select All</label>
+                        </div>
                     </label>
                 </div>
 
