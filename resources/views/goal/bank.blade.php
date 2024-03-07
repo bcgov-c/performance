@@ -346,6 +346,23 @@
 		    </div>
 	    </div>
         
+        <div class="modal fade" id="unsavedChangesModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:1060"> 
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Unsaved Changes</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>Save changes to this goal?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary saveChangesBtn" id="saveChangesBtn">Save Changes</button>
+                        <button type="button" class="btn btn-secondary" id="discardChangesBtn">Don't Save</button>
+                        <button type="button" class="btn btn-secondary" id="cancelChangesBtn">Cancel</button>
+                    </div>
+                    </div>
+                </div>
+        </div>
         
     
     @push('css')
@@ -517,6 +534,7 @@
                                     //window.location.href= '/goal';
                                     $('.alert-danger').show();
                                     $('.alert-danger').html('Your goal has been saved.');
+                                    $('.text-danger').hide();
                                     $('#created_id').val(result.goal_id)
                                     //$('.btn-submit').hide();
                                     //$('.text-danger').hide();
@@ -1132,6 +1150,19 @@
         CKEDITOR.instances['measure_of_success'].on('change', function() {
             data_save = false;
         });
+
+        $('#goal_title').on('change', function() {
+            data_save = false;
+        });
+
+        $('#tag_ids').on('change', function() {
+            data_save = false;
+        });
+
+        $('#itemsToShare').on('change', function() {
+            data_save = false;
+        });
+
     });
     $('#addGoalToLibraryModal').on('hidden.bs.modal', function (e) {
         $('#what').val('');
@@ -1203,6 +1234,18 @@
             $('#addGoalToLibraryModal #target_date').prop("readonly",true);
                     
         });
+
+
+        $(document).on('hide.bs.modal', '#addGoalToLibraryModal', function(e) {
+            if(!data_save) {
+                e.preventDefault();
+                $('#unsavedChangesModal').modal('show');
+            } else {
+                location.reload();
+            }
+        });
+
+        /*
         $(document).on('hide.bs.modal', '#addGoalToLibraryModal', function(e) {
             modal_open = false;
             const isContentModified = () => {
@@ -1229,9 +1272,25 @@
                 location.reload();            
             }
         });
+        */
         
+        $(document).on('click', '#saveChangesBtn', function(e){
+            data_save = true;
+            $('#add-goal-to-library-form').submit();    
+            $('#unsavedChangesModal').modal('hide');
+        });
+        $(document).on('click', '#discardChangesBtn', function(e){
+            location.reload();
+            e.preventDefault();
+        });
+
+        $(document).on('click', '#cancelChangesBtn', function(e){
+            $('#unsavedChangesModal').modal('hide');
+            modal_open = true;
+            e.preventDefault();
+        });
+
         $("#add-goal-to-library-form").on('submit', function (e) {
-            $('#savebtn').prop('disabled', true);
             e.preventDefault();
             for (var i in CKEDITOR.instances){
                 CKEDITOR.instances[i].updateElement();
@@ -1243,8 +1302,12 @@
                 data: $(form).serialize(),
                 success: function (result) {
                     if(result.success){
-                        $('.alert-danger').hide();
-                        window.location.reload();
+                        $('.alert-danger').show();
+                        $('.alert-danger').html('Your goal has been saved.');
+                        $('.text-danger').hide();
+                        $('#created_id').val(result.goal_id)
+                        
+                        // window.location.reload(); // Remove this line
                         data_save = true;
                     }
                 },
@@ -1257,7 +1320,7 @@
                         $('.text-danger').text('');
                     });
                     Object.entries(errors).forEach(function callback(value, index) {
-                         console.log(value[0]);
+                        console.log(value[0]);
                         var className = '.error-' + value[0];
                         $('#addGoalToLibraryModal input[name='+value[0]+']').addClass('is-invalid');
                         $(className).text(value[1]);
