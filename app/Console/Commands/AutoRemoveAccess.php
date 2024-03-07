@@ -80,7 +80,7 @@ class AutoRemoveAccess extends Command
                         'deleted_at' => Carbon::now(),
                         'deleted_by' => 'AutoRemoveAccess',
                     ]);
-                    \DB::table('model_has_roles AS mhr')->whereRaw("mhr.model_id = {$oneid->model_id} AND mhr.role_id = {$oneid->role_id}")->delete();
+                    \DB::table('model_has_roles')->whereRaw("model_id = {$oneid->model_id} AND role_id = {$oneid->role_id}")->delete();
                     DB::commit();
                     echo 'Removed access for '.$oneid->model_id.'.'; echo "\r\n";
                     $count_success += 1;
