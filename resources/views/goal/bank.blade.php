@@ -378,7 +378,8 @@
             var need_fresh = false;
             var autosave = true;
             var no_warning = false;
-            var myTimeout;
+            var myTimeout;            
+            var data_save = true;
 
             $('#filter-menu select, #filter-menu input').change(function () {
                 $("#filter-menu").submit();
@@ -525,6 +526,7 @@
                             type : 'POST',
                             data: $('#add-goal-to-library-form').serialize(),
                             success: function (result) {
+                                data_save = true;
                                 console.log(result);
                                 need_fresh = true;
                                 if(result.success){
@@ -1109,7 +1111,6 @@
 
 <script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
 <script>
-    var data_save = true;
     $(document).on('click', '#add-goal-to-library-btn', function () {
         modal_open = true;
         $("#addGoalToLibraryModal").modal('show');
@@ -1237,7 +1238,14 @@
 
 
         $(document).on('hide.bs.modal', '#addGoalToLibraryModal', function(e) {
-            if(!data_save) {
+            var has_alert = false;
+            var errorMessage = "There are one or more errors on the page. Please review and try again.";
+
+            if ($('.alert-danger').html().includes(errorMessage)) {
+                has_alert = true;
+            } 
+
+            if(!data_save || has_alert){
                 e.preventDefault();
                 $('#unsavedChangesModal').modal('show');
             } else {
