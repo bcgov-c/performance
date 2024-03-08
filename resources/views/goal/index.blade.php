@@ -371,8 +371,16 @@
         $('#start_date').prop("readonly",true);
         $('#target_date').prop("readonly",true);
     });
+    
     $(document).on('hide.bs.modal', '#addGoalModal', function(e) {
-        if(isContentModified) {
+        var has_alert = false;
+        var errorMessage = "There are one or more errors on the page. Please review and try again.";
+
+        if ($('.alert-danger').html().includes(errorMessage)) {
+            has_alert = true;
+        } 
+
+        if(isContentModified || has_alert){
             e.preventDefault();
             $('#unsavedChangesModal').modal('show');
         } else {
