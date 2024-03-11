@@ -201,7 +201,7 @@
                     ---->
                     <x-button type="button" class="btn-md" id="saveGoalBtn"> Save Changes</x-button>                    
                     <x-button icon="question" href="{{ route('resource.goal-setting') }} " target="_blank" tooltip='Click here to access goal setting resources and examples (opens in new window).'>
-                        Need Help
+                        Need Help?
                     </x-button>
                 </div>
             </div>

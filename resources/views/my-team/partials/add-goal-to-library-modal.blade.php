@@ -90,13 +90,11 @@
                     <small class="text-danger error-itemsToShare"></small>
                 </div>
             </div>
-            <br/>
+
             <div class="row">
                 <div class="col-12 text-right">
-                    <x-button type="submit" class="btn-md" id="savebtn"> Save Changes</x-button>                    
-                    <x-button icon="question" href="{{ route('resource.goal-setting') }} " target="_blank" tooltip='Click here to access goal setting resources and examples (opens in new window).'>
-                        Need Help
-                    </x-button>
+                <button id="savebtn" type="submit" class="btn btn-submit btn-primary mt-3">Save</button>
+                <button id="cancelbtn" type="button" class="btn btn-secondary mt-3" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </form>
