@@ -14,7 +14,7 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="alert alert-success send-notification-info-top" attr-loc="top"  role="alert" style="display:none">
-                                Sent notifications to other participants.
+                                Notifications to other participants have been sent.
                             </div>
                         </div>
                     </div>
