@@ -559,31 +559,19 @@ class MyTeamController extends Controller
         $tags = '';
         if(isset($input['tag_ids'])) {
             $tags = $input['tag_ids'];
-            unset($input['tag_ids']); 
+        unset($input['tag_ids']); 
         }
-        $id = '';
-        if(isset($input["created_id"])){
-            $id = $input["created_id"];
-        }        
         
         DB::beginTransaction();
-        if ($id) {
-            $goal = Goal::withoutGlobalScope(NonLibraryScope::class)
-                    ->where('id', $id)
-                    ->firstOrFail();
-            $goal->update($input);
-        } else {
-            $goal = Goal::create($input);
-            
-        }    
+        $goal = Goal::create($input);
         if ($share_with) {
             $goal->sharedWith()->sync($share_with);
-        }   
+        }
         
         DB::commit();
-                
-        $id = $goal->id;
+        
         if ($tags) {
+            $id = $goal->id;
             $add_tag_goal = Goal::withoutGlobalScope(NonLibraryScope::class)->findOrFail($id);
             $add_tag_goal->tags()->sync($tags);
         }
@@ -643,8 +631,9 @@ class MyTeamController extends Controller
                 array_push($sendMail->bindvariables, $goal->mandatory_status_descr);          // Mandatory or suggested status
                 $response = $sendMail->sendMailWithGenericTemplate();
             }
-        }        
-        return response()->json(['success' => true, 'message' => 'Goal added to library successfully', 'goal_id' => $id]);
+        }
+                
+        return response()->json(['success' => true, 'message' => 'Goal added to library successfully']);
         // return redirect()->back();
     }
 

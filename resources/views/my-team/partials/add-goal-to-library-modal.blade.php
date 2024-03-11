@@ -22,7 +22,6 @@
       </div>
       <div class="modal-body p-4">
         <form action="{{ route('my-team.add-goal-to-library')}}" method="POST" id='add-goal-to-library-form'>
-            <input type="hidden" id="created_id" name="created_id" value="0">
             @csrf
             <div class="row">
                 <div class="col-12">
