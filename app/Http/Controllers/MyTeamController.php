@@ -566,6 +566,16 @@ class MyTeamController extends Controller
             $id = $input["created_id"];
         }        
         
+        $existing_users = array();
+        if($id != '') {
+            $shared_users = DB::select("SELECT user_id FROM goals_shared_with WHERE goal_id = '$id'");
+            if (!empty($shared_users)) {
+                foreach ($shared_users as $user) {
+                    $existing_users[] = $user->user_id;
+                }
+            }
+        }
+        
         DB::beginTransaction();
         if ($id) {
             $goal = Goal::withoutGlobalScope(NonLibraryScope::class)
@@ -607,15 +617,6 @@ class MyTeamController extends Controller
         // }
 
         // Send out email to the user when the Goal Bank added
-        $existing_users = array();
-        $shared_users = DB::select("SELECT user_id FROM goals_shared_with WHERE goal_id = '$id'");
-
-        if (!empty($shared_users)) {
-            foreach ($shared_users as $user) {
-                $existing_users[] = $user->user_id;
-            }
-        }
-
         foreach ($request->itemsToShare as $user_id) {
             if (!in_array($user_id, $existing_users)) {
                 $user = User::where('id', $user_id)
