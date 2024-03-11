@@ -351,7 +351,7 @@ function updateConversation(conversation_id) {
                             CKEDITOR.instances['info_comment10'].setReadOnly( true );  
                             $('#info_comment11').prop( 'disabled', true );
                         } else {
-                            $('.notifyParticipants').show();
+                            <!-- $('.notifyParticipants').show(); -->
                         }      
                         
                         <?php if ($type == 'past'){ ?>

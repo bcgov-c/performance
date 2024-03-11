@@ -930,17 +930,14 @@
             });
             
             $(document).on('click', '.notifyParticipants', function(e) {
-                var attrLocValue = $(this).attr('attr-loc');
-                e.preventDefault();
-                sendNotifications();
-                // unsave_warning = false;
-                // setTimeRoll();
-                if(attrLocValue == "top"){
-                    $('.notifyParticipants').hide();
-                    $('.send-notification-info-top').show();
-                // } else {
-                //     $('.sup-comment-save-info-top').hide();
-                //     $('.sup-comment-save-info').show();
+                if (confirm('Are you sure you want to send notification to the other participants?')) {
+                    var attrLocValue = $(this).attr('attr-loc');
+                    e.preventDefault();
+                    sendNotifications();
+                    if(attrLocValue == "top"){
+                        $('.notifyParticipants').hide();
+                        $('.send-notification-info-top').show();
+                    }
                 }
             });
             
