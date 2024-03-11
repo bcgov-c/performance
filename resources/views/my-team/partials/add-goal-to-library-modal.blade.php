@@ -44,7 +44,7 @@
                 <div class="col-sm-6">
                         <b>Tags</b>
                         <i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resources/goal-setting?t=8' target=\'_blank\'><u>View full list of tag descriptions.</u></a><br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>."></i>				
-                        <x-xdropdown :list="$tags" name="tag_ids[]" id="tag_ids"  class="tags" displayField="name" multiple/>
+                        <x-xdropdown :list="$tags" name="tag_ids[]"  class="tags" displayField="name" multiple/>
                         <small  class="text-danger error-tag_ids"></small>
                 </div>
                 <div class="col-12">
@@ -80,7 +80,7 @@
                 <div class="col-6">
                     <!-- <label> -->
                         <b>Audience</b><br>                        
-                        <select multiple class="form-control items-to-share" id="itemsToShare" name="itemsToShare[]">
+                        <select multiple class="form-control items-to-share" name="itemsToShare[]">
                             @foreach ($employees_list as $employee)
                                 <option value="{{ $employee['id'] }}" selected> {{$employee["name"]}}</option>                                
                             @endforeach
@@ -92,7 +92,7 @@
             </div>
             <br/>
             <div class="row">
-                <div class="col-12 text-left">
+                <div class="col-12 text-right">
                     <x-button type="submit" class="btn-md" id="savebtn"> Save Changes</x-button>                    
                     <x-button icon="question" href="{{ route('resource.goal-setting') }} " target="_blank" tooltip='Click here to access goal setting resources and examples (opens in new window).'>
                         Need Help
