@@ -1504,7 +1504,7 @@ class ConversationController extends Controller
                     $notification->send(); 
                 }
                 if ($user && $user->allow_email_notification) {                            
-                    $topic = ConversationTopic::find($request->conversation_topic_id);
+                    $topic = ConversationTopic::find($conversation->conversation_topic_id);
                     $sendMail = new \App\MicrosoftGraph\SendMail();
                     $sendMail->toRecipients = [ $value->participant_id ];
                     $sendMail->sender_id = null;  // default sender is System
