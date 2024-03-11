@@ -1,4 +1,3 @@
-@include('dashboard.partials.accessibility')
 <script src="https://cdn.ckeditor.com/4.20.1/standard-all/ckeditor.js"></script>
 <style>
     th{
