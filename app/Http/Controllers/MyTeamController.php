@@ -607,41 +607,51 @@ class MyTeamController extends Controller
         // }
 
         // Send out email to the user when the Goal Bank added
-        foreach ($request->itemsToShare as $user_id) {
+        $existing_users = array();
+        $shared_users = DB::select("SELECT user_id FROM goals_shared_with WHERE goal_id = '$id'");
 
-            $user = User::where('id', $user_id)
-                            ->with('userPreference')
-                            ->select('id','name','guid', 'employee_id')
-                            ->first();
-
-            if ($user && $user->allow_inapp_notification) {
-                 // Use Class to create DashboardNotification
-                $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                $notification->user_id =  $user_id;
-                $notification->notification_type = 'GB';
-                $notification->comment = ($goal->display_name ? $goal->display_name : $goal->user->name) . ' added a new goal to your goal bank.';
-                $notification->related_id = $goal->id;
-                $notification->notify_user_id = $user_id;
-                $notification->send();
+        if (!empty($shared_users)) {
+            foreach ($shared_users as $user) {
+                $existing_users[] = $user->user_id;
             }
+        }
 
-            if ($user && $user->allow_email_notification && $user->userPreference->goal_bank_flag == 'Y') {
+        foreach ($request->itemsToShare as $user_id) {
+            if (!in_array($user_id, $existing_users)) {
+                $user = User::where('id', $user_id)
+                                ->with('userPreference')
+                                ->select('id','name','guid', 'employee_id')
+                                ->first();
 
-                // Send Out Email Notification to Employee
-                $sendMail = new \App\MicrosoftGraph\SendMail();
-                $sendMail->toRecipients = [ $user->id ];  
-                $sendMail->sender_id = null; 
-                $sendMail->useQueue = false;
-                $sendMail->saveToLog = true;
-                $sendMail->alert_type = 'N';
-                $sendMail->alert_format = 'E';
+                if ($user && $user->allow_inapp_notification) {
+                    // Use Class to create DashboardNotification
+                    $notification = new \App\MicrosoftGraph\SendDashboardNotification();
+                    $notification->user_id =  $user_id;
+                    $notification->notification_type = 'GB';
+                    $notification->comment = ($goal->display_name ? $goal->display_name : $goal->user->name) . ' added a new goal to your goal bank.';
+                    $notification->related_id = $goal->id;
+                    $notification->notify_user_id = $user_id;
+                    $notification->send();
+                }
 
-                $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
-                array_push($sendMail->bindvariables, $user->name);                            // Recipient of the email
-                array_push($sendMail->bindvariables, $goal->user ? ($goal->display_name ? $goal->display_name : $goal->user->name) : '');   // Person who added goal to goal bank
-                array_push($sendMail->bindvariables, $goal->title);                           // goal title
-                array_push($sendMail->bindvariables, $goal->mandatory_status_descr);          // Mandatory or suggested status
-                $response = $sendMail->sendMailWithGenericTemplate();
+                if ($user && $user->allow_email_notification && $user->userPreference->goal_bank_flag == 'Y') {
+
+                    // Send Out Email Notification to Employee
+                    $sendMail = new \App\MicrosoftGraph\SendMail();
+                    $sendMail->toRecipients = [ $user->id ];  
+                    $sendMail->sender_id = null; 
+                    $sendMail->useQueue = false;
+                    $sendMail->saveToLog = true;
+                    $sendMail->alert_type = 'N';
+                    $sendMail->alert_format = 'E';
+
+                    $sendMail->template = 'NEW_GOAL_IN_GOAL_BANK';
+                    array_push($sendMail->bindvariables, $user->name);                            // Recipient of the email
+                    array_push($sendMail->bindvariables, $goal->user ? ($goal->display_name ? $goal->display_name : $goal->user->name) : '');   // Person who added goal to goal bank
+                    array_push($sendMail->bindvariables, $goal->title);                           // goal title
+                    array_push($sendMail->bindvariables, $goal->mandatory_status_descr);          // Mandatory or suggested status
+                    $response = $sendMail->sendMailWithGenericTemplate();
+                }
             }
         }        
         return response()->json(['success' => true, 'message' => 'Goal added to library successfully', 'goal_id' => $id]);
