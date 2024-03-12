@@ -366,29 +366,6 @@
 
     });    
 
-    $(document).ready(function() {
-        // Initialize DataTable
-        var table = $('#notification-table').DataTable();
-
-        // Define the column index where you want to replace checkboxes
-        var checkboxColumnIndex = 0; // Replace 0 with the actual index of your checkbox column
-
-        // Render the checkboxes using HTML structure
-        table.cells('td', checkboxColumnIndex).render(function(data, type, row) {
-            if (type === 'display') {
-                return '<div role="group" aria-labelledby="id-group-label">' +
-                        '<ul class="checkboxes">' +
-                            '<li>' +
-                                '<div role="checkbox" aria-checked="false" tabindex="0">' + data + '</div>' +
-                            '</li>' +
-                        '</ul>' +
-                    '</div>';
-            }
-            return data;
-        });
-    });
-
-
 </script>
 
 </x-slot>
