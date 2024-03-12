@@ -6,12 +6,11 @@
             <td class="align-middle">
                 <div class="pr-3">
                     <label for="employee-list-select-all ">
-                        {{-- <input id="master" type="checkbox" name="select_all">&nbsp;&nbsp;Select All --}}
-                        <div class="checkbox-container" role="group" aria-labelledby="checkbox-group-label">
-                            <input id="employee-list-select-all" type="checkbox" name="select_all" role="checkbox" tabindex="0">
-                            <label for="employee-list-select-all" class="checkbox-label">Select All</label>
-                        </div>
-                    </label>
+                    <div role="group" aria-labelledby="id-group-label">
+                        <ul class="checkboxes">
+                            <li><div role="checkbox" aria-checked="false"  name="select_all" id="employee-list-select-all" tabindex="0">Select All</div></li>
+                        </ul>
+                    </div>
                 </div>
 
             </td>
@@ -353,6 +352,30 @@
         });
 
     });    
+
+    $(document).ready(function() {
+        // Initialize DataTable
+        var table = $('#notification-table').DataTable();
+
+        // Define the column index where you want to replace checkboxes
+        var checkboxColumnIndex = 0; // Replace 0 with the actual index of your checkbox column
+
+        // Render the checkboxes using HTML structure
+        table.cells('td', checkboxColumnIndex).render(function(data, type, row) {
+            if (type === 'display') {
+                return '<div role="group" aria-labelledby="id-group-label">' +
+                        '<ul class="checkboxes">' +
+                            '<li>' +
+                                '<div role="checkbox" aria-checked="false" tabindex="0">' + data + '</div>' +
+                            '</li>' +
+                        '</ul>' +
+                    '</div>';
+            }
+            return data;
+        });
+    });
+
+
 </script>
 
 </x-slot>

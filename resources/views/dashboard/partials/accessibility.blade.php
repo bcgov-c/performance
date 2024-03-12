@@ -1,29 +1,126 @@
 <style>
+ul.checkboxes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  padding-left: 1em;
+}
+
+ul.checkboxes li {
+  list-style: none;
+  margin: 1px;
+  padding: 0;
+}
+
 [role="checkbox"] {
+  display: inline-block;
+  padding: 4px 8px;
   cursor: pointer;
 }
 
-[role="checkbox"]:focus {
-  outline: 2px solid blue; /* Example focus styling */
+[role="checkbox"]::before {
+  position: relative;
+  top: 1px;
+  left: -4px;
+  content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='16' width='16' style='forced-color-adjust: auto;'%3E%3Crect x='2' y='2' height='13' width='13' rx='2' stroke='currentcolor' stroke-width='1' fill-opacity='0' /%3E%3C/svg%3E");
 }
 
-[aria-checked="false"]::before {
-  content: "\2610"; /* Unicode for empty checkbox */
+[role="checkbox"][aria-checked="true"]::before {
+  position: relative;
+  top: 1px;
+  content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='16' width='16' style='forced-color-adjust: auto;'%3E%3Crect x='2' y='2' height='13' width='13' rx='2' stroke='currentcolor' stroke-width='1' fill-opacity='0' /%3E%3Cpolyline points='4,8 7,12 12,5' fill='none' stroke='currentcolor' stroke-width='2' /%3E%3C/svg%3E");
 }
 
-[aria-checked="true"]::before {
-  content: "\2611"; /* Unicode for checked checkbox */
+[role="checkbox"]:focus,
+[role="checkbox"]:hover {
+  padding: 2px 6px;
+  border: 2px solid #005a9c;
+  border-radius: 5px;
+  background-color: #def;
 }
 
-.checkbox-container {
-    display: inline-flex;
-    align-items: center; /* Align items vertically center */
+[role="checkbox"]:hover {
+  cursor: pointer;
 }
-
-.checkbox-label {
-    margin-left: 5px; /* Add space between checkbox and label */
-}
-
 
 </style>
+
+
+
+<script>
+/*
+ *   This content is licensed according to the W3C Software License at
+ *   https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
+ *
+ *   File:   Checkbox.js
+ *
+ *   Desc:   Checkbox widget that implements ARIA Authoring Practices
+ */
+
+ 'use strict';
+
+class Checkbox {
+  constructor(domNode) {
+    this.domNode = domNode;
+    this.domNode.tabIndex = 0;
+
+    if (!this.domNode.getAttribute('aria-checked')) {
+      this.domNode.setAttribute('aria-checked', 'false');
+    }
+
+    this.domNode.addEventListener('keydown', this.onKeydown.bind(this));
+    this.domNode.addEventListener('keyup', this.onKeyup.bind(this));
+    this.domNode.addEventListener('click', this.onClick.bind(this));
+  }
+
+  toggleCheckbox() {
+    if (this.domNode.getAttribute('aria-checked') === 'true') {
+      this.domNode.setAttribute('aria-checked', 'false');
+    } else {
+      this.domNode.setAttribute('aria-checked', 'true');
+    }
+  }
+
+  /* EVENT HANDLERS */
+
+  // Make sure to prevent page scrolling on space down
+  onKeydown(event) {
+    if (event.key === ' ') {
+      event.preventDefault();
+    }
+  }
+
+  onKeyup(event) {
+    var flag = false;
+
+    switch (event.key) {
+      case ' ':
+        this.toggleCheckbox();
+        flag = true;
+        break;
+
+      default:
+        break;
+    }
+
+    if (flag) {
+      event.stopPropagation();
+    }
+  }
+
+  onClick() {
+    this.toggleCheckbox();
+  }
+}
+
+// Initialize checkboxes on the page
+window.addEventListener('load', function () {
+  let checkboxes = document.querySelectorAll('.checkboxes [role="checkbox"]');
+  for (let i = 0; i < checkboxes.length; i++) {
+    new Checkbox(checkboxes[i]);
+  }
+});
+
+
+</script>
 
