@@ -153,9 +153,13 @@ class DashboardController extends Controller
                     return '<table class="inner" style="border:none">'. 
                         '<tr>'.
 
-                        '<td class="pr-3" style="vertical-align:middle"><input type="checkbox" id="itemCheck'. 
-                                $notification->id .'" name="itemCheck[]" value="'. 
-                                $notification->id .'" class="dt-body-center"></td>'. 
+                        '<td class="pr-3" style="vertical-align:middle">
+                            <div role="group" aria-labelledby="id-group-label">
+                                <ul class="checkboxes">
+                                    <li><div role="checkbox" aria-checked="false" tabindex="0" id="itemCheck' . $notification->id . '" name="itemCheck[]" value="' . $notification->id . '" class="dt-body-center"></div></li>
+                                </ul>
+                            </div>
+                        </td>'. 
                         '<td>'.$text.'</td>'.
                         '</tr>'.
                         '</table>';
