@@ -510,7 +510,7 @@
         });
            
         function setTimeRoll(){
-                const minutes = 1;
+                const minutes = 20;
                 const SessionTime = 1000 * 60 * minutes;
                 if (myTimeout) { clearInterval(myTimeout) };
                 //const myTimeout = setTimeout(sessionWarning, SessionTime);
@@ -597,21 +597,6 @@
 @endpush   
 
 <script>
-    function applyAccessibilityRoles() {
-        // Get the checkbox container div
-        var checkboxContainer = $('#goalbanks').closest('.dataTables_wrapper').find('.dataTables_scrollBody');
-
-        // Get the h3 element for grouping label
-        var groupingLabel = $('<h3>').text('Select Goal');
-
-        // Set id attribute for the h3 element
-        var groupId = 'checkbox-group-label';
-        groupingLabel.attr('id', groupId);
-
-        // Add aria-labelledby attribute to the checkbox container div
-        checkboxContainer.attr('aria-labelledby', groupId);
-    }
-
     $(document).ready(function() {
       const json_goalbanks = <?php echo $json_goalbanks;?>;
 
@@ -659,7 +644,6 @@
         dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>',
         "drawCallback": function(settings) {
             // Apply accessibility roles after DataTable has been drawn
-            applyAccessibilityRoles();
         }
       });
 
