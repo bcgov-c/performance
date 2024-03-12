@@ -137,25 +137,22 @@
             retrieve: true,
             processing: true,
             serverSide: true,
-            'order': [[0, 'desc']],
-            // "dom": '<<t>pi>',
+            order: [[0, 'desc']],
             ajax: {
                 url: '{!! route("dashboard") !!}',
                 data: function (d) {}
             },
-            "createdRow": function( row, data, dataIndex){
+            createdRow: function( row, data, dataIndex){
                 if( data.status == 'R'){
                     $(row).addClass('bg-light');
                 } 
             },
-            "fnDrawCallback": function() {
-
-                list = ( $('#notification-table input:checkbox') );
+            fnDrawCallback: function() {
+                list = $('#notification-table input:checkbox');
 
                 $.each(list, function( index, item ) {
-                    var pos = $.inArray( parseInt(item.value) , g_selected_employees);
-                    // console.log( pos + ' - ' + item.value + ' - ' + g_selected_employees);
-                    if ( pos === -1 ) {
+                    var pos = $.inArray(parseInt(item.value), g_selected_employees);
+                    if (pos === -1) {
                         $(item).prop('checked', false); // unchecked
                     } else {
                         $(item).prop('checked', true);  // checked 
@@ -176,14 +173,30 @@
 
                 // Update Badge Count
                 updateBadgeCount();
-
             },
             columns: [
                 {data: 'created_at', visible: false },
-                {data: 'item_detail', name: 'item_detail', orderable: false, searchable: false,  width: '80%', className: 'py-1' },
+                {data: 'item_detail', 
+                    name: 'item_detail', 
+                    orderable: false, 
+                    searchable: false,  
+                    width: '80%', 
+                    className: 'py-1',
+                    render: function(data, type, full, meta) {
+                        // Here you can customize the HTML content of the column
+                        return `
+                            <div role="group" aria-labelledby="id-group-label">
+                                <ul class="checkboxes">
+                                    <li><div role="checkbox" aria-checked="false" tabindex="0">${data}</div></li>
+                                </ul>
+                            </div>
+                        `;
+                    }
+                },
                 {data: 'action', name: 'action', orderable: false, searchable: false, width: '20%', className: 'dt-right dt-nowrap my-0'},
             ]
         });
+
 
         
         $('#notification-table tbody').on( 'click', 'input:checkbox', function () {
