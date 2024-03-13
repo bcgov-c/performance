@@ -151,17 +151,19 @@ class DashboardController extends Controller
                     }
 
                     return '<table class="inner" style="border:none">'.
-                            '<tr tabindex="0">'.
-                                '<td class="pr-3" style="vertical-align:middle">'.
-                                    '<label style="position: relative;">'.
-                                        '<input type="checkbox" style="position: absolute; left: -20px;" id="itemCheck'. 
-                                                $notification->id .'" name="itemCheck[]" value="'. 
-                                                $notification->id .'" class="dt-body-center">'.
+                                '<tr tabindex="0">'.
+                                    '<td class="pr-3" style="vertical-align:middle">'.
+                                        '<label style="position: relative;" id="checkboxLabel' . $notification->id . '">'.
+                                            '<input type="checkbox" style="position: absolute; left: -20px;" id="itemCheck'. 
+                                                    $notification->id .'" name="itemCheck[]" value="'. 
+                                                    $notification->id .'" class="dt-body-center" aria-labelledby="checkboxLabel' . $notification->id . '">'.
+                                        '</label>'.
+                                    '</td>'.
+                                    '<td>'.
                                         $text.
-                                    '</label>'.
-                                '</td>'.
-                            '</tr>'.
-                        '</table>';
+                                    '</td>'.
+                                '</tr>'.
+                            '</table>';
                 })
                 ->addColumn('action', function ($notification) {
 
