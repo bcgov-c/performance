@@ -5,13 +5,11 @@
           <tr>
             <td class="align-middle">
                 <div class="pr-3">
-                    <label for="employee-list-select-all ">
-                        <div role="group" aria-labelledby="id-group-label">
-                            <ul class="checkboxes">
-                                <li><div role="checkbox" aria-checked="false"  name="select_all" id="employee-list-select-all" tabindex="0">Select All</div></li>
-                            </ul>
-                        </div>
-                    </label>
+                    <div role="group" aria-labelledby="id-group-label">
+                        <ul class="checkboxes">
+                            <li><label><input id="employee-list-select-all" type="checkbox" name="select_all" role="checkbox" tabindex="0" aria-label="Select All"> Select All</li>
+                        </ul>
+                    </div>
                 </div>
 
             </td>
