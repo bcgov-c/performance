@@ -47,5 +47,10 @@ ul.checkboxes li label:hover {
   cursor: pointer;
 }
 
+
+.focusable {
+    /* Define styles for when the element is focused */
+    outline: 2px solid blue; /* Change the color and style as needed */
+}
 </style>
 
