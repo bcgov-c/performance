@@ -7,7 +7,7 @@
                 <div class="pr-3">
                     <div role="group" aria-labelledby="id-group-label">
                         <ul class="checkboxes">
-                            <li><label><input id="employee-list-select-all" type="checkbox" name="select_all" role="checkbox" tabindex="0" aria-label="Select All"> Select All</li>
+                            <li><label><input id="employee-list-select-all" type="checkbox" name="select_all" role="checkbox" tabindex="0"> Select All</li>
                         </ul>
                     </div>
                 </div>

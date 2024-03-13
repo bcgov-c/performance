@@ -156,9 +156,11 @@ class DashboardController extends Controller
                                     '<label style="position: relative;">'.
                                         '<input type="checkbox" style="position: absolute; left: -20px;" id="itemCheck'. 
                                                 $notification->id .'" name="itemCheck[]" value="'. 
-                                                $notification->id .'" class="dt-body-center"> '.
-                                        $text.
+                                                $notification->id .'" class="dt-body-center"> '.                                       
                                     '</label>'.
+                                '</td>'.
+                                '<td>'.
+                                    $text.
                                 '</td>'.
                             '</tr>'.
                         '</table>';
