@@ -234,7 +234,7 @@ class AccessPermissionsController extends Controller
                 }
                 $this->refreshAdminOrgUsersById($newId->id);
             };  
-            if($request->input('accessselect') == 5) {
+            if($request->input('accessselect') == 3 || $request->input('accessselect') == 5) {
                 $demo = EmployeeDemo::withoutGlobalScopes()
                     ->whereNull('date_deleted')
                     ->join('users', 'users.employee_id', 'employee_demo.employee_id')
@@ -587,7 +587,7 @@ class AccessPermissionsController extends Controller
 
             $this->refreshAdminOrgUsersById( $request->input('model_id') );
         }
-        if ($request->input('role_id') == 5){
+        if ($request->input('role_id') == 3 || $request->input('role_id') == 5){
             ModelHasRoleAudit::updateOrCreate([
                 'model_id' => $request->input('model_id'),
                 'role_id' => $request->input('role_id'),
