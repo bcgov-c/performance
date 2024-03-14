@@ -150,15 +150,21 @@ class DashboardController extends Controller
                             break;
                     }
 
-                    return 
-                            '<td class="pr-3 focusable" style="vertical-align:middle">'.
-                                '<label style="position: relative;">'.
-                                    '<input type="checkbox" style="position: absolute; left: -20px;" id="itemCheck'. 
-                                            $notification->id .'" name="itemCheck[]" value="'. 
-                                            $notification->id .'" class="dt-body-center">'.
-                                    $text.
-                                '</label>'.
-                            '</td>';    
+                    return '<td class="pr-3 focusable" style="vertical-align:middle">'.
+                                '<div role="group" aria-labelledby="id-group-label" tabindex="0">
+                                    <ul class="checkboxes">
+                                        <li>
+                                            <label style="position: relative;">
+                                                <input type="checkbox" style="position: absolute; left: -20px;" id="itemCheck'. 
+                                                $notification->id .'" name="itemCheck[]" value="'. 
+                                                $notification->id .'" class="dt-body-center">'.
+                                                '<span aria-hidden="true">'.$text.'</span>'.
+                                                '<span class="sr-only">'.$text.'</span>'. // This will be read by screen readers only
+                                            '</label>
+                                        </li>
+                                    </ul>
+                                </div>'.
+                            '</td>';
                 })
                 ->addColumn('action', function ($notification) {
 
