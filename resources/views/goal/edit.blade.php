@@ -4,10 +4,13 @@
             Edit: {{ $goal-> title}} 
         </h2>
         <!----<small><a href="{{ route('goal.index') }}">Back to list</a></small>---->
+        <a role="button" class="btn btn-primary btn-md" href="{{ route('goal.show', $goal->id) }}">
+                        <i class="fa fa-backward"></i>&nbsp;        Back
+            </a>
     </x-slot>
 
     <div class="container-fluid">
-        <form action="{{ route ('goal.update', $goal->id)}}" method="POST">
+        <form id="goalform" action="{{ route ('goal.update', $goal->id)}}" method="POST">
             <input type ="hidden" id="datatype" name="datatype" value"manual">
             @csrf
             @method('PUT')
@@ -82,10 +85,32 @@
                 @endif
    
                 <div class="col-12 text-center mb-3">
-                    <x-button type="submit" class="btn-lg"> Save </x-button>
+                    <x-button type="button" class="btn-lg" id="saveButton"> Save </x-button>
+                    <x-button type="button" class="btn-lg" id="cancelButton"> <i class="fa fa-undo"></i>&nbsp; Cancel </x-button>
                 </div>
             </div>
         </form>
+    </div>
+
+
+    <div class="modal" id="confirmationModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to update Goal?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="confirmYes" class="btn btn-primary">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>                    
+                </div>
+            </div>
+        </div>
     </div>
     @push('css')
         <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}">
@@ -93,6 +118,13 @@
 
     @push('js')
     <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
+    <script>
+        var cancelButton = document.getElementById('cancelButton');
+
+        cancelButton.addEventListener('click', function() {
+            window.location.href = "{{ url()->current() }}";
+        });
+    </script>
 
     <script>				
 				$('body').popover({
@@ -159,21 +191,28 @@
             window.location.reload();
         }
         window.isDirty = true;
-        $('form').on('submit', () => {
+
+
+        $('#saveButton').on('click', function(event) {
             window.isDirty = false;
             if (no_msg == false) {
-                // Display a confirmation dialog
-                const userConfirmed = confirm('Are you sure you want to update Goal ?');                
-                // Cancel the form submission if the user did not confirm
-                if (!userConfirmed) {
-                    event.preventDefault();
-                }
-            }
+                // Prevent the default form submission
+                event.preventDefault();
+                // Show the confirmation modal
+                $('#confirmationModal').modal('show');
+            }            
         });
+        $('#confirmYes').on('click', function() {
+            // Submit the form
+            $('#goalform').submit();
+        });
+
+
         let originalData = $('form').serialize();
         $(document).ready(function () {
             originalData = $('form').serialize();
         });
+        /*
         window.onbeforeunload = function () {
             if (!window.isDirty) {
                 return;
@@ -186,13 +225,14 @@
                 return "If you continue you will lose any unsaved information";
             }
         };
+        */
         
         $('body').popover({
             selector: '[data-toggle-select]',
             trigger: 'click',
         });
         
-        const minutes = 3;
+        const minutes = 20;
         const SessionTime = 1000 * 60 * minutes;
         
         $(document).ready(function () { 

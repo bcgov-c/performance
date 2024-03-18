@@ -3,7 +3,9 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             Create new goal
         </h2>
-        <small><a href="{{ route('goal.index') }}">Back to list</a></small>
+        <a role="button" class="btn btn-primary btn-md" href="{{ route('goal.index') }}">
+                        <i class="fa fa-backward"></i>&nbsp;        Back to list
+        </a>
     </x-slot>
 
     <div class="container-fluid">
