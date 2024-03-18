@@ -5,13 +5,17 @@
             @if(!$disableEdit && $goal->user_id === Auth::Id() && $goal['status'] == 'active')
             <x-button icon="edit" :href="route('goal.edit', $goal->id)">Edit</x-button>
             @endif
-        </h2>
-        @if(session('from_share'))
-            <small><a href="{{ route('goal.share') }}">Back to list</a></small>
-        @else
-            <small><a href="{{ url()->previous() === url()->current() ? route('goal.index') : url()->previous() }}">Back to list</a></small>
-        @endif
         
+        @if(session('from_share'))
+            <a role="button" class="btn btn-primary btn-md" href="{{ route('goal.share') }}">
+                        <i class="fa fa-undo"></i>&nbsp;        Back to list
+            </a>
+        @else
+            <a role="button" class="btn btn-primary btn-md" href="{{ url()->previous() === url()->current() ? route('goal.index') : url()->previous() }}">
+                        <i class="fa fa-undo"></i>&nbsp;        Back to list
+            </a>
+        @endif
+        </h2>
     </x-slot>
     <div class="container-fluid">
         <div class="card">
