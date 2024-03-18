@@ -8,11 +8,11 @@
         
         @if(session('from_share'))
             <a role="button" class="btn btn-primary btn-md" href="{{ route('goal.share') }}">
-                        <i class="fa fa-undo"></i>&nbsp;        Back to list
+                        <i class="fa fa-backward"></i>&nbsp;        Back to list
             </a>
         @else
             <a role="button" class="btn btn-primary btn-md" href="{{ url()->previous() === url()->current() ? route('goal.index') : url()->previous() }}">
-                        <i class="fa fa-undo"></i>&nbsp;        Back to list
+                        <i class="fa fa-backward"></i>&nbsp;        Back to list
             </a>
         @endif
         </h2>

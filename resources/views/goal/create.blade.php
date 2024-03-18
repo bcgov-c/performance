@@ -4,9 +4,8 @@
             Create new goal
         </h2>
         <a role="button" class="btn btn-primary btn-md" href="{{ route('goal.index') }}">
-                        <i class="fa fa-undo"></i>&nbsp;        Back to list
+                        <i class="fa fa-backward"></i>&nbsp;        Back to list
         </a>
-        <small><a href="{{ route('goal.index') }}">Back to list</a></small>
     </x-slot>
 
     <div class="container-fluid">
