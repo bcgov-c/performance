@@ -6,11 +6,11 @@
         <!----<small><a href="{{ route('goal.index') }}">Back to list</a></small>---->
         @if(session('from_share'))
             <a role="button" class="btn btn-primary btn-md" href="{{ route('goal.share') }}">
-                        <i class="fa fa-undo"></i>&nbsp;        Back to list
+                        <i class="fa fa-backward"></i>&nbsp;        Back to list
             </a>
         @else
             <a role="button" class="btn btn-primary btn-md" href="{{ url()->previous() === url()->current() ? route('goal.index') : url()->previous() }}">
-                        <i class="fa fa-undo"></i>&nbsp;        Back to list
+                        <i class="fa fa-backward"></i>&nbsp;        Back to list
             </a>
         @endif
     </x-slot>
@@ -92,6 +92,7 @@
    
                 <div class="col-12 text-center mb-3">
                     <x-button type="submit" class="btn-lg"> Save </x-button>
+                    <x-button type="button" class="btn-lg" id="cancelButton"> <i class="fa fa-undo"></i>&nbsp; Cancel </x-button>
                 </div>
             </div>
         </form>
@@ -102,6 +103,13 @@
 
     @push('js')
     <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
+    <script>
+        var cancelButton = document.getElementById('cancelButton');
+
+        cancelButton.addEventListener('click', function() {
+            window.location.href = "{{ url()->current() }}";
+        });
+    </script>
 
     <script>				
 				$('body').popover({
