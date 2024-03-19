@@ -4,19 +4,13 @@
             Edit: {{ $goal-> title}} 
         </h2>
         <!----<small><a href="{{ route('goal.index') }}">Back to list</a></small>---->
-        @if(session('from_share'))
-            <a role="button" class="btn btn-primary btn-md" href="{{ route('goal.share') }}">
-                        <i class="fa fa-backward"></i>&nbsp;        Back to list
+        <a role="button" class="btn btn-primary btn-md" href="{{ route('goal.show', $goal->id) }}">
+                        <i class="fa fa-backward"></i>&nbsp;        Back
             </a>
-        @else
-            <a role="button" class="btn btn-primary btn-md" href="{{ url()->previous() === url()->current() ? route('goal.index') : url()->previous() }}">
-                        <i class="fa fa-backward"></i>&nbsp;        Back to list
-            </a>
-        @endif
     </x-slot>
 
     <div class="container-fluid">
-        <form action="{{ route ('goal.update', $goal->id)}}" method="POST">
+        <form id="goalform" action="{{ route ('goal.update', $goal->id)}}" method="POST">
             <input type ="hidden" id="datatype" name="datatype" value"manual">
             @csrf
             @method('PUT')
@@ -91,11 +85,32 @@
                 @endif
    
                 <div class="col-12 text-center mb-3">
-                    <x-button type="submit" class="btn-lg"> Save </x-button>
+                    <x-button type="button" class="btn-lg" id="saveButton"> Save </x-button>
                     <x-button type="button" class="btn-lg" id="cancelButton"> <i class="fa fa-undo"></i>&nbsp; Cancel </x-button>
                 </div>
             </div>
         </form>
+    </div>
+
+
+    <div class="modal" id="confirmationModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to update Goal?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="confirmYes" class="btn btn-primary">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>                    
+                </div>
+            </div>
+        </div>
     </div>
     @push('css')
         <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}">
@@ -176,17 +191,23 @@
             window.location.reload();
         }
         window.isDirty = true;
-        $('form').on('submit', () => {
+
+
+        $('#saveButton').on('click', function(event) {
             window.isDirty = false;
             if (no_msg == false) {
-                // Display a confirmation dialog
-                const userConfirmed = confirm('Are you sure you want to update Goal ?');                
-                // Cancel the form submission if the user did not confirm
-                if (!userConfirmed) {
-                    event.preventDefault();
-                }
-            }
+                // Prevent the default form submission
+                event.preventDefault();
+                // Show the confirmation modal
+                $('#confirmationModal').modal('show');
+            }            
         });
+        $('#confirmYes').on('click', function() {
+            // Submit the form
+            $('#goalform').submit();
+        });
+
+
         let originalData = $('form').serialize();
         $(document).ready(function () {
             originalData = $('form').serialize();

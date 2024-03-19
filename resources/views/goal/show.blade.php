@@ -11,7 +11,7 @@
                         <i class="fa fa-backward"></i>&nbsp;        Back to list
             </a>
         @else
-            <a role="button" class="btn btn-primary btn-md" href="{{ url()->previous() === url()->current() ? route('goal.index') : url()->previous() }}">
+            <a role="button" class="btn btn-primary btn-md" href="{{ route('goal.index') }}">
                         <i class="fa fa-backward"></i>&nbsp;        Back to list
             </a>
         @endif
