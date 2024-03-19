@@ -456,8 +456,20 @@ class GoalController extends Controller
         if($is_ajax){
             return response()->json(['success' => true, 'message' => 'Goal Updated successfully']);
         } else {
+            /*
             if ($request->datatype != "auto") {
                 return redirect()->route($goal->is_library ? 'goal.library' : 'goal.index');
+            } else {
+                //return \Redirect::route('goal.edit', [$id]);
+                return \Redirect::route('goal.edit', [$id])->with('autosave', " Goal updated.");
+            }
+            */
+            if ($request->datatype != "auto") {
+                if ($goal->is_library) {
+                    return \Redirect::route('goal.library');
+                } else {
+                    return \Redirect::route('goal.show', [$id])->with('autosave', " Goal updated.");
+                }
             } else {
                 //return \Redirect::route('goal.edit', [$id]);
                 return \Redirect::route('goal.edit', [$id])->with('autosave', " Goal updated.");
