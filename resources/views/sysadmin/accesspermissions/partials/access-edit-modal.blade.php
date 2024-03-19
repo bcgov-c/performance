@@ -1,10 +1,8 @@
-<form id="modal-form" class="form-control" action="manageexistingaccessupdate" method="post" enctype="multipart/form-data">
-    
-    <div class="modal fade editModal" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
-
-        {{ method_field('PUT') }}
-        {{ csrf_field() }}
-        <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document" style="min-width:90%">
+<div class="modal fade editModal" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable" style="min-width:90%">
+        <form   id="modal-form" action="manageexistingaccessupdate" method="post" style="min-width:90%">
+            {{ method_field('PUT') }}
+            {{ csrf_field() }}
             <div class="modal-content">
                 <div class="modal-header bg-primary">
                     <h5 class="modal-title" type="hidden" id="accessDetailLabel">Edit Employee Access Level</h5>
@@ -59,8 +57,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    
+        </form>
     </div>
-
-</form>
+</div>
