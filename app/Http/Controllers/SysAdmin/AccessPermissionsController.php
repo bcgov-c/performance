@@ -783,4 +783,100 @@ class AccessPermissionsController extends Controller
         } while ($level < 4);
     }
 
+    public function export(Request $request, $paramJSON = null) {
+        $user = auth()->user();
+        $userid = $user->id;
+            
+        $user_role = DB::table('model_has_roles')                        
+            ->where('model_id', $userid)
+            ->whereIntegerInRaw('role_id', [4])
+            ->where('model_type', 'App\Models\User')
+            ->get();
+            
+        if(count($user_role) == 0) {
+            return redirect()->to('/');
+            exit;
+        }
+        $param = json_decode($paramJSON);
+        $dd_level0 = $param[0];
+        $dd_level1 = $param[1];
+        $dd_level2 = $param[2];
+        $dd_level3 = $param[3];
+        $dd_level4 = $param[4];
+        $criteria = $param[5];
+        $search_text = $param[6];
+        // dd($dd_level0);
+        $query = UserManageAccessView::from('user_manage_access_view AS u')
+        ->when("{$dd_level0}", function($q) use($dd_level0) { return $q->whereRaw("u.organization_key = {$dd_level0}"); })
+        ->when("{$dd_level1}", function($q) use($dd_level1) { return $q->whereRaw("u.level1_key = {$dd_level1}"); })
+        ->when("{$dd_level2}", function($q) use($dd_level2) { return $q->whereRaw("u.level2_key = {$dd_level2}"); })
+        ->when("{$dd_level3}", function($q) use($dd_level3) { return $q->whereRaw("u.level3_key = {$dd_level3}"); })
+        ->when("{$dd_level4}", function($q) use($dd_level4) { return $q->whereRaw("u.level4_key = {$dd_level4}"); })
+        ->when("{$search_text}" && "{$criteria}" != 'all', function($q) use($criteria, $search_text) { return $q->whereRaw("u.{$criteria} like '%{$search_text}%'"); })
+        ->when("{$search_text}" && "{$criteria}" == 'all', function($q) use($search_text) { return $q->whereRaw("(u.employee_id LIKE '%{$search_text}%' OR u.display_name LIKE '%{$search_text}%' OR u.jobcode_desc LIKE '%{$search_text}%' OR u.deptid LIKE '%{$search_text}%')"); })
+        ->selectRaw("
+            employee_id
+            , display_name 
+            , user_email
+            , jobcode
+            , jobcode_desc
+            , organization
+            , level1_program
+            , level2_division
+            , level3_branch
+            , level4
+            , deptid
+            , role_id
+            , reason
+            , role_longname
+            , model_id
+            , sysadmin
+            , org_count
+        ");
+        $records = $query->get();
+        // Generating Output file
+        $filename = 'AccessAndPermissions_'. Carbon::now()->format('YmdHis') . '.csv';
+        $headers = array(
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+        $columns = [
+            'Employee ID',  
+            'Name', 
+            'Email', 
+            'Classification', 
+            'Organization', 
+            'Access Level', 
+            'Access Description', 
+        ];
+        $callback = function() use($records, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            foreach ($records as $rec) {
+                $row['Employee ID'] = $rec->employee_id;
+                $row['Name'] = $rec->display_name;
+                $row['Email'] = $rec->user_email;
+                $row['Classification'] = $rec->jobcode_desc;
+                $row['Organization'] = $rec->organization;
+                $row['Access Level'] = $rec->role_longname;
+                $row['Access Description'] = $rec->reason;
+                fputcsv($file, array(
+                    $row['Employee ID'], 
+                    $row['Name'], 
+                    $row['Email'], 
+                    $row['Classification'], 
+                    $row['Organization'], 
+                    $row['Access Level'], 
+                    $row['Access Description']
+                ));
+            }
+            fclose($file);
+        };
+        return response()->stream($callback, 200, $headers);
+    }
+
+
 }
