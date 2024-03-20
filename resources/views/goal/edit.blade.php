@@ -212,6 +212,7 @@
         $(document).ready(function () {
             originalData = $('form').serialize();
         });
+        /*
         window.onbeforeunload = function () {
             if (!window.isDirty) {
                 return;
@@ -224,13 +225,14 @@
                 return "If you continue you will lose any unsaved information";
             }
         };
+        */
         
         $('body').popover({
             selector: '[data-toggle-select]',
             trigger: 'click',
         });
         
-        const minutes = 15;
+        const minutes = 20;
         const SessionTime = 1000 * 60 * minutes;
         
         $(document).ready(function () { 
