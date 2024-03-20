@@ -18,8 +18,10 @@
 
     @push('css')
         <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+        <link href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" rel="stylesheet">
         <x-slot name="css">
-            <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
             <style>
                 .text-truncate-30 {
                     white-space: wrap; 
@@ -36,7 +38,17 @@
                 }
 
                 #filtertable_filter label {
-                    text-align: right !important;
+                    display: none;
+                    /* text-align: right !important; */
+                }
+
+                #filtertable_wrapper .dt-buttons {
+                    float: none;
+                    text-align:right;
+                }
+
+                #filtertable_wrapper .dataTables_processing {
+                    top: 50px;
                 }
 
                 #admintable_filter label {
@@ -55,6 +67,8 @@
     @push('js')
         <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
         <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
 
 		<script>	
@@ -96,8 +110,9 @@
 			$(document).ready(function(){
 
                 $('#filtertable').DataTable ( {
+                    dom: 'lfrtip',
                     serverSide: true,
-                    searching: false,
+                    searching: true,
                     processing: true,
                     paging: true,
                     deferRender: true,
@@ -138,6 +153,25 @@
                         {title: 'SysAdmin', ariaTitle: 'SysAdmin', target: 16, orderData: [16, 0], type: 'num', data: 'sysadmin', name: 'sysadmin', searchable: false, className: 'dt-nowrap show-modal', visible: false},
                     ]
                 } );
+
+                // add export button on right
+                $("#filtertable_filter").append("<button id='export-btn' value='export' class='dt-button buttons-csv buttons-html5'>Export</button> ");
+
+                $('#export-btn').on('click', function() {
+                    let parray = encodeURIComponent(JSON.stringify([
+                        $('#dd_level0').val(), 
+                        $('#dd_level1').val(),
+                        $('#dd_level2').val(),
+                        $('#dd_level3').val(),
+                        $('#dd_level4').val(),
+                        $('#criteria').val(),
+                        $('#search_text').val()
+                    ]));
+                    var export_url = "{{ route('sysadmin.accesspermissions.export', ':parray') }}";
+                    export_url = export_url.replace(':parray', parray);
+                    let _url = export_url;
+                    window.location.href = _url;
+                });
 
                 $('#btn_search').click(function(e) {
                     e.preventDefault();
