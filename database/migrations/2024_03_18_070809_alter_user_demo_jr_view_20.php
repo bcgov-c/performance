@@ -14,7 +14,9 @@ class AlterUserDemoJrView20 extends Migration
     public function up()
     {
         \DB::statement("
-            ALTER VIEW user_demo_jr_view
+            ALTER 
+                ALGORITHM = MERGE
+                VIEW user_demo_jr_view
             AS
             SELECT
                 u.id AS user_id,
