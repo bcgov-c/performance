@@ -14,6 +14,7 @@ use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Classes\PDPDataClass;
 
 
 class EmployeeListController extends Controller {
@@ -118,61 +119,34 @@ class EmployeeListController extends Controller {
     public function getCurrentList(Request $request) {
         $user = auth()->user();
         $userid = $user->id;
-            
         $user_role = DB::table('model_has_roles')                        
             ->where('model_id', $userid)
             ->whereIntegerInRaw('role_id', [4, 5])
             ->where('model_type', 'App\Models\User')
             ->get();
-            
         if(count($user_role) == 0) {
             return redirect()->to('/');
             exit;
         }
-
         if ($request->ajax()) {
-            $query = UserDemoJrView::from('user_demo_jr_view AS u')
-                ->whereNull('u.date_deleted')
-                ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
-                ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
-                ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
-                ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
-                ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
-                ->when($request->search_text && $request->criteria == 'u.employee_name', function($q) use ($request) { return $q->whereRaw("(u.employee_name LIKE '%{$request->search_text}%' OR u.user_name LIKE '%{$request->search_text}%')"); })
-                ->when($request->search_text && $request->criteria != 'u.employee_name', function($q) use ($request) { return $q->whereRaw("{$request->criteria} LIKE '%{$request->search_text}%'"); })
-                ->selectRaw ("
-                    u.user_id AS id,
-                    u.guid,
-                    u.user_name,
-                    u.excused_flag,
-                    u.employee_id,
-                    u.employee_name, 
-                    u.employee_email, 
-                    u.position_number,
-                    u.empl_record,
-                    u.jobcode_desc,
-                    u.organization,
-                    u.level1_program,
-                    u.level2_division,
-                    u.level3_branch,
-                    u.level4,
-                    u.deptid,
-                    u.date_deleted,
-                    u.employee_status,
-                    u.supervisor_name,
-                    u.supervisor_position_number,
-                    u.reporting_to_employee_id,
-                    u.reporting_to_name,
-                    u.reporting_to_email,
-                    u.reporting_to_position_number,
-                    u.due_date_paused,
-                    u.next_conversation_date,
-                    u.excusedtype AS excused,
-                    CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
-                    CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
-                    CONCAT (u.reportees, ' / ', (SELECT COUNT(1) FROM shared_profiles AS sp USE INDEX (SHARED_PROFILES_SHARED_WITH_FOREIGN), users AS u2, employee_demo AS dmo USE INDEX (IDX_EMPLOYEE_DEMO_EMPLOYEEID_RECORD) WHERE sp.shared_with IS NOT NULL AND sp.shared_with = u.user_id AND sp.shared_id = u2.id AND u2.employee_id = dmo.employee_id AND u2.empl_record = dmo.empl_record AND dmo.date_deleted IS NULL)) AS reportees,
-                    (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active' AND g.is_library = 0 AND g.deleted_at IS NULL) AS activeGoals
-                ");
+            $newClass = new PDPDataClass;
+            $query = $newClass->UserDemoAnnexSQL($request)
+            ->whereNull('employee_demo.date_deleted')
+            ->when($request->dd_level0, function($q) use($request) { return $q->where('users_annex.organization_key', $request->dd_level0); })
+            ->when($request->dd_level1, function($q) use($request) { return $q->where('users_annex.level1_key', $request->dd_level1); })
+            ->when($request->dd_level2, function($q) use($request) { return $q->where('users_annex.level2_key', $request->dd_level2); })
+            ->when($request->dd_level3, function($q) use($request) { return $q->where('users_annex.level3_key', $request->dd_level3); })
+            ->when($request->dd_level4, function($q) use($request) { return $q->where('users_annex.level4_key', $request->dd_level4); })
+            ->when($request->search_text && $request->criteria == 'employee_demo.employee_name', function($q) use ($request) { return $q->whereRaw("(employee_demo.employee_name LIKE '%{$request->search_text}%' OR users.name LIKE '%{$request->search_text}%')"); })
+            ->when($request->search_text && $request->criteria != 'employee_demo.employee_name', function($q) use ($request) { return $q->whereRaw("{$request->criteria} LIKE '%{$request->search_text}%'"); })
+            ->selectRaw ("
+                users.id,
+                CASE when users_annex.jr_excused_type = 'A' THEN 'Auto' ELSE CASE when users.excused_flag = 1 THEN 'Manual' ELSE 'No' END END AS excused,
+                CASE WHEN (users.excused_flag != 0 OR users_annex.jr_due_date_paused = 'Y') THEN 'Paused' ELSE users_annex.jr_next_conversation_date END AS nextConversationDue,
+                CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = users.id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
+                CONCAT (users_annex.reportees, ' / ', (SELECT COUNT(1) FROM shared_profiles AS sp USE INDEX (SHARED_PROFILES_SHARED_WITH_FOREIGN), users AS u2, employee_demo AS dmo USE INDEX (IDX_EMPLOYEE_DEMO_EMPLOYEEID_RECORD) WHERE sp.shared_with IS NOT NULL AND sp.shared_with = users.id AND sp.shared_id = u2.id AND u2.employee_id = dmo.employee_id AND u2.empl_record = dmo.empl_record AND dmo.date_deleted IS NULL)) AS reportees,
+                (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = users.id AND g.status = 'active' AND g.is_library = 0 AND g.deleted_at IS NULL) AS activeGoals
+            ");
             return Datatables::of($query)
                 ->addIndexColumn()
                 ->editColumn('reportees', function($row) {
@@ -236,18 +210,15 @@ class EmployeeListController extends Controller {
     public function exportCurrent(Request $request, $paramJSON = null) {
         $user = auth()->user();
         $userid = $user->id;
-            
         $user_role = DB::table('model_has_roles')                        
             ->where('model_id', $userid)
             ->whereIntegerInRaw('role_id', [4, 5])
             ->where('model_type', 'App\Models\User')
             ->get();
-            
         if(count($user_role) == 0) {
             return redirect()->to('/');
             exit;
         }
-
         $param = json_decode($paramJSON);
         $dd_level0 = $param[0];
         $dd_level1 = $param[1];
@@ -256,48 +227,24 @@ class EmployeeListController extends Controller {
         $dd_level4 = $param[4];
         $criteria = $param[5];
         $search_text = $param[6];
-        $query = UserDemoJrView::from('user_demo_jr_view AS u')
-            ->whereNull('u.date_deleted')
-            ->when($dd_level0, function($q) use($dd_level0) { return $q->where('u.organization_key', $dd_level0); })
-            ->when($dd_level1, function($q) use($dd_level1) { return $q->where('u.level1_key', $dd_level1); })
-            ->when($dd_level2, function($q) use($dd_level2) { return $q->where('u.level2_key', $dd_level2); })
-            ->when($dd_level3, function($q) use($dd_level3) { return $q->where('u.level3_key', $dd_level3); })
-            ->when($dd_level4, function($q) use($dd_level4) { return $q->where('u.level4_key', $dd_level4); })
-            ->when($search_text && $criteria == 'u.employee_name', function($q) use ($search_text) { return $q->whereRaw("(u.employee_name LIKE '%{$search_text}%' OR u.user_name LIKE '%{$search_text}%')"); })
-            ->when($search_text && $criteria != 'u.employee_name', function($q) use ($criteria, $search_text) { return $q->whereRaw("{$criteria} LIKE '%{$search_text}%'"); })
-            ->selectRaw ("
-                u.user_id AS id,
-                u.guid,
-                u.user_name,
-                u.excused_flag,
-                u.employee_id,
-                u.employee_name, 
-                u.employee_email, 
-                u.position_number,
-                u.empl_record,
-                u.jobcode_desc,
-                u.organization,
-                u.level1_program,
-                u.level2_division,
-                u.level3_branch,
-                u.level4,
-                u.deptid,
-                u.date_deleted,
-                u.employee_status,
-                u.supervisor_name,
-                u.supervisor_position_number,
-                u.reporting_to_employee_id,
-                u.reporting_to_name,
-                u.reporting_to_email,
-                u.reporting_to_position_number,
-                u.due_date_paused,
-                u.next_conversation_date,
-                u.excusedtype AS excused,
-                CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
-                CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
-                CONCAT (u.reportees, ' / ', (SELECT COUNT(1) FROM shared_profiles AS sp USE INDEX (SHARED_PROFILES_SHARED_WITH_FOREIGN), users AS u2, employee_demo AS dmo USE INDEX (IDX_EMPLOYEE_DEMO_EMPLOYEEID_RECORD) WHERE sp.shared_with IS NOT NULL AND sp.shared_with = u.user_id AND sp.shared_id = u2.id AND u2.employee_id = dmo.employee_id AND u2.empl_record = dmo.empl_record AND dmo.date_deleted IS NULL)) AS reportees,
-                (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active' AND g.is_library = 0 AND g.deleted_at IS NULL) AS activeGoals
-            ");
+        $newClass = new PDPDataClass;
+        $query = $newClass->UserDemoAnnexSQL($request);
+        $query->whereNull('employee_demo.date_deleted')
+        ->when($dd_level0, function($q) use($dd_level0) { return $q->where('users_annex.organization_key', $dd_level0); })
+        ->when($dd_level1, function($q) use($dd_level1) { return $q->where('users_annex.level1_key', $dd_level1); })
+        ->when($dd_level2, function($q) use($dd_level2) { return $q->where('users_annex.level2_key', $dd_level2); })
+        ->when($dd_level3, function($q) use($dd_level3) { return $q->where('users_annex.level3_key', $dd_level3); })
+        ->when($dd_level4, function($q) use($dd_level4) { return $q->where('users_annex.level4_key', $dd_level4); })
+        ->when($search_text && $criteria == 'employee_demo.employee_name', function($q) use ($search_text) { return $q->whereRaw("(employee_demo.employee_name LIKE '%{$search_text}%' OR users.name LIKE '%{$search_text}%')"); })
+        ->when($search_text && $criteria != 'employee_demo.employee_name', function($q) use ($criteria, $search_text) { return $q->whereRaw("{$criteria} LIKE '%{$search_text}%'"); })
+        ->selectRaw ("
+            users.id,
+            CASE when users_annex.jr_excused_type = 'A' THEN 'Auto' ELSE CASE when users.excused_flag = 1 THEN 'Manual' ELSE 'No' END END AS excused,
+            CASE WHEN (users.excused_flag != 0 OR users_annex.jr_due_date_paused = 'Y') THEN 'Paused' ELSE users_annex.jr_next_conversation_date END AS nextConversationDue,
+            CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = users.id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
+            CONCAT (users_annex.reportees, ' / ', (SELECT COUNT(1) FROM shared_profiles AS sp USE INDEX (SHARED_PROFILES_SHARED_WITH_FOREIGN), users AS u2, employee_demo AS dmo USE INDEX (IDX_EMPLOYEE_DEMO_EMPLOYEEID_RECORD) WHERE sp.shared_with IS NOT NULL AND sp.shared_with = users.id AND sp.shared_id = u2.id AND u2.employee_id = dmo.employee_id AND u2.empl_record = dmo.empl_record AND dmo.date_deleted IS NULL)) AS reportees,
+            (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = users.id AND g.status = 'active' AND g.is_library = 0 AND g.deleted_at IS NULL) AS activeGoals
+        ");
         $records = $query->get();
         // Generating Output file
         $filename = 'Current_Employees_'. Carbon::now()->format('YmdHis') . '.csv';
@@ -385,62 +332,35 @@ class EmployeeListController extends Controller {
     public function getPastList(Request $request) {
         $user = auth()->user();
         $userid = $user->id;
-            
         $user_role = DB::table('model_has_roles')                        
             ->where('model_id', $userid)
             ->whereIntegerInRaw('role_id', [4, 5])
             ->where('model_type', 'App\Models\User')
             ->get();
-            
         if(count($user_role) == 0) {
             return redirect()->to('/');
             exit;
         }
-
         if ($request->ajax()) {
-            $query = UserDemoJrView::from('user_demo_jr_view AS u')
-                ->whereNotNull('u.date_deleted')
-                ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
-                ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
-                ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
-                ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
-                ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
-                ->when($request->search_text && $request->criteria == 'u.employee_name', function($q) use ($request) { return $q->whereRaw("(u.employee_name LIKE '%{$request->search_text}%' OR u.user_name LIKE '%{$request->search_text}%')"); })
-                ->when($request->search_text && $request->criteria != 'u.employee_name', function($q) use ($request) { return $q->whereRaw("{$request->criteria} LIKE '%{$request->search_text}%'"); })
-                ->selectRaw ("
-                    u.user_id AS id,
-                    u.guid,
-                    u.user_name,
-                    u.excused_flag,
-                    u.employee_id,
-                    u.employee_name, 
-                    u.employee_email, 
-                    u.position_number,
-                    u.empl_record,
-                    u.jobcode_desc,
-                    u.organization,
-                    u.level1_program,
-                    u.level2_division,
-                    u.level3_branch,
-                    u.level4,
-                    u.deptid,
-                    u.date_deleted AS u_date_deleted,
-                    u.employee_status,
-                    u.supervisor_name,
-                    u.supervisor_position_number,
-                    u.reporting_to_employee_id,
-                    u.reporting_to_name,
-                    u.reporting_to_email,
-                    u.reporting_to_position_number,
-                    u.due_date_paused,
-                    u.next_conversation_date,
-                    u.excusedtype AS excused,
-                    CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
-                    CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
-                    u.reportees,
-                    (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active' AND g.is_library = 0 AND g.deleted_at IS NULL) AS activeGoals,
-                    CASE WHEN u.date_deleted IS NOT NULL THEN u.date_deleted ELSE '' END AS date_deleted
-                ");
+            $newClass = new PDPDataClass;
+            $query = $newClass->UserDemoAnnexSQL($request)
+            ->whereNotNull('employee_demo.date_deleted')
+            ->when($request->dd_level0, function($q) use($request) { return $q->where('users_annex.organization_key', $request->dd_level0); })
+            ->when($request->dd_level1, function($q) use($request) { return $q->where('users_annex.level1_key', $request->dd_level1); })
+            ->when($request->dd_level2, function($q) use($request) { return $q->where('users_annex.level2_key', $request->dd_level2); })
+            ->when($request->dd_level3, function($q) use($request) { return $q->where('users_annex.level3_key', $request->dd_level3); })
+            ->when($request->dd_level4, function($q) use($request) { return $q->where('users_annex.level4_key', $request->dd_level4); })
+            ->when($request->search_text && $request->criteria == 'employee_demo.employee_name', function($q) use ($request) { return $q->whereRaw("(employee_demo.employee_name LIKE '%{$request->search_text}%' OR users.name LIKE '%{$request->search_text}%')"); })
+            ->when($request->search_text && $request->criteria != 'employee_demo.employee_name', function($q) use ($request) { return $q->whereRaw("{$request->criteria} LIKE '%{$request->search_text}%'"); })
+            ->selectRaw ("
+                users.id,
+                CASE when users_annex.jr_excused_type = 'A' THEN 'Auto' ELSE CASE when users.excused_flag = 1 THEN 'Manual' ELSE 'No' END END AS excused,
+                CASE WHEN (users.excused_flag != 0 OR users_annex.jr_due_date_paused = 'Y') THEN 'Paused' ELSE users_annex.jr_next_conversation_date END AS nextConversationDue,
+                CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = users.id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
+                CONCAT (users_annex.reportees, ' / ', (SELECT COUNT(1) FROM shared_profiles AS sp USE INDEX (SHARED_PROFILES_SHARED_WITH_FOREIGN), users AS u2, employee_demo AS dmo USE INDEX (IDX_EMPLOYEE_DEMO_EMPLOYEEID_RECORD) WHERE sp.shared_with IS NOT NULL AND sp.shared_with = users.id AND sp.shared_id = u2.id AND u2.employee_id = dmo.employee_id AND u2.empl_record = dmo.empl_record AND dmo.date_deleted IS NULL)) AS reportees,
+                (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = users.id AND g.status = 'active' AND g.is_library = 0 AND g.deleted_at IS NULL) AS activeGoals,
+                CASE WHEN employee_demo.date_deleted IS NOT NULL THEN employee_demo.date_deleted ELSE '' END AS date_deleted
+            ");
             return Datatables::of($query)
                 ->addIndexColumn()
                 ->make(true);
@@ -450,18 +370,15 @@ class EmployeeListController extends Controller {
     public function exportPast(Request $request,  $paramJSON = null) {
         $user = auth()->user();
         $userid = $user->id;
-            
         $user_role = DB::table('model_has_roles')                        
             ->where('model_id', $userid)
             ->whereIntegerInRaw('role_id', [4, 5])
             ->where('model_type', 'App\Models\User')
             ->get();
-            
         if(count($user_role) == 0) {
             return redirect()->to('/');
             exit;
         }
-
         $param = json_decode($paramJSON);
         $dd_level0 = $param[0];
         $dd_level1 = $param[1];
@@ -470,49 +387,26 @@ class EmployeeListController extends Controller {
         $dd_level4 = $param[4];
         $criteria = $param[5];
         $search_text = $param[6];
-        $query = UserDemoJrView::from('user_demo_jr_view AS u')
-            ->whereNotNull('u.date_deleted')
-            ->when($dd_level0, function($q) use($dd_level0) { return $q->where('u.organization_key', $dd_level0); })
-            ->when($dd_level1, function($q) use($dd_level1) { return $q->where('u.level1_key', $dd_level1); })
-            ->when($dd_level2, function($q) use($dd_level2) { return $q->where('u.level2_key', $dd_level2); })
-            ->when($dd_level3, function($q) use($dd_level3) { return $q->where('u.level3_key', $dd_level3); })
-            ->when($dd_level4, function($q) use($dd_level4) { return $q->where('u.level4_key', $dd_level4); })
-            ->when($search_text && $criteria == 'u.employee_name', function($q) use ($search_text) { return $q->whereRaw("(u.employee_name LIKE '%{$search_text}%' OR u.user_name LIKE '%{$search_text}%')"); })
-            ->when($search_text && $criteria != 'u.employee_name', function($q) use ($criteria, $search_text) { return $q->whereRaw("{$criteria} LIKE '%{$search_text}%'"); })
-            ->selectRaw ("
-                u.user_id AS id,
-                u.guid,
-                u.user_name,
-                u.excused_flag,
-                u.employee_id,
-                u.employee_name, 
-                u.employee_email, 
-                u.position_number,
-                u.empl_record,
-                u.jobcode_desc,
-                u.organization,
-                u.level1_program,
-                u.level2_division,
-                u.level3_branch,
-                u.level4,
-                u.deptid,
-                u.date_deleted AS u_date_deleted,
-                u.employee_status,
-                u.supervisor_name,
-                u.supervisor_position_number,
-                u.reporting_to_employee_id,
-                u.reporting_to_name,
-                u.reporting_to_email,
-                u.reporting_to_position_number,
-                u.due_date_paused,
-                u.next_conversation_date,
-                u.excusedtype AS excused,
-                CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
-                CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
-                u.reportees,
-                (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active' AND g.is_library = 0 AND g.deleted_at IS NULL) AS activeGoals,
-                CASE WHEN u.date_deleted IS NOT NULL THEN u.date_deleted ELSE '' END AS date_deleted
-            ");
+        $newClass = new PDPDataClass;
+        $query = $newClass->UserDemoAnnexSQL($request)
+        ->whereNotNull('employee_demo.date_deleted')
+        ->when($dd_level0, function($q) use($dd_level0) { return $q->where('users_annex.organization_key', $dd_level0); })
+        ->when($dd_level1, function($q) use($dd_level1) { return $q->where('users_annex.level1_key', $dd_level1); })
+        ->when($dd_level2, function($q) use($dd_level2) { return $q->where('users_annex.level2_key', $dd_level2); })
+        ->when($dd_level3, function($q) use($dd_level3) { return $q->where('users_annex.level3_key', $dd_level3); })
+        ->when($dd_level4, function($q) use($dd_level4) { return $q->where('users_annex.level4_key', $dd_level4); })
+        ->when($search_text && $criteria == 'employee_demo.employee_name', function($q) use ($search_text) { return $q->whereRaw("(employee_demo.employee_name LIKE '%{$search_text}%' OR users.name LIKE '%{$search_text}%')"); })
+        ->when($search_text && $criteria != 'employee_demo.employee_name', function($q) use ($criteria, $search_text) { return $q->whereRaw("{$criteria} LIKE '%{$search_text}%'"); })
+        ->selectRaw ("
+            users.id,
+            CASE when users_annex.jr_excused_type = 'A' THEN 'Auto' ELSE CASE when users.excused_flag = 1 THEN 'Manual' ELSE 'No' END END AS excused,
+            CASE WHEN (users.excused_flag != 0 OR users_annex.jr_due_date_paused = 'Y') THEN 'Paused' ELSE users_annex.jr_next_conversation_date END AS nextConversationDue,
+            CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = users.id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
+            CONCAT (users_annex.reportees, ' / ', (SELECT COUNT(1) FROM shared_profiles AS sp USE INDEX (SHARED_PROFILES_SHARED_WITH_FOREIGN), users AS u2, employee_demo AS dmo USE INDEX (IDX_EMPLOYEE_DEMO_EMPLOYEEID_RECORD) WHERE sp.shared_with IS NOT NULL AND sp.shared_with = users.id AND sp.shared_id = u2.id AND u2.employee_id = dmo.employee_id AND u2.empl_record = dmo.empl_record AND dmo.date_deleted IS NULL)) AS reportees,
+            (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = users.id AND g.status = 'active' AND g.is_library = 0 AND g.deleted_at IS NULL) AS activeGoals,
+            CASE WHEN employee_demo.date_deleted IS NOT NULL THEN employee_demo.date_deleted ELSE '' END AS date_deleted
+        ");
+        $records = $query->get();
         $records = $query->get();
         // Generating Output file
         $filename = 'Past_Employees_'. Carbon::now()->format('YmdHis') . '.csv';
@@ -602,14 +496,14 @@ class EmployeeListController extends Controller {
 
     protected function search_criteria_list() {
         return [
-            'u.employee_name'=> 'Name',
-            'u.employee_id' => 'Employee ID', 
-            'u.employee_email' => 'Email', 
-            'u.position_number' => 'Position #',
-            'u.reporting_to_name' => 'Reports To Name',
-            'u.reporting_to_position_number' => 'Reports to Position #',
-            'u.jobcode_desc' => 'Classification',
-            'u.deptid' => 'Dept ID'
+            'employee_demo.employee_name'=> 'Name',
+            'users.employee_id' => 'Employee ID', 
+            'employee_demo.employee_email' => 'Email', 
+            'employee_demo.position_number' => 'Position #',
+            'users_annex.reporting_to_name' => 'Reports To Name',
+            'users_annex.reporting_to_position_number' => 'Reports to Position #',
+            'employee_demo.jobcode_desc' => 'Classification',
+            'employee_demo.deptid' => 'Dept ID'
         ];
     }
 
