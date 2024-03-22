@@ -82,7 +82,7 @@ class NotificationLogDataTable extends DataTable
      *
      * @return string
      */
-    protected function filename()
+    protected function filename(): string
     {
         return 'NotificationLog_' . date('YmdHis');
     }
