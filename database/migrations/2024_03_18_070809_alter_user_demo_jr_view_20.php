@@ -97,7 +97,7 @@ class AlterUserDemoJrView20 extends Migration
                 d.employee_name AS employee_name_search,
                 ua.reportees
             FROM
-                (users AS u USE INDEX (IDX_USERS_ID) JOIN employee_demo AS d USE INDEX (IDX_EMPLOYEE_DEMO_EMPLOYEEID_ORGID) ON u.employee_id = d.employee_id)
+                (users AS u USE INDEX (USERS_EMPLOYEE_ID_EMPL_RECORD_INDEX) JOIN employee_demo AS d USE INDEX (EMPLOYEE_DEMO_EMPLOYEE_ID_EMPL_RECORD_UNIQUE) ON u.employee_id = d.employee_id)
                 LEFT JOIN users_annex AS ua USE INDEX (USERS_ANNEX_EMPLOYEE_ID_RECORD_INDEX) ON ua.employee_id = d.employee_id AND ua.empl_record = d.empl_record
             WHERE
                 (d.pdp_excluded = 0)
