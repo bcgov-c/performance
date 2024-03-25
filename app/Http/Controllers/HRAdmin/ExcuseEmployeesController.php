@@ -7,7 +7,6 @@ namespace App\Http\Controllers\HRAdmin;
 use App\Models\EmployeeDemo;
 use App\Models\ExcusedReason;
 use App\Models\EmployeeDemoTree;
-use App\Models\HRUserDemoJrView;
 use App\Models\HRUserDemoJrHistoryView;
 use App\Models\User;
 use Carbon\Carbon;
@@ -20,11 +19,19 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
+use App\Classes\PDPDataClass;
 
 
 class ExcuseEmployeesController extends Controller {
 
-    public function addindex(Request $request)  {
+    public $pdpData;
+
+    public function __construct() {
+        // parent::__construct();
+        $this->pdpData = new PDPDataClass;
+    }
+
+    public function addindex(Request $request) {
         $errors = session('errors');
         $old_selected_emp_ids = []; // $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
         $old_selected_org_nodes = []; // $request->old_selected_org_nodes ? json_decode($request->selected_org_nodes) : [];
@@ -39,34 +46,18 @@ class ExcuseEmployeesController extends Controller {
         $reasons = ExcusedReason::where('id', '>', 2)->get();
         $reasons2 = ExcusedReason::where('id', '<=', 2)->get();
         $yesOrNo = [
-                [ "id" => 0, "name" => 'No' ],
-                [ "id" => 1, "name" => 'Yes' ],
-            ];
+            [ "id" => 0, "name" => 'No' ],
+            [ "id" => 1, "name" => 'Yes' ],
+        ];
         $yesOrNo2 = [
-                [ "id" => 0, "name" => 'No' ],
-                [ "id" => 1, "name" => 'Yes' ],
-            ];
+            [ "id" => 0, "name" => 'No' ],
+            [ "id" => 1, "name" => 'Yes' ],
+        ];
         return view('shared.excuseemployees.addindex', compact('criteriaList','matched_emp_ids', 'old_selected_emp_ids', 'old_selected_org_nodes', 'reasons', 'reasons2', 'yesOrNo', 'yesOrNo2') );
     }
 
     public function getFilteredList(Request $request) {
-        $demoWhere = $this->baseFilteredWhere($request, $request->option);
-        $sql = clone $demoWhere; 
-        $matched_emp_ids = $sql->select([ 
-                'u.employee_id', 
-                'u.employee_name', 
-                'u.jobcode_desc', 
-                'u.employee_email', 
-                'u.organization', 
-                'u.level1_program', 
-                'u.level2_division', 
-                'u.level3_branch',
-                'u.level4',
-                'u.deptid', 
-                'u.jobcode_desc'
-            ])
-            ->pluck('u.employee_id');    
-        return $matched_emp_ids;
+        return $this->baseFilteredWhere($request, $request->option)->pluck('users.employee_id');
     }
 
     public function managehistory(Request $request) {
@@ -97,7 +88,6 @@ class ExcuseEmployeesController extends Controller {
         $request->session()->flash('dd_level2', $request->dd_level2);
         $request->session()->flash('dd_level3', $request->dd_level3);
         $request->session()->flash('dd_level4', $request->dd_level4);
-
         $criteriaList = $this->search_criteria_list_history();
         return view('shared.excuseemployees.managehistory', compact ('request', 'criteriaList'));
     }
@@ -205,11 +195,11 @@ class ExcuseEmployeesController extends Controller {
         // Employee ID by Tree ID
         $empIdsByOrgId = [];
         $sql = clone $demoWhere; 
-        $rows = $sql->select('orgid AS id', 'employee_id')
-            ->groupBy('orgid', 'employee_id')
-            ->orderBy('orgid')->orderBy('employee_id')
+        $rows = $sql->select('employee_demo.orgid AS id', 'users.employee_id')
+            ->groupBy('employee_demo.orgid', 'users.employee_id')
+            ->orderBy('employee_demo.orgid')->orderBy('users.employee_id')
             ->get();
-        $empIdsByOrgId = $rows->groupBy('orgid')->all();
+        $empIdsByOrgId = $rows->groupBy('employee_demo.orgid')->all();
         if($request->ajax()){
             switch ($index) {
                 case 2:
@@ -238,43 +228,41 @@ class ExcuseEmployeesController extends Controller {
                 'criteria' => $request->criteria,
                 'search_text' => $request->search_text,
             ]);
-            $sql = clone $demoWhere; 
-            $employees = $sql->selectRaw("
-                user_id as id
-                , guid
-                , excused_flag
-                , excused_reason_id
-                , excused_updated_by
-                , excused_updated_at
-                , employee_id
-                , employee_name
-                , jobcode
-                , jobcode_desc
-                , employee_email
-                , organization
-                , level1_program
-                , level2_division
-                , level3_branch
-                , level4
-                , deptid
-                , employee_status
-                , due_date_paused
-                , excused_type
-                , current_manual_excuse
-                , created_by_id
-                , updated_by_id
-                , updated_at
-                , created_at as j_created_at
-                , reason_id
-                , reason_name
-                , edj_excused_reason_desc
-                , excusedtype
-                , excusedlink
-                , excused_by_name
-                , created_at_string
-                , employee_id_search
-                , employee_name_search
-                ");
+            $employees = $demoWhere->selectRaw("
+                users.id
+                , users.guid
+                , users.excused_flag
+                , users.excused_reason_id
+                , users.excused_updated_by
+                , users.excused_updated_at
+                , users.employee_id
+                , employee_demo.employee_name
+                , employee_demo.jobcode
+                , employee_demo.jobcode_desc
+                , employee_demo.employee_email
+                , users_annex.organization
+                , users_annex.level1_program
+                , users_annex.level2_division
+                , users_annex.level3_branch
+                , users_annex.level4
+                , employee_demo.deptid
+                , employee_demo.employee_status
+                , users_annex.jr_due_date_paused AS due_date_paused
+                , users_annex.jr_excused_type AS excused_type
+                , users_annex.jr_current_manual_excuse AS current_manual_excuse
+                , users_annex.jr_created_by_id AS created_by_id
+                , users_annex.jr_updated_by_id AS updated_by_id
+                , users_annex.jr_updated_at AS updated_at
+                , users_annex.jr_created_at AS j_created_at
+                , CASE when users_annex.jr_excused_type = 'A' THEN users_annex.reason_id ELSE CASE when users.excused_flag = 1 THEN users.excused_reason_id ELSE '' END END AS reason_id
+                , CASE when users_annex.jr_excused_type = 'A' THEN users_annex.reason_name ELSE CASE when users.excused_flag = 1 THEN excused_reasons.name ELSE '' END END AS reason_name
+                , CASE when users_annex.jr_excused_type = 'A' THEN 'Auto' ELSE CASE when users.excused_flag = 1 THEN 'Manual' ELSE 'No' END END AS excusedtype
+                , CASE when users_annex.jr_excused_type = 'A' THEN 'Auto' ELSE CASE when users.excused_flag = 1 THEN 'Manual' ELSE 'No' END END AS excusedlink
+                , CASE when users_annex.jr_excused_type = 'A' THEN users_annex.excused_by_name ELSE CASE when users.excused_flag = 1 THEN en.name ELSE '' END END AS excused_by_name
+                , CASE when users_annex.jr_excused_type = 'A' THEN users_annex.created_at_string ELSE CASE when users.excused_flag = 1 THEN users.excused_updated_at ELSE '' END END AS created_at_string
+                , users.id AS employee_id_search
+                , employee_demo.employee_name AS employee_name_search
+            ");
             return Datatables::of($employees)
                 ->addColumn('select_users', static function ($employee) {
                     return '<input pid="1335" type="checkbox" id="userCheck'. 
@@ -323,12 +311,11 @@ class ExcuseEmployeesController extends Controller {
         $validator = Validator::make($input, $rules, $messages);
         if ($validator->fails()) {
             return redirect()->route(request()->segment(1).'.excuseemployees')
-                ->with('message', " There are one or more errors on the page. Please review and try again.")    
-                ->withErrors($validator)
-                ->withInput();
+            ->with('message', " There are one or more errors on the page. Please review and try again.")    
+            ->withErrors($validator)
+            ->withInput();
         }
         $selected_emp_ids = $request->selected_emp_ids ? json_decode($request->selected_emp_ids) : [];
-
         $selection = EmployeeDemo::select('users.id')
             ->join('users', 'employee_demo.employee_id', 'users.employee_id')
             ->whereIn('employee_demo.employee_id', $selected_emp_ids )
@@ -368,11 +355,11 @@ class ExcuseEmployeesController extends Controller {
     protected function search_criteria_list() {
         return [
             'all' => 'All',
-            'employee_id' => 'Employee ID', 
-            'employee_name'=> 'Employee Name',
-            'excusedtype' => 'Excuse Type', 
-            'edj_excused_reason_desc' => 'Excuse Reason',
-            'excused_by_name' => 'Excused By'
+            'users.employee_id' => 'Employee ID', 
+            'employee_demo.employee_name'=> 'Employee Name',
+            "(CASE when users_annex.jr_excused_type = 'A' THEN 'Auto' ELSE CASE when users.excused_flag = 1 THEN 'Manual' ELSE 'No' END END)" => 'Excuse Type', 
+            "(CASE when users_annex.jr_excused_type = 'A' THEN users_annex.reason_name ELSE CASE when users.excused_flag = 1 THEN excused_reasons.name ELSE '' END END)" => 'Excuse Reason',
+            "(CASE when users_annex.jr_excused_type = 'A' THEN users_annex.excused_by_name ELSE CASE when users.excused_flag = 1 THEN en.name ELSE '' END END)" => 'Excused By'
         ];
     }
 
@@ -388,55 +375,54 @@ class ExcuseEmployeesController extends Controller {
     }
 
     protected function baseFilteredWhere($request, $option = null) {
-        $authId = Auth::id();
-        $base = HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
-            ->where('u.auth_id', \DB::raw($authId))
-            ->whereNull('u.date_deleted')
-            ->when("{$request->{$option.'dd_level0'}}", function($q) use($request, $option) { return $q->whereRaw("u.organization_key = {$request->{$option.'dd_level0'}}"); })
-            ->when("{$request->{$option.'dd_level1'}}", function($q) use($request, $option) { return $q->whereRaw("u.level1_key = {$request->{$option.'dd_level1'}}"); })
-            ->when("{$request->{$option.'dd_level2'}}", function($q) use($request, $option) { return $q->whereRaw("u.level2_key = {$request->{$option.'dd_level2'}}"); })
-            ->when("{$request->{$option.'dd_level3'}}", function($q) use($request, $option) { return $q->whereRaw("u.level3_key = {$request->{$option.'dd_level3'}}"); })
-            ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); })
-            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); })
-            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(employee_id LIKE '%{$request->{$option.'search_text'}}%' OR employee_name LIKE '%{$request->{$option.'search_text'}}%' OR excusedtype LIKE '%{$request->{$option.'search_text'}}%' OR edj_excused_reason_desc LIKE '%{$request->{$option.'search_text'}}%' OR excused_by_name LIKE '%{$request->{$option.'search_text'}}%')"); });
-        return $base;
+        return $this->pdpData->HRUserDemoAnnexSQL_Base($request)
+        ->leftjoin(\DB::raw('users AS en USE INDEX (IDX_USERS_ID)'), 'users.excused_updated_by', 'en.id')
+        ->leftjoin('excused_reasons', 'users.excused_reason_id', 'excused_reasons.id')
+        ->whereNull('employee_demo.date_deleted')
+        ->when("{$request->{$option.'dd_level0'}}", function($q) use($request, $option) { return $q->where('users_annex.organization_key', "{$request->{$option.'dd_level0'}}"); })
+        ->when("{$request->{$option.'dd_level1'}}", function($q) use($request, $option) { return $q->where('users_annex.level1_key', "{$request->{$option.'dd_level1'}}"); })
+        ->when("{$request->{$option.'dd_level2'}}", function($q) use($request, $option) { return $q->where('users_annex.level2_key', "{$request->{$option.'dd_level2'}}"); })
+        ->when("{$request->{$option.'dd_level3'}}", function($q) use($request, $option) { return $q->where('users_annex.level3_key', "{$request->{$option.'dd_level3'}}"); })
+        ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->where('users_annex.level4_key', "{$request->{$option.'dd_level4'}}"); })
+        ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use ($request, $option) { return $q->whereRaw("(users.employee_id LIKE '%{$request->{$option.'search_text'}}%' OR employee_demo.employee_name LIKE '%{$request->{$option.'search_text'}}%' OR (CASE when users_annex.jr_excused_type = 'A' THEN 'Auto' ELSE CASE when users.excused_flag = 1 THEN 'Manual' ELSE 'No' END END) LIKE '%{$request->{$option.'search_text'}}%' OR (CASE when users_annex.jr_excused_type = 'A' THEN users_annex.reason_name ELSE CASE when users.excused_flag = 1 THEN excused_reasons.name ELSE '' END END) LIKE '%{$request->{$option.'search_text'}}%' OR (CASE when users_annex.jr_excused_type = 'A' THEN users_annex.excused_by_name ELSE CASE when users.excused_flag = 1 THEN en.name ELSE '' END END) LIKE '%{$request->{$option.'search_text'}}%')"); })
+        ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use ($request, $option) { return $q->whereRaw("{$request->{$option.'criteria'}} LIKE '%{$request->{$option.'search_text'}}%'"); });
     }
 
     protected function baseFilteredSQLs($request, $option = null) {
         $demoWhere = $this->baseFilteredWhere($request, $option);
         $sql_level0 = clone $demoWhere; 
         $sql_level0->join('employee_demo_tree AS o', function($join) {
-            $join->on('u.organization_key', 'o.organization_key')
+            $join->on('users_annex.organization_key', 'o.organization_key')
                 ->where('o.level', 0);
             });
         $sql_level1 = clone $demoWhere; 
         $sql_level1->join('employee_demo_tree AS o', function($join) {
-            $join->on('u.organization_key', 'o.organization_key')
-                ->on('u.level1_key', 'o.level1_key')
+            $join->on('users_annex.organization_key', 'o.organization_key')
+                ->on('users_annex.level1_key', 'o.level1_key')
                 ->where('o.level', 1);
             });
         $sql_level2 = clone $demoWhere; 
         $sql_level2->join('employee_demo_tree AS o', function($join) {
-            $join->on('u.organization_key', 'o.organization_key')
-                ->on('u.level1_key', 'o.level1_key')
-                ->on('u.level2_key', 'o.level2_key')
+            $join->on('users_annex.organization_key', 'o.organization_key')
+                ->on('users_annex.level1_key', 'o.level1_key')
+                ->on('users_annex.level2_key', 'o.level2_key')
                 ->where('o.level', 2);    
             });    
         $sql_level3 = clone $demoWhere; 
         $sql_level3->join('employee_demo_tree AS o', function($join) {
-            $join->on('u.organization_key', 'o.organization_key')
-                ->on('u.level1_key', 'o.level1_key')
-                ->on('u.level2_key', 'o.level2_key')
-                ->on('u.level3_key', 'o.level3_key')
+            $join->on('users_annex.organization_key', 'o.organization_key')
+                ->on('users_annex.level1_key', 'o.level1_key')
+                ->on('users_annex.level2_key', 'o.level2_key')
+                ->on('users_annex.level3_key', 'o.level3_key')
                 ->where('o.level',3);    
             });
         $sql_level4 = clone $demoWhere; 
         $sql_level4->join('employee_demo_tree AS o', function($join) {
-            $join->on('u.organization_key', 'o.organization_key')
-                ->on('u.level1_key', 'o.level1_key')
-                ->on('u.level2_key', 'o.level2_key')
-                ->on('u.level3_key', 'o.level3_key')
-                ->on('u.level4_key', 'o.level4_key')
+            $join->on('users_annex.organization_key', 'o.organization_key')
+                ->on('users_annex.level1_key', 'o.level1_key')
+                ->on('users_annex.level2_key', 'o.level2_key')
+                ->on('users_annex.level3_key', 'o.level3_key')
+                ->on('users_annex.level4_key', 'o.level4_key')
                 ->where('o.level', 4);
             });
         return  [$sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4];
