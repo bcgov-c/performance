@@ -1085,83 +1085,109 @@ class GoalBankController extends Controller
     public function managegetList(Request $request) {
         if ($request->ajax()) {
             $query = Goal::withoutGlobalScopes()
-                ->leftjoin('users as cu', 'cu.id', 'goals.created_by')
-                ->leftjoin('employee_demo as ced', 'ced.employee_id', 'cu.employee_id')
-                ->leftjoin('employee_demo_tree as edt', 'edt.id', 'ced.orgid')
-                ->where('is_library', \DB::raw(1))
-                ->whereIn('by_admin', [\DB::raw(1), \DB::raw(2)])
-                ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
-                    return $q->where(function($query) use ($request) { 
-                        return $query->whereRaw("(goals.title LIKE '%".$request->search_text."%')")
-                            ->orWhereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
-                    });
-                })
-                ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
-                    return $q->whereRaw("(goals.title LIKE '%".$request->search_text."%')");
-                })
-                ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
-                    return $q->whereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
-                })
-                ->select
-                    (
+                    ->leftJoin('users as cu', 'cu.id', 'goals.created_by')
+                    ->leftJoin('employee_demo as ced', 'ced.employee_id', 'cu.employee_id')
+                    ->leftJoin('employee_demo_tree as edt', 'edt.id', 'ced.orgid')
+                    ->leftJoin(DB::raw('(
+                        SELECT auditable_id, original_auth_id
+                        FROM audits
+                        WHERE auditable_type LIKE "%Goal%"
+                        AND (auditable_id, created_at) IN (
+                            SELECT auditable_id, MAX(created_at)
+                            FROM audits
+                            WHERE auditable_type LIKE "%Goal%"
+                            GROUP BY auditable_id
+                        )
+                    ) AS latest_audits'), 'goals.id', '=', 'latest_audits.auditable_id')
+                    ->leftJoin('users as uu', 'uu.id', '=', 'latest_audits.original_auth_id')
+                    ->leftJoin('employee_demo as ued', 'ued.employee_id', 'uu.employee_id')
+                    ->where('is_library', 1)
+                    ->whereIn('by_admin', [1, 2])
+                    ->when($request->search_text && $request->criteria == 'all', function ($q) use ($request) {
+                        return $q->where(function ($query) use ($request) {
+                            return $query->whereRaw("(goals.title LIKE '%" . $request->search_text . "%')")
+                                ->orWhereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%" . $request->search_text . "%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%" . $request->search_text . "%'))");
+                        });
+                    })
+                    ->when($request->search_text && $request->criteria == 'gt', function ($q) use ($request) {
+                        return $q->whereRaw("(goals.title LIKE '%" . $request->search_text . "%')");
+                    })
+                    ->when($request->search_text && $request->criteria == 'cby', function ($q) use ($request) {
+                        return $q->whereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%" . $request->search_text . "%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%" . $request->search_text . "%'))");
+                    })
+                    ->select(
                         'goals.id',
                         'goals.title',
                         'goals.created_at',
+                        'goals.updated_at',
                         'goals.is_mandatory',
                         'goals.display_name',
                         'ced.employee_name AS creator_name',
                         'edt.organization AS ced_organization',
+                        'uu.name as last_updated_by'
                     )
-                ->addSelect(['audience' =>
-                    GoalSharedWith::whereColumn('goal_id', 'goals.id')
+                    ->addSelect(['audience' =>
+                        GoalSharedWith::whereColumn('goal_id', 'goals.id')
                         ->selectRAW('count(distinct id)')
-                ] )
-                ->addSelect(['org_audience' => 
-                    GoalBankOrg::whereColumn('goal_id', 'goals.id')
-                        ->where('version', \DB::raw(2))
+                    ])
+                    ->addSelect(['org_audience' =>
+                        GoalBankOrg::whereColumn('goal_id', 'goals.id')
+                        ->where('version', 2)
                         ->whereNotNull('orgid')
                         ->selectRAW('count(distinct goal_bank_orgs.id)')
-                ] )
-                ->addSelect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
-            return Datatables::of($query)
-                ->addIndexColumn()
-                ->addcolumn('click_title', function ($row) {
-                    return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.$row->title.' value="'.$row->id.'">'.$row->title.'</a>';
-                })
-                ->addcolumn('click_goal_type', function ($row) {
-                    return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.$row->goal_type_name.' value="'.$row->id.'">'.$row->goal_type_name.'</a>';
-                })
-                ->addcolumn('click_display_name', function ($row) {
-                    if ($row->display_name) {
-                        return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.$row->display_name.' value="'.$row->id.'">'.$row->display_name.'</a>';
-                    } else {
-                        return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.$row->creator_name.' value="'.$row->id.'">'.$row->creator_name.'</a>';
-                    }
-                })
-                ->addcolumn('click_creator_name', function ($row) {
-                    return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.$row->creator_name.' value="'.$row->id.'">'.$row->creator_name.'</a>';
-                })
-                ->addcolumn('click_creator_organization', function ($row) {
-                    return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.$row->ced_organization.' value="'.$row->id.'">'.$row->ced_organization.'</a>';
-                })
-                ->addColumn('mandatory', function ($row) {
-                    return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.($row->is_mandatory ? "Mandatory" : "Suggested").' value="'.$row->id.'">'.($row->is_mandatory ? "Mandatory" : "Suggested").'</a>';
-                })
-                ->editColumn('created_at', function ($row) {
-                    return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.($row->created_at ? $row->created_at->format('F d, Y') : null).' value="'.$row->id.'">'.($row->created_at ? $row->created_at->format('F d, Y') : null).'</a>';
-                })
-                ->editColumn('audience', function ($row) {
-                    return '<a href="'.route(request()->segment(1).'.goalbank.editone', $row->id).'" aria-label="Edit Goal For Individuals" value="'.$row->id.'">'.$row->audience.' Employees</a>';
-                })
-                ->editColumn('org_audience', function ($row) {
-                    return '<a href="'.route(request()->segment(1).'.goalbank.editpage', $row->id).'" aria-label="Edit Goal For Business Units" value="'.$row->id.'">'.$row->org_audience.' Business Units</a>';
-                })
-                ->addcolumn('action', function($row) {
-                    $btn = '<a href="/'.request()->segment(1).'/goalbank/deletegoal/' . $row->id . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->id .'"><i class="fa fa-trash"></i></a>';
-                    return $btn;
-                })
-                ->rawColumns(['click_title', 'click_goal_type', 'click_display_name', 'click_creator_name', 'click_creator_organization', 'mandatory', 'created_at', 'goal_type_name', 'created_by', 'audience', 'org_audience', 'action', 'title-link'])
-                ->make(true);
+                    ])
+                    ->addSelect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
+
+
+                    $sql = $query->toSql();
+                    error_log(print_r($sql,true));
+
+                    return Datatables::of($query)
+                        ->addIndexColumn()
+                        ->addColumn('click_title', function ($row) {
+                            return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - "' . $row->title . ' value="' . $row->id . '">' . $row->title . '</a>';
+                        })
+                        ->addColumn('click_goal_type', function ($row) {
+                            return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - "' . $row->goal_type_name . ' value="' . $row->id . '">' . $row->goal_type_name . '</a>';
+                        })
+                        ->addColumn('click_display_name', function ($row) {
+                            if ($row->display_name) {
+                                return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - "' . $row->display_name . ' value="' . $row->id . '">' . $row->display_name . '</a>';
+                            } else {
+                                return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - "' . $row->creator_name . ' value="' . $row->id . '">' . $row->creator_name . '</a>';
+                            }
+                        })
+                        ->addColumn('click_creator_name', function ($row) {
+                            return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - "' . $row->creator_name . ' value="' . $row->id . '">' . $row->click_creator_name . '</a>';
+                        })
+                        ->addColumn('click_creator_organization', function ($row) {
+                            return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - "' . $row->ced_organization . ' value="' . $row->id . '">' . $row->ced_organization . '</a>';
+                        })
+                        ->addColumn('mandatory', function ($row) {
+                            return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - "' . ($row->is_mandatory ? "Mandatory" : "Suggested") . ' value="' . $row->id . '">' . ($row->is_mandatory ? "Mandatory" : "Suggested") . '</a>';
+                        })
+                        ->editColumn('created_at', function ($row) {
+                            return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - "' . ($row->created_at ? $row->created_at->format('F d, Y') : null) . ' value="' . $row->id . '">' . ($row->created_at ? $row->created_at->format('F d, Y') : null) . '</a>';
+                        })
+                        ->editColumn('updated_at', function ($row) {
+                            return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Goal updated at ' . ($row->updated_at ? $row->updated_at->format('F d, Y') : null).'">' . ($row->updated_at ? $row->updated_at->format('F d, Y') : null) . '</a>';
+                        })
+                        ->addColumn('click_updater_name', function ($row) {
+                            return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Goal updated by ' . $row->last_updated_by .'">' .  $row->last_updated_by . '</a>';
+                        })
+                        ->editColumn('audience', function ($row) {
+                            return '<a href="' . route(request()->segment(1) . '.goalbank.editone', $row->id) . '" aria-label="Edit Goal For Individuals" value="' . $row->id . '">' . $row->audience . ' Employees</a>';
+                        })
+                        ->editColumn('org_audience', function ($row) {
+                            return '<a href="' . route(request()->segment(1) . '.goalbank.editpage', $row->id) . '" aria-label="Edit Goal For Business Units" value="' . $row->id . '">' . $row->org_audience . ' Business Units</a>';
+                        })
+                        ->addColumn('action', function ($row) {
+                            $btn = '<a href="/' . request()->segment(1) . '/goalbank/deletegoal/' . $row->id . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="' . $row->id . '"><i class="fa fa-trash"></i></a>';
+                            return $btn;
+                        })
+                        ->rawColumns(['click_title', 'click_goal_type', 'click_display_name', 'click_creator_name', 'click_creator_organization', 'mandatory', 'created_at', 'goal_type_name', 'created_by', 'audience', 'updated_at', 'click_updater_name','org_audience', 'action', 'title-link'])
+                        ->make(true);
+
         }
     }
 
