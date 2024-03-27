@@ -137,10 +137,12 @@
                         {title: 'Display Name', ariaTitle: 'Display Name', target: 4, orderData: [4, 10], type: 'string', data: 'click_display_name', name: 'click_display_name', searchable: true, className: 'dt-nowrap'},
                         {title: 'Created By', ariaTitle: 'Created By', target: 5, orderData: [5, 10], type: 'string', data: 'click_creator_name', name: 'click_creator_name', searchable: true, className: 'dt-nowrap'},
                         {title: 'Created By Organization', ariaTitle: 'Created By Organization', target: 6, orderData: [6, 10], type: 'string', data: 'click_creator_organization', name: 'click_creator_organization', searchable: true, className: 'dt-nowrap'},
-                        {title: 'Individual Audience', ariaTitle: 'Individual Audience', target: 7, orderData: [7, 10], type: 'num', data: 'audience', name: 'audience', searchable: true},
-                        {title: 'Business Unit Audience', ariaTitle: 'Business Unit Audience', target: 8, orderData: [8, 10], type: 'num', data: 'org_audience', name: 'org_audience', searchable: true},
-                        {title: 'Action', ariaTitle: 'Action', target: 9, orderData: [9, 10], type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},
-                        {title: 'Goal ID', ariaTitle: 'Goal ID', target: 10, orderData: [10], type: 'string', data: 'id', name: 'id', searchable: false, visible: false},
+                        {title: 'Last Modified Date', ariaTitle: 'Last Modified Date', target: 3, orderData: [3, 10], type: 'date', data: 'updated_at', name: 'updated_at', searchable: true, className: 'dt-nowrap'},
+                        {title: 'Last Modified By', ariaTitle: 'Last Modified By', target: 5, orderData: [5, 10], type: 'string', data: 'click_updater_name', name: 'click_updater_name', searchable: true, className: 'dt-nowrap'},
+                        {title: 'Individual Audience', ariaTitle: 'Individual Audience', target: 8, orderData: [7, 10], type: 'num', data: 'audience', name: 'audience', searchable: true},
+                        {title: 'Business Unit Audience', ariaTitle: 'Business Unit Audience', target: 9, orderData: [8, 10], type: 'num', data: 'org_audience', name: 'org_audience', searchable: true},
+                        {title: 'Action', ariaTitle: 'Action', target: 9, orderData: [10, 11], type: 'string', data: 'action', name: 'action', orderable: false, searchable: false},
+                        {title: 'Goal ID', ariaTitle: 'Goal ID', target: 10, orderData: [11], type: 'string', data: 'id', name: 'id', searchable: false, visible: false},
                     ]
                 } );
             });
