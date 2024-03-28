@@ -1089,7 +1089,7 @@ class GoalBankController extends Controller
                     ->leftJoin('employee_demo as ced', 'ced.employee_id', 'cu.employee_id')
                     ->leftJoin('employee_demo_tree as edt', 'edt.id', 'ced.orgid')
                     ->leftJoin(DB::raw('(
-                        SELECT auditable_id, original_auth_id
+                        SELECT auditable_id, original_auth_id, user_id
                         FROM audits
                         WHERE auditable_type LIKE "%Goal%"
                         AND (auditable_id, created_at) IN (
@@ -1099,7 +1099,13 @@ class GoalBankController extends Controller
                             GROUP BY auditable_id
                         )
                     ) AS latest_audits'), 'goals.id', '=', 'latest_audits.auditable_id')
-                    ->leftJoin('users as uu', 'uu.id', '=', 'latest_audits.original_auth_id')
+                    ->leftJoin('users as uu', function($join) {
+                        $join->on('uu.id', '=', 'latest_audits.original_auth_id')
+                             ->orWhere(function($query) {
+                                $query->on('uu.id', '=', 'latest_audits.user_id')
+                                      ->whereNull('latest_audits.original_auth_id');
+                             });
+                    })
                     ->leftJoin('employee_demo as ued', 'ued.employee_id', 'uu.employee_id')
                     ->where('is_library', 1)
                     ->whereIn('by_admin', [1, 2])
