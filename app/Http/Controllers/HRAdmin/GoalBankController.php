@@ -1137,6 +1137,24 @@ class GoalBankController extends Controller
                 ->leftjoin('users as cu', 'cu.id', 'goals.created_by')
                 ->leftjoin('employee_demo as ced', 'ced.employee_id', 'cu.employee_id')
                 ->leftjoin('employee_demo_tree as edt', 'edt.id', 'ced.orgid')
+                ->leftJoin(DB::raw('(
+                    SELECT auditable_id, original_auth_id, user_id
+                    FROM audits
+                    WHERE auditable_type LIKE "%Goal%"
+                    AND (auditable_id, created_at) IN (
+                        SELECT auditable_id, MAX(created_at)
+                        FROM audits
+                        WHERE auditable_type LIKE "%Goal%"
+                        GROUP BY auditable_id
+                    )
+                ) AS latest_audits'), 'goals.id', '=', 'latest_audits.auditable_id')
+                ->leftJoin('users as uu', function($join) {
+                    $join->on('uu.id', '=', 'latest_audits.original_auth_id')
+                         ->orWhere(function($query) {
+                            $query->on('uu.id', '=', 'latest_audits.user_id')
+                                  ->whereNull('latest_audits.original_auth_id');
+                         });
+                })
                 ->where('is_library', \DB::raw(1))
                 ->where('goals.created_by', \DB::raw(Auth::id()))
                 ->where('by_admin', \DB::raw(2))
@@ -1162,6 +1180,8 @@ class GoalBankController extends Controller
                         'goals.display_name',
                         'ced.employee_name as creator_name',
                         'edt.organization AS ced_organization',
+                        'goals.updated_at',
+                        'uu.name as last_updated_by',
                     )
                 ->addSelect(['audience' =>
                     GoalSharedWith::whereColumn('goal_id', 'goals.id')
@@ -1178,6 +1198,24 @@ class GoalBankController extends Controller
                 ->leftjoin('users as cu', 'cu.id', 'goals.created_by')
                 ->leftjoin('employee_demo as ced', 'ced.employee_id', 'cu.employee_id')
                 ->leftjoin('employee_demo_tree as edt', 'edt.id', 'ced.orgid')
+                ->leftJoin(DB::raw('(
+                    SELECT auditable_id, original_auth_id, user_id
+                    FROM audits
+                    WHERE auditable_type LIKE "%Goal%"
+                    AND (auditable_id, created_at) IN (
+                        SELECT auditable_id, MAX(created_at)
+                        FROM audits
+                        WHERE auditable_type LIKE "%Goal%"
+                        GROUP BY auditable_id
+                    )
+                ) AS latest_audits'), 'goals.id', '=', 'latest_audits.auditable_id')
+                ->leftJoin('users as uu', function($join) {
+                    $join->on('uu.id', '=', 'latest_audits.original_auth_id')
+                         ->orWhere(function($query) {
+                            $query->on('uu.id', '=', 'latest_audits.user_id')
+                                  ->whereNull('latest_audits.original_auth_id');
+                         });
+                })
                 ->where('is_library', \DB::raw(1))
                 ->where('by_admin', \DB::raw(2))
                 ->where('goals.created_by', '<>', \DB::raw(Auth::id()))
@@ -1204,6 +1242,8 @@ class GoalBankController extends Controller
                         'goals.display_name',
                         'ced.employee_name as creator_name',
                         'edt.organization AS ced_organization',
+                        'goals.updated_at',
+                        'uu.name as last_updated_by',
                     )
                 ->addSelect(['audience' =>
                     GoalSharedWith::whereColumn('goal_id', 'goals.id')
@@ -1220,6 +1260,24 @@ class GoalBankController extends Controller
                 ->leftjoin('users as cu', 'cu.id', 'goals.created_by')
                 ->leftjoin('employee_demo as ced', 'ced.employee_id', 'cu.employee_id')
                 ->leftjoin('employee_demo_tree as edt', 'edt.id', 'ced.orgid')
+                ->leftJoin(DB::raw('(
+                    SELECT auditable_id, original_auth_id, user_id
+                    FROM audits
+                    WHERE auditable_type LIKE "%Goal%"
+                    AND (auditable_id, created_at) IN (
+                        SELECT auditable_id, MAX(created_at)
+                        FROM audits
+                        WHERE auditable_type LIKE "%Goal%"
+                        GROUP BY auditable_id
+                    )
+                ) AS latest_audits'), 'goals.id', '=', 'latest_audits.auditable_id')
+                ->leftJoin('users as uu', function($join) {
+                    $join->on('uu.id', '=', 'latest_audits.original_auth_id')
+                         ->orWhere(function($query) {
+                            $query->on('uu.id', '=', 'latest_audits.user_id')
+                                  ->whereNull('latest_audits.original_auth_id');
+                         });
+                })
                 ->where('is_library', \DB::raw(1))
                 ->where('by_admin', \DB::raw(2))
                 ->where('goals.created_by', '<>', \DB::raw(Auth::id()))
@@ -1246,6 +1304,8 @@ class GoalBankController extends Controller
                         'goals.display_name',
                         'ced.employee_name as creator_name',
                         'edt.organization AS ced_organization',
+                        'goals.updated_at',
+                        'uu.name as last_updated_by',
                     )
                 ->addSelect(['audience' =>
                     GoalSharedWith::whereColumn('goal_id', 'goals.id')
@@ -1262,6 +1322,24 @@ class GoalBankController extends Controller
                 ->leftjoin('users as cu', 'cu.id', 'goals.created_by')
                 ->leftjoin('employee_demo as ced', 'ced.employee_id', 'cu.employee_id')
                 ->leftjoin('employee_demo_tree as edt', 'edt.id', 'ced.orgid')
+                ->leftJoin(DB::raw('(
+                    SELECT auditable_id, original_auth_id, user_id
+                    FROM audits
+                    WHERE auditable_type LIKE "%Goal%"
+                    AND (auditable_id, created_at) IN (
+                        SELECT auditable_id, MAX(created_at)
+                        FROM audits
+                        WHERE auditable_type LIKE "%Goal%"
+                        GROUP BY auditable_id
+                    )
+                ) AS latest_audits'), 'goals.id', '=', 'latest_audits.auditable_id')
+                ->leftJoin('users as uu', function($join) {
+                    $join->on('uu.id', '=', 'latest_audits.original_auth_id')
+                         ->orWhere(function($query) {
+                            $query->on('uu.id', '=', 'latest_audits.user_id')
+                                  ->whereNull('latest_audits.original_auth_id');
+                         });
+                })
                 ->where('is_library', \DB::raw(1))
                 ->where('by_admin', \DB::raw(2))
                 ->where('goals.created_by', '<>', \DB::raw(Auth::id()))
@@ -1288,6 +1366,8 @@ class GoalBankController extends Controller
                         'goals.display_name',
                         'ced.employee_name AS creator_name',
                         'edt.organization AS ced_organization',
+                        'goals.updated_at',
+                        'uu.name as last_updated_by',
                     )
                 ->addSelect(['audience' =>
                     GoalSharedWith::whereColumn('goal_id', 'goals.id')
@@ -1328,6 +1408,12 @@ class GoalBankController extends Controller
                 ->editColumn('created_at', function ($row) {
                     return '<a href="'.route(request()->segment(1).'.goalbank.editdetails', $row->id).'" aria-label="Edit Goal Details - "'.($row->created_at ? $row->created_at->format('F d, Y') : null).' value="'.$row->id.'">'.($row->created_at ? $row->created_at->format('F d, Y') : null).'</a>';
                 })
+                ->editColumn('updated_at', function ($row) {
+                    return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Goal updated at ' . ($row->updated_at ? $row->updated_at->format('F d, Y') : null).'">' . ($row->updated_at ? $row->updated_at->format('F d, Y') : null) . '</a>';
+                })
+                ->addColumn('click_updater_name', function ($row) {
+                    return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Goal updated by ' . $row->last_updated_by .'">' .  $row->last_updated_by . '</a>';
+                })
                 ->editColumn('audience', function ($row) {
                     return '<a href="'.route(request()->segment(1).'.goalbank.editone', $row->id).'" aria-label="Edit Goal For Individuals" value="'.$row->id.'">'.$row->audience.' Employees</a>';
                 })
@@ -1338,7 +1424,7 @@ class GoalBankController extends Controller
                     $btn = '<a href="/'.request()->segment(1).'/goalbank/deletegoal/' . $row->id . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->id .'"><i class="fa fa-trash"></i></a>';
                     return $btn;
                 })
-                ->rawColumns(['click_title', 'click_goal_type', 'click_display_name', 'click_creator_name', 'click_creator_organization', 'mandatory', 'created_at', 'goal_type_name', 'created_by', 'audience', 'org_audience', 'action', 'title-link'])
+                ->rawColumns(['click_title', 'click_goal_type', 'click_display_name', 'click_creator_name', 'click_creator_organization', 'mandatory', 'created_at', 'goal_type_name', 'created_by', 'audience', 'updated_at', 'click_updater_name','org_audience', 'action', 'title-link'])
                 ->make(true);
         }
     }
