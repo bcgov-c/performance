@@ -855,69 +855,75 @@
             }
           ],
           "order": [[0, "desc"]],
-          dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>'
+          dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>',
+          "paging": true, // Enable paging
+          "pageLength": 20, // Show only 1 item per page
+          "drawCallback": function(settings) {
+                initializeMultiselect(); // Reinitialize multiselect dropdowns after each draw
+            }
         });
 
       team_goalbanks.column(0).visible(false);
     });
     
+    const initializeMultiselect = function() {
+                $(".search-users").each(function() {
+                    const goalId = $(this).data('goal-id');
+                    const selectDropdown = this;
+                    let valueBeforeChange = [];
+                    $(this).multiselect({
+                        allSelectedText: 'All',
+                        selectAllText: 'All',
+                        nonSelectedText: 'No one',
+                        includeSelectAllOption: true,
+                        onDropdownShow: function () {
+                            valueBeforeChange = [...selectDropdown.options].filter(option => option.selected).map(option => option.value);
+                        },
+                        onDropdownHide: function () {
+                            const valueAfterChange = [...selectDropdown.options].filter(option => option.selected).map(option => option.value);
+                            let toRevert;
+                            if (valueBeforeChange.length === 0 && valueAfterChange.length !== 0) {
+                                toRevert = !confirm("Sharing this goal will make it visible to the selected employees. Continue?");
+                            }
+
+                            if (valueBeforeChange.length !==0 && valueAfterChange.length === 0) {
+                                toRevert = !confirm("Making this goal private will hide it from all employees. Continue?");
+                            }
+
+                            if (toRevert) {
+                                valueAfterChange.forEach((value) => {
+                                    if (!valueBeforeChange.includes(value)) {
+                                        $(selectDropdown).multiselect('deselect', value);
+                                    }
+                                });
+                                valueBeforeChange.forEach((value) => {
+                                    $(selectDropdown).multiselect('select', value);
+                                });
+                            }
+                            const finalSelectedOptions = [...selectDropdown.options].filter(option => option.selected).map(option => option.value);
+                            document.getElementById("syncGoalSharingData").innerHTML = "";
+                            finalSelectedOptions.forEach((value) => {
+                                const input = document.createElement("input");
+                                input.setAttribute('value', value);
+                                input.name = $(selectDropdown).attr('name');
+                                document.getElementById("syncGoalSharingData").appendChild(input);
+                            });
+                            const input = document.createElement("input");
+                            input.setAttribute('value', finalSelectedOptions.length !== 0 ? "1" : "0");
+                            input.name = "is_shared["+goalId+"]";
+                            document.getElementById("syncGoalSharingData").appendChild(input);
+                            const form = $("#share-my-goals-form").get()[0];
+                            fetch(form.action, {method:'POST', body: new FormData(form)});
+                        }
+                    });
+                });
+            };
     
     $(document).ready(() => {            
             $(".tags").multiselect({
                 enableFiltering: true,
                 enableCaseInsensitiveFiltering: true,
-            });
-            $(".search-users").each(function() {
-                const goalId = $(this).data('goal-id');
-                const selectDropdown = this;
-                let valueBeforeChange = [];
-                $(this).multiselect({
-                    allSelectedText: 'All',
-                    selectAllText: 'All',
-                    nonSelectedText: 'No one',
-                    // nonSelectedText: null,
-                    includeSelectAllOption: true,
-                    onDropdownShow: function () {
-                        valueBeforeChange = [...selectDropdown.options].filter(option => option.selected).map(option => option.value);
-                    },
-                    onDropdownHide: function () {
-                        const valueAfterChange = [...selectDropdown.options].filter(option => option.selected).map(option => option.value);
-                        let toRevert;
-                        if (valueBeforeChange.length === 0 && valueAfterChange.length !== 0) {
-                            toRevert = !confirm("Sharing this goal will make it visible to the selected employees. Continue?");
-                        }
-
-                        if (valueBeforeChange.length !==0 && valueAfterChange.length === 0) {
-                            toRevert = !confirm("Making this goal private will hide it from all employees. Continue?");
-                        }
-
-                        if (toRevert) {
-                            valueAfterChange.forEach((value) => {
-                                if (!valueBeforeChange.includes(value)) {
-                                    $(selectDropdown).multiselect('deselect', value);
-                                }
-                            });
-                            valueBeforeChange.forEach((value) => {
-                                $(selectDropdown).multiselect('select', value);
-                            });
-                        }
-                        const finalSelectedOptions = [...selectDropdown.options].filter(option => option.selected).map(option => option.value);
-                        document.getElementById("syncGoalSharingData").innerHTML = "";
-                        finalSelectedOptions.forEach((value) => {
-                            const input = document.createElement("input");
-                            input.setAttribute('value', value);
-                            input.name = $(selectDropdown).attr('name');
-                            document.getElementById("syncGoalSharingData").appendChild(input);
-                        });
-                        const input = document.createElement("input");
-                        input.setAttribute('value', finalSelectedOptions.length !== 0 ? "1" : "0");
-                        input.name = "is_shared["+goalId+"]";
-                        document.getElementById("syncGoalSharingData").appendChild(input);
-                        const form = $("#share-my-goals-form").get()[0];
-                        fetch(form.action, {method:'POST', body: new FormData(form)});
-                    }
-                });
-            });
+            });            
             
             $("#goal_title").change(function(){
                 var goal_title = $("#goal_title").val();
