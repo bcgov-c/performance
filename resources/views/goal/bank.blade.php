@@ -857,7 +857,7 @@
           "order": [[0, "desc"]],
           dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>',
           "paging": true, // Enable paging
-          "pageLength": 20, // Show only 1 item per page
+          "pageLength": 10, // Show only 1 item per page
           "drawCallback": function(settings) {
                 initializeMultiselect(); // Reinitialize multiselect dropdowns after each draw
             }
