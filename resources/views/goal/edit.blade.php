@@ -232,7 +232,7 @@
             trigger: 'click',
         });
         
-        const minutes = 20;
+        const minutes = 3;
         const SessionTime = 1000 * 60 * minutes;
         
         $(document).ready(function () { 
@@ -244,7 +244,7 @@
         function sessionWarning() {
             no_msg = true;    
             $('#datatype').val('auto');
-            $(".btn-primary").trigger("click");
+            $('#saveButton').trigger("click");
             alert('You have not saved your work in 20 minutes. To protect your work, it has been automatically saved.');    
         } 
 
