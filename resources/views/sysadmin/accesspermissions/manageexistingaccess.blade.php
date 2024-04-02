@@ -320,23 +320,26 @@
                 });
 
                 $('#removeButton').on('click', function(event) {
-                    var model_id = $('#model_id').val();
-                    var role_id = $('#role_id').val();
-                    var token = $('meta[name="csrf-token"]').attr('content');
                     event.preventDefault();
-                    $.ajax ( {
-                        type: 'POST',
-                        url: 'manageexistingaccessdelete/'+model_id+'/'+role_id,
-                        data: {
-                            'model_id':model_id,
-                            'role_id':role_id,
-                            '_token':token,
-                            '_method':"DELETE",
-                        },
-                        success: function (result) {
-                            window.location.href = 'manageexistingaccess';
-                        }
-                    });
+                    if (confirm('Are you sure?')) {
+                        $('#removeButton').attr('disabled', true);
+                        var model_id = $('#model_id').val();
+                        var role_id = $('#role_id').val();
+                        var token = $('meta[name="csrf-token"]').attr('content');
+                        $.ajax ( {
+                            type: 'POST',
+                            url: 'manageexistingaccessdelete/'+model_id+'/'+role_id,
+                            data: {
+                                'model_id':model_id,
+                                'role_id':role_id,
+                                '_token':token,
+                                '_method':"DELETE",
+                            },
+                            success: function (result) {
+                                window.location.href = 'manageexistingaccess';
+                            }
+                        });
+                    };
                 });
 
                 $(window).on('beforeunload', function(){
