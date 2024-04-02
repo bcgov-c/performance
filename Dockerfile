@@ -20,7 +20,7 @@ RUN chgrp -R 0 /app && \
 #
 # Build Server Deployment Image
 #
-FROM php:8.0-apache
+FROM php:8.2.17RC2-apache
 
 WORKDIR /
 
