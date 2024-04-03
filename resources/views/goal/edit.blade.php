@@ -232,19 +232,19 @@
             trigger: 'click',
         });
         
-        const minutes = 3;
-        const SessionTime = 1000 * 60 * minutes;
+        const mins = 1;
+        const SessionTimes = 1000 * 60 * mins;
         
         $(document).ready(function () { 
             @if (!\Session::has('autosave')) 
-                const myTimeout = setTimeout(sessionWarning, SessionTime);  
+                const myTimeout = setTimeout(sessionWarnings, SessionTimes);  
             @endif
         });    
             
-        function sessionWarning() {
+        function sessionWarnings() {
             no_msg = true;    
             $('#datatype').val('auto');
-            $('#saveButton').trigger("click");
+            $('#goalform').submit();
             alert('You have not saved your work in 20 minutes. To protect your work, it has been automatically saved.');    
         } 
 
