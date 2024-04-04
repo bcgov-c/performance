@@ -3,7 +3,6 @@ function updateConversation(conversation_id) {
                     url: '/conversation/' + conversation_id
                     , success: function(result) {
                         comment_changed = false;
-                        console.log('comment_changed ' + comment_changed);
                         modal_open=true;
                         is_viewer = result.is_viewer;
                         isSupervisor = result.view_as_supervisor;
