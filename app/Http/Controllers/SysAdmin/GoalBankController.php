@@ -1164,7 +1164,7 @@ class GoalBankController extends Controller
                             }
                         })
                         ->addColumn('click_creator_name', function ($row) {
-                            return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - "' . $row->creator_name . ' value="' . $row->id . '">' . $row->click_creator_name . '</a>';
+                            return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - "' . $row->creator_name . ' value="' . $row->id . '">' . $row->creator_name . '</a>';
                         })
                         ->addColumn('click_creator_organization', function ($row) {
                             return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - "' . $row->ced_organization . ' value="' . $row->id . '">' . $row->ced_organization . '</a>';
