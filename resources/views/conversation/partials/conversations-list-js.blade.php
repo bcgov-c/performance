@@ -25,6 +25,8 @@
             
             document.getElementById("closemodal").onclick = function(e) {myFunction(e)};
             function myFunction(e) { 
+                console.log('function comment_changed ' + comment_changed); 
+                          
                 $('.emp-comment-save-info').hide();
                 $('.emp-comment-save-info-top').hide();
                 $('.sup-comment-save-info').hide();
@@ -40,8 +42,6 @@
                             $('#saveChangesBtn').on('click', function () {
                                 // Perform save actions
                                 saveComments();
-                                $('.notifyParticipants').show();
-                                $('.send-notification-info-top').hide();
 
                                 // Close the modal
                                 $('#unsavedChangesModal').modal('hide');
@@ -51,11 +51,11 @@
                                 $('.modal-body').find('.error').html('');
                                 $('.modal-body').find('input[type=radio]').prop('checked', false);
 
-                                // // Close the viewConversationModal
-                                // $('#viewConversationModal').modal('toggle');
-                                // var roleParam = getParameterByName('ownerrole');
-                                // var newURL = window.location.origin + window.location.pathname + '?ownerrole=' + encodeURIComponent(roleParam) + window.location.hash;
-                                // window.location.href = newURL;
+                                // Close the viewConversationModal
+                                $('#viewConversationModal').modal('toggle');
+                                var roleParam = getParameterByName('ownerrole');
+                                var newURL = window.location.origin + window.location.pathname + '?ownerrole=' + encodeURIComponent(roleParam) + window.location.hash;
+                                window.location.href = newURL;
                             });
 
                             // Handle Cancel button click
@@ -626,6 +626,7 @@
             $(document).on('click', '.btn-view-conversation', function(e) {
                 conversation_id = e.currentTarget.getAttribute('data-id');
                 updateConversation(conversation_id);
+                console.log('modal open');                
                 setTimeRoll();
             });
 
