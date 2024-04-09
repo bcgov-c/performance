@@ -1,4 +1,5 @@
 @include('dashboard.partials.accessibility')
+ 
 
 <x-side-layout title="{{ __('Dashboard - Performance Development Platform') }}" >
     <x-slot name="header">
@@ -8,10 +9,10 @@
     </x-slot>
     <div class="container-fluid">
         <div class="row mb-4">
-            <div class="col-12 col-sm-4 col-md-4">
+            <div class="col-12 col-sm-4 col-md-4" index-tab="0" aria-label="My Current Supervisor">
                 <strong>
-                    My Current Supervisor
-                    <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="{{ $supervisorTooltip }}"></i>
+                My Current Supervisor
+                    <i tabindex="0" class="fa fa-info-circle" data-trigger="focus"  data-toggle="popover" data-placement="right" data-html="true" data-content="{{ $supervisorTooltip }}"></i>
                 </strong>
                 <div class="bg-white border-b rounded p-2 mt-2 shadow-sm">
                     {{-- <x-profile-pic></x-profile-pic> --}}
@@ -21,56 +22,61 @@
                                 {{ $supv ? $supv->user_name : 'No supervisor' }}
                             @endforeach
                         @else
-                            Vacant
+                            <button class="btn p-0 text-left" style="width:100%" >
+                                Vacant
+                            </button>
                         @endif
                     @else
-                        <label for="supervisor_btn">
-                            <button type="button" icon="fas fa-xs fa-ellipsis-v" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                {{ $preferredSupervisor ? $preferredSupervisor->name : 'Select a supervisor' }}
-                            </button>
-                            <div class="dropdown-menu"  size="xs">
-                                @foreach($supervisorList as $supv)
-                                    @if(!$preferredSupervisor || $supv->employee_id != $preferredSupervisor->supv_empl_id)
-                                        <x-button icon="fas fa-xs fa-fw" value="{{ $supv->employee_id }}" data-id="{{ $supv->employee_id }}" data-name="{{ $supv->name }}" class="dropdown-item change_supervisor" name="change_supervisor" id="change_supervisor">
-                                            {{ $supv->user_name }}
-                                        </x-button>
-                                    @else
-                                        <x-button icon="fas fa-xs fa-fw fa-solid fa-user-check" value="{{ $supv->employee_id }}" data-id="{{ $supv->employee_id }}" data-name="{{ $supv->name }}" class="dropdown-item no_change_supervisor" name="no_change_supervisor" id='no_change_supervisor'>
-                                            {{ $supv->user_name }}
-                                        </x-button>
-                                    @endif
-                                @endforeach
-                            </div>
-                        </label>
-                    @endif
+                    <label for="supervisor_btn">
+                        <button type="button" icon="fas fa-xs fa-ellipsis-v" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{ $preferredSupervisor ? $preferredSupervisor->name : 'Select a supervisor' }}
+                        </button>
+                        <div class="dropdown-menu" size="xs">
+                            @foreach($supervisorList as $supv)
+                                @php
+                                    $isSelected = $preferredSupervisor && $supv->employee_id == $preferredSupervisor->supv_empl_id;
+                                @endphp
+                                <x-button icon="fas fa-xs fa-fw {{ $isSelected ? 'fa-solid fa-user-check' : '' }}" 
+                                        value="{{ $supv->employee_id }}" 
+                                        data-id="{{ $supv->employee_id }}" 
+                                        data-name="{{ $supv->name }}" 
+                                        class="dropdown-item {{ $isSelected ? 'selected' : '' }}" 
+                                        name="change_supervisor" 
+                                        id="change_supervisor_{{ $supv->employee_id }}">
+                                    {{ $supv->user_name }}
+                                </x-button>
+                            @endforeach
+                        </div>
+                    </label>
+                    @endif             
                 </div>
             </div>
-            <div class="col-12 col-sm-4 col-md-4">
+            <div class="col-12 col-sm-4 col-md-4" index-tab="0" aria-label="My Profile Shared with">
                 <strong>
                     My Profile is Shared with
-                    <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="{{ $profilesharedTooltip }}"></i>
+                    <i tabindex="0"  class="fa fa-info-circle" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true" data-content="{{ $profilesharedTooltip }}"></i>
                 </strong>
                 <div class="bg-white border-b rounded p-2 mt-2 shadow-sm">
-                        @if(count($sharedList) > 0)
-                        <button class="btn p-0" style="width:100%" data-toggle="modal" data-target="#profileSharedWithViewModal">
-                            <div class="d-flex align-items-center">
-                                {{-- <x-profile-pic></x-profile-pic> --}}
-                                {{$sharedList[0]->sharedWithUser->name}}
-                                @if(count($sharedList) > 1)
-                                    and {{count($sharedList) - 1}} Others.
-                                @else
-                                    .     
-                                @endif
-                                Click to view more details.
-                                <div class="flex-fill"></div>
-                                <i class="fa fa-chevron-right"></i>
-                            </div>
-                        </button>    
-                        @else
-                        <button class="btn p-0" style="width:100%">
-                            No one
-                        </button>    
-                        @endif                    
+                    @if(count($sharedList) > 0)
+                    <button class="btn p-0" style="width:100%" data-toggle="modal" data-target="#profileSharedWithViewModal">
+                        <div class="d-flex align-items-center">
+                            {{-- <x-profile-pic></x-profile-pic> --}}
+                            <span id="sharedWithName">{{ $sharedList[0]->sharedWithUser->name }}</span>
+                            @if(count($sharedList) > 1)
+                                and {{ count($sharedList) - 1 }} Others.
+                            @else
+                                .     
+                            @endif
+                            Click to view more details.
+                            <div class="flex-fill"></div>
+                            <i class="fa fa-chevron-right"></i>
+                        </div>
+                    </button>    
+                    @else
+                    <button class="btn p-0" style="width:100%">
+                        No one
+                    </button>    
+                    @endif                    
                 </div>
             </div>
             @if($jobList && $jobList->count() > 1)
