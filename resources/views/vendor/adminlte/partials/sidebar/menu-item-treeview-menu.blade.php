@@ -12,7 +12,8 @@ if (session('sr_user') && $item['id'] == 'sys-admin-menu'){
     {{-- Menu toggler --}}
     
     @if(session()->has('SR_ALLOWED') && $item['text'] == 'My Team')
-        <a class="nav-link py-3 {{ $item['class'] }} @isset($item['shift']) {{ $item['shift'] }} @endisset"
+        <a aria-label="Main Menu of {{ $item['text'] }}"
+        class="nav-link py-3 {{ $item['class'] }} @isset($item['shift']) {{ $item['shift'] }} @endisset"
         href="{{ array_key_exists('url', $item) ? url($item['url']) : '' }}" {!! $item['data-compiled'] ?? '' !!}>
 
             <i class="mr-2 {{ $item['icon'] ?? 'far fa-fw fa-circle' }} {{
@@ -31,7 +32,8 @@ if (session('sr_user') && $item['id'] == 'sys-admin-menu'){
             </p>
         </a>
     @elseif(!session()->has('SR_ALLOWED') )
-        <a class="nav-link py-3 {{ $item['class'] }} @isset($item['shift']) {{ $item['shift'] }} @endisset"
+        <a aria-label="Main Menu of {{ $item['text'] }}"
+        class="nav-link py-3 {{ $item['class'] }} @isset($item['shift']) {{ $item['shift'] }} @endisset"
              href="{{ array_key_exists('url', $item) ? url($item['url']) : '' }}" {!! $item['data-compiled'] ?? '' !!}>
 
             <i class="mr-2 {{ $item['icon'] ?? 'far fa-fw fa-circle' }} {{

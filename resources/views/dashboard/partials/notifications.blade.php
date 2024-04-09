@@ -14,18 +14,18 @@
 
             </td>
             <td class="align-middle ">
-                <label for="action_btn">
-                    <button type="button" icon="fas fa-xs fa-ellipsis-v" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <label for="notification-table">
+                    <button type="button" aria-label="List of actions that can be taken on the selected notifications" icon="fas fa-xs fa-ellipsis-v" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Actions
                     </button>
                     <div class="dropdown-menu"  size="xs">
-                        <x-button icon="fas fa-xs fa-trash-alt" class="dropdown-item delete_all" id='delete_all'>
+                        <x-button icon="fas fa-xs fa-trash-alt" class="dropdown-item delete_all" id='delete_all' arial-label="Delete selected">
                             Delete selected
                         </x-button>
-                        <x-button icon="fas fa-xs fa-envelope-open" href="{{ route('dashboard.updatestatus') }}" class="dropdown-item update_status" >
+                        <x-button icon="fas fa-xs fa-envelope-open" id='update_status' class="dropdown-item update_status" arial-label="Mark as read">
                             Mark as read
                         </x-button>
-                        <x-button icon="fas fa-xs fa-envelope" href="{{ route('dashboard.resetstatus') }}" class="dropdown-item reset_status" >
+                        <x-button icon="fas fa-xs fa-envelope" id='reset_status' class="dropdown-item reset_status" arial-label="Mark as unread">
                             Mark as unread
                         </x-button>
                     </div>
@@ -181,7 +181,15 @@
                 {data: 'created_at', visible: false },
                 {data: 'item_detail', name: 'item_detail', orderable: false, searchable: false,  width: '80%', className: 'py-1' },
                 {data: 'action', name: 'action', orderable: false, searchable: false, width: '20%', className: 'dt-right dt-nowrap my-0'},
-            ]
+            ],
+            language: {
+                paginate: {
+                    first: 'Go to first page',
+                    previous: 'Go to previous page',
+                    next: 'Go to next page',
+                    last: 'Go to last page'
+                }
+            }
         });
 
         
@@ -261,9 +269,10 @@
                     method: "DELETE",
                     url:  '/dashboard/' + id,
                     success: function(data)
-                    {
+                    {                        
                         oTable.ajax.reload(null, false);	// reload datatables
                         updateBadgeCount();
+                        alert('Notification has been deleted.');
                     },
                     error: function(response) {
                         console.log('Error');
@@ -350,7 +359,6 @@
             }
         });
 
-    });    
 </script>
 
 </x-slot>

@@ -1,15 +1,15 @@
 
-<div class="modal fade" id="profileSharedWithViewModal" tabindex="-1" aria-labelledby="profileSharedWithViewLabel" aria-hidden="true">
+<div class="modal fade" id="profileSharedWithViewModal" tabindex="0" aria-labelledby="profileSharedWithViewLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header bg-primary">
         <h5 class="modal-title" id="profileSharedWithViewLabel">Profile shared with</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
+          <span aria-hidden="true" class="close-white" >&times;</span>
         </button>
       </div>
       <div class="modal-body p-4">
-        <table class="table table-sm">
+        <table class="table table-sm" aria-describedby="Profile Shared with details">
             <thead>
                 <th>Shared With</th>
                 <th>Comment</th>
