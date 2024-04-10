@@ -74,7 +74,6 @@ button:active {
     outline: none; /* Remove the default outline */
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5); /* Add a red box shadow when focused */
 }
- 
 </style>
 
 
@@ -152,6 +151,7 @@ window.addEventListener('load', function () {
     new Checkbox(checkboxes[i]);
   }
 });
+
 
 
 </script>
