@@ -122,9 +122,9 @@
 
     $(function() {
 
-@if ($open_modal)
-        $('#profileSharedWithViewModal').modal('show');
-@endif 
+        @if ($open_modal)
+                $('#profileSharedWithViewModal').modal('show');
+        @endif 
 
         $.ajaxSetup({
             headers: {
@@ -358,7 +358,7 @@
                 }
             }
         });
-
+    });
 </script>
 
 </x-slot>

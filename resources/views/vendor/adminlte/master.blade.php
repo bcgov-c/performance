@@ -170,6 +170,7 @@
     {{-- Custom Scripts --}}
     @yield('adminlte_js')
     <script>
+        var large_device = true;
         $(document).ready(function() {
             // Get the button element
             var menuToggleBtn = $('.navbar-nav');
@@ -189,6 +190,13 @@
                     isExpanded = true;
                 }
             });
+
+
+            if ($('body').hasClass('sidebar-closed')) {
+                large_device = false;
+            } else {
+                large_device = true;
+            }
         });
 
 
@@ -205,10 +213,8 @@
         // Hide the Profile Picture when the main sidebar collapse
         $(function() { 
             $(document).on('shown.lte.pushmenu', function()  {
-                console.log('shown');
                 $('div#sidebar-profile-picture').show(100);
             }).on('collapsed.lte.pushmenu', function() {
-                console.log('hide');
                 $('div#sidebar-profile-picture').hide(100);
             });
         });
@@ -258,7 +264,21 @@
             window.snowplow('trackPageView');
         }
         // <!-- Snowplow stops plowing –>
+        
+
+        $(document).ready(function() {
+            // Select the anchor element within the menu item
+            $('.nav-item a.nav-link').on('blur', function() {
+                // Check if the text content of the anchor element is "Resources"
+                if(large_device != true) {
+                    if ($(this).text().trim() === 'Resources') {
+                        $('[data-widget="pushmenu"]').click();
+                    }
+                }
+            });
+        });
     </script>
+
 
 </body>
 

@@ -33,7 +33,7 @@
 
     {{-- Sidebar menu --}}
     <div class="sidebar">
-        <nav class="pt-2">
+        <nav class="pt-2" id="sidebarNav">
             <ul class="nav nav-pills nav-sidebar flex-column {{ config('adminlte.classes_sidebar_nav', '') }}"
                 data-widget="treeview" role="menu"
                 @if(config('adminlte.sidebar_nav_animation_speed') != 300)
