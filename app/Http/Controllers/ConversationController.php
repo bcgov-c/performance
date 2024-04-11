@@ -174,8 +174,16 @@ class ConversationController extends Controller
              // With My Team
              if ($sharedSupervisorIds && $sharedSupervisorIds[0]) {
                 $myTeamQuery->where(function($query) use ($sharedSupervisorIds,$myCurrentTeam_array) {
-                    $query->whereNotIn('user_id', $sharedSupervisorIds)->
-                    WhereHas('conversationParticipants', function ($query) use ($myCurrentTeam_array ) {
+                    $query->where(function($shared) use ($sharedSupervisorIds){
+                        return $shared->whereNotIn('user_id', $sharedSupervisorIds)
+                        ->orWhere(function($part) {
+                            return $part->whereHas('conversationParticipants', function($mgr) {
+                                return $mgr->where('participant_id', \DB::raw(Auth::id()))
+                                ->whereRaw("role = 'mgr'");
+                            });
+                        });
+                    })
+                    ->whereHas('conversationParticipants', function ($query) use ($myCurrentTeam_array ) {
                         $query->whereIn('participant_id', $myCurrentTeam_array);
                     });
                 });
