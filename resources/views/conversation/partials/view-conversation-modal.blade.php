@@ -10,26 +10,6 @@
             </div>
             
             <div class="modal-body p-4">
-                @if ($type == 'upcoming')
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="alert alert-success send-notification-info-top" attr-loc="top"  role="alert" style="display:none">
-                                Notifications to other participants have been sent.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                    <div class="col-12">
-                            <button type="button" class="btn btn-primary float-right notifyParticipants" attr-loc="top" style="display:none">
-                                <i class="fa fa-info-circle notifyParticipantsInfo" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" 
-                                    data-content="Use this button to alert the other participant that you have made updates to this conversation." 
-                                    data-original-title="" title="" aria-describedby="popover271882"> 
-                                </i>
-                                Send Notification
-                            </button>
-                        </div>
-                    </div>
-                @endif             
                 <div class="row">
                     <div class="col-12">
                         <div class="alert alert-default-danger error-date-alert" style="display:none">
@@ -115,9 +95,15 @@
                 <!-----employee comments: 4,7,8,9,10--------->
                 <!-----supervisor comments: 1,2,3,5,6,11--------->
 
-                
 
                 @if ($type == 'upcoming')
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="alert alert-success send-notification-info-top" attr-loc="top"  role="alert" style="display:none">
+                                Notifications to other participants have been sent.
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-12">
                             <div class="alert alert-success sup-comment-save-info-top" attr-loc="top"  role="alert" style="display:none">
@@ -130,8 +116,22 @@
                     </div>
                     <div class="row">
                         <div class="col-12">
+                            <button type="button" class="btn btn-primary float-right notifyParticipantsSup ml-1" attr-loc="top" style="display:none">
+                                <i class="fa fa-info-circle notifyParticipantsInfo" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" 
+                                    data-content="Use this button to alert the other participant that you have made updates to this conversation." 
+                                    data-original-title="" title="" aria-describedby="popover271882"> 
+                                </i>
+                                Send Notification
+                            </button>
                             <button type="button" class="btn btn-primary float-right supSaveAllComments" attr-loc="top" style="display:none">Save Comments</button>
                             <button type="button" class="btn btn-primary float-left empSaveAllComments" attr-loc="top"  style="display:none">Save Comments</button>
+                            <button type="button" class="btn btn-primary float-left notifyParticipantsEmp ml-1" attr-loc="top" style="display:none">
+                                <i class="fa fa-info-circle notifyParticipantsInfo" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" 
+                                    data-content="Use this button to alert the other participant that you have made updates to this conversation." 
+                                    data-original-title="" title="" aria-describedby="popover271882"> 
+                                </i>
+                                Send Notification
+                            </button>
                         </div>
                     </div>
                     <hr>
@@ -204,19 +204,33 @@
                                 </div>
                         </div>
                         @if ($type == 'upcoming')
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="alert alert-success emp-comment-save-info" attr-loc="bottom" role="alert" style="display:none">
-                                    Comments are saved.
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="alert alert-success send-notification-info-emp" attr-loc="bottom"  role="alert" style="display:none">
+                                        Notifications to other participants have been sent.
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <button type="button" class="btn btn-primary float-left empSaveAllComments" attr-loc="bottom" style="display:none">Save Comments</button>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="alert alert-success emp-comment-save-info" attr-loc="bottom" role="alert" style="display:none">
+                                        Comments are saved.
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <hr>
+                            <div class="row">
+                                <div class="col-12">
+                                    <button type="button" class="btn btn-primary float-left empSaveAllComments" attr-loc="bottom" style="display:none">Save Comments</button>
+                                    <button type="button" class="btn btn-primary float-left notifyParticipantsEmp ml-1" attr-loc="bottom" style="display:none">
+                                        <i class="fa fa-info-circle notifyParticipantsInfo" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" 
+                                            data-content="Use this button to alert the other participant that you have made updates to this conversation." 
+                                            data-original-title="" title="" aria-describedby="popover271882"> 
+                                        </i>
+                                        Send Notification
+                                    </button>
+                                </div>
+                            </div>
+                            <hr>
                         @endif    
                     </div>
                 
@@ -309,6 +323,13 @@
                         @if ($type == 'upcoming')
                             <div class="row">
                                 <div class="col-12">
+                                    <div class="alert alert-success send-notification-info-sup" attr-loc="bottom"  role="alert" style="display:none">
+                                        Notifications to other participants have been sent.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
                                     <div class="alert alert-success sup-comment-save-info" attr-loc="bottom" role="alert" style="display:none">
                                         Comments are saved.
                                     </div>
@@ -316,6 +337,13 @@
                             </div>
                             <div class="row">
                                 <div class="col-12">
+                                    <button type="button" class="btn btn-primary float-right notifyParticipantsSup ml-1" attr-loc="bottom" style="display:none">
+                                        <i class="fa fa-info-circle notifyParticipantsInfo" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" 
+                                            data-content="Use this button to alert the other participant that you have made updates to this conversation." 
+                                            data-original-title="" title="" aria-describedby="popover271882"> 
+                                        </i>
+                                        Send Notification
+                                    </button>
                                     <button type="button" class="btn btn-primary float-right supSaveAllComments" attr-loc="bottom" style="display:none">Save Comments</button>
                                 </div>
                             </div>
@@ -323,7 +351,6 @@
                         @endif             
                     </div>                                      
                 </div>
-                
                 
                 <div id="sign-off-block">
                 <form id="employee-sign_off_form" method="post">

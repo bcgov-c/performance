@@ -40,8 +40,14 @@
                             $('#saveChangesBtn').on('click', function () {
                                 // Perform save actions
                                 saveComments();
-                                $('.notifyParticipants').show();
+                                if (isSupervisor) {
+                                    $('.notifyParticipantsSup').show();
+                                } else {
+                                    $('.notifyParticipantsEmp').show();
+                                }
                                 $('.send-notification-info-top').hide();
+                                $('.send-notification-info-emp').hide();
+                                $('.send-notification-info-sup').hide();
 
                                 // Close the modal
                                 $('#unsavedChangesModal').modal('hide');
@@ -885,6 +891,8 @@
                         saveComments();                                
                         $('.notifyParticipants').show();
                         $('.send-notification-info-top').hide();
+                        $('.send-notification-info-emp').hide();
+                        $('.send-notification-info-sup').hide();
                         alert('You have not saved your work in 20 minutes so the PDP has auto-saved to make sure you don\'t lose any information.');
                         unsave_warning = false;
                     }    
@@ -897,8 +905,10 @@
                 var attrLocValue = $(this).attr('attr-loc');
                 e.preventDefault();
                 saveComments();
-                $('.notifyParticipants').show();
+                $('.notifyParticipantsEmp').show();
                 $('.send-notification-info-top').hide();
+                $('.send-notification-info-emp').hide();
+                $('.send-notification-info-sup').hide();
                 unsave_warning = false;
                 setTimeRoll();
                 if(attrLocValue == "top"){
@@ -915,8 +925,10 @@
                 var attrLocValue = $(this).attr('attr-loc');
                 e.preventDefault();
                 saveComments();
-                $('.notifyParticipants').show();
+                $('.notifyParticipantsSup').show();
                 $('.send-notification-info-top').hide();
+                $('.send-notification-info-emp').hide();
+                $('.send-notification-info-sup').hide();
                 unsave_warning = false;
                 setTimeRoll();
                 if(attrLocValue == "top"){
@@ -935,6 +947,40 @@
                     sendNotifications();
                     if(attrLocValue == "top"){
                         $('.notifyParticipants').hide();
+                        $('.notifyParticipantsEmp').hide();
+                        $('.notifyParticipantsSup').hide();
+                        $('.send-notification-info-top').show();
+                    }
+                }
+            });
+            
+            $(document).on('click', '.notifyParticipantsEmp', function(e) {
+                if (confirm('Are you sure you want to send notification to the other participants?')) {
+                    var attrLocValue = $(this).attr('attr-loc');
+                    e.preventDefault();
+                    sendNotifications();
+                    $('.notifyParticipants').hide();
+                    $('.notifyParticipantsEmp').hide();
+                    $('.notifyParticipantsSup').hide();
+                    if(attrLocValue == "bottom"){
+                        $('.send-notification-info-emp').show();
+                    } else {
+                        $('.send-notification-info-top').show();
+                    }
+                }
+            });
+            
+            $(document).on('click', '.notifyParticipantsSup', function(e) {
+                if (confirm('Are you sure you want to send notification to the other participants?')) {
+                    var attrLocValue = $(this).attr('attr-loc');
+                    e.preventDefault();
+                    sendNotifications();
+                    $('.notifyParticipants').hide();
+                    $('.notifyParticipantsEmp').hide();
+                    $('.notifyParticipantsSup').hide();
+                    if(attrLocValue == "bottom"){
+                        $('.send-notification-info-sup').show();
+                    } else {
                         $('.send-notification-info-top').show();
                     }
                 }
