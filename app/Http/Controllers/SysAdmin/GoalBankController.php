@@ -996,8 +996,17 @@ class GoalBankController extends Controller
             ->when("{$request->{$option.'dd_level2'}}", function($q) use($request, $option) { return $q->whereRaw("u.level2_key = {$request->{$option.'dd_level2'}}"); }) 
             ->when("{$request->{$option.'dd_level3'}}", function($q) use($request, $option) { return $q->whereRaw("u.level3_key = {$request->{$option.'dd_level3'}}"); }) 
             ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); }) 
-            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("u.{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); }) 
-            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(u.employee_id LIKE '%{$request->{$option.'search_text'}}%' OR u.employee_name LIKE '%{$request->{$option.'search_text'}}%' OR u.jobcode_desc LIKE '%{$request->{$option.'search_text'}}%' OR u.deptid LIKE '%{$request->{$option.'search_text'}}%')"); }); 
+            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { 
+                return $q->where("u.{$request->{$option.'criteria'}}", 'LIKE', "%{$request->{$option.'search_text'}}%"); 
+            }) 
+            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { 
+                return $q->where(function($q1) use($request, $option) {
+                    return $q1->where('u.employee_id', 'LIKE', "%{$request->{$option.'search_text'}}%")
+                    ->orWhere('u.employee_name', 'LIKE', "%{$request->{$option.'search_text'}}%")
+                    ->orWhere('u.jobcode_desc', 'LIKE', "%{$request->{$option.'search_text'}}%")
+                    ->orWhere('u.deptid',  'LIKE', "%{$request->{$option.'search_text'}}%"); 
+                });
+            }); 
     } 
  
     protected function baseFilteredSQLs($request, $option = null) {
@@ -1123,15 +1132,31 @@ class GoalBankController extends Controller
             ->whereIn('by_admin', [\DB::raw(1), \DB::raw(2)])
             ->when($request->search_text && $request->criteria == 'all', function ($q) use ($request) {
                 return $q->where(function ($query) use ($request) {
-                    return $query->whereRaw("goals.title LIKE '%" . $request->search_text . "%'")
-                        ->orWhereRaw("(goals.display_name IS NULL AND ced.employee_name LIKE '%" . $request->search_text . "%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%" . $request->search_text . "%')");
+                    return $query->where('goals.title', 'LIKE', "%{$request->search_text}%")
+                    ->orWhere(function($q1) use ($request) {
+                        return $q1->whereNull('goals.display_name')
+                        ->where('ced.employee_name', 'LIKE', "%{$request->search_text}%");
+                    })
+                    ->orWhere(function($q2) use ($request) {
+                        return $q2->whereNotNull('goals.display_name')
+                        ->where('goals.display_name', 'LIKE', "%{$request->search_text}%");
+                    });
                 });
             })
             ->when($request->search_text && $request->criteria == 'gt', function ($q) use ($request) {
-                return $q->whereRaw("(goals.title LIKE '%" . $request->search_text . "%')");
+                return $q->where('goals.title', 'LIKE', "%{$request->search_text}%");
             })
             ->when($request->search_text && $request->criteria == 'cby', function ($q) use ($request) {
-                return $q->whereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%" . $request->search_text . "%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%" . $request->search_text . "%'))");
+                return $q->where(function($query) use ($request) {
+                    return $query->Where(function($q1) use ($request) {
+                        return $q1->whereNull('goals.display_name')
+                        ->where('ced.employee_name', 'LIKE', "%{$request->search_text}%");
+                    })
+                    ->orWhere(function($q2) use ($request) {
+                        return $q2->whereNotNull('goals.display_name')
+                        ->where('goals.display_name', 'LIKE', "%{$request->search_text}%");
+                    });
+                });
             })
             ->distinct()
             ->addSelect(['audience' =>
@@ -1204,8 +1229,17 @@ class GoalBankController extends Controller
                 ->when($request->dd_level4, function($q) use($request) {return $q->where('u.level4_key', $request->dd_level4);})
                 ->when($request->dd_superv == 'sup', function($q) use($request) { return $q->whereRaw("(u.isSupervisor = 1 OR u.isDelegate = 1)"); })
                 ->when($request->dd_superv == 'non', function($q) use($request) { return $q->whereRaw("NOT u.isSupervisor = 1 AND NOT u.isDelegate = 1"); })
-                ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { return $q->whereRaw("u.{$request->criteria} like '%{$request->search_text}%'"); })
-                ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(u.employee_id LIKE '%{$request->search_text}%' OR u.employee_name LIKE '%{$request->search_text}%' OR u.jobcode_desc LIKE '%{$request->search_text}%' OR u.deptid LIKE '%{$request->search_text}%')"); })
+                ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { 
+                    return $q->where("u.{$request->criteria}", 'LIKE', "%{$request->search_text}%"); 
+                })
+                ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { 
+                    return $q->where(function($q1) use($request) {
+                        return $q1->where('u.employee_id', 'LIKE', "%{$request->search_text}%")
+                        ->orWhere('u.employee_name', 'LIKE', "%{$request->search_text}%")
+                        ->orWhere('u.jobcode_desc', 'LIKE', "%{$request->search_text}%")
+                        ->orWhere('u.deptid', 'LIKE', "%{$request->search_text}%"); 
+                    });
+                })
                 ->selectRaw ("
                     u.employee_id,
                     u.employee_name,

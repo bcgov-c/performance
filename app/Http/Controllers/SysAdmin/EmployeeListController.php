@@ -137,8 +137,15 @@ class EmployeeListController extends Controller {
             ->when($request->dd_level2, function($q) use($request) { return $q->where('users_annex.level2_key', $request->dd_level2); })
             ->when($request->dd_level3, function($q) use($request) { return $q->where('users_annex.level3_key', $request->dd_level3); })
             ->when($request->dd_level4, function($q) use($request) { return $q->where('users_annex.level4_key', $request->dd_level4); })
-            ->when($request->search_text && $request->criteria == 'employee_demo.employee_name', function($q) use ($request) { return $q->whereRaw("(employee_demo.employee_name LIKE '%{$request->search_text}%' OR users.name LIKE '%{$request->search_text}%')"); })
-            ->when($request->search_text && $request->criteria != 'employee_demo.employee_name', function($q) use ($request) { return $q->whereRaw("{$request->criteria} LIKE '%{$request->search_text}%'"); })
+            ->when($request->search_text && $request->criteria == 'employee_demo.employee_name', function($q) use ($request) { 
+                return $q->where(function ($q1) use ($request){
+                    return $q1->where('employee_demo.employee_name', 'LIKE', "%{$request->search_text}%")
+                    ->orWhere('users.name', 'LIKE', "%{$request->search_text}%"); 
+                });
+            })
+            ->when($request->search_text && $request->criteria != 'employee_demo.employee_name', function($q) use ($request) { 
+                return $q->where("{$request->criteria}", 'like', "%{$request->search_text}%"); 
+            })
             ->selectRaw ("
                 users.id,
                 CASE when users_annex.jr_excused_type = 'A' THEN 'Auto' ELSE CASE when users.excused_flag = 1 THEN 'Manual' ELSE 'No' END END AS excused,
@@ -235,8 +242,15 @@ class EmployeeListController extends Controller {
         ->when($dd_level2, function($q) use($dd_level2) { return $q->where('users_annex.level2_key', $dd_level2); })
         ->when($dd_level3, function($q) use($dd_level3) { return $q->where('users_annex.level3_key', $dd_level3); })
         ->when($dd_level4, function($q) use($dd_level4) { return $q->where('users_annex.level4_key', $dd_level4); })
-        ->when($search_text && $criteria == 'employee_demo.employee_name', function($q) use ($search_text) { return $q->whereRaw("(employee_demo.employee_name LIKE '%{$search_text}%' OR users.name LIKE '%{$search_text}%')"); })
-        ->when($search_text && $criteria != 'employee_demo.employee_name', function($q) use ($criteria, $search_text) { return $q->whereRaw("{$criteria} LIKE '%{$search_text}%'"); })
+        ->when($search_text && $criteria == 'employee_demo.employee_name', function($q) use ($search_text) { 
+            return $q->where(function ($q1) use ($search_text){
+                return $q1->where('employee_demo.employee_name', 'LIKE', "%{$search_text}%")
+                ->orWhere('users.name', 'LIKE', "%{$search_text}%"); 
+            });
+        })
+        ->when($search_text && $criteria != 'employee_demo.employee_name', function($q) use ($criteria, $search_text) { 
+            return $q->where("{$criteria}", 'like', "%{$search_text}%"); 
+        })
         ->selectRaw ("
             users.id,
             CASE when users_annex.jr_excused_type = 'A' THEN 'Auto' ELSE CASE when users.excused_flag = 1 THEN 'Manual' ELSE 'No' END END AS excused,
@@ -350,8 +364,15 @@ class EmployeeListController extends Controller {
             ->when($request->dd_level2, function($q) use($request) { return $q->where('users_annex.level2_key', $request->dd_level2); })
             ->when($request->dd_level3, function($q) use($request) { return $q->where('users_annex.level3_key', $request->dd_level3); })
             ->when($request->dd_level4, function($q) use($request) { return $q->where('users_annex.level4_key', $request->dd_level4); })
-            ->when($request->search_text && $request->criteria == 'employee_demo.employee_name', function($q) use ($request) { return $q->whereRaw("(employee_demo.employee_name LIKE '%{$request->search_text}%' OR users.name LIKE '%{$request->search_text}%')"); })
-            ->when($request->search_text && $request->criteria != 'employee_demo.employee_name', function($q) use ($request) { return $q->whereRaw("{$request->criteria} LIKE '%{$request->search_text}%'"); })
+            ->when($request->search_text && $request->criteria == 'employee_demo.employee_name', function($q) use ($request) { 
+                return $q->where(function ($q1) use ($request){
+                    return $q1->where('employee_demo.employee_name', 'LIKE', "%{$request->search_text}%")
+                    ->orWhere('users.name', 'LIKE', "%{$request->search_text}%"); 
+                });
+            })
+            ->when($request->search_text && $request->criteria != 'employee_demo.employee_name', function($q) use ($request) { 
+                return $q->where("{$request->criteria}", 'like', "%{$request->search_text}%"); 
+            })
             ->selectRaw ("
                 users.id,
                 CASE when users_annex.jr_excused_type = 'A' THEN 'Auto' ELSE CASE when users.excused_flag = 1 THEN 'Manual' ELSE 'No' END END AS excused,
@@ -395,8 +416,15 @@ class EmployeeListController extends Controller {
         ->when($dd_level2, function($q) use($dd_level2) { return $q->where('users_annex.level2_key', $dd_level2); })
         ->when($dd_level3, function($q) use($dd_level3) { return $q->where('users_annex.level3_key', $dd_level3); })
         ->when($dd_level4, function($q) use($dd_level4) { return $q->where('users_annex.level4_key', $dd_level4); })
-        ->when($search_text && $criteria == 'employee_demo.employee_name', function($q) use ($search_text) { return $q->whereRaw("(employee_demo.employee_name LIKE '%{$search_text}%' OR users.name LIKE '%{$search_text}%')"); })
-        ->when($search_text && $criteria != 'employee_demo.employee_name', function($q) use ($criteria, $search_text) { return $q->whereRaw("{$criteria} LIKE '%{$search_text}%'"); })
+        ->when($search_text && $criteria == 'employee_demo.employee_name', function($q) use($search_text) { 
+            return $q->where(function($q1) use($search_text){
+                return $q1->where('employee_demo.employee_name', 'LIKE', "%{$search_text}%")
+                ->orWhere('users.name', 'LIKE', "%{$search_text}%"); 
+            });
+        })
+        ->when($search_text && $criteria != 'employee_demo.employee_name', function($q) use($criteria, $search_text) { 
+            return $q->where("{$criteria}", 'like', "%{$search_text}%"); 
+        })
         ->selectRaw ("
             users.id,
             CASE when users_annex.jr_excused_type = 'A' THEN 'Auto' ELSE CASE when users.excused_flag = 1 THEN 'Manual' ELSE 'No' END END AS excused,

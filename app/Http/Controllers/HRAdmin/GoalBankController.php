@@ -1045,8 +1045,17 @@ class GoalBankController extends Controller
             ->when("{$request->{$option.'dd_level2'}}", function($q) use($request, $option) { return $q->whereRaw("u.level2_key = {$request->{$option.'dd_level2'}}"); }) 
             ->when("{$request->{$option.'dd_level3'}}", function($q) use($request, $option) { return $q->whereRaw("u.level3_key = {$request->{$option.'dd_level3'}}"); }) 
             ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); }) 
-            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("u.{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); }) 
-            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(u.employee_id LIKE '%{$request->{$option.'search_text'}}%' OR u.employee_name LIKE '%{$request->{$option.'search_text'}}%' OR u.jobcode_desc LIKE '%{$request->{$option.'search_text'}}%' OR u.deptid LIKE '%{$request->{$option.'search_text'}}%')"); }); 
+            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { 
+                return $q->where("u.{$request->{$option.'criteria'}}", 'LIKE', "%{$request->{$option.'search_text'}}%"); 
+            }) 
+            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { 
+                return $q->where(function($q1) use($request, $option) {
+                    return $q1->where('u.employee_id', 'LIKE', "%{$request->{$option.'search_text'}}%")
+                    ->orWhere('u.employee_name', 'LIKE', "%{$request->{$option.'search_text'}}%")
+                    ->orWhere('u.jobcode_desc', 'LIKE', "%{$request->{$option.'search_text'}}%")
+                    ->orWhere('u.deptid', 'LIKE', "%{$request->{$option.'search_text'}}%"); 
+                });
+            });
     } 
  
     protected function baseFilteredSQLs($request, $option = null) {
@@ -1134,68 +1143,81 @@ class GoalBankController extends Controller
     public function managegetList(Request $request) {
         if ($request->ajax()) {
             $ownedgoals = Goal::withoutGlobalScopes()
-                ->leftjoin(\DB::raw('users AS cu USE INDEX (IDX_USERS_ID)'), 'goals.created_by', 'cu.id')
-                ->leftjoin(\DB::raw('employee_demo AS ced USE INDEX (EMPLOYEE_DEMO_EMPLOYEE_ID_EMPL_RECORD_UNIQUE)'), 'cu.employee_id', 'ced.employee_id')
-                ->leftJoin(\DB::raw('employee_demo_tree AS edt USE INDEX (EMPLOYEE_DEMO_TREE_ID_UNIQUE)'), 'ced.orgid', 'edt.id')
-
-                ->leftJoin(\DB::raw('audits AS latest_audits USE INDEX (AUDITS_AUDITABLE_TYPE_AUDITABLE_ID_INDEX)'), function($join) {
-                    return $join->on(function($on) {
-                        return $on->whereRaw("latest_audits.auditable_type like '%Goal%' AND goals.id = latest_audits.auditable_id")
-                        ->whereRaw("latest_audits.id = (SELECT MAX(aud.id) FROM audits AS aud USE INDEX (AUDITS_AUDITABLE_TYPE_AUDITABLE_ID_INDEX) WHERE latest_audits.auditable_type = aud.auditable_type AND latest_audits.auditable_id = aud.auditable_id)");
+            ->leftjoin(\DB::raw('users AS cu USE INDEX (IDX_USERS_ID)'), 'goals.created_by', 'cu.id')
+            ->leftjoin(\DB::raw('employee_demo AS ced USE INDEX (EMPLOYEE_DEMO_EMPLOYEE_ID_EMPL_RECORD_UNIQUE)'), 'cu.employee_id', 'ced.employee_id')
+            ->leftJoin(\DB::raw('employee_demo_tree AS edt USE INDEX (EMPLOYEE_DEMO_TREE_ID_UNIQUE)'), 'ced.orgid', 'edt.id')
+            ->leftJoin(\DB::raw('audits AS latest_audits USE INDEX (AUDITS_AUDITABLE_TYPE_AUDITABLE_ID_INDEX)'), function($join) {
+                return $join->on(function($on) {
+                    return $on->whereRaw("latest_audits.auditable_type like '%Goal%' AND goals.id = latest_audits.auditable_id")
+                    ->whereRaw("latest_audits.id = (SELECT MAX(aud.id) FROM audits AS aud USE INDEX (AUDITS_AUDITABLE_TYPE_AUDITABLE_ID_INDEX) WHERE latest_audits.auditable_type = aud.auditable_type AND latest_audits.auditable_id = aud.auditable_id)");
+                });
+            })
+            ->leftJoin(\DB::raw('users AS uu USE INDEX (IDX_USERS_ID)'), 'latest_audits.original_auth_id', 'uu.id')
+            ->leftJoin(\DB::raw('employee_demo AS ued USE INDEX (EMPLOYEE_DEMO_EMPLOYEE_ID_EMPL_RECORD_UNIQUE)'), 'uu.employee_id', 'ued.employee_id')
+            ->leftJoin(\DB::raw('users AS uu2 USE INDEX (IDX_USERS_ID)'), function($join){
+                return $join->on('latest_audits.user_id', 'uu2.id')
+                ->whereNull('latest_audits.original_auth_id');
+            })
+            ->leftJoin(\DB::raw('employee_demo AS ued2 USE INDEX (EMPLOYEE_DEMO_EMPLOYEE_ID_EMPL_RECORD_UNIQUE)'), 'uu2.employee_id', 'ued2.employee_id')
+            ->selectRaw("
+                goals.id,
+                goals.title,
+                goals.created_at,
+                goals.updated_at,
+                goals.is_mandatory,
+                goals.display_name,
+                ced.employee_name AS creator_name,
+                edt.organization AS ced_organization,
+                CASE WHEN ued.employee_name IS NULL THEN ued2.employee_name ELSE ued.employee_name END as last_updated_by,
+                goals.title AS click_title,
+                NULL AS click_goal_type,
+                goals.display_name AS click_display_name,
+                ced.employee_name AS click_creator_name,
+                edt.organization AS click_creator_organization,
+                CASE WHEN ued.employee_name IS NULL THEN ued2.employee_name ELSE ued.employee_name END AS click_updater_name,
+                CASE WHEN goals.is_mandatory = 1 THEN 'Mandatory' ELSE 'Suggested' END AS mandatory
+            ")
+            ->where('is_library', \DB::raw(1))
+            ->where('goals.created_by', \DB::raw(Auth::id()))
+            ->where('by_admin', \DB::raw(2))
+            ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
+                return $q->where(function($query) use ($request) {
+                    return $query->where('goals.title', 'LIKE', "%{$request->search_text}%")
+                    ->orWhere(function($q1) use ($request) {
+                        return $q1->whereNull('goals.display_name')
+                        ->where('ced.employee_name', 'LIKE', "%{$request->search_text}%");
+                    })
+                    ->orWhere(function($q2) use ($request) {
+                        return $q2->whereNotNull('goals.display_name')
+                        ->where('goals.display_name', 'LIKE', "%{$request->search_text}%");
                     });
+                });
+            })
+            ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
+                return $q->where('goals.title', 'LIKE', "%{$request->search_text}%");
+            })
+            ->when( $request->search_text && $request->criteria == 'cby', function ($q1) use($request) {
+                return $q1->where(function($q1a) use($request) {
+                    return $q1a->whereNull('goals.display_name')
+                    ->where('ced.employee_name', 'LIKE', "%{$request->search_text}%");
                 })
-                ->leftJoin(\DB::raw('users AS uu USE INDEX (IDX_USERS_ID)'), 'latest_audits.original_auth_id', 'uu.id')
-                ->leftJoin(\DB::raw('employee_demo AS ued USE INDEX (EMPLOYEE_DEMO_EMPLOYEE_ID_EMPL_RECORD_UNIQUE)'), 'uu.employee_id', 'ued.employee_id')
-                ->leftJoin(\DB::raw('users AS uu2 USE INDEX (IDX_USERS_ID)'), function($join){
-                    return $join->on('latest_audits.user_id', 'uu2.id')
-                    ->whereNull('latest_audits.original_auth_id');
-                })
-                ->leftJoin(\DB::raw('employee_demo AS ued2 USE INDEX (EMPLOYEE_DEMO_EMPLOYEE_ID_EMPL_RECORD_UNIQUE)'), 'uu2.employee_id', 'ued2.employee_id')
-                ->selectRaw("
-                    goals.id,
-                    goals.title,
-                    goals.created_at,
-                    goals.updated_at,
-                    goals.is_mandatory,
-                    goals.display_name,
-                    ced.employee_name AS creator_name,
-                    edt.organization AS ced_organization,
-                    CASE WHEN ued.employee_name IS NULL THEN ued2.employee_name ELSE ued.employee_name END as last_updated_by,
-                    goals.title AS click_title,
-                    NULL AS click_goal_type,
-                    goals.display_name AS click_display_name,
-                    ced.employee_name AS click_creator_name,
-                    edt.organization AS click_creator_organization,
-                    CASE WHEN ued.employee_name IS NULL THEN ued2.employee_name ELSE ued.employee_name END AS click_updater_name,
-                    CASE WHEN goals.is_mandatory = 1 THEN 'Mandatory' ELSE 'Suggested' END AS mandatory
-                ")
-                ->where('is_library', \DB::raw(1))
-                ->where('goals.created_by', \DB::raw(Auth::id()))
-                ->where('by_admin', \DB::raw(2))
-                ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
-                    $q->where(function($query) use ($request) {
-                        return $query->whereRaw("(goals.title LIKE '%".$request->search_text."%')")
-                            ->orWhereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
-                    });
-                })
-                ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
-                    return $q->whereRaw("(goals.title LIKE '%".$request->search_text."%')");
-                })
-                ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
-                    return $q->whereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
-                })
-                ->distinct()
-                ->addSelect(['audience' =>
-                    GoalSharedWith::whereColumn('goal_id', 'goals.id')
-                        ->selectRAW('count(distinct id)')
-                ] )
-                ->addSelect(['org_audience' => 
-                    GoalBankOrg::whereColumn('goal_id', 'goals.id')
-                        ->where('version', \DB::raw(2))
-                        ->whereNotNull('orgid')
-                        ->selectRAW('count(distinct id)')
-                ] )
-                ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
+                ->orWhere(function($q1b) use($request) {
+                    return $q1b->whereNotNull('goals.display_name')
+                    ->where('goals.display_name', 'LIKE', "%{$request->search_text}%");
+                });
+            })
+            ->distinct()
+            ->addSelect(['audience' =>
+                GoalSharedWith::whereColumn('goal_id', 'goals.id')
+                    ->selectRAW('count(distinct id)')
+            ] )
+            ->addSelect(['org_audience' => 
+                GoalBankOrg::whereColumn('goal_id', 'goals.id')
+                    ->where('version', \DB::raw(2))
+                    ->whereNotNull('orgid')
+                    ->selectRAW('count(distinct id)')
+            ] )
+            ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
             $otherHRgoals = Goal::withoutGlobalScopes()
             ->leftjoin(\DB::raw('users AS cu USE INDEX (IDX_USERS_ID)'), 'goals.created_by', 'cu.id')
             ->leftjoin(\DB::raw('employee_demo AS ced USE INDEX (EMPLOYEE_DEMO_EMPLOYEE_ID_EMPL_RECORD_UNIQUE)'), 'cu.employee_id', 'ced.employee_id')
@@ -1232,39 +1254,58 @@ class GoalBankController extends Controller
                 CASE WHEN ued.employee_name IS NULL THEN ued2.employee_name ELSE ued.employee_name END AS click_updater_name,
                 CASE WHEN goals.is_mandatory = 1 THEN 'Mandatory' ELSE 'Suggested' END AS mandatory
             ")
-                ->where('is_library', \DB::raw(1))
-                ->where('by_admin', \DB::raw(2))
-                ->where('goals.created_by', '<>', \DB::raw(Auth::id()))
-                ->whereRaw("EXISTS (SELECT 1 FROM auth_orgs AS ao, goal_bank_orgs AS gbo WHERE ao.type = 'HR' AND ao.auth_id = ".Auth::id()." AND ao.orgid = gbo.orgid AND gbo.goal_id = goals.id AND gbo.version = 2 AND gbo.inherited = 0 LIMIT 1)")
-                ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
-                    $q->where(function($query) use ($request) {
-                        return $query->whereRaw("(goals.title LIKE '%".$request->search_text."%')")
-                            ->orWhereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
+            ->where('is_library', \DB::raw(1))
+            ->where('by_admin', \DB::raw(2))
+            ->where('goals.created_by', '<>', \DB::raw(Auth::id()))
+            ->whereRaw("EXISTS (SELECT 1 FROM auth_orgs AS ao, goal_bank_orgs AS gbo WHERE ao.type = 'HR' AND ao.auth_id = ".Auth::id()." AND ao.orgid = gbo.orgid AND gbo.goal_id = goals.id AND gbo.version = 2 AND gbo.inherited = 0 LIMIT 1)")
+            ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
+                return $q->where(function($query) use ($request) {
+                    // return $query->whereRaw("(goals.title LIKE '%".$request->search_text."%')")
+                    //     ->orWhereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
+                    return $query->where('goals.title', 'LIKE', "%{$request->search_text}%")
+                    ->orWhere(function($qa) use ($request) {
+                        return $qa->where(function($qa1) use ($request) {
+                            return $qa1->whereNull('goals.display_name')
+                            ->where('ced.employee_name', 'LIKE', "%{$request->search_text}%");
+                        })
+                        ->orWhere(function($qa2) use ($request) {
+                            return $qa2->whereNotNull('goals.display_name')
+                            ->where('goals.display_name', 'LIKE', "%{$request->search_text}%");
+                        });
                     });
-                })
-                ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
-                    return $q->whereRaw("(goals.title LIKE '%".$request->search_text."%')");
-                })
-                ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
-                    return $q->whereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
-                })
-                ->distinct()
-                ->addSelect(['audience' =>
-                    GoalSharedWith::whereColumn('goal_id', 'goals.id')
-                        ->selectRAW('count(distinct id)')
-                ] )
-                ->addSelect(['org_audience' => 
-                    GoalBankOrg::whereColumn('goal_id', 'goals.id')
-                        ->where('version', \DB::raw(2))
-                        ->whereNotNull('orgid')
-                        ->selectRAW('count(distinct id)')
-                ] )
-                ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
+                });
+            })
+            ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
+                return $q->where('goals.title', 'LIKE', "%{$request->search_text}%");
+            })
+            ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
+                return $q->Where(function($qa) use ($request) {
+                    return $qa->where(function($qa1) use ($request) {
+                        return $qa1->whereNull('goals.display_name')
+                        ->where('ced.employee_name', 'LIKE', "%{$request->search_text}%");
+                    })
+                    ->orWhere(function($qa2) use ($request) {
+                        return $qa2->whereNotNull('goals.display_name')
+                        ->where('goals.display_name', 'LIKE', "%{$request->search_text}%");
+                    });
+                });
+            })
+            ->distinct()
+            ->addSelect(['audience' =>
+                GoalSharedWith::whereColumn('goal_id', 'goals.id')
+                    ->selectRAW('count(distinct id)')
+            ] )
+            ->addSelect(['org_audience' => 
+                GoalBankOrg::whereColumn('goal_id', 'goals.id')
+                    ->where('version', \DB::raw(2))
+                    ->whereNotNull('orgid')
+                    ->selectRAW('count(distinct id)')
+            ] )
+            ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
             $inheritedHRgoals = Goal::withoutGlobalScopes()
             ->leftjoin(\DB::raw('users AS cu USE INDEX (IDX_USERS_ID)'), 'goals.created_by', 'cu.id')
             ->leftjoin(\DB::raw('employee_demo AS ced USE INDEX (EMPLOYEE_DEMO_EMPLOYEE_ID_EMPL_RECORD_UNIQUE)'), 'cu.employee_id', 'ced.employee_id')
             ->leftJoin(\DB::raw('employee_demo_tree AS edt USE INDEX (EMPLOYEE_DEMO_TREE_ID_UNIQUE)'), 'ced.orgid', 'edt.id')
-
             ->leftJoin(\DB::raw('audits AS latest_audits USE INDEX (AUDITS_AUDITABLE_TYPE_AUDITABLE_ID_INDEX)'), function($join) {
                 return $join->on(function($on) {
                     return $on->whereRaw("latest_audits.auditable_type like '%Goal%' AND goals.id = latest_audits.auditable_id")
@@ -1296,39 +1337,56 @@ class GoalBankController extends Controller
                 CASE WHEN ued.employee_name IS NULL THEN ued2.employee_name ELSE ued.employee_name END AS click_updater_name,
                 CASE WHEN goals.is_mandatory = 1 THEN 'Mandatory' ELSE 'Suggested' END AS mandatory
             ")
-                ->where('is_library', \DB::raw(1))
-                ->where('by_admin', \DB::raw(2))
-                ->where('goals.created_by', '<>', \DB::raw(Auth::id()))
-                ->whereRaw("EXISTS (SELECT 1 FROM auth_orgs AS ao, employee_demo_tree AS edt, goal_bank_orgs AS gbo WHERE ao.type = 'HR' AND ao.auth_id = ".Auth::id()." AND ao.orgid = edt.id AND gbo.goal_id = goals.id AND gbo.version = 2 AND gbo.inherited = 1 AND (edt.organization_key = gbo.orgid OR edt.level1_key = gbo.orgid OR edt.level2_key = gbo.orgid OR edt.level3_key = gbo.orgid OR edt.level4_key = gbo.orgid) LIMIT 1)")
-                ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
-                    $q->where(function($query) use ($request) {
-                        return $query->whereRaw("(goals.title LIKE '%".$request->search_text."%')")
-                            ->orWhereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
+            ->where('is_library', \DB::raw(1))
+            ->where('by_admin', \DB::raw(2))
+            ->where('goals.created_by', '<>', \DB::raw(Auth::id()))
+            ->whereRaw("EXISTS (SELECT 1 FROM auth_orgs AS ao, employee_demo_tree AS edt, goal_bank_orgs AS gbo WHERE ao.type = 'HR' AND ao.auth_id = ".Auth::id()." AND ao.orgid = edt.id AND gbo.goal_id = goals.id AND gbo.version = 2 AND gbo.inherited = 1 AND (edt.organization_key = gbo.orgid OR edt.level1_key = gbo.orgid OR edt.level2_key = gbo.orgid OR edt.level3_key = gbo.orgid OR edt.level4_key = gbo.orgid) LIMIT 1)")
+            ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
+                return $q->where(function($query) use ($request) {
+                    return $query->where('goals.title', 'LIKE', "%{$request->search_text}%")
+                    ->orWhere(function($qa) use ($request) {
+                        return $qa->where(function($qa1) use ($request) {
+                            return $qa1->whereNull('goals.display_name')
+                            ->where('ced.employee_name', 'LIKE', "%{$request->search_text}%");
+                        })
+                        ->orWhere(function($qa2) use ($request) {
+                            return $qa2->whereNotNull('goals.display_name')
+                            ->where('goals.display_name', 'LIKE', "%{$request->search_text}%");
+                        });
                     });
-                })
-                ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
-                    return $q->whereRaw("(goals.title LIKE '%".$request->search_text."%')");
-                })
-                ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
-                    return $q->whereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
-                })
-                ->distinct()
-                ->addSelect(['audience' =>
-                    GoalSharedWith::whereColumn('goal_id', 'goals.id')
-                        ->selectRAW('count(distinct id)')
-                ] )
-                ->addSelect(['org_audience' => 
-                    GoalBankOrg::whereColumn('goal_id', 'goals.id')
-                        ->where('version', \DB::raw(2))
-                        ->whereNotNull('orgid')
-                        ->selectRAW('count(distinct id)')
-                ] )
-                ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
+                });
+            })
+            ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
+                return $q->where('goals.title', 'LIKE', "%{$request->search_text}%");
+            })
+            ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
+                return $q->Where(function($qa) use ($request) {
+                    return $qa->where(function($qa1) use ($request) {
+                        return $qa1->whereNull('goals.display_name')
+                        ->where('ced.employee_name', 'LIKE', "%{$request->search_text}%");
+                    })
+                    ->orWhere(function($qa2) use ($request) {
+                        return $qa2->whereNotNull('goals.display_name')
+                        ->where('goals.display_name', 'LIKE', "%{$request->search_text}%");
+                    });
+                });
+            })
+            ->distinct()
+            ->addSelect(['audience' =>
+                GoalSharedWith::whereColumn('goal_id', 'goals.id')
+                    ->selectRAW('count(distinct id)')
+            ] )
+            ->addSelect(['org_audience' => 
+                GoalBankOrg::whereColumn('goal_id', 'goals.id')
+                    ->where('version', \DB::raw(2))
+                    ->whereNotNull('orgid')
+                    ->selectRAW('count(distinct id)')
+            ] )
+            ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
             $individualgoals = Goal::withoutGlobalScopes()
             ->leftjoin(\DB::raw('users AS cu USE INDEX (IDX_USERS_ID)'), 'goals.created_by', 'cu.id')
             ->leftjoin(\DB::raw('employee_demo AS ced USE INDEX (EMPLOYEE_DEMO_EMPLOYEE_ID_EMPL_RECORD_UNIQUE)'), 'cu.employee_id', 'ced.employee_id')
             ->leftJoin(\DB::raw('employee_demo_tree AS edt USE INDEX (EMPLOYEE_DEMO_TREE_ID_UNIQUE)'), 'ced.orgid', 'edt.id')
-
             ->leftJoin(\DB::raw('audits AS latest_audits USE INDEX (AUDITS_AUDITABLE_TYPE_AUDITABLE_ID_INDEX)'), function($join) {
                 return $join->on(function($on) {
                     return $on->whereRaw("latest_audits.auditable_type like '%Goal%' AND goals.id = latest_audits.auditable_id")
@@ -1360,76 +1418,94 @@ class GoalBankController extends Controller
                 CASE WHEN ued.employee_name IS NULL THEN ued2.employee_name ELSE ued.employee_name END AS click_updater_name,
                 CASE WHEN goals.is_mandatory = 1 THEN 'Mandatory' ELSE 'Suggested' END AS mandatory
             ")
-                ->where('is_library', \DB::raw(1))
-                ->where('by_admin', \DB::raw(2))
-                ->where('goals.created_by', '<>', \DB::raw(Auth::id()))
-                ->whereRaw("EXISTS (SELECT 1 FROM goals_shared_with AS gsw, users AS udjv1, employee_demo AS udjv2, auth_orgs AS ao WHERE gsw.goal_id = goals.id AND gsw.user_id = udjv1.id AND udjv1.employee_id = udjv2.employee_id AND ao.type = 'HR' AND ao.auth_id = ".Auth::id()." AND udjv2.orgid = ao.orgid LIMIT 1)")
-                ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
-                    $q->where(function($query) use ($request) {
-                        return $query->whereRaw("(goals.title LIKE '%".$request->search_text."%')")
-                            ->orWhereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
+            ->where('is_library', \DB::raw(1))
+            ->where('by_admin', \DB::raw(2))
+            ->where('goals.created_by', '<>', \DB::raw(Auth::id()))
+            ->whereRaw("EXISTS (SELECT 1 FROM goals_shared_with AS gsw, users AS udjv1, employee_demo AS udjv2, auth_orgs AS ao WHERE gsw.goal_id = goals.id AND gsw.user_id = udjv1.id AND udjv1.employee_id = udjv2.employee_id AND ao.type = 'HR' AND ao.auth_id = ".Auth::id()." AND udjv2.orgid = ao.orgid LIMIT 1)")
+            ->when( $request->search_text && $request->criteria == 'all', function ($q) use($request) {
+                $q->where(function($query) use ($request) {
+                    return $query->where('goals.title', 'LIKE', "%{$request->search_text}%")
+                    ->orWhere(function($qa) use ($request) {
+                        return $qa->where(function($qa1) use ($request) {
+                            return $qa1->whereNull('goals.display_name')
+                            ->where('ced.employee_name', 'LIKE', "%{$request->search_text}%");
+                        })
+                        ->orWhere(function($qa2) use ($request) {
+                            return $qa2->whereNotNull('goals.display_name')
+                            ->where('goals.display_name', 'LIKE', "%{$request->search_text}%");
+                        });
                     });
-                })
-                ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
-                    return $q->whereRaw("(goals.title LIKE '%".$request->search_text."%')");
-                })
-                ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
-                    return $q->whereRaw("((goals.display_name IS NULL AND ced.employee_name LIKE '%".$request->search_text."%') OR (NOT goals.display_name IS NULL AND goals.display_name LIKE '%".$request->search_text."%'))");
-                })
-                ->distinct()
-                ->addSelect(['audience' =>
-                    GoalSharedWith::whereColumn('goal_id', 'goals.id')
-                        ->selectRAW('count(distinct id)')
-                ] )
-                ->addSelect(['org_audience' => 
-                    GoalBankOrg::whereColumn('goal_id', 'goals.id')
-                        ->where('version', \DB::raw(2))
-                        ->whereNotNull('orgid')
-                        ->selectRAW('count(distinct id)')
-                ] )
-                ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
-                $query = $ownedgoals->union($otherHRgoals)->union($inheritedHRgoals)->union($individualgoals);
-                return Datatables::of($query)
-                ->addIndexColumn()
-                ->editColumn('click_title', function ($row) {
-                    return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - ' . $row->title . '" value="' . $row->id . '">' . $row->title . '</a>';
-                })
-                ->editColumn('click_goal_type', function ($row) {
-                    return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - ' . $row->goal_type_name . '" value="' . $row->id . '">' . $row->goal_type_name . '</a>';
-                })
-                ->editColumn('click_display_name', function ($row) {
-                    return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - ' . $row->display_name . '" value="' . $row->id . '">' . $row->display_name . '</a>';
-                })
-                ->editColumn('click_creator_name', function ($row) {
-                    return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - ' . $row->creator_name . '" value="' . $row->id . '">' . $row->creator_name . '</a>';
-                })
-                ->editColumn('click_creator_organization', function ($row) {
-                    return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - ' . $row->ced_organization . '" value="' . $row->id . '">' . $row->ced_organization . '</a>';
-                })
-                ->editColumn('mandatory', function ($row) {
-                    return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - ' . $row->mandatory . '" value="' . $row->id . '">' . $row->mandatory . '</a>';
-                })
-                ->editColumn('created_at', function ($row) {
-                    return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - ' . ($row->created_at ? $row->created_at->format('F d, Y') : null) . '" value="' . $row->id . '">' . ($row->created_at ? $row->created_at->format('F d, Y') : null) . '</a>';
-                })
-                ->editColumn('updated_at', function ($row) {
-                    return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Goal updated at ' . ($row->updated_at ? $row->updated_at->format('F d, Y') : null).'">' . ($row->updated_at ? $row->updated_at->format('F d, Y') : null) . '</a>';
-                })
-                ->editColumn('click_updater_name', function ($row) {
-                    return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Goal updated by ' . $row->last_updated_by .'">' .  $row->last_updated_by . '</a>';
-                })
-                ->editColumn('audience', function ($row) {
-                    return '<a href="' . route(request()->segment(1) . '.goalbank.editone', $row->id) . '" aria-label="Edit Goal For Individuals" value="' . $row->id . '">' . $row->audience . ' Employees</a>';
-                })
-                ->editColumn('org_audience', function ($row) {
-                    return '<a href="' . route(request()->segment(1) . '.goalbank.editpage', $row->id) . '" aria-label="Edit Goal For Business Units" value="' . $row->id . '">' . $row->org_audience . ' Business Units</a>';
-                })
-                ->addcolumn('action', function($row) {
-                    $btn = '<a href="/'.request()->segment(1).'/goalbank/deletegoal/' . $row->id . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->id .'"><i class="fa fa-trash"></i></a>';
-                    return $btn;
-                })
-                ->rawColumns(['click_title', 'click_goal_type', 'click_display_name', 'click_creator_name', 'click_creator_organization', 'mandatory', 'created_at', 'goal_type_name', 'created_by', 'audience', 'updated_at', 'click_updater_name','org_audience', 'action', 'title-link'])
-                ->make(true);
+                });
+            })
+            ->when( $request->search_text && $request->criteria == 'gt', function ($q) use($request) {
+                return $q->where('goals.title', 'LIKE', "%{$request->search_text}%");
+            })
+            ->when( $request->search_text && $request->criteria == 'cby', function ($q) use($request) {
+                return $q->Where(function($qa) use ($request) {
+                    return $qa->where(function($qa1) use ($request) {
+                        return $qa1->whereNull('goals.display_name')
+                        ->where('ced.employee_name', 'LIKE', "%{$request->search_text}%");
+                    })
+                    ->orWhere(function($qa2) use ($request) {
+                        return $qa2->whereNotNull('goals.display_name')
+                        ->where('goals.display_name', 'LIKE', "%{$request->search_text}%");
+                    });
+                });
+            })
+            ->distinct()
+            ->addSelect(['audience' =>
+                GoalSharedWith::whereColumn('goal_id', 'goals.id')
+                    ->selectRAW('count(distinct id)')
+            ] )
+            ->addSelect(['org_audience' => 
+                GoalBankOrg::whereColumn('goal_id', 'goals.id')
+                    ->where('version', \DB::raw(2))
+                    ->whereNotNull('orgid')
+                    ->selectRAW('count(distinct id)')
+            ] )
+            ->addselect(['goal_type_name' => GoalType::select('name')->whereColumn('goal_type_id', 'goal_types.id')->limit(1)]);
+            $query = $ownedgoals->union($otherHRgoals)->union($inheritedHRgoals)->union($individualgoals);
+            return Datatables::of($query)
+            ->addIndexColumn()
+            ->editColumn('click_title', function ($row) {
+                return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - ' . $row->title . '" value="' . $row->id . '">' . $row->title . '</a>';
+            })
+            ->editColumn('click_goal_type', function ($row) {
+                return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - ' . $row->goal_type_name . '" value="' . $row->id . '">' . $row->goal_type_name . '</a>';
+            })
+            ->editColumn('click_display_name', function ($row) {
+                return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - ' . $row->display_name . '" value="' . $row->id . '">' . $row->display_name . '</a>';
+            })
+            ->editColumn('click_creator_name', function ($row) {
+                return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - ' . $row->creator_name . '" value="' . $row->id . '">' . $row->creator_name . '</a>';
+            })
+            ->editColumn('click_creator_organization', function ($row) {
+                return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - ' . $row->ced_organization . '" value="' . $row->id . '">' . $row->ced_organization . '</a>';
+            })
+            ->editColumn('mandatory', function ($row) {
+                return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - ' . $row->mandatory . '" value="' . $row->id . '">' . $row->mandatory . '</a>';
+            })
+            ->editColumn('created_at', function ($row) {
+                return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Edit Goal Details - ' . ($row->created_at ? $row->created_at->format('F d, Y') : null) . '" value="' . $row->id . '">' . ($row->created_at ? $row->created_at->format('F d, Y') : null) . '</a>';
+            })
+            ->editColumn('updated_at', function ($row) {
+                return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Goal updated at ' . ($row->updated_at ? $row->updated_at->format('F d, Y') : null).'">' . ($row->updated_at ? $row->updated_at->format('F d, Y') : null) . '</a>';
+            })
+            ->editColumn('click_updater_name', function ($row) {
+                return '<a href="' . route(request()->segment(1) . '.goalbank.editdetails', $row->id) . '" aria-label="Goal updated by ' . $row->last_updated_by .'">' .  $row->last_updated_by . '</a>';
+            })
+            ->editColumn('audience', function ($row) {
+                return '<a href="' . route(request()->segment(1) . '.goalbank.editone', $row->id) . '" aria-label="Edit Goal For Individuals" value="' . $row->id . '">' . $row->audience . ' Employees</a>';
+            })
+            ->editColumn('org_audience', function ($row) {
+                return '<a href="' . route(request()->segment(1) . '.goalbank.editpage', $row->id) . '" aria-label="Edit Goal For Business Units" value="' . $row->id . '">' . $row->org_audience . ' Business Units</a>';
+            })
+            ->addcolumn('action', function($row) {
+                $btn = '<a href="/'.request()->segment(1).'/goalbank/deletegoal/' . $row->id . '" class="view-modal btn btn-xs btn-danger" onclick="return confirm(`Are you sure?`)" aria-label="Delete" id="delete_goal" value="'. $row->id .'"><i class="fa fa-trash"></i></a>';
+                return $btn;
+            })
+            ->rawColumns(['click_title', 'click_goal_type', 'click_display_name', 'click_creator_name', 'click_creator_organization', 'mandatory', 'created_at', 'goal_type_name', 'created_by', 'audience', 'updated_at', 'click_updater_name','org_audience', 'action', 'title-link'])
+            ->make(true);
         }
     }
 
@@ -1449,8 +1525,17 @@ class GoalBankController extends Controller
                 ->when($request->dd_level4, function($q) use($request) {return $q->where('u.level4_key', $request->dd_level4);})
                 ->when($request->dd_superv == 'sup', function($q) use($request) { return $q->whereRaw("(u.isSupervisor = 1 OR u.isDelegate = 1)"); })
                 ->when($request->dd_superv == 'non', function($q) use($request) { return $q->whereRaw("NOT u.isSupervisor = 1 AND NOT u.isDelegate = 1"); })
-                ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { return $q->whereRaw("u.{$request->criteria} like '%{$request->search_text}%'"); })
-                ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(u.employee_id LIKE '%{$request->search_text}%' OR u.employee_name LIKE '%{$request->search_text}%' OR u.jobcode_desc LIKE '%{$request->search_text}%' OR u.deptid LIKE '%{$request->search_text}%')"); })
+                ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { 
+                    return $q->where("u.{$request->criteria}", 'LIKE', "%{$request->search_text}%"); 
+                })
+                ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { 
+                    return $q->where(function($q1) use($request) {
+                        return $q1->where('u.employee_id', 'LIKE', "%{$request->search_text}%")
+                        ->orWhere('u.employee_name', 'LIKE', "%{$request->search_text}%")
+                        ->orWhere('u.jobcode_desc', 'LIKE', "%{$request->search_text}%")
+                        ->orWhere('u.deptid', 'LIKE', "%{$request->search_text}%");
+                    });
+                })
                 ->selectRaw ("
                     u.employee_id,
                     u.employee_name,
