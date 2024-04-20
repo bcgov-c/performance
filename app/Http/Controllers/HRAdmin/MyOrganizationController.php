@@ -69,8 +69,15 @@ class MyOrganizationController extends Controller {
                 ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
                 ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
                 ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
-                ->when($request->search_text && $request->criteria == 'u.employee_name', function($q) use ($request) { return $q->whereRaw("(u.employee_name LIKE '%{$request->search_text}%' OR u.user_name LIKE '%{$request->search_text}%')"); })
-                ->when($request->search_text && $request->criteria != 'u.employee_name', function($q) use ($request) { return $q->whereRaw("{$request->criteria} LIKE '%{$request->search_text}%'"); })
+                ->when($request->search_text && $request->criteria == 'u.employee_name', function($q) use($request) { 
+                    return $q->where(function($q1) use($request) {
+                        return $q1->where('u.employee_name', 'LIKE', "%{$request->search_text}%")
+                        ->orWhere('u.user_name', 'LIKE', "%{$request->search_text}%"); 
+                    });
+                })
+                ->when($request->search_text && $request->criteria != 'u.employee_name', function($q) use ($request) { 
+                    return $q->where("{$request->criteria}", 'LIKE', "%{$request->search_text}%"); 
+                })
                 ->selectRaw ("
                     user_id,
                     user_id AS id,

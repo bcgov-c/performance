@@ -37,16 +37,16 @@ class NotificationController extends Controller
                 ->when($recipients, function ($query) use($recipients) { 
                     if (App::environment(['production'])) {
                         $query->whereHas('recipients.recipient', function ($query) use($recipients) { 
-                            $query->whereRaw("lower(name) like  '%". strtolower($recipients) . "%'"); 
+                            return $query->where('name', 'LIKE', "%{$recipients}%"); 
                         });        
                     } else {
                         $query->where(function ($q) use($recipients) {
-                            $q->whereRaw("lower(description) like  '%". strtolower($recipients) . "%'") 
+                            $q->where('description', 'LIKE', "%{$recipients}%%") 
                               ->orWhereExists(function ($q2) use($recipients) {
                                     $q2->select(DB::raw(1))
                                         ->from('users')
                                         ->whereColumn('notification_logs.notify_user_id', 'users.id')
-                                        ->whereRaw("lower(users.name) like '%". strtolower($recipients) . "%'"); 
+                                        ->where('users.name', 'LIKE', "%{$recipients}%"); 
                             });
                         });
                     }
@@ -56,14 +56,14 @@ class NotificationController extends Controller
                 })
                 ->when($request->notify_user, function ($query) use($request) {
                     $query->whereHas('notify_user', function ($query) use($request) { 
-                        $query->whereRaw("lower(name) like  '%". strtolower($request->notify_user) . "%'") 
-                              ->orwhereRaw("users.employee_id like '%". strtolower($request->notify_user) . "%'"); 
+                        $query->where('name', 'LIKE', "%{$request->notify_user}%") 
+                              ->orWhere('users.employee_id', 'LIKE', "%{$request->notify_user}%"); 
                     });   
                 })
                 ->when($request->overdue_user, function ($query) use($request) {
                     $query->whereHas('overdue_user', function ($query) use($request) { 
-                        $query->whereRaw("lower(name) like  '%". strtolower($request->overdue_user) . "%'") 
-                              ->orwhereRaw("users.employee_id like '%". strtolower($request->overdue_user) . "%'"); 
+                        $query->where('name', 'LIKE', "%{$request->overdue_user}%") 
+                              ->orWhere('users.employee_id', 'LIKE', "%{$request->overdue_user}%"); 
                     });   
                 })
                 ->when($request->notify_due_date, function ($query) use($request) {
@@ -419,8 +419,17 @@ class NotificationController extends Controller
             ->when($request->dd_level4, function($q) use($request) { return $q->whereRaw("u.level4_key = {$request->dd_level4}"); })
             ->when($job_titles, function ($q) use($job_titles) { return $q->whereIn('employee_demo.job_title', $job_titles->toArray() ); })
             ->when($request->active_since, function ($q) use($request) { return $q->where('employee_demo.hire_dt', '>=', $request->active_since); })
-            ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { return $q->whereRaw("{$request->criteria} like '%{$request->search_text}%'"); })
-            ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(employee_demo.employee_id LIKE '%{$request->search_text}%' OR employee_demo.employee_name LIKE '%{$request->search_text}%' OR employee_demo.classification_group LIKE '%{$request->search_text}%' OR employee_demo.deptid LIKE '%{$request->search_text}%')"); });
+            ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { 
+                return $q->where("{$request->criteria}", 'LIKE', "%{$request->search_text}%"); 
+            })
+            ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { 
+                return $q->where(function($q1) use($request) {
+                    return $q1->where('employee_demo.employee_id', 'LIKE', "%{$request->search_text}%")
+                    ->orWhere('employee_demo.employee_name', 'LIKE', "%{$request->search_text}%")
+                    ->orWhere('employee_demo.classification_group', 'LIKE', "%{$request->search_text}%")
+                    ->orWhere('employee_demo.deptid', 'LIKE', "%{$request->search_text}%"); 
+                });
+            });
     }
 
 

@@ -103,8 +103,18 @@ class ExcuseEmployeesController extends Controller {
                 ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
                 ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
                 ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
-                ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { return $q->whereRaw("{$request->criteria} like '%{$request->search_text}%'"); })
-                ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(employee_id LIKE '%{$request->search_text}%' OR employee_name LIKE '%{$request->search_text}%' OR u.excusedtype LIKE '%{$request->search_text}%' OR j_excused_reason_desc LIKE '%{$request->search_text}%' OR excused_by_name LIKE '%{$request->search_text}%')"); })
+                ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { 
+                    return $q->where("{$request->criteria}", 'LIKE', "%{$request->search_text}%");
+                })
+                ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { 
+                    return $q->where(function($q1) use($request) {
+                        return $q1->where('employee_id', 'LIKE', "%{$request->search_text}%")
+                        ->orWhere('employee_name', 'LIKE', "%{$request->search_text}%")
+                        ->orWhere('u.j_excusedtype', 'LIKE', "%{$request->search_text}%")
+                        ->orWhere('j_excused_reason_desc', 'LIKE', "%{$request->search_text}%")
+                        ->orWhere('excused_by_name', 'LIKE', "%{$request->search_text}%"); 
+                    });
+                })
                 ->distinct()
                 ->selectRaw ("
                     u.user_id AS id
@@ -357,9 +367,9 @@ class ExcuseEmployeesController extends Controller {
             'all' => 'All',
             'users.employee_id' => 'Employee ID', 
             'employee_demo.employee_name'=> 'Employee Name',
-            "(CASE when users_annex.jr_excused_type = 'A' THEN 'Auto' ELSE CASE when users.excused_flag = 1 THEN 'Manual' ELSE 'No' END END)" => 'Excuse Type', 
-            "(CASE when users_annex.jr_excused_type = 'A' THEN users_annex.reason_name ELSE CASE when users.excused_flag = 1 THEN excused_reasons.name ELSE '' END END)" => 'Excuse Reason',
-            "(CASE when users_annex.jr_excused_type = 'A' THEN users_annex.excused_by_name ELSE CASE when users.excused_flag = 1 THEN en.name ELSE '' END END)" => 'Excused By'
+            'excusedtype'=> 'Excuse Type',
+            'reason_name'=> 'Excuse Reason',
+            'excused_by_name' => 'Excused By'
         ];
     }
 
@@ -368,7 +378,7 @@ class ExcuseEmployeesController extends Controller {
             'all' => 'All',
             'employee_id' => 'Employee ID', 
             'employee_name'=> 'Employee Name',
-            'u.excusedtype' => 'Excuse Type', 
+            'j_excusedtype' => 'Excuse Type', 
             'j_excused_reason_desc' => 'Excuse Reason',
             'excused_by_name' => 'Excused By'
         ];
@@ -384,8 +394,18 @@ class ExcuseEmployeesController extends Controller {
         ->when("{$request->{$option.'dd_level2'}}", function($q) use($request, $option) { return $q->where('users_annex.level2_key', "{$request->{$option.'dd_level2'}}"); })
         ->when("{$request->{$option.'dd_level3'}}", function($q) use($request, $option) { return $q->where('users_annex.level3_key', "{$request->{$option.'dd_level3'}}"); })
         ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->where('users_annex.level4_key', "{$request->{$option.'dd_level4'}}"); })
-        ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use ($request, $option) { return $q->whereRaw("(users.employee_id LIKE '%{$request->{$option.'search_text'}}%' OR employee_demo.employee_name LIKE '%{$request->{$option.'search_text'}}%' OR (CASE when users_annex.jr_excused_type = 'A' THEN 'Auto' ELSE CASE when users.excused_flag = 1 THEN 'Manual' ELSE 'No' END END) LIKE '%{$request->{$option.'search_text'}}%' OR (CASE when users_annex.jr_excused_type = 'A' THEN users_annex.reason_name ELSE CASE when users.excused_flag = 1 THEN excused_reasons.name ELSE '' END END) LIKE '%{$request->{$option.'search_text'}}%' OR (CASE when users_annex.jr_excused_type = 'A' THEN users_annex.excused_by_name ELSE CASE when users.excused_flag = 1 THEN en.name ELSE '' END END) LIKE '%{$request->{$option.'search_text'}}%')"); })
-        ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use ($request, $option) { return $q->whereRaw("{$request->{$option.'criteria'}} LIKE '%{$request->{$option.'search_text'}}%'"); });
+        ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { 
+            return $q->where(function($q1) use($request, $option) {
+                return $q1->where('users.employee_id', 'LIKE', "%{$request->{$option.'search_text'}}%")
+                ->orWhere('employee_demo.employee_name', 'LIKE', "%{$request->{$option.'search_text'}}%")
+                ->orWhere('excusedtype', 'LIKE', "%{$request->{$option.'search_text'}}%")
+                ->orWhere('reason_name', 'LIKE', "%{$request->{$option.'search_text'}}%")
+                ->orWhere('excused_by_name', 'LIKE', "%{$request->{$option.'search_text'}}%");
+            });
+        })
+        ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { 
+            return $q->where("{$request->{$option.'criteria'}}", 'LIKE', "%{$request->{$option.'search_text'}}%"); 
+        });
     }
 
     protected function baseFilteredSQLs($request, $option = null) {
