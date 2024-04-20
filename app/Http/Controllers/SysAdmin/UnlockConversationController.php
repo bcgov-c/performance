@@ -155,8 +155,17 @@ class UnlockConversationController extends Controller
                         ->when($request->dd_level2, function($q) use($request) { return $q->whereRaw("u.level2_key = {$request->dd_level2}"); })
                         ->when($request->dd_level3, function($q) use($request) { return $q->whereRaw("u.level3_key = {$request->dd_level3}"); })
                         ->when($request->dd_level4, function($q) use($request) { return $q->whereRaw("u.level4_key = {$request->dd_level4}"); })
-                        ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { return $q->whereRaw("{$request->criteria} like '%{$request->search_text}%'"); })
-                        ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { return $q->whereRaw("(employee_demo.employee_id LIKE '%{$request->search_text}%' OR employee_demo.employee_name LIKE '%{$request->search_text}%' OR employee_demo.classification_group LIKE '%{$request->search_text}%' OR employee_demo.deptid LIKE '%{$request->search_text}%')"); });
+                        ->when($request->search_text && $request->criteria != 'all', function($q) use($request) { 
+                            return $q->where("{$request->criteria}", 'LIKE', "%{$request->search_text}%"); 
+                        })
+                        ->when($request->search_text && $request->criteria == 'all', function($q) use($request) { 
+                            return $q->where(function($q1) use($request) {
+                                return $q1->where('employee_demo.employee_id', 'LIKE', "%{$request->search_text}%")
+                                ->orWhere('employee_demo.employee_name', 'LIKE', "%{$request->search_text}%")
+                                ->orWhere('employee_demo.classification_group', 'LIKE', "%{$request->search_text}%")
+                                ->orWhere('employee_demo.deptid', 'LIKE', "%{$request->search_text}%"); 
+                            });
+                        });
                 });
             });    
         return $sql;
