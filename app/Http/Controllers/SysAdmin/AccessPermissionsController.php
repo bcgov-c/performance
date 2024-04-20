@@ -298,8 +298,17 @@ class AccessPermissionsController extends Controller
         ->when("{$request->{$option.'dd_level2'}}", function($q) use($request, $option) { return $q->whereRaw("u.level2_key = {$request->{$option.'dd_level2'}}"); })
         ->when("{$request->{$option.'dd_level3'}}", function($q) use($request, $option) { return $q->whereRaw("u.level3_key = {$request->{$option.'dd_level3'}}"); })
         ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); })
-        ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("u.{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); })
-        ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(u.employee_id LIKE '%{$request->{$option.'search_text'}}%' OR u.display_name LIKE '%{$request->{$option.'search_text'}}%' OR u.jobcode_desc LIKE '%{$request->{$option.'search_text'}}%' OR u.deptid LIKE '%{$request->{$option.'search_text'}}%')"); });
+        ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { 
+            return $q->where("u.{$request->{$option.'criteria'}}", 'LIKE', "%{$request->{$option.'search_text'}}%"); 
+        })
+        ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { 
+            return $q->where(function($q1) use($request, $option) {
+                return $q1->where('u.employee_id', 'LIKE', "%{$request->{$option.'search_text'}}%")
+                ->orWhere('u.display_name', 'LIKE', "%{$request->{$option.'search_text'}}%")
+                ->orWhere('u.jobcode_desc', 'LIKE', "%{$request->{$option.'search_text'}}%")
+                ->orWhere('u.deptid', 'LIKE', "%{$request->{$option.'search_text'}}%");
+            });
+        });
     }
 
     protected function baseFilteredSQLs($request, $option = null) {
@@ -392,8 +401,17 @@ class AccessPermissionsController extends Controller
             ->when("{$request->{$option.'dd_level2'}}", function($q) use($request, $option) { return $q->whereRaw("u.level2_key = {$request->{$option.'dd_level2'}}"); })
             ->when("{$request->{$option.'dd_level3'}}", function($q) use($request, $option) { return $q->whereRaw("u.level3_key = {$request->{$option.'dd_level3'}}"); })
             ->when("{$request->{$option.'dd_level4'}}", function($q) use($request, $option) { return $q->whereRaw("u.level4_key = {$request->{$option.'dd_level4'}}"); })
-            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { return $q->whereRaw("u.{$request->{$option.'criteria'}} like '%{$request->{$option.'search_text'}}%'"); })
-            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { return $q->whereRaw("(u.employee_id LIKE '%{$request->{$option.'search_text'}}%' OR u.display_name LIKE '%{$request->{$option.'search_text'}}%' OR u.jobcode_desc LIKE '%{$request->{$option.'search_text'}}%' OR u.deptid LIKE '%{$request->{$option.'search_text'}}%')"); })
+            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" != 'all', function($q) use($request, $option) { 
+                return $q->where("u.{$request->{$option.'criteria'}}", 'LIKE', "%{$request->{$option.'search_text'}}%"); 
+            })
+            ->when("{$request->{$option.'search_text'}}" && "{$request->{$option.'criteria'}}" == 'all', function($q) use($request, $option) { 
+                return $q->where(function($q1) use($request, $option) {
+                    return $q1->where('u.employee_id', 'LIKE', "%{$request->{$option.'search_text'}}%")
+                    ->orWhere('u.display_name', 'LIKE', "%{$request->{$option.'search_text'}}%")
+                    ->orWhere('u.jobcode_desc', 'LIKE', "%{$request->{$option.'search_text'}}%")
+                    ->orWhere('u.deptid', 'LIKE', "%{$request->{$option.'search_text'}}%"); 
+                });
+            })
             ->selectRaw("
                 employee_id
                 , display_name 
@@ -805,15 +823,23 @@ class AccessPermissionsController extends Controller
         $dd_level4 = $param[4];
         $criteria = $param[5];
         $search_text = $param[6];
-        // dd($dd_level0);
         $query = UserManageAccessView::from('user_manage_access_view AS u')
         ->when("{$dd_level0}", function($q) use($dd_level0) { return $q->whereRaw("u.organization_key = {$dd_level0}"); })
         ->when("{$dd_level1}", function($q) use($dd_level1) { return $q->whereRaw("u.level1_key = {$dd_level1}"); })
         ->when("{$dd_level2}", function($q) use($dd_level2) { return $q->whereRaw("u.level2_key = {$dd_level2}"); })
         ->when("{$dd_level3}", function($q) use($dd_level3) { return $q->whereRaw("u.level3_key = {$dd_level3}"); })
         ->when("{$dd_level4}", function($q) use($dd_level4) { return $q->whereRaw("u.level4_key = {$dd_level4}"); })
-        ->when("{$search_text}" && "{$criteria}" != 'all', function($q) use($criteria, $search_text) { return $q->whereRaw("u.{$criteria} like '%{$search_text}%'"); })
-        ->when("{$search_text}" && "{$criteria}" == 'all', function($q) use($search_text) { return $q->whereRaw("(u.employee_id LIKE '%{$search_text}%' OR u.display_name LIKE '%{$search_text}%' OR u.jobcode_desc LIKE '%{$search_text}%' OR u.deptid LIKE '%{$search_text}%')"); })
+        ->when("{$search_text}" && "{$criteria}" != 'all', function($q) use($criteria, $search_text) { 
+            return $q->where("u.{$criteria}", 'LIKE', "%{$search_text}%"); 
+        })
+        ->when("{$search_text}" && "{$criteria}" == 'all', function($q) use($search_text) { 
+            return $q->where(function($q1) use($search_text) {
+                return $q1->where('u.employee_id', 'LIKE', "%{$search_text}%")
+                ->orWhere('u.display_name', 'LIKE', "%{$search_text}%")
+                ->orWhere('u.jobcode_desc', 'LIKE', "%{$search_text}%")
+                ->orWhere('u.deptid', 'LIKE', "%{$search_text}%"); 
+            });
+        })
         ->selectRaw("
             employee_id
             , display_name 
