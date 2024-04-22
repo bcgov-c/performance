@@ -110,7 +110,7 @@
 		<br>
 		<div class="col-md-3 mb-2">
 			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveChangesModal()" id="obtn_send" name="obtn_send" value="btn_send">Save Changes</button>
-			<button class="btn btn-secondary mt-2" id="obtn_cancel_send" name="obtn_cancel_send">Cancel</button>
+			<button class="btn btn-secondary mt-2" id="obtn_cancel_send" name="obtn_cancel_send" type="button" onClick="window.location='{{ URL::previous() }}'">Cancel</button>
 		</div>
 
 	</form>
