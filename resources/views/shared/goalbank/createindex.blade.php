@@ -207,7 +207,7 @@
 			<div class="row">
 				<div class="col-md-3 mb-2">
 					<button class="btn btn-primary mt-2" id="obtn_send" type="button" onclick="confirmSaveChangesModal()" name="btn_confirm" value="btn_confirm">Add Goal</button>
-					<button id="obtn_cancel_send" name="obtn_cancel_send" class="btn btn-secondary mt-2">Cancel</button>
+					<button id="obtn_cancel_send" name="obtn_cancel_send" class="btn btn-secondary mt-2" type="button" onclick="window.location.reload()">Cancel</button>
 				</div>
 			</div>
 		</div>
