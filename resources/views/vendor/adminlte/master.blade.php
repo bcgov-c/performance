@@ -173,20 +173,20 @@
         var large_device = true;
         $(document).ready(function() {
             // Get the button element
-            var menuToggleBtn = $('.navbar-nav');
+            var menuToggleBtn = $('.main-sidebar');
 
             // Initially set the aria-label
-            menuToggleBtn.attr('aria-label', 'This button will hide the right menu bar');
+            menuToggleBtn.attr('aria-label', 'This button will hide the left menu bar');
             var isExpanded = false;
 
             // Add click event listener to toggle aria-label
             menuToggleBtn.on('click', function() {
                 // Update the aria-label based on the state
                 if (isExpanded) {
-                    menuToggleBtn.attr('aria-label', 'This button will hide the hidden right menu bar');
+                    menuToggleBtn.attr('aria-label', 'This button will hide the hidden left menu bar');
                     isExpanded = false;
                 } else {
-                    menuToggleBtn.attr('aria-label', 'This button will display the hidden right menu bar');
+                    menuToggleBtn.attr('aria-label', 'This button will display the hidden left menu bar');
                     isExpanded = true;
                 }
             });

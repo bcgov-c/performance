@@ -184,10 +184,10 @@
             ],
             language: {
                 paginate: {
-                    first: 'Go to first page',
-                    previous: 'Go to previous page',
-                    next: 'Go to next page',
-                    last: 'Go to last page'
+                    first: 'First',
+                    previous: 'Previous',
+                    next: 'Next',
+                    last: 'Last'
                 }
             }
         });
@@ -264,7 +264,7 @@
 
             id = $(this).attr('data-id');
             comment = $(this).attr('data-comment');
-
+            /*
             $.ajax({
                     method: "DELETE",
                     url:  '/dashboard/' + id,
@@ -277,6 +277,27 @@
                     error: function(response) {
                         console.log('Error');
                     }
+            });
+            */
+            $.ajax({
+                method: "DELETE",
+                url: '/dashboard/' + id,
+                success: function(data) {
+                    oTable.ajax.reload(null, false); // reload datatables
+                    updateBadgeCount();
+                    // Add ARIA live region and role to make the alert accessible
+                    $('<div role="alert" aria-live="polite"></div>')
+                        .text('Notification has been deleted.')
+                        .appendTo('body')
+                        .fadeIn('slow')
+                        .delay(1000)
+                        .fadeOut('slow', function() {
+                            $(this).remove();
+                        });
+                },
+                error: function(response) {
+                    console.log('Error');
+                }
             });
 
         });
