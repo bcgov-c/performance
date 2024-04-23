@@ -100,7 +100,7 @@
             <br>
             <div class="col-md-3 mb-2">
                 <button class="btn btn-primary mt-2" type="button" onclick="confirmSaveAllModal()" id="btn_send" name="btn_send" value="btn_send">Save</button>
-                <button class="btn btn-secondary mt-2">Cancel</button>
+                <button class="btn btn-secondary mt-2" type="button" onclick="window.location.reload()">Cancel</button>
             </div>
         </div>
 
