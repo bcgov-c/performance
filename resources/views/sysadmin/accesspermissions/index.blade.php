@@ -102,7 +102,7 @@
 		<br>
 		<div class="col-md-3 mb-2">
 			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveAccessModal()" name="btn_send" value="btn_send">Assign Employees</button>
-			<button class="btn btn-secondary mt-2">Cancel</button>
+			<button class="btn btn-secondary mt-2" type="button" onclick="window.location.reload()">Cancel</button>
 		</div>
 
 	</form>
