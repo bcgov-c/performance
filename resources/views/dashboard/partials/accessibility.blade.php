@@ -156,18 +156,5 @@ window.addEventListener('load', function () {
     new Checkbox(checkboxes[i]);
   }
 });
-
-
-// Get all <a> elements with data-dt-idx attribute
-var links = document.querySelectorAll('a[data-dt-idx]');
-
-// Loop through each link
-links.forEach(function(link) {
-    // Get the text content of the link
-    var labelText = link.textContent.trim();
-    
-    // Add the aria-label attribute with the text content
-    link.setAttribute('aria-label', labelText);
-});
 </script>
 
