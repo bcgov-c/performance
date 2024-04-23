@@ -148,12 +148,10 @@
                 } 
             },
             "fnDrawCallback": function() {
-
-                list = ( $('#notification-table input:checkbox') );
+                list = $('#notification-table input:checkbox');
 
                 $.each(list, function( index, item ) {
-                    var pos = $.inArray( parseInt(item.value) , g_selected_employees);
-                    // console.log( pos + ' - ' + item.value + ' - ' + g_selected_employees);
+                    var pos = $.inArray(parseInt(item.value), g_selected_employees);
                     if ( pos === -1 ) {
                         $(item).prop('checked', false); // unchecked
                     } else {
@@ -176,6 +174,18 @@
                 // Update Badge Count
                 updateBadgeCount();
 
+                // Add aria-label to pagination links
+                $('#notification-table_paginate .paginate_button').each(function(index) {
+                    var label = $(this).text().trim();
+                    if (label === 'Previous') {
+                        $(this).attr('aria-label', 'Previous Page');
+                    } else if (label === 'Next') {
+                        $(this).attr('aria-label', 'Next Page');
+                    } else {
+                        $(this).attr('aria-label', 'Page ' + label);
+                    }
+                });
+
             },
             columns: [
                 {data: 'created_at', visible: false },
@@ -184,14 +194,13 @@
             ],
             language: {
                 paginate: {
-                    first: 'Go to first page',
-                    previous: 'Go to previous page',
-                    next: 'Go to next page',
-                    last: 'Go to last page'
+                    first: 'First',
+                    previous: 'Previous',
+                    next: 'Next',
+                    last: 'Last'
                 }
             }
         });
-
         
         $('#notification-table tbody').on( 'click', 'input:checkbox', function () {
 
@@ -264,7 +273,7 @@
 
             id = $(this).attr('data-id');
             comment = $(this).attr('data-comment');
-
+            /*
             $.ajax({
                     method: "DELETE",
                     url:  '/dashboard/' + id,
@@ -277,6 +286,27 @@
                     error: function(response) {
                         console.log('Error');
                     }
+            });
+            */
+            $.ajax({
+                method: "DELETE",
+                url: '/dashboard/' + id,
+                success: function(data) {
+                    oTable.ajax.reload(null, false); // reload datatables
+                    updateBadgeCount();
+                    // Add ARIA live region and role to make the alert accessible
+                    $('<div role="alert" aria-live="polite"></div>')
+                        .text('Notification has been deleted.')
+                        .appendTo('body')
+                        .fadeIn('slow')
+                        .delay(1000)
+                        .fadeOut('slow', function() {
+                            $(this).remove();
+                        });
+                },
+                error: function(response) {
+                    console.log('Error');
+                }
             });
 
         });

@@ -1,6 +1,6 @@
 @include('dashboard.partials.accessibility')
  
-
+   
 <x-side-layout title="{{ __('Dashboard - Performance Development Platform') }}" >
     <x-slot name="header">
         <h1 class="font-semibold text-xl text-primary leading-tight" role="banner">
@@ -12,7 +12,7 @@
             <div class="col-12 col-sm-4 col-md-4" index-tab="0" aria-label="My Current Supervisor">
                 <strong>
                 My Current Supervisor
-                    <i tabindex="0" class="fa fa-info-circle" data-trigger="focus"  data-toggle="popover" data-placement="right" data-html="true" data-content="{{ $supervisorTooltip }}"></i>
+                    <i tabindex="0" class="fa fa-info-circle" data-trigger="focus"  data-toggle="popover" data-placement="right" data-html="true" aria-label="{{ $supervisorTooltip }}" data-content="{{ $supervisorTooltip }}"></i>
                 </strong>
                 <div class="bg-white border-b rounded p-2 mt-2 shadow-sm">
                     {{-- <x-profile-pic></x-profile-pic> --}}
@@ -54,7 +54,7 @@
             <div class="col-12 col-sm-4 col-md-4" index-tab="0" aria-label="My Profile Shared with">
                 <strong>
                     My Profile is Shared with
-                    <i tabindex="0"  class="fa fa-info-circle" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true" data-content="{{ $profilesharedTooltip }}"></i>
+                    <i tabindex="0"  class="fa fa-info-circle" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true" aria-label="{{ $profilesharedTooltip }}" data-content="{{ $profilesharedTooltip }}"></i>
                 </strong>
                 <div class="bg-white border-b rounded p-2 mt-2 shadow-sm">
                     @if(count($sharedList) > 0)
@@ -83,7 +83,7 @@
                 <div class="col-12 col-sm-4 col-md-4">
                     <strong>
                         My Primary Job
-                        <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="{{ $jobTooltip }}"></i>
+                        <i tabindex="0" class="fa fa-info-circle" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true" aria-label="{{ $jobTooltip }}" data-content="{{ $jobTooltip }}"></i>
                     </strong>
                     <div class="bg-white border-b rounded p-2 mt-2 shadow-sm">
                         {{-- <x-profile-pic></x-profile-pic> --}}
@@ -138,6 +138,11 @@
         </div>
     </div>
 
+<style>
+.badge {
+    font-size: 100%;
+}
+</style> 
     
     @push('js')
         {{-- <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
