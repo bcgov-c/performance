@@ -148,12 +148,10 @@
                 } 
             },
             "fnDrawCallback": function() {
-
-                list = ( $('#notification-table input:checkbox') );
+                list = $('#notification-table input:checkbox');
 
                 $.each(list, function( index, item ) {
-                    var pos = $.inArray( parseInt(item.value) , g_selected_employees);
-                    // console.log( pos + ' - ' + item.value + ' - ' + g_selected_employees);
+                    var pos = $.inArray(parseInt(item.value), g_selected_employees);
                     if ( pos === -1 ) {
                         $(item).prop('checked', false); // unchecked
                     } else {
@@ -176,6 +174,18 @@
                 // Update Badge Count
                 updateBadgeCount();
 
+                // Add aria-label to pagination links
+                $('#notification-table_paginate .paginate_button').each(function(index) {
+                    var label = $(this).text().trim();
+                    if (label === 'Previous') {
+                        $(this).attr('aria-label', 'Previous Page');
+                    } else if (label === 'Next') {
+                        $(this).attr('aria-label', 'Next Page');
+                    } else {
+                        $(this).attr('aria-label', 'Page ' + label);
+                    }
+                });
+
             },
             columns: [
                 {data: 'created_at', visible: false },
@@ -191,7 +201,6 @@
                 }
             }
         });
-
         
         $('#notification-table tbody').on( 'click', 'input:checkbox', function () {
 
