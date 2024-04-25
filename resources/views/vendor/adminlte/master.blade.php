@@ -173,7 +173,7 @@
         var large_device = true;
         $(document).ready(function() {
             // Get the button element
-            var menuToggleBtn = $('.main-sidebar');
+            var menuToggleBtn = $('.nav-link');
 
             // Initially set the aria-label
             menuToggleBtn.attr('aria-label', 'This button will hide the left menu bar');
