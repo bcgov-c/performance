@@ -173,7 +173,7 @@
         var large_device = true;
         $(document).ready(function() {
             // Get the button element
-            var menuToggleBtn = $('.nav-link');
+            var menuToggleBtn = $('[data-widget="pushmenu"]');
 
             // Initially set the aria-label
             menuToggleBtn.attr('aria-label', 'This button will hide the left menu bar');

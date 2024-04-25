@@ -126,6 +126,22 @@
         </div>
     </div>
 
+    <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notificationModalLabel">Notification</h5>
+            </div>
+            <div class="modal-body" aria-label="Notification has been deleted.">
+                Notification has been deleted.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
     @include('dashboard.partials.shared_with_view-modal')
     @if(!empty($message))
     @include('dashboard.partials.message-modal', ['content' => $message->message])
@@ -211,6 +227,24 @@
             $('.no_change_job').on('click', function(e) {
                 e.preventDefault();
             });
+
+
+            
+            //make the select all can be checked/unchecked by keyboard space and enter
+            var selectAllCheckbox = document.getElementById('employee-list-select-all');
+
+            // Add event listener for keydown event
+            selectAllCheckbox.addEventListener('keydown', function(event) {
+            // Check if the key pressed is Enter or Space
+            if (event.key === 'Enter' || event.key === ' ') {
+                // Toggle the checkbox                
+                $('#employee-list-select-all').click();
+                //this.checked = !this.checked;
+                // Prevent default behavior (e.g., scrolling the page)
+                event.preventDefault();
+            }
+            });
+
 
         </script>
 
