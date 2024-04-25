@@ -294,15 +294,7 @@
                 success: function(data) {
                     oTable.ajax.reload(null, false); // reload datatables
                     updateBadgeCount();
-                    // Create a new div element
-                    var alertDiv = $('<div role="alert" aria-live="polite"></div>').text('Notification has been deleted.');
-                    // Append the new div to the body
-                    $('body').append(alertDiv);
-                    // Fade in the div
-                    alertDiv.fadeIn('slow').delay(1000).fadeOut('slow', function() {
-                        // Remove the div after fading out
-                        alertDiv.remove();
-                    });
+                    $('#notificationModal').show();
                 },
                 error: function(response) {
                     console.log('Error');
