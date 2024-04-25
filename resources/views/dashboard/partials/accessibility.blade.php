@@ -65,6 +65,16 @@ button:active {
     color: white;
 }
 
+.close-white {
+    border: 1px solid transparent;
+    padding: 3px;
+}
+
+.close-white:focus,
+.close-white:active {
+    border: 1px solid white;
+}
+
 .btn-danger:focus {
     outline: 2px solid #1A5A96; /* Change the color and style as needed */
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5); /* Add a red box shadow when focused */
