@@ -292,17 +292,13 @@
                 method: "DELETE",
                 url: '/dashboard/' + id,
                 success: function(data) {
-                    oTable.ajax.reload(null, false); // reload datatables
-                    updateBadgeCount();
-                    // Create a new div element
-                    var alertDiv = $('<div role="alert" aria-live="polite"></div>').text('Notification has been deleted.');
-                    // Append the new div to the body
-                    $('body').append(alertDiv);
-                    // Fade in the div
-                    alertDiv.fadeIn('slow').delay(1000).fadeOut('slow', function() {
-                        // Remove the div after fading out
-                        alertDiv.remove();
-                    });
+                    $('#notificationModal').modal('show');
+                    // When the modal is closed
+                    $('#notificationModal').on('hidden.bs.modal', function (e) {
+                        // Reload datatables and update badge count
+                        oTable.ajax.reload(null, false);
+                        updateBadgeCount();     
+                    });            
                 },
                 error: function(response) {
                     console.log('Error');
