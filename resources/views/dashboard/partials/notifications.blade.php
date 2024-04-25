@@ -292,9 +292,13 @@
                 method: "DELETE",
                 url: '/dashboard/' + id,
                 success: function(data) {
-                    oTable.ajax.reload(null, false); // reload datatables
-                    updateBadgeCount();
-                    $('#notificationModal').show();
+                    $('#notificationModal').modal('show');
+                    // When the modal is closed
+                    $('#notificationModal').on('hidden.bs.modal', function (e) {
+                        // Reload datatables and update badge count
+                        oTable.ajax.reload(null, false);
+                        updateBadgeCount();     
+                    });            
                 },
                 error: function(response) {
                     console.log('Error');
