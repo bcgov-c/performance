@@ -50,14 +50,14 @@ ul.checkboxes li label:hover {
 
 .focusable {
     /* Define styles for when the element is focused */
-    outline: 2px solid #6574cd; /* Change the color and style as needed */
+    outline: 2px solid #1A5A96; /* Change the color and style as needed */
 }
 
 /* Apply a border and outline when the element is focused */
 button:focus,
 button:active {
     outline: none; /* Remove the default focus outline */
-    border: 2px solid #6574cd; /* Add a border when the element is focused */
+    border: 2px solid #1A5A96; /* Add a border when the element is focused */
     /* Add any other styles you want to apply when the element is focused */
 }
 
@@ -66,19 +66,17 @@ button:active {
 }
 
 .btn-danger:focus {
-    outline: 2px solid #6574cd; /* Change the color and style as needed */
+    outline: 2px solid #1A5A96; /* Change the color and style as needed */
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5); /* Add a red box shadow when focused */
 }
 
 .btn-primary:focus {
-    outline: 2px solid #6574cd; /* Change the color and style as needed */
+    outline: 2px solid #1A5A96; /* Change the color and style as needed */
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5); /* Add a red box shadow when focused */
 }
 
 /* White border on focus for close button */
-.close:focus {
-  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.5); /* Change the color and opacity as needed */
-}
+
 </style>
 
 

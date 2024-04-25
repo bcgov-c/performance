@@ -294,15 +294,15 @@
                 success: function(data) {
                     oTable.ajax.reload(null, false); // reload datatables
                     updateBadgeCount();
-                    // Add ARIA live region and role to make the alert accessible
-                    $('<div role="alert" aria-live="polite"></div>')
-                        .text('Notification has been deleted.')
-                        .appendTo('body')
-                        .fadeIn('slow')
-                        .delay(1000)
-                        .fadeOut('slow', function() {
-                            $(this).remove();
-                        });
+                    // Create a new div element
+                    var alertDiv = $('<div role="alert" aria-live="polite"></div>').text('Notification has been deleted.');
+                    // Append the new div to the body
+                    $('body').append(alertDiv);
+                    // Fade in the div
+                    alertDiv.fadeIn('slow').delay(1000).fadeOut('slow', function() {
+                        // Remove the div after fading out
+                        alertDiv.remove();
+                    });
                 },
                 error: function(response) {
                     console.log('Error');

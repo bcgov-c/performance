@@ -175,11 +175,11 @@ class DashboardController extends Controller
                         if  ( !(in_array($notification->notification_type, ['CA', 'CS', 'CN'])) ) {
                             $text .= '<button aria-label="View the notification" alt="View the notification" onclick="'. $link . '"' .
                                     'data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Now hover out." '.
-                                    'class="notification-modal btn btn-sm btn-primary mt-2" value="'. $notification->id .'">View</button>';
+                                    'class="notification-modal btn btn-sm btn-outline-primary mt-2" value="'. $notification->id .'">View <i class="fas fa-eye fa-lg" ></i></button>';
                         }
                     }
-                    $text .= '<button aria-label="Delete the notification" alt="Delete the notification" class="btn btn-danger btn-sm ml-2 delete-dn mt-2"  data-id="'. $notification->id .
-                                '" data-comment="'. $notification->comment . '"><i class="fas fa-trash-alt fa-lg" ></i></button>';
+                    $text .= '<button aria-label="Delete the notification" alt="Delete the notification" class="btn btn-outline-danger btn-sm ml-2 delete-dn mt-2"  data-id="'. $notification->id .
+                                '" data-comment="'. $notification->comment . '">Delete <i class="fas fa-trash-alt fa-lg" ></i></button>';
 
                     return $text;
                 })
