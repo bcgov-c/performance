@@ -5,7 +5,7 @@
       <div class="modal-header bg-primary">
         <h5 class="modal-title" id="profileSharedWithViewLabel">Profile shared with</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true" class="close-white" style="border: 1px solid transparent; border-radius: 50%; padding: 3px;" tabindex="0" onfocus="this.style.border = '1px solid white';" onblur="this.style.border = '1px solid transparent';">×</span>
+          <span aria-hidden="true" class="close-white" style="border: 1px solid transparent; padding: 3px;" tabindex="0" onfocus="this.style.border = '1px solid white';" onblur="this.style.border = '1px solid transparent';">×</span>
         </button>
       </div>
       <div class="modal-body p-4">
