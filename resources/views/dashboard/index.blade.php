@@ -61,13 +61,14 @@
                     <button class="btn p-0" style="width:100%" data-toggle="modal" data-target="#profileSharedWithViewModal">
                         <div class="d-flex align-items-center">
                             {{-- <x-profile-pic></x-profile-pic> --}}
-                            <span id="sharedWithName">{{ $sharedList[0]->sharedWithUser->name }}</span>
+                            <span id="sharedWithName">{{ $sharedList[0]->sharedWithUser->name }}
                             @if(count($sharedList) > 1)
                                 and {{ count($sharedList) - 1 }} Others.
                             @else
                                 .     
                             @endif
                             Click to view more details.
+                            </span>
                             <div class="flex-fill"></div>
                             <i class="fa fa-chevron-right"></i>
                         </div>
