@@ -228,6 +228,23 @@
                 e.preventDefault();
             });
 
+
+            
+            //make the select all can be checked/unchecked by keyboard space and enter
+            var selectAllCheckbox = document.getElementById('employee-list-select-all');
+
+            // Add event listener for keydown event
+            selectAllCheckbox.addEventListener('keydown', function(event) {
+            // Check if the key pressed is Enter or Space
+            if (event.key === 'Enter' || event.key === ' ') {
+                // Toggle the checkbox
+                this.checked = !this.checked;
+                // Prevent default behavior (e.g., scrolling the page)
+                event.preventDefault();
+            }
+            });
+
+
         </script>
 
 
