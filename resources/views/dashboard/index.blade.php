@@ -239,7 +239,7 @@
             if (event.key === 'Enter' || event.key === ' ') {
                 // Toggle the checkbox                
                 $('#employee-list-select-all').click();
-                this.checked = !this.checked;
+                //this.checked = !this.checked;
                 // Prevent default behavior (e.g., scrolling the page)
                 event.preventDefault();
             }
