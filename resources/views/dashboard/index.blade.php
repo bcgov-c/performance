@@ -237,7 +237,8 @@
             selectAllCheckbox.addEventListener('keydown', function(event) {
             // Check if the key pressed is Enter or Space
             if (event.key === 'Enter' || event.key === ' ') {
-                // Toggle the checkbox
+                // Toggle the checkbox                
+                $('#employee-list-select-all').click();
                 this.checked = !this.checked;
                 // Prevent default behavior (e.g., scrolling the page)
                 event.preventDefault();
