@@ -18,7 +18,7 @@
             <x-button icon="clone" href="{{ route('goal.library') }}">
                 Add Goal from Goal Bank
             </x-button>
-            <x-button icon="question" href="{{ route('resource.user-guide','t=1') }} " target="_blank" tooltip='Click here to access goal setting resources and examples (opens in new window).'>    
+            <x-button icon="question" href="{{ route('resource.user-guide','t=1') }} " target="_blank" data-trigger="focus" data-toggle="popover" tooltip='Click here to access goal setting resources and examples (opens in new window).'>    
                 Need Help?
             </x-button>
         @endif
@@ -28,44 +28,53 @@
         {{-- {{$dataTable->table()}} --}}
 
         <div class="row">
+            <div class="col-12">
+                <h3>Search Goals</h3>
+                <hr>
+            </div>
             @if ($type != 'supervisor')   
                 <form action="" method="get" id="filter-menu">
-                    <div class="row">
-                        
+                    <div class="row">                        
                         <div class="col-12"  id="msgdiv"></div>
                         
                         <div class="col">
                             <label>
-                                Title
-                                <input type="text" name="title" class="form-control" value="{{request()->title}}">
+                                Goal Title
+                                <input type="text" id="title" name="title" class="form-control" value="{{request()->title}}">
                             </label>
                         </div>
                         <div class="col">
-                            <x-dropdown :list="$goaltypes" label="Goal Type" name="goal_type" :selected="request()->goal_type"></x-dropdown>
+                            <x-dropdown :list="$goaltypes" id="goal_type" label="Goal Type" name="goal_type" :selected="request()->goal_type"></x-dropdown>
                         </div>
                         @if ($type == 'past')
                             <div class="col">
-                                <x-dropdown :list="$statusList" label="Status" name="status" :selected="request()->status"></x-dropdown>                      
+                                <x-dropdown :list="$statusList" id="status" label="Status" name="status" :selected="request()->status"></x-dropdown>                      
                             </div>
                         @endif
                         <div class="col">
-                            <x-dropdown :list="$tagsList" label="Tags" name="tag_id" :selected="request()->tag_id"></x-dropdown>
+                            <x-dropdown :list="$tagsList" label="Tags" id="tag_id" name="tag_id" :selected="request()->tag_id"></x-dropdown>
                         </div>
                         <div class="col">
                             <label>
                                 Start Date
-                                <input type="text" class="form-control" name="filter_start_date" value="{{request()->filter_start_date ?? 'Any'}}">
+                                <input type="text" class="form-control" id="filter_start_date" name="filter_start_date" value="{{request()->filter_start_date ?? 'Any'}}">
                             </label>
                         </div>
                         <div class="col">
                             <label>
                                 End Date
-                                <input type="text" class="form-control" name="filter_target_date" value="{{request()->filter_target_date ?? 'Any'}}">
+                                <input type="text" class="form-control" id="filter_target_date" name="filter_target_date" value="{{request()->filter_target_date ?? 'Any'}}">
                             </label>
                         </div>
                     </div>
                     <input name="sortby" id="sortby" value="{{$sortby}}" type="hidden">
                     <input name="sortorder" id="sortorder" value="{{$sortorder}}" type="hidden">
+                    <div class="row">
+                    <div class="col-12 mt-3">
+                        <button type="submit" class="btn btn-primary mr-2" aria-label="Click the button to search goals">Search</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()" aria-label="Click the button to reset the form">Reset</button>
+                    </div>
+                    </div>
                 </form>    
             @endif    
             @if ($type == 'current' || $type == 'supervisor')
@@ -145,19 +154,19 @@
                         <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="{{$type_desc_str}}"> </i>
                         <x-dropdown :list="$goal_types_modal" name="goal_type_id" />
                     </div>
-                    </div>
-                       <div class="col-6">
+                </div>
+                <div class="col-6">
                        <b>Goal Title</b>
                         <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>                        
                         <x-input-modal id="goal_title" name="title" />
-                    </div>
-                    <div class="col-sm-6">
+                </div>
+                <div class="col-sm-6">
                         <b>Tags</b>
                         <i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resources/goal-setting?t=8' target=\'_blank\'><u>View full list of tag descriptions.</u></a><br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>."></i>				
                         <x-xdropdown :list="$tags" name="tag_ids[]"  class="tags" displayField="name" multiple/>
                         <small  class="text-danger error-tag_ids"></small>
-                    </div>
-                       <div class="col-12">
+                </div>
+                <div class="col-12">
                         <!-- <label style="font-weight: normal;"> -->
                         <b>Goal Description</b>          
                         <p>
@@ -172,13 +181,13 @@
                         <small class="text-danger error-what"></small>
                         <x-textarea-modal id="what" name="what"/>
                         <!-- </label> -->
-                  </div>
-                       <div class="col-12">
+                </div>
+                <div class="col-12">
                             <b>Measures of Success</b>
                             <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"'> </i>                        
                             <x-textarea-modal id="measure_of_success" name="measure_of_success" />
                             <small class="text-danger error-measure_of_success"></small>
-                        </div>
+                </div>
                 <div class="col-sm-6">
                     <x-input label="Start Date " class="error-start" type="date" name="start_date" id="start_date" />
                     <small  class="text-danger error-start_date"></small>
@@ -203,6 +212,11 @@
                     <x-button icon="question" href="{{ route('resource.goal-setting') }} " target="_blank" tooltip='Click here to access goal setting resources and examples (opens in new window).'>
                         Need Help
                     </x-button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    
                 </div>
             </div>
         </form>
@@ -775,9 +789,23 @@
     
 <script>
 $(".share-with-users").select2({
+    placeholder: "Add employee", // Add the placeholder here
     language: {
         errorLoading: function () {
             return "Searching for results.";
+        },
+        inputTooShort: function (args) {
+            return "Type to search for employees";
+        },
+        searching: function () {
+            return "Searching for results";
+        },
+        noResults: function () {
+            return "No results found";
+        },
+        // Add the aria-label here
+        input: function () {
+            return "Add employee";
         }
     },
     width: '100%',
@@ -856,10 +884,10 @@ $(".share-with-users").select2({
                 }
             }).on('apply.daterangepicker', function(ev, picker) {
                 $(this).val(picker.startDate.format('MMM DD, YYYY') + ' - ' + picker.endDate.format('MMM DD, YYYY'));
-                $("#filter-menu").submit();
+                //$("#filter-menu").submit();
             }).on('cancel.daterangepicker', function(ev, picker) {
                 $('input[name="filter_start_date"]').val('Any');
-                $("#filter-menu").submit();
+                //$("#filter-menu").submit();
             });
             
         $('input[name="filter_target_date"]').daterangepicker({
@@ -870,14 +898,14 @@ $(".share-with-users").select2({
                 }
             }).on('apply.daterangepicker', function(ev, picker) {
                 $(this).val(picker.startDate.format('MMM DD, YYYY') + ' - ' + picker.endDate.format('MMM DD, YYYY'));
-                $("#filter-menu").submit();
+                //$("#filter-menu").submit();
             }).on('cancel.daterangepicker', function(ev, picker) {
                 $('input[name="filter_target_date"]').val('Any');
-                $("#filter-menu").submit();
+                //$("#filter-menu").submit();
             });    
             
             $('#filter-menu select, #filter-menu input').change(function () {
-                $("#filter-menu").submit();
+                //$("#filter-menu").submit();
             });
             
             function sort(obj){
@@ -1039,6 +1067,25 @@ $(".share-with-users").select2({
             });
 </script>    
 
+<script>
+    function resetForm() {
+        $('#title').val('');
+        $('#goal_type').val('');
+        $('#status').val('');
+        $('#tag_id').val('');
+        $('#filter_start_date').val('');
+        $('#filter_target_date').val('');
+
+        $("#filter-menu").submit();
+    }
+
+    $(document).ready(function(){
+        $('[data-toggle="popover"]').popover();
+    });
+    
+</script>
+
+
 <style>
     .multiselect {
             overflow: hidden;
@@ -1061,6 +1108,43 @@ $(".share-with-users").select2({
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
         background-color: #1A5A96;
     }
+
+        
+    .btn-danger:focus {
+        outline: 2px solid #1A5A96; /* Change the color and style as needed */
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5); /* Add a red box shadow when focused */
+    }
+
+    .btn-primary:focus {
+        outline: 2px solid #1A5A96; /* Change the color and style as needed */
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5); /* Add a red box shadow when focused */
+    }
+
+    .btn-secondary:focus {
+        outline: 2px solid #1A5A96; /* Change the color and style as needed */
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5); /* Add a red box shadow when focused */
+    }
+
+    .tab-button:focus {
+        outline: 2px solid #1A5A96; /* Change the color and style as needed */
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5); /* Add a red box shadow when focused */
+    }
+
+    .btn-outline-primary:focus {
+        outline: 2px solid #1A5A96; /* Change the color and style as needed */
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5); /* Add a red box shadow when focused */
+    }
+
+    .btn-outline-danger:focus {
+        outline: 2px solid #1A5A96; /* Change the color and style as needed */
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5); /* Add a red box shadow when focused */
+    }
+
+    .btn-group:focus {
+        outline: 2px solid #1A5A96; /* Change the color and style as needed */
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5); /* Add a red box shadow when focused */
+    }
+
 </style>    
  
     
