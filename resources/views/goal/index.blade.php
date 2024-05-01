@@ -57,13 +57,13 @@
                         <div class="col">
                             <label>
                                 Start Date
-                                <input type="text" class="form-control" id="filter_start_date" name="filter_start_date" value="{{request()->filter_start_date ?? 'Any'}}">
+                                <input type="text" class="form-control" id="filter_start_date" name="filter_start_date" value="{{request()->filter_start_date ?? ''}}">
                             </label>
                         </div>
                         <div class="col">
                             <label>
                                 End Date
-                                <input type="text" class="form-control" id="filter_target_date" name="filter_target_date" value="{{request()->filter_target_date ?? 'Any'}}">
+                                <input type="text" class="form-control" id="filter_target_date" name="filter_target_date" value="{{request()->filter_target_date ?? ''}}">
                             </label>
                         </div>
                     </div>
@@ -878,6 +878,7 @@ $(".share-with-users").select2({
         
         $('input[name="filter_start_date"]').daterangepicker({
                 autoUpdateInput: false,
+                placeholder: 'Select date range', // Set the placeholder text
                 locale: {
                     cancelLabel: 'Any',
                     format: 'MMM DD, YYYY'
@@ -886,12 +887,13 @@ $(".share-with-users").select2({
                 $(this).val(picker.startDate.format('MMM DD, YYYY') + ' - ' + picker.endDate.format('MMM DD, YYYY'));
                 //$("#filter-menu").submit();
             }).on('cancel.daterangepicker', function(ev, picker) {
-                $('input[name="filter_start_date"]').val('Any');
+                //$('input[name="filter_start_date"]').val('Any');
                 //$("#filter-menu").submit();
             });
             
         $('input[name="filter_target_date"]').daterangepicker({
                 autoUpdateInput: false,
+                placeholder: 'Select date range', // Set the placeholder text
                 locale: {
                     cancelLabel: 'Any',
                     format: 'MMM DD, YYYY'
@@ -900,7 +902,7 @@ $(".share-with-users").select2({
                 $(this).val(picker.startDate.format('MMM DD, YYYY') + ' - ' + picker.endDate.format('MMM DD, YYYY'));
                 //$("#filter-menu").submit();
             }).on('cancel.daterangepicker', function(ev, picker) {
-                $('input[name="filter_target_date"]').val('Any');
+                //$('input[name="filter_target_date"]').val('Any');
                 //$("#filter-menu").submit();
             });    
             
