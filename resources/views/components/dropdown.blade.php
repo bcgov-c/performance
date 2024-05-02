@@ -4,10 +4,10 @@
     {!! $label ?? '' ? '<br>': ''!!}
     <select {!! $attributes->merge(['class' => 'form-control']) !!}  aria-haspopup="true" aria-expanded="false">>
         @if($blankOptionText != null)
-            <option value="" aria-labelledby="{{$blankOptionText}}">{{$blankOptionText}}</option>
+            <option value="" aria-labelledby="{{$blankOptionText}}, menu item">{{$blankOptionText}}</option>
         @endif
         @foreach ($list as $item)
-            <option aria-labelledby="{{ $item['name'] }}" value="{{ $item['id'] }}" {{ ($item['selected'] ?? '') || $selected != null && ($item['id'] == $selected || (is_array($selected) && (in_array($item['id'], $selected)))) ? 'selected': '' }}>
+            <option aria-labelledby="{{ $item['name'] }}, menu item" value="{{ $item['id'] }}" {{ ($item['selected'] ?? '') || $selected != null && ($item['id'] == $selected || (is_array($selected) && (in_array($item['id'], $selected)))) ? 'selected': '' }}>
                 {{ $item['name'] }}
             </option>
         @endforeach
