@@ -65,14 +65,10 @@ button:active {
     color: white;
 }
 
-.close-white {
-    border: 1px solid transparent;
-    padding: 3px;
-}
-
-.close-white:focus,
-.close-white:active {
+.close:focus,
+.close:active {
     border: 1px solid white;
+    padding: 3px;
 }
 
 .btn-danger:focus {
