@@ -4,7 +4,7 @@
 
    <thead>
     <tr>
-      <th scope="col" style="width: 120px;"><a href="javascript:sort('title');">Title</a></th>
+      <th scope="col" style="width: 120px;"><a href="javascript:sort('title');">Goal Title</a></th>
       <th scope="col" style="width: 120px;"><a href="javascript:sort('goal_type_id');">Goal Type</a></th>
       <th scope="col" style="width: 100px;"><a href="javascript:sort('tagnames');">Tags</a></th>
       <th scope="col" style="width: 80px;"><a href="javascript:sort('start_date');">Start Date</a></th>
@@ -21,9 +21,12 @@
     </th>
       @endif
       <th scope="col" style="width: 60px;"><a href="javascript:sort('status');">Status</a>
-      <i tabindex="0" class="fa fa-info-circle" id="status_label" data-trigger='focus' data-toggle="popover" data-placement="right" data-html="true" data-content="<ul><li><b>Active</b>: currently in progress or scheduled for a future date</li><li><b>Achieved</b>: supervisor and employee agree objectives met</li><li><b>Archived</b>: cancelled, deferred or no longer relevant to your work but you want to save for future reference</li></ul>You can delete goals that do not meet any of the above criteria"></i>				
+      <i tabindex="0" class="fa fa-info-circle" id="status_label" data-trigger='focus' data-toggle="popover" data-placement="right" data-html="true" 
+      data-content="<ul><li><b>Active</b>: currently in progress or scheduled for a future date</li><li><b>Achieved</b>: supervisor and employee agree objectives met</li><li><b>Archived</b>: cancelled, deferred or no longer relevant to your work but you want to save for future reference</li></ul>You can delete goals that do not meet any of the above criteria."
+      aria-label="<ul><li><b>Active</b>: currently in progress or scheduled for a future date</li><li><b>Achieved</b>: supervisor and employee agree objectives met</li><li><b>Archived</b>: cancelled, deferred or no longer relevant to your work but you want to save for future reference</li></ul>You can delete goals that do not meet any of the above criteria."> </i>
+      				
       </th>
-      <th style="width: 150px;"> </th>
+      <th style="width: 150px;">Action</th>
     </tr>
   </thead>
   <tbody>
@@ -57,7 +60,8 @@
       <td >{{ $goal->target_date_human }}</td>
       @if ($type == 'current')
       <td>  
-        <select multiple class="form-control share-with-users"  name="share_with_users[]" aria-label='Search and add employees from the list with whom you want to share the goal'>
+        <label class="visually-hidden" for="share_with_users">Search and add employees from the list with whom you want to share the goal:</label>
+        <select multiple class="form-control share-with-users" id="share_with_users" name="share_with_users[]">
             <?php if($goal->shared_user_id != '' && $goal->shared_user_name != ''){
                 $share_user_id_arr = explode(',', $goal->shared_user_id);
                 $share_user_name_arr = explode(',', $goal->shared_user_name);
@@ -65,7 +69,6 @@
                     echo "<option value='".$share_user_id_arr[$i]."'  selected>".$share_user_name_arr[$i]."</option>";                    
                 }
             }?>
-            
         </select>
       </td>
       @endif
