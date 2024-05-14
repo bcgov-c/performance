@@ -167,8 +167,8 @@ class GoalController extends Controller
             $query = $query->where('goal_types.name', '<>', 'Private');
         }
         
-        
-        
+        /** #1119 My Current Goals Page - dont use data rang but search by single datepicker **/
+        /*
         if(isset($request->filter_start_date) && $request->filter_start_date != ''){
             $start_date_array = explode('-', $request->filter_start_date);
             if(count($start_date_array) == 2) {
@@ -189,6 +189,18 @@ class GoalController extends Controller
                 $query = $query->whereBetween('goals.target_date', [$from, $to]);
             }
         }
+        */
+
+        if(isset($request->filter_start_date) && $request->filter_start_date != ''){
+            $start_date = trim($request->filter_start_date);
+            $query = $query->where('goals.start_date', '>=', "$start_date");
+        }
+        if(isset($request->filter_target_date) && $request->filter_target_date != ''){
+            $target_date = trim($request->filter_target_date);
+            $query = $query->where('goals.target_date', '<=', "$target_date");
+        }
+
+        
         //$authId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
         
         if(!session()->has('sortby')) {

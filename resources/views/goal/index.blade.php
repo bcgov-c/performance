@@ -30,7 +30,6 @@
         <div class="row">
             <div class="col-12">
                 <h3>Search Goals</h3>
-                <hr>
             </div>
             @if ($type != 'supervisor')   
                 <form action="" method="get" id="filter-menu">
@@ -57,13 +56,13 @@
                         <div class="col">
                             <label>
                                 Start Date
-                                <input type="text" class="form-control" id="filter_start_date" name="filter_start_date" value="{{request()->filter_start_date ?? ''}}">
+                                <input aria-label="Enter the goals start date" type="text" class="form-control" id="filter_start_date" name="filter_start_date" value="{{request()->filter_start_date ?? ''}}">
                             </label>
                         </div>
                         <div class="col">
                             <label>
                                 End Date
-                                <input type="text" class="form-control" id="filter_target_date" name="filter_target_date" value="{{request()->filter_target_date ?? ''}}">
+                                <input aria-label="Enter the goals targe end date" type="text" class="form-control" id="filter_target_date" name="filter_target_date" value="{{request()->filter_target_date ?? ''}}">
                             </label>
                         </div>
                     </div>
@@ -873,42 +872,31 @@ $(".share-with-users").select2({
                 $('#msgdiv').html('<div class="alert alert-info"><p><i class="fa fa-info-circle"></i> '+savemsg+'</p></div>');
                 localStorage.setItem('savemsg', '');
             }
+
+            
+
+            $('.drp-buttons').hide();
             
         });
         
         $('input[name="filter_start_date"]').daterangepicker({
-                autoUpdateInput: false,
-                placeholder: 'Select date range', // Set the placeholder text
-                locale: {
-                    cancelLabel: 'Any',
-                    format: 'MMM DD, YYYY'
-                }
-            }).on('apply.daterangepicker', function(ev, picker) {
-                $(this).val(picker.startDate.format('MMM DD, YYYY') + ' - ' + picker.endDate.format('MMM DD, YYYY'));
-                //$("#filter-menu").submit();
-            }).on('cancel.daterangepicker', function(ev, picker) {
-                //$('input[name="filter_start_date"]').val('Any');
-                //$("#filter-menu").submit();
-            });
-            
+            autoUpdateInput: true,
+            singleDatePicker: true, // Set to true for a single date picker
+            placeholder: 'Select date', // Set the placeholder text
+            locale: {
+                format: 'MMM DD, YYYY'
+            }
+        });
+
         $('input[name="filter_target_date"]').daterangepicker({
-                autoUpdateInput: false,
-                placeholder: 'Select date range', // Set the placeholder text
-                locale: {
-                    cancelLabel: 'Any',
-                    format: 'MMM DD, YYYY'
-                }
-            }).on('apply.daterangepicker', function(ev, picker) {
-                $(this).val(picker.startDate.format('MMM DD, YYYY') + ' - ' + picker.endDate.format('MMM DD, YYYY'));
-                //$("#filter-menu").submit();
-            }).on('cancel.daterangepicker', function(ev, picker) {
-                //$('input[name="filter_target_date"]').val('Any');
-                //$("#filter-menu").submit();
-            });    
+            autoUpdateInput: true,
+            singleDatePicker: true, // Set to true for a single date picker
+            placeholder: 'Select date', // Set the placeholder text
+            locale: {
+                format: 'MMM DD, YYYY'
+            }
+        });
             
-            $('#filter-menu select, #filter-menu input').change(function () {
-                //$("#filter-menu").submit();
-            });
             
             function sort(obj){
                 $('#sortby').val(obj);
