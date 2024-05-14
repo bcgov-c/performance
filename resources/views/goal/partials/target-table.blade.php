@@ -16,14 +16,14 @@
           <br/>Type the name of your colleague into the search field to find and select them. You can repeat this process to add additional colleagues if needed. You can also remove a colleague by clicking the &quot;X&quot; next to their name.
           <br/>As the creator of the shared goal, you are the only one that can make major edits or change the status to achieved or archived." 
           data-original-title="" title="" aria-label="You can use this function to share a goal with colleagues. This goal will appear on their “Goals Shared with Me” tab and they will be able view and add comments to the goal. 
-          <br/>Type the name of your colleague into the search field to find and select them. You can repeat this process to add additional colleagues if needed. You can also remove a colleague by clicking the &quot;X&quot; next to their name.
-          <br/>As the creator of the shared goal, you are the only one that can make major edits or change the status to achieved or archived."> </i>
+          Type the name of your colleague into the search field to find and select them. You can repeat this process to add additional colleagues if needed. You can also remove a colleague by clicking the X next to their name.
+          As the creator of the shared goal, you are the only one that can make major edits or change the status to achieved or archived."> </i>
     </th>
       @endif
       <th scope="col" style="width: 60px;"><a href="javascript:sort('status');">Status</a>
       <i tabindex="0" class="fa fa-info-circle" id="status_label" data-trigger='focus' data-toggle="popover" data-placement="right" data-html="true" 
       data-content="<ul><li><b>Active</b>: currently in progress or scheduled for a future date</li><li><b>Achieved</b>: supervisor and employee agree objectives met</li><li><b>Archived</b>: cancelled, deferred or no longer relevant to your work but you want to save for future reference</li></ul>You can delete goals that do not meet any of the above criteria."
-      aria-label="<ul><li><b>Active</b>: currently in progress or scheduled for a future date</li><li><b>Achieved</b>: supervisor and employee agree objectives met</li><li><b>Archived</b>: cancelled, deferred or no longer relevant to your work but you want to save for future reference</li></ul>You can delete goals that do not meet any of the above criteria."> </i>
+      aria-label="Active: currently in progress or scheduled for a future date.Achieved: supervisor and employee agree objectives met.Archived: cancelled, deferred or no longer relevant to your work but you want to save for future reference.You can delete goals that do not meet any of the above criteria."> </i>
       				
       </th>
       <th style="width: 150px;">Action</th>
