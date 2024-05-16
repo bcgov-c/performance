@@ -161,5 +161,6 @@ window.addEventListener('load', function () {
     new Checkbox(checkboxes[i]);
   }
 });
+
 </script>
 
