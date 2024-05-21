@@ -1225,7 +1225,7 @@ class GoalBankController extends Controller
 
             ->leftJoin(\DB::raw('audits AS latest_audits USE INDEX (AUDITS_AUDITABLE_TYPE_AUDITABLE_ID_INDEX)'), function($join) {
                 return $join->on(function($on) {
-                    return $on->whereRaw("latest_audits.auditable_type like '%Goal%' AND goals.id = latest_audits.auditable_id")
+                    return $on->whereRaw("latest_audits.auditable_type like '%Goal' AND goals.id = latest_audits.auditable_id")
                     ->whereRaw("latest_audits.id = (SELECT MAX(aud.id) FROM audits AS aud USE INDEX (AUDITS_AUDITABLE_TYPE_AUDITABLE_ID_INDEX) WHERE latest_audits.auditable_type = aud.auditable_type AND latest_audits.auditable_id = aud.auditable_id)");
                 });
             })
@@ -1240,7 +1240,7 @@ class GoalBankController extends Controller
                 goals.id,
                 goals.title,
                 goals.created_at,
-                goals.updated_at,
+                latest_audits.created_at AS updated_at,
                 goals.is_mandatory,
                 goals.display_name,
                 ced.employee_name AS creator_name,
@@ -1308,7 +1308,7 @@ class GoalBankController extends Controller
             ->leftJoin(\DB::raw('employee_demo_tree AS edt USE INDEX (EMPLOYEE_DEMO_TREE_ID_UNIQUE)'), 'ced.orgid', 'edt.id')
             ->leftJoin(\DB::raw('audits AS latest_audits USE INDEX (AUDITS_AUDITABLE_TYPE_AUDITABLE_ID_INDEX)'), function($join) {
                 return $join->on(function($on) {
-                    return $on->whereRaw("latest_audits.auditable_type like '%Goal%' AND goals.id = latest_audits.auditable_id")
+                    return $on->whereRaw("latest_audits.auditable_type like '%Goal' AND goals.id = latest_audits.auditable_id")
                     ->whereRaw("latest_audits.id = (SELECT MAX(aud.id) FROM audits AS aud USE INDEX (AUDITS_AUDITABLE_TYPE_AUDITABLE_ID_INDEX) WHERE latest_audits.auditable_type = aud.auditable_type AND latest_audits.auditable_id = aud.auditable_id)");
                 });
             })
@@ -1323,7 +1323,7 @@ class GoalBankController extends Controller
                 goals.id,
                 goals.title,
                 goals.created_at,
-                goals.updated_at,
+                latest_audits.created_at AS updated_at,
                 goals.is_mandatory,
                 goals.display_name,
                 ced.employee_name AS creator_name,
@@ -1389,7 +1389,7 @@ class GoalBankController extends Controller
             ->leftJoin(\DB::raw('employee_demo_tree AS edt USE INDEX (EMPLOYEE_DEMO_TREE_ID_UNIQUE)'), 'ced.orgid', 'edt.id')
             ->leftJoin(\DB::raw('audits AS latest_audits USE INDEX (AUDITS_AUDITABLE_TYPE_AUDITABLE_ID_INDEX)'), function($join) {
                 return $join->on(function($on) {
-                    return $on->whereRaw("latest_audits.auditable_type like '%Goal%' AND goals.id = latest_audits.auditable_id")
+                    return $on->whereRaw("latest_audits.auditable_type like '%Goal' AND goals.id = latest_audits.auditable_id")
                     ->whereRaw("latest_audits.id = (SELECT MAX(aud.id) FROM audits AS aud USE INDEX (AUDITS_AUDITABLE_TYPE_AUDITABLE_ID_INDEX) WHERE latest_audits.auditable_type = aud.auditable_type AND latest_audits.auditable_id = aud.auditable_id)");
                 });
             })
@@ -1404,7 +1404,7 @@ class GoalBankController extends Controller
                 goals.id,
                 goals.title,
                 goals.created_at,
-                goals.updated_at,
+                latest_audits.created_at AS updated_at,
                 goals.is_mandatory,
                 goals.display_name,
                 ced.employee_name AS creator_name,
