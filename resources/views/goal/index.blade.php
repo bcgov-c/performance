@@ -872,14 +872,11 @@ $(".share-with-users").select2({
                 $('#msgdiv').html('<div class="alert alert-info"><p><i class="fa fa-info-circle"></i> '+savemsg+'</p></div>');
                 localStorage.setItem('savemsg', '');
             }
-
-            
-
-            $('.drp-buttons').hide();
             
         });
         
         $('input[name="filter_start_date"]').daterangepicker({
+            autoApply: true,
             autoUpdateInput: true,
             singleDatePicker: true, // Set to true for a single date picker
             placeholder: 'Select date', // Set the placeholder text
@@ -889,6 +886,7 @@ $(".share-with-users").select2({
         });
 
         $('input[name="filter_target_date"]').daterangepicker({
+            autoApply: true,
             autoUpdateInput: true,
             singleDatePicker: true, // Set to true for a single date picker
             placeholder: 'Select date', // Set the placeholder text
