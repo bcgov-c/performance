@@ -189,8 +189,8 @@ class ExportDatabaseToBI extends Command
             ->orderByRaw('1');
         
         // Chucking
-        $sql->chunk(5000, function($chuck) use($table_name, $hidden_fields, &$n) {
-            $this->info( "Sending table '{$table_name}' batch (5000) - " . ++$n );
+        $sql->chunk(2000, function($chuck) use($table_name, $hidden_fields, &$n) {
+            $this->info( "Sending table '{$table_name}' batch (2000) - " . ++$n );
 
             //$chuck->makeHidden(['password', 'remember_token']);
             if ($hidden_fields) {
