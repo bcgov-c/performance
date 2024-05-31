@@ -56,13 +56,13 @@
                         <div class="col">
                             <label>
                                 Start Date
-                                <input aria-label="Enter the goals start date" type="text" class="form-control" id="filter_start_date" name="filter_start_date" value="{{request()->filter_start_date ?? ''}}">
+                                <input aria-label="Enter the goals start date in format MM/DD/YYYY" placeholder="MM/DD/YYYY" type="text" class="form-control" id="filter_start_date" name="filter_start_date" value="{{request()->filter_start_date ?? ''}}">
                             </label>
                         </div>
                         <div class="col">
                             <label>
                                 End Date
-                                <input aria-label="Enter the goals targe end date" type="text" class="form-control" id="filter_target_date" name="filter_target_date" value="{{request()->filter_target_date ?? ''}}">
+                                <input aria-label="Enter the goals targe end date in format MM/DD/YYYY" placeholder="MM/DD/YYYY" type="text" class="form-control" id="filter_target_date" name="filter_target_date" value="{{request()->filter_target_date ?? ''}}">
                             </label>
                         </div>
                     </div>
@@ -877,23 +877,35 @@ $(".share-with-users").select2({
         
         $('input[name="filter_start_date"]').daterangepicker({
             autoApply: true,
-            autoUpdateInput: true,
+            autoUpdateInput: false, // Prevent the input from auto-updating
             singleDatePicker: true, // Set to true for a single date picker
-            placeholder: 'Select date', // Set the placeholder text
             locale: {
-                format: 'MMM DD, YYYY'
-            }
+                format: 'MMM/DD/YYYY'
+            }          
         });
+        // Manually update the input field when a date is selected
+        $('input[name="filter_start_date"]').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('MM/DD/YYYY'));
+        });
+
+        // Ensure the placeholder remains
+        $('input[name="filter_start_date"]').attr('placeholder', 'MM/DD/YYYY');
 
         $('input[name="filter_target_date"]').daterangepicker({
             autoApply: true,
-            autoUpdateInput: true,
+            autoUpdateInput: false, // Prevent the input from auto-updating
             singleDatePicker: true, // Set to true for a single date picker
-            placeholder: 'Select date', // Set the placeholder text
             locale: {
-                format: 'MMM DD, YYYY'
+                format: 'MM/DD/YYYY'
             }
         });
+        // Manually update the input field when a date is selected
+        $('input[name="filter_target_date"]').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('MM/DD/YYYY'));
+        });
+
+        // Ensure the placeholder remains
+        $('input[name="filter_target_date"]').attr('placeholder', 'MM/DD/YYYY');
             
             
             function sort(obj){
