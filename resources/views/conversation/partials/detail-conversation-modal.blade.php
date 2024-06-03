@@ -195,7 +195,7 @@ function updateConversation(conversation_id) {
                                 $('.team_member_agreement').prop('disabled', false);
 
                                 if(employee_signed == false) {                                
-                                    $('#signoff-emp-id-input').html('<div id="emp-signoff-row"><div class="my-2">Enter employee ID to sign :</div><input type="text" id="employee_id" class="form-control d-inline w-50"><button class="btn btn-primary btn-sign-off ml-2" type="button">Sign with my employee ID</button><br><span class="text-danger error" data-error-for="employee_id"></span></div>');                                
+                                    $('#signoff-emp-id-input').html('<div id="emp-signoff-row"><div class="my-2">Enter employee ID to sign :</div><div class="row"><div class="col" tabindex="0"><input type="text" id="employee_id" class="form-control d-inline w-50"></div><button class="btn btn-primary btn-sign-off ml-2" style="float:left;"type="button" aria-label="Enter employee ID to sign">Sign with my employee ID</button></div><br><span class="text-danger error" data-error-for="employee_id"></span></div>');                                
                                     $('#unsign-off-block').html('');
                                 } else {
                                     CKEDITOR.instances['info_comment4'].setReadOnly( true );
