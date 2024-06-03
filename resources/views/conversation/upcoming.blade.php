@@ -70,32 +70,33 @@ i {
     </div>
     
     <div class="mt-4">       
-            
-        <div class="card">            
-                <div class="card-header" id="heading_sup" style="border-bottom-width: 0px;">
-                    <h5 class="mb-1"data-toggle="collapse" data-target="#collapse_sup" aria-expanded="1" aria-controls="collapse_sup">
-                        <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_sup" aria-expanded="false" aria-controls="collapse_sup">
-
-                                <button class="btn btn-link text-left">
-                                    <h4>Open Conversations with my Supervisor</h4>
-                                </button> 
-                                <span class="float-right"  style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
-                                <br/>
-                                <button class="btn btn-link text-left" style="color:black">
-                                    <p>This area contains all open conversations between you and your supervisor(s).</p>
-                                </button>   
-                        </h5>
+        <div class="card" tabindex="0">            
+            <div class="card-header" id="heading_sup" style="border-bottom-width: 0px;">
+                <h5 class="mb-1"data-toggle="collapse" data-target="#collapse_sup" aria-expanded="1" aria-controls="collapse_sup">
+                    <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_sup" aria-expanded="false" aria-controls="collapse_sup">
+                        <div tabindex="0">
+                            <button class="btn btn-link text-left">
+                                <h4>Open Conversations with my Supervisor</h4>
+                            </button> 
+                            <span class="float-right"  style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
+                        </div>
+                        <div tabindex="0">
+                            <button class="btn btn-link text-left" style="color:black">
+                                <p>This area contains all open conversations between you and your supervisor(s).</p>
+                            </button>   
+                        </div>
                     </h5>
-                </div>
+                </h5>
+            </div>
 
-                <div id="collapse_sup" class="collapse" aria-labelledby="heading_sup">
+                <div id="collapse_sup" class="collapse" aria-labelledby="heading_sup" tabindex="-1">
                     <div class="card-body">
                         <form action="" method="post" id="sup-filter-menu">
-                            <div class="row">
+                        <div class="row">
                                 <div class="col">
                                     <label>
                                         Conversation Type
-                                        <select name="sup_conversation_topic_id" id="sup_conversation_topic_id" class="sup_filtersub form-control">
+                                        <select name="sup_conversation_topic_id" id="sup_conversation_topic_id" class="form-control" tabindex="0" onchange="$('#sup-filter-menu').submit();$('#sup_conversation_topic_id').focus();">
                                             @foreach($conversationList as $item)
                                             <option value="{{$item['id']}}"
                                                     @if($item['id'] == request()->sup_conversation_topic_id)    
@@ -109,7 +110,7 @@ i {
                                 <div class="col">
                                     <label>
                                         Supervisors
-                                        <select name="supervisors" id="supervisors" class="sup_filtersub form-control">
+                                        <select name="supervisors" id="supervisors" class="form-control" tabindex="0" onchange="$('#sup-filter-menu').submit();$('#supervisors').focus();">
                                             @foreach($supervisor_members as $item)
                                             <option value="{{$item['id']}}"
                                                     @if($item['id'] == request()->supervisors)    
@@ -123,7 +124,7 @@ i {
                                 <div class="col">
                                     <label>
                                         Employee Signed
-                                        <select name="sup_employee_signed" id="sup_employee_signed" class="sup_filtersub form-control">
+                                        <select name="sup_employee_signed" id="sup_employee_signed" class="form-control" tabindex="0" onchange="$('#sup-filter-menu').submit();$('#sup_employee_signed').focus();">
                                                 <option value="any">Any</option><option value="1"
                                                     @if(request()->sup_employee_signed == '1')    
                                                     selected
@@ -140,7 +141,7 @@ i {
                                 <div class="col">
                                     <label>
                                         Supervisor Signed
-                                        <select name="sup_supervisor_signed" id="sup_supervisor_signed" class="sup_filtersub form-control">
+                                        <select name="sup_supervisor_signed" id="sup_supervisor_signed" class="form-control" tabindex="0" onchange="$('#sup-filter-menu').submit();$('#sup_supervisor_signed').focus();">
                                                 <option value="any">Any</option><option value="1"
                                                     @if(request()->sup_supervisor_signed == '1')    
                                                     selected
@@ -162,24 +163,26 @@ i {
         </div>        
             
         @if($user->hasRole('Supervisor'))
-        <div class="card">            
+        <div class="card" tabindex="0">            
                 <div class="card-header" id="heading_emp" style="border-bottom-width: 0px;">
                     <h5 class="mb-1"data-toggle="collapse" data-target="#collapse_emp" aria-expanded="1" aria-controls="collapse_emp">
                         <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_emp" aria-expanded="false" aria-controls="collapse_emp">
-
+                            <div tabindex="0">
                                 <button class="btn btn-link text-left">
                                     <h4>Open Conversations with my Team</h4>
                                 </button> 
                                 <span class="float-right" id="caret_2"  style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
-                                <br/>
+                            </div>
+                            <div tabindex="0">
                                 <button class="btn btn-link text-left" style="color:black">
                                     <p>This area contains all open conversations between you and your direct reports.</p>
                                 </button>   
+                            </div>
                         </h5>
                     </h5>
                 </div>
 
-                <div id="collapse_emp" class="accordion-collapse collapse" aria-labelledby="heading_emp">
+                <div id="collapse_emp" class="accordion-collapse collapse" aria-labelledby="heading_emp" tabindex="-1">
                     <div class="card-body">
                         <form action="" method="post" id="filter-menu">
                             <input name="sub" id="sub" value="1" type="hidden">
@@ -187,7 +190,7 @@ i {
                                 <div class="col">
                                     <label>
                                         Conversation Type
-                                        <select name="conversation_topic_id" id="conversation_topic_id" class="filtersub form-control">
+                                        <select name="conversation_topic_id" id="conversation_topic_id" class="form-control" tabindex="0" onchange="$('#filter-menu').submit();$('#conversation_topic_id').focus();">
                                             @foreach($conversationList as $item)
                                             <option value="{{$item['id']}}"
                                                     @if($item['id'] == request()->conversation_topic_id)    
@@ -201,7 +204,7 @@ i {
                                 <div class="col">
                                     <label>
                                         Team Members
-                                        <select name="team_members" id="team_members" class="filtersub form-control">
+                                        <select name="team_members" id="team_members" class="form-control" tabindex="0" onchange="$('#filter-menu').submit();$('#team_members').focus();">
                                             @foreach($team_members as $item)
                                             <option value="{{$item['id']}}"
                                                     @if($item['id'] == request()->team_members)    
@@ -215,7 +218,7 @@ i {
                                 <div class="col">
                                     <label>
                                         Employee Signed
-                                        <select name="employee_signed" id="employee_signed" class="filtersub form-control">
+                                        <select name="employee_signed" id="employee_signed" class="form-control" tabindex="0" onchange="$('#filter-menu').submit();$('#employee_signed').focus();">
                                                 <option value="any">Any</option><option value="1"
                                                     @if(request()->employee_signed == '1')    
                                                     selected
@@ -232,7 +235,7 @@ i {
                                 <div class="col">
                                     <label>
                                         Supervisor Signed
-                                        <select name="supervisor_signed" id="supervisor_signed" class="filtersub form-control">
+                                        <select name="supervisor_signed" id="supervisor_signed" class="form-control" tabindex="0" onchange="$('#filter-menu').submit();$('#supervisor_signed').focus();">
                                                 <option value="any">Any</option><option value="1"
                                                     @if(request()->supervisor_signed == '1')    
                                                     selected
@@ -255,8 +258,7 @@ i {
         @endif
     </div> 
 
-    
-
+    @include('conversation.partials.upcoming-modals')
     @include('conversation.partials.view-conversation-modal')
 
         @include('conversation.partials.delete-hidden-form')
@@ -348,7 +350,12 @@ i {
       $('#collapse_sup').collapse('hide');
   }
   
-  $(document).ready(function() {
+    $(document).on('click', '#btn_ok_agree', function(e) {
+        $('#agreeSignOffModal').modal('hide');
+        $('#viewConversationModal').modal('show');
+    }); 
+
+    $(document).ready(function() {
         const json_myTeamConversations = <?php echo $json_myTeamConversations;?>;
         const employee_table = $('#employee_conversations').DataTable({
             data: json_myTeamConversations,
@@ -359,24 +366,49 @@ i {
               {
                 title: '<div style="padding-left: 20px;">Name</div>', // add left padding to header cell
                 render: function(data, type, row) {
-                  return '<a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</a>';
+                  return '<div tabindex="0"><a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</a></div>';
                 }
               },
-              { title: "Participants", data: "participants" },
-              { title: "Employee Signed", data: "employee_signed" },
-              { title: "Supervisor Signed", data: "supervisor_signed" },
-              { title: "Created At", data: "create_date" },
-              { title: "Last Updated", data: "update_date" },
-              {
-                title: "",
-                render: function(data, type, row) {
-                  var disallowed = true;
-                  if(row.signoff_user_id == null && row.supervisor_signoff_id == null){
-                      disallowed = false;
-                  }
-                  return '<button class="btn btn-danger btn-sm float-right ml-2 delete-btn" data-id="' + row.id + '" data-disallowed="'+ disallowed +'"><i class="fa-trash fa"></i></button>';
+                { 
+                    title: "Participants", 
+                    render: function(data, type, row) {
+                        return '<div tabindex="0">'+row.participants+'</div>';
+                    }
+                },
+                { 
+                    title: "Employee Signed", 
+                    render: function(data, type, row) {
+                        return '<label Employee Signed></label><div tabindex="0">'+row.employee_signed+'</div>';
+                    }
+                },
+                { 
+                    title: "Supervisor Signed", 
+                    render: function(data, type, row) {
+                        return '<label Supervisor Signed></label><div tabindex="0">'+row.supervisor_signed+'</div>';
+                    }
+                },
+                { 
+                    title: "Created At", 
+                    render: function(data, type, row) {
+                        return '<label Created At></label><div tabindex="0">'+row.create_date+'</div>';
+                    }
+                },
+                { 
+                    title: "Last Updated", 
+                    render: function(data, type, row) {
+                        return '<label Last Updated></label><div tabindex="0">'+row.update_date+'</div>';
+                    }
+                },
+                {
+                    title: "",
+                    render: function(data, type, row) {
+                        var disallowed = true;
+                        if(row.signoff_user_id == null && row.supervisor_signoff_id == null){
+                            disallowed = false;
+                        }
+                        return '<div tabindex="0"><button class="btn btn-outline-danger btn-sm ml-2 mt-2 delete-btn" data-id="'+row.id+'" data-disallowed="'+disallowed+'" aria-label="Delete conversation button">Delete <i class="fa-trash fa"></i></button></div>';
+                    }
                 }
-              }
             ],
             "order": [[0, "desc"]],
             dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>'
@@ -390,30 +422,55 @@ i {
         const supervisor_table = $('#supervisor_conversations').DataTable({
             data: json_conversations,
             columns: [
-              { title: "ID", data: "id" },
-              { title: "Employee ID", data: "signoff_user_id" },
-              { title: "Supervisor ID", data: "supervisor_signoff_id" },              
-              {
-                title: '<div style="padding-left: 20px;">Name</div>', // add left padding to header cell
-                render: function(data, type, row) {
-                  return '<a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</a>';
+                { title: "ID", data: "id" },
+                { title: "Employee ID", data: "signoff_user_id" },
+                { title: "Supervisor ID", data: "supervisor_signoff_id" },              
+                {
+                    title: '<div style="padding-left: 20px;">Name</div>', // add left padding to header cell
+                    render: function(data, type, row) {
+                    return '<div tabindex="0"><a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</a></div>';
+                    }
+                },
+                { 
+                    title: "Participants", 
+                    render: function(data, type, row) {
+                        return '<label Participants></label><div tabindex="0">'+row.participants+'</div>';
+                    }
+                },
+                { 
+                    title: "Employee Signed", 
+                    render: function(data, type, row) {
+                        return '<label Employee Signed></label><div tabindex="0">'+row.employee_signed+'</div>';
+                    }
+                },
+                { 
+                    title: "Supervisor Signed", 
+                    render: function(data, type, row) {
+                        return '<label Supervisor Signed></label><div tabindex="0">'+row.supervisor_signed+'</div>';
+                    }
+                },
+                { 
+                    title: "Created At", 
+                    render: function(data, type, row) {
+                        return '<label Created At></label><div tabindex="0">'+row.create_date+'</div>';
+                    }
+                },
+                { 
+                    title: "Last Updated", 
+                    render: function(data, type, row) {
+                        return '<label Last Updated></label><div tabindex="0">'+row.update_date+'</div>';
+                    }
+                },
+                {
+                    title: "",
+                    render: function(data, type, row) {
+                        var disallowed = true;
+                        if(row.signoff_user_id == null && row.supervisor_signoff_id == null){
+                            disallowed = false;
+                        }
+                        return '<div tabindex="0"><button class="btn btn-outline-danger btn-sm ml-2 mt-2 delete-btn" data-id="'+row.id+'" data-disallowed="'+disallowed+'" aria-label="Delete conversation button">Delete<i class="fa-trash fa"></i></button></div>';
+                    }
                 }
-              },
-              { title: "Participants", data: "participants" },
-              { title: "Employee Signed", data: "employee_signed" },
-              { title: "Supervisor Signed", data: "supervisor_signed" },
-              { title: "Created At", data: "create_date" },
-              { title: "Last Updated", data: "update_date" },
-              {
-                title: "",
-                render: function(data, type, row) {
-                  var disallowed = true;
-                  if(row.signoff_user_id == null && row.supervisor_signoff_id == null){
-                      disallowed = false;
-                  }
-                  return '<button class="btn btn-danger btn-sm float-right ml-2 delete-btn" data-id="' + row.id + '" data-disallowed="'+ disallowed +'"><i class="fa-trash fa"></i></button>';
-                }
-              }
             ],
             "order": [[0, "desc"]],
             dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>'

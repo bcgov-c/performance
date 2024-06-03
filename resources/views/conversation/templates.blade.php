@@ -36,31 +36,34 @@
 
 
     <div class="mt-4">
-        
-        <div class="card">
-            
+        <div class="card" tabindex="0">
             <div class="card-header" id="heading_1" style="border-bottom-width: 0px;">
-                    <h5 class="mb-1"data-toggle="collapse" data-target="#collapse_1" aria-expanded="1" aria-controls="collapse_1">
-                        <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_1" aria-expanded="false" aria-controls="collapse_1">
-
-                                <button class="btn btn-link text-left">
-                                    <h4>Performance Check-in Template</h4>
-                                </button> 
-                                <span class="float-right"  style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
-                                <br/>                                
-                                <button class="btn btn-link text-left" style="color:black">
-                                    <p>The Performance check-In template can be used in most situations. 
-                                        It includes options to capture progress against goals, celebrate successes, 
-                                        discuss ways to improve future performance outcomes, and record an overall performance evaluation.</p>
-                                </button>   
-                        </h5>
+                <h5 class="mb-1"data-toggle="collapse" data-target="#collapse_1" aria-expanded="1" aria-controls="collapse_1">
+                    <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_1" aria-expanded="false" aria-controls="collapse_1">
+                        <div tabindex="0">
+                            <button class="btn btn-link text-left">
+                                <h4>Performance Check-in Template</h4>
+                            </button> 
+                            <span class="float-right"  style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
+                        </div>
+                        <div tabindex="0">
+                            <button class="btn btn-link text-left" style="color:black">
+                                <p>
+                                    The Performance check-In template can be used in most situations. 
+                                    It includes options to capture progress against goals, celebrate successes, 
+                                    discuss ways to improve future performance outcomes, and record an overall performance evaluation.
+                                </p>
+                            </button>   
+                        </div>
                     </h5>
+                </h5>
+            <!-- </div> -->
 		</div>
                 
                 <form id="conversation_form_1" action="{{ route ('conversation.store')}}" method="POST">
                 <input type="hidden" name="date" value="{{ \Carbon\Carbon::now() }}">
                 <input type="hidden" name="time" value="{{ \Carbon\Carbon::now() }}">      
-		<div id="collapse_1" class="collapse" aria-labelledby="heading_1">
+		<div id="collapse_1" class="collapse" aria-labelledby="heading_1" tabindex="-1">
                     <div class="card-body">
                         @foreach ($templates as $template)
                         @if(strtolower($template->name) === 'performance check-in')   
@@ -72,18 +75,18 @@
                                             <table class="table">
                                                 <thead class="headborder">
                                                     <tr style="border-bottom: solid #FCBA19">
-                                                        <th width="20%" style="border-bottom: solid #FCBA19">Name</th>
-                                                        <th width="45%" style="border-bottom: solid #FCBA19">When to use</th>
-                                                        <th width="15%" style="border-bottom: solid #FCBA19">Participants</th>
+                                                        <th width="20%" style="border-bottom: solid #FCBA19" aria-label="Name">Name</th>
+                                                        <th width="45%" style="border-bottom: solid #FCBA19" aria-label="When to use">When to use</th>
+                                                        <th width="15%" style="border-bottom: solid #FCBA19" aria-label="Participants" id="header_label_participants">Participants</th>
                                                         <th width="20%" style="border-bottom: solid #FCBA19">&nbsp;</th>
                                                     </tr>
                                                 </tdhead>
                                                 <tbody style="border-collapse: collapse;">
                                                 <tr style="background-color: #efefef">
-                                                    <td><a class="btn btn-link ml-2 btn-view-conversation" data-id="{{$template->id}}" data-toggle="modal" data-target="#viewConversationModal">{{$template->name}}</a></td>
-                                                    <td>{!! $template->when_to_use !!}</td>
+                                                    <td><div tabindex="0"><a class="btn btn-link ml-2 btn-view-conversation" data-id="{{$template->id}}" data-toggle="modal" data-target="#viewConversationModal">{{$template->name}}</a></div></td>
+                                                    <td><div tabindex="0">{!! $template->when_to_use !!}</div></td>
                                                     <td>
-                                                        <select class="form-control w-100 select" style="width:100%; margin-top: 8px;" name="participant_id[]" id="participant_id" required>
+                                                        <select class="form-control w-100 select" style="width:100%; margin-top: 8px;" name="participant_id[]" id="participant_id" required aria-required="true" aria-describedby="header_label_participants">
                                                             <option value="">None Selected</option>
                                                             @foreach($participant_users as $p)
                                                             @if(session()->has('view-profile-as'))
@@ -96,10 +99,11 @@
                                                             @endforeach
                                                        </select>
                                                     </td>                                                    
-                                                    <td>
-                                                        <button class="btn d-flex align-items-center" >
+                                                    <td><div tabindex="0">
+                                                        <button class="btn d-flex align-items-center" aria-label="Start Conversation">
                                                         <span class="btn btn-primary">Start Conversation</span>
                                                         </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                                 </tbody>
@@ -115,23 +119,27 @@
 	</div>
         
         
-        <div class="card">
+        <div class="card" tabindex="0">
 		
             <div class="card-header" id="heading_2" style="border-bottom-width: 0px;">
                     <h5 class="mb-1" data-toggle="collapse" data-target="#collapse_2" aria-expanded="1" aria-controls="collapse_2">
                         <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_2" aria-expanded="false" aria-controls="collapse_2">
+                            <div tabindex="0">
                                 <button class="btn btn-link text-left">
                                     <h4>Other Templates</h4>
                                 </button> 
                                 <span class="float-right" style="color:#1a5a96"><i class="fa fa-chevron-down"></i></span> 
-                                <br/>                                
+                            </div>
+                                <!-- <br/>                                 -->
+                            <div tabindex="0">
                                 <button class="btn btn-link text-left"  style="color:black">
                                     <p>These templates can be used as required to support conversations that require a more 
                                         specific focus.</p>
                                 </button>   
+                            </div>
                         </h5>
                     </h5>
-		</div>
+		    </div>
 		
 		<div id="collapse_2" class="collapse" aria-labelledby="heading_2">
                     <div class="card-body">
@@ -142,9 +150,9 @@
                         <table class="table table-striped">
                             <thead class="headborder">
                                 <tr style="border-bottom: solid #FCBA19">
-                                    <th width="20%" style="border-bottom: solid #FCBA19">Name</th>
-                                    <th width="45%" style="border-bottom: solid #FCBA19">When to use</th>
-                                    <th width="15%" style="border-bottom: solid #FCBA19">Participants</th>
+                                    <th width="20%" style="border-bottom: solid #FCBA19" aria-label="Name">Name</th>
+                                    <th width="45%" style="border-bottom: solid #FCBA19" aria-label="When to use">When to use</th>
+                                    <th width="15%" style="border-bottom: solid #FCBA19" aria-label="Participants" id="header_label_participants">Participants</th>
                                     <th width="20%" style="border-bottom: solid #FCBA19">&nbsp;</th>
                                 </tr>
                             </thead>
@@ -152,10 +160,10 @@
                                 @foreach ($templates as $template)
                                 @if(strtolower($template->name) !== 'performance check-in')
                                 <tr>
-                                    <td><a class="btn btn-link ml-2 btn-view-conversation" data-id="{{$template->id}}" data-toggle="modal" data-target="#viewConversationModal">{{$template->name}}</a></td>
-                                    <td>{!! $template->when_to_use !!}</td>
+                                    <td><div tabindex="0"><a class="btn btn-link ml-2 btn-view-conversation" data-id="{{$template->id}}" data-toggle="modal" data-target="#viewConversationModal">{{$template->name}}</a></div></td>
+                                    <td><div tabindex="0">{!! $template->when_to_use !!}</div></td>
                                     <td>
-                                        <select class="form-control w-100 select" style="width:100%; margin-top: 8px;"" name="participant_id_{{$template->id}}[]" id="participant_id_{{$template->id}}" required>
+                                        <select class="form-control w-100 select" style="width:100%; margin-top: 8px;" name="participant_id_{{$template->id}}[]" id="participant_id_{{$template->id}}" required aria-required="true" aria-describedby="header_label_participants">
                                             <option value="">None Selected</option>
                                             @foreach($participant_users as $p)
                                             @if(session()->has('view-profile-as'))
@@ -169,10 +177,11 @@
                                         </select>
                                     </td>
                                     <td>   
-                                       
+                                        <div tabindex="0">
                                         <button class="btn d-flex align-items-center" onclick="javascript:conversation_sub({{$template->id}});">
                                             <span class="btn btn-primary">Start Conversation</span>
                                         </button>
+                                        </div>
                                     </td>
                                 </tr>
                                 @endif

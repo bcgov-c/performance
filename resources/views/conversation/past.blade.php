@@ -105,7 +105,7 @@ i {
                                 <div class="col">
                                     <label>
                                         Status
-                                        <select name="sup_status" id="sup_status" class="sup_filtersub form-control">
+                                        <select name="sup_status" id="sup_status" class="form-control" tabindex="0" onchange="$('#sup-filter-menu').submit();$('#sup_status').focus();">
                                             <option value="">Any</option>
                                             <option value="locked"
                                                     @if(request()->sup_status == 'locked')    
@@ -123,7 +123,7 @@ i {
                                 <div class="col">
                                     <label>
                                         Conversation Type
-                                        <select name="sup_conversation_topic_id" id="sup_conversation_topic_id" class="sup_filtersub form-control">
+                                        <select name="sup_conversation_topic_id" id="sup_conversation_topic_id" class="form-control" tabindex="0" onchange="$('#sup-filter-menu').submit();$('#sup_conversation_topic_id').focus();">
                                             @foreach($conversationList as $item)
                                             <option value="{{$item['id']}}"
                                                     @if($item['id'] == request()->sup_conversation_topic_id)    
@@ -137,7 +137,7 @@ i {
                                 <div class="col">
                                     <label>
                                         Supervisors
-                                        <select name="supervisors" id="supervisors" class="sup_filtersub form-control">
+                                        <select name="supervisors" id="supervisors" class="form-control" tabindex="0" onchange="$('#sup-filter-menu').submit();$('#supervisors').focus();">
                                             @foreach($supervisor_members as $item)
                                             <option value="{{$item['id']}}"
                                                     @if($item['id'] == request()->supervisors)    
@@ -151,7 +151,7 @@ i {
                                 <div class="col">
                                     <label>
                                         Date
-                                        <input class="sup_filtersub form-control form-control-md" type="date" name="sup_signoff_date" id="sup_signoff_date" value="{{request()->sup_signoff_date}}" autocomplete="off">
+                                        <input class="form-control form-control-md" type="date" name="sup_signoff_date" id="sup_signoff_date" value="{{request()->sup_signoff_date}}" autocomplete="off" tabindex="0" onchange="$('#sup-filter-menu').submit();$('#sup_signoff_date').focus();">
                                     </label>
                                 </div>
                             </div>
@@ -187,7 +187,7 @@ i {
                                 <div class="col">
                                     <label>
                                         Status
-                                        <select name="status" id="status" class="filtersub form-control">
+                                        <select name="status" id="status" class="form-control" tabindex="0" onchange="$('#filter-menu').submit();$('#status').focus();">
                                             <option value="">Any</option>
                                             <option value="locked"
                                                     @if(request()->status == 'locked')    
@@ -205,7 +205,7 @@ i {
                                 <div class="col">
                                     <label>
                                         Conversation Type
-                                        <select name="conversation_topic_id" id="conversation_topic_id" class="filtersub form-control">
+                                        <select name="conversation_topic_id" id="conversation_topic_id" class="form-control" tabindex="0" onchange="$('#filter-menu').submit();$('#conversation_topic_id').focus();">
                                             @foreach($conversationList as $item)
                                             <option value="{{$item['id']}}"
                                                     @if($item['id'] == request()->conversation_topic_id)    
@@ -219,7 +219,7 @@ i {
                                 <div class="col">
                                     <label>
                                         Team Members
-                                        <select name="team_members" id="team_members" class="filtersub form-control">
+                                        <select name="team_members" id="team_members" class="form-control" tabindex="0" onchange="$('#filter-menu').submit();$('#team_members').focus();">
                                             @foreach($team_members as $item)
                                             <option value="{{$item['id']}}"
                                                     @if($item['id'] == request()->team_members)    
@@ -233,7 +233,7 @@ i {
                                 <div class="col">
                                     <label>
                                         Date
-                                        <input class="filtersub form-control form-control-md" type="date" name="signoff_date" id="signoff_date" value="{{request()->signoff_date}}" autocomplete="off">
+                                        <input class="form-control form-control-md" type="date" name="signoff_date" id="signoff_date" value="{{request()->signoff_date}}" autocomplete="off" tabindex="0" onchange="$('#filter-menu').submit();$('#signoff_date').focus();">
                                     </label>
                                 </div>
                             </div>
@@ -337,7 +337,7 @@ i {
               {
                 title: '<div style="padding-left: 20px;">Name</div>', // add left padding to header cell
                 render: function(data, type, row) {
-                  return '<a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</button>';
+                  return '<div tabindex="0"><a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+row.name+'</a></div>';
                 }
               },
               { title: "Participants", data: "participants" },
@@ -365,7 +365,7 @@ i {
                     title: '<div style="padding-left: 20px;">Name</div>', // add left padding to header cell
                     data: "name",
                     render: function(data, type, row) {
-                        return '<a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+data+'</a>';
+                        return '<div tabindex="0"><a class="btn btn-link ml-2 btn-view-conversation" data-id="'+row.id+'" data-toggle="modal" data-target="#viewConversationModal">'+data+'</a></div>';
                     }
                 },
                 { title: "Participants", data: "participants" },
