@@ -22,7 +22,7 @@
             <x-button icon="plus-circle" data-toggle="modal" data-target="#addGoalModal">
                 Create New Goal
             </x-button>
-            <x-button icon="clone" href="{{ route('goal.library') }}">
+            <x-button icon="clone" href="{{ route('goal.library') }}" >
                 Add Goal from Goal Bank
             </x-button>
             <x-button icon="question" href="{{ route('resource.user-guide','t=1') }} " target="_blank" data-trigger="focus" data-toggle="popover" tooltip='Click here to access goal setting resources and examples (opens in new window).'>    

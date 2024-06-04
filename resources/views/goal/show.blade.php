@@ -3,17 +3,19 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
 		{{ $goal['title'] }}
             @if(!$disableEdit && $goal->user_id === Auth::Id() && $goal['status'] == 'active')
-            <x-button icon="edit" :href="route('goal.edit', $goal->id)">Edit</x-button>
+            <button class="btn btn-outline-primary btn-md" id="edit-btn" href="{{ route('goal.edit', $goal->id) }}" tabindex="0">
+                        <i class="fa fa-edit"></i>&nbsp;        Edit
+            </button>
             @endif
         
         @if(session('from_share'))
-            <a role="button" class="btn btn-primary btn-md" href="{{ route('goal.share') }}">
+        <button class="btn btn-outline-primary btn-md" id="back-share-btn" href="{{ route('goal.share') }}">
                         <i class="fa fa-backward"></i>&nbsp;        Back to list
-            </a>
+            </button>
         @else
-            <a role="button" class="btn btn-primary btn-md" href="{{ route('goal.index') }}">
+        <button class="btn btn-outline-primary btn-md" id="back-list-btn" href="{{ route('goal.index') }}">
                         <i class="fa fa-backward"></i>&nbsp;        Back to list
-            </a>
+            </button>
         @endif
         </h2>
     </x-slot>
@@ -91,10 +93,10 @@
                                     <div class="comment-text">
                                         {!! (!$comment->trashed()) ? $comment->comment : '<i>Comment is deleted.</i>' !!}
                                     </div>
-                                    <x-button class="btn edit-save d-none" action="submit" :data-comment-id="$comment->id" size="sm">Save</x-button>
+                                    <x-button class="btn edit-save d-none" action="submit" :data-comment-id="$comment->id" size="sm" tabindex="0">Save</x-button>
                                     <div>
-                                        @if($comment->canBeEdited())<x-button icon='edit' style="link" class="comment-edit" :data-comment-id="$comment->id" size="sm">Edit</x-button>@endif
-                                        @if(!$comment->trashed() && $comment->canBeDeleted())<x-button icon='trash' style="link" class="comment-delete" :data-comment-id="$comment->id" size="sm">Delete</x-button>@endif
+                                        @if($comment->canBeEdited())<x-button icon='edit' style="link" class="comment-edit" :data-comment-id="$comment->id" size="sm" tabindex="0">Edit</x-button>@endif
+                                        @if(!$comment->trashed() && $comment->canBeDeleted())<x-button icon='trash' style="link" class="comment-delete" :data-comment-id="$comment->id" size="sm" tabindex="0">Delete</x-button>@endif
                                     </div>
                                     <div>
                                         @foreach($comment->replies as $reply)
@@ -111,15 +113,15 @@
                                                 <div class="comment-text">
                                                     {!! (!$reply->trashed()) ? $reply->comment : '<i>Comment is deleted.</i>' !!}
                                                 </div>
-                                                <x-button class="btn edit-save d-none" action="submit" :data-comment-id="$reply->id" size="sm">Save</x-button>
+                                                <x-button class="btn edit-save d-none" action="submit" :data-comment-id="$reply->id" size="sm" tabindex="0">Save</x-button>
                                                 <div>
-                                                    @if($reply->canBeEdited())<x-button icon='edit' style="link" class="comment-edit" :data-comment-id="$reply->id" size="sm">Edit</x-button>@endif
-                                                    @if(!$reply->trashed() && $reply->canBeDeleted())<x-button icon='trash' style="link" class="comment-delete" :data-comment-id="$reply->id" size="sm">Delete</x-button>@endif
+                                                    @if($reply->canBeEdited())<x-button icon='edit' style="link" class="comment-edit" :data-comment-id="$reply->id" size="sm" tabindex="0">Edit</x-button>@endif
+                                                    @if(!$reply->trashed() && $reply->canBeDeleted())<x-button icon='trash' style="link" class="comment-delete" :data-comment-id="$reply->id" size="sm" tabindex="0">Delete</x-button>@endif
                                                 </div>
                                             </div>
                                         </div>
                                         @endforeach
-                                        <x-button icon='reply' style="link" class="comment-reply" :data-comment-id="$comment->id" size="sm">Reply</x-button>
+                                        <x-button icon='reply' style="link" class="comment-reply" :data-comment-id="$comment->id" size="sm" tabindex="0">Reply</x-button>
                                         <div class="reply-box d-none">
                                             <form action="{{route('goal.add-comment', $goal->id)}}" method="POST">
                                                 @csrf
@@ -130,7 +132,9 @@
                                                         <!-- <x-textarea class="ckeditor" name="comment" id="addreply"/> -->
                                                         <textarea class="addreply" id="addreply" name="comment"></textarea>
                                                         <div class="d-flex flex-row my-2">
-                                                            <x-button class="btn" action="submit" :data-comment-id="$comment->id" size="sm">Add Comment</x-button>
+                                                        <button role="button" class="btn btn-outline-primary btn-sm btn" action="submit" :data-comment-id="$comment->id" tabindex="0">
+                                                                Add Comment
+                                                        </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -148,7 +152,9 @@
                                         <textarea name="comment" id="addcomment"></textarea>
                                         <!-- <x-textarea class="ckeditor" name="comment" id="addcomment"/> -->
                                         <div class="d-flex flex-row my-2">
-                                            <x-button class="btn" action="submit" size="sm">Add Comment</x-button>
+                                        <button role="button" class="btn btn-outline-primary btn-sm btn" action="submit" :data-comment-id="$comment->id">
+                                                Add Comment
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -299,7 +305,22 @@
         selector: '[data-toggle]',
         trigger: 'hover',
     });
+
+    $('#edit-btn').click(function(){
+        window.location.href = "{{ route('goal.edit', $goal->id) }}";
+    }); 
+
+    $('#back-share-btn').click(function(){
+        window.location.href = "{{ route('goal.share') }}";
+    });
+
+    $('#back-list-btn').click(function(){
+        window.location.href = "{{ route('goal.index') }}";
+    });
     </script>
     @endpush
 
 </x-side-layout>
+
+
+@include('goal.partials.accessibility')

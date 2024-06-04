@@ -1,17 +1,26 @@
+@push('css')
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    @endpush
+    
+    @push('js')
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    @endpush
+
 <x-side-layout title="{{ __('My Goals - Performance Development Platform') }}">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             Edit: {{ $goal-> title}} 
         </h2>
         <!----<small><a href="{{ route('goal.index') }}">Back to list</a></small>---->
-        <a role="button" class="btn btn-primary btn-md" href="{{ route('goal.show', $goal->id) }}">
-                        <i class="fa fa-backward"></i>&nbsp;        Back
-            </a>
+        <button class="btn btn-outline-primary btn-md" id="back-btn" href="{{ route('goal.show', $goal->id) }}">
+            <i class="fa fa-backward"></i>&nbsp;        Back
+        </button>
     </x-slot>
 
     <div class="container-fluid">
         <form id="goalform" action="{{ route ('goal.update', $goal->id)}}" method="POST">
-            <input type ="hidden" id="datatype" name="datatype" value"manual">
+            <input type ="hidden" id="datatype" name="datatype" value="manual">
             @csrf
             @method('PUT')
             <div class="row">
@@ -64,10 +73,14 @@
                     <!-- <x-textarea-modal id="measure_of_success" label="Measures of Success" name="measure_of_success" class="content" tooltip='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"' :value="$goal->measure_of_success" /> -->
                 </div>                                        
                 <div class="col-sm-6">
-                    <x-input label="Start Date" type="date" name="start_date" id="start_date" :value="$goal->start_date ? $goal->start_date->format('Y-m-d') : ''" />
+                    <label for="start_date">Start Date<br/>
+                        <input aria-label="Enter the goals start date in format YYYY-MM-DD" placeholder="YYYY-MM-DD" type="text" class="form-control" id="start_date" name="start_date" value="{{$goal->start_date ? $goal->start_date->format('Y-m-d') : ''}}">
+                    </label>
                 </div>
                 <div class="col-sm-6">
-                    <x-input label="End Date" type="date" name="target_date" id="target_date" :value="$goal->target_date ? $goal->target_date->format('Y-m-d') : ''" />
+                    <label for="start_date">End Date<br/>
+                        <input aria-label="Enter the goals target date in format YYYY-MM-DD" placeholder="YYYY-MM-DD" type="text" class="form-control" id="target_date" name="target_date" value="{{$goal->target_date ? $goal->target_date->format('Y-m-d') : ''}}">
+                    </label>
                 </div>
                 
                 @if(session()->has('is_bank')) 
@@ -85,15 +98,15 @@
                 @endif
    
                 <div class="col-12 text-center mb-3">
-                    <x-button type="button" class="btn-lg" id="saveButton"> Save </x-button>
-                    <x-button type="button" class="btn-lg" id="cancelButton"> <i class="fa fa-undo"></i>&nbsp; Cancel </x-button>
+                    <button type="button" id="saveButton" class="btn btn-lg btn-outline-primary">Save</button>
+                    <button type="button" id="cancelButton" class="btn btn-lg btn-outline-primary"> <i class="fa fa-undo"></i>&nbsp; Cancel</button>
                 </div>
             </div>
         </form>
     </div>
 
 
-    <div class="modal" id="confirmationModal" tabindex="-1" role="dialog">
+    <div class="modal" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -106,12 +119,55 @@
                     Are you sure you want to update Goal?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="confirmYes" class="btn btn-primary">Yes</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>                    
+                    <button type="button" id="confirmYes" class="btn btn-outline-primary">Yes</button>
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">No</button>                      
                 </div>
             </div>
         </div>
     </div>
+
+
+
+    <div class="modal fade" id="saveModal" tabindex="-1" role="dialog" aria-labelledby="saveModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="saveModalLabel">Auto Save</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            You have not saved your work in 20 minutes. To protect your work, it has been automatically saved.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="modal fade" id="alertModal" tabindex="-1" role="dialog" aria-labelledby="alertModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="alertModalLabel">Alert</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+            Please choose start date first.
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        </div>
+    </div>
+
+
     @push('css')
         <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}">
     @endpush
@@ -175,13 +231,29 @@
             
         });
     </script>
-    <script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
+    <script src="//cdn.ckeditor.com/4.17.2/full/ckeditor.js"></script>
     <script type="text/javascript">
         $(document).ready(function(){
             CKEDITOR.replace('what', {
-                toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent", "Link"] ],disableNativeSpellChecker: false  });
+                extraPlugins: 'a11yhelp', // Include the accessibility help plugin
+                removePlugins: 'elementspath', // Optionally remove the elementspath plugin for better accessibility
+                toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent", "Link"] ],
+                disableNativeSpellChecker: false  });
+            
+            
             CKEDITOR.replace('measure_of_success', {
-                toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent", "Link"] ],disableNativeSpellChecker: false  });
+                extraPlugins: 'a11yhelp', // Include the accessibility help plugin
+                removePlugins: 'elementspath', // Optionally remove the elementspath plugin for better accessibility
+                toolbar: [ ["Bold", "Italic", "Underline", "-", "NumberedList", "BulletedList", "-", "Outdent", "Indent", "Link"] ],
+                disableNativeSpellChecker: false  });
+        
+        
+            // Set ARIA attributes for better accessibility
+            CKEDITOR.on('instanceReady', function (ev) {
+                var editor = ev.editor;
+                editor.container.setAttribute('role', 'application');
+                editor.container.setAttribute('aria-labelledby', 'editor1_label');
+            });    
         });
     </script>
     <script>
@@ -244,9 +316,32 @@
         function sessionWarnings() {
             no_msg = true;    
             $('#datatype').val('auto');
-            $('#goalform').submit();
-            alert('You have not saved your work in 20 minutes. To protect your work, it has been automatically saved.');    
-        } 
+
+            // Update CKEditor instances
+            for (instance in CKEDITOR.instances) {
+                CKEDITOR.instances[instance].updateElement();
+            }
+
+            // Serialize the form data
+            var formData = $('#goalform').serialize();
+
+            // Submit the form using AJAX
+            $.ajax({
+                type: 'POST',
+                url: "{{ route('goal.update', $goal->id) }}",
+                data: formData,
+                success: function(response) {
+                    // Show the modal on successful form submission
+                    $('#saveModal').modal('show');
+                },
+                error: function(xhr, status, error) {
+                // Handle any errors
+                console.error('Form submission failed:', error);
+                }
+            });
+
+            return false; // Prevent default form submission
+        }
 
     </script>
     @endpush
@@ -260,18 +355,57 @@
             $( "#target_date" ).attr("min",start_date);            
         });
         
-        $( "#target_date" ).change(function() {
-            var start_date = $( "#start_date" ).val();
+        $("#target_date").change(function() {
+            var start_date = $("#start_date").val();
             if (start_date === '') {
-                alert('Please choose start date first.');
-                $( "#target_date" ).val('');
-            }           
-        });        
+                // Show the modal
+                $('#alertModal').modal('show');
+                // Reset the target date
+                $("#target_date").val('');
+            }
+        });   
         
         @if(session()->has('title_miss'))                           
             $('input[name=title]').addClass('is-invalid');
         @endif
+
+        $('#back-btn').click(function(){
+            window.location.href = "{{ route('goal.show', $goal->id) }}";
+        });
         
+
+        $('input[name="start_date"]').daterangepicker({
+            autoApply: true,
+            autoUpdateInput: false, // Prevent the input from auto-updating
+            singleDatePicker: true, // Set to true for a single date picker
+            locale: {
+                format: 'YYYY-MM-DD'
+            }          
+        });
+        // Manually update the input field when a date is selected
+        $('input[name="start_date"]').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('YYYY-MM-DD'));
+        });
+
+        // Ensure the placeholder remains
+        $('input[name="start_date"]').attr('placeholder', 'YYYY-MM-DD');
+
+        $('input[name="target_date"]').daterangepicker({
+            autoApply: true,
+            autoUpdateInput: false, // Prevent the input from auto-updating
+            singleDatePicker: true, // Set to true for a single date picker
+            locale: {
+                format: 'YYYY-MM-DD'
+            }
+        });
+        // Manually update the input field when a date is selected
+        $('input[name="target_date"]').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('YYYY-MM-DD'));
+        });
+        
+        // Ensure the placeholder remains
+        $('input[name="target_date"]').attr('placeholder', 'YYYY-MM-DD');
+
 </script>    
 
 
@@ -286,3 +420,5 @@
         overflow-y: scroll;
     }
 </style>    
+
+@include('goal.partials.accessibility')
