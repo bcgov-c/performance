@@ -97,6 +97,11 @@
         box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.5); /* Change the shadow color to black */
     }
 
+    .btn-link:focus {
+        outline: 2px solid #1A5A96; /* Change the color and style as needed */
+        box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.5); /* Change the shadow color to black */
+    }
+
     
     .visually-hidden {
         position: absolute;
