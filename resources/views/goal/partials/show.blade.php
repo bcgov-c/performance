@@ -55,7 +55,7 @@
     <b>{{__("Tags")}}</b>
     <div class="form-control-plaintext">
         @foreach($goal->tags as $tag)
-            <div class="btn btn-outline-primary btn-sm" style="cursor: default;">
+            <div class="btn btn-outline-primary btn-sm" style="cursor: default;" tabindex="0">
                 {{$tag['name']}}
             </div>
         @endforeach
