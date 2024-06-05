@@ -20,7 +20,7 @@
 
     <div class="container-fluid">
         <form id="goalform" action="{{ route ('goal.update', $goal->id)}}" method="POST">
-            <input type ="hidden" id="datatype" name="datatype" value"manual">
+            <input type ="hidden" id="datatype" name="datatype" value="manual">
             @csrf
             @method('PUT')
             <div class="row">
@@ -316,8 +316,31 @@
         function sessionWarnings() {
             no_msg = true;    
             $('#datatype').val('auto');
-            $('#goalform').submit();
-            $('#saveModal').modal('show'); // Show the Bootstrap modal
+
+            // Update CKEditor instances
+            for (instance in CKEDITOR.instances) {
+                CKEDITOR.instances[instance].updateElement();
+            }
+
+            // Serialize the form data
+            var formData = $('#goalform').serialize();
+
+            // Submit the form using AJAX
+            $.ajax({
+                type: 'POST',
+                url: "{{ route('goal.update', $goal->id) }}",
+                data: formData,
+                success: function(response) {
+                    // Show the modal on successful form submission
+                    $('#saveModal').modal('show');
+                },
+                error: function(xhr, status, error) {
+                // Handle any errors
+                console.error('Form submission failed:', error);
+                }
+            });
+
+            return false; // Prevent default form submission
         }
 
     </script>
