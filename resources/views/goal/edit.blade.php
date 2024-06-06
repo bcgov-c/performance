@@ -20,7 +20,7 @@
 
     <div class="container-fluid">
         <form id="goalform" action="{{ route ('goal.update', $goal->id)}}" method="POST">
-            <input type ="hidden" id="datatype" name="datatype" value"manual">
+            <input type ="hidden" id="datatype" name="datatype" value="manual">
             @csrf
             @method('PUT')
             <div class="row">
@@ -106,7 +106,7 @@
     </div>
 
 
-    <div class="modal" id="confirmationModal" tabindex="-1" role="dialog">
+    <div class="modal" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -125,6 +125,49 @@
             </div>
         </div>
     </div>
+
+
+
+    <div class="modal fade" id="saveModal" tabindex="-1" role="dialog" aria-labelledby="saveModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="saveModalLabel">Auto Save</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            You have not saved your work in 20 minutes. To protect your work, it has been automatically saved.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="modal fade" id="alertModal" tabindex="-1" role="dialog" aria-labelledby="alertModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="alertModalLabel">Alert</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+            Please choose start date first.
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        </div>
+    </div>
+
+
     @push('css')
         <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.min.css') }}">
     @endpush
@@ -273,9 +316,32 @@
         function sessionWarnings() {
             no_msg = true;    
             $('#datatype').val('auto');
-            $('#goalform').submit();
-            alert('You have not saved your work in 20 minutes. To protect your work, it has been automatically saved.');    
-        } 
+
+            // Update CKEditor instances
+            for (instance in CKEDITOR.instances) {
+                CKEDITOR.instances[instance].updateElement();
+            }
+
+            // Serialize the form data
+            var formData = $('#goalform').serialize();
+
+            // Submit the form using AJAX
+            $.ajax({
+                type: 'POST',
+                url: "{{ route('goal.update', $goal->id) }}",
+                data: formData,
+                success: function(response) {
+                    // Show the modal on successful form submission
+                    $('#saveModal').modal('show');
+                },
+                error: function(xhr, status, error) {
+                // Handle any errors
+                console.error('Form submission failed:', error);
+                }
+            });
+
+            return false; // Prevent default form submission
+        }
 
     </script>
     @endpush
@@ -289,13 +355,15 @@
             $( "#target_date" ).attr("min",start_date);            
         });
         
-        $( "#target_date" ).change(function() {
-            var start_date = $( "#start_date" ).val();
+        $("#target_date").change(function() {
+            var start_date = $("#start_date").val();
             if (start_date === '') {
-                alert('Please choose start date first.');
-                $( "#target_date" ).val('');
-            }           
-        });        
+                // Show the modal
+                $('#alertModal').modal('show');
+                // Reset the target date
+                $("#target_date").val('');
+            }
+        });   
         
         @if(session()->has('title_miss'))                           
             $('input[name=title]').addClass('is-invalid');
