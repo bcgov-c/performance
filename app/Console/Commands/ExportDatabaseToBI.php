@@ -124,16 +124,11 @@ class ExportDatabaseToBI extends Command
 
             // Main Loop
             foreach ($this->db_tables as $table) {
-            $table_name =  $table['name'];
-            $delta_field = $table['delta'];
-            $hidden_fields = $table['hidden'];
-
-            $this->sendTableDataToDataWarehouse($table_name, $delta_field, $hidden_fields, $last_cutoff_time);
-
-            $data  = DB::table($table_name)->get()->toJson();
-
+                $table_name =  $table['name'];
+                $delta_field = $table['delta'];
+                $hidden_fields = $table['hidden'];
+                $this->sendTableDataToDataWarehouse($table_name, $delta_field, $hidden_fields, $last_cutoff_time);
             }
-
         
             DB::table('stored_dates')->updateOrInsert(
                 [
