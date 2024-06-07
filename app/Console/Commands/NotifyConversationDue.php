@@ -543,7 +543,7 @@ class NotifyConversationDue extends Command
                         // $sendMail->ccRecipients = [$user->id];  // test
                         // $sendMail->bccRecipients = [$user->id]; // test 
                         $sendMail->sender_id = null;  // default sender is System
-                        $sendMail->useQueue = false;
+                        $sendMail->useQueue = true;
                         $sendMail->saveToLog = true;
 
                         $sendMail->alert_type = 'N';
@@ -743,7 +743,7 @@ class NotifyConversationDue extends Command
                             // $sendMail->ccRecipients = [$user->id];  // test
                             // $sendMail->bccRecipients = [$user->id]; // test 
                             $sendMail->sender_id = null;  // default sender is System
-                            $sendMail->useQueue = false;
+                            $sendMail->useQueue = true;
                             $sendMail->saveToLog = true;
 
                             $sendMail->alert_type = 'N';
