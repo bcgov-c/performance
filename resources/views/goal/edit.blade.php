@@ -33,11 +33,14 @@
                 @endif
                 <div class="col-12">
                     <b>Goal Type</b>
-                    <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="{{$type_desc_str}}"> </i>
+                    @php
+                    $type_desc_str_cleaned = preg_replace('/\bhttps?:\/\/\S+/i', '', strip_tags($type_desc_str));
+                    @endphp
+                    <i tabindex="0"  class="fa fa-info-circle" data-trigger='focus' data-toggle="popover" data-placement="right" data-html="true" aria-label="{{ $type_desc_str_cleaned }}" data-content="{{$type_desc_str}}"> </i>
                     <!-- <x-tooltip-dropdown-outside name="goal_type_id" :options="$goaltypes" data-trigger='click' data-toggle="popover" data-html="true" data-content="{{$type_desc_str}}" label="Goal Type" popoverstr="{{$type_desc_str}}" tooltipField="description" displayField="name" />                                                                             -->
                     <x-dropdown :list="$goaltypes" name="goal_type_id" :selected="$goal->goal_type_id" />
                     <b>Goal Title</b>
-                    <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>
+                    <i tabindex="0"  class="fa fa-info-circle" data-trigger='focus' data-toggle="popover" data-placement="right" data-html="true" aria-label="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform." data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>
                     <x-input-modal name="title"  :value="$goal->title"/>                    
                     @if(session()->has('title_miss'))                           
                         <small class="text-danger">The title field is required</small>
@@ -46,7 +49,7 @@
                 </div>                                                   
                 <div class="col-12">
                     <b>Tags</b>    
-                    <i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resources/goal-setting?t=8' target=\'_blank\'><u>View full list of tag descriptions.</u></a><br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>."></i>				
+                    <i tabindex="0"  class="fa fa-info-circle" id="tags_label" data-trigger='focus' data-toggle="popover" data-placement="right" data-html="true"  aria-label="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time." data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resources/goal-setting?t=8' target=\'_blank\'><u>View full list of tag descriptions.</u></a><br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>."></i>				
                     <x-xdropdown :list="$tags" name="tag_ids[]" :selected="array_column($goal->tags->toArray(), 'id')" class="tags" multiple/>
                     @if(session()->has('tags_miss'))                           
                         <small class="text-danger">The tags field is required</small>
@@ -56,9 +59,9 @@
                    <b>Goal Description</b>      
                    <p>
 				    Each goal should include a description of <b>WHAT</b>  
-				    <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".'> </i> you will accomplish, <b>WHY</b> 
-				    <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important, and <b>HOW</b> 
-				    <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> you will achieve it. 
+				    <i tabindex="0" class="fa fa-info-circle" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true" data-content='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".' aria-label='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".'> </i> you will accomplish, <b>WHY</b> 
+				    <i tabindex="0" class="fa fa-info-circle" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'  aria-label='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important, and <b>HOW</b> 
+				    <i tabindex="0" class="fa fa-info-circle" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".' aria-label='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> you will achieve it. 
 				    </p>            
                    <!-- <p class="py-2">Each goal should include a description of <b>WHAT</b><x-tooltip-modal text='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".' /> you will accomplish, <b>WHY</b><x-tooltip-modal text='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".' /> it is important, and <b>HOW</b><x-tooltip-modal text='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'/> you will achieve it.</p>                         -->
                    <x-textarea-modal id="what" name="what" :value="$goal->what" />
@@ -68,7 +71,7 @@
                    </div>
                 <div class = "col-12">
                     <b>Measures of Success</b>
-                    <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"'> </i>
+                    <i tabindex="0" class="fa fa-info-circle" data-trigger='focus' data-toggle="popover" data-placement="right" data-html="true" data-content='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"' aria-label='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"'> </i>
                     <x-textarea-modal id="measure_of_success" name="measure_of_success" class="content" :value="$goal->measure_of_success" />
                     <!-- <x-textarea-modal id="measure_of_success" label="Measures of Success" name="measure_of_success" class="content" tooltip='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"' :value="$goal->measure_of_success" /> -->
                 </div>                                        
