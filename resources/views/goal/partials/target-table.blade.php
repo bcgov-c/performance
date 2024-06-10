@@ -53,16 +53,26 @@
       <td >{{ $goal->target_date_human }}</td>
       @if ($type == 'current')
       <td>  
-        <select multiple class="form-control share-with-users"  name="share_with_users[]">
-            <?php if($goal->shared_user_id != '' && $goal->shared_user_name != ''){
-                $share_user_id_arr = explode(',', $goal->shared_user_id);
-                $share_user_name_arr = explode(',', $goal->shared_user_name);
-                for ($i=0; $i<count($share_user_id_arr); $i++){
-                    echo "<option value='".$share_user_id_arr[$i]."'  selected>".$share_user_name_arr[$i]."</option>";                    
-                }
-            }?>
-            
-        </select>
+        @if(!isset($viewingProfileAs))
+          <select multiple class="form-control share-with-users" id="share_with_users" name="share_with_users[]">
+              @if($goal->shared_user_id != '' && $goal->shared_user_name != '')
+                  @php
+                      $share_user_id_arr = explode(',', $goal->shared_user_id);
+                      $share_user_name_arr = explode(',', $goal->shared_user_name);
+                  @endphp
+                  @foreach($share_user_id_arr as $index => $user_id)
+                      <option value="{{ $user_id }}" selected>{{ $share_user_name_arr[$index] }}</option>
+                  @endforeach
+              @endif
+          </select>
+        @else
+        @if($goal->shared_user_id != '' && $goal->shared_user_name != '')
+            @php
+                $formatted_user_names = str_replace(',', ', ', $goal->shared_user_name);
+            @endphp
+            {{ $formatted_user_names }}
+        @endif
+        @endif
       </td>
       @endif
       <td>
