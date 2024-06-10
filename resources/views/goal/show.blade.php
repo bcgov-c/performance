@@ -2,7 +2,7 @@
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
 		{{ $goal['title'] }}
-            @if(!$disableEdit && $goal->user_id === Auth::Id() && $goal['status'] == 'active')
+            @if(!$disableEdit && $goal->user_id === Auth::Id() && $goal['status'] == 'active' && !isset($viewingProfileAs))
             <button class="btn btn-outline-primary btn-md" id="edit-btn" href="{{ route('goal.edit', $goal->id) }}" tabindex="0">
                         <i class="fa fa-edit"></i>&nbsp;        Edit
             </button>
