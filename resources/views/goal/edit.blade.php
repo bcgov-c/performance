@@ -38,10 +38,10 @@
                     @endphp
                     <i tabindex="0"  class="fa fa-info-circle" data-trigger='focus' data-toggle="popover" data-placement="right" data-html="true" aria-label="{{ $type_desc_str_cleaned }}" data-content="{{$type_desc_str}}"> </i>
                     <!-- <x-tooltip-dropdown-outside name="goal_type_id" :options="$goaltypes" data-trigger='click' data-toggle="popover" data-html="true" data-content="{{$type_desc_str}}" label="Goal Type" popoverstr="{{$type_desc_str}}" tooltipField="description" displayField="name" />                                                                             -->
-                    <x-dropdown :list="$goaltypes" name="goal_type_id" :selected="$goal->goal_type_id" />
+                    <x-dropdown :list="$goaltypes" name="goal_type_id" :selected="$goal->goal_type_id" arial_label="goal type field"/>
                     <b>Goal Title</b>
                     <i tabindex="0"  class="fa fa-info-circle" data-trigger='focus' data-toggle="popover" data-placement="right" data-html="true" aria-label="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform." data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>
-                    <x-input-modal name="title"  :value="$goal->title"/>                    
+                    <x-input-modal name="title"  :value="$goal->title" arial_label="goal title field"/>                    
                     @if(session()->has('title_miss'))                           
                         <small class="text-danger">The title field is required</small>
                     @endif
@@ -50,7 +50,7 @@
                 <div class="col-12">
                     <b>Tags</b>    
                     <i tabindex="0"  class="fa fa-info-circle" id="tags_label" data-trigger='focus' data-toggle="popover" data-placement="right" data-html="true"  aria-label="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time." data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resources/goal-setting?t=8' target=\'_blank\'><u>View full list of tag descriptions.</u></a><br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>."></i>				
-                    <x-xdropdown :list="$tags" name="tag_ids[]" :selected="array_column($goal->tags->toArray(), 'id')" class="tags" multiple/>
+                    <x-xdropdown :list="$tags" name="tag_ids[]" :selected="array_column($goal->tags->toArray(), 'id')" class="tags" multiple arial_label="goal tags field" tabindex="0"/>
                     @if(session()->has('tags_miss'))                           
                         <small class="text-danger">The tags field is required</small>
                     @endif
@@ -353,11 +353,13 @@
 
 
 <script>    
+        /*
         $( "#start_date" ).change(function() {
             var start_date = $( "#start_date" ).val();
             $( "#target_date" ).attr("min",start_date);            
         });
-        
+        */
+        /*
         $("#target_date").change(function() {
             var start_date = $("#start_date").val();
             if (start_date === '') {
@@ -366,7 +368,8 @@
                 // Reset the target date
                 $("#target_date").val('');
             }
-        });   
+        });
+        */   
         
         @if(session()->has('title_miss'))                           
             $('input[name=title]').addClass('is-invalid');
@@ -377,37 +380,56 @@
         });
         
 
-        $('input[name="start_date"]').daterangepicker({
-            autoApply: true,
-            autoUpdateInput: false, // Prevent the input from auto-updating
-            singleDatePicker: true, // Set to true for a single date picker
-            locale: {
-                format: 'YYYY-MM-DD'
-            }          
-        });
-        // Manually update the input field when a date is selected
-        $('input[name="start_date"]').on('apply.daterangepicker', function(ev, picker) {
-            $(this).val(picker.startDate.format('YYYY-MM-DD'));
-        });
+        $(document).ready(function() {
+            // Initialize the start_date daterangepicker
+            $('input[name="start_date"]').daterangepicker({
+                autoApply: true,
+                autoUpdateInput: false, // Prevent the input from auto-updating
+                singleDatePicker: true, // Set to true for a single date picker
+                locale: {
+                    format: 'YYYY-MM-DD'
+                }
+            });
 
-        // Ensure the placeholder remains
-        $('input[name="start_date"]').attr('placeholder', 'YYYY-MM-DD');
+            // Manually update the input field when a date is selected
+            $('input[name="start_date"]').on('apply.daterangepicker', function(ev, picker) {
+                var startDate = picker.startDate.format('YYYY-MM-DD');
+                $(this).val(startDate);
 
-        $('input[name="target_date"]').daterangepicker({
-            autoApply: true,
-            autoUpdateInput: false, // Prevent the input from auto-updating
-            singleDatePicker: true, // Set to true for a single date picker
-            locale: {
-                format: 'YYYY-MM-DD'
-            }
+                // Update the minDate of the target_date picker
+                $('input[name="target_date"]').data('daterangepicker').minDate = picker.startDate;
+                $('input[name="target_date"]').val(''); // Optionally clear the target_date value
+            });
+
+            // Ensure the placeholder remains
+            $('input[name="start_date"]').attr('placeholder', 'YYYY-MM-DD');
+
+            // Initialize the target_date daterangepicker
+            $('input[name="target_date"]').daterangepicker({
+                autoApply: true,
+                autoUpdateInput: false, // Prevent the input from auto-updating
+                singleDatePicker: true, // Set to true for a single date picker
+                locale: {
+                    format: 'YYYY-MM-DD'
+                }
+            });
+
+            // Manually update the input field when a date is selected
+            $('input[name="target_date"]').on('apply.daterangepicker', function(ev, picker) {
+                var targetDate = picker.startDate.format('YYYY-MM-DD');
+
+                // Check if start_date is empty
+                if ($('input[name="start_date"]').val() === '') {
+                    alert('Please choose a start date first.');
+                    $(this).val(''); // Clear the target_date value
+                } else {
+                    $(this).val(targetDate);
+                }
+            });
+
+            // Ensure the placeholder remains
+            $('input[name="target_date"]').attr('placeholder', 'YYYY-MM-DD');
         });
-        // Manually update the input field when a date is selected
-        $('input[name="target_date"]').on('apply.daterangepicker', function(ev, picker) {
-            $(this).val(picker.startDate.format('YYYY-MM-DD'));
-        });
-        
-        // Ensure the placeholder remains
-        $('input[name="target_date"]').attr('placeholder', 'YYYY-MM-DD');
 
 </script>    
 
