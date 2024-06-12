@@ -288,8 +288,9 @@ class GoalController extends Controller
     * @param  int  $id
     * @return \Illuminate\Http\Response
     */
-    public function show($id)
+    public function show($id, Request $request)
     {
+        $from = $request->from;        
         // TODO: Manage Auth when we are clear with Supervisor Logic.
         $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->/* where('user_id', Auth::id())
         -> */where('id', $id)
@@ -352,7 +353,7 @@ class GoalController extends Controller
             // ->wherenull('status')
             // ->update(['status' => 'R']);
 
-            return view('goal.show', compact('goal', 'linkedGoals'));
+            return view('goal.show', compact('goal', 'linkedGoals', 'from'));
         } else {
             echo "You don't have the right permission to access this goal.";
         }
