@@ -8,7 +8,11 @@
             </button>
             @endif
         
-        @if(session('from_share'))
+        @if($from == 'bank')
+        <button class="btn btn-outline-primary btn-md" id="back-bank-btn" href="{{ route('goal.library') }}">
+                        <i class="fa fa-backward"></i>&nbsp;        Back to list
+            </button>
+        @elseif (session('from_share'))
         <button class="btn btn-outline-primary btn-md" id="back-share-btn" href="{{ route('goal.share') }}">
                         <i class="fa fa-backward"></i>&nbsp;        Back to list
             </button>
@@ -316,6 +320,10 @@
 
     $('#back-list-btn').click(function(){
         window.location.href = "{{ route('goal.index') }}";
+    });
+
+    $('#back-bank-btn').click(function(){
+        window.location.href = "{{ route('goal.library') }}";
     });
     </script>
     @endpush

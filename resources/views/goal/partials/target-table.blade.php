@@ -93,9 +93,10 @@
             @method('DELETE')
             <button type="button" aria-label=" Click on the view button to view the goal" alt=" View the goal" 
             onclick="viewGoal({{ $goal->id }})"  class="btn btn-outline-primary btn-sm ml-2 mt-2"  tabindex="0">View <i class="fas fa-eye fa-lg"></i></button>
-
+            @if(!isset($viewingProfileAs))
             <button type="submit" aria-label="Click on the delete button to delete the goal" alt="Delete the goal" 
             class="btn btn-outline-danger btn-sm ml-2 delete-dn mt-2"   tabindex="0">Delete <i class="fas fa-trash-alt fa-lg"></i></button>
+            @endif
           </form>
         </div>
       </td>

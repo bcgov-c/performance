@@ -1,4 +1,6 @@
 <label for="notification-table">
+    
+    @if(!isset($viewingProfileAs))
     <button type="button" aria-label="Current goal is marked as {{ $goal->status }}" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <x-goal-status :status="$goal->status"></x-goal-status>
     </button>
@@ -11,5 +13,8 @@
                 </a>
             @endif
         @endforeach
-    </div>
+    </div>    
+    @else
+        {{ ucfirst($goal->status) }}
+    @endif
 </label>
