@@ -117,12 +117,14 @@
 		</div>
             
 		<div id="collapse_1" class="collapse" aria-labelledby="heading_1">
-                    <div class="card-body">                        
+                    <div class="card-body">   
+                        @if(!isset($viewingProfileAs))                     
                         <p>
                             <x-button id="add-goal-to-library-btn" class="my-2">
                                 <i class="fas fa-plus-square"></i> Add Goal to Bank
                             </x-button>
                         </p>
+                        @endif
                          <form action="" method="get" id="filter-lib-menu">
                             <div class="row">
                                 <div class="col">
@@ -800,13 +802,19 @@
           data: json_team_goalbanks,
           columns: [
             { title: "ID", data: "id" },
+            
             {
               title: "Goal Title",
               data: "title",
               render: function(data, type, row) {
-                return '<a href="' + '{{ route("goal.edit", [":id", "from" => "bank"]) }}'.replace(':id', row.id) + '" class="p-2">' + data + '</a>';
+                @if(!isset($viewingProfileAs))
+                    return '<a href="' + '{{ route("goal.edit", [":id", "from" => "bank"]) }}'.replace(':id', row.id) + '" class="p-2">' + data + '</a>';
+                @else
+                    return '<a href="' + '{{ route("goal.show", [":id", "from" => "bank"]) }}'.replace(':id', row.id) + '" class="p-2">' + data + '</a>';
+                @endif
               }
             },
+            
             { title: "Goal Type", data: "typename" },
             { title: "Tags", data: "tagnames" },
             { title: "Date Added", data: "created_at" },
@@ -837,13 +845,18 @@
                   
                 }
                 // Generate the multiselect dropdown HTML
+                @if(!isset($viewingProfileAs))
                 var dropdownHtml = '<select multiple class="form-control search-users ml-1"  id="search-users-' + row.id + '" name="share_with[' + row.id + '][]"  data-goal-id="' + row.id + '" >' +
                   options +
                   '</select>';
+                @else
+                var dropdownHtml = sharedUserNames;
+                @endif
 
                 return dropdownHtml;
               }
             },
+            @if(!isset($viewingProfileAs))
             {
               title: "Actions",
               data: null,
@@ -853,6 +866,7 @@
                 return deleteButton;
               }
             }
+            @endif
           ],
           "order": [[0, "desc"]],
           dom: '<"row"<"col-md-12"t>>' + '<"row"<"col-md-6"i><"col-md-6"p>>',

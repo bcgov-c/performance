@@ -83,8 +83,12 @@
           <form id="delete-goal-{{$goal->id}}" action="{{ route('goal.destroy', $goal->id)}}" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete this goal?')">
             @csrf
             @method('DELETE')
-            <x-button :href="route('goal.show', $goal->id)" size='sm' class="mr-2">View</x-button>
-            <x-button size='sm' icon='trash' style="danger"></x-button>
+            <button type="button" aria-label=" Click on the view button to view the goal" alt=" View the goal" 
+            onclick="viewGoal({{ $goal->id }})"  class="btn btn-outline-primary btn-sm ml-2 mt-2"  tabindex="0">View <i class="fas fa-eye fa-lg"></i></button>
+            @if(!isset($viewingProfileAs))
+            <button type="submit" aria-label="Click on the delete button to delete the goal" alt="Delete the goal" 
+            class="btn btn-outline-danger btn-sm ml-2 delete-dn mt-2"   tabindex="0">Delete <i class="fas fa-trash-alt fa-lg"></i></button>
+            @endif
           </form>
         </div>
       </td>
