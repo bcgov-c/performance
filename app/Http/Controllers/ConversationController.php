@@ -404,10 +404,10 @@ class ConversationController extends Controller
             if(isset($item->is_locked)){
                 if($item->is_locked){
                     $myTeamConversations_arr[$i]['is_locked'] = 'Locked';
-                    $myTeamConversations_arr[$i]['status'] = '<i class="fa fa-lock"></i>';                    
+                    $myTeamConversations_arr[$i]['status'] = '<div tabindex="0"><i class="fa fa-lock" aria-label="Locked Conversation"></i></div>';                    
                 } else {
                     $myTeamConversations_arr[$i]['is_locked'] = 'Unlocked';
-                    $myTeamConversations_arr[$i]['status'] = '<i class="fa fa-unlock"></i>';     
+                    $myTeamConversations_arr[$i]['status'] = '<div tabindex="0"><i class="fa fa-unlock" aria-label="Unlocked Conversation"></i></div>';     
                 }
             }
             $last_sign_off_date = '';
@@ -492,10 +492,10 @@ class ConversationController extends Controller
             if(isset($item->is_locked)){
                 if($item->is_locked){
                     $conversations_arr[$i]['is_locked'] = 'Locked';
-                    $conversations_arr[$i]['status'] = '<i class="fa fa-lock"></i>';      
+                    $conversations_arr[$i]['status'] = '<div tabindex="0"><i class="fa fa-lock" aria-label="Locked Conversation"></i></div>';      
                 } else {
                     $conversations_arr[$i]['is_locked'] = 'Unlocked';
-                    $conversations_arr[$i]['status'] = '<i class="fa fa-unlock"></i>';      
+                    $conversations_arr[$i]['status'] = '<div tabindex="0"><i class="fa fa-unlock" aria-label="Unlocked Conversation"></i></div>';      
                 }
             }
             $last_sign_off_date = '';

@@ -81,10 +81,9 @@ i {
     <div class="mt-4">
             
         <div class="card">            
-                <div class="card-header" id="heading_sup" style="border-bottom-width: 0px;">
+                <div class="card-header" id="heading_sup" style="border-bottom-width: 0px;" tabindex="0">
                     <h5 class="mb-1"data-toggle="collapse" data-target="#collapse_sup" aria-expanded="1" aria-controls="collapse_sup">
                         <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_sup" aria-expanded="false" aria-controls="collapse_sup">
-
                                 <button class="btn btn-link text-left">
                                     <h4>Completed Conversations with my Supervisor</h4>
                                 </button> 
@@ -163,7 +162,7 @@ i {
             
         @if($user->hasRole('Supervisor'))
         <div class="card">            
-                <div class="card-header" id="heading_emp" style="border-bottom-width: 0px;">
+                <div class="card-header" id="heading_emp" style="border-bottom-width: 0px;" tabindex="0">
                     <h5 class="mb-1"data-toggle="collapse" data-target="#collapse_emp" aria-expanded="1" aria-controls="collapse_emp">
                         <h5 class="mb-0" data-toggle="collapse" data-target="#collapse_emp" aria-expanded="false" aria-controls="collapse_emp">
 
@@ -179,7 +178,7 @@ i {
                     </h5>
                 </div>
 
-                <div id="collapse_emp" class="accordion-collapse collapse" aria-labelledby="heading_emp">
+                <div id="collapse_emp" class="accordion-collapse collapse" aria-labelledby="heading_emp" tabindex="0">
                     <div class="card-body">
                         <form action="" method="post" id="filter-menu">
                             <input name="sub" id="sub" value="1" type="hidden">
@@ -299,6 +298,18 @@ i {
       $('#heading_emp').click(function() {
          $('#caret_emp').css('transform', 'rotate(180deg)');
       });
+      if(signoff_date){
+        $('#signoff_date').focus();
+      }
+      if(team_members){
+        $('#team_members').focus();
+      }
+      if(conversation_topic_id != 0){
+        $('#conversation_topic_id').focus();
+      }
+      if(status){
+        $('#status').focus();
+      }
   } else {
       $('#collapse_emp').collapse('hide');
   }
@@ -318,10 +329,46 @@ i {
       $('#heading_sup').click(function() {
          $('#caret_sup').css('transform', 'rotate(180deg)');
       });
+      if(sup_signoff_date){
+        $('#sup_signoff_date').focus();
+      }
+      if(supervisors){
+        $('#supervisors').focus();
+      }
+      if(sup_conversation_topic_id != 0){
+        $('#sup_conversation_topic_id').focus();
+      }
+      if(sup_status){
+        $('#sup_status').focus();
+      }
   } else {
       $('#collapse_sup').collapse('hide');
   }
+
+
+  $('#heading_emp').on("keypress", function(e){
+    console.log('collapse_emp = '.show_collapse);
+    if ( e.which == 13 ) {
+        e.preventDefault();
+        if(show_collapse){
+            $('#collapse_emp').collapse('show');
+        } else {
+            $('#collapse_emp').collapse('hide');
+        }
+    }
+  })
   
+  $('#collapse_sup').on("keypress", function(e){
+        console.log('collapse_sup = '.show_collapse_1);
+    if ( e.which == 13 ) {
+        e.preventDefault();
+        if(show_collapse_1){
+            $('#collapse_sup').collapse('show');
+        } else {
+            $('#collapse_sup').collapse('hide');
+        }
+    }
+  })
   
   
   $(document).ready(function() {

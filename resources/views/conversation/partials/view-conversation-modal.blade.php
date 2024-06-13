@@ -396,11 +396,9 @@
 
                                         </div> -->
 
-                                        <div class="mt-3" tabindex="0">
+                                        <div class="mt-3">
                                                 <label style="font-weight: normal;">
-                                                    <!-- <div tabindex="0"> -->
-                                                        <input type="checkbox" class="team_member_agreement" name="team_member_agreement" id="signoff_team_member_agreement" value="1" aria-label="Team member disagrees with the information contained in this performance review">&nbsp;Team member disagrees with the information contained in this performance review.
-                                                    <!-- </div> -->
+                                                    <div tabindex="0"><input type="checkbox" class="team_member_agreement" name="team_member_agreement" id="signoff_team_member_agreement" value="1" aria-label="Team member disagrees with the information contained in this performance review"></div>&nbsp;Team member disagrees with the information contained in this performance review.
                                                 </label>
                                                 <p><span class="agree-message text-danger error"></span></p>
                                         </div>
@@ -467,7 +465,7 @@
                                             
                                             <div class="mt-3">
                                                     <label style="font-weight: normal;">
-                                                        <input type="checkbox" class="team_member_agreement" name="team_member_agreement" id="unsingoff-team_member_agreement" value="1">&nbsp;Team member disagrees with the information contained in this performance review.
+                                                        <div tabindex="0"><input type="checkbox" class="team_member_agreement" name="team_member_agreement" id="unsingoff-team_member_agreement" value="1"></div>&nbsp;Team member disagrees with the information contained in this performance review.
                                                     </label>
                                                 </div>
                                             </div>

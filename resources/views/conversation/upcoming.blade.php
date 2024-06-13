@@ -312,6 +312,18 @@ i {
       $('#heading_emp').click(function() {
          $('#caret_emp').css('transform', 'rotate(180deg)');
       });
+      if(supervisor_signed != 'any'){
+        $('#supervisor_signed').focus();
+      }
+      if(employee_signed != 'any'){
+        $('#employee_signed').focus();
+      }
+      if(team_members){
+        $('#team_members').focus();
+      }
+      if(conversation_topic_id != 0){
+        $('#conversation_topic_id').focus();
+      }
   } else {
       $('#collapse_emp').collapse('hide');
   }
@@ -346,6 +358,18 @@ i {
       $('#heading_sup').click(function() {
          $('#caret_sup').css('transform', 'rotate(180deg)');
       });
+      if(sup_supervisor_signed != 'any'){
+        $('#sup_supervisor_signed').focus();
+      }
+      if(sup_employee_signed != 'any'){
+        $('#sup_employee_signed').focus();
+      }
+      if(supervisors){
+        $('#supervisors').focus();
+      }
+      if(sup_conversation_topic_id != 0){
+        $('#sup_conversation_topic_id').focus();
+      }
   } else {
       $('#collapse_sup').collapse('hide');
   }
