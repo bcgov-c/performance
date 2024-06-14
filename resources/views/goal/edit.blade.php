@@ -429,6 +429,29 @@
 
             // Ensure the placeholder remains
             $('input[name="target_date"]').attr('placeholder', 'YYYY-MM-DD');
+
+            // Add change event for start_date
+            $('input[name="start_date"]').on('change', function() {
+                var startDate = $(this).val();
+                var targetDate = $('input[name="target_date"]').val();
+
+                // If start date is empty or later than target date
+                if (startDate === '' || (targetDate !== '' && moment(startDate).isAfter(moment(targetDate)))) {
+                    alert('The start date cannot be empty or later than the target date. Both dates will be cleared.');
+                    $('input[name="start_date"]').val('');
+                    $('input[name="target_date"]').val('');
+                    // Reset minDate for target_date picker
+                    $('input[name="target_date"]').data('daterangepicker').minDate = false;
+                }
+            });
+
+            // Check if start_date has an initial value on page load
+            var initialStartDate = $('input[name="start_date"]').val();
+            if (initialStartDate) {
+                // Set the minDate of the target_date picker
+                var initialStartMoment = moment(initialStartDate, 'YYYY-MM-DD');
+                $('input[name="target_date"]').data('daterangepicker').minDate = initialStartMoment;
+            }
         });
 
 </script>    
