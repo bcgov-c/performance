@@ -60,9 +60,11 @@
                       $share_user_id_arr = explode(',', $goal->shared_user_id);
                       $share_user_name_arr = explode(',', $goal->shared_user_name);
                   @endphp
-                  @foreach($share_user_id_arr as $index => $user_id)
-                      <option value="{{ $user_id }}" selected>{{ $share_user_name_arr[$index] }}</option>
-                  @endforeach
+                  @if(!empty($share_user_id_arr))
+                      @foreach($share_user_id_arr as $index => $user_id)
+                          <option value="{{ $user_id }}" selected>{{ $share_user_name_arr[$index] }}</option>
+                      @endforeach
+                  @endif
               @endif
           </select>
         @else
