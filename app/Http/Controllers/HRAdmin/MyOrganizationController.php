@@ -2,35 +2,32 @@
 
 namespace App\Http\Controllers\HRAdmin;
 
+use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Conversation;
+use App\Models\SharedProfile;
+use App\Models\HRUserDemoJrView;
+use App\Models\Position;
+use App\Models\UserDemoJrView;
 use App\Models\EmployeeDemo;
-use App\Models\OrganizationTree;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 
-
-
-
-class MyOrganizationController extends Controller
-{
+class MyOrganizationController extends Controller {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         $errors = session('errors');
-
         if ($errors) {
             $old = session()->getOldInput();
             $request->dd_level0 = isset($old['dd_level0']) ? $old['dd_level0'] : null;
@@ -41,7 +38,6 @@ class MyOrganizationController extends Controller
             $request->criteria = isset($old['criteria']) ? $old['criteria'] : null;
             $request->search_text = isset($old['search_text']) ? $old['search_text'] : null;
         } 
-
         if ($request->btn_search) {
             session()->put('_old_input', [
                 'dd_level0' => $request->dd_level0,
@@ -53,364 +49,136 @@ class MyOrganizationController extends Controller
                 'search_text' => $request->search_text,
             ]);
         }
-
-        $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-        $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-        $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-        $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-        $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
-
-        $request->session()->flash('level0', $level0);
-        $request->session()->flash('level1', $level1);
-        $request->session()->flash('level2', $level2);
-        $request->session()->flash('level3', $level3);
-        $request->session()->flash('level4', $level4);
-
+        $request->session()->flash('dd_level0', $request->dd_level0);
+        $request->session()->flash('dd_level1', $request->dd_level1);
+        $request->session()->flash('dd_level2', $request->dd_level2);
+        $request->session()->flash('dd_level3', $request->dd_level3);
+        $request->session()->flash('dd_level4', $request->dd_level4);
         $criteriaList = $this->search_criteria_list();
-
         return view('hradmin.myorg.myorganization', compact ('request', 'criteriaList'));
     }
 
-    public function getList(Request $request)
-    {
-        if ($request->ajax()) 
-        {
+    public function getList(Request $request) {
+        if ($request->ajax()) {
             $authId = Auth::id();
-            $level0 = $request->dd_level0 ? OrganizationTree::where('id', $request->dd_level0)->first() : null;
-            $level1 = $request->dd_level1 ? OrganizationTree::where('id', $request->dd_level1)->first() : null;
-            $level2 = $request->dd_level2 ? OrganizationTree::where('id', $request->dd_level2)->first() : null;
-            $level3 = $request->dd_level3 ? OrganizationTree::where('id', $request->dd_level3)->first() : null;
-            $level4 = $request->dd_level4 ? OrganizationTree::where('id', $request->dd_level4)->first() : null;
-            $query = User::withoutGlobalScopes()
-            ->join('employee_demo', 'users.guid', '=', 'employee_demo.guid')
-            ->join('admin_orgs', function($join) {
-                $join->on('admin_orgs.organization', '=', 'employee_demo.organization')
-                ->on('admin_orgs.level1_program', '=', 'employee_demo.level1_program')
-                ->on('admin_orgs.level2_division', '=', 'employee_demo.level2_division')
-                ->on('admin_orgs.level3_branch', '=', 'employee_demo.level3_branch')
-                ->on('admin_orgs.level4', '=', 'employee_demo.level4');
-            })
-            ->where('admin_orgs.user_id', '=', $authId)
-            ->when($level0, function($q) use($level0) {return $q->where('employee_demo.organization', $level0->name);})
-            ->when($level1, function($q) use($level1) {return $q->where('employee_demo.level1_program', $level1->name);})
-            ->when($level2, function($q) use($level2) {return $q->where('employee_demo.level2_division', $level2->name);})
-            ->when($level3, function($q) use($level3) {return $q->where('employee_demo.level3_branch', $level3->name);})
-            ->when($level4, function($q) use($level4) {return $q->where('employee_demo.level4', $level4->name);})
-            ->when($request->criteria == 'id' && $request->search_text, function($q) use($request){return $q->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'name' && $request->search_text, function($q) use($request){return $q->where('employee_demo.employee_name', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'job' && $request->search_text, function($q) use($request){return $q->where('employee_demo.job_title', 'like', "%" . $request->search_text . "%");})
-            ->when($request->criteria == 'dpt' && $request->search_text, function($q) use($request){return $q->where('employee_demo.deptid', 'like', "%" . $request->search_text . "%");})
-            ->when([$request->criteria == 'all' && $request->search_text, $request->search_text], function($q) use ($request) 
-            {
-                return $q->where(function ($query2) use ($request) 
-                {
-                    $query2->where('employee_demo.employee_id', 'like', "%" . $request->search_text . "%")
-                    ->orWhere('employee_demo.employee_name', 'like', "%" . $request->search_text . "%")
-                    ->orWhere('employee_demo.job_title', 'like', "%" . $request->search_text . "%")
-                    ->orWhere('employee_demo.deptid', 'like', "%" . $request->search_text . "%");
-                });
-            })
-            ->select
-            (
-                'employee_demo.employee_id',
-                'employee_demo.employee_name', 
-                'employee_demo.job_title',
-                'employee_demo.organization',
-                'employee_demo.level1_program',
-                'employee_demo.level2_division',
-                'employee_demo.level3_branch',
-                'employee_demo.level4',
-                'employee_demo.deptid',
-                'users.excused_start_date',
-                'users.id'
-            );
+            $query = HRUserDemoJrView::from('hr_user_demo_jr_view AS u')
+                ->where('auth_id', \DB::raw($authId))
+                ->whereNull('u.date_deleted')
+                ->when($request->dd_level0, function($q) use($request) { return $q->where('u.organization_key', $request->dd_level0); })
+                ->when($request->dd_level1, function($q) use($request) { return $q->where('u.level1_key', $request->dd_level1); })
+                ->when($request->dd_level2, function($q) use($request) { return $q->where('u.level2_key', $request->dd_level2); })
+                ->when($request->dd_level3, function($q) use($request) { return $q->where('u.level3_key', $request->dd_level3); })
+                ->when($request->dd_level4, function($q) use($request) { return $q->where('u.level4_key', $request->dd_level4); })
+                ->when($request->search_text && $request->criteria == 'u.employee_name', function($q) use($request) { 
+                    return $q->where(function($q1) use($request) {
+                        return $q1->where('u.employee_name', 'LIKE', "%{$request->search_text}%")
+                        ->orWhere('u.user_name', 'LIKE', "%{$request->search_text}%"); 
+                    });
+                })
+                ->when($request->search_text && $request->criteria != 'u.employee_name', function($q) use ($request) { 
+                    return $q->where("{$request->criteria}", 'LIKE', "%{$request->search_text}%"); 
+                })
+                ->selectRaw ("
+                    user_id,
+                    user_id AS id,
+                    u.user_name,
+                    guid,
+                    excused_flag,
+                    employee_id,
+                    u.employee_name, 
+                    u.employee_email,
+                    u.position_number,
+                    u.empl_record,
+                    u.reporting_to_employee_id,
+                    u.reporting_to_name,
+                    u.reporting_to_email,
+                    u.reporting_to_position_number,
+                    u.supervisor_position_number,
+                    jobcode_desc,
+                    u.orgid AS orgid,
+                    u.organization AS organization,
+                    u.level1_program AS level1_program,
+                    u.level2_division AS level2_division,
+                    u.level3_branch AS level3_branch,
+                    u.level4 AS level4,
+                    u.deptid AS deptid,
+                    u.employee_status,
+                    due_date_paused,
+                    u.next_conversation_date,
+                    excusedtype,
+                    CASE WHEN (u.excused_flag != 0 OR u.due_date_paused = 'Y') THEN 'Paused' ELSE u.next_conversation_date END AS nextConversationDue,
+                    CASE WHEN (SELECT 1 FROM shared_profiles AS sp WHERE sp.shared_id = u.user_id LIMIT 1) THEN 'Yes' ELSE 'No' END AS shared,
+                    CONCAT (u.reportees, ' / ', (SELECT COUNT(1) FROM shared_profiles AS sp USE INDEX (SHARED_PROFILES_SHARED_WITH_FOREIGN), user_demo_jr_view AS u2 WHERE sp.shared_with IS NOT NULL AND sp.shared_with = u.user_id AND sp.shared_id = u2.user_id AND u2.date_deleted IS NULL)) AS reportees,
+                    (SELECT COUNT(1) FROM goals as g USE INDEX (GOALS_USER_ID_INDEX) WHERE g.user_id = u.user_id AND g.status = 'active' AND g.is_library = 0 AND g.deleted_at IS NULL) AS activeGoals
+                ");
             return Datatables::of($query)->addIndexColumn()
-            ->addColumn('activeGoals', function($row) {
-                $countActiveGoals = $row->activeGoals()->count() . ' Goals';
-                return $countActiveGoals;
-            })
-            ->addColumn('nextConversationDue', function ($row) {
-                $nextConversation = Conversation::nextConversationDue(User::find($row["id"]));
-                return $nextConversation;
-            })
-            ->addColumn('excused', function ($row) {
-                $yesOrNo = ($row->excused_start_date !== null) ? 'Yes' : 'No';
-                return $yesOrNo;
-            })
-            ->addColumn('shared', function ($row) {
-                $yesOrNo = $row->is_shared ? "Yes" : "No";
-                return $yesOrNo;
-            })
-            ->addColumn('reportees', function($row) {
-                $countReportees = $row->reportees()->count() ?? '0';
-                return $countReportees;
-            })
-            ->make(true);
+                ->addIndexColumn()
+                ->editColumn('reportees', function($row) {
+                    $text = $row->reportees;
+                    return view('hradmin.myorg.partials.link', compact(["row", 'text']));
+                })
+                ->rawColumns(['reportees'])
+                ->make(true);
         }
     }
 
-    public function getOrganizations(Request $request) {
-
-        $orgs = OrganizationTree::join('admin_orgs', function($join) {
-            $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
-            ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
-            ->on('organization_trees.level2_division', '=', 'admin_orgs.level2_division')
-            ->on('organization_trees.level3_branch', '=', 'admin_orgs.level3_branch')
-            ->on('organization_trees.level4', '=', 'admin_orgs.level4');
-        })
-        ->where('admin_orgs.user_id', '=', Auth::id())
-        ->orderby('organization_trees.name','asc')->select('organization_trees.id','organization_trees.name')
-        ->where('organization_trees.level',0)
-        ->when( $request->q , function ($q) use($request) {
-            return $q->whereRaw("LOWER(name) LIKE '%" . strtolower($request->q) . "%'");
-        })
-        ->get();
-
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($formatted_orgs);
-    } 
-
-    public function getPrograms(Request $request) {
-
-        $level0 = $request->level0 ? OrganizationTree::join('admin_orgs', function($join) {
-            $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
-            ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
-            ->on('organization_trees.level2_division', '=', 'admin_orgs.level2_division')
-            ->on('organization_trees.level3_branch', '=', 'admin_orgs.level3_branch')
-            ->on('organization_trees.level4', '=', 'admin_orgs.level4');
-        })
-        ->where('admin_orgs.user_id', '=', Auth::id())
-        ->where('organization_trees.id',$request->level0)->first() : null;
-
-        $orgs = OrganizationTree::join('admin_orgs', function($join) {
-            $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
-            ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
-            ->on('organization_trees.level2_division', '=', 'admin_orgs.level2_division')
-            ->on('organization_trees.level3_branch', '=', 'admin_orgs.level3_branch')
-            ->on('organization_trees.level4', '=', 'admin_orgs.level4');
-        })
-        ->where('admin_orgs.user_id', '=', Auth::id())
-        ->orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-        ->where('organization_trees.level',1)
-        ->when( $request->q , function ($q) use($request) {
-            return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
-            })
-        ->when( $level0 , function ($q) use($level0) {
-            return $q->where('organization_trees.organization', $level0->name );
-        })
-        ->groupBy('organization_trees.name')
-        ->get();
-
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($formatted_orgs);
-    } 
-
-    public function getDivisions(Request $request) {
-
-        $level0 = $request->level0 ? OrganizationTree::join('admin_orgs', function($join) {
-            $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
-            ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
-            ->on('organization_trees.level2_division', '=', 'admin_orgs.level2_division')
-            ->on('organization_trees.level3_branch', '=', 'admin_orgs.level3_branch')
-            ->on('organization_trees.level4', '=', 'admin_orgs.level4');
-        })
-        ->where('admin_orgs.user_id', '=', Auth::id())
-        ->where('organization_trees.id', $request->level0)->first() : null;
-        $level1 = $request->level1 ? OrganizationTree::join('admin_orgs', function($join) {
-            $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
-            ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
-            ->on('organization_trees.level2_division', '=', 'admin_orgs.level2_division')
-            ->on('organization_trees.level3_branch', '=', 'admin_orgs.level3_branch')
-            ->on('organization_trees.level4', '=', 'admin_orgs.level4');
-        })
-        ->where('admin_orgs.user_id', '=', Auth::id())
-        ->where('organization_trees.id', $request->level1)->first() : null;
-
-        $orgs = OrganizationTree::join('admin_orgs', function($join) {
-            $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
-            ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
-            ->on('organization_trees.level2_division', '=', 'admin_orgs.level2_division')
-            ->on('organization_trees.level3_branch', '=', 'admin_orgs.level3_branch')
-            ->on('organization_trees.level4', '=', 'admin_orgs.level4');
-        })
-        ->where('admin_orgs.user_id', '=', Auth::id())
-        ->orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',2)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
+    public function reporteesList(Request $request, $id, $posn) {
+        $user = UserDemoJrView::where('user_id', $id)->first();
+        if ($request->ajax()) {
+            $reportees = EmployeeDemo::join(\DB::raw('users_annex AS d_ua USE INDEX (users_annex_employee_id_record_index)'), function($join){
+                    return $join->on(function($on){
+                        return $on->whereRaw("employee_demo.employee_id = d_ua.employee_id")
+                            ->whereRaw("employee_demo.empl_record = d_ua.empl_record")
+                            ->whereNull('employee_demo.date_deleted');
+                    });
                 })
-            ->when( $level0 , function ($q) use($level0) {
-                return $q->where('organization_trees.organization', $level0->name) ;
-            })
-            ->when( $level1 , function ($q) use($level1) {
-                return $q->where('organization_trees.level1_program', $level1->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->limit(300)
-            ->get();
-
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($formatted_orgs);
-    } 
-
-    public function getBranches(Request $request) {
-
-        $level0 = $request->level0 ? OrganizationTree::join('admin_orgs', function($join) {
-            $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
-            ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
-            ->on('organization_trees.level2_division', '=', 'admin_orgs.level2_division')
-            ->on('organization_trees.level3_branch', '=', 'admin_orgs.level3_branch')
-            ->on('organization_trees.level4', '=', 'admin_orgs.level4');
-        })
-        ->where('admin_orgs.user_id', '=', Auth::id())
-        ->where('id', $request->level0)->first() : null;
-        $level1 = $request->level1 ? OrganizationTree::join('admin_orgs', function($join) {
-            $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
-            ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
-            ->on('organization_trees.level2_division', '=', 'admin_orgs.level2_division')
-            ->on('organization_trees.level3_branch', '=', 'admin_orgs.level3_branch')
-            ->on('organization_trees.level4', '=', 'admin_orgs.level4');
-        })
-        ->where('admin_orgs.user_id', '=', Auth::id())
-        ->where('organization_trees.id', $request->level1)->first() : null;
-        $level2 = $request->level2 ? OrganizationTree::join('admin_orgs', function($join) {
-            $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
-            ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
-            ->on('organization_trees.level2_division', '=', 'admin_orgs.level2_division')
-            ->on('organization_trees.level3_branch', '=', 'admin_orgs.level3_branch')
-            ->on('organization_trees.level4', '=', 'admin_orgs.level4');
-        })
-        ->where('admin_orgs.user_id', '=', Auth::id())
-        ->where('organization_trees.id', $request->level2)->first() : null;
-
-        $orgs = OrganizationTree::join('admin_orgs', function($join) {
-            $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
-            ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
-            ->on('organization_trees.level2_division', '=', 'admin_orgs.level2_division')
-            ->on('organization_trees.level3_branch', '=', 'admin_orgs.level3_branch')
-            ->on('organization_trees.level4', '=', 'admin_orgs.level4');
-        })
-        ->where('admin_orgs.user_id', '=', Auth::id())
-        ->orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',3)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
+                ->join(\DB::raw('employee_managers AS d_um USE INDEX (idx_employee_managers_supervisor_emplid_employee_id)'), function($join) use($user, $posn) {
+                    return $join->on(function($on) use($user, $posn) {
+                        return $on->whereRaw("d_um.supervisor_emplid = '{$user->employee_id}'")
+                            ->whereRaw("d_um.employee_id = employee_demo.employee_id")
+                            ->whereRaw("d_um.supervisor_position_number = '{$posn}'");
+                    });
                 })
-            ->when( $level0 , function ($q) use($level0) {
-                return $q->where('organization_trees.organization', $level0->name) ;
-            })
-            ->when( $level1 , function ($q) use($level1) {
-                return $q->where('organization_trees.level1_program', $level1->name );
-            })
-            ->when( $level2 , function ($q) use($level2) {
-                return $q->where('organization_trees.level2_division', $level2->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->limit(300)
-            ->get();
-
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
-        }
-
-        return response()->json($formatted_orgs);
-    } 
-
-    public function getLevel4(Request $request) {
-        $level0 = $request->level0 ? OrganizationTree::join('admin_orgs', function($join) {
-            $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
-            ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
-            ->on('organization_trees.level2_division', '=', 'admin_orgs.level2_division')
-            ->on('organization_trees.level3_branch', '=', 'admin_orgs.level3_branch')
-            ->on('organization_trees.level4', '=', 'admin_orgs.level4');
-        })
-        ->where('admin_orgs.user_id', '=', Auth::id())
-        ->where('organization_trees.id', $request->level0)->first() : null;
-        $level1 = $request->level1 ? OrganizationTree::join('admin_orgs', function($join) {
-            $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
-            ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
-            ->on('organization_trees.level2_division', '=', 'admin_orgs.level2_division')
-            ->on('organization_trees.level3_branch', '=', 'admin_orgs.level3_branch')
-            ->on('organization_trees.level4', '=', 'admin_orgs.level4');
-        })
-        ->where('admin_orgs.user_id', '=', Auth::id())
-        ->where('organization_trees.id', $request->level1)->first() : null;
-        $level2 = $request->level2 ? OrganizationTree::join('admin_orgs', function($join) {
-            $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
-            ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
-            ->on('organization_trees.level2_division', '=', 'admin_orgs.level2_division')
-            ->on('organization_trees.level3_branch', '=', 'admin_orgs.level3_branch')
-            ->on('organization_trees.level4', '=', 'admin_orgs.level4');
-        })
-        ->where('admin_orgs.user_id', '=', Auth::id())
-        ->where('organization_trees.id', $request->level2)->first() : null;
-        $level3 = $request->level3 ? OrganizationTree::join('admin_orgs', function($join) {
-            $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
-            ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
-            ->on('organization_trees.level2_division', '=', 'admin_orgs.level2_division')
-            ->on('organization_trees.level3_branch', '=', 'admin_orgs.level3_branch')
-            ->on('organization_trees.level4', '=', 'admin_orgs.level4');
-        })
-        ->where('admin_orgs.user_id', '=', Auth::id())
-        ->where('organization_trees.id', $request->level3)->first() : null;
-
-        $orgs = OrganizationTree::join('admin_orgs', function($join) {
-            $join->on('organization_trees.organization', '=', 'admin_orgs.organization')
-            ->on('organization_trees.level1_program', '=', 'admin_orgs.level1_program')
-            ->on('organization_trees.level2_division', '=', 'admin_orgs.level2_division')
-            ->on('organization_trees.level3_branch', '=', 'admin_orgs.level3_branch')
-            ->on('organization_trees.level4', '=', 'admin_orgs.level4');
-        })
-        ->where('admin_orgs.user_id', '=', Auth::id())
-        ->orderby('organization_trees.name','asc')->select(DB::raw('min(organization_trees.id) as id'),'organization_trees.name')
-            ->where('organization_trees.level',4)
-            ->when( $request->q , function ($q) use($request) {
-                return $q->whereRaw("LOWER(organization_trees.name) LIKE '%" . strtolower($request->q) . "%'");
+                ->where('d_ua.reporting_to_employee_id', $user->employee_id)
+                ->where('d_ua.reporting_to_position_number', $posn)
+                ->selectRaw("
+                    employee_demo.employee_id AS employee_id, 
+                    employee_demo.employee_name AS employee_name, 
+                    employee_demo.employee_email AS employee_email, 
+                    CASE WHEN d_um.source IN ('Posn', 'ODS') THEN 'Direct' WHEN d_um.source IN ('Posn Next', 'ODS Next') THEN 'Delegated' END AS reporteetype
+                ");
+            $shared = \DB::table('shared_profiles AS sp')
+                ->whereRaw("sp.shared_with = ".$user->user_id)
+                ->join(\DB::raw('users AS u USE INDEX (IDX_USERS_ID)'), 'sp.shared_id', 'u.id')
+                ->join(\DB::raw('employee_demo AS dmo USE INDEX (IDX_EMPLOYEE_DEMO_EMPLOYEEID_RECORD)'), function ($join) {
+                    $join->on('u.employee_id', 'dmo.employee_id');
+                    $join->on('u.empl_record', 'dmo.empl_record');
                 })
-            ->when( $level0 , function ($q) use($level0) {
-                return $q->where('organization_trees.organization', $level0->name) ;
-            })
-            ->when( $level1 , function ($q) use($level1) {
-                return $q->where('organization_trees.level1_program', $level1->name );
-            })
-            ->when( $level2 , function ($q) use($level2) {
-                return $q->where('organization_trees.level2_division', $level2->name );
-            })
-            ->when( $level3 , function ($q) use($level3) {
-                return $q->where('organization_trees.level3_branch', $level3->name );
-            })
-            ->groupBy('organization_trees.name')
-            ->limit(300)
-            ->get();
-
-        $formatted_orgs = [];
-        foreach ($orgs as $org) {
-            $formatted_orgs[] = ['id' => $org->id, 'text' => $org->name ];
+                ->whereNull('dmo.date_deleted')
+                ->whereRaw('dmo.pdp_excluded = 0')
+                ->selectRaw("
+                    dmo.employee_id AS employee_id, 
+                    dmo.employee_name AS employee_name, 
+                    dmo.employee_email AS employee_email, 
+                    'Shared' AS reporteetype
+                ");
+            $query = $reportees->union($shared);
+            return Datatables::of($query)
+                ->addIndexColumn()
+                ->make(true);
         }
-
-        return response()->json($formatted_orgs);
-    } 
+    }
 
     protected function search_criteria_list() {
         return [
-            'all' => 'All',
-            'emp' => 'Employee ID', 
-            'name'=> 'Employee Name',
-            'job' => 'Job Title', 
-            'dpt' => 'Department ID'
+            'u.employee_name'=> 'Name',
+            'u.employee_id' => 'Employee ID', 
+            'u.employee_email' => 'Email', 
+            'u.position_number' => 'Position #',
+            'u.reporting_to_name' => 'Reports To Name',
+            'u.reporting_to_position_number' => 'Reports to Position #',
+            'u.jobcode_desc' => 'Classification',
+            'u.deptid' => 'Dept ID'
         ];
     }
 

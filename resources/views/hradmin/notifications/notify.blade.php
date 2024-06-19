@@ -1,4 +1,4 @@
-<x-side-layout title="{{ __('Dashboard') }}">
+<x-side-layout title="{{ __('Notifications - Performance Development Platform') }}">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-primary leading-tight" role="banner">
             Notify Users
@@ -21,6 +21,11 @@
 
  @if ($message = Session::get('success'))
  <div class="alert alert-success">
+	 <p>{{ $message }}</p>
+ </div>
+@endif
+@if ($message = Session::get('failure'))
+ <div class="alert alert-danger">
 	 <p>{{ $message }}</p>
  </div>
 @endif
@@ -133,7 +138,7 @@
 				@enderror
 			  </div>
  --}}				
-			  <div class="col-4">
+			  {{-- <div class="col-4">
 				<label for="sender_id" >From</label>
 				<select class="form-control select2 @error('sender_id') is-invalid @enderror" 
 						name="sender_id" id="sender_id" >
@@ -148,7 +153,7 @@
 					{{  $message  }}
 					</span>
 				@enderror
-			  </div>
+			  </div> --}}
 			</div>
 			<div class="form-row mb-2">
 			  <div class="col-8">

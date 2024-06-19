@@ -173,7 +173,7 @@
             $(document).on('click', '.btn-submit', function(e) {
                 e.preventDefault();
                 $.ajax({
-                    url: '/goal/library'
+                    url: '/goal/goalbank'
                     , type: 'POST'
                     , data: $('#goal_form').serialize() + '&start_date=' + $('#start_date').val() + '&target_date=' + $('#target_date').val(),
 
@@ -195,7 +195,7 @@
                 e.preventDefault();
                 $("#goal_form").find('input[name=selected_goal]').val($(this).data('id'));
 
-                $.get('/goal/library/'+$(this).data('id')+'?add=true', function (data) {
+                $.get('/goal/goalbank/'+$(this).data('id')+'?add=true', function (data) {
                     $("#goal-detail-modal").find('.data-placeholder').html(data);
                     $("#goal-detail-modal").modal('show');
                 });

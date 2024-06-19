@@ -24,22 +24,23 @@ class CreateGoalRequest extends FormRequest
     public function rules()
     {
         return [
+            'created_goal_id' => 'nullable',
             'title' => 'required',
             'start_date' => 'nullable',
             'target_date' => 'nullable',
-            'what' => 'required',
+            'what' => 'nullable',
             'why' => 'nullable',
             'how' => 'nullable',
             'measure_of_success' => 'nullable',
             'goal_type_id' => 'required|exists:goal_types,id',
-            'tag_ids' => 'nullable|array',
+            'tag_ids' => 'required|array',
             'tag_ids.*' => 'exists:tags,id'
         ];
     }
     
     public function messages() {
         return [
-            'what.required' => 'The description field is required'
+            //'what.required' => 'The description field is required'
         ];
     }
 }

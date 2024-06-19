@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Scopes\NonPDPExcludedScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 // use Illuminate\Database\Eloquent\Builder;
+use App\Models\User;
 
 class EmployeeDemo extends Model
 {
@@ -30,7 +32,7 @@ class EmployeeDemo extends Model
         'classification',
         'deptid',
         'Jobcode',
-        'job_title',
+        'jobcode_desc',
         'position_number',
         'position_start_date',
         'manager_id',
@@ -40,11 +42,23 @@ class EmployeeDemo extends Model
         'date_deleted',
         'date_updated',
         'date_created',
+        'orgid'
     ];
 
-    public function users() {
-        return $this->belongsToMany('App/Model/User', 'id', 'employee_id');
+    protected static function boot()
+    {
+      parent::boot();
+  
+      static::addGlobalScope(new NonPDPExcludedScope);
     }
+  
+    public function users() {
+        return $this->hasOne(User::class, 'employee_id', 'employee_id');
+    }
+
+    // public function dr_count() {
+    //     return $this->belongsToMany('App\Models\User', 'users', 'id', 'supervisor_emplid')->count();
+    // }
 
 //     protected function setKeysForSaveQuery(Builder $query)
 //     {

@@ -13,13 +13,13 @@
 <div class="card">
 	<div class="card-body">
 		<h6></h6>
-		<table class="table table-bordered" id="employee-list-table">
+		<table class="table table-bordered table-striped" id="employee-list-table">
 			<thead>
 				<tr>
                     <th><input name="select_all" value="1" id="employee-list-select-all" type="checkbox" /></th>
                     <th>Employee ID</th>
 					<th>Employee Name</th>
-                    <th>Job Title</th>
+                    <th>Classification</th>
 					<th>Email</th>
 					<th>Organization</th>
 					<th>Program</th>
@@ -39,7 +39,7 @@
 
 @push('css')
 
-    <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 	<style>
 	#employee-list-table_filter label {
 		text-align: right !important;
@@ -49,8 +49,8 @@
 @endpush
 
 @push('js')
-    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
     
 
     <script>

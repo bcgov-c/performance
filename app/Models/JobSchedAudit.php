@@ -10,6 +10,7 @@ class JobSchedAudit extends Model
 {
 
     public $table = 'job_sched_audit';
+    public $timestamps = false;
 
     use HasFactory;
 
@@ -21,6 +22,17 @@ class JobSchedAudit extends Model
         'start_time',
         'end_time',
         'status',
+        'details'
     ];
+
+    // Static function for gettig the list of status
+    public static function job_status_options() {
+
+        return self::whereNotNull('status')
+                ->select('status')
+                ->distinct()
+                ->orderBy('status')
+                ->pluck('status');
+    }
 
 }

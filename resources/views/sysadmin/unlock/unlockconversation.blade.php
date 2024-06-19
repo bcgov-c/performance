@@ -1,4 +1,4 @@
-<x-side-layout title="{{ __('Dashboard') }}">
+<x-side-layout title="{{ __('Unlock Conversations - Performance Development Platform') }}">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-primary leading-tight" role="banner">
             Unlock Conversations
@@ -25,7 +25,7 @@
 
 
 {{-- Search Criteria Section --}}
-<form id="unlocked-conversation-form" action="{{ route('sysadmin.unlock.unlockconversation.search') }}" method="post">
+<form id="unlocked-conversation-form" action="{{ route('sysadmin.unlock.unlockconversation.search') }}" method="post" class="search-filter">
 	@csrf
 
 	<div class="card p-3">
@@ -40,7 +40,7 @@
 			</select>
 		</div>
 		<div class="form-group col-md-3">
-			<label for="dd_level1">Program</label>
+			<label for="dd_level1">Level 1</label>
 			<select id="dd_level1" name="dd_level1" class="form-control select2">
 				@if ( old('dd_level1') && session()->get('level1') )
 					<option value="{{ session()->get('level1')->id }}">{{ session()->get('level1')->name }}</option>
@@ -48,7 +48,7 @@
 			</select>
 		</div>
 		<div class="form-group col-md-3">
-			<label for="dd_level2">Division</label>
+			<label for="dd_level2">Level 2</label>
 			<select id="dd_level2" name="dd_level2" class="form-control select2">
 				@if ( old('dd_level2') && session()->get('level2') )
 					<option value="{{ session()->get('level2')->id }}">{{ session()->get('level2')->name }}</option>
@@ -56,7 +56,7 @@
 			</select>
 		</div>
 		<div class="form-group col-md-3">
-			<label for="dd_level3">Branch</label>
+			<label for="dd_level3">Level 3</label>
 			<select id="dd_level3" name="dd_level3" class="form-control select2">
 				@if ( old('dd_level3') && session()->get('level3') )
 					<option value="{{ session()->get('level3')->id }}">{{ session()->get('level3')->name }}</option>
@@ -77,7 +77,8 @@
 				<select id="topic_id" name="topic_id" class="form-control" >
 					<option  value="">Select Topic</option>
 					@foreach( $topicList as $topic)
-						<option value="{{ $topic->id }}" {{  old('topic_id') == $topic->id ? 'selected' : ''  }}>
+						{{-- <option value="{{ $topic->id }}" {{  old('topic_id') == $topic->id ? 'selected' : ''  }}> --}}
+						<option value="{{ $topic->id }}">
 							{{ $topic->name }}</option>
 					@endforeach
 				</select>
@@ -85,12 +86,12 @@
 			<div class="form-group col-md-3">
 				<label for="completion_date_from">Completion Date (From)</label>
 				<input type="date" class="form-control" id="completion_date_from" name="completion_date_from" 
-					value="{{ old('completion_date_from') }}">
+					value="">
 			</div>
 			<div class="form-group col-md-3">
 				<label for="completion_date_to">Completion Date (To)</label>
 				<input type="date" class="form-control" id="completion_date_to" name="completion_date_to" 
-					value="{{ old('completion_date_to') }}">
+					value="">
 			</div>
 
 
@@ -98,15 +99,15 @@
 				<label for="criteria">Search Criteria</label>
 				<select id="criteria" name="criteria" class="form-control">
 					@foreach( $criteriaList as $key => $value )
-						<option value="{{ $key }}" {{  old('criteria') == $key ? 'selected' : '' }} >{{ $value }}</option>
+						<option value="{{ $key }}">{{ $value }}</option>
 					@endforeach
 				</select>
 			</div>
 
 			<div class="form-group col-md-2">
-				<label for="search_text">search</label>
+				<label for="search_text">Search</label>
 				<input type="text" id="search_text" name="search_text" class="form-control" 
-						value="{{ old('search_text') }}" placeholder="Employee">
+						value="" placeholder="Keyword">
 			</div>
 
 		</div>
@@ -114,9 +115,11 @@
 		<div class="form-row">
 			<div class="form-group col-md-12">
 			<span class="float-right">  
-			<button type="submit" class="btn btn-primary" name="btn_search" 
-					value="btn_search" formaction="{{ route('sysadmin.unlock.unlockconversation.search') }}">Search</button>
-			<button type="button" class="btn btn-secondary  " id="btn_search_reset" name="btn_reset" value="btn_reset">reset</button>
+			<button type="button" class="btn btn-primary" name="btn_search" id ="btn_search" 
+					value="btn_search" 
+					{{-- formaction="{{ route('sysadmin.unlock.unlockconversation.search') }}" --}}
+					>Search</button>
+			<button type="button" class="btn btn-secondary  " id="btn_search_reset" name="btn_reset" value="btn_reset">Reset</button>
 			</span>
 			</div>
 		</div>
@@ -129,7 +132,7 @@
 <div class="card">
 	<div class="card-body">
 		<h6></h6>
-		<table class="table table-bordered" id="conversation-list-table" style="width: 100%">
+		<table class="table table-bordered table-striped" id="conversation-list-table" style="width: 100%">
 			<thead>
 				<tr>
                     <th>&nbsp;</th>
@@ -194,7 +197,7 @@
 
 <x-slot name="css">
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 
 <style>
 .select2-selection--multiple{
@@ -216,8 +219,114 @@
 
 <x-slot name="js">
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+<script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
+
+<script>            
+	CKEDITOR.replace('info_comment1', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment2', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment3', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment4', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment5', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment6', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment7', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment8', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment9', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment10', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	
+	 modal_open=false;
+</script> 
 
 <script>
 $.ajaxSetup({
@@ -245,7 +354,6 @@ $(function() {
                     d.dd_level3 = $('#dd_level3').val();
                     d.dd_level4 = $('#dd_level4').val();
                     d.topic_id = $('#topic_id').val();
-                    d.hire_dt = $('#hire_dt').val();
 					d.completion_date_from = $('#completion_date_from').val();
 					d.completion_date_to = $('#completion_date_to').val();
                     d.criteria = $('#criteria').val();
@@ -254,9 +362,9 @@ $(function() {
             },
             columns: [
 				{data: 'unlock', name: 'unlock', orderable: false, searchable: false},
-                {data: 'topic', name: 'topic'},
-                {data: 'participants', name: 'participants'},
-                {data: 'completed_date', name: 'completed_date'},
+                {data: 'topic.name', name: 'topic.name'},
+                {data: 'participants', name: 'participants', orderable: false},
+                {data: 'completed_date', name: 'completed_date'},			
                 {data: 'action', name: 'action', orderable: false, searchable: false}
             ],
             columnDefs: [
@@ -283,7 +391,7 @@ $(function() {
 		placeholder: 'select organization',
 		allowClear: true,
 		ajax: {
-			url: '/hradmin/notifications/org-organizations'
+			url: '/sysadmin/org-list/1/0'
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -302,10 +410,10 @@ $(function() {
 	});
 
 	$('#dd_level1').select2({
-		placeholder: 'select program',
+		placeholder: 'select level 1',
 		allowClear: true,
 		ajax: {
-			url: '/hradmin/notifications/org-programs' 
+			url: '/sysadmin/org-list/1/1' 
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -325,10 +433,10 @@ $(function() {
 	});
 
 	$('#dd_level2').select2({
-		placeholder: 'select division',
+		placeholder: 'select level 2',
 		allowClear: true,
 		ajax: {
-			url: '/hradmin/notifications/org-divisions' 
+			url: '/sysadmin/org-list/1/2' 
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -349,10 +457,10 @@ $(function() {
 	});
 
 	$('#dd_level3').select2({
-		placeholder: 'select branch',
+		placeholder: 'select level 3',
 		allowClear: true,
 		ajax: {
-			url: '/hradmin/notifications/org-branches' 
+			url: '/sysadmin/org-list/1/3' 
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -377,7 +485,7 @@ $(function() {
 		placeholder: 'select level 4',
 		allowClear: true,
 		ajax: {
-			url: '/hradmin/notifications/org-level4' 
+			url: '/sysadmin/org-list/1/4' 
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -426,18 +534,39 @@ $(function() {
 	});
 
 
+	$('#btn_search').on('click', function() {
+            // oTable.ajax.reload(null, true);
+            oTable.draw();
+    });
+
 	$('#btn_search_reset').click(function() {
-		$('#dd_level0').val(null).trigger('change');
-		$('#dd_level1').val(null).trigger('change');
-		$('#dd_level2').val(null).trigger('change');
-		$('#dd_level3').val(null).trigger('change');
-		$('#dd_level4').val(null).trigger('change');
-		$('#topic_id').val(null).trigger('change');
-		$('#completion_date_from').val(null);
-		$('#completion_date_to').val(null);
-		$('#search_text').val(null);
+
+		// Reset filter fields value
+		$('.search-filter input').map( function() {$(this).val(''); });
+        $('.search-filter select').map( function() { return $(this).val(''); })
+		$(".search-filter .select2").map(function() { $(this).val('').trigger('change'); })
+
+        oTable.search( '' ).columns().search( '' ).draw();
+
+		// $('#dd_level0').val(null).trigger('change');
+		// $('#dd_level1').val(null).trigger('change');
+		// $('#dd_level2').val(null).trigger('change');
+		// $('#dd_level3').val(null).trigger('change');
+		// $('#dd_level4').val(null).trigger('change');
+		// $('#topic_id').val('').trigger('change');
+		// $('#completion_date_from').val(null);
+		// $('#completion_date_to').val(null);
+		// $('#search_text').val(null);
+
 	});
 
+	$('#unlocked-conversation-form').on('keyup keypress', function(e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode === 13) { 
+            e.preventDefault();
+            return false;
+        }
+    });
 
 	// dispaly Detail in Modal
 	$(document).on("click", ".unlock-modal" , function(e) {

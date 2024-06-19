@@ -46,22 +46,21 @@
             <label for="criteria">Search Criteria</label>
             <select id="criteria" name="criteria" class="form-control">
                 @foreach( $criteriaList as $key => $value )
-                    <option value="{{ $key }}" {{  old('criteria') == $key ? 'selected' : '' }} >{{ $value }}</option>
+                    <option value="{{ $key }}" >{{ $value }}</option>
                 @endforeach
             </select>
         </div>
         <div class="form-group col-md-2">
             <label for="search_text">Search Text</label>
             <input type="text" id="search_text" name="search_text" class="form-control" 
-                    value="{{ old('search_text') }}" placeholder="Search Text">
+                    value="" placeholder="Search Text">
         </div>
         <div class="form-group col-md-2 p-3 float-left float-bottom" style="display: flex; flex-direction: column;">
             <div class="form-group row"> </div>
                 <div class="form-group row">
                     <span class="float-left float-bottom">  
-                        <button type="submit" class="btn btn-primary" name="btn_search" 
-                            value="btn_search" formaction="{{ route('sysadmin.accesspermissions.search') }}">Filter</button>
-                        <button type="button" class="btn btn-secondary  " id="btn_search_reset" name="btn_reset" value="btn_reset">Reset</button>
+                        <button type="button" class="btn btn-primary" id="btn_search" name="btn_search" value="btn_search">Filter</button>
+                        <button type="button" class="btn btn-secondary" id="btn_search_reset" name="btn_reset" value="btn_reset">Reset</button>
                     </span>
                 </div>
             </div>
@@ -94,11 +93,22 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
+
         $('#dd_level0').select2({
             placeholder: 'Select Organization',
             allowClear: true,
+            serverSide: true,
+            searching: false,
+            processing: true,
+            paging: true,
+            deferRender: true,
+            retrieve: true,
+            scrollCollapse: true,
+            scroller: true,
+            scrollX: true,
+            stateSave: true,
             ajax: {
-                url: '/sysadmin/accesspermissions/org-organizations'
+                url: '/sysadmin/org-list/1/0'
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -119,8 +129,18 @@
         $('#dd_level1').select2({
             placeholder: 'Select Level 1',
             allowClear: true,
+            serverSide: true,
+            searching: false,
+            processing: true,
+            paging: true,
+            deferRender: true,
+            retrieve: true,
+            scrollCollapse: true,
+            scroller: true,
+            scrollX: true,
+            stateSave: true,
             ajax: {
-                url: '/sysadmin/accesspermissions/org-programs' 
+                url: '/sysadmin/org-list/1/1' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -142,8 +162,18 @@
         $('#dd_level2').select2({
             placeholder: 'Select Level 2',
             allowClear: true,
+            serverSide: true,
+            searching: false,
+            processing: true,
+            paging: true,
+            deferRender: true,
+            retrieve: true,
+            scrollCollapse: true,
+            scroller: true,
+            scrollX: true,
+            stateSave: true,
             ajax: {
-                url: '/sysadmin/accesspermissions/org-divisions' 
+                url: '/sysadmin/org-list/1/2' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -166,8 +196,18 @@
         $('#dd_level3').select2({
             placeholder: 'Select Level 3',
             allowClear: true,
+            serverSide: true,
+            searching: false,
+            processing: true,
+            paging: true,
+            deferRender: true,
+            retrieve: true,
+            scrollCollapse: true,
+            scroller: true,
+            scrollX: true,
+            stateSave: true,
             ajax: {
-                url: '/sysadmin/accesspermissions/org-branches' 
+                url: '/sysadmin/org-list/1/3' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -191,8 +231,18 @@
         $('#dd_level4').select2({
             placeholder: 'Select level 4',
             allowClear: true,
+            serverSide: true,
+            searching: false,
+            processing: true,
+            paging: true,
+            deferRender: true,
+            retrieve: true,
+            scrollCollapse: true,
+            scroller: true,
+            scrollX: true,
+            stateSave: true,
             ajax: {
-                url: '/sysadmin/accesspermissions/org-level4' 
+                url: '/sysadmin/org-list/1/4' 
                 , dataType: 'json'
                 , delay: 250
                 , data: function(params) {
@@ -240,16 +290,94 @@
             $('#dd_level4').val(null).trigger('change');
         });
 
-        $('#btn_search_reset').click(function() {
+        $('#dd_level4').on('select2:select', function (e) {
+            e.preventDefault();
+        });
+
+        $('#dd_level0').on('select2:unselect', function (e) {
+            e.preventDefault();
             $('#dd_level0').val(null).trigger('change');
             $('#dd_level1').val(null).trigger('change');
             $('#dd_level2').val(null).trigger('change');
             $('#dd_level3').val(null).trigger('change');
             $('#dd_level4').val(null).trigger('change');
-            $('#search_text').val(null);
         });
 
+        $('#dd_level1').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#dd_level1').val(null).trigger('change');
+            $('#dd_level2').val(null).trigger('change');
+            $('#dd_level3').val(null).trigger('change');
+            $('#dd_level4').val(null).trigger('change');
+        });
 
+        $('#dd_level2').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#dd_level2').val(null).trigger('change');
+            $('#dd_level3').val(null).trigger('change');
+            $('#dd_level4').val(null).trigger('change');
+        });
+
+        $('#dd_level3').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#dd_level3').val(null).trigger('change');
+            $('#dd_level4').val(null).trigger('change');
+        });
+
+        $('#dd_level4').on('select2:unselect', function (e) {
+            e.preventDefault();
+            $('#dd_level4').val(null).trigger('change');
+            $('#btn_search').click();
+        });
+
+        $('#dd_level0').change(function (e){
+            e.preventDefault();
+        });
+
+        $('#dd_level1').change(function (e){
+            e.preventDefault();
+        });
+
+        $('#dd_level2').change(function (e){
+            e.preventDefault();
+        });
+
+        $('#dd_level3').change(function (e){
+            e.preventDefault();
+        });
+
+        $('#dd_level4').change(function (e){
+            e.preventDefault();
+            $('#btn_search').click();
+        });
+
+        $('#criteria').change(function (e){
+            e.preventDefault();
+            $('#btn_search').click();
+        });
+
+        $('#search_text').change(function (e){
+            e.preventDefault();
+            $('#btn_search').click();
+        });
+
+        $('#search_text').keydown(function (e){
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                $('#btn_search').click();
+            }
+        });
+
+        $('#btn_search_reset').click(function(e) {
+            e.preventDefault();
+            $('#criteria').val('all');
+            $('#search_text').val(null);
+            $('#dd_level0').val(null).trigger('change');
+            $('#dd_level1').val(null).trigger('change');
+            $('#dd_level2').val(null).trigger('change');
+            $('#dd_level3').val(null).trigger('change');
+            $('#dd_level4').val(null).trigger('change');
+        });
 
     </script>
 

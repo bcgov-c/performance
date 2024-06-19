@@ -275,6 +275,11 @@ return [
                     'active' => ['my-team/my-employees/*'],
                 ],
                 // [
+                //     'text' => 'Statistic and Reports',
+                //     'url'  => 'my-team/statistics/sharedsummary',
+                //     'active' => ['my-team/statistics/*']
+                // ],                
+                // [
                 //     'text' => 'Notify Team Members',
                 //     'url'  => 'my-team/notify-team-members',
                 //     'active' => ['my-team/members/*'],
@@ -284,6 +289,7 @@ return [
         [
             'role' => 'listitem',
             'text' => 'HR Administration',
+            'id' => 'hr-admin-menu',
             'url'  => '#',
             'icon' => 'fas fa-fw fa-cog',
             'active' => ['hradmin/*'],
@@ -296,17 +302,17 @@ return [
                 ],
                 [
                     'text' => 'Share Employees',
-                    'url'  => 'hradmin/employeeshares/addnew',
+                    'url'  => 'hradmin/employeeshares',
                     'active' => ['hradmin/employeeshares/*']
                 ],
                 [
                     'text' => 'Excuse Employees',
-                    'url'  => 'hradmin/excused/excuseemployee',
-                    'active' => ['hradmin/excused/*']
+                    'url'  => 'hradmin/excuseemployees',
+                    'active' => ['hradmin/excuseemployees/*']
                 ],
                 [
                     'text' => 'Goal Bank',
-                    'url'  => 'hradmin/goalbank/creategoal',
+                    'url'  => 'hradmin/goalbank',
                     'active' => ['hradmin/goalbank/*']
                 ],
                 // [
@@ -316,7 +322,7 @@ return [
                 // ],
                 [
                     'text' => 'Statistic and Reports',
-                    'url'  => 'hradmin/statistics/goalsummary',
+                    'url'  => 'hradmin/statistics/sharedsummary',
                     'active' => ['hradmin/statistics/*']
                 ]
 
@@ -325,6 +331,7 @@ return [
         [
             'role' => 'listitem',
             'text' => 'System Administration',
+            'id' => 'sys-admin-menu',
             'url'  => '#',
             'icon' => 'fas fa-fw fa-cog',
             'active' => ['sysadmin/*'],
@@ -332,40 +339,57 @@ return [
             'submenu' => [
                 [
                     'text' => 'Employee List',
-                    'url'  => 'sysadmin/employees/currentemployees',
-                    'active' => ['sysadmin/employees/*']
+                    'url'  => 'sysadmin/employeelists',
+                    'active' => ['sysadmin/employeelists/*']
                 ],
                 [
                     'text' => 'Share Employees',
-                    'url'  => 'sysadmin/employeeshares/addnew',
+                    'url'  => 'sysadmin/employeeshares',
                     'active' => ['sysadmin/employeeshares/*']
                 ],
                 [
                     'text' => 'Excuse Employees',
-                    'url'  => 'sysadmin/excuseemployees/addindex',
+                    'url'  => 'sysadmin/excuseemployees',
                     'active' => ['sysadmin/excuseemployees/*']
                 ],
                 [
                     'text' => 'Goal Bank',
-                    'url'  => 'sysadmin/goalbank/creategoal',
+                    'url'  => 'sysadmin/goalbank',
                     'active' => ['sysadmin/goalbank/*']
+                ],
+                [
+                    'text' => 'Supervisor Overrides',
+                    'url'  => 'sysadmin/supervisoroverrides',
+                    'active' => ['sysadmin/supervisoroverrides/*']
+                ],
+                [
+                    'text' => 'Tags Management',
+                    'url'  => 'sysadmin/tags',
+                    'active' => ['sysadmin/tags/*']
                 ],
                 [
                     'text' => 'Unlock Conversations',
                     'url'  => 'sysadmin/unlock/unlockconversation',
                     'active' => ['sysadmin/unlock/*']
                 ],
-                // [
-                //     // 'text' => 'Notifications',
-                //     // 'url'  => 'sysadmin/notifications/createnotification',
-                //     // 'active' => ['sysadmin/notifications/*']
-                //     'text' => 'Notifications',
-                //     'url'  => 'sysadmin/notifications',
-                //     'active' => ['sysadmin/notifications/*']
-                // ],
+                [
+                    'text' => 'Notifications',
+                    'url'  => 'sysadmin/notifications',
+                    'active' => ['sysadmin/notifications/*']
+                ],
+                [
+                    'text' => 'Resource Manage',
+                    'url'  => 'sysadmin/resource-manage',
+                    'active' => ['sysadmin/resource-manage/*']
+                ],
+                [
+                    'text' => 'Conversations',
+                    'url'  => 'sysadmin/conversation-template',
+                    'active' => ['sysadmin/conversation-template/*']
+                ],
                 [
                     'text' => 'Access and Permissions',
-                    'url'  => 'sysadmin/accesspermissions/index',
+                    'url'  => 'sysadmin/accesspermissions',
                     'active' => ['sysadmin/accesspermissions/*']
                 ],
                 [
@@ -375,17 +399,60 @@ return [
                 ],
                 [
                     'text' => 'Statistic and Reports',
-                    'url'  => 'sysadmin/statistics/goalsummary',
+                    'url'  => 'sysadmin/statistics/sharedsummary',
                     'active' => ['sysadmin/statistics/*']
+                ],
+                [
+                    'text' => 'System Security',
+                    'url'  => 'sysadmin/system-security/access-logs',
+                    'active' => ['sysadmin/system-security/*']
+                ],
+                [
+                    'text' => 'Schedule Job Audit',
+                    'url'  => 'sysadmin/job-schedule-audit',
+                    'active' => ['sysadmin/system-security/*']
+                ],
+                [
+                    'text' => 'Auditing',
+                    'url'  => 'sysadmin/auditing',
+                    'active' => ['sysadmin/auditing/*']
+                ],
+                [
+                    'text' => 'Welcome Message',
+                    'url'  => 'sysadmin/messageeditor',
+                    'active' => ['sysadmin/messageeditor/*']
+                ],
+            ],
+        ],
+        [
+            'role' => 'listitem',
+            'text' => 'Service Representative',
+            'id' => 'sr-menu',
+            'url'  => '#',
+            'icon' => 'fas fa-fw fa-cog',
+            'active' => ['sysadmin/*'],
+            'can' => ['service representative'],
+            'submenu' => [ 
+                [
+                    'text' => 'Employee List',
+                    'url'  => 'sysadmin/employeelists',
+                    'active' => ['sysadmin/employeelists/*']
+                ],               
+                [
+                    'text' => 'Switch Identity',
+                    'url'  => 'sysadmin/switch-identity',
+                    'active' => ['sysadmin/switch-identity/*']
                 ],
             ],
         ],
         [
             'role' => 'listitem',
             'text' => 'Resources',
-            'url'  => 'resource/user-guide',
+            // 'url'  => 'resource/user-guide',
+            'url'  => 'resources',
             'icon' => 'fas fa-fw fa-book',
-            'active' => ['resource/*']
+            // 'active' => ['resource/*']
+            'active' => ['resources/*']
         ],
     ],
 
@@ -451,17 +518,17 @@ return [
                 [
                     'type' => 'js',
                     'asset' => false,
-                    'location' => '//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js',
+                    'location' => '//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js',
                 ],
                 [
                     'type' => 'js',
                     'asset' => false,
-                    'location' => '//cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js',
+                    'location' => '//cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js',
                 ],
                 [
                     'type' => 'css',
                     'asset' => false,
-                    'location' => '//cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css',
+                    'location' => '//cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css',
                 ],
             ],
         ],

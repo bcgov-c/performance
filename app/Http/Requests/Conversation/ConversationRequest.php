@@ -33,7 +33,7 @@ class ConversationRequest extends FormRequest
         return [
             'conversation_topic_id' => 'required|exists:conversation_topics,id',
             'participant_id' => 'required',
-            'date' => 'required|sometimes|date|after_or_equal:today|before:'. $date,
+            'date' => 'required|sometimes|date|after_or_equal:today',
             'time' => 'required|sometimes',
             'owner_id' => 'nullable'
         ];

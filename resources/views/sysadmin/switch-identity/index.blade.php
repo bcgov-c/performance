@@ -1,9 +1,9 @@
-@extends('sysadmin.layout', ['title' => 'Switch Identity'])
+@extends('sysadmin.layout', ['title' => 'Switch Identity','tab_title' => 'Switch Identity - Performance Development Platform'])
 @section('page-content')
     
     <div class="card">
         <div class="card-body p-n5 ">
-            @include('sysadmin.employees.partials.filter')
+            @include('sysadmin.switch-identity.partials.filter')
             <div class="px-3 pt-2 pb-3"> 
                 <table class="table table-bordered table-striped table-sm filtertable" id="filtertable" style="width: 100%; overflow-x: auto; "></table>
             </div>
@@ -49,9 +49,9 @@
     </x-slot>
 
     @push('css')
-        <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+        <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
         <x-slot name="css">
-            <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+            <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
             <style>
                 .text-truncate-30 {
                     white-space: wrap; 
@@ -73,10 +73,17 @@
     @endpush
 
     @push('js')
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>  
+        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+        <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
+
+
+        <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>  
         <script src="https://code.jquery.com/jquery-3.6.0.js"></script>  
-        <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script> -->
         <script type="text/javascript">
             $(document).ready()
             {
@@ -85,11 +92,16 @@
                     var table = $('.filtertable').DataTable 
                     (
                         {
-                            processing: true,
                             serverSide: true,
+                            searching: true,
+                            processing: true,
+                            paging: true,
+                            deferRender: true,
+                            retrieve: true,
+                            scrollCollapse: true,
+                            scroller: true,
                             scrollX: true,
                             stateSave: true,
-                            deferRender: true,
                             ajax: 
                             {
                                 url: "{{ route('sysadmin.identity-list') }}",
@@ -108,25 +120,25 @@
                             [
                                 
                                 {
-                                "title": "Action",    
-                                "data":"id",
-                                "render": function(data, type, row, meta){
-                                    if(type === 'display'){
-                                        data = '<a href="/sysadmin/switch-identity-action?new_user_id=' + data + '" class="edit btn btn-primary btn-sm">Switch</a>';
-                                        }
-                                    return data;
+                                    "title": "Action",    
+                                    "data":"id",
+                                    "render": function(data, type, row, meta){
+                                        if(type === 'display'){
+                                            data = '<a href="/sysadmin/switch-identity-action?new_user_id=' + data + '" class="edit btn btn-primary btn-sm">Switch</a>';
+                                            }
+                                        return data;
                                     }
                                 },
-                                {title: 'Employee ID', ariaTitle: 'Employee ID', target: 0, type: 'string', data: 'employee_id', name: 'employee_demo.employee_id', searchable: true},
-                                {title: 'Login Name', ariaTitle: 'Login Name', target: 0, type: 'string', data: 'name', name: 'users.name', searchable: true},
-                                {title: 'Employee Name', ariaTitle: 'Employee Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_demo.employee_name', searchable: true},
-                                {title: 'Job Title', ariaTitle: 'Job Title', target: 0, type: 'string', data: 'job_title', name: 'employee_demo.job_title', searchable: true},
-                                {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'employee_demo.organization', searchable: true},
-                                {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'employee_demo.level1_program', searchable: true},
-                                {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'employee_demo.level2_division', searchable: true},
-                                {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'employee_demo.level3_branch', searchable: true},
-                                {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'employee_demo.level4', searchable: true},
-                                {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', name: 'employee_demo.deptid', searchable: true},
+                                {title: 'Employee ID', ariaTitle: 'Employee ID', target: 0, type: 'string', data: 'employee_id', name: 'u.employee_id', searchable: true},
+                                {title: 'Login Name', ariaTitle: 'Login Name', target: 0, type: 'string', data: 'user_name', name: 'u.user_name', searchable: true},
+                                {title: 'Employee Name', ariaTitle: 'Employee Name', target: 0, type: 'string', data: 'employee_name', name: 'u.employee_name', searchable: true},
+                                {title: 'Classification', ariaTitle: 'Classification', target: 0, type: 'string', data: 'jobcode_desc', name: 'u.jobcode_desc', searchable: true},
+                                {title: 'Organization', ariaTitle: 'Organization', target: 0, type: 'string', data: 'organization', name: 'u.organization', searchable: true},
+                                {title: 'Level 1', ariaTitle: 'Level 1', target: 0, type: 'string', data: 'level1_program', name: 'u.level1_program', searchable: true},
+                                {title: 'Level 2', ariaTitle: 'Level 2', target: 0, type: 'string', data: 'level2_division', name: 'u.level2_division', searchable: true},
+                                {title: 'Level 3', ariaTitle: 'Level 3', target: 0, type: 'string', data: 'level3_branch', name: 'u.level3_branch', searchable: true},
+                                {title: 'Level 4', ariaTitle: 'Level 4', target: 0, type: 'string', data: 'level4', name: 'u.level4', searchable: true},
+                                {title: 'Dept', ariaTitle: 'Dept', target: 0, type: 'string', data: 'deptid', name: 'u.deptid', searchable: true},
      
                             ],
                             'columnDefs': [ {

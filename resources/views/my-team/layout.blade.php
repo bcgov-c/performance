@@ -1,4 +1,4 @@
-<x-side-layout>
+<x-side-layout title="{{ __('Team Members - Performance Development Platform') }}">
     <div class="row">
         <div class="col-12 col-sm-6">
             <h3>My Team</h3>
@@ -28,6 +28,11 @@
     <script>
         (function () {
             $(document).on('click', '.btn-submit', function(e) {
+                var confirmResult = confirm ("Are you sure you want to update the excused status of this employee?");
+                if (!confirmResult) {
+                    e.preventDefault();
+                    return false;
+                }
                 e.preventDefault();
                 const $form = $(this).parents('form');
                 $.ajax({
@@ -55,6 +60,10 @@
                     }
                 });
             });
+            $(document).on('click', '.btn-reset', function(e) {
+                $("#employee-excused-modal").find("input[name=excused_start_date]").val(null);
+                $("#employee-excused-modal").find("input[name=excused_end_date]").val(null);
+            });
             $(document).on('click', '#share-my-goals-btn', function () {
                 $("#shareMyGoalsModal").modal('show');
             });
@@ -75,6 +84,11 @@
             });
 
             $(".share-with-users").select2({
+                language: {
+                        errorLoading: function () {
+                            return "Searching for results.";
+                        }
+                        },
                 width: '100%',
                 ajax: {
                     url: '/users',
@@ -89,8 +103,9 @@
                     processResults: function (response, params) {
                         return {
                             results: $.map(response.data.data, function (item) {
+                                console.log(item);
                                 return {
-                                    text: item.name,
+                                    text: item.name+(item.employee_email ? ' - '+item.employee_email : ''),
                                     id: item.id
                                 }
                             }),
@@ -105,7 +120,8 @@
             $(".items-to-share").multiselect({
                 allSelectedText: 'All',
                 selectAllText: 'All',
-                includeSelectAllOption: true
+                includeSelectAllOption: true,
+                nonSelectedText: null,
             });
             var currentUserForModal  = null;
             $(document).on('show.bs.modal', '#employee-profile-sharing-modal', function (e) {
@@ -123,7 +139,8 @@
                         $(".items-to-share-edit").multiselect({
                             allSelectedText: 'All',
                             selectAllText: 'All',
-                            includeSelectAllOption: true
+                            includeSelectAllOption: true,
+                            nonSelectedText: null,
                         });
                     }
                 });
@@ -155,32 +172,45 @@
             $(document).on('submit', '#share-profile-form', function (e) {
                 e.preventDefault();
                 const $form = $(this);
-                $.ajax({
-                    url: $form.attr('action'),
-                    type : 'POST',
-                    data: $form.serialize(),
-                    success: function (result) {
-                        if(result.success){
-                            // window.location.href= '/goal';
-//                            $("#employee-profile-sharing-modal").modal('hide');
-                            alert("Successfully shared");
-                            window.location.reload(true);
-                        }
-                    },
-                    beforeSend: function() {
-                        $form.find('.text-danger').each(function(i, obj) {
-                            $('.text-danger').text('');
-                        });
-                    },
-                    error: function (error){
-                        var errors = error.responseJSON.errors;
+                const userConfirmed = confirm('Are you sure you want to share the selected profile(s)?');                
+                // Cancel the form submission if the user did not confirm
+                if (!userConfirmed) {
+                    event.preventDefault();
+                    window.location.reload(true);
+                } else {
+                    $.ajax({
+                        url: $form.attr('action'),
+                        type : 'POST',
+                        data: $form.serialize(),
+                        success: function (result) {
+                            if(result.success){
+                                // window.location.href= '/goal';
+    //                            $("#employee-profile-sharing-modal").modal('hide');
+                                alert("Successfully shared");
+                                window.location.reload(true);
+                            } else {
+                                alert(result.message);
+                            }
+                        },
+                        beforeSend: function() {
+                            $form.find('.text-danger').each(function(i, obj) {
+                                $('.text-danger').text('');
+                            });
+                        },
+                        error: function (error){
+                            var errors = error.responseJSON.errors;
 
-                        Object.entries(errors).forEach(function callback(value, index) {
-                            var className = '.error-' + value[0];
-                            $form.find(className).text(value[1]);
-                        });
-                    }
-                });
+                            Object.entries(errors).forEach(function callback(value, index) {
+                                var className = '.error-' + value[0];
+                                $form.find(className).text(value[1]);
+                            });
+                        }
+                    });
+                }                
+            });
+
+            $('#employee-profile-sharing-modal').on('hidden.bs.modal', function () {
+                window.location.reload(true);
             });
 
             $(document).on('change', '.is-shared', function (e) {
@@ -321,11 +351,27 @@
                 const userName = $(this).data("user-name");
                 $("#employee-excused-modal").find(".user-name").html(userName);
                 $("#employee-excused-modal").find("input[name=user_id]").val($(this).data('user-id'));
-                const excusedData = $(this).data("user-excused");
-                $("#employee-excused-modal").find("input[name=excused_start_date]").val(excusedData.start_date);
-                $("#employee-excused-modal").find("input[name=excused_end_date]").val(excusedData.end_date);
-                $("#employee-excused-modal").find("input[name=excused_reason_id]").val(excusedData.reason_id);
-                debugger;
+                $("#employee-excused-modal").find("select[name=excused_flag]").val($(this).data("user-row").excused_flag ?? 0);
+                $("#employee-excused-modal").find("select[name=excused_flag2]").val(1);
+                $("#employee-excused-modal").find("select[name=excused_reason_id]").val($(this).data("user-row").excused_reason_id ? ($(this).data("user-row").excused_reason_id < 3 ? 3 : $(this).data("user-row").excused_reason_id) : 3);
+                $("#employee-excused-modal").find("select[name=excused_flag2]").attr('disabled', true);
+                $("#employee-excused-modal").find("select[name=excused_reason_id2]").attr('disabled', true);
+                if ($(this).data("excused-type") == 'A') {
+                    $("#employee-excused-modal").find("select[name=excused_reason_id2]").val($(this).data("current-status") == 'A' ? 2 : 1);
+                    $("#employee-excused-modal").find("select[name=excused_reason_id]").attr('disabled', true);
+                    $("#divExcused1").hide();
+                    $("#divExcused2").show();
+                    $("#divReason1").hide();
+                    $("#divReason2").show();
+                    $("#employee-excused-modal").find("button[name=excused_update_btn]").attr('disabled', true);
+                } else {
+                    $("#employee-excused-modal").find("select[name=excused_reason_id]").attr('disabled', false);
+                    $("#divExcused1").show();
+                    $("#divExcused2").hide();
+                    $("#divReason1").show();
+                    $("#divReason2").hide();
+                    $("#employee-excused-modal").find("button[name=excused_update_btn]").attr('disabled', false);
+                }
             });
 
             var conversation_id = 0;

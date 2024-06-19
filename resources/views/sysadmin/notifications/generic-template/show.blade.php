@@ -1,4 +1,4 @@
-<x-side-layout title="{{ __('Dashboard') }}">
+<x-side-layout title="{{ __('Notifications - Performance Development Platform') }}">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-primary leading-tight" role="banner">
             Generic Templates
@@ -37,7 +37,7 @@
             <label for="sender" class="col-sm-2 col-form-label">Sender:</label>
             <div class="col-sm-2">
                 <input type="text" class="form-control" id="sender" name="sender" 
-                value="{{ $generic_template->sender == '1' ? 'User' : 'Other' }}" readonly>
+                value="{{ $generic_template->sender == '1' ? 'User' : 'System' }}" readonly>
             </div>
           
             <label for="email" class="col-sm-1 col-form-label text-right">Email:</label>

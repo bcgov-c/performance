@@ -1,6 +1,5 @@
 <!-- Modal -->
-<div class="modal fade" id="employee-excused-modal" tabindex="-1" aria-labelledby="employeeExcused"
-    aria-hidden="true">
+<div class="modal fade" id="employee-excused-modal" tabindex="-1" aria-labelledby="employeeExcused" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-primary">
@@ -10,34 +9,35 @@
                 </button>
             </div>
             <div class="p-4">
-                <p>All employees are required to complete a performance profile if they have worked more than 30 days within the Ministry's performance reporting cycle.</p>
-                <p>Employees may be excused from completing a profile only if they fit into one of the categories listed in the dropdown box below.  Note: employees that show up incorrectly in your list can be changed by contacting AskMyHR to change the reporting relationship.</p>
+                <p>Excusing an employee will remove them from any reporting and will pause the employee’s conversation deadlines. Employees will automatically be excused if 1) they are on leave or inactive status in PeopleSoft; or 2) if they are a DM, ADM, or Executive Lead covered by a different performance review process. You should only use this form to manually excuse an employee if they fit into one of the categories listed in the dropdown box below.</p>
                 <u><strong>Declaration</strong></u>
-                <p>I wish to excuse <strong><span class="user-name"></span></strong> from having to complete their MyPerformance profile.</p>
+                <p>I wish to excuse <strong><span class="user-name"></span></strong> from the Performance Development process.</p>
                 <div class="alert alert-default-warning alert-dismissible">
-                  <span class="h5"><i class="icon fas fa-exclamation-triangle"></i>Note: by doing so, this employee will not show up in current and historical performance reports.</span>
+                    <span class="h5"><i class="icon fas fa-exclamation-triangle"></i>Note: By doing so, this employee will not show up in PDP reports.</span>
                 </div>
                 <form id="excused_form" action="{{ route ('excused.updateExcuseDetails')}}" method="POST">
                     @csrf
                     <input type="hidden" name="user_id" value="">
                     <div class="row">
-                        <div class="col-6 mt-1">
-                            <x-input class="form-control" type="date" label="From" name="excused_start_date" value="$currentProfile->excused_start_date"/>
-                            <small class="text-danger error-excused_start_date"></small>
+                        <div class="col-2 mt-1" id="divExcused1">
+                            <x-dropdown :list="$yesOrNo" label="Excused" name="excused_flag" id="excused_flag" value=""/>
                         </div>
-                        <div class="col-6 mt-1">
-                            <x-input  class="form-control" type="date" label="To" name="excused_end_date" value="$currentProfile->excused_end_date" />
-                            <small class="text-danger error-excused_end_date"></small>
+                        <div class="col-2 mt-1" id="divExcused2">
+                            <x-dropdown :list="$yesOrNo2" label="Excused" name="excused_flag2" id="excused_flag2" value=""/>
                         </div>
-                        <div class="col-6 mt-1">
-                            <x-dropdown :list="$eReasons" label="Reasons" name="excused_reason_id" value="$currentProfile->excused_reason_id"/>
-                            <small class="text-danger error-excused_reason_id"></small>
+                        <div class="col-10 mt-1" id="divReason1">
+                            <x-dropdown :list="$eReasons" label="Reason" name="excused_reason_id" id="excused_reason_id" value=""/>
+                        </div>
+                        <div class="col-10 mt-1" id="divReason2">
+                            <x-dropdown :list="$eReasons2" label="Reason" name="excused_reason_id2" id="excused_reason_id2" value=""/>
                         </div>
                         <div class="col-12 text-left pb-5 mt-3">
-                            <x-button type="button" class="btn-md btn-submit">Proceed</x-button>
+                            <x-button type="button" class="btn-md btn-submit" name="excused_update_btn" id="excused_update_btn">Update</x-button>
                         </div>
                     </div>
                 </form>
+            </div>
         </div>
     </div>
 </div>
+

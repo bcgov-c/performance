@@ -8,6 +8,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta http-equiv='cache-control' content='no-cache'>
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
 
     {{-- Custom Meta Tags --}}
     @yield('meta_tags')
@@ -77,29 +80,58 @@
 
 <body class="@yield('classes_body')" @yield('body_data') data-panel-auto-height="{{session()->has('view-profile-as') ? -63 : 0}}">
     @if(session()->has('view-profile-as'))
-    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center">
+    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center sticky-top">
         <span class="flex-fill"></span>
         <span>
-            <i class="icon fas fa-exclamation-circle"></i> You are viewing {{$viewingProfileAs->name}}'s profile.
+            <i class="icon fas fa-exclamation-circle"></i> 
+            @if($viewingProfileAs)
+                You are viewing {{$viewingProfileAs->name}}'s profile. Click "Return to My Profile" to go back to your own.
+            @else
+                Click "Return to My Profile" to go back to your own.
+            @endif
         </span>
         <span class="flex-fill"></span>
 
         <div class="form-inline" style="position:absolute; right:0">
-            <select name="" class="form-control form-control-sm" id="view-profile-as">
-                @foreach ($listOfEmployee as $employee)
-                    <option value="{{$employee->id}}" {{ ($viewingProfileAs->id === $employee->id) ? 'selected' : ''}}>{{$employee->name}}</option>
-                @endforeach
-            </select>
+            <x-button :href="route('my-team.return-to-my-view')" size="sm" style="light" class="mx-2">Return to my profile</x-button>
+        </div>
+    </div>
+    
+    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center fixed-top">
+        <span class="flex-fill"></span>
+        <span>
+            <i class="icon fas fa-exclamation-circle"></i> 
+            @if($viewingProfileAs)
+                You are viewing {{$viewingProfileAs->name}}'s profile. Click "Return to My Profile" to go back to your own.
+            @else
+                Click "Return to My Profile" to go back to your own.
+            @endif
+        </span>
+        <span class="flex-fill"></span>
+
+        <div class="form-inline" style="position:absolute; right:0">
             <x-button :href="route('my-team.return-to-my-view')" size="sm" style="light" class="mx-2">Return to my profile</x-button>
         </div>
     </div>
     @endif
     
     @if(session()->has('user_is_switched') && !session()->has('view-profile-as'))
-    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center">
+    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center sticky-top ">
         <span class="flex-fill"></span>
         <span>
-            <i class="icon fas fa-exclamation-circle"></i> You are logged in as {{auth()->user()->name}}'s account.
+            <i class="icon fas fa-exclamation-circle"></i> You are logged in as {{auth()->user()->name}}'s account. Click "Revert Identity" to return to your own profile.
+        </span>
+        <span class="flex-fill"></span>
+
+        <div class="form-inline" style="position:absolute; right:0">
+            <x-button :href="route('dashboard.revert-identity')" size="sm" style="light" class="mx-2">Revert Identity</x-button>
+        </div>
+    </div>
+    
+    <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center fixed-top">
+        <span class="flex-fill"></span>
+        <span>
+            <i class="icon fas fa-exclamation-circle"></i> You are logged in as {{auth()->user()->name}}'s account. Click "Revert Identity" to return to your own profile.
         </span>
         <span class="flex-fill"></span>
 
@@ -158,6 +190,52 @@
                 $('div#sidebar-profile-picture').hide(100);
             });
         });
+    </script>
+        
+
+    <script>
+        // Check session expiration status every minute (adjust as needed)
+        const minutes = 120;
+        const SessionTime = 1000 * 60 * minutes;
+        setInterval(checkSessionExpiration, SessionTime);
+
+        function checkSessionExpiration() {
+            $.ajax({
+                url: '/check-session-expiration', // Replace with the actual route to check session expiration
+                type: 'GET',
+                success: function(response) {
+                    if (response.sessionExpired) {
+                        window.location.href = '/session-expired';
+                    }
+                }
+            });
+        }
+    </script>
+
+    <script>
+        // <!-- Snowplow starts plowing - Standalone vE.2.14.0 -->
+        var collector = '{{ env('SNOWPLOW_COLLECTOR') }}';
+        if(collector != null && collector != ''){
+            ;(function(p,l,o,w,i,n,g){if(!p[i]){p.GlobalSnowplowNamespace=p.GlobalSnowplowNamespace||[];
+            p.GlobalSnowplowNamespace.push(i);p[i]=function(){(p[i].q=p[i].q||[]).push(arguments)
+            };p[i].q=p[i].q||[];n=l.createElement(o);g=l.getElementsByTagName(o)[0];n.async=1;
+            n.src=w;g.parentNode.insertBefore(n,g)}}(window,document,"script","https://www2.gov.bc.ca/StaticWebResources/static/sp/sp-2-14-0.js","snowplow"));
+            window.snowplow('newTracker','rt',collector, {
+            appId: 'Snowplow_standalone_PSA',
+            cookieLifetime: 86400 * 548,
+            platform: 'web',
+            post: true,
+            forceSecureTracker: true,
+            contexts: {
+            webPage: true,
+            performanceTiming: true
+            }
+            });
+            window.snowplow('enableActivityTracking', 30, 30); // Ping every 30 seconds after 30 seconds
+            window.snowplow('enableLinkClickTracking');
+            window.snowplow('trackPageView');
+        }
+        // <!-- Snowplow stops plowing –>
     </script>
 
 </body>

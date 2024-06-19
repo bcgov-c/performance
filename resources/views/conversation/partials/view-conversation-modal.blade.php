@@ -1,11 +1,14 @@
-<div class="modal fade" id="viewConversationModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+<div class="modal fade" id="viewConversationModal" aria-labelledby="addModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header bg-primary">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <h5 id="template-header"></h5>
+                <button type="button" class="close" id="closemodal" aria-label="Close" style="color:white">
                     <span aria-hidden="true">&times;</span>
                 </button>
+                <input type="hidden" name="viewmode" id="viewmode" value="0">
             </div>
+            
             <div class="modal-body p-4">
                 <div class="row">
                     <div class="col-12">
@@ -51,214 +54,462 @@
                 </div>
 
                 <hr>
-                <div>
-                    <h5 id="template-title"></h5>
-                    <br>
-                    <h6><u>Suggested Discussion Questions</u></h6>
-                    <div id="questions-to-consider" class="p-3">
-
-                    </div>
-                </div>
-
-                <div class=" d-none" id="info_to_capture">
-                    <h6><u>Information to Capture</u></h6>
-                    
-                    <h6 id="info_capture1">What date will a follow up meeting occur?</h6>
-
-                    <div class="row">
-                        <div class="col-md-8">
-                            <textarea class="form-control supervisor-comment info_comment1 mb-4 d-none" name="info_comment1" id="info_comment1_edit"></textarea>
-                            <textarea class="form-control supervisor-comment info_comment1 mb-4 btn-conv-edit" name="info_comment1" id="info_comment1" data-id="info_comment1" data-name="info_comment1"></textarea>
-                            <span id="info_comment1" class="info_comment1"></span>
-                        </div>
-                        <div class="col-md-4">
-                            @if ($type == 'upcoming')
-                            <x-edit-cancel-save name="info_comment1" id="info_comment1" hideEdit="true" />
-                            @endif
-                        </div>
-                    </div>
-
-                    <h6 id="info_capture2">What must the employee accomplish? By when?</h6>
-
-                    <div class="row">
-                        <div class="col-md-8">
-                            <textarea class="form-control supervisor-comment info_comment2 mb-4 d-none" name="info_comment2" id="info_comment2_edit"></textarea>
-                            <textarea class="form-control supervisor-comment info_comment2 mb-4 btn-conv-edit" name="info_comment2" id="info_comment2" data-id="info_comment2" data-name="info_comment2"></textarea>
-                            <span id="info_comment2" class="info_comment2"></span>
-                        </div>
-                        <div class="col-md-4">
-                            @if ($type == 'upcoming')
-                            <x-edit-cancel-save name="info_comment2" id="info_comment2" hideEdit="true" />
-                            @endif
-                        </div>
-                    </div>
-
-                    <h6 id="info_capture3">What support will the supervisor (and others) provide? By when?</h6>
-                    <div class="row">
-                        <div class="col-md-8">
-                            <textarea class="form-control supervisor-comment info_comment3 mb-4 d-none" name="info_comment3" id="info_comment3_edit"></textarea>
-                            <textarea class="form-control supervisor-comment info_comment3 mb-4 btn-conv-edit" name="info_comment3" id="info_comment3" data-id="info_comment3" data-name="info_comment3"></textarea>
-
-                        </div>
-                        <div class="col-md-4">
-                            @if ($type == 'upcoming')
-                            <x-edit-cancel-save name="info_comment3" id="info_comment3" hideEdit="true" />
-                            @endif
-                        </div>
-                    </div>
-                    
-                    <div id="comment_area6" style="display: none">
-                    <h6 id="info_capture4" >Supervisor Comments (optional) – provide feedback on area(s) for growth identified by employee above </h6>
-                    <div class="row" >
-                        <div class="col-md-8">
-                             <textarea class="form-control supervisor-comment info_comment6 mb-4 d-none" name="info_comment6" id="info_comment6_edit"></textarea>
-                             <textarea class="form-control supervisor-comment info_comment6 mb-4 btn-conv-edit" name="info_comment6" id="info_comment6" data-id="info_comment6" data-name="info_comment6"></textarea>
-
-                        </div>
-                        <div class="col-md-4">
-                             @if ($type == 'upcoming')
-                             <x-edit-cancel-save name="info_comment6" id="info_comment6" hideEdit="true" />
-                             @endif
-                        </div>
-                    </div>
-                    </div>
                 
-                </div>
-
-                <div>
-
-                    <h6><u>Comments</u></h6>
-
-                    <h6>Employee Comments and Action Items</h6>
-
-                    <div class="row">
-                        <div class="col-md-8">
-                            <textarea class="form-control info_comment4 mb-4 employee-comment d-none" name="info_comment4" id="info_comment4_edit"></textarea>
-                            <textarea class="form-control info_comment4 mb-4 employee-comment btn-conv-edit" data-name="info_comment4" data-id="info_comment4" name="info_comment4" id="info_comment4"></textarea>
+                
+                
+                <div class="card"  id="pfc_card">
+                        <div class="card-header panel-heading bg-primary" id="heading_2">
+                        <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_2" aria-expanded="false" aria-controls="collapse_2">
+                                <button class="btn btn-link" style="color:white">
+                                    <span class="acc-title">Preparing For The Conversation</span>
+                                    <span class="acc-status"  id="caret_2"><i class="fas fa-caret-down"></i></span>                                
+                                </button>
+                        </h5>
                         </div>
-                        <div class="col-md-4">
-                            @if ($type == 'upcoming')
-                            <x-edit-cancel-save name="info_comment4" id="info_comment4" hideEdit="true" />
-                            @endif
+
+                        <div id="collapse_2" class="collapse" aria-labelledby="heading_2">
+                        <div class="card-body">
+                            <div id="preparing-for-conversation" class="p-3"> </div>
+                        </div>
+                        </div>
+                </div>
+                
+                
+                <div class="card" id="sdq_card">
+                        <div class="card-header panel-heading bg-primary" id="heading_1">
+                        <h5 class="mb-0"data-toggle="collapse" data-target="#collapse_1" aria-expanded="false" aria-controls="collapse_1">
+                                <button class="btn btn-link" style="color:white">
+                                <span class="acc-title">Suggested Discussion Questions</span>
+                                <span class="acc-status" id="caret_1"><i class="fas fa-caret-down"></i></span>
+                                </button>
+                        </h5>
+                        </div>
+
+                        <div id="collapse_1" class="collapse" aria-labelledby="heading_1">
+                        <div class="card-body">
+                            <div id="questions-to-consider" class="p-3"> </div>
+                        </div>
+                        </div>
+                </div>
+                
+                <!-----employee comments: 4,7,8,9,10--------->
+                <!-----supervisor comments: 1,2,3,5,6,11--------->
+
+
+                @if ($type == 'upcoming')
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="alert alert-success send-notification-info-top" attr-loc="top"  role="alert" style="display:none">
+                                Notifications to other participants have been sent.
+                            </div>
                         </div>
                     </div>
-                    <h6>Supervisor Comments and Action Items</h6>
                     <div class="row">
-                        <div class="col-md-8">
-                            <textarea class="form-control info_comment5 mb-4 supervisor-comment d-none" name="info_comment5" id="info_comment5_edit"></textarea>
-                            <textarea class="form-control info_comment5 mb-4 supervisor-comment btn-conv-edit" name="info_comment5" id="info_comment5" data-id="info_comment5" data-name="info_comment5"></textarea>
-                            <span id="info_comment5" class="info_comment5"></span>
-                        </div>
-                        <div class="col-md-4">
-                            @if ($type == 'upcoming')
-                            <x-edit-cancel-save name="info_comment5" id="info_comment5" hideEdit="true" />
-                            @endif
+                        <div class="col-12">
+                            <div class="alert alert-success sup-comment-save-info-top" attr-loc="top"  role="alert" style="display:none">
+                                Comments are saved.
+                            </div>
+                            <div class="alert alert-success emp-comment-save-info-top" attr-loc="top"  role="alert" style="display:none">
+                                Comments are saved.
+                            </div>
                         </div>
                     </div>
-                </div>
-                <hr>
-                @if ($showSignoff ?? true)
-                <div id="signoff-form-block">
-                    <div id="employee-signoff-questions" class="d-none">
-                        <h5><u>Sign-off</u></h5>
-                        <div class="alert alert-default-danger common-error" style="display:none">
-                            <span class="h5">
-
-                            </span>
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="button" class="btn btn-primary float-right notifyParticipantsSup ml-1" attr-loc="top" style="display:none">
+                                <i class="fa fa-info-circle notifyParticipantsInfo" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" 
+                                    data-content="Use this button to alert the other participant that you have made updates to this conversation." 
+                                    data-original-title="" title="" aria-describedby="popover271882"> 
+                                </i>
+                                Send Notification
+                            </button>
+                            <button type="button" class="btn btn-primary float-right supSaveAllComments" attr-loc="top" style="display:none">Save Comments</button>
+                            <button type="button" class="btn btn-primary float-left empSaveAllComments" attr-loc="top"  style="display:none">Save Comments</button>
+                            <button type="button" class="btn btn-primary float-left notifyParticipantsEmp ml-1" attr-loc="top" style="display:none">
+                                <i class="fa fa-info-circle notifyParticipantsInfo" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" 
+                                    data-content="Use this button to alert the other participant that you have made updates to this conversation." 
+                                    data-original-title="" title="" aria-describedby="popover271882"> 
+                                </i>
+                                Send Notification
+                            </button>
                         </div>
-                        <form id="employee-sign_off_form" method="post">
-                            @csrf
-                            <table class="table table-borderless text-center">
-                                <tr>
-                                    <th></th>
-                                    <th colspan="2" class="p-1 bg-dark border border-dark">Employee</th>
-                                    <th class="p-1"></th>
-                                    <th colspan="2" class="p-1 bg-dark border border-dark">Supervisor</th>
-                                </tr>
-                                <tr>
-                                    <th></th>
-                                    <td class="border-left border-dark emp-inputs" style="width:85px">Yes</td>
-                                    <td class="border-left border-right border-dark emp-inputs" style="width:85px">No</td>
-                                    <td></td>
-                                    <td class="border-left border-dark sup-inputs" style="width:85px">Yes</td>
-                                    <td class="border-left border-right border-dark sup-inputs" style="width:85px">No</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">We reviewed progress of goals and adjusted as necessary.</td>
-                                    <td class="border-left border-dark emp-inputs"><input type="radio" name="check_one" value="1"></td>
-                                    <td class="border-left border-right border-dark emp-inputs"><input type="radio" name="check_one" value="0"></td>
-                                    <td></td>
-                                    <td class="border-left border-dark sup-inputs"><input type="radio" name="check_one_" value="1"></td>
-                                    <td class="border-left border-right border-dark sup-inputs"><input type="radio" name="check_one_" value="0"></td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">Performance expectations have been clearly communicated.</td>
-                                    <td class="border border-top-0 border-dark emp-inputs"><input type="radio" name="check_two" value="1"></td>
-                                    <td class="border border-top-0 border-dark emp-inputs"><input type="radio" name="check_two" value="0"></td>
-                                    <td></td>
-                                    <td class="border border-top-0 border-dark sup-inputs"><input type="radio" name="check_two_" value="1"></td>
-                                    <td class="border border-top-0 border-dark sup-inputs"><input type="radio" name="check_two_" value="0"></td>
-                                </tr>
-                                <!-- <tr>
-                                    <td class="text-left">I accept the content of this record of conversation.</td>
-                                    <td class="border border-top-0 border-dark emp-inputs"><input type="radio" name="check_three" value="1"></td>
-                                    <td class="border border-top-0 border-dark emp-inputs"><input type="radio" name="check_three" value="0"></td>
-                                    <td></td>
-                                    <td class="border border-top-0 border-dark sup-inputs"><input type="radio" name="check_three_" value="1"></td>
-                                    <td class="border border-top-0 border-dark sup-inputs"><input type="radio" name="check_three_" value="0"></td>
-                                </tr> -->
-                            </table>
-                            <div id="signoff-emp-id-input">
-                                <div class="my-2">Enter your 6 digit employee ID to indicate you have read and accept the performance review:</div>
+                    </div>
+                    <hr>
+                @endif   
 
-                                <input type="text" id="employee_id" class="form-control d-inline w-50">
-                                <button class="btn btn-primary btn-sign-off ml-2" type="button">Sign with my employee ID</button>
-                                <br>
-                                <span class="text-danger error" data-error-for="employee_id"></span>
 
-                                <div class="mt-3">
-                                    <input type="hidden" name="team_member_agreement" value="0">
-                                    <label style="font-weight: normal;">
-                                        <input type="checkbox" name="team_member_agreement" id="team_member_agreement" value="1">&nbsp;Team member disagrees with the information contained in this performance review.
-                                    </label>
+                
+                <div class="row">
+                    <div class="col-6">
+                        <div class="card">
+                                <div class="card-header panel-heading bg-primary">
+                                Employee Comments
+                                </div>                                
+
+                                <div class="card-body">
+                                    <div id="div-info-comment4">
+                                        <h6 id="tip-info-comment4"></h6>
+                                        <span id="desc-info-comment4"></span>
+                                        <span id="control-info-comment4" style="display:none"><br/><span id="info_area4"></span></span>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <textarea class="form-control info_comment4 mb-4 employee-comment btn-conv-edit" data-name="info_comment4" data-id="info_comment4" name="info_comment4" id="info_comment4"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="div-info-comment7">                                        
+                                        <br/>
+                                        <h6 id="tip-info-comment7"></h6>
+                                        <span id="desc-info-comment7"></span>
+                                        <span id="control-info-comment7" style="display:none"><br/><span id="info_area7"></span></span>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <textarea class="form-control info_comment7 mb-4 employee-comment btn-conv-edit" data-name="info_comment7" data-id="info_comment7" name="info_comment7" id="info_comment7"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="div-info-comment8">                                        
+                                        <br/>
+                                        <h6 id="tip-info-comment8"></h6>
+                                        <span id="desc-info-comment8"></span>
+                                        <span id="control-info-comment8" style="display:none"><br/><span id="info_area8"></span></span>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <textarea class="form-control info_comment8 mb-4 employee-comment btn-conv-edit" data-name="info_comment8" data-id="info_comment8" name="info_comment8" id="info_comment8"></textarea>
+                                            </div>
+                                        </div>    
+                                    </div>
+                                    <div id="div-info-comment9">
+                                        <br/>
+                                        <h6 id="tip-info-comment9"></h6>
+                                        <span id="desc-info-comment9"></span>
+                                        <span id="control-info-comment9" style="display:none"><br/><span id="info_area9"></span></span>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <textarea class="form-control info_comment9 mb-4 employee-comment btn-conv-edit" data-name="info_comment9" data-id="info_comment9" name="info_comment9" id="info_comment9"></textarea>
+                                            </div>
+                                        </div>    
+                                    </div>
+                                    <div id="div-info-comment10">
+                                        <br/>
+                                        <h6 id="tip-info-comment10"></h6>
+                                        <span id="desc-info-comment10"></span>
+                                        <span id="control-info-comment10" style="display:none"><br/><span id="info_area10"></span></span>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <textarea class="form-control info_comment10 mb-4 employee-comment btn-conv-edit" data-name="info_comment10" data-id="info_comment10" name="info_comment10" id="info_comment10"></textarea>
+                                            </div>
+                                        </div>    
+                                    </div>
+                                </div>
+                        </div>
+                        @if ($type == 'upcoming')
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="alert alert-success send-notification-info-emp" attr-loc="bottom"  role="alert" style="display:none">
+                                        Notifications to other participants have been sent.
+                                    </div>
                                 </div>
                             </div>
-                        </form>
-
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="alert alert-success emp-comment-save-info" attr-loc="bottom" role="alert" style="display:none">
+                                        Comments are saved.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <button type="button" class="btn btn-primary float-left empSaveAllComments" attr-loc="bottom" style="display:none">Save Comments</button>
+                                    <button type="button" class="btn btn-primary float-left notifyParticipantsEmp ml-1" attr-loc="bottom" style="display:none">
+                                        <i class="fa fa-info-circle notifyParticipantsInfo" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" 
+                                            data-content="Use this button to alert the other participant that you have made updates to this conversation." 
+                                            data-original-title="" title="" aria-describedby="popover271882"> 
+                                        </i>
+                                        Send Notification
+                                    </button>
+                                </div>
+                            </div>
+                            <hr>
+                        @endif    
                     </div>
-                    
-                            
-                </div>
+                
+                    <div class="col-6">
+                        <div class="card">
+                               <div class="card-header panel-heading bg-primary">
+                                Supervisor Comments
+                                </div>
 
-                <div id="unsignoff-form-block">
-                    <div class="my-2">Enter 6 digit employee ID to unsign:</div>
-                    <form id="unsign-off-form" data-action-url="{{ route('conversation.unsignoff', 'xxx')}}" method="post">
-                        @csrf
-                        <input type="text" name="employee_id" id="employee_id" class="form-control d-inline w-50">
-                        <button data-action="unsignoff" class="btn btn-primary btn-sign-off ml-2" type="button">Un-Sign</button>
-                        <br>
-                        <span class="text-danger error" data-error-for="employee_id"></span>
-
-                        <div class="mt-3">
-                            <label style="font-weight: normal;">
-                                <input type="checkbox" name="team_member_agreement" id="team_member_agreement_2" value="1" disabled>&nbsp;Team member disagrees with the information contained in this performance review.
-                            </label>
-                        </div>
-                    </form>
+                                <div class="card-body">
+                                    <div class="row"  id="div-info-comment1">
+                                        <div class="col-12">
+                                            <h6 id="tip-info-comment1"></h6>                                    
+                                            <span id="desc-info-comment1"></span>
+                                            <span id="control-info-comment1" style="display:none"><br/><span id="info_area1"></span></span>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <textarea class="form-control supervisor-comment info_comment1 mb-4 btn-conv-edit" name="info_comment1" id="info_comment1" data-id="info_comment1" data-name="info_comment1"></textarea>
+                                                </div>
+                                            </div> 
+                                        </div> 
+                                    </div>
+                                    <div class="row"  id="div-info-comment2">
+                                        <div class="col-12">   
+                                            <br/>
+                                            <h6 id="tip-info-comment2"></h6>
+                                            <span id="desc-info-comment2"></span>
+                                            <span id="control-info-comment2" style="display:none"><br/><span id="info_area2"></span></span>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <textarea class="form-control supervisor-comment info_comment2 mb-4 btn-conv-edit" name="info_comment2" id="info_comment2" data-id="info_comment2" data-name="info_comment2"></textarea>
+                                                </div>
+                                            </div> 
+                                        </div> 
+                                    </div>
+                                    <div class="row"  id="div-info-comment3">                                     
+                                        <div class="col-12">   
+                                            <br/>
+                                            <h6 id="tip-info-comment3"></h6>
+                                            <span id="desc-info-comment3"></span>
+                                            <span id="control-info-comment3" style="display:none"><br/><span id="info_area3"></span></span>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <textarea class="form-control supervisor-comment info_comment3 mb-4 btn-conv-edit" name="info_comment3" id="info_comment3" data-id="info_comment3" data-name="info_comment3"></textarea>
+                                                </div>
+                                            </div> 
+                                        </div> 
+                                    </div>
+                                    <div class="row" id="div-info-comment5">
+                                        <div class="col-12">
+                                            <br/>   
+                                            <h6 id="tip-info-comment5"></h6>
+                                            <span id="desc-info-comment5"></span>
+                                            <span id="control-info-comment5" style="display:none"><br/><span id="info_area5"></span></span>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <textarea class="form-control supervisor-comment info_comment5 mb-4 btn-conv-edit" name="info_comment5" id="info_comment5" data-id="info_comment5" data-name="info_comment5"></textarea>
+                                                </div>
+                                            </div> 
+                                        </div> 
+                                    </div>
+                                    <div class="row"  id="div-info-comment6">
+                                        <div class="col-12">   
+                                            <br/>
+                                            <h6 id="tip-info-comment6"></h6>
+                                            <span id="desc-info-comment6"></span>
+                                            <span id="control-info-comment6" style="display:none"><br/><span id="info_area6"></span></span>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <textarea class="form-control supervisor-comment info_comment6 mb-4 btn-conv-edit" name="info_comment6" id="info_comment6" data-id="info_comment6" data-name="info_comment6"></textarea>
+                                                </div>
+                                            </div> 
+                                        </div> 
+                                    </div>
+                                    <div class="row"  id="div-info-comment11">
+                                        <div class="col-12">
+                                            <br/>   
+                                            <h6 id="tip-info-comment11"></h6>
+                                            <span id="desc-info-comment11"></span>
+                                            <span id="control-info-comment11" style="display:none"><br/><span id="info_area11"></span></span>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <input class="form-control form-control-md supervisor-comment info_comment11 mb-4 " type="date" name="info_comment11" id="info_comment11" data-id="info_comment11" data-name="info_comment11">                                                 
+                                                </div>
+                                            </div> 
+                                        </div> 
+                                    </div>
+                                </div>
+                        </div>                                 
+                        @if ($type == 'upcoming')
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="alert alert-success send-notification-info-sup" attr-loc="bottom"  role="alert" style="display:none">
+                                        Notifications to other participants have been sent.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="alert alert-success sup-comment-save-info" attr-loc="bottom" role="alert" style="display:none">
+                                        Comments are saved.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <button type="button" class="btn btn-primary float-right notifyParticipantsSup ml-1" attr-loc="bottom" style="display:none">
+                                        <i class="fa fa-info-circle notifyParticipantsInfo" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" 
+                                            data-content="Use this button to alert the other participant that you have made updates to this conversation." 
+                                            data-original-title="" title="" aria-describedby="popover271882"> 
+                                        </i>
+                                        Send Notification
+                                    </button>
+                                    <button type="button" class="btn btn-primary float-right supSaveAllComments" attr-loc="bottom" style="display:none">Save Comments</button>
+                                </div>
+                            </div>
+                            <hr>
+                        @endif             
+                    </div>                                      
                 </div>
-                <div class="mt-3 alert alert-default-warning d-none" id="locked-message">
-                    <!-- Conversation records can be un-signed and edited for up to two weeks from initial completion date. After the two week period, a request to unlock the conversation record will need to be submitted to your HR Administrator if changes are required. -->
-                    Conversation records can be un-signed and edited for up to two weeks from initial completion date. After the two week period, an AskMyHR request to unlock the conversation record will need to be submitted to Myself > HR Software Systems Support > Performance Development Platform.
+                
+                <div id="sign-off-block">
+                <form id="employee-sign_off_form" method="post">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="card">
+                               <div class="card-header panel-heading bg-primary">
+                                Employee Sign-Off
+                                </div>                                
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <p><b>We have reviewed goals and adjusted as necessary.</b></p>
+                                            <p><input class="employee-sign-off1" type="radio" name="check_one" value="1"> Yes</p>
+                                            <p><input class="employee-sign-off1"  type="radio" name="check_one" value="0"> No</p>
+                                            <br/>
+                                            <p><b>Performance expectations are clear.</b></p>
+                                            <p><input class="employee-sign-off2" type="radio" name="check_two" value="1"> Yes</p>
+                                            <p><input class="employee-sign-off2" type="radio" name="check_two" value="0"> No</p>
+                                            <br/>
+                                            
+                                            <div class="mt-3">
+                                                    <label style="font-weight: normal;">
+                                                        <input type="checkbox" class="team_member_agreement" name="team_member_agreement" id="signoff_team_member_agreement" value="1">&nbsp;Team member disagrees with the information contained in this performance review.
+                                                    </label>
+                                                    <p><span class="agree-message text-danger error"></span></p>
+                                            </div>
+                                        </div>
+                                            
+                                            <div id="emp-signoff-row">                                                
+                                                <div id="signoff-emp-id-input"></div>                                            
+                                            </div> 
+                                            <div class="mt-3 alert alert-default-warning alert-dismissible" id="employee-signoff-message">
+                                                    <span class="h5"><i class="icon fas fa-exclamation-circle"></i><b class="name"></b> has <b class="not d-none">not</b> signed this record of conversation <span class="emp-time"></span></span>
+                                            </div>
+                                    </div>
+                                </div>
+                        </div>                        
+                    </div>
+                    <div class="col-6">
+                        <div class="card">
+                               <div class="card-header panel-heading bg-primary">
+                                Supervisor Sign-Off
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <p><b>We have reviewed goals and adjusted as necessary.</b></p>
+                                            <p><input class="supervisor-sign-off1" type="radio" name="check_one_" value="1"> Yes</p>
+                                            <p><input class="supervisor-sign-off1" type="radio" name="check_one_" value="0"> No</p>
+                                            <br/>
+                                            <p><b>Performance expectations are clear.</b></p>
+                                            <p><input class="supervisor-sign-off2" type="radio" name="check_two_" value="1"> Yes</p>
+                                            <p><input class="supervisor-sign-off2" type="radio" name="check_two_" value="0"> No</p>
+                                            <br/>
+                                            <div id="sup-signoff-row">
+                                                <div id="signoff-sup-id-input"></div>
+                                            </div>      
+                                            <div class="mt-3 alert alert-default-warning alert-dismissible" id="supervisor-signoff-message">
+                                                <span class="h5"><i class="icon fas fa-exclamation-circle"></i><b class="name"></b> has <b class="not d-none">not</b> signed this record of conversation <span class="sup-time"></span></span>
+                                            </div>                                               
+                                        </div> 
+                                    </div>                                    
+                                </div>
+                        </div>                        
+                    </div>
                 </div>
-                @endif
-                <div class="mt-3 alert alert-default-warning alert-dismissible" id="supervisor-signoff-message">
-                    <span class="h5"><i class="icon fas fa-exclamation-circle"></i><b class="name"></b> has <b class="not d-none">not</b> signed this record of conversation <span class="time"></span></span>
+                </form>    
                 </div>
-                <div class="mt-3 alert alert-default-warning alert-dismissible" id="employee-signoff-message">
-                    <span class="h5"><i class="icon fas fa-exclamation-circle"></i><b class="name"></b> has <b class="not d-none">not</b> signed this record of conversation <span class="time"></span></span>
+                
+                <div id="unsign-off-block">
+                <form id="unsign-off-form" data-action-url="{{ route('conversation.unsignoff', 'xxx')}}" method="post">    
+                <div class="row">
+                    <div class="col-6">
+                        <div class="card">
+                               <div class="card-header panel-heading bg-primary">
+                                Employee Unsign-Off
+                                </div>                                
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <p><b>We have reviewed goals and adjusted as necessary.</b></p>
+                                            <p><input class="employee-sign-off1" type="radio" name="check_one" value="1"> Yes</p>
+                                            <p><input class="employee-sign-off1"  type="radio" name="check_one" value="0"> No</p>
+                                            <br/>
+                                            <p><b>Performance expectations are clear.</b></p>
+                                            <p><input class="employee-sign-off2" type="radio" name="check_two" value="1"> Yes</p>
+                                            <p><input class="employee-sign-off2" type="radio" name="check_two" value="0"> No</p>
+                                            <br/>
+                                            
+                                            <div class="mt-3">
+                                                    <label style="font-weight: normal;">
+                                                        <input type="checkbox" class="team_member_agreement" name="team_member_agreement" id="unsingoff-team_member_agreement" value="1">&nbsp;Team member disagrees with the information contained in this performance review.
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            
+                                            <div id="emp-unsignoff-row">                                                
+                                                <div id="unsignoff-emp-id-input"></div>                                            
+                                            </div> 
+                                            <div class="mt-3 alert alert-default-warning alert-dismissible" id="employee-unsignoff-message">
+                                                    <span class="h5"><i class="icon fas fa-exclamation-circle"></i><b class="name"></b> has <b class="not d-none">not</b> signed this record of conversation <span class="emp-time"></span></span>
+                                            </div>
+                                    </div>
+                                </div>
+                        </div>                        
+                    </div>
+                    <div class="col-6">
+                        <div class="card">
+                               <div class="card-header panel-heading bg-primary">
+                                Supervisor Unsign-Off
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <p><b>We have reviewed goals and adjusted as necessary.</b></p>
+                                            <p><input class="supervisor-sign-off1" type="radio" name="check_one_" value="1"> Yes</p>
+                                            <p><input class="supervisor-sign-off1" type="radio" name="check_one_" value="0"> No</p>
+                                            <br/>
+                                            <p><b>Performance expectations are clear.</b></p>
+                                            <p><input class="supervisor-sign-off2" type="radio" name="check_two_" value="1"> Yes</p>
+                                            <p><input class="supervisor-sign-off2" type="radio" name="check_two_" value="0"> No</p>
+                                            <br/>
+                                            <div id="sup-unsignoff-row">
+                                                <div id="unsignoff-sup-id-input"></div>
+                                            </div>      
+                                            <div class="mt-3 alert alert-default-warning alert-dismissible" id="supervisor-unsignoff-message">
+                                                <span class="h5"><i class="icon fas fa-exclamation-circle"></i><b class="name"></b> has <b class="not d-none">not</b> signed this record of conversation <span class="sup-time"></span></span>
+                                            </div>                                               
+                                        </div> 
+                                    </div>                                    
+                                </div>
+                        </div>                        
+                    </div>
                 </div>
+                </form>    
+                </div>   
+                
             </div>
         </div>
-
     </div>
+
+
+    <div class="modal fade" id="unsavedChangesModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:99"> 
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Unsaved Changes</h5>
+            </div>
+            <div class="modal-body">
+                <p>Save changes to this conversation?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
+                <button type="button" class="btn btn-secondary" id="discardChangesBtn">Don't Save</button>
+                <button type="button" class="btn btn-secondary" id="cancelChangesBtn">Cancel</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
 </div>

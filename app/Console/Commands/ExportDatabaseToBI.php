@@ -51,7 +51,7 @@ class ExportDatabaseToBI extends Command
      *
      * @var string
      */
-    protected $signature = 'command:ExportDatabaseToBI';  
+    protected $signature = 'command:ExportDatabaseToBI {--manual}';  
 
     /**
      * The console command description.
@@ -82,79 +82,83 @@ class ExportDatabaseToBI extends Command
         $this->info( 'Bulk Database Upload to ODS, Started: '. $start_time);
   
         $job_name = 'command:ExportDatabaseToBI';
+        $switch = strtolower(env('PRCS_SEND_ODS_DATA'));
+        $manualoverride = (strtolower($this->option('manual')) ? true : false);
+        $status = (($switch == 'on' || $manualoverride) ? 'Initiated' : 'Disabled');
         $audit_id = JobSchedAudit::insertGetId(
           [
             'job_name' => $job_name,
             'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
-            'status' => 'Initiated'
+            'status' => $status
           ]
         );
   
-        $stored = DB::table('stored_dates')
-        ->where('name', 'ODS Bulk Database Upload')
-        ->first();
-  
-        if(is_null($stored)){
-            $last_cutoff_time = Carbon::create(1900, 1, 1, 0, 0, 0, 'PDT')->format('c');
-            $this->info( 'Last Bulk Upload Date not found.  Using ' . $last_cutoff_time);
-            $stored = DB::table('stored_dates')->updateOrInsert(
+        if ($switch == 'on' || $manualoverride) {
+
+            $stored = DB::table('stored_dates')
+            ->where('name', 'ODS Bulk Database Upload')
+            ->first();
+    
+            if(is_null($stored)){
+                $last_cutoff_time = Carbon::create(1900, 1, 1, 0, 0, 0, 'PDT')->format('c');
+                $this->info( 'Last Bulk Upload Date not found.  Using ' . $last_cutoff_time);
+                $stored = DB::table('stored_dates')->updateOrInsert(
+                    [
+                    'name' => 'ODS Bulk Database Upload',
+                    ],
+                    [
+                    'value' => Carbon::create(1900, 1, 1, 0, 0, 0, 'PDT')->format('c'),
+                    ]
+            );
+            } else {  
+                if($stored->value){
+                    $last_cutoff_time = $stored->value;
+                    $this->info( 'Last Bulk Upload Date:  ' . $last_cutoff_time);
+                }else{
+                    $last_cutoff_time = Carbon::create(1900, 1, 1, 0, 0, 0, 'PDT')->format('c');
+                    $this->info( 'Last Bulk Upload Date not found.  Using ' . $last_cutoff_time);
+                }
+            }
+    
+            $this->info( now() );
+
+            // Main Loop
+            foreach ($this->db_tables as $table) {
+                $table_name =  $table['name'];
+                $delta_field = $table['delta'];
+                $hidden_fields = $table['hidden'];
+                $this->sendTableDataToDataWarehouse($table_name, $delta_field, $hidden_fields, $last_cutoff_time);
+            }
+        
+            DB::table('stored_dates')->updateOrInsert(
                 [
                 'name' => 'ODS Bulk Database Upload',
                 ],
                 [
-                'value' => Carbon::create(1900, 1, 1, 0, 0, 0, 'PDT')->format('c'),
+                'value' => $start_time,
                 ]
-          );
-        } else {  
-            if($stored->value){
-                $last_cutoff_time = $stored->value;
-                $this->info( 'Last Bulk Upload Date:  ' . $last_cutoff_time);
-            }else{
-                $last_cutoff_time = Carbon::create(1900, 1, 1, 0, 0, 0, 'PDT')->format('c');
-                $this->info( 'Last Bulk Upload Date not found.  Using ' . $last_cutoff_time);
-            }
+            );
+            $this->info( 'Last Pull Date Updated to: ' . $start_time);
+        
+            $end_time = Carbon::now();
+            DB::table('job_sched_audit')->updateOrInsert(
+                [
+                'id' => $audit_id
+                ],
+                [
+                'job_name' => $job_name,
+                'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
+                'end_time' => date('Y-m-d H:i:s', strtotime($end_time)),
+                'cutoff_time' => date('Y-m-d H:i:s', strtotime($last_cutoff_time)),
+                'status' => 'Completed',
+                ]
+            );
+        
+            $this->info( 'Bulk Database Upload to ODS, Completed: ' . $end_time);
+
+        } else {
+            $this->info( 'Process is currently disabled; or "PRCS_SEND_ODS_DATA=on" is currently missing in the .env file.');
         }
-  
-        $this->info( now() );
-
-        // Main Loop
-        foreach ($this->db_tables as $table) {
-           $table_name =  $table['name'];
-           $delta_field = $table['delta'];
-           $hidden_fields = $table['hidden'];
-
-           $this->sendTableDataToDataWarehouse($table_name, $delta_field, $hidden_fields, $last_cutoff_time);
-
-           $data  = DB::table($table_name)->get()->toJson();
-
-        }
-
-    
-        DB::table('stored_dates')->updateOrInsert(
-            [
-              'name' => 'ODS Bulk Database Upload',
-            ],
-            [
-              'value' => $start_time,
-            ]
-          );
-          $this->info( 'Last Pull Date Updated to: ' . $start_time);
-      
-          $end_time = Carbon::now();
-          DB::table('job_sched_audit')->updateOrInsert(
-            [
-              'id' => $audit_id
-            ],
-            [
-              'job_name' => $job_name,
-              'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
-              'end_time' => date('Y-m-d H:i:s', strtotime($end_time)),
-              'cutoff_time' => date('Y-m-d H:i:s', strtotime($last_cutoff_time)),
-              'status' => 'Completed',
-            ]
-          );
-      
-          $this->info( 'Bulk Database Upload to ODS, Completed: ' . $end_time);
 
         return 0;
     }
@@ -180,8 +184,8 @@ class ExportDatabaseToBI extends Command
             ->orderByRaw('1');
         
         // Chucking
-        $sql->chunk(5000, function($chuck) use($table_name, $hidden_fields, &$n) {
-            $this->info( "Sending table '{$table_name}' batch (5000) - " . ++$n );
+        $sql->chunk(2000, function($chuck) use($table_name, $hidden_fields, &$n) {
+            $this->info( "Sending table '{$table_name}' batch (2000) - " . ++$n );
 
             //$chuck->makeHidden(['password', 'remember_token']);
             if ($hidden_fields) {

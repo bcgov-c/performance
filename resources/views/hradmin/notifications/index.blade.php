@@ -1,5 +1,5 @@
 
-<x-side-layout title="{{ __('Dashboard') }}">
+<x-side-layout title="{{ __('Notifications - Performance Development Platform') }}">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-primary leading-tight" role="banner">
             Notify Users
@@ -70,7 +70,7 @@
 		</form>
 
 		<p></p>
-		<table class="table table-bordered" id="notificationlog-table">
+		<table class="table table-bordered table-striped" id="notificationlog-table">
 			<thead>
 				<tr>
 					<th>Date Sent</th>
@@ -89,7 +89,7 @@
 
 
 <x-slot name="css">
-    <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 	<style>
 	.text-truncate-30 {
 		white-space: wrap; 
@@ -111,8 +111,8 @@
 </x-slot>
 
 <x-slot name="js">
-    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
     <script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
     <script>
 

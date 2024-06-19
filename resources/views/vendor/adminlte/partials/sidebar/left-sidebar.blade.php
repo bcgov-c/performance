@@ -30,6 +30,7 @@
             </div>
         </div>
     </div>
+
     {{-- Sidebar menu --}}
     <div class="sidebar">
         <nav class="pt-2">
@@ -45,6 +46,10 @@
                 @each('adminlte::partials.sidebar.menu-item', $adminlte->menu('sidebar'), 'item')
             </ul>
         </nav>
+    </div>
+
+    <div class="d-flex flex-column align-items-center  py-5">
+        <img src="{{asset('img/brand/WhereIdeasWork.png')}}" alt="" style="max-width:200px; max-height:200px">
     </div>
 
 </aside>

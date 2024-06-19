@@ -46,14 +46,14 @@
             <label for="criteria">Search Criteria</label>
             <select id="criteria" name="criteria" class="form-control">
                 @foreach( $criteriaList as $key => $value )
-                    <option value="{{ $key }}" {{  old('criteria') == $key ? 'selected' : '' }} >{{ $value }}</option>
+                    <option value="{{ $key }}" >{{ $value }}</option>
                 @endforeach
             </select>
         </div>
         <div class="form-group col-md-2 mb-2 ">
             <label for="search_text">Search Text</label>
             <input type="text" id="search_text" name="search_text" class="form-control" 
-                    value="{{ old('search_text') }}" placeholder="Search Text">
+                    value="" placeholder="Search Text">
         </div>
         <div class="form-group col-md-2 mb-2 p-3 float-left float-bottom" style="display: flex; flex-direction: column;">
             <div class="form-group row"> </div>
@@ -78,14 +78,12 @@
         height: auto !important;
         min-height: 38px !important;
     }
-
     .select2-container .select2-selection--single {
         height: 38px !important;
         }
     .select2-container--default .select2-selection--single .select2-selection__arrow {
         height: 38px !important;
     }
-
     </style>
 
 @endpush
@@ -100,7 +98,7 @@
                 placeholder: 'Select Organization',
                 allowClear: true,
                 ajax: {
-                    url: '/sysadmin/employees/org-organizations'
+                    url: '/sysadmin/org-list/1/0'
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -117,12 +115,11 @@
                     , cache: false
                 }
             });
-
             $('#dd_level1').select2({
                 placeholder: 'Select Level 1',
                 allowClear: true,
                 ajax: {
-                    url: '/sysadmin/employees/org-programs' 
+                    url: '/sysadmin/org-list/1/1' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -140,12 +137,11 @@
                     , cache: false
                 }
             });
-
             $('#dd_level2').select2({
                 placeholder: 'Select Level 2',
                 allowClear: true,
                 ajax: {
-                    url: '/sysadmin/employees/org-divisions' 
+                    url: '/sysadmin/org-list/1/2' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -164,12 +160,11 @@
                     , cache: false
                 }
             });
-
             $('#dd_level3').select2({
                 placeholder: 'Select Level 3',
                 allowClear: true,
                 ajax: {
-                    url: '/sysadmin/employees/org-branches' 
+                    url: '/sysadmin/org-list/1/3' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -189,12 +184,11 @@
                     , cache: false
                 }
             });
-
             $('#dd_level4').select2({
                 placeholder: 'Select level 4',
                 allowClear: true,
                 ajax: {
-                    url: '/sysadmin/employees/org-level4' 
+                    url: '/sysadmin/org-list/1/4' 
                     , dataType: 'json'
                     , delay: 250
                     , data: function(params) {
@@ -223,25 +217,21 @@
                 $('#dd_level3').val(null).trigger('change');
                 $('#dd_level4').val(null).trigger('change');
             });
-
             $('#dd_level1').on('select2:select', function (e) {
                 // Do something
                 $('#dd_level2').val(null).trigger('change');
                 $('#dd_level3').val(null).trigger('change');
                 $('#dd_level4').val(null).trigger('change');
             });
-
             $('#dd_level2').on('select2:select', function (e) {
                 // Do something
                 $('#dd_level3').val(null).trigger('change');
                 $('#dd_level4').val(null).trigger('change');
             });
-
             $('#dd_level3').on('select2:select', function (e) {
                 // Do something
                 $('#dd_level4').val(null).trigger('change');
             });
-
             $('#btn_search_reset').click(function() {
                 $('#dd_level0').val(null).trigger('change');
                 $('#dd_level1').val(null).trigger('change');
@@ -250,9 +240,8 @@
                 $('#dd_level4').val(null).trigger('change');
                 $('#search_text').val(null);
             });
-
             $('#btn_search').click(function() {
-                $('#filtertable').DataTable().ajax.reload(null, false);
+                $('#filtertable').DataTable().ajax.reload();
             });
         };
     </script>

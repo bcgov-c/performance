@@ -1,3 +1,4 @@
+<p>Tags help to more accurately identity, sort, and report on your goals in the Performance Development Platform. You can add more than one tag to a goal.</p>
 <div class="table-responsive">
     <table cellspacing="0" cellpadding="0" class="table table-condensed table-bordered">
         <tbody>

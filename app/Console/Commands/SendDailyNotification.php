@@ -3,12 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use DateTime;
-use DateTimeZone;
-use Microsoft\Graph\Graph;
-use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
-use GuzzleHttp\Client;
-
+use Illuminate\Support\Facades\Mail;
 
 class SendDailyNotification extends Command
 {
@@ -43,86 +38,28 @@ class SendDailyNotification extends Command
      */
     public function handle()
     {
-        $accessToken = $this->getAccessToken();
 
-        // Create a Graph client
-        $graph = new Graph();
-        $graph->setAccessToken($accessToken);
+        // June 24, replaceto send 
 
-        $attendeeAddresses = ['james.poon@gov.bc.ca', 'james.poon@telus.com', 'myphd2@gmail.com', 'employee11@extest.gov.bc.ca', 'employee12@extest.gov.bc.ca'];
-        $subject = 'ePerformance Application - schedule daily notification testing';
-        $body = 'Test message -- daily notification send out from server for testing purpose, please ignore.';
+        $toAddresses = explode(',', env('PRCS_DAILY_NOTIFICATION_LIST'));
 
-        $attendees = [];
-        foreach ($attendeeAddresses as $attendeeAddress) {
-            array_push($attendees, [
-                // Add the email address in the emailAddress property
-                'emailAddress' => [
-                    'address' => $attendeeAddress,
-                ],
-            ]);
+        $subject = '(from region: '. env('APP_ENV') .') Performance Application Platform - schedule daily notification testing';
+        $body = "Test message -- daily notification send out from server for testing purpose, please ignore. (from region: " . env('APP_ENV') .')';
+
+        Mail::raw( $body , function($message) use($subject, $toAddresses) {
+            $message->to( $toAddresses );
+            $message->subject(  $subject );
+        });  
+
+         // check for failures
+        if (Mail::failures()) {
+            // return response showing failed emails
+            $this->info('Error. Failed to sent daily notification to eligible people.');
+        } else {
+            $this->info('Successfully sent daily notification to eligible people.');
         }
 
-        // Build message
-        $newMessage = [
-            "message" => [
-                "subject" => $subject,
-                "body" => [
-                    "contentType" => "Text",
-                    "content" => $body,
-                ],
-                'toRecipients' => $attendees
-            ],
-            "saveToSentItems" => "true",
-        ];
-
-        //  User - API https://graph.microsoft.com/v1.0/me/sendMail
-        $sendMailUrl = '/users/'.env('OAUTH_DEFAULT_SENDER_EMAIL').'/sendMail';
-        $response = $graph->createRequest('POST', $sendMailUrl)
-            ->addHeaders(['Prefer' => 'outlook.timezone="Pacific Standard Time"'])
-            ->attachBody($newMessage)
-            ->execute();
-
-        //return $response;
-        $this->info('Successfully sent daily notification to eligible people.');
-
-
-    }
-
-    protected function getAccessToken()
-    {
-
-        $client = new client;
-        $endpoint = env('OAUTH_AUTHORITY').env('OAUTH_TOKEN_ENDPOINT');
-
-        try {
-
-            $response = $client->request('POST', $endpoint, [
-                'form_params' => [
-                    'client_id' => env('OAUTH_APP_ID'),
-                    'client_secret' => env('OAUTH_APP_PASSWORD'),
-                    'scope' => 'https://graph.microsoft.com/.default',
-                    'grant_type' => 'client_credentials',
-                ] 
-            ]);
-
-
-            $contents = $response->getBody()->getContents();
-            $token_array = json_decode($contents, true);
-            
-            return $token_array['access_token'];
-
-        }
-        catch (GuzzleHttp\Exception\ClientException $e) {
-            $response = $e->getResponse();
-            $responseBodyAsString = $response->getBody()->getContents();
-
-            echo $respose;
-            echo $responseBodyAsString;
-            // To Do -- notify administrator about the process failure
-            exit(1);
-
-        }
+        return 0;
 
     }
 

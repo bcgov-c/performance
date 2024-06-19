@@ -13,7 +13,7 @@ class OrganizationTree extends Model
     use HasFactory, NodeTrait;
 
     protected $fillable = [
-        'name', 'status', 'level', 'organization', 'level1_program', 'level2_division',
+        'name', 'status', 'level', 'deptid', 'organization', 'level1_program', 'level2_division',
         'level3_branch', 'level4', 'parent_id', 'no_of_employee', 
     ];
 
@@ -74,7 +74,7 @@ class OrganizationTree extends Model
 
     public function users() {
 
-        $demoWhere = EmployeeDemo::join('users','employee_demo.guid', 'users.guid')
+        $demoWhere = EmployeeDemo::join('users','employee_demo.employee_id', 'users.employee_id')
             ->where('organization_trees.id', $this->id );
   
         $sql_level0 = clone $demoWhere; 

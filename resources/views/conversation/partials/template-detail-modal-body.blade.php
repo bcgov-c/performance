@@ -79,7 +79,13 @@
                     Participants
                    <select class="form-control w-100 select2" style="width:100%;" multiple name="participant_id[]" id="participant_id" required>
                         @foreach($participants as $p)
+                        @if(session()->has('view-profile-as'))
+                            @if(auth()->user()->id == $p->id)
+                            <option value="{{ $p->id }}">{{ $p->name }}</option>
+                            @endif
+                        @else
                         <option value="{{ $p->id }}">{{ $p->name }}</option>
+                        @endif
                         @endforeach
                    </select>
                 </label>

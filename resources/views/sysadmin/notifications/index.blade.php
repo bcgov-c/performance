@@ -1,5 +1,5 @@
 
-<x-side-layout title="{{ __('Dashboard') }}">
+<x-side-layout title="{{ __('Notifications - Performance Development Platform') }}">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-primary leading-tight" role="banner">
             Notify Users
@@ -44,14 +44,14 @@
 				<label for="date_sent_to">Date Sent (To)</label>
 				<input type="date" class="form-control" id="date_sent_to" name="date_sent_to" placeholder="" value="">
 				</div>
-				<div class="col-md-2 mb-2">
+				<div class="col-md-3 mb-2">
 				<label for="recipients">Recipients</label>
 					<input type="text" class="form-control" id="recipients" name="recipients" placeholder="name">
 				</div>
 				<div class="col-md-2 mb-2">
 				<label for="alert_format">Alert Format</label>
 				<select  class="form-control @error('alert_format') is-invalid @enderror" id="alert_format" name="alert_format">
-					<option value="">Select Alert Format</option>
+					<option value="">All </option>
 					@foreach ($alert_format_list as $key => $value)
 					  <option value="{{ $key }}" {{ old('alert_format') == $value ?? 'selected'}}>{{ $value }}</option>
 					@endforeach
@@ -60,6 +60,43 @@
 				<input type="text" class="form-control" id="alert_format" placeholder="" value="">
  --}}				  
 				</div>
+				{{-- <div class="col-md-1 mb-1">
+					<label></label>
+					<button class="btn btn-primary mt-2" type="submit">Search</button>
+				</div> --}}
+				
+			</div>
+
+
+            <div class="form-row">
+				<div class="col-md-3 mb-2">
+				<label for="notify_user">Notify User</label>
+				<input type="text" class="form-control" id="notify_user" name="notify_user" placeholder="notify user name" value="">
+				</div>
+				<div class="col-md-3 mb-2">
+				<label for="overdue_user">Overdue User</label>
+				<input type="text" class="form-control" id="overdue_user" name="overdue_user" placeholder="Overdue user name" value="">
+				</div>
+				<div class="col-md-2 mb-2">
+				<label for="notify_due_date">Notify Due Date</label>
+					<input type="date" class="form-control" id="notify_due_date" name="notify_due_date" placeholder="">
+				</div>
+                <div class="col-md-2 mb-2">
+                    <label for="alert_format">Notify For Days</label>
+                <select  class="form-control id="notify_for_days" name="notify_for_days">
+					<option value="">All </option>
+					@foreach ( [ '30' => 'Due in Month', '7' => 'Due in Week', '0' => 'Overdue'] as $key => $value)
+					  <option value="{{ $key }}">{{ $value }}</option>
+					@endforeach
+				  </select>
+                </div>
+
+                {{-- <div class="col-md-2 mb-2">
+                    <label for="notify_for_days">Notify for days</label>
+                        <input type="text" class="form-control" id="notify_for_days" name="notify_for_days" placeholder="">
+                </div> --}}
+  
+
 				<div class="col-md-1 mb-1">
 					<label></label>
 					<button class="btn btn-primary mt-2" type="submit">Search</button>
@@ -70,15 +107,20 @@
 		</form>
 
 		<p></p>
-		<table class="table table-bordered" id="notificationlog-table">
+		<table class="table table-bordered table-striped" id="notificationlog-table">
 			<thead>
 				<tr>
+                    <th>Tran ID</th>
 					<th>Date Sent</th>
 					<th>Subject</th>
 					<th>Recipients</th>
 					<th>Alert Type</th>
 					<th>Alert Format</th>
-					<th>Description</th>
+					<th>Action</th>
+                    <th>Notify User</th>
+                    <th>Overdue User</th>
+                    <th>Overdue Date</th>
+                    <th>Notify For days</th>
 				</tr>
 			</thead>
 		</table>
@@ -89,7 +131,7 @@
 
 
 <x-slot name="css">
-    <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 	<style>
 	.text-truncate-30 {
 		white-space: wrap; 
@@ -107,19 +149,25 @@
 	#notificationlog-table_filter label {
 		text-align: right !important;
 	}
+    #notificationlog-table_filter {
+        display: none;
+    }
+    
 </style>
 </x-slot>
 
 <x-slot name="js">
-    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
     <script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
     <script>
 
     var oTable = $('#notificationlog-table').DataTable({
+        "scrollX": true,
         retrieve: true,
         processing: true,
         serverSide: true,
+        'order': [[0, 'desc']],
         ajax: {
             url: '{!! route('sysadmin.notifications') !!}',
             data: function (d) {
@@ -127,34 +175,43 @@
                 d.date_sent_to = $('input[name=date_sent_to]').val();
 				d.recipients = $('input[name=recipients]').val();
 				d.alert_format = $('select[name=alert_format]').val();
+                d.notify_user = $('input[name=notify_user]').val();
+                d.overdue_user = $('input[name=overdue_user]').val();
+                d.notify_due_date = $('input[name=notify_due_date]').val();
+                d.notify_for_days = $('select[name=notify_for_days]').val();
 			}
         },
         columns: [
-			{data: 'date_sent', name: 'date_sent'},
-            {data: 'subject', name: 'subject' },
+            {data: 'id', name: 'id'},
+			{data: 'date_sent', name: 'date_sent', className: 'dt-nowrap'},
+            {data: 'subject', name: 'subject', className: 'dt-nowrap'},
             {data: 'recipients', name: 'recipients'},
             {data: 'alert_type_name', name: 'alert_type_name'},
             {data: 'alert_format_name', name: 'alert_format_name'},
-            {data: 'action', name: 'action', orderable: false, searchable: false}
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+            {data: 'notify_user.name', name: 'notify_user_id', defaultContent: '',  orderable: false  },
+            {data: 'overdue_user.name', name: 'overdue_user_id', defaultContent: '', orderable: false},
+            {data: 'notify_due_date', name: 'notify_due_date', defaultContent: '', },
+            {data: 'notify_for_days', name: 'notify_for_days', defaultContent: '', },
         ],
 		columnDefs: [
-                {
-                    render: function (data, type, full, meta) {
-                        console.log(data);
-                        array_tos = data.split(";");
-                        if (array_tos.length > 5) {
-                            text = '( ' + array_tos.length + ' recipients )';
-                        } else { text = data; }
-                        return '<span>' + text + "</span>";
-                    },
-                    targets: 2
-                },
+                // {
+                //     render: function (data, type, full, meta) {
+                //         console.log(data);
+                //         array_tos = data.split(";");
+                //         if (array_tos.length > 5) {
+                //             text = '( ' + array_tos.length + ' recipients )';
+                //         } else { text = data; }
+                //         return '<span>' + text + "</span>";
+                //     },
+                //     targets: 3
+                // },
 
                 {
                     render: function (data, type, full, meta) {
                         return '<div data-toggle="tooltip" class="text-truncate-30" title="' + data + '">' + data + "</div>";
                     },
-                    targets: 1
+                    targets: 2
                 },
 				{
 					render: function (data, type, full, meta) {

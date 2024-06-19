@@ -20,14 +20,6 @@ class MyTeamGoalController extends Controller {
 
         $employees = $myTeamController->myEmployeesAjax();
 
-        // $adminShared=EmployeeShare::select('shared_with_id')
-        // ->where('user_id', '=', Auth::id())
-        // ->whereIn('shared_element_id', ['B', 'G'])
-        // ->pluck('shared_with_id');
-        // $adminemps = User::select('users.*')
-        // ->whereIn('users.id', $adminShared)->get();
-        // $employees = $employees->merge($adminemps);
-
         return view('my-team.goals.index', compact('goals', 'employees'));
     }
 

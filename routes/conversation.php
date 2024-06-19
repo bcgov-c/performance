@@ -17,6 +17,12 @@ Route::post('conversation', [ConversationController::class, 'store'])->name('con
 Route::put('conversation/{conversation}', [ConversationController::class, 'update'])->name('conversation.update');
 Route::delete('conversation/{conversation}', [ConversationController::class, 'destroy'])->name('conversation.destroy');
 Route::post('conversation-info-comment', [ConversationInfoCommentController::class, 'store'])->name('conversation-info-comment.store');
+Route::get('conversation/agreement/{conversation}', [ConversationController::class, 'agreement'])->name('conversation.agreement');
+Route::get('conversation/disagreement/{conversation}', [ConversationController::class, 'disagreement'])->name('conversation.disagreement');
 
 Route::get('participant', [ParticipantController::class, 'index'])->name('participant.index');
+Route::get('conversation-template/{id}', [ConversationController::class, 'conversationTemplate'])->name('conversation-template.detail');
+
+Route::get('conversation/sendnotification/{id}', [ConversationController::class, 'sendNotification'])->name('conversation.sendnotification');
+
 

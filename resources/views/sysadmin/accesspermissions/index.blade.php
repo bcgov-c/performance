@@ -1,4 +1,4 @@
-<x-side-layout title="{{ __('Dashboard') }}">
+<x-side-layout title="{{ __('Access and Permissions - Performance Development Platform') }}">
     <div name="header" class="container-header p-n2 "> 
         <div class="container-fluid">
             <h3>Access and Permissions</h3>
@@ -6,8 +6,7 @@
         </div>
     </div>
 
-	<p class="px-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tincidunt, nibh nec interdum fermentum, est metus rutrum elit, in molestie ex massa ut urna. Duis dignissim tortor ipsum, dignissim rutrum quam gravida sed. Mauris auctor malesuada luctus. Praesent vitae ante et diam gravida lobortis. Donec eleifend euismod scelerisque. Curabitur laoreet erat sit amet tortor rutrum tristique. Sed lobortis est ac mauris lobortis euismod. Morbi tincidunt porta orci eu elementum. Donec lorem lacus, hendrerit a augue sed, tempus rhoncus arcu. Praesent a enim vel eros elementum porta. Nunc ut leo eu augue dapibus efficitur ac ac risus. Maecenas risus tellus, tincidunt vitae finibus vel, ornare vel neque. Curabitur imperdiet orci ac risus tempor semper. Integer nec varius urna, sit amet rhoncus diam. Aenean finibus, sapien eu placerat tristique, sapien dui maximus neque, id tempor dui magna eget lorem. Suspendisse egestas mauris non feugiat bibendum.</p>
-	<p class="px-3">Cras quis augue quis risus auctor facilisis quis ac ligula. Fusce vehicula consequat dui, et egestas augue sodales aliquam. In hac habitasse platea dictumst. Curabitur sit amet nulla nibh. Morbi mollis malesuada diam ut egestas. Pellentesque blandit placerat nisi ac facilisis. Vivamus consequat, nisl a lacinia ultricies, velit leo consequat magna, sit amet condimentum justo nibh id nisl. Quisque mattis condimentum cursus. Nullam eget congue augue, a molestie leo. Aenean sollicitudin convallis arcu non maximus. Curabitur ut lacinia nisi. Nam cursus venenatis lacus aliquet dapibus. Nulla facilisi.</p>
+	<p class="px-3">Follow the steps below to select an employee and assign them additional functions within the Performance platform.</p>
 
 
 	<br>
@@ -25,7 +24,7 @@
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title">Confirmation</h5>
+						<h5 class="modal-title"><i class="fa fa-exclamation-triangle fa-2x" style="color:red"></i>&nbsp &nbsp Confirmation</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						    <span aria-hidden="true">&times;</span>
 						</button>
@@ -64,7 +63,7 @@
             </div>
         </div>
 		<br>
-		<h6 class="text-bold">Step 2. Select access level and reason for assigning access</h6> 
+		<h6 class="text-bold">Step 2. Select access level and access description</h6> 
 		<br>
 		<div class="row  p-3">
 			<div class="col col-4">
@@ -77,7 +76,9 @@
 				</label>
 			</div>
 			<div class="col col-8">
-				<x-input id="reason" name="reason" label="Reason for assigning" data-toggle="tooltip" data-placement="top" data-trigger="hover-focus" tooltip="Reason tooltip"/>
+				<b> Access Description </b>
+				<i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="List org levels (i.e. BCPSA - All; or SDPR - Corporate Services) followed by the role of the individual (i.e. SHR, Ambassador, Reporting). Full example: BCPSA - Corporate Workforce Strategies: Ambassador."> </i>
+				<x-input id="reason" name="reason"/>
 			</div>
 		</div>
 
@@ -86,6 +87,7 @@
 		<br>
 
 		<input type="hidden" id="selected_org_nodes" name="selected_org_nodes" value="">
+		<input type="hidden" id="selected_inherited" name="selected_inherited" value="">
 
 		@include('sysadmin.accesspermissions.partials.filter2')
 
@@ -100,7 +102,7 @@
 		<br>
 		<div class="col-md-3 mb-2">
 			<button class="btn btn-primary mt-2" type="button" onclick="confirmSaveAccessModal()" name="btn_send" value="btn_send">Assign Employees</button>
-			<button class="btn btn-secondary mt-2">Cancel</button>
+			<button class="btn btn-secondary mt-2" type="button" onclick="window.location.reload()">Cancel</button>
 		</div>
 
 	</form>
@@ -115,7 +117,7 @@
 
 			.select2-container .select2-selection--single {
 				height: 38px !important;
-			}EmployeeID
+			}
 
 			.select2-container--default .select2-selection--single .select2-selection__arrow {
 				height: 38px !important;
@@ -138,8 +140,6 @@
 				position: fixed;
 				top: 25%;
 				left: 47%;
-				/* height: 100%;
-				width: 100%; */
 				width: 10em;
 				height: 10em;
 				z-index: 9000000;
@@ -150,18 +150,51 @@
 
 	<x-slot name="js">
 
+		<script>	
+
+			$('body').popover({
+				selector: '[data-toggle]',
+				trigger: 'click',
+			});
+			
+			$('.modal').popover({
+				selector: '[data-toggle-select]',
+				trigger: 'click',
+			});
+
+			$('body').on('click', function (e) {
+			$('[data-toggle=popover]').each(function () {
+				// hide any open popovers when the anywhere else in the body is clicked
+				if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+					$(this).popover('hide');
+				}
+				});
+			});	
+			$('body').on('click', function (e) {
+			$('[data-toggle=dropdown]').each(function () {
+				// hide any open popovers when the anywhere else in the body is clicked
+				if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+					$(this).popover('hide');
+				}
+				});
+			});	
+
+		</script>
+
 		<script>
-			let g_matched_employees = {!!json_encode($matched_emp_ids)!!};
-			let g_selected_employees = {!!json_encode($old_selected_emp_ids)!!};
-			let g_selected_orgnodes = {!!json_encode($old_selected_org_nodes)!!};
-			let g_employees_by_org = [];
+
+			g_matched_employees = {!! json_encode($matched_emp_ids) !!};
+			g_selected_employees = {!! json_encode($old_selected_emp_ids) !!};
+			g_selected_orgnodes = {!! json_encode($old_selected_org_nodes) !!};
+			g_selected_inherited = {!! json_encode($old_selected_inherited) !!};
+			g_employees_by_org = [];
 
 			function confirmSaveAccessModal(){
 				count = g_selected_employees.length;
 				if (count == 0) {
-					$('#saveAccessModal .modal-body p').html('Are you sure to grant administrator access ?');
+					$('#saveAccessModal .modal-body p').html('Are you sure you want to grant administrator access ?');
 				} else {
-					$('#saveAccessModal .modal-body p').html('Are you sure to grant administrator access to ' + count + ' selected users?');
+					$('#saveAccessModal .modal-body p').html('Are you sure you want to grant administrator access to <b>' + count + '</b> selected employee(s)?');
 				}
 				$('#saveAccessModal').modal();
 			}
@@ -169,6 +202,14 @@
 			$(document).ready(function(){
 
 				$('#pageLoader').hide();
+
+				function navTreeActive() {
+					return $('#nav-tree').attr('class').search(/active/i) > 0 ?? false;
+				}
+
+				function navListActive() {
+					return $('#nav-list').attr('class').search(/active/i) > 0 ?? false;
+				}
 
 				$('#notify-form').keydown(function (e) {
 					if (e.keyCode == 13) {
@@ -178,23 +219,21 @@
 				});
 
 				$('#notify-form').submit(function() {
-					// console.log('Search Button Clicked');			
-
 					// assign back the selected employees to server
 					var text = JSON.stringify(g_selected_employees);
 					$('#selected_emp_ids').val( text );
 					var text2 = JSON.stringify(g_selected_orgnodes);
 					$('#selected_org_nodes').val( text2 );
+					var text3 = JSON.stringify(g_selected_inherited);
+					$('#selected_inherited').val( text3 );
 					return true; // return false to cancel form action
 				});
-
 
 				// Tab  -- LIST Page  activate
 				$("#nav-list-tab").on("click", function(e) {
 					table  = $('#employee-list-table').DataTable();
 					table.rows().invalidate().draw();
 				});
-
 
 				// Tab  -- TREE activate
 				$("#nav-tree-tab").on("click", function(e) {
@@ -205,7 +244,7 @@
                         if($.trim($(target).attr('loaded'))=='') {
                             $.when( 
                                 $.ajax({
-                                    url: '/sysadmin/accesspermissions/org-tree',
+                                    url: '/sysadmin/accesspermissions/org-tree/1',
                                     type: 'GET',
                                     data: $("#notify-form").serialize(),
                                     dataType: 'html',
@@ -219,7 +258,7 @@
                                         $('#nav-tree').attr('loaded','loaded');
                                     },
                                     complete: function() {
-                                        $(".tree-loading-spinner").hide();
+                                        $("#tree-loading-spinner").hide();
                                     },
                                     error: function () {
                                         alert("error");
@@ -228,18 +267,29 @@
                                 })
                                 
                             ).then(function( data, textStatus, jqXHR ) {
-                                //alert( jqXHR.status ); // Alerts 200
                                 nodes = $('#accordion-level0 input:checkbox');
                                 redrawTreeCheckboxes();	
                             }); 
                         
                         } else {
-                            redrawTreeCheckboxes();
+							$(target).removeAttr('loaded');
+							$("#nav-tree-tab").click();
                         }
                     } else {
-						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Tree result is too big.  Please apply organization filter before clicking on Tree.');
+						$(target).removeAttr('loaded');
+						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
 					}
 				});
+
+				$('#btn_search').click(function(e) {
+					e.preventDefault();
+					if (navListActive()) {
+						$('#employee-list-table').DataTable().rows().invalidate().draw();
+					}
+					if (navTreeActive()) {
+						$("#nav-tree-tab").click();
+					}
+				}); 
 
 				function redrawTreeCheckboxes() {
 					// redraw the selection 
@@ -278,7 +328,6 @@
 
 				function eredrawTreeCheckboxes() {
 					// redraw the selection 
-					//console.log('eredraw triggered');
 					enodes = $('#eaccordion-level0 input:checkbox');
 					$.each( enodes, function( index, chkbox ) {
 						if (eg_employees_by_org.hasOwnProperty(chkbox.value)) {
@@ -296,7 +345,7 @@
 								$(chkbox).prop("indeterminate", false);
 							}
 						} else {
-							if ( $(chkbox).attr('name') == 'userCheck[]') {
+							if ( $(chkbox).attr('name') == 'euserCheck[]') {
 								if (g_selected_orgnodes.includes(chkbox.value)) {
 									$(chkbox).prop('checked', true);
 								} else {
@@ -389,14 +438,15 @@
 				}
 
 				$('#ebtn_search').click(function(e) {
+					g_selected_orgnodes = [];
+					g_selected_inherited = [];
 					target = $('#enav-tree'); 
 					ddnotempty = $('#edd_level0').val() + $('#edd_level1').val() + $('#edd_level2').val() + $('#edd_level3').val() + $('#edd_level4').val();
-                    if(ddnotempty) {
+					if(ddnotempty) {
 						// To do -- ajax called to load the tree
 						$.when( 
 							$.ajax({
-								url: '/sysadmin/accesspermissions/eorg-tree',
-								// url: $url,
+								url: '/sysadmin/accesspermissions/org-tree/2',
 								type: 'GET',
 								data: $("#notify-form").serialize(),
 								dataType: 'html',
@@ -416,48 +466,28 @@
 								},
 
 								error: function () {
+									// Create New Access Page, Step 3
+									$(target).removeAttr('loaded');
 									alert("error");
 									$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
 								}
 							})
 							
 						).then(function( data, textStatus, jqXHR ) {
-							//alert( jqXHR.status ); // Alerts 200
 							enodes = $('#eaccordion-level0 input:checkbox');
 							eredrawTreeCheckboxes();	
 						}); 
 					} else {
-						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Tree result is too big.  Please apply organization filter before clicking on Tree.');
+						$(target).removeAttr('loaded');
+						$(target).html('<i class="glyphicon glyphicon-info-sign"></i> Please apply the organization filter before creating a tree view.');
 					};
 				});
 
+				$(window).on('beforeunload', function(){
+					$('#pageLoader').show();
+				});
+
 			});
-
-			$(window).on('beforeunload', function(){
-				$('#pageLoader').show();
-			});
-
-			$(window).resize(function(){
-				location.reload();
-				return;
-			});
-
-			// Model -- Confirmation Box
-
-			// var modalConfirm = function(callback) {
-			// 	$("#btn-confirm").on("click", function(){
-			// 		$("#mi-modal").modal('show');
-			// 	});
-			// 	$("#modal-btn-si").on("click", function(){
-			// 		callback(true);
-			// 		$("#mi-modal").modal('hide');
-			// 	});
-				
-			// 	$("#modal-btn-no").on("click", function(){
-			// 		callback(false);
-			// 		$("#mi-modal").modal('hide');
-			// 	});
-			// };
 
 		</script>
 	</x-slot>

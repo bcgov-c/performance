@@ -20,6 +20,10 @@ class SharedProfile extends Model
         'created_at', 'updated_at'
     ];
 
+    protected $appends = [
+        'shared_element_name',
+    ];
+
     public function sharedWith() {
         return $this->belongsTo(User::class, 'shared_with');
     }
@@ -30,5 +34,19 @@ class SharedProfile extends Model
 
     public function sharedUser() {
         return $this->belongsTo(User::class, 'shared_id');
+    }
+
+    public function getSharedElementNameAttribute() {
+
+        $text = '';
+        if (count($this->shared_item) == 2) {
+            $text = 'Full Profile';
+        } elseif (in_array(1, $this->shared_item)) {
+            $text = 'Goal';
+        } else {
+            $text = 'Conversations';
+        }
+
+        return $text;
     }
 }

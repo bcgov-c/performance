@@ -5,7 +5,6 @@ namespace App\Http\Controllers\HRAdmin;
 
 
 use App\Models\User;
-use App\Jobs\SendEmailJob;
 use App\Models\EmployeeDemo;
 use Illuminate\Http\Request;
 use App\Models\NotificationLog;
@@ -170,13 +169,14 @@ class NotificationController extends Controller
 
         list($sql_level0, $sql_level1, $sql_level2, $sql_level3, $sql_level4) = 
             $this->baseFilteredSQLs($request, $level0, $level1, $level2, $level3, $level4, $job_titles);
-        
+
         $rows = $sql_level4->groupBy('organization_trees.id')->select('organization_trees.id')
             ->union( $sql_level3->groupBy('organization_trees.id')->select('organization_trees.id') )
             ->union( $sql_level2->groupBy('organization_trees.id')->select('organization_trees.id') )
             ->union( $sql_level1->groupBy('organization_trees.id')->select('organization_trees.id') )
             ->union( $sql_level0->groupBy('organization_trees.id')->select('organization_trees.id') )
             ->pluck('organization_trees.id'); 
+
         $orgs = OrganizationTree::whereIn('id', $rows->toArray() )->get()->toTree();
 
         // Employee Count by Organization
@@ -272,8 +272,8 @@ class NotificationController extends Controller
         $validator = Validator::make(request()->all(), [
             'sender_id'          => 'required',
             //'recipients'         => 'required',
-            'orgCheck'         => 'required',
-            'userCheck'         => 'required',
+            'orgCheck'         => 'required_if:userCheck,null',
+            'userCheck'         => 'required_if:orgCheck,null',
             'subject'            => 'required',
             'body'               => 'required',
         ]);
@@ -302,7 +302,7 @@ class NotificationController extends Controller
         $employee_ids = ($request->userCheck) ? $request->userCheck : [];
 
         $toRecipients = EmployeeDemo::select('users.id')
-                ->join('users', 'employee_demo.guid', 'users.guid')
+                ->join('users', 'employee_demo.employee_id', 'users.employee_id')
                 ->whereIn('employee_demo.employee_id', $selected_emp_ids )
                 ->distinct()
                 ->orderBy('employee_demo.employee_name')
@@ -313,26 +313,20 @@ class NotificationController extends Controller
         $sendMail = new \App\MicrosoftGraph\SendMail();
         $sendMail->toRecipients = $toRecipients->toArray();
         $sendMail->sender_id = $request->sender_id;
+        $sendMail->useQueue = true;
         $sendMail->subject = $request->subject;
         $sendMail->body = $request->body;
         $sendMail->alertFormat = $request->alert_format;
-        $response = $sendMail->sendMailWithoutGenericTemplate();
-        if ($response->getStatus() == 202) {
+        $success = $sendMail->sendMailWithoutGenericTemplate();
+        if ($success) {
             return redirect()->route('hradmin.notifications.notify')
                 ->with('success','Email with subject "' . $request->subject  . '" was successfully sent.');
+        } else {
+            return redirect()->back()
+                ->with('failure','Error! Email with subject "' . $request->subject  . '" was failed to sent out.');
         }
 
-        // Method 2: Using Queue
-        $sendEmailJob = (new SendEmailJob())->delay( now()->addSeconds(1) );
-        $sendEmailJob->bccRecipients = $bccRecipients->toArray();  // $request->recipients;
-        $sendEmailJob->sender_id = $request->sender_id;
-        $sendEmailJob->subject = $request->subject;
-        $sendEmailJob->body = $request->body;
-        $sendEmailJob->alertFormat = $request->alert_format;
-        $ret = dispatch($sendEmailJob);
 
-        return redirect()->route('hradmin.notifications.notify')
-            ->with('success','Job for sending email with subject "' . $request->subject  . '" was successfully dispatched.');
     
 
     }
@@ -545,11 +539,9 @@ class NotificationController extends Controller
     }
 
     protected function baseFilteredWhere($request, $level0, $level1, $level2, $level3, $level4, $job_titles) {
-
-
-
         // Base Where Clause
-        $demoWhere = EmployeeDemo::when( $level0, function ($q) use($level0) {
+        $demoWhere = EmployeeDemo::whereNull('employee_demo.date_deleted')
+        ->when( $level0, function ($q) use($level0) {
             return $q->where('employee_demo.organization', $level0->name);
         })
         ->when( $level1, function ($q) use($level1) {
@@ -591,9 +583,6 @@ class NotificationController extends Controller
         ->when( $request->search_text && $request->criteria == 'dpt', function ($q) use($request) {
             return $q->whereRaw("LOWER(employee_demo.deptid) LIKE '%" . strtolower($request->search_text) . "%'");
         });
-     
-        // dd ([ $request, $request->criteria,  $demoWhere->toSql() ]);
-
         return $demoWhere;
     }
 

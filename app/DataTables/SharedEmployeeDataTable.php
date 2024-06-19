@@ -5,9 +5,14 @@ namespace App\DataTables;
 use App\Models\Conversation;
 use App\Models\SharedProfile;
 use App\Models\User;
+use App\Models\EmployeeDemo;
+use App\Models\EmployeeDemoJunior;
+use App\Models\ExcusedClassification;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class SharedEmployeeDataTable extends DataTable
 {
@@ -27,39 +32,52 @@ class SharedEmployeeDataTable extends DataTable
                 $text = $row['active_goals_count'] . " Goals";
                 return view('my-team.partials.link-to-profile', compact(['row', 'text']));
             })->addColumn('nextConversationDue', function ($row) {
-                $text = Conversation::nextConversationDue(User::find($row["id"]));
-                $landingPage = 'conversation.templates';
-                return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
-            })/* ->addColumn('latestConversation', function ($row) {
-                if( !$row['is_conversation_shared_with_auth_user']) {
-                    return "-";
+                $jr = EmployeeDemoJunior::where('employee_id', $row->employee_id)->getQuery()->orderBy('id', 'desc')->first();
+                if (isset($jr->excused_type) && $jr->excused_type) {
+                    if ($jr->excused_type == 'A') {
+                        $text = 'Paused';
+                        $landingPage = 'conversation.templates';
+                        return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
+                    }
                 }
-                $conversation = $row->latestConversation[0] ?? null;
-                return view('my-team.partials.conversation', compact(["row", "conversation"]));
-            })->addColumn('upcomingConversation', function ($row) {
-                if( !$row['is_conversation_shared_with_auth_user']) {
-                    return "-";
+                if ($row->excused_flag) {
+                    $text = 'Paused';
+                    $landingPage = 'conversation.templates';
+                    return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
                 }
-                $removeBlankLink = true;
-                $conversation = $row->upcomingConversation[0] ?? null;
-                return view('my-team.partials.conversation', compact(["row", "conversation", 'removeBlankLink']));
-            }) */
+                if (isset($jr->next_conversation_date) && $jr->next_conversation_date) {
+                    $text = Carbon::parse($jr->next_conversation_date)->format('M d, Y');
+                    $landingPage = 'conversation.templates';
+                    return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
+                }
+            })
             ->addColumn('shared', function ($row) {
                 $yesOrNo = ($row->is_shared) ? 'Yes' : 'No';
                 return view('my-team.partials.view-btn', compact(["row", "yesOrNo"])); // $row['id'];
             })
-            ->addColumn('excused', function ($row) {
-                // $yesOrNo = ($row->id % 2 !== 0) ? 'Yes' : 'No';
-                $yesOrNo = ($row->excused_start_date !== null) ? 'Yes' : 'No';
-
+            ->addColumn('excused_flag', function ($row) {
+                $jr = EmployeeDemoJunior::where('employee_id', $row->employee_id)->getQuery()->orderBy('id', 'desc')->first();
+                $excused_type = '';
+                $current_status = '';
                 $excused = json_encode([
-                    'start_date' => $row->excused_start_date,
-                    'end_date' => $row->excused_end_date,
+                    'excused_flag' => $row->excused_flag,
                     'reason_id' => $row->excused_reason_id
                 ]);
-                // return view('my-team.partials.switch', compact(["yesOrNo"])); // $row['id'];
-                // return $row;
-                return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo"]));
+                if ($jr) {
+                    $current_status = $jr->current_employee_status;
+                    if (isset($jr->excused_type) && $jr->excused_type) {
+                        $excused_type = $jr->excused_type;
+                        if ($jr->excused_type == 'A') {
+                            $yesOrNo = 'Auto';
+                            return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo", "excused_type", "current_status"]));
+                        }
+                    }
+                }
+                $yesOrNo = $row->excused_flag ? 'Yes' : 'No';
+                return view('my-team.partials.switch', compact(["row", "excused", "yesOrNo", "excused_type", "current_status"]));
+            })
+            ->addColumn('direct-reports', function($row) {
+                return view('my-team.partials.direct-report-col', compact(["row"]));
             });
     }
 
@@ -71,10 +89,20 @@ class SharedEmployeeDataTable extends DataTable
      */
     public function query(User $model)
     {
-        return $model->newQuery()->whereIn('id', SharedProfile::where('shared_with', Auth::id())->pluck('shared_id') )
+        return $model->newQuery()
+            ->whereIn('id', SharedProfile::where('shared_with', Auth::id())->pluck('shared_id') )
+            ->where(function ($query) {
+                $query->where('reporting_to', '<>', Auth::id())
+                      ->orWhereNull('reporting_to');
+            })   
             ->withCount('activeGoals')
             ->with('upcomingConversation')
-            ->with('latestConversation');
+            ->with('employee_demo')
+            ->with('employee_demo_jr')
+            ->with('latestConversation')
+            ->whereHas('employee_demo', function($qed){
+                return $qed->whereNull('employee_demo.date_deleted');
+            });
     }
 
     /**
@@ -122,33 +150,17 @@ class SharedEmployeeDataTable extends DataTable
                 ->exportable(false)
                 ->printable(false)
                 ->addClass('text-center'),
-            /* Column::computed('upcomingConversation')
-                ->title('Upcoming Conversation')
-                ->exportable(false)
-                ->printable(false)
-                ->addClass('text-center'),
-            Column::computed('latestConversation')
-                ->title('Last Conversation')
-                ->exportable(false)
-                ->printable(false)
-                ->addClass('text-center'), */
             Column::computed('shared')
                 ->exportable(false)
                 ->printable(false)
                 ->width(60)
                 ->addClass('text-center'),
-            Column::computed('excused')
+            Column::computed('excused_flag')
+                ->title('Excused')
                 ->exportable(false)
                 ->printable(false)
                 ->width(60)
-                ->addClass('text-center')
-            /* new Column([
-                'title' => 'Type',
-                'data' => 'goal_type.name',
-                'name' => 'goalType.name'
-            ]),
-            'start_date',
-            'target_date', */
+                ->addClass('text-center'),
         ];
     }
 }

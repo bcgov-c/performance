@@ -1,4 +1,4 @@
-<x-side-layout title="{{ 'Unlock conversation' }}">
+<x-side-layout title="{{ 'Unlock Conversations - Performance Development Platform' }}">
 
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-primary leading-tight" role="banner">
@@ -20,7 +20,8 @@
 
 
 {{-- Search Criteria Section --}}
-<form id="manage-unlocked-conversation-form" action="{{ route('sysadmin.unlock.manageunlocked.search') }}" method="post">
+<form id="manage-unlocked-conversation-form" action="{{ route('sysadmin.unlock.manageunlocked.search') }}" 
+		method="post" class="search-filter" >
 	@csrf
 
 	<div class="card p-3">
@@ -35,7 +36,7 @@
 			</select>
 		</div>
 		<div class="form-group col-md-3">
-			<label for="dd_level1">Program</label>
+			<label for="dd_level1">Level 1</label>
 			<select id="dd_level1" name="dd_level1" class="form-control select2">
 				@if ( old('dd_level1') && session()->get('level1') )
 					<option value="{{ session()->get('level1')->id }}">{{ session()->get('level1')->name }}</option>
@@ -43,7 +44,7 @@
 			</select>
 		</div>
 		<div class="form-group col-md-3">
-			<label for="dd_level2">Division</label>
+			<label for="dd_level2">Level 2</label>
 			<select id="dd_level2" name="dd_level2" class="form-control select2">
 				@if ( old('dd_level2') && session()->get('level2') )
 					<option value="{{ session()->get('level2')->id }}">{{ session()->get('level2')->name }}</option>
@@ -51,7 +52,7 @@
 			</select>
 		</div>
 		<div class="form-group col-md-3">
-			<label for="dd_level3">Branch</label>
+			<label for="dd_level3">Level 3</label>
 			<select id="dd_level3" name="dd_level3" class="form-control select2">
 				@if ( old('dd_level3') && session()->get('level3') )
 					<option value="{{ session()->get('level3')->id }}">{{ session()->get('level3')->name }}</option>
@@ -93,15 +94,15 @@
 				<label for="criteria">Search Criteria</label>
 				<select id="criteria" name="criteria" class="form-control">
 					@foreach( $criteriaList as $key => $value )
-						<option value="{{ $key }}" {{  old('criteria') == $key ? 'selected' : '' }} >{{ $value }}</option>
+						<option value="{{ $key }}"  >{{ $value }}</option>
 					@endforeach
 				</select>
 			</div>
 
 			<div class="form-group col-md-2">
-				<label for="search_text">search</label>
+				<label for="search_text">Search</label>
 				<input type="text" id="search_text" name="search_text" class="form-control" 
-						value="{{ old('search_text') }}" placeholder="Employee">
+						value="" placeholder="Keyword">
 			</div>
 
 		</div>
@@ -109,9 +110,11 @@
 		<div class="form-row">
 			<div class="form-group col-md-12">
 			<span class="float-right">  
-			<button type="submit" class="btn btn-primary" name="btn_search" 
-					value="btn_search" formaction="{{ route('sysadmin.unlock.manageunlocked.search') }}">Search</button>
-			<button type="button" class="btn btn-secondary  " id="btn_search_reset" name="btn_reset" value="btn_reset">reset</button>
+			<button type="button" class="btn btn-primary" name="btn_search"  id ="btn_search" 
+					value="btn_search" 
+					{{-- formaction="{{ route('sysadmin.unlock.manageunlocked.search') }}" --}}
+					>Search</button>
+			<button type="button" class="btn btn-secondary  " id="btn_search_reset" name="btn_reset" value="btn_reset">Reset</button>
 			</span>
 			</div>
 		</div>
@@ -124,7 +127,7 @@
 <div class="card">
 	<div class="card-body">
 		<h6></h6>
-		<table class="table table-bordered" id="conversation-list-table" style="width: 100%">
+		<table class="table table-bordered table-striped" id="conversation-list-table" style="width: 100%">
 			<thead>
 				<tr>
                     <th>&nbsp;</th>
@@ -156,7 +159,7 @@
 					<p>
                         <i class="icon fas fa-exclamation-circle"></i>
 						This record of conversation has been unlocked by System Administrator or Ministry HR Administrator
-                        due to a special request on behalf of one or nore of the conversation participants.
+                        due to a special request on behalf of one or more of the conversation participants.
                         This record of conversation will be locked on ''. Unlocking this record of coversation will allow participants to un-sign and 
 						edit the content. The conversation will remain unlocked until the date entered below.
 					</p>
@@ -191,7 +194,7 @@
 <x-slot name='css'>
 
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 
 <style>
 .select2-selection--multiple{
@@ -213,9 +216,118 @@
 
 <x-slot name="js">
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+<script src="//cdn.ckeditor.com/4.17.2/basic/ckeditor.js"></script>
+        
+<script>            
+	CKEDITOR.replace('info_comment1', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment2', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment3', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment4', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment5', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment6', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment7', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment8', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment9', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	CKEDITOR.replace('info_comment10', {
+		toolbar: "Custom",
+		toolbar_Custom: [
+			["Bold", "Italic", "Underline"],
+			["NumberedList", "BulletedList"],
+			["Outdent", "Indent"],
+			["Link"],
+		],
+		disableNativeSpellChecker: false
+	});
+	
+	 modal_open=false;
+</script>    
+
 <script>
+	
+
 
 $.ajaxSetup({
 	headers: {
@@ -276,7 +388,7 @@ $(function() {
 		placeholder: 'select organization',
 		allowClear: true,
 		ajax: {
-			url: '/hradmin/notifications/org-organizations'
+			url: '/sysadmin/org-list/1/0'
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -295,10 +407,10 @@ $(function() {
 	});
 
 	$('#dd_level1').select2({
-		placeholder: 'select program',
+		placeholder: 'select level 1',
 		allowClear: true,
 		ajax: {
-			url: '/hradmin/notifications/org-programs' 
+			url: '/sysadmin/org-list/1/1' 
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -318,10 +430,10 @@ $(function() {
 	});
 
 	$('#dd_level2').select2({
-		placeholder: 'select division',
+		placeholder: 'select level 2',
 		allowClear: true,
 		ajax: {
-			url: '/hradmin/notifications/org-divisions' 
+			url: '/sysadmin/org-list/1/2' 
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -342,10 +454,10 @@ $(function() {
 	});
 
 	$('#dd_level3').select2({
-		placeholder: 'select branch',
+		placeholder: 'select level 3',
 		allowClear: true,
 		ajax: {
-			url: '/hradmin/notifications/org-branches' 
+			url: '/sysadmin/org-list/1/3' 
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -370,7 +482,7 @@ $(function() {
 		placeholder: 'select level 4',
 		allowClear: true,
 		ajax: {
-			url: '/hradmin/notifications/org-level4' 
+			url: '/sysadmin/org-list/1/4' 
 			, dataType: 'json'
 			, delay: 250
 			, data: function(params) {
@@ -418,18 +530,38 @@ $(function() {
 		$('#dd_level4').val(null).trigger('change');
 	});
 
+	$('#btn_search').on('click', function() {
+            // oTable.ajax.reload(null, true);
+            oTable.draw();
+    });
 
 	$('#btn_search_reset').click(function() {
-		$('#dd_level0').val(null).trigger('change');
-		$('#dd_level1').val(null).trigger('change');
-		$('#dd_level2').val(null).trigger('change');
-		$('#dd_level3').val(null).trigger('change');
-		$('#dd_level4').val(null).trigger('change');
-		$('#topic_id').val(null).trigger('change');
-		$('#due_date_from').val(null);
-		$('#due_date_to').val(null);
-		$('#search_text').val(null);
+		// Reset filter fields value
+		$('.search-filter input').map( function() {$(this).val(''); });
+        $('.search-filter select').map( function() { return $(this).val(''); })
+		$(".search-filter .select2").map(function() { $(this).val('').trigger('change'); })
+
+		oTable.search( '' ).columns().search( '' ).draw();
+
+        // oTable.search( '' ).columns().search( '' ).draw();
+		// $('#dd_level0').val(null).trigger('change');
+		// $('#dd_level1').val(null).trigger('change');
+		// $('#dd_level2').val(null).trigger('change');
+		// $('#dd_level3').val(null).trigger('change');
+		// $('#dd_level4').val(null).trigger('change');
+		// $('#topic_id').val(null).trigger('change');
+		// $('#due_date_from').val(null);
+		// $('#due_date_to').val(null);
+		// $('#search_text').val(null);
 	});
+
+	$('#manage-unlocked-conversation-form').on('keyup keypress', function(e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode === 13) { 
+            e.preventDefault();
+            return false;
+        }
+    });
 
 
 	// dispaly Detail in Modal
@@ -437,9 +569,12 @@ $(function() {
 			e.preventDefault();
 
             inst = 'This record of conversation has been unlocked by System Administrator or Ministry HR Administrator ' +  
-                    'due to a special request on behalf of one or nore of the conversation participants. ' + 
-                    'This record of conversation will be locked on <b>' +  $(this).attr('unlock-until')  + '</b>. If you need to edit the conversation lock ' + 
-                    'date, you can use the calendar selection tool below to do so.'; 
+                    'due to a special request on behalf of one or more of the conversation participants. ' + 
+					// 'This record of conversation will be locked on <b>' +  $(this).attr('unlock-until')  + '</b>.
+					'This record will remain unlocked until <b>' +  $(this).attr('unlock-until')  + '</b>.' +
+					' If you need to edit the conversation lock ' + 
+                    'date, you can use the calendar selection tool below to do so. ' + 
+					'The conversation will remain unlocked until the date entered below.'; 
 
 			// Clear all those error message if exists
 			$('#unlock_until').val( $(this).attr('unlock-until') );

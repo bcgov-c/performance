@@ -1,42 +1,41 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\AzureLoginController;
-use App\Http\Controllers\Auth\MicrosoftGraphLoginController;
-/* use App\Http\Controllers\Auth\ConfirmablePasswordController;
-use App\Http\Controllers\Auth\EmailVerificationNotificationController;
-use App\Http\Controllers\Auth\EmailVerificationPromptController;
-use App\Http\Controllers\Auth\NewPasswordController;
-use App\Http\Controllers\Auth\PasswordResetLinkController;
-use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\Auth\VerifyEmailController; */
-
+use App\MicrosoftGraph\SendMail;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
-use App\MicrosoftGraph\SendMail;
+/* use App\Http\Controllers\Auth\ConfirmablePasswordController;
+use App\Http\Controllers\Auth\AzureLoginController;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\VerifyEmailController; */
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 
+use App\Http\Controllers\Auth\MicrosoftGraphLoginController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\EmailVerificationPromptController;
+use App\Http\Controllers\Auth\EmailVerificationNotificationController;
+use App\Http\Controllers\Auth\KeycloakLoginController;
+
+
+
+Route::get('login/{provider}', [KeycloakLoginController::class, 'redirectToProvider'])
+                 ->middleware('guest')->name('keycloak-login');
+Route::get('login/{provider}/callback', [KeycloakLoginController::class, 'handleProviderCallback']);
+Route::post('/logout', [KeycloakLoginController::class, 'destroy'])
+                ->middleware('auth')->name('logout');
 
 //Route::get('/login/microsoft', [AzureLoginController::class, 'login'])->name('ms-login');
 
 // Route::get('/login/microsoft/callback', [AzureLoginController::class, 'handleCallback'])->name('ms-callback');
 
 // MS Graph API Authenication -- composer require league/oauth2-client  microsoft/microsoft-graph
-Route::get('/login/microsoft/callback', [MicrosoftGraphLoginController::class, 'callback']);
-Route::get('/login/microsoft', [MicrosoftGraphLoginController::class, 'signin'])
-                 ->middleware('guest')
-                 ->name('ms-login');
-Route::post('/logout', [MicrosoftGraphLoginController::class, 'destroy'])
-                //->middleware('auth')
-                ->name('logout');
-// Test function                 
-Route::get('/graph/sendmail', function() {
-
-    $sendMail = new SendMail();
-    $response = $sendMail->send(['james.poon@telus.com', 'myphd2@gmail.com'],   "test email from BC Govt",
-         "this is for testing purpose");
-    return view('dashboard');
-
-})->middleware('auth')->name('sendmail');
+// Route::get('/login/microsoft/callback', [MicrosoftGraphLoginController::class, 'callback']);
+// Route::get('/login/microsoft', [MicrosoftGraphLoginController::class, 'signin'])
+//                  ->middleware('guest')
+//                  ->name('ms-login');
+// Route::post('/logout', [MicrosoftGraphLoginController::class, 'destroy'])
+//                 //->middleware('auth')
+//                 ->name('logout');
 
 /* 
 Route::get('/register', [RegisteredUserController::class, 'create'])

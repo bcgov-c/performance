@@ -54,8 +54,8 @@
 
 // Sidebar color when hover and active
 .nav-sidebar .nav-link:hover {
-  color: #003366 !important;
-   font-weight: bold;
+  color: #FFF !important;
+  font-weight: bold;
 }
 
 .sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active, .sidebar-light-primary .nav-sidebar > .nav-item > .nav-link.active {
@@ -63,7 +63,11 @@
    font-weight: bold;
 }
 
-
+[class*=sidebar-dark-] .nav-sidebar > .nav-item.menu-open > .nav-link, [class*=sidebar-dark-] .nav-sidebar > .nav-item:hover > .nav-link,
+[class*=sidebar-dark-] .nav-sidebar > .nav-item > .nav-link:focus {
+  background-color: #FFF;
+  color: #fff;
+}
 
 
 
@@ -85,4 +89,38 @@ a.btn:not(.btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-warning,
 
 div.border-primary a {
   font-weight:bold !important;
+}
+
+[class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active, [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active:hover, [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active:focus {
+  color: #FCBA19;
+}
+
+[class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link:hover, [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link:focus {
+  background-color: #1A5A96;
+  color: #fff;
+}
+
+[class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active, [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active:hover, [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link.active:focus {
+    background-color: rgba(255, 255, 255, 0);
+    color: #FCBA19;
+}
+
+[class*=sidebar-dark-] .nav-sidebar > .nav-item.menu-open > .nav-link, [class*=sidebar-dark-] .nav-sidebar > .nav-item:hover > .nav-link,
+[class*=sidebar-dark-] .nav-sidebar > .nav-item > .nav-link:focus {
+  background-color: #1A5A96;
+  color: #fff;
+}
+
+/* Menu item under User Menu (Main Header - Navbar */
+li.user-menu a.acct-pref
+{
+  background: #f2f2f2;
+  color: #003366 !important;
+  border-radius: 0.25rem; 
+}
+
+li.user-menu a.acct-pref:active,
+li.user-menu a.acct-pref:hover  {
+  background: #003366;
+  color: white !important; 
 }

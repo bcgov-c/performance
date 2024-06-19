@@ -8,10 +8,16 @@ use Illuminate\Support\Facades\Config;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\Models\User;
+use App\Models\SharedProfile;
+use OwenIt\Auditing\Contracts\Auditable;
+use OwenIt\Auditing\Auditable as AuditableTrait;
 
-class Conversation extends Model
+class Conversation extends Model implements Auditable
+
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, AuditableTrait;
 
     protected $with = ['topic', 'conversationParticipants', 'conversationParticipants.participant'];
     protected $appends = ['c_date', 'c_time', 'questions', 'date_time', 'is_current_user_participant', 'is_with_supervisor', 'last_sign_off_date', 'is_locked'];
@@ -35,10 +41,17 @@ class Conversation extends Model
     }
 
     public function getIsLockedAttribute() {
-        if (!$this->initial_signoff) {
+        $signoff_time = max($this->supervisor_signoff_time, $this->sign_off_time);
+
+        if (!$signoff_time) {
             return false;
         }
-        return $this->initial_signoff->addDays(14)->isPast();
+        $locked = $signoff_time->addDays(14)->isPast();
+        if ($locked && $this->isUnlock) {
+            $locked = false;
+        }
+
+        return $locked;
     }
 
     public function getInfoComment1Attribute() {
@@ -79,13 +92,28 @@ class Conversation extends Model
             $authId = $userID;
         }
         $user = User::find($authId);
+        $sharing = SharedProfile::find($authId);
         $reportingManager = $user ? $user->reportingManager()->first() : null;
-        if (!$reportingManager) {
+        
+        //check sharing manager
+        $sharingManagers =  DB::table('shared_profiles')                        
+                            ->where('shared_id', $authId)
+                            ->get()->toArray(); 
+        $sharing = array();
+        foreach ($sharingManagers as $sharingManager) {
+            array_push($sharing, $sharingManager->shared_with);
+        }                
+        if (!$reportingManager && count($sharing) == 0) {
             return false;
         }
+        
         foreach ($this->conversationParticipants->toArray() as $cp) {
-            if ($cp['participant_id'] === $reportingManager->id)
+            if (isset($reportingManager->id) && $cp['participant_id'] == $reportingManager->id) {
                 return true;
+            }
+            if (in_array($cp['participant_id'], $sharing)) {
+                return true;
+            }
         }
         return false;
     }
@@ -97,7 +125,8 @@ class Conversation extends Model
 
     public function getLastSignOffDateAttribute()
     {
-        return $this->supervisor_signoff_time > $this->sign_off_time ? $this->sign_off_time : $this->supervisor_signoff_time;
+        // return $this->supervisor_signoff_time > $this->sign_off_time ? $this->sign_off_time : $this->supervisor_signoff_time;
+        return max($this->supervisor_signoff_time, $this->sign_off_time);
     }
 
     public function getCTimeAttribute()
@@ -136,7 +165,7 @@ class Conversation extends Model
         if ($user === null) 
             $user = Auth::user();
         $authId = $user->id;
-        
+
         $lastConv = self::where(function ($query) use ($authId) {
             $query->where('user_id', $authId)->orWhereHas('conversationParticipants', function ($query) use ($authId) {
                 return $query->where('participant_id', $authId);
@@ -146,7 +175,7 @@ class Conversation extends Model
         ->whereNotIn('id', $ignoreList)
         ->orderBy('sign_off_time', 'DESC')
         ->first();
-        
+                        
         if ($lastConv && !$lastConv->isWithSupervisor($user->id)) {
             $ignoreList[] = $lastConv->id;
             $lastConv = self::getLastConv($ignoreList, $user);
@@ -156,44 +185,49 @@ class Conversation extends Model
 
     public static function warningMessage() {
         $lastConv = self::getLastConv();
-        
-        if ($lastConv) {
-            if ($lastConv->sign_off_time->addMonths(4)->lt(Carbon::now())) {
+        $authId = Auth::id();
+        $user = User::find($authId);
+
+        $jr = EmployeeDemoJunior::where('employee_id', $user->employee_id)->getQuery()->orderBy('id', 'desc')->first();
+        if ((isset($jr->excused_type) && $jr->excused_type == 'A') || $user->excused_flag) {
+            $msg = "Employee is currently excused and their conversation deadline is paused";
+            return [
+                $msg, "success"
+            ];
+        } else {
+            $msg = "Next performance conversation is due by ";
+            if(isset($jr->next_conversation_date)){
+                if (Carbon::now()->gte($jr->next_conversation_date)) {
+                    return [
+                        $msg.Carbon::parse($jr->next_conversation_date)->format('M d, Y'),
+                        "danger"
+                    ];
+                }
+                $diff = Carbon::now()->diffInMonths(Carbon::parse($jr->next_conversation_date), false);
                 return [
-                    "You are required to complete a performance conversation every 4 months at minimum. You are overdue. Please complete a conversation as soon as possible.",
-                    "danger"
+                    $msg.Carbon::parse($jr->next_conversation_date)->format('M d, Y'),
+                    $diff < 0 ? "danger" : ($diff < 1 ? "warning" : "success")
                 ];
             }
-            $nextDueDate = $lastConv->sign_off_time->addMonths(4);
-            $diff = Carbon::now()->diffInMonths($lastConv->sign_off_time->addMonths(4), false);
-            return [
-                // "Your last performance conversation was completed on ".$lastConv->sign_off_time->format('d-M-y').". 
-                "Your next performance conversation is due by ". $lastConv->sign_off_time->addMonths(4)->format('d-M-y'),
-                $diff < 0 ? "danger" : ($diff < 1 ? "warning" : "success")
-            ];
         }
-        $user = Auth::user();
-        $nextDueDate = $user->joining_date ? $user->joining_date->addMonths(4) : '';
-        $diff = Carbon::now()->diffInMonths($nextDueDate, false);
-        /* dd([
-            Carbon::now()->format('d-M-y'),
-            $nextDueDate->format('d-M-y'),
-            $diff
-        ]); */
-        return [
-            "You must complete your first performance conversation by " . $nextDueDate->format('d-M-y'),
-            $diff < 0 ? "danger" : ($diff < 1 ? "warning" : "success")
-        ];
     }
 
     public static function nextConversationDue($user = null) {
-        if ($user === null)
+        // if ($user === null)
+        //     $user = Auth::user();
+        // $lastConv = self::getLastConv([], $user);
+        // $nextConvDate =  ($lastConv) ? $lastConv->sign_off_time->addMonths(4)->format('M d, Y') : (
+        //     $user->joining_date ? $user->joining_date->addMonths(4)->format('M d, Y') : ''
+        // );
+        // if ((!$nextConvDate) || (Carbon::createFromDate(2022, 10, 14)->gt($nextConvDate))) {
+        //     $DDt = abs (($user->id % 10) - 1) * 5 + (($user->id % 5));
+        //     $nextConvDate = Carbon::createFromDate(2022, 10, 14)->addDays($DDt)->format('M d, Y');
+        // }
+        // return $nextConvDate;
+        if ($user === null) {
             $user = Auth::user();
-        $lastConv = self::getLastConv([], $user);
-        $nextConvDate =  ($lastConv) ? $lastConv->sign_off_time->addMonths(4)->format('d-M-y') : (
-            $user->joining_date ? $user->joining_date->addMonths(4)->format('d-M-y') : ''
-        );
-        return $nextConvDate;
+        } 
+        return $user->next_conversation_date;
     }
 
     public static function latestPastConversation()
@@ -230,5 +264,18 @@ class Conversation extends Model
         return $this->belongsTo(User::class, 'supervisor_signoff_id');
     }
 
+    public function transformAudit(array $data): array
+    {
+ 
+        if(session()->has('user_is_switched')) {
+            $original_auth_id = session()->get('existing_user_id');
+        } else {
+            $original_auth_id = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
+        }
+
+        $data['original_auth_id'] =  $original_auth_id;
+
+        return $data;
+    }
 
 }

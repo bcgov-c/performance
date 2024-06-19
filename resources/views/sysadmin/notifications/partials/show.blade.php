@@ -6,7 +6,7 @@
     </div>
     <div class="row mt-2">
         <div class="col col-sm-2">Sender:</div>
-        <div class="col col-sm-8 font-weight-bold">{{ $notificationLog->sender->name }}</div>
+        <div class="col col-sm-8 font-weight-bold">{{ $notificationLog->sender ? $notificationLog->sender->name : $notificationLog->sender_email }}</div>
     </div>
     <div class="row mt-2">
         <div class="col col-sm-2">Recipients</div>

@@ -1,12 +1,25 @@
-<x-side-layout>
+<x-side-layout title="{{ __('My Goals - Performance Development Platform') }}">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
 		{{ $goal['title'] }}
             @if(!$disableEdit && $goal->user_id === Auth::Id() && $goal['status'] == 'active')
             <x-button icon="edit" :href="route('goal.edit', $goal->id)">Edit</x-button>
             @endif
+        
+        @if($from == 'bank')
+        <button class="btn btn-outline-primary btn-md" id="back-bank-btn" href="{{ route('goal.library') }}">
+                        <i class="fa fa-backward"></i>&nbsp;        Back to list
+            </button>
+        @elseif (session('from_share'))
+        <button class="btn btn-outline-primary btn-md" id="back-share-btn" href="{{ route('goal.share') }}">
+                        <i class="fa fa-backward"></i>&nbsp;        Back to list
+            </a>
+        @else
+            <a role="button" class="btn btn-primary btn-md" href="{{ route('goal.index') }}">
+                        <i class="fa fa-backward"></i>&nbsp;        Back to list
+            </a>
+        @endif
         </h2>
-        <small><a href="{{ url()->previous() === url()->current() ? route('goal.index') : url()->previous() }}">Back to list</a></small>
     </x-slot>
     <div class="container-fluid">
         <div class="card">
@@ -19,7 +32,7 @@
                             <div class="px-3 pb-3">
                                 {{ $goal->user->name}}
                                 <span class="float-right">
-                                    @if ($goal->user_id === Auth::id())
+                                    @if ($goal->user_id === Auth::id() && (session()->get('original-auth-id') == Auth::id() or session()->get('original-auth-id') == null ))
                                     @include("goal.partials.status-change")
                                     @else
                                     <x-goal-status :status="$goal->status"></x-goal-status>
@@ -71,9 +84,14 @@
                             <b>Comments</b>
                             @foreach ($goal->comments as $comment)
                             <div class="d-flex flex-row my-2">
-                                <x-profile-pic></x-profile-pic>
+                                {{-- <x-profile-pic></x-profile-pic> --}}
                                 <div class="border flex-fill p-2 rounded">
-                                    <b>{{$comment->user->name}}</b> on {{$comment->created_at->format('M d, Y H:i A')}}<br>
+                                    <b>{{$comment->user->name}}</b> on 
+                                        @if ($comment->updated_at != $comment->created_at)
+                                            {{$comment->updated_at->format('M d, Y H:i A')}} - (edited)<br>
+                                        @else
+                                            {{$comment->created_at->format('M d, Y H:i A')}}<br>
+                                        @endif
                                     <div class="comment-text">
                                         {!! (!$comment->trashed()) ? $comment->comment : '<i>Comment is deleted.</i>' !!}
                                     </div>
@@ -85,9 +103,15 @@
                                     <div>
                                         @foreach($comment->replies as $reply)
                                         <div class="card mt-2 p-2 d-flex flex-row bg-light">
-                                            <x-profile-pic></x-profile-pic>
+                                            {{-- <x-profile-pic></x-profile-pic> --}}
                                             <div class="flex-fill">
-                                                <b>{{$reply->user->name}}</b> on {{$reply->created_at->format('M d, Y H:i A')}}<br>
+                                                <b>{{$reply->user->name}}</b> on 
+                                                    @if ($reply->updated_at != $reply->created_at)
+                                                        {{$reply->updated_at->format('M d, Y H:i A')}} - (edited)<br>
+                                                    @else
+                                                        {{$reply->created_at->format('M d, Y H:i A')}}<br>
+                                                    @endif
+                                               
                                                 <div class="comment-text">
                                                     {!! (!$reply->trashed()) ? $reply->comment : '<i>Comment is deleted.</i>' !!}
                                                 </div>
@@ -105,10 +129,10 @@
                                                 @csrf
                                                 <input type="hidden" name="parent_id" value="{{$comment->id}}">
                                                 <div class="d-flex flex-row my-2">
-                                                    <x-profile-pic></x-profile-pic>
+                                                    {{-- <x-profile-pic></x-profile-pic> --}}
                                                     <div class="border flex-fill p-2 rounded">
                                                         <!-- <x-textarea class="ckeditor" name="comment" id="addreply"/> -->
-                                                        <textarea class="addreply" name="comment"></textarea>
+                                                        <textarea class="addreply" id="addreply" name="comment"></textarea>
                                                         <div class="d-flex flex-row my-2">
                                                             <x-button class="btn" action="submit" :data-comment-id="$comment->id" size="sm">Add Comment</x-button>
                                                         </div>
@@ -123,7 +147,7 @@
                             <form action="{{route('goal.add-comment', $goal->id)}}" method="POST">
                                 @csrf
                                 <div class="d-flex flex-row my-2">
-                                    <x-profile-pic></x-profile-pic>
+                                    {{-- <x-profile-pic></x-profile-pic> --}}
                                     <div class="border flex-fill p-2 rounded">
                                         <textarea name="comment" id="addcomment"></textarea>
                                         <!-- <x-textarea class="ckeditor" name="comment" id="addcomment"/> -->
@@ -188,20 +212,24 @@
             toolbar_Custom: [
                 ["Bold", "Italic", "Underline"],
                 ["NumberedList", "BulletedList"],
-                ["Outdent", "Indent"]
+                ["Outdent", "Indent"],
+                ["Link"],
             ],
         });
     });
+    
     $(document).ready(function(){
         CKEDITOR.replaceAll('addreply', {
             toolbar: "Custom",
             toolbar_Custom: [
                 ["Bold", "Italic", "Underline"],
                 ["NumberedList", "BulletedList"],
-                ["Outdent", "Indent"]
+                ["Outdent", "Indent"],
+                ["Link"],
             ],
         });
     });
+    
     </script>
 
     <script>
@@ -230,7 +258,9 @@
             const commentId = $(this).data("comment-id");
             const form = document.getElementById("delete-comment-form");
             fetch(form.action.replace("xxx", commentId),{method:'POST', body: new FormData(form)});
-            window.location.reload();
+            setTimeout(function(){
+                window.location.reload();
+             }, 1000);
         }
     });
 
@@ -242,7 +272,8 @@
             toolbar_Custom: [
                 ["Bold", "Italic", "Underline"],
                 ["NumberedList", "BulletedList"],
-                ["Outdent", "Indent"]
+                ["Outdent", "Indent"],
+                ["Link"],
             ],
         });
         $(this).parent().parent().find(".edit-save").data("editor", instance.name);
@@ -260,6 +291,10 @@
         const form = document.getElementById("edit-comment-form");
         $(form).find(".comment").val(data);
         fetch(form.action.replace("xxx", commentId), {method:'POST', body: new FormData(form)});
+        
+        setTimeout(function(){
+                window.location.reload();
+             }, 1000);
     });
 
 
@@ -267,6 +302,22 @@
     $('body').popover({
         selector: '[data-toggle]',
         trigger: 'hover',
+    });
+
+    $('#edit-btn').click(function(){
+        window.location.href = "{{ route('goal.edit', $goal->id) }}";
+    }); 
+
+    $('#back-share-btn').click(function(){
+        window.location.href = "{{ route('goal.share') }}";
+    });
+
+    $('#back-list-btn').click(function(){
+        window.location.href = "{{ route('goal.index') }}";
+    });
+
+    $('#back-bank-btn').click(function(){
+        window.location.href = "{{ route('goal.library') }}";
     });
     </script>
     @endpush

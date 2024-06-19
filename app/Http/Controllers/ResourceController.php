@@ -3,84 +3,96 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\Tag;
 
 class ResourceController extends Controller
 {
-    public function userguide()
-    {
-        return view('resource.user-guide');
+    public function userguide(Request $request)
+    {   
+        $t = $request->t;
+        $data = $this->pullContent('userguide');             
+
+        return view('resource.user-guide', compact('data', 't'));
+    }
+    public function videotutorials(Request $request)
+    {   
+        $t = $request->t;
+
+        $data = $this->pullContent('videotutorials');       
+        return view('resource.video-tutorials', compact('data', 't'));
     }
     public function goalsetting(Request $request)
     {
-        //get goal tags
-        $tags = Tag::all()->toArray();
+        
         $t = $request->t;
         
-        $data = [
-            [
-                'question' => 'What is goal setting?',
-                'answer' => 'Goal setting is a process of working towards what you want to do or who you want to be.'
-            ],
-            [
-                'question' => 'Why are goals important?',
-                'answer_file' => '2'
-            ],
-            [
-                'question' => 'Elements of effective goals(the Five C’s)',
-                'answer_file' => '3'
-            ],
-            [
-                'question' => 'What does a good goal statement look like?',
-                'answer_file' => '4'
-            ],
-            [
-                'question' => 'What are goal tags?',
-                'answer_file' => '8'
-            ],
-            [
-                'question' => 'Examples of Work Goals',
-                'answer_file' => '5'
-            ],
-            [
-                'question' => 'Examples of Learning Goals',
-                'answer_file' => '6'
-            ],
-            [
-                'question' => 'Examples of Career Goals',
-                'answer_file' => '7'
-            ],
-        ];
+        //get goal tags
+        $tags = Tag::all()->sortBy("name")->toArray();
+        $data = $this->pullContent('goalsetting');       
         return view('resource.goal-setting', compact('data', 'tags', 't'));
     }
-    public function conversations()
+    public function conversations(Request $request)
     {
-      $data = [
-          [
-              'question' => 'What is a performance development conversation?',
-              'answer' => 'Any conversation about an employee and their work can be considered a performance development conversation. They can be informal check-ins, regular 1-on-1’s, recognition for a job well done, feedback, or more formal conversations when trying to modify an employee’s behaviour.'
-          ],
-          [
-              'question' => 'Why are conversations important?',
-              'answer_file' => '2'
-          ],
-          [
-              'question' => 'When are conversations effective?',
-              'answer_file' => '3'
-          ],
-          [
-              'question' => 'Elements of a meaningful conversation',
-              'answer_file' => '4'
-          ],
-          [
-              'question' => 'Elements of effective feedback',
-              'answer_file' => '5'
-          ],
-      ];
-         return view('resource.conversations', compact('data'));
+      
+        $t = $request->t;
+
+        $data = $this->pullContent('conversations');      
+        return view('resource.conversations', compact('data', 't'));
     }
-    public function contact()
+    public function contact(Request $request)
     {
-         return view('resource.contact');
+        $t = $request->t;
+
+        $data = $this->pullContent('contact');      
+        return view('resource.contact', compact('data', 't'));
+    }
+
+    public function faq(Request $request)
+    {
+      
+      $t = $request->t;
+
+      $data = $this->pullContent('faq');  
+      return view('resource.faq', compact('data', 't'));
+    }
+
+
+    public function hradmin(Request $request)
+    {   
+        $t = $request->t;
+        $data = $this->pullContent('hr-admin');  
+        
+        return view('resource.hr-admin', compact('data', 't'));
+    }
+
+
+    public function accessPerformance(Request $request)
+    {   
+        $t = $request->t;
+        $data = $this->pullContent('access-performance');  
+        
+        return view('resource.access-performance', compact('data', 't'));
+    }
+
+
+    private function pullContent($category){
+        $resourceData = DB::table('resource_content')
+            ->select('question', 'answer', 'answer_file')
+            ->where('category', $category)
+            ->get();
+
+        // Initialize an empty array to store the formatted data
+        $data = [];
+
+        // Loop through the retrieved data and format it
+        foreach ($resourceData as $row) {
+            $data[] = [
+                'question' => $row->question,
+                'answer' => $row->answer,
+                'answer_file' => $row->answer_file,
+            ];
+        }   
+        return $data;
     }
 }

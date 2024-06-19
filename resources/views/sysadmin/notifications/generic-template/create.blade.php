@@ -1,4 +1,4 @@
-<x-side-layout title="{{ __('Dashboard') }}">
+<x-side-layout title="{{ __('Notifications - Performance Development Platform') }}">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-primary leading-tight" role="banner">
             Generic Templates
@@ -7,8 +7,15 @@
     </x-slot>
 
 <div class="card">
-    <div class="card-body">
-
+    @if(Session::has('message'))
+                    <div class="col-12"> 
+                        <br/>
+                        <div class="alert alert-danger" style="display:">
+                            <i class="fa fa-info-circle"></i> {{ Session::get('message') }}
+                        </div>
+                    </div>
+        @endif
+    <div class="card-body">        
         <form action="{{ isset($generic_template) ? route('generic-template.update', $generic_template->id ) : route('generic-template.store') }}" 
             method="post">
             @csrf
@@ -61,7 +68,7 @@
                     <select id="sender" class="form-control @error('sender') is-invalid @enderror" name="sender">
                             {{ $val_status = old('sender') ? old('sender') : '1' }}    
                         <option value="1" {{ $val_status == '1' ? 'selected' : '' }}>{{ 'User'   }}</option>
-                        <option value="2" {{ $val_status == '2' ? 'selected' : '' }}>{{ 'Other' }}</option>
+                        <option value="2" {{ $val_status == '2' ? 'selected' : '' }}>{{ 'System' }}</option>
                     </select>
                     @error('sender')
                         <span class="invalid-feedback">
@@ -73,7 +80,7 @@
               <div class="col-sm-5">
                 {{--  --}}
                 <select class="form-control select2 @error('sender_id') is-invalid @enderror" 
-                     name="sender_id" id="sender_id">
+                     name="sender_id" id="sender_id" style="width:100%">
                     @if (old('sender_id')) 
                         @foreach ( Session::get('old_sender_ids') ?? [] as $key =>$value )
                             <option value="{{ $key }}">{{ $value }}</option>
@@ -197,6 +204,7 @@
                             ["Bold", "Italic", "Underline"],
                             ["NumberedList", "BulletedList"],
                             ["Outdent", "Indent"],
+                            ["Link"],
                         ],
                     });
 
@@ -262,3 +270,11 @@
           @endpush
 
 </x-side-layout>
+<style>
+    .alert-danger {
+        color: #a94442;
+        background-color: #f2dede;
+        border-color: #ebccd1;
+    }
+    
+</style> 

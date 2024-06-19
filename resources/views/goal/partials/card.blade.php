@@ -1,7 +1,11 @@
     <div class="card card-primary shadow">
         <div class="card-header p-1">
             <div class="d-flex">
-                <a href="{{route("goal.show", $goal->id)}}" class="p-2">
+                @if(isset($from) && $from == 'bank') 
+                    <a href="{{route("goal.edit", $goal->id)}}" class="p-2">
+                @else
+                    <a href="{{route("goal.show", $goal->id)}}" class="p-2">
+                @endif
                     <p class="card-title">
                         {{ $goal->start_date_human}}
                             <span class="mx-4">&#8212;</span>
@@ -10,7 +14,7 @@
                 </a>
                 <div class="flex-fill"></div>
                 
-                @if (($type ?? '') !== 'supervisor' && !$disableEdit && 1 == 0)
+                @if ($type !== 'supervisor' && !$disableEdit && 1 == 0)
                 @if(!session()->has('view-profile-as'))
                 <form id="delete-goal-{{$goal->id}}" action="{{ route('goal.destroy', $goal->id)}}" method="POST" onsubmit="return confirm('{{ $goalDeleteConfirmationText ?? 'Are you sure you want to permanently delete this goal?' }}')">
                     @csrf
@@ -22,7 +26,12 @@
             </div>
         </div>
         <div class="card-body" style="min-height:135px">
-            <a href="{{route("goal.show", $goal->id)}}">
+            @if(isset($from) && $from == 'bank') 
+                    <a href="{{route("goal.edit", $goal->id)}}" class="p-2">
+            @else
+                    <a href="{{route("goal.show", $goal->id)}}" class="p-2">
+            @endif
+                
                 <p class="h5">
                     {{ $goal->title }}
                 </p>
@@ -32,7 +41,7 @@
                 </p> -->
                 <p>
                     <b>Goal Type:&nbsp;&nbsp;&nbsp;</b>{{ $goal->goaltype->name}}<br>
-                    <b>Created by:&nbsp;&nbsp;&nbsp;</b>{{ $goal->originalCreatedBy ? $goal->originalCreatedBy->name : $goal->user->name }}<br>
+                    <b>Shared by:&nbsp;&nbsp;&nbsp;</b>{{ $goal->user->name  }}<br>
                 </p>
             
         </div>
@@ -43,8 +52,11 @@
         @endif
         <div class="card-footer align-items-center">
             @if(!session()->has('view-profile-as')) 
-            @if(Auth::user()->reporteesCount() > 0 && (request()->is('goal/current') || request()->is('goal/library')))
+            @if(session()->has('has_employees') > 0 && (request()->is('goal/current') || request()->is('goal/goalbank')))
+                <div>
                 @include('goal.partials.goal-share-with-dropdown')
+                <br><br>
+                </div>
             @endif
             @endif
             <div class="flex-fill"></div>
@@ -68,31 +80,43 @@
 
             @if(!$goal->is_library)
             <div>
-                @if(($type ?? '') !== 'supervisor' && !$disableEdit)                    
-                    Status: 
-                    @include('goal.partials.status-change')
+                @if(($type ?? '') !== 'supervisor' && !$disableEdit)                       
+                    Goal Status:&nbsp;&nbsp;  
+                    <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="<b>Active</b> - Currently in progress or scheduled for a future date. <br><br><b>Achieved</b> - Supervisor and employee agree objectives met. <br><br><b>Not Met</b> - Substantial portion incomplete by end date. <br><br><b>Cancelled Or Deferred</b> - Shift in plans but want to archive goal for future reference."  ></i>                  
+                    @include('goal.partials.status-change')                                     
                 @else
                     <x-goal-status :status="$goal->status"></x-goal-status>
-                @endif
+                @endif  
+                @if(($type ?? '') !== 'supervisor' && !$disableEdit)
                 <span style="float: right">
                 <form id="delete-goal-{{$goal->id}}" action="{{ route('goal.destroy', $goal->id)}}" method="POST" onsubmit="return confirm('{{ $goalDeleteConfirmationText ?? 'Are you sure you want to permanently delete this goal?' }}')">
                     @csrf
                     @method('DELETE')
                     @if(!session()->has('view-profile-as'))  
-                    <x-button size="md" icon='trash' class="ml-1 text-light" aria-label="Delete button" tooltip="Click to permanently delete this goal" style="danger"></x-button>
+                    <!-- <x-button size="md" icon='trash' class="ml-1 text-light" aria-label="Delete button" tooltip="Click to permanently delete this goal" style="danger"></x-button> -->
+                    <x-button size="md" icon='trash' class="ml-1 text-light" aria-label="Delete button" style="danger"></x-button>
                     @endif
-                    <x-button
+                    <!-- <x-button
                     :href='route("goal.show", $goal->id)'
                     :tooltip="__('Click to view the details of this goal.')"
-                    tooltipPosition="bottom" class="ml-2">{{__('View')}}</x-button>
+                    tooltipPosition="bottom" class="ml-2">{{__('View')}}</x-button> -->
+                    <x-button
+                    :href='route("goal.show", $goal->id)' class="ml-2">{{__('View')}}</x-button>
                     </span>
                 </form>  
-                
+                @else    
+                <span style="float: right">
+                <form id="delete-goal-{{$goal->id}}" action="{{ route('goal.destroy', $goal->id)}}" method="POST" onsubmit="return confirm('{{ $goalDeleteConfirmationText ?? 'Are you sure you want to permanently delete this goal?' }}')">                    
+                    <x-button
+                    :href='route("goal.show", $goal->id)' class="ml-2">{{__('View')}}</x-button>
+                    </span>
+                </form>      
+                @endif 
             </div>
             @endif
             
-            @if(($type ?? '') === 'supervisor' && !$disableEdit)
-                <form action="{{route('goal.supervisor.copy', $goal->id)}}" method="post" onSubmit="return confirm('This goal will be copied to your Current Goals tab. You can access and edit it there without impacting your supervisor\'s goal. Continue?');">
+            @if(($type ?? '') === 'supervisor' && !$disableEdit && 1==0)
+                <form action="{{route('goal.supervisor.copy', $goal->id)}}" method="post" onSubmit="return confirm('This goal will be copied to your Current Goals tab. You can access and edit it there without impacting the original goal. Continue?');">
                     @csrf
                     <x-button
                         :data-id="$goal->id"

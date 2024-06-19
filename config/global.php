@@ -10,14 +10,19 @@ return [
             'color' => 'success',
             'tooltip' => 'Supervisor and employee agree objectives met',
         ],
-        'not met' => [
-            'color' => 'red',
-            'tooltip' => 'Substantial portion incomplete by end date',
-        ],
-        'cancelled or deferred' => [
+        // 'not met' => [
+        //     'color' => 'red',
+        //     'tooltip' => 'Substantial portion incomplete by end date',
+        // ],
+        // 'cancelled or deferred' => [
+        //     'color' => 'warning',
+        //     'tooltip' =>
+        //         'Shift in plans but want to archive goal for future reference',
+        // ],
+        'archived' => [
             'color' => 'warning',
             'tooltip' =>
-                'Shift in plans but want to archive goal for future reference',
+                'Cancelled, deferred or no longer relevant to your work but you want to save for future reference',
         ],
     ],
 
@@ -59,7 +64,7 @@ return [
                     '<li>What competencies and values will you focus on to achieve your goals?</li>',
                     '<li>What do you need to learn to achieve your goals? Do you have any gaps that you want to address?</li>',
                     '<li>What are the barriers to your success? How will you overcome them?</li>',
-                    '<li>Imagine what success will look like: this can inform your personal performance measures (remember to pick results that are within your control and/or influence).</li>',
+                    '<li>Imagine what success will look like: this can inform your personal performance measures (remember to pick results that are within your control and/or influence)</li>',
                     '<li>What personal goals would you like to include in your profile?</li>',
                     '<ul><li>What are your greatest growth opportunities?</li></ul>',
                     '<ul><li>What strengths do you have that you want to use more of? (Think about what you do effortlessly. What are you doing when you are at your best?)</li></ul>',

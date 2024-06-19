@@ -30,7 +30,7 @@
 
 
     <div class="card-body">
-                <table class="table table-sm table-bordered rounded">
+                <table class="table table-sm table-bordered rounded table-striped">
                     <thead>
                     <tr class="text-center bg-light">
                         <th class="col-2">Template Name</th>

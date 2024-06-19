@@ -25,9 +25,10 @@ class AddGoalToLibraryRequest extends FormRequest
     {
         return [
             'title' => 'required',
-            'what' => 'required',
+            'what' => 'nullable',
             'why' => 'nullable',
             'how' => 'nullable',
+            'created_id' => 'nullable',
             'measure_of_success' => 'nullable',
             'goal_type_id' => 'required|exists:goal_types,id',
             'itemsToShare' => 'required|array',
@@ -35,6 +36,7 @@ class AddGoalToLibraryRequest extends FormRequest
             'is_mandatory' => 'required|boolean',
             'start_date' => 'nullable',
             'target_date' => 'nullable',
+            'tag_ids' => 'required|array',
             'tag_ids.*' => 'exists:tags,id'
         ];
     }
@@ -42,7 +44,7 @@ class AddGoalToLibraryRequest extends FormRequest
     public function messages() {
         return [
             'itemsToShare.required' => 'please select at least one employee',
-            'what.required' => 'The description field is required'
+            //'what.required' => 'The description field is required'
         ];
     }
 }

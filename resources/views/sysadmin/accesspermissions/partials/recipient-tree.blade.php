@@ -26,11 +26,11 @@
                 <h6 class="mb-0">
                 
                 <a role="button" data-toggle="collapse" href="#collapse-{{ $org->id }}" aria-expanded="false" class="collapsed"
-                            aria-controls="collapse-{{ $org->id }}">
+                    aria-controls="collapse-{{ $org->id }}">
                     <input pid="" class="" type="checkbox"  id="orgCheck{{ $org->id }}" name="orgCheck[]" 
                         {{ (is_array(old('orgCheck')) and in_array($org->id, old('orgCheck'))) ? ' checked' : '' }}
                         value="{{ $org->id }}">    
-                        <span class="pr-2">{{ $org->name }}</span>
+                    <span class="pr-2">{{ $org->name }}</span>
                     <span class="badge badge-pill badge-primary">{{ $countByOrg[$org->id] }}</span>
                 </a>
                 </h6>
@@ -341,260 +341,253 @@
 
 
 <script>
-$(document).ready(function() {
+    $(document).ready(function() {
 
-    g_employees_by_org = {!!json_encode($empIdsByOrgId)!!};      
+        g_employees_by_org = {!!json_encode($empIdsByOrgId)!!};      
 
-    list = $("input[type=checkbox]:checked");
+        list = $("input[type=checkbox]:checked");
 
-    $.each(list, function( index, item ) {
+        $.each(list, function( index, item ) {
 
-        pid = $(item).attr('pid');
+            pid = $(item).attr('pid');
 
-        do {
-            value = '#orgCheck' + pid;
-            //console.log(  value );
-            toggle_indeterminate( value );
-            //console.log("parent : " + pid);                
-            pid = $('#orgCheck' + pid).attr('pid');    
-        } 
-        while (pid);
-
-    });
-
-
-
-    // Set parent checkbox
-    function toggle_indeterminate( prev_input ) {
-
-        prev_location = $(prev_input).parent().attr('href');
-        total = $(prev_location).find('input').length;
-        selected = $(prev_location).find('input:checked').length;
-        if (selected == 0) {
-            $(prev_input).prop("indeterminate", false);
-            $(prev_input).prop('checked', false);
-        } else if ( total == selected ) {
-            $(prev_input).prop("indeterminate", false);
-            $(prev_input).prop('checked', true);
-        } else if (total > selected ) {
-            $(prev_input).prop("indeterminate", true);
-        } else {
-            $(prev_input).prop("indeterminate", false);
-        }
-
-    }
-
-    function load_employees_on_node( tree_id ) {
-
-        var target = '#employees-' + tree_id;
-        
-        if($.trim($(target).html())=='') {
-            $.ajax({
-                url: '/sysadmin/goalbank/employees/' + tree_id,
-                type: 'GET',
-                data: $("#notify-form").serialize(),
-                dataType: 'html',
-                beforeSend: function() {
-                    //$('#pageLoader').show();  
-                    $(".loading-spinner").show();                    
-                },
-                success: function (result) {
-                    $(target).html(''); 
-                    $(target).html(result);
-
-                    nodes = $(target).find('input:checkbox');
-                    $.each( nodes, function( index, chkbox ) {
-                        console.log( chkbox.value )
-						if (g_selected_employees.includes(chkbox.value)) {
-							$(chkbox).prop('checked', true);
-                        } 
-                    });
-
-                },
-                complete: function() {
-                    //$('#pageLoader').hide();  
-                    $(".loading-spinner").hide();
-                },
-                error: function () {
-                    alert("error");
-                    $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
-                }
-            });
-        }
-    }
-
-    $("#accordion-level0 .card-header.employees").on("click","a", function(e) 
-    {
-        var tree_id = $(this).attr('data');
-        load_employees_on_node(tree_id);
-    });
-
-    $("#accordion-level0 .card-header").on("click","a", function(e) {
-        //e.preventDefault(); 	
-
-        if (e.target.tagName != "INPUT") {
-            // do link
-            //alert("Doing link functionality");
-        } else {
-            e.stopPropagation();
-    
-            //var location  = '#collapse-' + $(e.target).val();
-            var location = $(this).attr('href') ;
-
-            if (e.target.checked) {
-                // expand itself
-                $(location).collapse();
-    
-                // to-do : checked all the following 
-                items = $(location).find('input:checkbox');
-                $.each(items, function(index, item) {
-                    $(item).prop('checked', true);
-                    $(item).prop("indeterminate", false);
-                })  
-
-                // TODO : add to selected listed
-                //if no employee class, then have to add all 
-                
-                // User level checkbox 
-                if ( $(e.target).attr('name') == 'userCheck[]') {
-                    emp_id = $(e.target).val();  
-                    if (!g_selected_employees.includes(emp_id)) {
-                            g_selected_employees.push( emp_id );    
-                    } 
-                }
-
-                node  = $(e.target).val();
-                if (g_employees_by_org.hasOwnProperty( node )) {
-                    $.each(g_employees_by_org[ node  ], function(index, emp) {
-                        if (!g_selected_employees.includes(emp.employee_id)) {
-                            g_selected_employees.push( emp.employee_id );    
-                        } 
-                    })  
-                }
-
-                nodes = $(location).find('input:checkbox')
-                $.each( nodes, function( index, chkbox ) {
-                    if (g_employees_by_org.hasOwnProperty(chkbox.value)) {
-                        $.each(g_employees_by_org[chkbox.value], function(index, emp) {
-                            if (!g_selected_employees.includes(emp.employee_id)) {
-                                g_selected_employees.push( emp.employee_id );    
-                            }
-                        })
-                    } else {
-                        if (chkbox.name == 'userCheck[]') {
-                            if (!g_selected_employees.includes(chkbox.value)) {
-                                g_selected_employees.push( chkbox.value);    
-                            }
-                        }
-                    }
-                });
-
-            } else {
-
-                //$(location).collapse('hide');
-
-                // unchecked the children 
-                items = $(location).find('input:checkbox');
-                $.each(items, function(index, item) {
-                    $(item).prop('checked', false);
-                    $(item).prop("indeterminate", false);
-                })  
-
-
-                // User level checkbox 
-                if ( $(e.target).attr('name') == 'userCheck[]') {
-                    emp_id = $(e.target).val();  
-                    var index = $.inArray(emp_id, g_selected_employees);
-                    if (index > -1) {
-                        g_selected_employees.splice( index, 1 );
-                    }
-                }
-
-                node = $(e.target).val();
-                if (g_employees_by_org.hasOwnProperty( node )) {
-                    $.each(g_employees_by_org[ node  ], function(index, emp) {
-                        if (!g_selected_employees.includes(emp.employee_id)) {
-                            g_selected_employees.push( emp.employee_id );    
-                        } 
-                    })  
-                }
-
-                nodes = $(location).find('input:checkbox');
-                $.each( nodes, function( index, chkbox ) {
-                    if (g_employees_by_org.hasOwnProperty(chkbox.value)) {
-                        $.each(g_employees_by_org[chkbox.value], function(index, emp) {
-                            var index = $.inArray(emp.employee_id, g_selected_employees);
-                            if (index > -1) {
-                                g_selected_employees.splice( index, 1 );
-                            }
-                        })
-                    } else {
-                        if (chkbox.name == 'userCheck[]') {
-                            var index = $.inArray(chkbox.value, g_selected_employees);
-                            if (index > -1) {
-                                g_selected_employees.splice( index, 1 );
-                            }
-                        }
-                    }
-                });
-                
-            }      
-
-            //console.log( g_selected_employees);     
-
-            pid = $(this).find('input:first').attr('pid');
             do {
                 value = '#orgCheck' + pid;
-                //console.log(  value );
                 toggle_indeterminate( value );
-                //console.log("parent : " + pid);                
                 pid = $('#orgCheck' + pid).attr('pid');    
             } 
             while (pid);
 
+        });
+
+
+
+        // Set parent checkbox
+        function toggle_indeterminate( prev_input ) {
+
+            prev_location = $(prev_input).parent().attr('href');
+            total = $(prev_location).find('input').length;
+            selected = $(prev_location).find('input:checked').length;
+            if (selected == 0) {
+                $(prev_input).prop("indeterminate", false);
+                $(prev_input).prop('checked', false);
+            } else if ( total == selected ) {
+                $(prev_input).prop("indeterminate", false);
+                $(prev_input).prop('checked', true);
+            } else if (total > selected ) {
+                $(prev_input).prop("indeterminate", true);
+            } else {
+                $(prev_input).prop("indeterminate", false);
+            }
+
         }
 
-    });
+        function load_employees_on_node( tree_id ) {
 
-    $("#accordion-level0").on('shown.bs.collapse', function () {
-        // do something
-        el = $('a.toggle-accordion');
-        if ( !el.hasClass("active")) {
-            el.addClass( "active");
-        }
-    });
+            var target = '#employees-' + tree_id;
+            
+            if($.trim($(target).html())=='') {
+                $.ajax({
+                    url: '/'+'{{ request()->segment(1) }}'+'/accesspermissions/employees/'+tree_id,
+                    type: 'GET',
+                    data: $("#notify-form").serialize(),
+                    dataType: 'html',
+                    beforeSend: function() {
+                        //$('#pageLoader').show();  
+                        $("#tree-loading-spinner").show();                    
+                    },
+                    success: function (result) {
+                        $(target).html(''); 
+                        $(target).html(result);
 
-    $("#accordion-level0").on('hidden.bs.collapse', function () {
-        
-        count = $('div.collapse.show').length;
-        if (count == 0) {
-            el = $('a.toggle-accordion');
-            if ( el.hasClass("active")) {
-                el.removeClass( "active");
+                        nodes = $(target).find('input:checkbox');
+                        $.each( nodes, function( index, chkbox ) {
+                            if (g_selected_employees.includes(chkbox.value)) {
+                                $(chkbox).prop('checked', true);
+                            } 
+                        });
+
+                    },
+                    complete: function() {
+                        //$('#pageLoader').hide();  
+                        $("#tree-loading-spinner").hide();
+                    },
+                    error: function () {
+                        alert("error");
+                        $(target).html('<i class="glyphicon glyphicon-info-sign"></i> Something went wrong, Please try again...');
+                    }
+                });
             }
         }
-    });
 
-    $(".toggle-accordion").on("click", function(e) {
+        $("#accordion-level0 .card-header.employees").on("click","a", function(e) 
+        {
+            var tree_id = $(this).attr('data');
+            load_employees_on_node(tree_id);
+        });
 
-        b_active =  $( e.target ).hasClass( "active" );
+        $("#accordion-level0 .card-header").on("click","a", function(e) {
+            //e.preventDefault(); 	
+
+            if (e.target.tagName != "INPUT") {
+                // do link
+                //alert("Doing link functionality");
+            } else {
+                e.stopPropagation();
         
-        if (b_active) {
-            nodes = $('div.collapse.show');
-            $.each( nodes, function( index, item ) {
-                $(item).collapse('hide');
-            });
-            $( e.target ).removeClass( "active" );
-        } else {
-            nodes = $('div.collapse');
-            $.each( nodes, function( index, item ) {
-                $(item).collapse('show');
-            });
-            $( e.target ).addClass( "active" );
-        }
+                //var location  = '#collapse-' + $(e.target).val();
+                var location = $(this).attr('href') ;
 
-    })
+                if (e.target.checked) {
+                    // expand itself
+                    $(location).collapse();
+        
+                    // to-do : checked all the following 
+                    items = $(location).find('input:checkbox');
+                    $.each(items, function(index, item) {
+                        $(item).prop('checked', true);
+                        $(item).prop("indeterminate", false);
+                    })  
+
+                    // TODO : add to selected listed
+                    //if no employee class, then have to add all 
+                    
+                    // User level checkbox 
+                    if ( $(e.target).attr('name') == 'userCheck[]') {
+                        emp_id = $(e.target).val();  
+                        if (!g_selected_employees.includes(emp_id)) {
+                                g_selected_employees.push( emp_id );    
+                        } 
+                    }
+
+                    node  = $(e.target).val();
+                    if (g_employees_by_org.hasOwnProperty( node )) {
+                        $.each(g_employees_by_org[ node  ], function(index, emp) {
+                            if (!g_selected_employees.includes(emp.employee_id)) {
+                                g_selected_employees.push( emp.employee_id );    
+                            } 
+                        })  
+                    }
+
+                    nodes = $(location).find('input:checkbox')
+                    $.each( nodes, function( index, chkbox ) {
+                        if (g_employees_by_org.hasOwnProperty(chkbox.value)) {
+                            $.each(g_employees_by_org[chkbox.value], function(index, emp) {
+                                if (!g_selected_employees.includes(emp.employee_id)) {
+                                    g_selected_employees.push( emp.employee_id );    
+                                }
+                            })
+                        } else {
+                            if (chkbox.name == 'userCheck[]') {
+                                if (!g_selected_employees.includes(chkbox.value)) {
+                                    g_selected_employees.push( chkbox.value);    
+                                }
+                            }
+                        }
+                    });
+
+                } else {
+
+                    //$(location).collapse('hide');
+
+                    // unchecked the children 
+                    items = $(location).find('input:checkbox');
+                    $.each(items, function(index, item) {
+                        $(item).prop('checked', false);
+                        $(item).prop("indeterminate", false);
+                    })  
 
 
-});
+                    // User level checkbox 
+                    if ( $(e.target).attr('name') == 'userCheck[]') {
+                        emp_id = $(e.target).val();  
+                        var index = $.inArray(emp_id, g_selected_employees);
+                        if (index > -1) {
+                            g_selected_employees.splice( index, 1 );
+                        }
+                    }
+
+                    node = $(e.target).val();
+                    if (g_employees_by_org.hasOwnProperty( node )) {
+                        $.each(g_employees_by_org[ node  ], function(index, emp) {
+                            if (!g_selected_employees.includes(emp.employee_id)) {
+                                g_selected_employees.push( emp.employee_id );    
+                            } 
+                        })  
+                    }
+
+                    nodes = $(location).find('input:checkbox');
+                    $.each( nodes, function( index, chkbox ) {
+                        if (g_employees_by_org.hasOwnProperty(chkbox.value)) {
+                            $.each(g_employees_by_org[chkbox.value], function(index, emp) {
+                                var index = $.inArray(emp.employee_id, g_selected_employees);
+                                if (index > -1) {
+                                    g_selected_employees.splice( index, 1 );
+                                }
+                            })
+                        } else {
+                            if (chkbox.name == 'userCheck[]') {
+                                var index = $.inArray(chkbox.value, g_selected_employees);
+                                if (index > -1) {
+                                    g_selected_employees.splice( index, 1 );
+                                }
+                            }
+                        }
+                    });
+                    
+                }      
+
+                pid = $(this).find('input:first').attr('pid');
+                do {
+                    value = '#orgCheck' + pid;
+                    toggle_indeterminate( value );
+                    pid = $('#orgCheck' + pid).attr('pid');    
+                } 
+                while (pid);
+
+            }
+
+        });
+
+        $("#accordion-level0").on('shown.bs.collapse', function () {
+            // do something
+            el = $('a.toggle-accordion');
+            if ( !el.hasClass("active")) {
+                el.addClass( "active");
+            }
+        });
+
+        $("#accordion-level0").on('hidden.bs.collapse', function () {
+            
+            count = $('div.collapse.show').length;
+            if (count == 0) {
+                el = $('a.toggle-accordion');
+                if ( el.hasClass("active")) {
+                    el.removeClass( "active");
+                }
+            }
+        });
+
+        $(".toggle-accordion").on("click", function(e) {
+
+            b_active =  $( e.target ).hasClass( "active" );
+            
+            if (b_active) {
+                nodes = $('div.collapse.show');
+                $.each( nodes, function( index, item ) {
+                    $(item).collapse('hide');
+                });
+                $( e.target ).removeClass( "active" );
+            } else {
+                nodes = $('div.collapse');
+                $.each( nodes, function( index, item ) {
+                    $(item).collapse('show');
+                });
+                $( e.target ).addClass( "active" );
+            }
+
+        })
+
+
+    });
 </script>
