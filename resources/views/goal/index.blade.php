@@ -218,6 +218,47 @@
   </div>
 </div>
 
+<!-- Auto Save Modal -->
+<div class="modal fade" id="autoSaveModal" tabindex="-1" aria-labelledby="autoSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="autoSaveModalLabel">Auto Save Notification</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        You have not saved your work in 20 minutes. To protect your work, it has been automatically saved.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to share the goal with the selected employee?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelShareBtn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmShareBtn">Share</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 
@@ -996,47 +1037,59 @@ $(".share-with-users").select2({
             }
             
             $(document).ready(function() {
+                var initialValue;
+                var selectedValue;
+                var goalId;
+
                 // Event handler for dropdown list change
                 $(document).on('change', '.share-with-users', function() {
-                  // Get the selected value
-                  var selectedValue = $(this).val();
+                    // Get the selected value
+                    selectedValue = $(this).val();
 
-                  // Get the corresponding goal ID in the row
-                  var goalId = $(this).closest('tr').data('goal-id');
+                    // Get the corresponding goal ID in the row
+                    goalId = $(this).closest('tr').data('goal-id');
 
-                  // Perform desired actions with the selected value and goal ID
-                  console.log('Selected value:', selectedValue);
-                  console.log('Goal ID:', goalId);
+                    // Show the confirmation modal
+                    $('#confirmationModal').modal('show');
+                });
 
-                  console.log('Goal ID:', goalId);
-                  console.log('Selected Values:', selectedValue);
-                  $('#sync_goal_id').val(goalId);
-                  $('#sync_users').val(selectedValue);
-                  
-                  // Prepare the data to be sent
-                    var formData = {
-                      sync_goal_id: goalId,
-                      sync_users: selectedValue
-                    };
+                // Handle the confirmation button click
+                $('#confirmShareBtn').on('click', function() {
+                        $('#sync_goal_id').val(goalId);
+                        $('#sync_users').val(selectedValue);
 
-                    $.ajax({
-                      url: '{{ route("goal.sync-goals") }}',
-                      type: 'POST',
-                      data: formData,
-                      success: function(response) {
-                        // Handle success response
-                        console.log('Data submitted successfully');
-                        // Optionally, you can perform additional actions here
-                      },
-                      error: function(xhr, status, error) {
-                        // Handle error response
-                        console.error('Error submitting data:', error);
-                        // Optionally, you can display an error message or perform additional actions here
-                      }
-                    });
-                  });
+                        // Prepare the data to be sent
+                        var formData = {
+                            sync_goal_id: goalId,
+                            sync_users: selectedValue
+                        };
 
+                        $.ajax({
+                            url: '{{ route("goal.sync-goals") }}',
+                            type: 'POST',
+                            data: formData,
+                            success: function(response) {
+                                // Handle success response
+                                console.log('Data submitted successfully');
+                                // Optionally, you can perform additional actions here
+                            },
+                            error: function(xhr, status, error) {
+                                // Handle error response
+                                console.error('Error submitting data:', error);
+                                // Optionally, you can display an error message or perform additional actions here
+                            }
+                        });
+
+                        // Hide the modal
+                        $('#confirmationModal').modal('hide');
+                });
+
+                // Handle the cancel button click
+                $('#cancelShareBtn').on('click', function() {
+                    location.reload();
+                });
             });
+
 </script>    
 
 <style>
