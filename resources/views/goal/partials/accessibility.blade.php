@@ -125,6 +125,23 @@
         border: 0;
     }
 
+    .focusable {
+        /* Define styles for when the element is focused */
+        outline: 2px solid #1A5A96; /* Change the color and style as needed */
+    }
+
+    /* Apply a border and outline when the element is focused */
+    button:focus,
+    button:active {
+        outline: none; /* Remove the default focus outline */
+        border: 2px solid #1A5A96; /* Add a border when the element is focused */
+        /* Add any other styles you want to apply when the element is focused */
+    }
+
+    .focus-border:focus {
+        outline: none; /* Remove the default outline */
+        border: 2px solid white; /* Add a white border */
+    }
 
 </style>    
  
