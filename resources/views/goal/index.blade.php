@@ -133,12 +133,12 @@
         </div>
 </div>
 
-<div class="modal fade" id="addGoalModal"  aria-labelledby="addModalLabel" aria-hidden="true">
+<div class="modal fade" id="addGoalModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header bg-primary">
         <h5 class="modal-title" id="addGoalModalLabel">Create New Goal</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close focus-border" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true" style="color:white">&times;</span>
         </button>
       </div>
@@ -148,26 +148,26 @@
             @csrf
             <div class="row">
                 <div class="col-12">
-                    <div class="alert alert-danger" style="display:none">
+                    <div class="alert alert-danger" role="alert" style="display:none">
                         <i class="fa fa-info-circle"></i> There are one or more errors on the page. Please review and try again.
                     </div>
                 </div>
                 <div class="col-6">
                     <div>
                         <b>Goal Type</b>
-                        <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="{{$type_desc_str}}"> </i>
+                        <i class="fa fa-info-circle" data-trigger='focus' tabindex="0" data-toggle="popover" data-placement="right" data-html="true" data-content="{{$type_desc_str}}" aria-label="{{$type_desc_str}}"> </i>
                         <x-dropdown :list="$goal_types_modal" name="goal_type_id" />
                     </div>
                 </div>
                 <div class="col-6">
                        <b>Goal Title</b>
-                        <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>                        
-                        <x-input-modal id="goal_title" name="title" />
+                        <i class="fa fa-info-circle" data-trigger='focus' tabindex="0" data-toggle="popover" data-placement="right" data-html="true" data-content="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform." aira-label="A short title (1-3 words) used to reference the goal throughout the Performance Development Platform."> </i>                        
+                        <x-input-modal id="goal_title" name="title"  aria-label="Goal title input"/>
                 </div>
                 <div class="col-sm-6">
                         <b>Tags</b>
-                        <i class="fa fa-info-circle" id="tags_label" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resources/goal-setting?t=8' target=\'_blank\'><u>View full list of tag descriptions.</u></a><br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>."></i>				
-                        <x-xdropdown :list="$tags" name="tag_ids[]"  class="tags" displayField="name" multiple/>
+                        <i class="fa fa-info-circle" id="tags_label" tabindex="0" data-trigger='focus' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resources/goal-setting?t=8' target=\'_blank\'><u>View full list of tag descriptions.</u></a><br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>." aria-label="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time."></i>				
+                        <x-xdropdown :list="$tags" name="tag_ids[]"  class="tags" displayField="name" aria-label="Goal tags" multiple/>
                         <small  class="text-danger error-tag_ids"></small>
                 </div>
                 <div class="col-12">
@@ -175,9 +175,9 @@
                         <b>Goal Description</b>          
                         <p>
 				        Each goal should include a description of <b>WHAT</b>  
-				        <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".'> </i> you will accomplish, <b>WHY</b> 
-				        <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important, and <b>HOW</b> 
-				        <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> you will achieve it. 
+				        <i class="fa fa-info-circle" data-trigger="focus" tabindex="0" data-toggle="popover" data-placement="right" data-html="true" data-content='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".' aria-label='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".'> </i> you will accomplish, <b>WHY</b> 
+				        <i class="fa fa-info-circle" data-trigger="focus" tabindex="0" data-toggle="popover" data-placement="right" data-html="true" data-content='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".' aria-label='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".'> </i> it is important, and <b>HOW</b> 
+				        <i class="fa fa-info-circle" data-trigger="focus" tabindex="0" data-toggle="popover" data-placement="right" data-html="true" data-content='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".' aira-label='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'> </i> you will achieve it. 
 				        </p>                                                                  
                         <!-- <p class="py-2">Each goal should include a description of <b>WHAT</b><x-tooltip-modal text='A concise opening statement of what you plan to achieve. For example, "My goal is to deliver informative Performance Development sessions to ministry audiences".' /> you will accomplish, <b>WHY</b><x-tooltip-modal text='Why this goal is important to you and the organization (value of achievement). For example, "This will improve the consistency and quality of the employee experience across the BCPS".' /> it is important, and <b>HOW</b><x-tooltip-modal text='A few high level steps to achieve your goal. For example, "I will do this by working closely with ministry colleagues to develop presentations that respond to the needs of their employees in each aspect of the Performance Development process".'/> you will achieve it.</p>                                                                 -->
                         <!-- <textarea id="what" label="Goal Descriptionxxx" name="what" ></textarea> -->
@@ -188,16 +188,20 @@
                 </div>
                 <div class="col-12">
                             <b>Measures of Success</b>
-                            <i class="fa fa-info-circle" data-trigger='click' data-toggle="popover" data-placement="right" data-html="true" data-content='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"'> </i>                        
+                            <i class="fa fa-info-circle" data-trigger='focus' tabindex="0" data-toggle="popover" data-placement="right" data-html="true" data-content='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"' aria-label='A qualitative or quantitative measure of success for your goal. For example, "Deliver a minimum of 2 sessions per month that reach at least 100 people"'> </i>                        
                             <x-textarea-modal id="measure_of_success" name="measure_of_success" />
                             <small class="text-danger error-measure_of_success"></small>
                 </div>
                 <div class="col-sm-6">
-                    <x-input label="Start Date " class="error-start" type="date" name="start_date" id="start_date" />
+                    <label for="start_date">Start Date<br/>
+                        <input aria-label="Enter the goals start date in format YYYY-MM-DD" placeholder="YYYY-MM-DD" type="text" class="form-control" id="start_date" name="start_date" value="">
+                    </label>
                     <small  class="text-danger error-start_date"></small>
                 </div>
                 <div class="col-sm-6">
-                    <x-input label="End Date " class="error-target" type="date" name="target_date" id="target_date" />
+                    <label for="start_date">End Date<br/>
+                        <input aria-label="Enter the goals target date in format YYYY-MM-DD" placeholder="YYYY-MM-DD" type="text" class="form-control" id="target_date" name="target_date" value="">
+                    </label>
                      <small  class="text-danger error-target_date"></small>
                 </div>
                 
@@ -235,6 +239,27 @@
     </div>
   </div>
 </div>
+
+<!-- Auto Save Modal -->
+<div class="modal fade" id="autoSaveModal" tabindex="-1" aria-labelledby="autoSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="autoSaveModalLabel">Auto Save Notification</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        You have not saved your work in 20 minutes. To protect your work, it has been automatically saved.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 
@@ -363,7 +388,7 @@
     }); */
     $(document).on('show.bs.modal', '#addGoalModal', function(e) {
         modal_open = true;
-        
+        $('#addGoalModal').focus(); // Set focus to the modal itself
         $('.alert-danger').hide();
         $('.alert-danger').html('<i class="fa fa-info-circle"></i> There are one or more errors on the page. Please review and try again.');
         $('.text-danger').html('');
@@ -788,6 +813,87 @@
             });
             
         });        
+
+
+
+        $(document).ready(function() {
+            $('select[name="tag_ids[]"]').attr('tabindex', '0');
+
+
+            // Initialize the start_date daterangepicker
+            $('input[name="start_date"]').daterangepicker({
+                autoApply: true,
+                autoUpdateInput: false, // Prevent the input from auto-updating
+                singleDatePicker: true, // Set to true for a single date picker
+                locale: {
+                    format: 'YYYY-MM-DD'
+                }
+            });
+
+            // Manually update the input field when a date is selected
+            $('input[name="start_date"]').on('apply.daterangepicker', function(ev, picker) {
+                var startDate = picker.startDate.format('YYYY-MM-DD');
+                $(this).val(startDate);
+
+                // Update the minDate of the target_date picker
+                $('input[name="target_date"]').data('daterangepicker').minDate = picker.startDate;
+                $('input[name="target_date"]').val(''); // Optionally clear the target_date value
+            });
+
+            // Ensure the placeholder remains
+            $('input[name="start_date"]').attr('placeholder', 'YYYY-MM-DD');
+
+            // Initialize the target_date daterangepicker
+            $('input[name="target_date"]').daterangepicker({
+                autoApply: true,
+                autoUpdateInput: false, // Prevent the input from auto-updating
+                singleDatePicker: true, // Set to true for a single date picker
+                locale: {
+                    format: 'YYYY-MM-DD'
+                }
+            });
+
+            // Manually update the input field when a date is selected
+            $('input[name="target_date"]').on('apply.daterangepicker', function(ev, picker) {
+                var targetDate = picker.startDate.format('YYYY-MM-DD');
+
+                // Check if start_date is empty
+                if ($('input[name="start_date"]').val() === '') {
+                    alert('Please choose a start date first.');
+                    $(this).val(''); // Clear the target_date value
+                } else {
+                    $(this).val(targetDate);
+                }
+            });
+
+            // Ensure the placeholder remains
+            $('input[name="target_date"]').attr('placeholder', 'YYYY-MM-DD');
+
+            // Add change event for start_date
+            $('input[name="start_date"]').on('change', function() {
+                var startDate = $(this).val();
+                var targetDate = $('input[name="target_date"]').val();
+
+                // If start date is empty or later than target date
+                if (startDate === '' || (targetDate !== '' && moment(startDate).isAfter(moment(targetDate)))) {
+                    alert('The start date cannot be empty or later than the target date. Both dates will be cleared.');
+                    $('input[name="start_date"]').val('');
+                    $('input[name="target_date"]').val('');
+                    // Reset minDate for target_date picker
+                    $('input[name="target_date"]').data('daterangepicker').minDate = false;
+                }
+            });
+
+            // Check if start_date has an initial value on page load
+            var initialStartDate = $('input[name="start_date"]').val();
+            if (initialStartDate) {
+                // Set the minDate of the target_date picker
+                var initialStartMoment = moment(initialStartDate, 'YYYY-MM-DD');
+                $('input[name="target_date"]').data('daterangepicker').minDate = initialStartMoment;
+            }
+        });
+
+
     </script>
     
     
@@ -918,7 +1024,7 @@ $(".share-with-users").select2({
                 $("#filter-menu").submit();
             }
                 
-        function setTimeRoll(){
+            function setTimeRoll() {
                 const minutes = 3;
                 const SessionTime = 1000 * 60 * minutes;
                 if (myTimeout) { clearInterval(myTimeout) };
@@ -950,7 +1056,7 @@ $(".share-with-users").select2({
                                         
                                         saved = true;
                                         isContentModified = false;
-                                        alert('You have not saved your work in 20 minutes. To protect your work, it has been automatically saved.');
+                                        $('#autoSaveModal').modal('show'); // Show the modal
                                     }
                                 },
                                 error: function (error){
@@ -972,7 +1078,7 @@ $(".share-with-users").select2({
                                             $('#addGoalModal input[name='+value[0]+']').addClass('is-invalid');
                                             $(className).text(value[1]);
                                         });
-                                        //alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');
+                                        //$('#autoSaveModal').modal('show'); // Show the modal if there is an error
                                     }
                             });   
                             $(this).prop('disabled', false);
@@ -996,7 +1102,7 @@ $(".share-with-users").select2({
                                         $('.btn-submit').hide();
                                         $('.text-danger').hide();
                                         $('.form-control').removeClass('is-invalid');  
-                                        alert('You have not saved your work in 20 minutes. To protect your work, it has been automatically saved.');
+                                        $('#autoSaveModal').modal('show'); // Show the modal
                                     }
                                 },
                                 error: function (error){
@@ -1018,15 +1124,15 @@ $(".share-with-users").select2({
                                             $('#addGoalModal input[name='+value[0]+']').addClass('is-invalid');
                                             $(className).text(value[1]);
                                         });
-                                        //alert('You have been inactive for more than 15 minutes. Your goal has been automatically saved.');
+                                        //$('#autoSaveModal').modal('show'); // Show the modal if there is an error
                                     }
                             });   
                             $(this).prop('disabled', false);
-
                         }
                     }    
                 }, SessionTime);                
             }
+
             
             $(document).ready(function() {
                 // Event handler for dropdown list change
