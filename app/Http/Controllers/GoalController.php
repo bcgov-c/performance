@@ -2079,4 +2079,30 @@ class GoalController extends Controller
         
         return $this->respondeWith($user_query);
     }
+
+
+    
+
+    public function getUser(Request $request)
+    {
+        $id = $request->id;
+        // Retrieve the user details
+        $user = User::find($id);
+        
+        // Check if user is found
+        if ($user) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ],
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found',
+            ], 404);
+        }
+    }
 }

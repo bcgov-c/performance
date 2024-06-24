@@ -1095,6 +1095,26 @@
                 }, SessionTime);                
             }
 
+
+            
+
+
+            // Function to fetch user details by user ID
+            function getUserDetails(userId, callback) {
+                    $.ajax({
+                        url: '{{ route("goal.get-user") }}', // Replace with your endpoint to fetch user details
+                        type: 'POST',
+                        data: { id: userId },
+                        success: function(response) {
+                            // Assuming the response contains user details
+                            callback(response);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching user details:', error);
+                            callback(null);
+                        }
+                    });
+            }
             
             $(document).ready(function() {
                 var initialValue;
@@ -1118,6 +1138,7 @@
 
                     // Check if initialValue is undefined or empty
                     if (!initialValue || initialValue.length === 0) {
+                        //remove the selected user
                         $('#sync_goal_id').val(goalId);
                         $('#sync_users').val(selectedValue);
                         
@@ -1143,14 +1164,29 @@
                             }
                         });
                     } else {
-                        // Check if the action is adding a new value
                         if (selectedValue.length > initialValue.length) {
-                            // Show the confirmation modal
-                            $('#confirmationModal').modal('show');
+                            //add new user
+                            // Get the newly added user ID
+                            var newUserId = selectedValue[selectedValue.length - 1];
+                            // Fetch user details and show the modal
+                            getUserDetails(newUserId, function(user) {
+                                if (user) {
+                                    // Update the modal content
+                                    $('#confirmationModal .modal-body').html(
+                                        `Are you sure you want to share the goal with the selected employee? 
+                                        <br/><i class="fas fa-user"></i> ${user.data.name} 
+                                        <br/><i class="fas fa-envelope"></i> ${user.data.email}`
+                                    );
+
+                                    // Show the confirmation modal
+                                    $('#confirmationModal').modal('show');
+                                } else {
+                                    console.error('User details not found');
+                                }
+                            });
                         } else {
-                            // Update the initial value for future changes
-                            initialValue = selectedValue.slice(); // Copy the selected values as the new initial values
-                            $(this).data('initial-value', initialValue);
+                            initialValue = selectedValue.slice();
+                            $this.data('initial-value', initialValue);
                         }
                     }
                     
