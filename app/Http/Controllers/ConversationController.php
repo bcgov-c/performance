@@ -64,6 +64,9 @@ class ConversationController extends Controller
                                     ->distinct()
                                     ->get();
         
+        //get reportee and shared with listing
+        $reporteeNshared = $user->avaliableReportees()->select('id')->pluck('id')->union(SharedProfile::where('shared_with', $user->id)->select('shared_id AS id')->pluck('id'))->toArray();
+
         //get historic team members
         $history_teammembers = DB::table('conversation_participants')
                                     ->select('conversation_participants.participant_id', 'users.name')
@@ -173,7 +176,7 @@ class ConversationController extends Controller
             
              // With My Team
              if ($sharedSupervisorIds && $sharedSupervisorIds[0]) {
-                $myTeamQuery->where(function($query) use ($sharedSupervisorIds,$myCurrentTeam_array) {
+                $myTeamQuery->where(function($query) use ($sharedSupervisorIds, $myCurrentTeam_array, $reporteeNshared) {
                     $query->where(function($shared) use ($sharedSupervisorIds){
                         return $shared->whereNotIn('user_id', $sharedSupervisorIds)
                         ->orWhere(function($part) {
@@ -185,6 +188,9 @@ class ConversationController extends Controller
                     })
                     ->whereHas('conversationParticipants', function ($query) use ($myCurrentTeam_array ) {
                         $query->whereIn('participant_id', $myCurrentTeam_array);
+                    })
+                    ->whereHas('conversationParticipants', function ($query) use ($reporteeNshared ) {
+                        $query->whereIn('participant_id', $reporteeNshared);
                     });
                 });
             }
