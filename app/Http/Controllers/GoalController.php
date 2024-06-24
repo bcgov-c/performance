@@ -1996,7 +1996,7 @@ class GoalController extends Controller
         }
         if($user && $user->allow_email_notification && $user->userPreference->goal_bank_flag == 'Y') {
             $sendMail = new \App\MicrosoftGraph\SendMail();
-            $sendMail->toRecipients = array( $user->user_id );  
+            $sendMail->toRecipients = array( $user->id );  
             $sendMail->sender_id = null;  // default sender is System
             $sendMail->useQueue = true;
             $sendMail->template = 'GOAL_SHARED';
