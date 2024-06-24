@@ -1115,7 +1115,7 @@
                     goalId = $(this).closest('tr').data('goal-id');
 
                     // Check if initialValue is undefined or empty
-                    if (!initialValue || initialValue.length === 0) {
+                    if (!initialValue) {
                         //remove the selected user
                         $('#sync_goal_id').val(goalId);
                         $('#sync_users').val(selectedValue);
