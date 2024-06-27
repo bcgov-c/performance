@@ -155,7 +155,7 @@
                 <div class="col-6">
                     <div>
                         <b>Goal Type</b>
-                        <i class="fa fa-info-circle" data-trigger='focus' tabindex="0" data-toggle="popover" data-placement="right" data-html="true" data-content="{{$type_desc_str}}" aria-label="{{$type_desc_str}}"> </i>
+                        <i class="fa fa-info-circle" data-trigger='focus' tabindex="0" data-toggle="popover" data-placement="right" data-html="true" data-content="{{$type_desc_str}}" aria-label="Work Goals  are foundational / required for your current position (in current role).Learning Goals are formal (i.e. courses or programs) and informal (i.e. networking or mentoring) activities relevant to your current role or personal development. Career Development Goals are not required for your current role but are desirable in order to improve and grow. They tend to be medium- or long-term. Private Goals are only visible to you as the goal owner. You can change this status later if you want to make them visible to others."> </i>
                         <x-dropdown :list="$goal_types_modal" name="goal_type_id" />
                     </div>
                 </div>
@@ -166,7 +166,7 @@
                 </div>
                 <div class="col-sm-6">
                         <b>Tags</b>
-                        <i class="fa fa-info-circle" id="tags_label" tabindex="0" data-trigger='focus' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resources/goal-setting?t=8' target=\'_blank\'><u>View full list of tag descriptions.</u></a><br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>." aria-label="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time."></i>				
+                        <i class="fa fa-info-circle" id="tags_label" tabindex="0" data-trigger='focus' data-toggle="popover" data-placement="right" data-html="true" data-content="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. <br/><br/><a href='/resources/goal-setting?t=8' target=\'_blank\'><u>View full list of tag descriptions.</u></a><br/><br/>Don't see the goal tag you are looking for? <a href='mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag'>Suggest a new goal tag</a>." aria-label="Tags help to more accurately identity, sort, and report on your goals. You can add more than one tag to a goal. The list of tags will change and grow over time. Link: /resources/goal-setting?t=8. Or mailto:performance.development@gov.bc.ca?subject=Suggestion for New Goal Tag"></i>				
                         <x-xdropdown :list="$tags" name="tag_ids[]"  class="tags" displayField="name" aria-label="Goal tags" multiple/>
                         <small  class="text-danger error-tag_ids"></small>
                 </div>
