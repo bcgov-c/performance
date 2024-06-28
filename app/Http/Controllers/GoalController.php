@@ -530,7 +530,7 @@ class GoalController extends Controller
         $authId = Auth::id();
         $user = User::find($authId);
         $adminGoals = Goal::withoutGlobalScopes()
-            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator '<br/>') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
+            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', 'audits.created_at as last_mod_date', DB::raw("(SELECT group_concat(distinct tags.name separator '<br/>') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
             ->join('goal_bank_orgs', function ($qon) {
                 return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
                     ->on('goal_bank_orgs.version', \DB::raw(2))
@@ -545,7 +545,18 @@ class GoalController extends Controller
             ->leftjoin('goal_types', 'goal_types.id', 'goals.goal_type_id')   
             ->whereIn('goals.by_admin', [1, 2])
             ->where('goals.is_library', true) 
-            ->whereNull('goals.deleted_at')        
+            ->whereNull('goals.deleted_at')
+            ->leftjoin('audits', function($joinon){
+                return $joinon->on('audits.auditable_id', 'goals.id')
+                ->whereNotExists(function($ne){
+                    return $ne->select(DB::raw(1))
+                    ->from('audits as audits2')
+                    ->where('audits2.auditable_type', 'audits.auditable_type')
+                    ->where('audits2.auditable_id', 'audits.auditable_id')
+                    ->where('audits2.id', '>', 'audits.id');
+                });
+            })        
+            ->where('audits.auditable_type', 'like', '%App\\\\Models\\\\Goal%%')  
             // ->whereRaw('employee_demo.pdp_excluded = 0')  
             ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.id', 'u2.name', 'goals.is_mandatory');
               
@@ -588,7 +599,7 @@ class GoalController extends Controller
         }
 
         $adminGoalsInherited = Goal::withoutGlobalScopes()
-            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', DB::raw("(SELECT group_concat(distinct tags.name separator '<br/>') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
+            ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory', 'goals.display_name', 'goal_types.name as typename', 'u2.id as creator_id', 'u2.name as username', 'audits.created_at as last_mod_date', DB::raw("(SELECT group_concat(distinct tags.name separator '<br/>') FROM goal_tags LEFT JOIN tags ON tags.id = goal_tags.tag_id WHERE goal_tags.goal_id = goals.id) as tagnames"))
             ->join('goal_bank_orgs', function ($qon) {
                 return $qon->on('goal_bank_orgs.goal_id', 'goals.id')
                     ->on('goal_bank_orgs.version', \DB::raw(2))
@@ -611,6 +622,17 @@ class GoalController extends Controller
                         )
                     ");
             })
+            ->leftjoin('audits', function($joinon){
+                return $joinon->on('audits.auditable_id', 'goals.id')
+                ->whereNotExists(function($ne){
+                    return $ne->select(DB::raw(1))
+                    ->from('audits as audits2')
+                    ->where('audits2.auditable_type', 'audits.auditable_type')
+                    ->where('audits2.auditable_id', 'audits.auditable_id')
+                    ->where('audits2.id', '>', 'audits.id');
+                });
+            })
+            ->where('audits.auditable_type', 'like', '%App\\\\Models\\\\Goal%%')  
         ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.id', 'u2.name', 'goals.is_mandatory');
         
         // Admin List filter below
@@ -661,8 +683,19 @@ class GoalController extends Controller
         ->leftjoin('users as u2', 'u2.id', '=', 'goals.created_by')
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')    
         ->leftjoin('goal_tags', 'goal_tags.goal_id', '=', 'goals.id')
-        ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id');  
-        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.id as creator_id','u2.name as username',DB::raw('group_concat(distinct tags.name separator "<br/>") as tagnames'));
+        ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')
+        ->leftjoin('audits', function($joinon){
+            return $joinon->on('audits.auditable_id', 'goals.id')
+            ->whereNotExists(function($ne){
+                return $ne->select(DB::raw(1))
+                ->from('audits as audits2')
+                ->where('audits2.auditable_type', 'audits.auditable_type')
+                ->where('audits2.auditable_id', 'audits.auditable_id')
+                ->where('audits2.id', '>', 'audits.id');
+            });
+        })
+        ->where('audits.auditable_type', 'like', '%App\\\\Models\\\\Goal%%');  
+        $query = $query->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'goals.is_mandatory','goals.display_name','goal_types.name as typename','u2.id as creator_id','u2.name as username', 'audits.created_at as last_mod_date', DB::raw('group_concat(distinct tags.name separator "<br/>") as tagnames'));
         
         if ($filter->has('goal_bank_mandatory') && $filter->goal_bank_mandatory !== null) {
             if ($filter->goal_bank_mandatory == "1") {
@@ -993,6 +1026,10 @@ class GoalController extends Controller
                 $date = Carbon::parse($item->created_at); // Parse the date string into a Carbon instance
                 $formattedDate = $date->format('Y-m-d');
                 $bankGoals_arr[$i]['created_at'] = $formattedDate;
+                
+                $date2 = Carbon::parse($item->last_mod_date); // Parse the date string into a Carbon instance
+                $formattedModDate = $date2->format('Y-m-d');
+                $bankGoals_arr[$i]['last_mod_date'] = $date2 ? $formattedModDate : null;
                 
                 $bankGoals_arr[$i]['user_id'] = $item->user_id;
                 if($item->is_mandatory == 1){

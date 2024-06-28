@@ -629,6 +629,7 @@
           { title: "Goal Type", data: "typename" },
           { title: "Tags", data: "tagnames" },
           { title: "Date Added", data: "created_at" },
+          { title: "Last Modified Date", data: "last_mod_date" },
           {
             title: "Created by",
             data: null,
