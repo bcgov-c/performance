@@ -78,6 +78,13 @@
 
 </head>
 
+<style>
+.cke_notification_warning {
+    display: none;
+}
+</style>
+
+
 <body class="@yield('classes_body')" @yield('body_data') data-panel-auto-height="{{session()->has('view-profile-as') ? -63 : 0}}">
     @if(session()->has('view-profile-as'))
     <div class="top-message-bar p-3 text-center bg-warning d-flex justify-content-center align-items-center sticky-top">
