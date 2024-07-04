@@ -65,7 +65,15 @@ class ConversationController extends Controller
                                     ->get();
         
         //get reportee and shared with listing
-        $reporteeNshared = $user->avaliableReportees()->select('id')->pluck('id')->union(SharedProfile::where('shared_with', $user->id)->select('shared_id AS id')->pluck('id'))->toArray();
+        $reporteeIds = $user->avaliableReportees()
+            ->pluck('id'); // Plucking the explicitly selected id from users
+
+        $sharedIds = SharedProfile::where('shared_with', $user->id)
+            ->select('shared_id AS id')
+            ->pluck('id');
+
+        $reporteeNshared = $reporteeIds->union($sharedIds)->toArray();
+        
 
         //get historic team members
         $history_teammembers = DB::table('conversation_participants')
