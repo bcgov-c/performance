@@ -185,6 +185,7 @@
             }
         });
         $("#add-goal-to-library-form").on('submit', function (e) {
+            $('#goal_title').removeClass('is-invalid');
             $('#savebtn').prop('disabled', true);
             e.preventDefault();
             for (var i in CKEDITOR.instances){
