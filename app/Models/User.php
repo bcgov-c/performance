@@ -180,6 +180,7 @@ class User extends Authenticatable
             })
             ->selectRaw("CONCAT(users_annex.employee_id, '-', users_annex.empl_record) AS combo_id")
             ->pluck('combo_id');
+        
         return User::join('employee_demo as ed', function ($on) {
                 return $on->on('ed.employee_id', 'users.employee_id')
                     ->on('ed.empl_record', 'users.empl_record')
@@ -187,7 +188,8 @@ class User extends Authenticatable
                     ->whereRaw('ed.pdp_excluded = 0');
             })
             ->whereIn(\DB::raw("CONCAT(users.employee_id, '-', users.empl_record)"), $reportee_emplids)
-            ->whereNull('ed.date_deleted');
+            ->whereNull('ed.date_deleted')
+            ->select('users.id'); // Explicitly select the id from users table
     }
 
     public function reporteesCount() {
