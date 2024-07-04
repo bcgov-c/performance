@@ -518,6 +518,7 @@
                 //const myTimeout = setTimeout(sessionWarning, SessionTime);
                 myTimeout = setInterval(function() { 
                     if (modal_open == true && autosave == true) {
+                        $('#goal_title').removeClass('is-invalid');
                         //$(".btn-submit").trigger("click");  
                         for (var i in CKEDITOR.instances){
                             CKEDITOR.instances[i].updateElement();
@@ -941,6 +942,7 @@
             });            
             
             $("#goal_title").change(function(){
+                $('#goal_title').removeClass('is-invalid');
                 var goal_title = $("#goal_title").val();
                 var tags = $('.tags').val(); 
                 if (goal_title != '' && tags != ''){
