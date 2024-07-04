@@ -529,6 +529,9 @@
     });
 
     $(document).on('click', '#saveGoalBtn', function(e){
+        //initialize warning fields
+        $('#goal_title').removeClass('is-invalid');
+
         isContentModified = false;
         $(this).prop('disabled', true);
         for (var i in CKEDITOR.instances){
