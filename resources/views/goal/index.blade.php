@@ -430,6 +430,7 @@
     });
 
     $(document).on('click', '#saveChangesBtn', function(e){
+        $('#goal_title').removeClass('is-invalid');
         isContentModified = false;
         for (var i in CKEDITOR.instances){
             CKEDITOR.instances[i].updateElement();
