@@ -189,7 +189,7 @@ class User extends Authenticatable
             })
             ->whereIn(\DB::raw("CONCAT(users.employee_id, '-', users.empl_record)"), $reportee_emplids)
             ->whereNull('ed.date_deleted')
-            ->select('users.id'); // Explicitly select the id from users table
+            ->select('users.id', 'users.name'); // Explicitly select the id from users table
     }
 
     public function reporteesCount() {
