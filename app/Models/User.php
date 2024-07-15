@@ -513,6 +513,7 @@ class User extends Authenticatable
                 ->whereRaw("em.employee_id = '{$this->employee_id}'")
                 ->whereRaw('authed.position_number = em.position_number')
                 ->whereRaw('authed.pdp_excluded = 0')
+                ->whereNull('authed.date_deleted')
                 ->get();
         }
         return $pJob;
