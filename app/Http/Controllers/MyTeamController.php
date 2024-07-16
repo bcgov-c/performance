@@ -345,7 +345,7 @@ class MyTeamController extends Controller
                           ->paginate();
         } else {
             $user_query = User::where('name', 'LIKE', "%{$search}%")
-                          ->where('users.id', '<>', $current_user) 
+                          ->where('users.id', '<>', $current_user)
                           ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
                           ->whereNull('employee_demo.date_deleted')  
                           ->whereRaw('employee_demo.pdp_excluded = 0')
@@ -366,21 +366,21 @@ class MyTeamController extends Controller
         $search = $request->search;
         
         if ($current_user == '') {
-            $user_query = User::select('users.id', 'name', 'employee_demo.employee_email') 
+            $user_query = User::select('users.id', 'name', 'employee_demo.employee_email')
                           ->where('name', 'LIKE', "%{$search}%")
                           ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
                           ->whereNull('employee_demo.date_deleted')  
                           ->whereRaw('employee_demo.pdp_excluded = 0')
-                          ->groupBy('users.id', 'name', 'employee_demo.employee_email') 
+                          ->groupBy('users.id', 'name', 'employee_demo.employee_email')
                           ->paginate();
         } else {
-            $user_query = User::select('users.id', 'name', 'employee_demo.employee_email') 
+            $user_query = User::select('users.id', 'name', 'employee_demo.employee_email')
                           ->where('name', 'LIKE', "%{$search}%")
                           ->where('users.id', '<>', $current_user)
                           ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
                           ->whereNull('employee_demo.date_deleted')  
                           ->whereRaw('employee_demo.pdp_excluded = 0')
-                          ->groupBy('users.id', 'name', 'employee_demo.employee_email') 
+                          ->groupBy('users.id', 'name', 'employee_demo.employee_email')
                           ->paginate();
         }
         
