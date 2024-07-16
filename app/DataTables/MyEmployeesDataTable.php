@@ -111,8 +111,7 @@ class MyEmployeesDataTable extends DataTable
             ->with('upcomingConversation')
             ->with('latestConversation')
             ->with('employee_demo')
-            ->with('employee_demo_jr')
-            ->withCount('reportees');
+            ->with('employee_demo_jr');
     }
 
     /**
