@@ -54,18 +54,20 @@
       @if ($type == 'current')
       <td>  
         @if(!isset($viewingProfileAs))
-          <select multiple class="form-control share-with-users" id="share_with_users" name="share_with_users[]">
-              @if($goal->shared_user_id != '' && $goal->shared_user_name != '')
-                  @php
-                      $share_user_id_arr = explode(',', $goal->shared_user_id);
-                      $share_user_name_arr = explode(',', $goal->shared_user_name);
-                  @endphp
-                  @if(!empty($share_user_id_arr))
-                      @foreach($share_user_id_arr as $index => $user_id)
-                          <option value="{{ $user_id }}" selected>{{ $share_user_name_arr[$index] }}</option>
-                      @endforeach
-                  @endif
-              @endif
+            <select multiple class="form-control share-with-users" id="share_with_users" name="share_with_users[]">
+            @if(!empty($goal->shared_user_id) && !empty($goal->shared_user_name))
+              @php
+                  $share_user_id_arr = array_map('trim', explode(',', $goal->shared_user_id));
+                  $share_user_name_arr = array_map('trim', explode(',', $goal->shared_user_name));
+                  $usernames = DB::table('users')
+                      ->whereIn('id', $share_user_id_arr)
+                      ->pluck('name');
+              @endphp
+
+              @foreach($share_user_id_arr as $index => $user_id)
+                        <option value="{{ $user_id }}" selected>{{ $usernames[$index] }}</option>
+                    @endforeach
+            @endif
           </select>
         @else
         @if($goal->shared_user_id != '' && $goal->shared_user_name != '')
