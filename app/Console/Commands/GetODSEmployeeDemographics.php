@@ -389,29 +389,6 @@ class GetODSEmployeeDemographics extends Command
         ->update(['pdp_excluded' => 1]);
         $this->info(Carbon::now()->format('c').' - Dept Exclusions updated.');
 
-        if($alldataoverride) {
-            if(ODSEmployeeDemo::first()){
-                $this->info(Carbon::now()->format('c').' - Checking for missing Employee Demo records...');
-                $lostItems = EmployeeDemo::withoutGlobalScopes()
-                ->select('id', 'employee_demo.employee_id', 'employee_demo.empl_record', 'employee_demo.date_deleted')
-                ->whereNull('employee_demo.date_deleted')
-                ->whereNotExists(function($subq){
-                    return $subq->select(DB::raw(1))
-                    ->from('ods_employee_demo')
-                    ->whereRaw('ods_employee_demo.employee_id = employee_demo.employee_id and ods_employee_demo.empl_record = employee_demo.empl_record');
-                })
-                ->get();
-                $lostItems->each(function($item, $key){
-                    $this->info(Carbon::now()->format('c')." ... missing {$item->employee_id} / {$item->empl_record} - updating date_deleted to current date/time...");
-                    $item->date_deleted = now();
-                    $item->save();
-                });
-                $this->info(Carbon::now()->format('c').' - Completed check for missing Employee Demo records...');
-            } else {
-                $this->info(Carbon::now()->format('c').' - Skipping check for missing Employee Demo records...');
-            }
-        }
-
         if(!$nodateupdateoverride) {
             DB::table('stored_dates')->updateOrInsert(
                 [

@@ -7,21 +7,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 // use Illuminate\Database\Eloquent\Builder;
 use App\Models\User;
-use OwenIt\Auditing\Contracts\Auditable;
-use OwenIt\Auditing\Auditable as AuditableTrait;
 
-class EmployeeDemo extends Model implements Auditable
+class EmployeeDemo extends Model
 {
     // Use \Awobaz\Compoships\Compoships;
 
     public $table = 'employee_demo';
 
     use HasFactory;
-    use AuditableTrait;
 
     //protected $primaryKey = ['guid'];
-    // protected $primaryKey = ['employee_id','empl_record'];
-    protected $primaryKey = 'id';
+    protected $primaryKey = ['employee_id','empl_record'];
 
     public $incrementing = false;
 
