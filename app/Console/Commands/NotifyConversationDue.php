@@ -49,21 +49,21 @@ class NotifyConversationDue extends Command
     public function handle()
     {
 
-        $switch = env('EMAIL_NOTIFICATION_ENABLED');
-        if (!($switch)) {
-            $this->info( now() );
-            $this->info( "This process was skipped. The EMAIL_NOTIFICATION_ENABLED (in .env) is not enabled.");
-            return 0;
-        }
+        $switch = env('EMAIL_NOTIFICATION_ENABLED'); 
+        if (!($switch)) { 
+            $this->info( now() ); 
+            $this->info( "This process was skipped. The EMAIL_NOTIFICATION_ENABLED (in .env) is not enabled."); 
+            return 0; 
+        } 
 
-        $start_time = Carbon::now();
+        $start_time = Carbon::now(); 
 
-        $this->task = JobSchedAudit::Create([
-            'job_name' => $this->signature,
-            'start_time' => date('Y-m-d H:i:s', strtotime($start_time)),
-            'cutoff_time' => date('Y-m-d H:i:s', strtotime($start_time)),
-            'status' => 'Initiated'
-        ]);
+        $this->task = JobSchedAudit::Create([ 
+            'job_name' => $this->signature, 
+            'start_time' => date('Y-m-d H:i:s', strtotime($start_time)), 
+            'cutoff_time' => date('Y-m-d H:i:s', strtotime($start_time)), 
+            'status' => 'Initiated' 
+        ]); 
 
         $this->logInfo( now() );
         $this->logInfo("(1) Dashboard Notification (In-App) -- Conversation Due (start)");
@@ -801,24 +801,24 @@ class NotifyConversationDue extends Command
                         ->where('shared_item', 'like',  '%"2"%' ) 
                         ->orderBy('users.id')
                         ->pluck('shared_with');
-
-        // Superviser
-        $supervisorListCount = $current_user->supervisorListCount();
-        $preferredSupervisor = $current_user->preferredSupervisor();
-
-        if ($supervisorListCount <= 1) {
-            if ($current_user->reportingManager) {
-                $manager_ids->push( $current_user->reportingManager->id );
-            }
-        } else {
-            if (!$preferredSupervisor) {
-                if ($current_user->reportingManager) {
-                    $manager_ids->push( $current_user->reportingManager->id );
-                }
-            } else {
-                $manager_ids->push( $preferredSupervisor->id );
-            }
-        }
+ 
+        // Superviser 
+        $supervisorListCount = $current_user->supervisorListCount(); 
+        $preferredSupervisor = $current_user->preferredSupervisor(); 
+ 
+        if ($supervisorListCount <= 1) { 
+            if ($current_user->reportingManager) { 
+                $manager_ids->push( $current_user->reportingManager->id ); 
+            } 
+        } else { 
+            if (!$preferredSupervisor) { 
+                if ($current_user->reportingManager) { 
+                    $manager_ids->push( $current_user->reportingManager->id ); 
+                } 
+            } else { 
+                $manager_ids->push( $preferredSupervisor->id ); 
+            } 
+        } 
 
         return $manager_ids;
 
