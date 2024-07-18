@@ -62,17 +62,14 @@
       <td>  
         @if(!isset($viewingProfileAs))
             <select multiple class="form-control share-with-users" id="share_with_users" name="share_with_users[]">
-            @if(!empty($goal->shared_user_id) && !empty($goal->shared_user_name))
+            @if(!empty($goal->shared_user_id) && !empty($goal->employee_name))
               @php
-                  $share_user_id_arr = array_map('trim', explode(',', $goal->shared_user_id));
-                  $share_user_name_arr = array_map('trim', explode(',', $goal->shared_user_name));
-                  $usernames = DB::table('users')
-                      ->whereIn('id', $share_user_id_arr)
-                      ->pluck('name');
+                  $share_user_id_arr = array_map('trim', explode('|', $goal->shared_user_id));
+                  $share_user_name_arr = array_map('trim', explode('|', $goal->employee_name));
               @endphp
 
               @foreach($share_user_id_arr as $index => $user_id)
-                        <option value="{{ $user_id }}" selected>{{ $usernames[$index] }}</option>
+                        <option value="{{ $user_id }}" selected>{{ $share_user_name_arr[$index] }}</option>
                     @endforeach
             @endif
           </select>
