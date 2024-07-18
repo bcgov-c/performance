@@ -116,7 +116,8 @@ class GoalController extends Controller
         ->leftjoin('tags', 'tags.id', '=', 'goal_tags.tag_id')    
         ->leftjoin('goal_types', 'goal_types.id', '=', 'goals.goal_type_id')
         ->leftJoin('goals_shared_with', 'goals_shared_with.goal_id', 'goals.id')
-        ->leftJoin('users as shared_users', 'shared_users.id', 'goals_shared_with.user_id');
+        ->leftJoin('users as shared_users', 'shared_users.id', 'goals_shared_with.user_id')
+        ->leftJoin('employee_demo as employee', 'employee.employee_id', 'shared_users.employee_id');
         
         session()->forget('from_share');
         if ($request->is("goal/current")) {
@@ -124,8 +125,11 @@ class GoalController extends Controller
             $query = $query->where('goals.user_id', $authId)
                     ->where('status', '=', 'active')
                     ->select('goals.*', DB::raw('group_concat(distinct tags.name separator ", ") as tagnames')
-                            ,DB::raw('group_concat(distinct goals_shared_with.user_id separator ",") as shared_user_id')
-                            ,DB::raw('group_concat(distinct shared_users.name separator ",") as shared_user_name')
+                            ,DB::raw('group_concat(distinct goals_shared_with.user_id separator "|") as shared_user_id')
+                            ,DB::raw('group_concat(distinct shared_users.name separator "|") as shared_user_name')
+                            ,DB::raw('group_concat(distinct concat(employee.employee_last_name, ", ", 
+                            employee.employee_first_name, " ", 
+                            employee.employee_middle_name) separator "|") as employee_name')
                             ,'goal_types.name as typename');            
         } else if($request->is("goal/share")){
             $type = 'supervisor';
