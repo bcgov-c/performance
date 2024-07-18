@@ -11,6 +11,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use App\Models\ExcludedDepartment;
 
 class GetODSEmployeeDemographics extends Command
 {
@@ -143,7 +144,7 @@ class GetODSEmployeeDemographics extends Command
           $total += count($data);
           $this->info(Carbon::now()->format('c').' - $top = ' . $top . ' : $skip = ' . $skip . ' : $data = ' . count($data) . ' : Count = ' . $total);
 
-        foreach($data as $item){
+          foreach($data as $item){
             EmployeeDemo::withoutGlobalScopes()
             ->updateOrCreate(
                 [
@@ -341,52 +342,27 @@ class GetODSEmployeeDemographics extends Command
 
         // Update pdp_excluded in employee_demo table
         $this->info(Carbon::now()->format('c').' - Updating Dept Exclusions...');
+        $excludedDepts = [];
+        $excludedDepts = ExcludedDepartment::whereNull('excluded_departments.deleted_at')->pluck('deptid')->toArray();
         EmployeeDemo::withoutGlobalScopes()
         ->whereRaw('employee_demo.pdp_excluded = 1')
-        ->where(function ($q)  {
-            $q->whereNotExists(function ($query) {
-                return $query->select(DB::raw(1))
-                        ->from('excluded_departments')
-                        ->where('excluded_departments.deptid', 'employee_demo.deptid')
-                        ->whereNull('excluded_departments.deleted_at');
-            });    
-        })
+        ->whereNotIn('employee_demo.deptid', $excludedDepts)
         ->update(['pdp_excluded' => 0]);
         EmployeeDemo::withoutGlobalScopes()
         ->whereNotNull("employee_demo.deptid")
         ->whereRaw('employee_demo.pdp_excluded = 0')
-        ->where(function ($q)  {
-            $q->whereExists(function ($query) {
-                return $query->select(DB::raw(1))
-                        ->from('excluded_departments')
-                        ->where('excluded_departments.deptid', 'employee_demo.deptid')
-                        ->whereNull('excluded_departments.deleted_at');
-            });    
-        })
+        ->whereIn('employee_demo.deptid', $excludedDepts)
         ->update(['pdp_excluded' => 1]);
+
         // Update pdp_excluded in ods_employee_demo table
         ODSEmployeeDemo::withoutGlobalScopes()
         ->whereRaw('ods_employee_demo.pdp_excluded = 1')
-        ->where(function ($q)  {
-            $q->whereNotExists(function ($query) {
-                return $query->select(DB::raw(1))
-                        ->from('excluded_departments')
-                        ->whereColumn('ods_employee_demo.deptid', 'excluded_departments.deptid')
-                        ->whereNull('excluded_departments.deleted_at');
-            });    
-        })
+        ->whereNotIn('ods_employee_demo.deptid', $excludedDepts)
         ->update(['pdp_excluded' => 0]);
         ODSEmployeeDemo::withoutGlobalScopes()
         ->whereNotNull("ods_employee_demo.deptid")
         ->whereRaw('ods_employee_demo.pdp_excluded = 0')
-        ->where(function ($q)  {
-            $q->whereExists(function ($query) {
-                return $query->select(DB::raw(1))
-                        ->from('excluded_departments')
-                        ->whereColumn('ods_employee_demo.deptid', 'excluded_departments.deptid')
-                        ->whereNull('excluded_departments.deleted_at');
-            });    
-        })
+        ->whereIn('ods_employee_demo.deptid', $excludedDepts)
         ->update(['pdp_excluded' => 1]);
         $this->info(Carbon::now()->format('c').' - Dept Exclusions updated.');
 
@@ -394,7 +370,7 @@ class GetODSEmployeeDemographics extends Command
             if(ODSEmployeeDemo::first()){
                 $this->info(Carbon::now()->format('c').' - Checking for missing Employee Demo records...');
                 $lostItems = EmployeeDemo::withoutGlobalScopes()
-                ->select('id', 'employee_demo.employee_id', 'employee_demo.empl_record', 'employee_demo.date_deleted')
+                ->select('employee_demo.id', 'employee_demo.employee_id', 'employee_demo.empl_record', 'employee_demo.date_deleted')
                 ->whereNull('employee_demo.date_deleted')
                 ->whereNotExists(function($subq){
                     return $subq->select(DB::raw(1))
