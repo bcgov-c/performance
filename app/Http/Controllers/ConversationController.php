@@ -1038,7 +1038,7 @@ class ConversationController extends Controller
         $emp = '';
         
         if(session()->has('view-profile-as')) {
-            $original_user = $request->session()->get('original-auth-id');
+            $original_user =  $request->session()->get('view-profile-as');
             foreach($conversation_participants as $participant) {
                 if($participant->role == 'mgr' && $participant->participant_id == $original_user) {
                     $mgr = $participant->participant_id;
