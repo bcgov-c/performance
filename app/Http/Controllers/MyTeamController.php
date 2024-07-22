@@ -366,22 +366,22 @@ class MyTeamController extends Controller
         $search = $request->search;
         
         if ($current_user == '') {
-            $user_query = User::select('users.id', 'name', 'employee_demo.employee_email') 
-                          ->where('name', 'LIKE', "%{$search}%")
-                          ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
-                          ->whereNull('employee_demo.date_deleted')  
-                          ->whereRaw('employee_demo.pdp_excluded = 0')
-                          ->groupBy('users.id', 'name', 'employee_demo.employee_email') 
-                          ->paginate();
+            $user_query = User::select('users.id', 'name', 'employee_demo.employee_email')
+                ->join(\DB::raw('employee_demo USE INDEX (EMPLOYEE_DEMO_EMPLOYEE_ID_EMPL_RECORD_UNIQUE)'), 'users.employee_id', 'employee_demo.employee_id')
+                ->when("{$search}", function($q) use($search) { return $q->where('name', 'LIKE', "%{$search}%"); })
+                ->whereNull('employee_demo.date_deleted')  
+                ->whereRaw('employee_demo.pdp_excluded = 0')
+                ->groupBy('users.id', 'name', 'employee_demo.employee_email') 
+                ->paginate();
         } else {
             $user_query = User::select('users.id', 'name', 'employee_demo.employee_email') 
-                          ->where('name', 'LIKE', "%{$search}%")
-                          ->where('users.id', '<>', $current_user) 
-                          ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
-                          ->whereNull('employee_demo.date_deleted')  
-                          ->whereRaw('employee_demo.pdp_excluded = 0')
-                          ->groupBy('users.id', 'name', 'employee_demo.employee_email') 
-                          ->paginate();
+                ->join(\DB::raw('employee_demo USE INDEX (EMPLOYEE_DEMO_EMPLOYEE_ID_EMPL_RECORD_UNIQUE)'), 'users.employee_id', 'employee_demo.employee_id')
+                ->when("{$search}", function($q) use($search) { return $q->where('name', 'LIKE', "%{$search}%"); })
+                ->where('users.id', '<>', $current_user) 
+                ->whereNull('employee_demo.date_deleted')  
+                ->whereRaw('employee_demo.pdp_excluded = 0')
+                ->groupBy('users.id', 'name', 'employee_demo.employee_email') 
+                ->paginate();
         }
         
         return $this->respondeWith($user_query);
