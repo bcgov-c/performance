@@ -27,6 +27,7 @@ use App\Http\Requests\Goals\AddGoalToLibraryRequest;
 use App\Http\Requests\MyTeams\UpdateProfileSharedWithRequest;
 use App\Models\UsersAnnex;
 use Carbon\Carbon;
+use App\Models\EmployeeDemo;
 
 class MyTeamController extends Controller
 {
@@ -366,22 +367,18 @@ class MyTeamController extends Controller
         $search = $request->search;
         
         if ($current_user == '') {
-            $user_query = User::select('users.id', 'name', 'employee_demo.employee_email') 
-                          ->where('name', 'LIKE', "%{$search}%")
-                          ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
-                          ->whereNull('employee_demo.date_deleted')  
-                          ->whereRaw('employee_demo.pdp_excluded = 0')
-                          ->groupBy('users.id', 'name', 'employee_demo.employee_email') 
-                          ->paginate();
+            $user_query = EmployeeDemo::join(\DB::raw('users USE INDEX (USERS_EMPLOYEE_ID_EMPL_RECORD_INDEX)'), 'users.employee_id', 'employee_demo.employee_id')
+            ->when("{$search}", function($q) use($search) { return $q->where('users.name', 'LIKE', "%{$search}%"); })
+            ->select('users.id', 'users.name', 'users.email')
+            ->distinct()
+            ->paginate();
         } else {
-            $user_query = User::select('users.id', 'name', 'employee_demo.employee_email') 
-                          ->where('name', 'LIKE', "%{$search}%")
-                          ->where('users.id', '<>', $current_user) 
-                          ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
-                          ->whereNull('employee_demo.date_deleted')  
-                          ->whereRaw('employee_demo.pdp_excluded = 0')
-                          ->groupBy('users.id', 'name', 'employee_demo.employee_email') 
-                          ->paginate();
+            $user_query = EmployeeDemo::join(\DB::raw('users USE INDEX (USERS_EMPLOYEE_ID_EMPL_RECORD_INDEX)'), 'users.employee_id', 'employee_demo.employee_id')
+            ->when("{$search}", function($q) use($search) { return $q->where('users.name', 'LIKE', "%{$search}%"); })
+            ->where('users.id', '<>', $current_user) 
+            ->select('users.id', 'users.name', 'users.email')
+            ->distinct()
+            ->paginate();
         }
         
         return $this->respondeWith($user_query);
