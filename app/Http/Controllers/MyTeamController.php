@@ -454,9 +454,7 @@ class MyTeamController extends Controller
             }
         }
 
-        $reportingHierarchy = $this->reportingHierarchy(Auth::id());    
-        
-        if(in_array($id, $reportingHierarchy)) {
+        if ($this->checkUserInHierarchy(Auth::id(), $id)){
             $hasAccess = true;
         }
 
@@ -491,9 +489,15 @@ class MyTeamController extends Controller
     public function viewDirectReport($id, Request $request) {
         $can_access = false;
 
-        $reportingHierarchy = $this->reportingHierarchy(Auth::id());    
-        
-        if(in_array($id, $reportingHierarchy)) {
+        /*
+        $reportingHierarchy = $this->reportingHierarchy(Auth::id());
+
+        if ($this->userInHierarchy($reportingHierarchy, $id)) {
+            $can_access = true;
+        }
+        */
+
+        if ($this->checkUserInHierarchy(Auth::id(), $id)){
             $can_access = true;
         }
         
@@ -766,4 +770,63 @@ class MyTeamController extends Controller
         return $tree;
     }
 
+    
+    private function userInHierarchy($tree, $user_id) {
+        // Check if the current node is the user we're looking for
+        if ($tree['user_id'] == $user_id) {
+            return true;
+        }
+    
+        // Recursively check each subordinate
+        foreach ($tree['subordinates'] as $subordinate) {
+            if ($this->userInHierarchy($subordinate, $user_id)) {
+                return true;
+            }
+        }
+    
+        // User not found in this branch
+        return false;
+    }
+
+    private function checkUserInHierarchy($supervisor_id, $user_id) {
+        // Initialize the queue with the supervisor
+        $queue = [$supervisor_id];
+        
+        // Use an associative array to keep track of visited nodes to prevent infinite loops
+        $visited = [];
+    
+        while (!empty($queue)) {
+            // Pop the first element from the queue
+            $current_id = array_shift($queue);
+    
+            // Check if the current user is the target user
+            if ($current_id == $user_id) {
+                return true;
+            }
+    
+            // Mark the current user as visited
+            if (isset($visited[$current_id])) {
+                continue;
+            }
+            $visited[$current_id] = true;
+    
+            // Get all subordinates of the current user
+            $subordinates = DB::table('users_annex')
+                ->select('user_id')
+                ->where('reporting_to_userid', $current_id)
+                ->distinct()
+                ->pluck('user_id')
+                ->toArray();
+    
+            // Add all subordinates to the queue
+            foreach ($subordinates as $subordinate) {
+                if (!isset($visited[$subordinate])) {
+                    $queue[] = $subordinate;
+                }
+            }
+        }
+    
+        // If the loop completes without finding the user, return false
+        return false;
+    }
 }
