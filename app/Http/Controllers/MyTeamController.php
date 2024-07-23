@@ -455,10 +455,9 @@ class MyTeamController extends Controller
             }
         }
 
-        $reporting_tos = array();
-        $reportingHierarchy = $this->reportingHierarchy($id, $reporting_tos);    
+        $reportingHierarchy = $this->reportingHierarchy(Auth::id());    
         
-        if(in_array(Auth::id(), $reportingHierarchy)) {
+        if(in_array($id, $reportingHierarchy)) {
             $hasAccess = true;
         }
 
@@ -491,13 +490,11 @@ class MyTeamController extends Controller
         
     }
     public function viewDirectReport($id, Request $request) {
-        $userReportingTos = DB::table('user_reporting_tos')->where('user_id', $id)->pluck('reporting_to_id')->toArray();
         $can_access = false;
 
-        $reporting_tos = array();
-        $reportingHierarchy = $this->reportingHierarchy($id);    
+        $reportingHierarchy = $this->reportingHierarchy(Auth::id());    
         
-        if(in_array(Auth::id(), $reportingHierarchy)) {
+        if(in_array($id, $reportingHierarchy)) {
             $can_access = true;
         }
         
