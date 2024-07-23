@@ -490,9 +490,16 @@ class MyTeamController extends Controller
     }
     public function viewDirectReport($id, Request $request) {
         $can_access = false;
+
+        /*
         $reportingHierarchy = $this->reportingHierarchy(Auth::id());
 
         if ($this->userInHierarchy($reportingHierarchy, $id)) {
+            $can_access = true;
+        }
+        */
+
+        if ($this->checkUserInHierarchy(Auth::id(), $id)){
             $can_access = true;
         }
         
@@ -780,6 +787,37 @@ class MyTeamController extends Controller
         }
     
         // User not found in this branch
+        return false;
+    }
+
+    private function checkUserInHierarchy($supervisor_id, $user_id) {
+        // Initialize the queue with the supervisor
+        $queue = [$supervisor_id];
+        
+        while (!empty($queue)) {
+            // Pop the first element from the queue
+            $current_id = array_shift($queue);
+            
+            // Check if the current user is the target user
+            if ($current_id == $user_id) {
+                return true;
+            }
+            
+            // Get all subordinates of the current user
+            $subordinates = DB::table('users_annex')
+                ->select('user_id')
+                ->where('reporting_to_userid', $current_id)
+                ->distinct()
+                ->pluck('user_id')
+                ->toArray();
+            
+            // Add all subordinates to the queue
+            foreach ($subordinates as $subordinate) {
+                $queue[] = $subordinate;
+            }
+        }
+        
+        // If the loop completes without finding the user, return false
         return false;
     }
 
