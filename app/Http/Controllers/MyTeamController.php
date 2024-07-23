@@ -492,7 +492,7 @@ class MyTeamController extends Controller
         $can_access = false;
 
         $reporting_tos = array();
-        $reportingHierarchy = $this->reportingHierarchy($id, $reporting_tos);    
+        $reportingHierarchy = $this->reportingHierarchy($id);    
         
         if(in_array(Auth::id(), $reportingHierarchy)) {
             $can_access = true;
@@ -748,21 +748,23 @@ class MyTeamController extends Controller
     }
 
 
-    private function reportingHierarchy($user_id, $reporting_tos){
-        if(!in_array($user_id, $reporting_tos)){
-            $reporting_to_userids = DB::table('users_annex')
-                        ->select('reporting_to_userid')
-                        ->where('user_id', $user_id)
-                        ->distinct()
-                        ->get() ;
+    private function reportingHierarchy($user_id) {
+        $tree = [
+            'user_id' => $user_id,
+            'subordinates' => []
+        ];
 
-            if(count($reporting_to_userids) > 0) {
-                $supervisor_userid = $reporting_to_userids[0]->reporting_to_userid;
-                array_push($reporting_tos, $supervisor_userid);
-                $reporting_tos = $this->reportingHierarchy($supervisor_userid, $reporting_tos);
-            } 
+        $subordinates = DB::table('users_annex')
+            ->select('user_id')
+            ->where('reporting_to_userid', $user_id)
+            ->distinct()
+            ->get();
+
+        foreach ($subordinates as $subordinate) {
+            $tree['subordinates'][] = $this->reportingHierarchy($subordinate->user_id);
         }
-        return $reporting_tos;
+
+        return $tree;
     }
 
 }
