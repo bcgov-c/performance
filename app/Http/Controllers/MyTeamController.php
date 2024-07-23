@@ -455,9 +455,9 @@ class MyTeamController extends Controller
             }
         }
 
-        $reportingHierarchy = $this->reportingHierarchy(Auth::id());    
-        
-        if(in_array($id, $reportingHierarchy)) {
+        $reportingHierarchy = $this->reportingHierarchy(Auth::id());
+
+        if ($this->userInHierarchy($reportingHierarchy, $id)) {
             $hasAccess = true;
         }
 
@@ -491,10 +491,9 @@ class MyTeamController extends Controller
     }
     public function viewDirectReport($id, Request $request) {
         $can_access = false;
+        $reportingHierarchy = $this->reportingHierarchy(Auth::id());
 
-        $reportingHierarchy = $this->reportingHierarchy(Auth::id());    
-        
-        if(in_array($id, $reportingHierarchy)) {
+        if ($this->userInHierarchy($reportingHierarchy, $id)) {
             $can_access = true;
         }
         
@@ -765,6 +764,24 @@ class MyTeamController extends Controller
         }
 
         return $tree;
+    }
+
+    
+    private function userInHierarchy($tree, $user_id) {
+        // Check if the current node is the user we're looking for
+        if ($tree['user_id'] == $user_id) {
+            return true;
+        }
+    
+        // Recursively check each subordinate
+        foreach ($tree['subordinates'] as $subordinate) {
+            if ($this->userInHierarchy($subordinate, $user_id)) {
+                return true;
+            }
+        }
+    
+        // User not found in this branch
+        return false;
     }
 
 }
