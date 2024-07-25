@@ -1506,6 +1506,7 @@ class ConversationController extends Controller
             ->whereRaw("participant_id = {$authId}")
             ->select('participant_id')
             ->first();
+        $authUser = User::find($authId);
         if ($userPart) {
             $conversation = Conversation::find($id);
             $otherPart = ConversationParticipant::whereRaw("conversation_id = {$id}")
@@ -1520,7 +1521,7 @@ class ConversationController extends Controller
                     $notification = new \App\MicrosoftGraph\SendDashboardNotification();
                     $notification->user_id = $value->participant_id;
                     $notification->notification_type = 'CN';
-                    $notification->comment = "{$conversation->user->name} has made updates to your conversation";
+                    $notification->comment = "{$authUser->name} has made updates to your conversation";
                     $notification->related_id = $conversation->id;
                     $notification->notify_user_id = $value->participant_id;
                     $notification->send(); 
@@ -1533,7 +1534,7 @@ class ConversationController extends Controller
                     $sendMail->useQueue = true;
                     $sendMail->template = 'CONVERSATION_CHANGE_NOTIFY';
                     array_push($sendMail->bindvariables, $user->name);
-                    array_push($sendMail->bindvariables, $conversation->user->name );
+                    array_push($sendMail->bindvariables, $authUser->name);
                     array_push($sendMail->bindvariables, $conversation->topic->name );
                     $response = $sendMail->sendMailWithGenericTemplate();
                 }
