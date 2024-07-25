@@ -754,78 +754,20 @@ class MyTeamController extends Controller
     }
 
 
-    private function reportingHierarchy($user_id) {
-        $tree = [
-            'user_id' => $user_id,
-            'subordinates' => []
-        ];
+    private function reportingHierarchy($user_id, $reporting_tos){
+        $reporting_to_userids = DB::table('users_annex')
+                    ->select('reporting_to_userid')
+                    ->where('user_id', $user_id)
+                    ->distinct()
+                    ->get() ;
 
-        $subordinates = DB::table('users_annex')
-            ->select('user_id')
-            ->where('reporting_to_userid', $user_id)
-            ->distinct()
-            ->get();
-
-        foreach ($subordinates as $subordinate) {
-            $tree['subordinates'][] = $this->reportingHierarchy($subordinate->user_id);
-        }
-
-        return $tree;
-    }
-
-    
-    private function userInHierarchy($tree, $user_id) {
-        // Check if the current node is the user we're looking for
-        if ($tree['user_id'] == $user_id) {
-            return true;
-        }
-    
-        // Recursively check each subordinate
-        foreach ($tree['subordinates'] as $subordinate) {
-            if ($this->userInHierarchy($subordinate, $user_id)) {
-                return true;
+        if(count($reporting_to_userids) > 0) {
+            $supervisor_userid = $reporting_to_userids[0]->reporting_to_userid;
+            if($supervisor_userid != $user_id) { // for fixing infinite looping of the supervisor relationship
+                array_push($reporting_tos, $supervisor_userid);
+                $reporting_tos = $this->reportingHierarchy($supervisor_userid, $reporting_tos);
             }
-        }
-    
-        // User not found in this branch
-        return false;
-    }
-
-    private function checkUserInHierarchy($supervisor_id, $user_id) {
-        // Initialize the queue with the supervisor
-        $queue = [$supervisor_id];
-        
-        // Use an associative array to keep track of visited nodes to prevent infinite loops
-        $visited = [];
-    
-        while (!empty($queue)) {
-            // Pop the first element from the queue
-            $current_id = array_shift($queue);
-    
-            // Check if the current user is the target user
-            if ($current_id == $user_id) {
-                return true;
-            }
-    
-            // Mark the current user as visited
-            if (isset($visited[$current_id])) {
-                continue;
-            // Get all subordinates of the current user
-            $subordinates = DB::table('users_annex')
-                ->select('user_id')
-                ->where('reporting_to_userid', $current_id)
-                ->distinct()
-                ->pluck('user_id')
-    
-            // Add all subordinates to the queue
-            foreach ($subordinates as $subordinate) {
-                if (!isset($visited[$subordinate])) {
-                    $queue[] = $subordinate;
-                }
-            }
-        }
-    
-        // If the loop completes without finding the user, return false
-        return false;
+        } 
+        return $reporting_tos;
     }
 }
