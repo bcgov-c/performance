@@ -794,37 +794,31 @@ class MyTeamController extends Controller
         // Initialize the queue with the supervisor
         $queue = [$supervisor_id];
         
-        // Use an associative array to keep track of visited nodes to prevent infinite loops
-        $visited = [];
-    
         while (!empty($queue)) {
             // Pop the first element from the queue
             $current_id = array_shift($queue);
-    
+            
             // Check if the current user is the target user
             if ($current_id == $user_id) {
                 return true;
             }
-    
-            // Mark the current user as visited
-            if (isset($visited[$current_id])) {
-                continue;
+            
             // Get all subordinates of the current user
             $subordinates = DB::table('users_annex')
                 ->select('user_id')
                 ->where('reporting_to_userid', $current_id)
                 ->distinct()
                 ->pluck('user_id')
-    
+                ->toArray();
+            
             // Add all subordinates to the queue
             foreach ($subordinates as $subordinate) {
-                if (!isset($visited[$subordinate])) {
-                    $queue[] = $subordinate;
-                }
+                $queue[] = $subordinate;
             }
         }
-    
+        
         // If the loop completes without finding the user, return false
         return false;
     }
+
 }
