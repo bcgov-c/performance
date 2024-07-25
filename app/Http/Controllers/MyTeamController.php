@@ -454,12 +454,12 @@ class MyTeamController extends Controller
             }
         }
 
-        $reporting_tos = array();
-        $reportingHierarchy = $this->reportingHierarchy($id, $reporting_tos);    
-        
-        if(in_array(Auth::id(), $reportingHierarchy)) {
+        //check if in the hierarchy tree
+        $reportings = array();
+        $reportingHierarchy_tree = $this->reportingHierarchy($id, $reportings);            
+        if(in_array(Auth::id(), $reportingHierarchy_tree)) {
             $hasAccess = true;
-        }
+        }      
 
         if($hasAccess || SharedProfile::where('shared_with', $actualAuthId)->where('shared_id', $id)->count() >= 1) {
             session()->put('view-profile-as', $id);
@@ -493,12 +493,12 @@ class MyTeamController extends Controller
         $userReportingTos = DB::table('user_reporting_tos')->where('user_id', $id)->pluck('reporting_to_id')->toArray();
         $can_access = false;
 
-        $reporting_tos = array();
-        $reportingHierarchy = $this->reportingHierarchy($id, $reporting_tos);    
-        
-        if(in_array(Auth::id(), $reportingHierarchy)) {
+        //check if in the hierarchy tree
+        $reportings = array();
+        $reportingHierarchy_tree = $this->reportingHierarchy($id, $reportings);            
+        if(in_array(Auth::id(), $reportingHierarchy_tree)) {
             $can_access = true;
-        }
+        }        
         
         //check supervisor override
         $supervisor = UsersAnnex::select('reporting_to_employee_id')
