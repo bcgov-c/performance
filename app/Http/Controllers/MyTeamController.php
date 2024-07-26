@@ -368,24 +368,14 @@ class MyTeamController extends Controller
         
         if ($current_user == '') {
             $user_query = EmployeeDemo::join(\DB::raw('users USE INDEX (USERS_EMPLOYEE_ID_EMPL_RECORD_INDEX)'), 'users.employee_id', 'employee_demo.employee_id')
-            ->when("{$search}", function($q) use($search) { 
-                return $q->where(function($qor) use($search){
-                    return $qor->where('employee_demo.employee_name', 'LIKE', "%{$search}%")
-                    ->orWhere('users.name', 'LIKE', "%{$search}%"); 
-                });
-            })
+            ->when("{$search}", function($q) use($search) { return $q->where('employee_demo.employee_name', 'LIKE', "%{$search}%"); })
             ->whereNull('employee_demo.date_deleted')
             ->select('users.id', 'employee_demo.employee_name AS name', 'employee_demo.employee_email')
             ->distinct()
             ->paginate();
         } else {
             $user_query = EmployeeDemo::join(\DB::raw('users USE INDEX (USERS_EMPLOYEE_ID_EMPL_RECORD_INDEX)'), 'users.employee_id', 'employee_demo.employee_id')
-            ->when("{$search}", function($q) use($search) { 
-                return $q->where(function($qor) use($search){
-                    return $qor->where('employee_demo.employee_name', 'LIKE', "%{$search}%")
-                    ->orWhere('users.name', 'LIKE', "%{$search}%"); 
-                });
-            })
+            ->when("{$search}", function($q) use($search) { return $q->where('employee_demo.employee_name', 'LIKE', "%{$search}%"); })
             ->whereNull('employee_demo.date_deleted')
             ->where('users.id', '<>', $current_user) 
             ->select('users.id', 'employee_demo.employee_name AS name', 'employee_demo.employee_email')
