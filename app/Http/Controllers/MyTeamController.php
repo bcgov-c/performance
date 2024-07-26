@@ -490,7 +490,6 @@ class MyTeamController extends Controller
         
     }
     public function viewDirectReport($id, Request $request) {
-        $userReportingTos = DB::table('user_reporting_tos')->where('user_id', $id)->pluck('reporting_to_id')->toArray();
         $can_access = false;
 
         //check if in the hierarchy tree
