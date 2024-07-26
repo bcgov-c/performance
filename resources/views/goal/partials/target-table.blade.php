@@ -58,12 +58,18 @@
             @if(!empty($goal->shared_user_id) && !empty($goal->employee_name))
               @php
                   $share_user_id_arr = array_map('trim', explode('|', $goal->shared_user_id));
-                  $share_user_name_arr = array_map('trim', explode('|', $goal->employee_name));
+                  $usernames = DB::table('employee_demo')
+                                  ->select('users.id', DB::raw("concat(employee_demo.employee_last_name, ', ', 
+                                                          employee_demo.employee_first_name, ' ', 
+                                                          ifnull(employee_demo.employee_middle_name, '')) as employee_name"))
+                                  ->join('users', 'employee_demo.employee_id', '=', 'users.employee_id')
+                                  ->whereIn('users.id', $share_user_id_arr)
+                                  ->pluck('employee_name', 'users.id'); // Pluck as associative array with user_id as key
               @endphp
 
-              @foreach($share_user_id_arr as $index => $user_id)
-                        <option value="{{ $user_id }}" selected>{{ $share_user_name_arr[$index] }}</option>
-                    @endforeach
+              @foreach($share_user_id_arr as $user_id)
+                  <option value="{{ $user_id }}" selected>{{ $usernames[$user_id] ?? '' }}</option>
+              @endforeach
             @endif
           </select>
         @else
