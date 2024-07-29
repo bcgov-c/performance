@@ -1029,6 +1029,7 @@ class ConversationController extends Controller
         
         $conversation_participants = DB::table('conversation_participants')                        
                             ->where('conversation_id', $conversation_id)
+                            ->orderBy('role','desc')
                             ->get();    
         $conversation->participants = $conversation_participants;
         $is_viewer = false;
@@ -1036,15 +1037,13 @@ class ConversationController extends Controller
         $disable_signoff = false;
         $mgr = '';
         $emp = '';
-        
+
         if(session()->has('view-profile-as')) {
             $original_user =  $request->session()->get('view-profile-as');
             foreach($conversation_participants as $participant) {
-                if($participant->role == 'mgr') {
+                if($participant->role == 'mgr' && $participant->participant_id == $original_user) {
                     $mgr = $participant->participant_id;
-                    if($participant->participant_id == $original_user){
-                        $view_as_supervisor = true;
-                    }
+                    $view_as_supervisor = true;
                 } else {
                     $emp = $participant->participant_id;
                 }
@@ -1056,11 +1055,9 @@ class ConversationController extends Controller
         }else {
             foreach($conversation_participants as $participant) {
                 $current_user = auth()->user()->id;
-                if($participant->role == 'mgr') {
+                if($participant->role == 'mgr' && $participant->participant_id == $current_user) {
                     $mgr = $participant->participant_id;
-                    if($participant->participant_id == $current_user){
-                        $view_as_supervisor = true;
-                    }
+                    $view_as_supervisor = true;
                 } else {
                     $emp = $participant->participant_id;
                 }
