@@ -1039,13 +1039,14 @@ class ConversationController extends Controller
         
         if(session()->has('view-profile-as')) {
             $original_user =  $request->session()->get('view-profile-as');
-            $emp = $original_user;
-            foreach($conversation_participants as $participant) {     
-                if($participant->role == 'mgr') {         
-                    $mgr = $participant->participant_id;           
+            foreach($conversation_participants as $participant) {
+                if($participant->role == 'mgr') {
+                    $mgr = $participant->participant_id;
                     if($participant->participant_id == $original_user){
-                        $view_as_supervisor = true;                        
+                        $view_as_supervisor = true;
                     }
+                } else {
+                    $emp = $participant->participant_id;
                 }
             } 
             if ($mgr == '' && $emp == ''){
@@ -1053,20 +1054,17 @@ class ConversationController extends Controller
                 $disable_signoff = true;
             }
         }else {
-            $current_user = auth()->user()->id;
-            $emp = $current_user;
-            foreach($conversation_participants as $participant) {                
+            foreach($conversation_participants as $participant) {
+                $current_user = auth()->user()->id;
                 if($participant->role == 'mgr') {
                     $mgr = $participant->participant_id;
                     if($participant->participant_id == $current_user){
-                        $view_as_supervisor = true;                        
+                        $view_as_supervisor = true;
                     }
+                } else {
+                    $emp = $participant->participant_id;
                 }
-            }   
-            if ($mgr == '' && $emp == ''){
-                $is_viewer = true;
-                $disable_signoff = true;
-            }     
+            }        
         }
         $conversation->is_viewer = $is_viewer;
         $conversation->view_as_supervisor = $view_as_supervisor;
