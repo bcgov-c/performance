@@ -1040,10 +1040,12 @@ class ConversationController extends Controller
         if(session()->has('view-profile-as')) {
             $original_user =  $request->session()->get('view-profile-as');
             foreach($conversation_participants as $participant) {
-                if($participant->role == 'mgr' && $participant->participant_id == $original_user) {
+                if($participant->role == 'mgr') {
                     $mgr = $participant->participant_id;
-                    $view_as_supervisor = true;
-                }elseif($participant->role == 'emp'  && $participant->participant_id == $original_user) {
+                    if($participant->participant_id == $original_user){
+                        $view_as_supervisor = true;
+                    }
+                } else {
                     $emp = $participant->participant_id;
                 }
             } 
@@ -1054,11 +1056,12 @@ class ConversationController extends Controller
         }else {
             foreach($conversation_participants as $participant) {
                 $current_user = auth()->user()->id;
-                if($participant->role == 'mgr' && $participant->participant_id == $current_user) {
+                if($participant->role == 'mgr') {
                     $mgr = $participant->participant_id;
-                    $view_as_supervisor = true;
-                }
-                if($participant->role == 'emp'  && $participant->participant_id == $current_user) {
+                    if($participant->participant_id == $current_user){
+                        $view_as_supervisor = true;
+                    }
+                } else {
                     $emp = $participant->participant_id;
                 }
             }        
