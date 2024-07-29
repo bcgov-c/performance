@@ -358,7 +358,9 @@
                 $user = App\Models\User::find($authId);
             @endphp
             var isSupervisor = {{$user->hasRole('Supervisor') ? 'true' : 'false'}};
+            
             var currentUser = {{$authId}};
+
             var conversation_id = 0;
             var toReloadPage = false;
             $('#conv_participant_edit').select2({
