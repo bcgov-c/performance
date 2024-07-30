@@ -35,3 +35,5 @@ Route::get('goal/{goal}/status/{status}', [GoalController::class, 'updateStatus'
 
 // Link Employee to Supervisor goals
 Route::post('link-goal', [GoalController::class, 'linkGoal'])->name('goal.link');
+
+Route::post('goal/get-user/', [GoalController::class, 'getUser'])->name('goal.get-user');

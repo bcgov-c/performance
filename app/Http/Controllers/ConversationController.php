@@ -64,6 +64,17 @@ class ConversationController extends Controller
                                     ->distinct()
                                     ->get();
         
+        //get reportee and shared with listing
+        $reporteeIds = $user->avaliableReportees()
+            ->pluck('id'); // Plucking the explicitly selected id from users
+
+        $sharedIds = SharedProfile::where('shared_with', $user->id)
+            ->select('shared_id AS id')
+            ->pluck('id');
+
+        $reporteeNshared = $reporteeIds->union($sharedIds)->toArray();
+        
+
         //get historic team members
         $history_teammembers = DB::table('conversation_participants')
                                     ->select('conversation_participants.participant_id', 'users.name')
@@ -173,7 +184,7 @@ class ConversationController extends Controller
             
              // With My Team
              if ($sharedSupervisorIds && $sharedSupervisorIds[0]) {
-                $myTeamQuery->where(function($query) use ($sharedSupervisorIds,$myCurrentTeam_array) {
+                $myTeamQuery->where(function($query) use ($sharedSupervisorIds, $myCurrentTeam_array, $reporteeNshared) {
                     $query->where(function($shared) use ($sharedSupervisorIds){
                         return $shared->whereNotIn('user_id', $sharedSupervisorIds)
                         ->orWhere(function($part) {
@@ -185,6 +196,9 @@ class ConversationController extends Controller
                     })
                     ->whereHas('conversationParticipants', function ($query) use ($myCurrentTeam_array ) {
                         $query->whereIn('participant_id', $myCurrentTeam_array);
+                    })
+                    ->whereHas('conversationParticipants', function ($query) use ($reporteeNshared ) {
+                        $query->whereIn('participant_id', $reporteeNshared);
                     });
                 });
             }
@@ -1492,6 +1506,7 @@ class ConversationController extends Controller
             ->whereRaw("participant_id = {$authId}")
             ->select('participant_id')
             ->first();
+        $authUser = User::find($authId);
         if ($userPart) {
             $conversation = Conversation::find($id);
             $otherPart = ConversationParticipant::whereRaw("conversation_id = {$id}")
@@ -1506,7 +1521,7 @@ class ConversationController extends Controller
                     $notification = new \App\MicrosoftGraph\SendDashboardNotification();
                     $notification->user_id = $value->participant_id;
                     $notification->notification_type = 'CN';
-                    $notification->comment = "{$conversation->user->name} has made updates to your conversation";
+                    $notification->comment = "{$authUser->name} has made updates to your conversation";
                     $notification->related_id = $conversation->id;
                     $notification->notify_user_id = $value->participant_id;
                     $notification->send(); 
@@ -1519,7 +1534,7 @@ class ConversationController extends Controller
                     $sendMail->useQueue = true;
                     $sendMail->template = 'CONVERSATION_CHANGE_NOTIFY';
                     array_push($sendMail->bindvariables, $user->name);
-                    array_push($sendMail->bindvariables, $conversation->user->name );
+                    array_push($sendMail->bindvariables, $authUser->name);
                     array_push($sendMail->bindvariables, $conversation->topic->name );
                     $response = $sendMail->sendMailWithGenericTemplate();
                 }

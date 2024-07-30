@@ -15,6 +15,10 @@
         label{
             width: 100%;
         }
+
+        .cke_notification_warning {
+            display: none;
+        }
     </style>
     {{ $css ?? '' }}
 @stop

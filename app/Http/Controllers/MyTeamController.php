@@ -27,6 +27,7 @@ use App\Http\Requests\Goals\AddGoalToLibraryRequest;
 use App\Http\Requests\MyTeams\UpdateProfileSharedWithRequest;
 use App\Models\UsersAnnex;
 use Carbon\Carbon;
+use App\Models\EmployeeDemo;
 
 class MyTeamController extends Controller
 {
@@ -345,7 +346,7 @@ class MyTeamController extends Controller
                           ->paginate();
         } else {
             $user_query = User::where('name', 'LIKE', "%{$search}%")
-                          ->where('id', '<>', $current_user)
+                          ->where('users.id', '<>', $current_user)
                           ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
                           ->whereNull('employee_demo.date_deleted')  
                           ->whereRaw('employee_demo.pdp_excluded = 0')
@@ -366,22 +367,20 @@ class MyTeamController extends Controller
         $search = $request->search;
         
         if ($current_user == '') {
-            $user_query = User::select('id', 'name', 'employee_demo.employee_email')
-                          ->where('name', 'LIKE', "%{$search}%")
-                          ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
-                          ->whereNull('employee_demo.date_deleted')  
-                          ->whereRaw('employee_demo.pdp_excluded = 0')
-                          ->groupBy('id', 'name', 'employee_demo.employee_email')
-                          ->paginate();
+            $user_query = EmployeeDemo::join(\DB::raw('users USE INDEX (USERS_EMPLOYEE_ID_EMPL_RECORD_INDEX)'), 'users.employee_id', 'employee_demo.employee_id')
+            ->when("{$search}", function($q) use($search) { return $q->where('employee_demo.employee_name', 'LIKE', "%{$search}%"); })
+            ->whereNull('employee_demo.date_deleted')
+            ->select('users.id', 'employee_demo.employee_name AS name', 'employee_demo.employee_email')
+            ->distinct()
+            ->paginate();
         } else {
-            $user_query = User::select('id', 'name', 'employee_demo.employee_email')
-                          ->where('name', 'LIKE', "%{$search}%")
-                          ->where('id', '<>', $current_user)
-                          ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
-                          ->whereNull('employee_demo.date_deleted')  
-                          ->whereRaw('employee_demo.pdp_excluded = 0')
-                          ->groupBy('id', 'name', 'employee_demo.employee_email')
-                          ->paginate();
+            $user_query = EmployeeDemo::join(\DB::raw('users USE INDEX (USERS_EMPLOYEE_ID_EMPL_RECORD_INDEX)'), 'users.employee_id', 'employee_demo.employee_id')
+            ->when("{$search}", function($q) use($search) { return $q->where('employee_demo.employee_name', 'LIKE', "%{$search}%"); })
+            ->whereNull('employee_demo.date_deleted')
+            ->where('users.id', '<>', $current_user) 
+            ->select('users.id', 'employee_demo.employee_name AS name', 'employee_demo.employee_email')
+            ->distinct()
+            ->paginate();
         }
         
         return $this->respondeWith($user_query);
@@ -447,7 +446,7 @@ class MyTeamController extends Controller
         //$hasAccess = true;
         // If it is shared with Logged In user.
         $hasAccess = false;
-        
+
         $employees = $this->myEmployeesAjax();
         foreach($employees as $employee) {
             if($id == $employee->id){
@@ -455,12 +454,12 @@ class MyTeamController extends Controller
             }
         }
 
-        $reporting_tos = array();
-        $reportingHierarchy = $this->reportingHierarchy($id, $reporting_tos);    
-        
-        if(in_array(Auth::id(), $reportingHierarchy)) {
+        //check if in the hierarchy tree
+        $reportings = array();
+        $reportingHierarchy_tree = $this->reportingHierarchy($id, $reportings);            
+        if(in_array(Auth::id(), $reportingHierarchy_tree)) {
             $hasAccess = true;
-        }
+        }      
 
         if($hasAccess || SharedProfile::where('shared_with', $actualAuthId)->where('shared_id', $id)->count() >= 1) {
             session()->put('view-profile-as', $id);
@@ -491,15 +490,14 @@ class MyTeamController extends Controller
         
     }
     public function viewDirectReport($id, Request $request) {
-        $userReportingTos = DB::table('user_reporting_tos')->where('user_id', $id)->pluck('reporting_to_id')->toArray();
         $can_access = false;
 
-        $reporting_tos = array();
-        $reportingHierarchy = $this->reportingHierarchy($id, $reporting_tos);    
-        
-        if(in_array(Auth::id(), $reportingHierarchy)) {
+        //check if in the hierarchy tree
+        $reportings = array();
+        $reportingHierarchy_tree = $this->reportingHierarchy($id, $reportings);            
+        if(in_array(Auth::id(), $reportingHierarchy_tree)) {
             $can_access = true;
-        }
+        }        
         
         //check supervisor override
         $supervisor = UsersAnnex::select('reporting_to_employee_id')
@@ -760,10 +758,11 @@ class MyTeamController extends Controller
 
         if(count($reporting_to_userids) > 0) {
             $supervisor_userid = $reporting_to_userids[0]->reporting_to_userid;
-            array_push($reporting_tos, $supervisor_userid);
-            $reporting_tos = $this->reportingHierarchy($supervisor_userid, $reporting_tos);
+            if($supervisor_userid != $user_id) { // for fixing infinite looping of the supervisor relationship
+                array_push($reporting_tos, $supervisor_userid);
+                $reporting_tos = $this->reportingHierarchy($supervisor_userid, $reporting_tos);
+            }
         } 
         return $reporting_tos;
     }
-
 }

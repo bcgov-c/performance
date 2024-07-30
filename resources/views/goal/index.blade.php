@@ -218,6 +218,47 @@
   </div>
 </div>
 
+<!-- Auto Save Modal -->
+<div class="modal fade" id="autoSaveModal" tabindex="-1" aria-labelledby="autoSaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="autoSaveModalLabel">Auto Save Notification</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        You have not saved your work in 20 minutes. To protect your work, it has been automatically saved.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeModalBtn">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to share the goal with the selected employee?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelShareBtn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmShareBtn">Share</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 
@@ -389,6 +430,7 @@
     });
 
     $(document).on('click', '#saveChangesBtn', function(e){
+        $('#goal_title').removeClass('is-invalid');
         isContentModified = false;
         for (var i in CKEDITOR.instances){
             CKEDITOR.instances[i].updateElement();
@@ -488,6 +530,9 @@
     });
 
     $(document).on('click', '#saveGoalBtn', function(e){
+        //initialize warning fields
+        $('#goal_title').removeClass('is-invalid');
+
         isContentModified = false;
         $(this).prop('disabled', true);
         for (var i in CKEDITOR.instances){
@@ -770,51 +815,88 @@
             });
             
         });        
-    </script>
-    
-    
-<script>
-$(".share-with-users").select2({
-    language: {
-        errorLoading: function () {
-            return "Searching for results.";
-        }
-    },
-    width: '100%',
-    data: [{
-        id: '',
-        text: '--- Select the employee ---'
-    }],
-    ajax: {
-        url: '{{ route("goal.get-all-user-options") }}',
-        dataType: 'json',
-        data: function (params) {
-            const query = {
-                search: params.term,
-                page: params.page || 1
-            };
-            return query;
-        },
-        processResults: function (response, params) {
-            const results = $.map(response.data.data, function (item) {
-                return {
-                    text: item.name + (item.employee_email ? ' - ' + item.employee_email : ''),
-                    id: item.id
-                };
-            });
-            // Add the empty option to the beginning of the results
-            results.unshift({ id: '', text: '--- Select the employee ---' });
 
-            return {
-                results: results,
-                pagination: {
-                    more: response.data.current_page !== response.data.last_page
+
+
+        $(document).ready(function() {
+            $('select[name="tag_ids[]"]').attr('tabindex', '0');
+
+
+            // Initialize the start_date daterangepicker
+            $('input[name="start_date"]').daterangepicker({
+                autoApply: true,
+                autoUpdateInput: false, // Prevent the input from auto-updating
+                singleDatePicker: true, // Set to true for a single date picker
+                locale: {
+                    format: 'YYYY-MM-DD'
                 }
-            };
-        }
-    }
-});
-</script>
+            });
+
+            // Manually update the input field when a date is selected
+            $('input[name="start_date"]').on('apply.daterangepicker', function(ev, picker) {
+                var startDate = picker.startDate.format('YYYY-MM-DD');
+                $(this).val(startDate);
+
+                // Update the minDate of the target_date picker
+                $('input[name="target_date"]').data('daterangepicker').minDate = picker.startDate;
+                $('input[name="target_date"]').val(''); // Optionally clear the target_date value
+            });
+
+            // Ensure the placeholder remains
+            $('input[name="start_date"]').attr('placeholder', 'YYYY-MM-DD');
+
+            // Initialize the target_date daterangepicker
+            $('input[name="target_date"]').daterangepicker({
+                autoApply: true,
+                autoUpdateInput: false, // Prevent the input from auto-updating
+                singleDatePicker: true, // Set to true for a single date picker
+                locale: {
+                    format: 'YYYY-MM-DD'
+                }
+            });
+
+            // Manually update the input field when a date is selected
+            $('input[name="target_date"]').on('apply.daterangepicker', function(ev, picker) {
+                var targetDate = picker.startDate.format('YYYY-MM-DD');
+
+                // Check if start_date is empty
+                if ($('input[name="start_date"]').val() === '') {
+                    alert('Please choose a start date first.');
+                    $(this).val(''); // Clear the target_date value
+                } else {
+                    $(this).val(targetDate);
+                }
+            });
+
+            // Ensure the placeholder remains
+            $('input[name="target_date"]').attr('placeholder', 'YYYY-MM-DD');
+
+            // Add change event for start_date
+            $('input[name="start_date"]').on('change', function() {
+                var startDate = $(this).val();
+                var targetDate = $('input[name="target_date"]').val();
+
+                // If start date is empty or later than target date
+                if (startDate === '' || (targetDate !== '' && moment(startDate).isAfter(moment(targetDate)))) {
+                    alert('The start date cannot be empty or later than the target date. Both dates will be cleared.');
+                    $('input[name="start_date"]').val('');
+                    $('input[name="target_date"]').val('');
+                    // Reset minDate for target_date picker
+                    $('input[name="target_date"]').data('daterangepicker').minDate = false;
+                }
+            });
+
+            // Check if start_date has an initial value on page load
+            var initialStartDate = $('input[name="start_date"]').val();
+            if (initialStartDate) {
+                // Set the minDate of the target_date picker
+                var initialStartMoment = moment(initialStartDate, 'YYYY-MM-DD');
+                $('input[name="target_date"]').data('daterangepicker').minDate = initialStartMoment;
+            }
+        });
+
+
+    </script>
     </x-slot>
 
     
@@ -994,49 +1076,210 @@ $(".share-with-users").select2({
                     }    
                 }, SessionTime);                
             }
+
+
+            
+
+
+            // Function to fetch user details by user ID
+            function getUserDetails(userId, callback) {
+                    $.ajax({
+                        url: '{{ route("goal.get-user") }}', // Replace with your endpoint to fetch user details
+                        type: 'POST',
+                        data: { id: userId },
+                        success: function(response) {
+                            // Assuming the response contains user details
+                            callback(response);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching user details:', error);
+                            callback(null);
+                        }
+                    });
+            }
             
             $(document).ready(function() {
+                var initialValue;
+                var selectedValue;
+                var goalId;
+                var currentDropdown;
+
                 // Event handler for dropdown list change
+                $(document).on('select2:selecting', '.share-with-users', function(e) {
+                    // Track the initial selected values
+                    currentDropdown = $(this);
+                    initialValue = $(this).val() || [];
+                });
+
                 $(document).on('change', '.share-with-users', function() {
-                  // Get the selected value
-                  var selectedValue = $(this).val();
+                    // Get the selected value
+                    selectedValue = $(this).val() || [];
 
-                  // Get the corresponding goal ID in the row
-                  var goalId = $(this).closest('tr').data('goal-id');
+                    // Get the corresponding goal ID in the row
+                    goalId = $(this).closest('tr').data('goal-id');
 
-                  // Perform desired actions with the selected value and goal ID
-                  console.log('Selected value:', selectedValue);
-                  console.log('Goal ID:', goalId);
+                    // Check if initialValue is undefined or empty
+                    if (!initialValue) {
+                        //remove the selected user
+                        $('#sync_goal_id').val(goalId);
+                        $('#sync_users').val(selectedValue);
+                        
+                        // Prepare the data to be sent
+                        var formData = {
+                            sync_goal_id: goalId,
+                            sync_users: selectedValue
+                        };
 
-                  console.log('Goal ID:', goalId);
-                  console.log('Selected Values:', selectedValue);
-                  $('#sync_goal_id').val(goalId);
-                  $('#sync_users').val(selectedValue);
-                  
-                  // Prepare the data to be sent
+                        $.ajax({
+                            url: '{{ route("goal.sync-goals") }}',
+                            type: 'POST',
+                            data: formData,
+                            success: function(response) {
+                                // Handle success response
+                                console.log('Data submitted successfully');
+                                // Optionally, you can perform additional actions here
+                            },
+                            error: function(xhr, status, error) {
+                                // Handle error response
+                                console.error('Error submitting data:', error);
+                                // Optionally, you can display an error message or perform additional actions here
+                            }
+                        });
+                    } else {
+                        if (selectedValue.length > initialValue.length) {
+                            //add new user
+                            // Get the newly added user ID
+                            var newUserId = selectedValue[selectedValue.length - 1];
+                            // Fetch user details and show the modal
+                            getUserDetails(newUserId, function(user) {
+                                if (user) {
+                                    // Update the modal content
+                                    $('#confirmationModal .modal-body').html(
+                                        `Are you sure you want to share the goal with the selected employee? 
+                                        <br/><i class="fas fa-user"></i> ${user.data.name} 
+                                        <br/><i class="fas fa-envelope"></i> ${user.data.email}`
+                                    );
+
+                                    // Show the confirmation modal
+                                    $('#confirmationModal').modal('show');
+                                } else {
+                                    console.error('User details not found');
+                                }
+                            });
+                        } else {
+                            initialValue = selectedValue.slice();
+                            $this.data('initial-value', initialValue);
+                        }
+                    }
+                    
+                });
+
+                // Handle the confirmation button click
+                $('#confirmShareBtn').on('click', function() {
+                    $('#sync_goal_id').val(goalId);
+                    $('#sync_users').val(selectedValue);
+
+                    // Prepare the data to be sent
                     var formData = {
-                      sync_goal_id: goalId,
-                      sync_users: selectedValue
+                        sync_goal_id: goalId,
+                        sync_users: selectedValue
                     };
 
                     $.ajax({
-                      url: '{{ route("goal.sync-goals") }}',
-                      type: 'POST',
-                      data: formData,
-                      success: function(response) {
-                        // Handle success response
-                        console.log('Data submitted successfully');
-                        // Optionally, you can perform additional actions here
-                      },
-                      error: function(xhr, status, error) {
-                        // Handle error response
-                        console.error('Error submitting data:', error);
-                        // Optionally, you can display an error message or perform additional actions here
-                      }
+                        url: '{{ route("goal.sync-goals") }}',
+                        type: 'POST',
+                        data: formData,
+                        success: function(response) {
+                            // Handle success response
+                            console.log('Data submitted successfully');
+                            // Optionally, you can perform additional actions here
+                        },
+                        error: function(xhr, status, error) {
+                            // Handle error response
+                            console.error('Error submitting data:', error);
+                            // Optionally, you can display an error message or perform additional actions here
+                        }
                     });
-                  });
 
+                    // Hide the modal
+                    $('#confirmationModal').modal('hide');
+                    // Update the initial value for future changes
+                    currentDropdown.data('initial-value', selectedValue);
+                });
+
+                // Handle the cancel button click
+                $('#cancelShareBtn').on('click', function() {
+                    location.reload();
+                });
+
+                // Handle the close button (X) click
+                $('#closeModalBtn').on('click', function() {
+                    location.reload();
+                });
+
+                // Select2 initialization
+                $(".share-with-users").select2({
+                    placeholder: "Search and add employees from the list with whom you want to share the goal",
+                    language: {
+                        errorLoading: function () {
+                            return "Searching for results.";
+                        },
+                        inputTooShort: function (args) {
+                            return "Type to search for employees";
+                        },
+                        searching: function () {
+                            return "Searching for results";
+                        },
+                        noResults: function () {
+                            return "No results found";
+                        },
+                        input: function () {
+                            return "Search and add employees from the list with whom you want to share the goal";
+                        }
+                    },
+                    width: '100%',
+                    data: [{
+                        id: '',
+                        text: '--- Select the employee ---'
+                    }],
+                    ajax: {
+                        url: '{{ route("goal.get-all-user-options") }}',
+                        dataType: 'json',
+                        data: function (params) {
+                            const query = {
+                                search: params.term,
+                                page: params.page || 1
+                            };
+                            return query;
+                        },
+                        processResults: function (response, params) {
+                            const results = $.map(response.data.data, function (item) {
+                                return {
+                                    text: item.name + (item.employee_email ? ' - ' + item.employee_email : ''),
+                                    id: item.id
+                                };
+                            });
+                            results.unshift({ id: '', text: '--- Select the employee ---' });
+
+                            return {
+                                results: results,
+                                pagination: {
+                                    more: response.data.current_page !== response.data.last_page
+                                }
+                            };
+                        }
+                    }
+                });
+
+                // Store the initial value in a data attribute
+                $(".share-with-users").each(function() {
+                    $(this).data('initial-value', $(this).val() || []);
+                });
+
+                
             });
+
+
 </script>    
 
 <style>
