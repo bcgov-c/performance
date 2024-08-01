@@ -9,22 +9,19 @@ class EmployeeDemoJunior extends Model
 {
 
     public $table = 'employee_demo_jr';
+    public $timestamps = true;
+    public $incrementing = true;
 
     use HasFactory;
 
     protected $primaryKey = 'id';
 
-    public $incrementing = true;
-
     protected $fillable = [
         'id',
         'guid',
+        'employee_id',
         'last_employee_status',
         'current_employee_status',
-        'last_classification',
-        'current_classification',
-        'last_manual_excuse',
-        'current_manual_excuse',
         'last_conversation_date',
         'next_conversation_date',
         'due_date_paused',
@@ -32,6 +29,16 @@ class EmployeeDemoJunior extends Model
         'created_by_id',
         'updated_by_id',
         'updated_by_name',
+        'last_classification',
+        'current_classification',
+        'last_manual_excuse',
+        'current_manual_excuse',
+        'last_classification_descr',
+        'current_classification_descr',
+        'excused_reason_id',
+        'excused_reason_descr',
+        'last_deptid',
+        'current_Deptid',
     ];
 
     public function users() {
