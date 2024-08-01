@@ -121,7 +121,7 @@ class SyncUserProfile extends Command
             })
             // Line below is for testing only.
             // ->whereRaw("employee_id = 'XXXXXX'")
-            ->orderBy('date_deleted')
+            ->whereNull('date_deleted')
             ->orderBy('employee_id')
             ->orderBy('job_indicator', 'desc')
             ->orderBy('empl_record')
@@ -301,7 +301,7 @@ class SyncUserProfile extends Command
         foreach ($employees as $employee) {
 
             $reporting_to = $this->getReportingUserId($employee, $exceptions);   
-            
+
             $user = User::from('users')
                 ->where('employee_id', $employee->employee_id)
                 ->select('id', 'reporting_to', 'last_sync_at')
@@ -381,6 +381,7 @@ class SyncUserProfile extends Command
     {
 
         $supervisor = EmployeeDemo::where('employee_id', $employee->supervisor_emplid)
+            ->whereNull('date_deleted')
             ->orderBy('job_indicator', 'desc')
             ->orderBy('empl_record')
             ->first();
