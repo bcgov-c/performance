@@ -21,6 +21,7 @@ class ConversationParticipant extends Model implements Auditable
         'conversation_id',
         'participant_id',
         'role',
+        'position_number',
     ];
 
     public $timestamps = false;
