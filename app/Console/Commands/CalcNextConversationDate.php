@@ -162,6 +162,7 @@ class CalcNextConversationDate extends Command
                         });
                     })
                     ->join('users', 'users.id', 'conversation_participants.participant_id')
+                    ->where('conversation_participants.position_number', $demo->position_number)
                     ->whereRaw("trim(users.guid) <> ''")
                     ->whereNotNull('users.guid')
                     ->whereNotNull('signoff_user_id')
@@ -174,11 +175,7 @@ class CalcNextConversationDate extends Command
                     
                     if ($lastConv) {
                         // use last conversation + 4 months as initial next conversation date
-                        // $lastConversationDate = $lastConv->getLastSignOffDateAttribute()->format('M d, Y');
-                        // $initNextConversationDate = $lastConv->getLastSignOffDateAttribute()->addMonth(4)->format('M d, Y');
-                        
                         $lastConversationDate = $lastConv->getLastSignOffDateAttribute()->toDateString();
-                        //$initNextConversationDate = $lastConv->getLastSignOffDateAttribute()->addMonth(4)->toDateString();
                         //clone instance to avoid duplicate calling from same instance
                         $initNextConversationDate = $lastConv->getLastSignOffDateAttribute()->clone()->addMonth(4)->toDateString();
                         // echo 'Last Conversation Date:'.$lastConversationDate; echo "\r\n";
@@ -249,7 +246,6 @@ class CalcNextConversationDate extends Command
                             break;
                     }
                     // calcualte initial last conversation date; init next conversation minus 4 months
-                    //$initLastConversationDate = Carbon::parse($initNextConversationDate)->subMonth(4)->toDateString();
                     $initLastConversationDate = Carbon::parse($initNextConversationDate)->clone()->subMonth(4)->toDateString(); // Clone the instance
                     if ($lastConversationDate) {
                         if (Carbon::parse($lastConversationDate)->gt($initLastConversationDate)) {
@@ -263,10 +259,6 @@ class CalcNextConversationDate extends Command
                             }
                         }
                     }
-                    // $initLastConversationDate = Carbon::parse($initNextConversationDate)->clone()->subMonth(4)->toDateString(); // Clone the instance
-                    // if ($lastConversationDate && Carbon::parse($lastConversationDate)->gt($initLastConversationDate)) {
-                    //     $initLastConversationDate = $lastConversationDate;
-                    // }
                     $demo_inarray = in_array($demo->jobcode, $ClassificationArray);
                     $demo_in_deptarray = in_array($demo->deptid, $ExcusedDepartmentArray);
                     // get last stored detail in junior table
@@ -299,7 +291,6 @@ class CalcNextConversationDate extends Command
                             || $demo->excused_flag);
                         if ($jr->current_employee_status == 'A' 
                             && $demo->employee_status == 'A'
-                            // && $jr_inarray == false
                             && $jr->excused_type <> 'A'
                             && $demo_inarray) {
                             // CLASSIFICATION CHANGE
@@ -311,7 +302,6 @@ class CalcNextConversationDate extends Command
                         $jr_in_deptarray = in_array($jr->current_deptid, $ExcusedDepartmentArray);
                         if ($jr->current_employee_status == 'A' 
                             && $demo->employee_status == 'A'
-                            // && $jr_in_deptarray == false
                             && $jr->excused_type <> 'A'
                             && $demo_in_deptarray) {
                             // DEPTID CHANGE
@@ -360,7 +350,6 @@ class CalcNextConversationDate extends Command
                             && $jr_in_deptarray == false
                             && $demo_in_deptarray == false
                             && $jr->current_manual_excuse == 'Y' 
-                            // && (!$demo->excused_flag || $demo->excused_flag == 0)) {
                             && !$demo->excused_flag) {
                             // MANUAL CHANGE
                             $changeType = 'manualEndExcuse';
@@ -387,9 +376,6 @@ class CalcNextConversationDate extends Command
                                 if ($prevDate == null) {
                                     $prevDate = $oneDay->created_at->toDateString();
                                     $prevPause = $oneDay->due_date_paused;
-                                    // if ($prevPause == 'Y') {
-                                    //     echo $demo->employee_id.': First row found excused date '.$prevDate.'. Status:'.$prevPause.'.'; echo "\r\n";
-                                    // }
                                 } else {
                                     if ($prevPause == 'Y' 
                                         && $oneDay->due_date_paused == 'N') {
@@ -552,7 +538,6 @@ class CalcNextConversationDate extends Command
                         echo '$changeType '.$changeType.'.  EMPLID '.$demo->employee_id.'.  newDueDate '.$newJr->next_conversation_date.'.  '; echo "\r\n";
                     } else {
                         if ($jr 
-                            //&& $jr->excused_type 
                             && $jr->next_conversation_date 
                             && $initNextConversationDate 
                             && $jr->next_conversation_date <> $initNextConversationDate) {
@@ -579,7 +564,6 @@ class CalcNextConversationDate extends Command
                             $newJr->updated_by_name = $jr->updated_by_name;
                             $newJr->excused_reason_id = $jr->excused_reason_id;
                             $newJr->excused_reason_desc = $jr->excused_reason_desc;
-                            // $newJr->created_at = $jr->created_at;
                             $newJr->updated_at = $jr->updated_at;
                             $newJr->save();
                             $updatecounter += 1;
@@ -626,7 +610,6 @@ class CalcNextConversationDate extends Command
                     Log::info(Carbon::now()->format('c').' - ['.$details.'] does not have GUID in Employee Demo table.');
                 }
                 $counter += 1;
-                // echo 'Processed '.$counter.'.  Updated '.$updatecounter.'.'; echo "\r";
             }
             $this->info(Carbon::now()->format('c').' - Processed '.$counter.'.  Updated '.$updatecounter.'.');
         });
@@ -660,7 +643,6 @@ class CalcNextConversationDate extends Command
             ]
         );
         $this->info(Carbon::now()->format('c').' - CalcNextConversationDate, Completed: '.$end_time);
-        // Log::info($end_time->format('c').' - '.$processname.' - Finished');
     } 
      
     protected function updateUsersTable() {
