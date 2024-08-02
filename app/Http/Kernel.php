@@ -67,5 +67,6 @@ class Kernel extends HttpKernel
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         'ViewShare' => \App\Http\Middleware\ViewShare::class,
         'ViewAsPermission' => \App\Http\Middleware\ViewAsPermission::class,
+        'api_token' => \App\Http\Middleware\ApiToken::class,
     ];
 }
