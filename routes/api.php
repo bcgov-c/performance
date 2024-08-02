@@ -25,3 +25,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     }
 });
 
+Route::middleware(['api_token'])->group(function () {
+
+    Route::get('/system/queue-status/{api_token}', [SystemStatusController::class, 'queueStatus']);
+    Route::get('/system/database-status/{api_token}', [SystemStatusController::class, 'databaseStatus']);
+
+});
+
