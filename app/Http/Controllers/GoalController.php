@@ -1725,7 +1725,9 @@ class GoalController extends Controller
                         $sendMail->alert_format = 'E';
                         $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
 
-                        array_push($sendMail->bindvariables, $goal->user->name);    // %1 Recipient of the email
+                        $recipient_user =  User::findOrFail($related_user->id);
+
+                        array_push($sendMail->bindvariables, $recipient_user->name);    // %1 Recipient of the email
                         array_push($sendMail->bindvariables,  $comment_user->name );        // %2 Person who added the comment
                         array_push($sendMail->bindvariables, $goal->title);         // %3 Goal title
                         array_push($sendMail->bindvariables, $comment->comment );   // %4 added comment
