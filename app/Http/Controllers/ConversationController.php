@@ -1050,7 +1050,9 @@ class ConversationController extends Controller
         $mgr = '';
         $emp = '';
 
-        if(session()->has('view-profile-as')) {
+        if(session()->has('view-profile-as')) {            
+            $is_viewer = true;
+            $disable_signoff = true;
             $original_user =  $request->session()->get('view-profile-as');
             foreach($conversation_participants as $participant) {
                 if($participant->role == 'mgr' && $participant->participant_id == $original_user) {
@@ -1060,10 +1062,6 @@ class ConversationController extends Controller
                     $emp = $participant->participant_id;
                 }
             } 
-            if ($mgr == '' && $emp == ''){
-                $is_viewer = true;
-                $disable_signoff = true;
-            }
         }else {
             foreach($conversation_participants as $participant) {
                 $current_user = auth()->user()->id;
