@@ -5,11 +5,8 @@ namespace App\Http\Controllers;
 use Exception;
 use DateTimeZone;
 use Carbon\Carbon;
-use App\Models\Setting;
 use Cron\CronExpression;
-use App\Models\CampaignYear;
 use Illuminate\Http\Request;
-use App\Models\ScheduleJobAudit;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Facades\DB;
@@ -71,8 +68,6 @@ class SystemStatusController extends Controller
         $status = "running";
         $uptime = null;
         try {
-            $setting = Setting::first();
-
             // Calculate UpTime
             $result = DB::select("SHOW GLOBAL STATUS LIKE 'Uptime'");
             $s = $result ? round($result[0]->Value) : null;
