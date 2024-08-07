@@ -35,6 +35,11 @@ class ConversationController extends Controller
     public function index(Request $request, $viewType = 'conversations')
     {
         $authId = Auth::id();
+
+        if(session()->has('view-profile-as')) {            
+            $authId =  $request->session()->get('view-profile-as');
+        }
+
         $user = User::find($authId);
         $supervisor = $user->reportingManager()->first();
         $supervisorId = (!$supervisor) ? null : $supervisor->id;
