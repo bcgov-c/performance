@@ -374,12 +374,12 @@
                                     <div class="row">
                                         <div class="col-12">
                                             <p><b>We have reviewed goals and adjusted as necessary.</b></p>
-                                            <p><input class="employee-sign-off1" type="radio" name="check_one" value="1"> Yes</p>
-                                            <p><input class="employee-sign-off1"  type="radio" name="check_one" value="0"> No</p>
+                                            <p><input class="employee-sign-off employee-sign-off1" type="radio" name="check_one" value="1"> Yes</p>
+                                            <p><input class="employee-sign-off employee-sign-off1"  type="radio" name="check_one" value="0"> No</p>
                                             <br/>
                                             <p><b>Performance expectations are clear.</b></p>
-                                            <p><input class="employee-sign-off2" type="radio" name="check_two" value="1"> Yes</p>
-                                            <p><input class="employee-sign-off2" type="radio" name="check_two" value="0"> No</p>
+                                            <p><input class="employee-sign-off employee-sign-off2" type="radio" name="check_two" value="1"> Yes</p>
+                                            <p><input class="employee-sign-off employee-sign-off2" type="radio" name="check_two" value="0"> No</p>
                                             <br/>
                                         </div>
                                     </div>
@@ -421,12 +421,12 @@
                                     <div class="row">
                                         <div class="col-12">
                                             <p><b>We have reviewed goals and adjusted as necessary.</b></p>
-                                            <p><input class="supervisor-sign-off1" type="radio" name="check_one_" value="1"> Yes</p>
-                                            <p><input class="supervisor-sign-off1" type="radio" name="check_one_" value="0"> No</p>
+                                            <p><input class="supervisor-sign-off supervisor-sign-off1" type="radio" name="check_one_" value="1"> Yes</p>
+                                            <p><input class="supervisor-sign-off supervisor-sign-off1" type="radio" name="check_one_" value="0"> No</p>
                                             <br/>
                                             <p><b>Performance expectations are clear.</b></p>
-                                            <p><input class="supervisor-sign-off2" type="radio" name="check_two_" value="1"> Yes</p>
-                                            <p><input class="supervisor-sign-off2" type="radio" name="check_two_" value="0"> No</p>
+                                            <p><input class="supervisor-sign-off supervisor-sign-off2" type="radio" name="check_two_" value="1"> Yes</p>
+                                            <p><input class="supervisor-sign-off supervisor-sign-off2" type="radio" name="check_two_" value="0"> No</p>
                                             <br/>
                                             <div id="sup-signoff-row">
                                                 <div id="signoff-sup-id-input"></div>
@@ -455,12 +455,12 @@
                                     <div class="row">
                                         <div class="col-12">
                                             <p><b>We have reviewed goals and adjusted as necessary.</b></p>
-                                            <p><input class="employee-sign-off1" type="radio" name="check_one" value="1"> Yes</p>
-                                            <p><input class="employee-sign-off1"  type="radio" name="check_one" value="0"> No</p>
+                                            <p><input class="employee-sign-off employee-sign-off1" type="radio" name="check_one" value="1"> Yes</p>
+                                            <p><input class="employee-sign-off employee-sign-off1"  type="radio" name="check_one" value="0"> No</p>
                                             <br/>
                                             <p><b>Performance expectations are clear.</b></p>
-                                            <p><input class="employee-sign-off2" type="radio" name="check_two" value="1"> Yes</p>
-                                            <p><input class="employee-sign-off2" type="radio" name="check_two" value="0"> No</p>
+                                            <p><input class="employee-sign-off employee-sign-off2" type="radio" name="check_two" value="1"> Yes</p>
+                                            <p><input class="employee-sign-off employee-sign-off2" type="radio" name="check_two" value="0"> No</p>
                                             <br/>
                                             
                                             <div class="mt-3">
@@ -489,12 +489,12 @@
                                     <div class="row">
                                         <div class="col-12">
                                             <p><b>We have reviewed goals and adjusted as necessary.</b></p>
-                                            <p><input class="supervisor-sign-off1" type="radio" name="check_one_" value="1"> Yes</p>
-                                            <p><input class="supervisor-sign-off1" type="radio" name="check_one_" value="0"> No</p>
+                                            <p><input class="supervisor-sign-off supervisor-sign-off1" type="radio" name="check_one_" value="1"> Yes</p>
+                                            <p><input class="supervisor-sign-off supervisor-sign-off1" type="radio" name="check_one_" value="0"> No</p>
                                             <br/>
                                             <p><b>Performance expectations are clear.</b></p>
-                                            <p><input class="supervisor-sign-off2" type="radio" name="check_two_" value="1"> Yes</p>
-                                            <p><input class="supervisor-sign-off2" type="radio" name="check_two_" value="0"> No</p>
+                                            <p><input class="supervisor-sign-off supervisor-sign-off2" type="radio" name="check_two_" value="1"> Yes</p>
+                                            <p><input class="supervisor-sign-off supervisor-sign-off2" type="radio" name="check_two_" value="0"> No</p>
                                             <br/>
                                             <div id="sup-unsignoff-row">
                                                 <div id="unsignoff-sup-id-input"></div>
