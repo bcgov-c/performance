@@ -116,16 +116,16 @@
                     </div>
                     <div class="row">
                         <div class="col-12">
-                            <button type="button" class="btn btn-primary float-right notifyParticipantsSup ml-1" attr-loc="top" style="display:none">
+                            <button type="button" class="btn btn-primary float-right notifyParticipants notifyParticipantsSup ml-1" attr-loc="top" style="display:none">
                                 <i class="fa fa-info-circle notifyParticipantsInfo" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" 
                                     data-content="Use this button to alert the other participant that you have made updates to this conversation." 
                                     data-original-title="" title="" aria-describedby="popover271882"> 
                                 </i>
                                 Send Notification
                             </button>
-                            <button type="button" class="btn btn-primary float-right supSaveAllComments" attr-loc="top" style="display:none">Save Comments</button>
-                            <button type="button" class="btn btn-primary float-left empSaveAllComments" attr-loc="top"  style="display:none">Save Comments</button>
-                            <button type="button" class="btn btn-primary float-left notifyParticipantsEmp ml-1" attr-loc="top" style="display:none">
+                            <button type="button" class="btn btn-primary float-right saveAllComments supSaveAllComments" attr-loc="top" style="display:none">Save Comments</button>
+                            <button type="button" class="btn btn-primary float-left saveAllComments empSaveAllComments" attr-loc="top"  style="display:none">Save Comments</button>
+                            <button type="button" class="btn btn-primary float-left notifyParticipants notifyParticipantsEmp ml-1" attr-loc="top" style="display:none">
                                 <i class="fa fa-info-circle notifyParticipantsInfo" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" 
                                     data-content="Use this button to alert the other participant that you have made updates to this conversation." 
                                     data-original-title="" title="" aria-describedby="popover271882"> 
@@ -220,8 +220,8 @@
                             </div>
                             <div class="row">
                                 <div class="col-12">
-                                    <button type="button" class="btn btn-primary float-left empSaveAllComments" attr-loc="bottom" style="display:none">Save Comments</button>
-                                    <button type="button" class="btn btn-primary float-left notifyParticipantsEmp ml-1" attr-loc="bottom" style="display:none">
+                                    <button type="button" class="btn btn-primary float-left saveAllComments empSaveAllComments" attr-loc="bottom" style="display:none">Save Comments</button>
+                                    <button type="button" class="btn btn-primary float-left notifyParticipants notifyParticipantsEmp ml-1" attr-loc="bottom" style="display:none">
                                         <i class="fa fa-info-circle notifyParticipantsInfo" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" 
                                             data-content="Use this button to alert the other participant that you have made updates to this conversation." 
                                             data-original-title="" title="" aria-describedby="popover271882"> 
@@ -337,14 +337,14 @@
                             </div>
                             <div class="row">
                                 <div class="col-12">
-                                    <button type="button" class="btn btn-primary float-right notifyParticipantsSup ml-1" attr-loc="bottom" style="display:none">
+                                    <button type="button" class="btn btn-primary float-right notifyParticipants notifyParticipantsSup ml-1" attr-loc="bottom" style="display:none">
                                         <i class="fa fa-info-circle notifyParticipantsInfo" data-trigger="hover" data-toggle="popover" data-placement="right" data-html="true" 
                                             data-content="Use this button to alert the other participant that you have made updates to this conversation." 
                                             data-original-title="" title="" aria-describedby="popover271882"> 
                                         </i>
                                         Send Notification
                                     </button>
-                                    <button type="button" class="btn btn-primary float-right supSaveAllComments" attr-loc="bottom" style="display:none">Save Comments</button>
+                                    <button type="button" class="btn btn-primary float-right saveAllComments supSaveAllComments" attr-loc="bottom" style="display:none">Save Comments</button>
                                 </div>
                             </div>
                             <hr>
