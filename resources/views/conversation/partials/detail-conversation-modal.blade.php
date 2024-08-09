@@ -264,6 +264,12 @@ function updateConversation(conversation_id) {
                                 
                                 $('.employee-sign-off').prop('disabled', true);
                                 $('.team_member_agreement').prop('disabled', true);
+
+                                
+                                $('.saveAllComments').prop('disabled', true);
+                                $('.notifyParticipants').prop('disabled', true);
+                                $('.saveAllComments').hide();
+                                $('.notifyParticipants').hide();
                                 
                                 $('#unsign-off-block').html('');
                         }
