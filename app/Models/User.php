@@ -460,11 +460,11 @@ class User extends Authenticatable
     }
 
     public function preferredSupervisor() {
-        if ($this->employee_demo && $this->employee_demo->position_number) {
+        if ($this->primaryJob() && $this->primaryJob()->position_number) {
             return PreferredSupervisor::join('users AS u', 'u.employee_id', 'preferred_supervisor.supv_empl_id')
             ->select('preferred_supervisor.supv_empl_id', 'u.name', 'u.id')
             ->where('preferred_supervisor.employee_id', '=', $this->employee_id)
-            ->where('preferred_supervisor.position_nbr', '=', $this->employee_demo->position_number)
+            ->where('preferred_supervisor.position_nbr', '=', $this->primaryJob()->position_number)
             ->first();
         } else {
             return null;
@@ -572,7 +572,7 @@ class User extends Authenticatable
             })
             ->join('employee_demo_tree AS edt', 'edt.id', 'ed.orgid')
             ->where('pj.employee_id', $this->employee_id)
-            ->selectRaw("pj.employee_id, pj.empl_record, CONCAT(edt.deptid, ' ', ed.jobcode_desc) AS job")
+            ->selectRaw("pj.employee_id, pj.empl_record, CONCAT(edt.deptid, ' ', ed.jobcode_desc) AS job, ed.position_number")
             ->first();
     }
 

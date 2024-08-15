@@ -380,8 +380,8 @@ class DashboardController extends Controller
     public function updateSupervisor(Request $request) {
         PreferredSupervisor::updateOrCreate([
             'employee_id' => Auth::user()->employee_id,
-            'position_nbr' => Auth::user()->employee_demo->position_number
         ], [
+            'position_nbr' => Auth::user()->primaryJob()->position_number,
             'supv_empl_id' => $request->id
         ]);
         $this->updateSupervisorDetails(Auth::user()->id);
