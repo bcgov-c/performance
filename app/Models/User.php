@@ -444,7 +444,7 @@ class User extends Authenticatable
         ->join('positions AS p', 'employee_demo.position_number', 'p.position_nbr')
         ->join('employee_demo AS e', function($join1){
             return $join1->on(function($on1){
-                return $on1->where('p.reports_to', 'e.position_number')
+                return $on1->whereColumn('p.reports_to', 'e.position_number')
                 ->whereRaw('e.pdp_excluded = 0');
             });
         })
@@ -480,7 +480,7 @@ class User extends Authenticatable
             ->join('users AS u', 'u.id', 'employee_supervisor.supervisor_id')
             ->join('employee_demo AS ed', function($join1){
                 return $join1->on(function($on1){
-                    return $on1->where('ed.employee_id', 'u.employee_id')
+                    return $on1->whereColumn('ed.employee_id', 'u.employee_id')
                     ->whereRaw('ed.pdp_excluded = 0');
                 });
             })
