@@ -22,6 +22,7 @@ use App\Http\Requests\Goals\EditSuggestedGoalRequest;
 use App\MicrosoftGraph\SendMail;
 use App\Models\Tag;
 use App\Models\GoalSharedWith;
+use App\Models\EmployeeDemo;
 
 class GoalController extends Controller
 {
@@ -2148,26 +2149,23 @@ class GoalController extends Controller
             $current_user = session()->get('checking_user');
         }
         
-        
         $search = $request->search;
         
         if ($current_user == '') {
-            $user_query = User::select('id', 'name', 'employee_demo.employee_email')
-                            ->where('name', 'LIKE', "%{$search}%")
-                            ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
-                            ->groupBy('id', 'name', 'employee_email')
-                            ->whereNull('employee_demo.date_deleted')  
-                            ->whereRaw('employee_demo.pdp_excluded = 0')
-                            ->paginate();
+            $user_query = EmployeeDemo::join(\DB::raw('users USE INDEX (USERS_EMPLOYEE_ID_EMPL_RECORD_INDEX)'), 'users.employee_id', 'employee_demo.employee_id')
+            ->when("{$search}", function($q) use($search) { return $q->where('employee_demo.employee_name', 'LIKE', "%{$search}%"); })
+            ->whereNull('employee_demo.date_deleted')
+            ->select('users.id', 'employee_demo.employee_name AS name', 'employee_demo.employee_email')
+            ->distinct()
+            ->paginate();
         } else {
-            $user_query = User::select('id', 'name', 'employee_demo.employee_email')
-                            ->where('name', 'LIKE', "%{$search}%")
-                            ->where('id', '<>', $current_user)
-                            ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
-                            ->groupBy('id', 'name', 'employee_demo.employee_email')
-                            ->whereNull('employee_demo.date_deleted')  
-                            ->whereRaw('employee_demo.pdp_excluded = 0')
-                            ->paginate();
+            $user_query = EmployeeDemo::join(\DB::raw('users USE INDEX (USERS_EMPLOYEE_ID_EMPL_RECORD_INDEX)'), 'users.employee_id', 'employee_demo.employee_id')
+            ->when("{$search}", function($q) use($search) { return $q->where('employee_demo.employee_name', 'LIKE', "%{$search}%"); })
+            ->whereNull('employee_demo.date_deleted')
+            ->where('users.id', '<>', $current_user) 
+            ->select('users.id', 'employee_demo.employee_name AS name', 'employee_demo.employee_email')
+            ->distinct()
+            ->paginate();
         }
         
         return $this->respondeWith($user_query);
