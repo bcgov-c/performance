@@ -27,27 +27,24 @@
                             </button>
                         @endif
                     @else
-                    <label for="supervisor_btn">
-                        <button type="button" icon="fas fa-xs fa-ellipsis-v" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{ $preferredSupervisor ? $preferredSupervisor->name : 'Select a supervisor' }}
-                        </button>
-                        <div class="dropdown-menu" size="xs">
-                            @foreach($supervisorList as $supv)
-                                @php
-                                    $isSelected = $preferredSupervisor && $supv->employee_id == $preferredSupervisor->supv_empl_id;
-                                @endphp
-                                <x-button icon="fas fa-xs fa-fw {{ $isSelected ? 'fa-solid fa-user-check' : '' }}" 
-                                        value="{{ $supv->employee_id }}" 
-                                        data-id="{{ $supv->employee_id }}" 
-                                        data-name="{{ $supv->name }}" 
-                                        class="dropdown-item {{ $isSelected ? 'selected' : '' }}" 
-                                        name="change_supervisor" 
-                                        id="change_supervisor_{{ $supv->employee_id }}">
-                                    {{ $supv->user_name }}
-                                </x-button>
-                            @endforeach
-                        </div>
-                    </label>
+                        <label for="supervisor_btn">
+                            <button type="button" icon="fas fa-xs fa-ellipsis-v" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {{ $preferredSupervisor ? $preferredSupervisor->name : 'Select a supervisor' }}
+                            </button>
+                            <div class="dropdown-menu"  size="xs">
+                                @foreach($supervisorList as $supv)
+                                    @if(!$preferredSupervisor || $supv->employee_id != $preferredSupervisor->supv_empl_id)
+                                        <x-button icon="fas fa-xs fa-fw" value="{{ $supv->employee_id }}" data-id="{{ $supv->employee_id }}" data-name="{{ $supv->name }}" class="dropdown-item change_supervisor" name="change_supervisor" id="change_supervisor">
+                                            {{ $supv->user_name }}
+                                        </x-button>
+                                    @else
+                                        <x-button icon="fas fa-xs fa-fw fa-solid fa-user-check" value="{{ $supv->employee_id }}" data-id="{{ $supv->employee_id }}" data-name="{{ $supv->name }}" class="dropdown-item no_change_supervisor" name="no_change_supervisor" id='no_change_supervisor'>
+                                            {{ $supv->user_name }}
+                                        </x-button>
+                                    @endif
+                                @endforeach
+                            </div>
+                        </label>
                     @endif             
                 </div>
             </div>
