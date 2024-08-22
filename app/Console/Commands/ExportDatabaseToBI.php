@@ -41,6 +41,10 @@ class ExportDatabaseToBI extends Command
         ['name' => 'tags',                          'delta' => 'updated_at',    'hidden' => null ],
         ['name' => 'users',                         'delta' => 'updated_at',    'hidden' => ['password', 'remember_token'] ],
         ['name' => 'user_reporting_tos',            'delta' => 'updated_at',    'hidden' => null ],
+        ['name' => 'preferred_supervisor',          'delta' => 'updated_at',    'hidden' => null ],
+        ['name' => 'employee_managers',             'delta' => 'updated_at',    'hidden' => null ],
+        ['name' => 'users_annex',                   'delta' => 'updated_at',    'hidden' => null ],
+        ['name' => 'ods_dept_org_hierarchy',        'delta' => 'updated_at',    'hidden' => null ],
     ];
  
     protected $success;
