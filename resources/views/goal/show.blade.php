@@ -123,7 +123,9 @@
                                             </div>
                                         </div>
                                         @endforeach
-                                        <x-button icon='reply' style="link" class="comment-reply" :data-comment-id="$comment->id" size="sm">Reply</x-button>
+                                        
+                                        @if ($goal->status == 'active')   
+                                        <x-button icon='reply' style="link" class="comment-reply" :data-comment-id="$comment->id" size="sm" tabindex="0">Reply</x-button>
                                         <div class="reply-box d-none">
                                             <form action="{{route('goal.add-comment', $goal->id)}}" method="POST">
                                                 @csrf
@@ -133,17 +135,23 @@
                                                     <div class="border flex-fill p-2 rounded">
                                                         <!-- <x-textarea class="ckeditor" name="comment" id="addreply"/> -->
                                                         <textarea class="addreply" id="addreply" name="comment"></textarea>
-                                                        <div class="d-flex flex-row my-2">
-                                                            <x-button class="btn" action="submit" :data-comment-id="$comment->id" size="sm">Add Comment</x-button>
+                                                        <div class="d-flex flex-row my-2">  
+                                                        <button role="button" class="btn btn-outline-primary btn-sm btn" action="submit" :data-comment-id="$comment->id" tabindex="0">
+                                                                Add Comment
+                                                        </button>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </form>
-                                        </div>
+                                        </div>                                        
+                                        @endif
+
                                     </div>
                                 </div>
                             </div>
                             @endforeach
+                            
+                            @if ($goal->status == 'active')  
                             <form action="{{route('goal.add-comment', $goal->id)}}" method="POST">
                                 @csrf
                                 <div class="d-flex flex-row my-2">
@@ -151,13 +159,16 @@
                                     <div class="border flex-fill p-2 rounded">
                                         <textarea name="comment" id="addcomment"></textarea>
                                         <!-- <x-textarea class="ckeditor" name="comment" id="addcomment"/> -->
-                                        <div class="d-flex flex-row my-2">
-                                            <x-button class="btn" action="submit" size="sm">Add Comment</x-button>
+                                        <div class="d-flex flex-row my-2">   
+                                        <button role="button" class="btn btn-outline-primary btn-sm btn" action="submit" :data-comment-id="$comment->id">
+                                                Add Comment
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
-                            </form>
-
+                            </form>                            
+                            @endif 
+                               
                         </div>
                         @endif
                     </div>
