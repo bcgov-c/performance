@@ -66,8 +66,6 @@
                                 <input aria-label="Enter the goals target date in format MM/DD/YYYY" placeholder="MM/DD/YYYY" type="text" class="form-control" id="filter_target_date" name="filter_target_date" value="{{request()->filter_target_date ?? ''}}">
                                 </label>
                             </div>
-                            <div class="form-group col-md-2">
-                            </div>
                             <div class="form-group col-md-2 p-3 float-left float-bottom" style="display: flex;flex-direction: column;margin-left: 0px;">
                                 <div class="form-group row">
                                     <span class="float-left float-bottom">  
