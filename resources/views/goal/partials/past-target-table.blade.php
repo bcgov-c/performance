@@ -51,6 +51,7 @@
             @endphp
             @php
                   $share_user_id_arr = array_map('trim', explode('|', $goal->shared_user_id));
+                  $share_user_id_arr = explode(',', $share_user_id_arr[0]);
                   $usernames = DB::table('employee_demo')
                                   ->select('users.id', DB::raw("concat(employee_demo.employee_last_name, ', ', 
                                                           employee_demo.employee_first_name, ' ', 
@@ -58,7 +59,7 @@
                                   ->join('users', 'employee_demo.employee_id', '=', 'users.employee_id')
                                   ->whereIn('users.id', $share_user_id_arr)
                                   ->pluck('employee_name', 'users.id'); // Pluck as associative array with user_id as key
-                  $namesString = $usernames->implode('<br>');                          
+                  $namesString = $usernames->implode('<br>');   
             @endphp  
             
             {!! $namesString !!}
