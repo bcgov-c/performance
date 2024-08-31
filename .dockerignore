@@ -1,6 +1,9 @@
+temp/
+vendor/
+openshift/app
+openshift/databases
 node_modules/
 storage/*.key
-vendor/
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml

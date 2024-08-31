@@ -32,11 +32,11 @@ class SendMail
     public $body;               /* String */
     public $bodyContentType;    /* text or html, default is 'html' */
 
-    // Generic Template 
+    // Generic Template
     public $template;           /* String - name of the template */
-    public $bindvariables;      
+    public $bindvariables;
 
-    // Option 
+    // Option
     public $importance;         /* low, normal, and high. */
     public $saveToSentItems;    /* Boolean -- true or false */
 
@@ -44,12 +44,12 @@ class SendMail
     public $saveToLog;          /* Boolean -- true or false */
     public $alertType;
     public $alertFormat;
-    
+
     // Default email for Testing purpose (sent any email to this email)
     public $SendToTestAccount;  /* jpoon@extest.gov.bc.ca */
 
     // Send the email using Queue
-    public $useQueue;  
+    public $useQueue;
 
     // Special fields for Conversation Due notification (use for avoid sent duplication)
     public $notify_user_id;
@@ -58,11 +58,11 @@ class SendMail
     public $notify_for_days;
 
     // Private property
-    private $generic_template;  
-    private $default_email_prod_region;  // Azure - principle name 
-    private $default_email_test_region;  // Azure - principle name 
-   
-    public function __construct() 
+    private $generic_template;
+    private $default_email_prod_region;  // Azure - principle name
+    private $default_email_test_region;  // Azure - principle name
+
+    public function __construct()
     {
         //$this->toAddresses = [];
         $this->toRecipients = [];
@@ -74,34 +74,34 @@ class SendMail
         $this->saveToLog = true;
 
         $this->SendToTestEmail = "travis.clark@gov.bc.ca";
-        
+
         $this->useQueue = false;
 
         $this->alertType = 'N';  /* Notification */
         $this->alertFormat = 'E';   /* E = E-mail, A = In App */
 
-        // Default Principle Name 
+        // Default Principle Name
         $this->default_email_prod_region = "travis.clark@gov.bc.ca";
         $this->default_email_test_region = "HRadministror1@extest.gov.bc.ca";
 
 
     }
 
-    public function sendMailWithoutGenericTemplate() 
+    public function sendMailWithoutGenericTemplate()
     {
 
         // if (!($this->sender_id) ) {
         //     $this->sender_id = Auth::id();
         // }
-        
+
         // return $this->sendMailUsingApplicationToken();
         return $this->sendMailUsingSMPTServer();
     }
 
-    public function sendMailWithGenericTemplate() 
+    public function sendMailWithGenericTemplate()
     {
 
-        $this->generic_template = GenericTemplate::where('template',$this->template)->first(); 
+        $this->generic_template = GenericTemplate::where('template',$this->template)->first();
 
         // Bind variable
         if ($this->generic_template) {
@@ -122,10 +122,10 @@ class SendMail
         }
         //return $this->sendMailUsingApplicationToken();
         return $this->sendMailUsingSMPTServer();
-       
+
     }
 
-    public function sendMailUsingSMPTServer() 
+    public function sendMailUsingSMPTServer()
     {
 
         $switch = strtolower(env('PRCS_EMAIL_NOTIFICATION'));
@@ -150,7 +150,7 @@ class SendMail
         } else {
 
             /* replace the body with the send out message, and also override the recipients */
-            $this->body = "<h4>Note: The following message is the content was sent out from Performance application (Region: ". App::environment() .")</h4>".      
+            $this->body = "<h4>Note: The following message is the content was sent out from Performance application (Region: ". App::environment() .")</h4>".
                           "<hr>".
                           "<p><b>From: </b>". $from . "</p>".
                           "<p><b>To: </b>". implode('; ', $a_toRecipients->toArray() ). "</p>".
@@ -174,7 +174,7 @@ class SendMail
 
                 // Mail::to( $a_toRecipients )
                 //     ->cc( $a_ccRecipients )
-                //     ->bcc( $a_bccRecipients )   
+                //     ->bcc( $a_bccRecipients )
                 //     ->queue(new NotifyMail($from, $this->subject, $this->body ));
 
                 dispatch(new NotifyMailJob($a_toRecipients, $a_ccRecipients, $a_bccRecipients, $from, $this->subject, $this->body));
@@ -190,17 +190,17 @@ class SendMail
 
                 // Log::info( $log_text . ' was successfully sent.' );
                 $bResult = true;
-                
+
             // } catch (Exception $e) {
-            //     Log::error( $log_text . ' was failed to sent out.' ); 
-            //     Log::error($e); 
+            //     Log::error( $log_text . ' was failed to sent out.' );
+            //     Log::error($e);
             //     $bResult = false;
             // }
         }
 
         if ($this->saveToLog) {
             // Insert Notification log
-            $notification_log = NotificationLog::Create([  
+            $notification_log = NotificationLog::Create([
                 'recipients' => ' ',        // Not in Use
                 'sender_id' => $this->sender_id,
                 'sender_email' => $from,
@@ -211,12 +211,12 @@ class SendMail
 
                 // special fields for conversation due notification (use in the schedule command)
                 'notify_user_id' => $this->notify_user_id,
-                'overdue_user_id' => $this->overdue_user_id, 
-                'notify_due_date' => $this->notify_due_date, 
+                'overdue_user_id' => $this->overdue_user_id,
+                'notify_due_date' => $this->notify_due_date,
                 'notify_for_days' => $this->notify_for_days,
 
                 'template_id' => $this->generic_template ? $this->generic_template->id : null,
-                'status' => $bResult, 
+                'status' => $bResult,
                 'use_queue' => $this->useQueue,
                 'date_sent' => now(),
             ]);
@@ -253,13 +253,13 @@ class SendMail
 
             }
 
-       }   
+       }
 
         return $bResult;
 
     }
 
-    // public function sendMailUsingApplicationToken() 
+    // public function sendMailUsingApplicationToken()
     // {
     //     $accessToken = $this->getAccessToken();
 
@@ -273,7 +273,7 @@ class SendMail
     //     $g_toRecipients = [];
     //     $g_ccRecipients = [];
     //     $g_bccRecipients = [];
-        
+
     //     if (App::environment(['production'])) {
     //         // TO
     //         foreach ($a_toRecipients as $emailAddress) {
@@ -307,11 +307,11 @@ class SendMail
     //         if (App::environment(['local'])) {
     //             $this->SendToTestEmail = "jpoon@extest.gov.bc.ca";
     //         }
-            
+
     //         $sender = User::where('id', $this->sender_id)->first();
 
     //         /* Override sender and recipients */
-    //         $this->body = "<h4>Note: The following message is the content was sent out from Performance application (Region: ". App::environment() .")</h4>".      
+    //         $this->body = "<h4>Note: The following message is the content was sent out from Performance application (Region: ". App::environment() .")</h4>".
     //                       "<hr>".
     //                       "<p><b>From: </b>". $sender->email . "</p>".
     //                       "<p><b>To: </b>". implode('; ', $a_toRecipients->toArray() ). "</p>".
@@ -321,7 +321,7 @@ class SendMail
     //                       "<p><b>Body : </b>" . $this->body . "</p>".
     //                       "<hr>";
     //         $this->subject = "Performance Application -- message sent out from (Region: ". App::environment() .") ";
-    //         $g_toRecipients = [ 
+    //         $g_toRecipients = [
     //             [
     //                 'emailAddress' => [
     //                 'address' => $this->SendToTestEmail,    /* default account for testing purpose */
@@ -346,7 +346,7 @@ class SendMail
     //     ];
 
     //     $sender = User::where('id', $this->sender_id)->first();
-        
+
     //     // Local user without Sender ID
     //     if ($sender->azure_id) {
     //         $graph_azure_id = $sender->azure_id;
@@ -370,7 +370,7 @@ class SendMail
     //     if ($this->saveToLog) {
 
     //         // Insert Notification log
-    //         $notification_log = NotificationLog::Create([  
+    //         $notification_log = NotificationLog::Create([
     //             'recipients' => (App::environment(['local'])) ? $this->SendToTestEmail : null,
     //             'sender_id' => $this->sender_id,
     //             'subject' => $this->subject,
@@ -378,7 +378,7 @@ class SendMail
     //             'alert_type' => $this->alertType,
     //             'alert_format' => $this->alertFormat,
     //             'template_id' => $this->generic_template ? $this->generic_template->id : null,
-    //             'status' => $response->getStatus(), 
+    //             'status' => $response->getStatus(),
     //             'date_sent' => now(),
     //         ]);
 
@@ -401,8 +401,8 @@ class SendMail
     //             ],['recipient_type' => 3]);
     //         }
 
-    //    }   
-        
+    //    }
+
     //     return $response;
 
     // }
@@ -421,12 +421,12 @@ class SendMail
     //                 'client_secret' => env('OAUTH_APP_PASSWORD'),
     //                 'scope' => 'https://graph.microsoft.com/.default',
     //                 'grant_type' => 'client_credentials',
-    //             ] 
+    //             ]
     //         ]);
 
     //         $contents = $response->getBody()->getContents();
     //         $token_array = json_decode($contents, true);
-            
+
     //         return $token_array['access_token'];
 
     //     }

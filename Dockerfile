@@ -1,146 +1,170 @@
+ARG DOCKER_FROM_IMAGE=php:8.3-fpm
+
 #
 # Build Composer Base Image
 #
-FROM composer as composer
-
-
-ENV COMPOSER_MEMORY_LIMIT=-1
-ENV COMPOSER_PROCESS_TIMEOUT=2000
-
-WORKDIR /app
-COPY . /app
-
-RUN composer update --ignore-platform-reqs
-RUN composer require kalnoy/nestedset doctrine/dbal awobaz/compoships dompdf/dompdf --ignore-platform-reqs
-
-RUN chgrp -R 0 /app && \
-    chmod -R g=u /app
-
+FROM composer:2.2 AS composer
 
 #
 # Build Server Deployment Image
 #
-FROM php:8.0-apache
+# trunk-ignore(hadolint/DL3006)
+FROM ${DOCKER_FROM_IMAGE}
 
-WORKDIR /
+ARG PHP_INI_ENVIRONMENT=production
+
+USER www-data
 
 # Local proxy config (remove for server deployment)
 # ENV http_proxy=http://198.161.14.25:8080
 
-RUN apt-get update -y && apt -y upgrade && apt-get install -y \
-    openssl \
-    ssh-client \
-    zip \
-    unzip \
-    vim \
-	sudo
+ENV ETC_DIR=/usr/local/etc
+ENV PHP_INI_DIR $ETC_DIR/php
+ENV PHP_CONF_DIR=${PHP_INI_DIR}/conf.d
+ENV PHP_INI_FILE ${PHP_CONF_DIR}/php.ini
+ENV BUILD_DIR=/tmp/build
+ENV WWW_DIR=/var/www
+# ENV APP_DIR=${BUILD_DIR}/html
+ENV STORAGE_DIR=/var/www/storage
+ENV APP_STORAGE_DIR=${STORAGE_DIR}/app
+ENV PUBLIC_STORAGE_DIR=${APP_STORAGE_DIR}/public
 
-#RUN apt-get update && apt-get install -y cron && cron
+# Switch to primary user for OS updates / installations
+USER root
 
-# Copy cron file to the cron.d directory
-#COPY /laravelcron /etc/cron.d/laravelcron
+# Clean up existing sources and use a different Debian mirror
+RUN rm -f /etc/apt/sources.list.d/* ; \
+    echo "deb http://deb.debian.org/debian bookworm main" > /etc/apt/sources.list; \
+    echo "deb http://ftp.us.debian.org/debian bookworm main" >> /etc/apt/sources.list; \
+		echo "deb http://ftp.ca.debian.org/debian/ bookworm main" >> /etc/apt/sources.list
 
-# Give execution rights on the cron job
-#RUN chmod 0644 /etc/cron.d/laravelcron
+RUN apt-get update -y || { sleep 30; apt-get update -y; } || { sleep 60; apt-get update -y; } || { sleep 90; apt-get update -y; } || { sleep 120; apt-get update -y; } \
+	&& apt-get upgrade -y --fix-missing
 
-# Apply cron job
-#RUN crontab /etc/cron.d/laravelcron
+RUN set -eux; \
+  dpkg --configure -a; \
+  apt-get -f install; \
+  apt-get install -y --no-install-recommends \
+	dos2unix \
+	openssh-client \
+	zlib1g-dev \
+	libicu-dev \
+	g++ \
+	rsync \
+	wget \
+	grsync \
+	tar \
+  git \
+  zip \
+  unzip \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
-RUN ln -sf /proc/self/fd/1 /var/log/apache2/access.log && \
-    ln -sf /proc/self/fd/1 /var/log/apache2/error.log && \
-	apt-get update -y && \
-	apt-get upgrade -y --fix-missing && \
-	apt-get dist-upgrade -y && \
-	dpkg --configure -a && \
-	apt-get -f install && \
-	apt-get install -y zlib1g-dev libicu-dev g++ && \
-	apt-get install rsync grsync && \
-	apt-get install tar && \
-	set -eux; \
-	\
-	if command -v a2enmod; then \
-		a2enmod rewrite; \
-	fi; \
-	\
-	savedAptMark="$(apt-mark showmanual)"; \
-	\
-	docker-php-ext-install -j "$(nproc)" \
-	; \
-	\
-# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
-	apt-mark auto '.*' > /dev/null; \
-	apt-mark manual $savedAptMark; \
-	ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
-		| awk '/=>/ { print $3 }' \
-		| sort -u \
-		| xargs -r dpkg-query -S \
-		| cut -d: -f1 \
-		| sort -u \
-		| xargs -rt apt-mark manual; \
-	\
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false;
+# Install PHPRedis
+RUN git clone https://github.com/phpredis/phpredis.git /phpredis
+WORKDIR /phpredis
+RUN	phpize && ./configure && make && make install
 
-RUN echo "deb https://packages.sury.org/php/ buster main" | tee /etc/apt/sources.list.d/php.list
-RUN docker-php-ext-install pdo pdo_mysql opcache
+# Copy Composer from the official image
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
-COPY --chown=www-data:www-data --from=composer /app /var/www/html
+# Copy application files
+WORKDIR ${BUILD_DIR}
+COPY . ${BUILD_DIR}
 
+# COPY the PHP extension installer with curl using root permissions
+RUN curl -L https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions -o /usr/local/bin/install-php-extensions
+
+RUN chmod +x /usr/local/bin/install-php-extensions && \
+    install-php-extensions \
+			# xdebug \
+			redis \
+			apcu \
+			gd \
+			xmlrpc \
+			pdo_mysql \
+			mysqli \
+			soap \
+			intl \
+			zip \
+			xsl \
+			opcache \
+			ldap \
+			exif
+
+# Ensure the www-data user has the necessary permissions
+RUN chown -R www-data:www-data ${WWW_DIR}
+
+# Install dependencies
+RUN --mount=type=cache,target=/tmp/cache composer install --working-dir=${BUILD_DIR} --no-scripts --no-autoloader --prefer-dist --no-dev && \
+	composer update  && \
+	chgrp -R 0 ${BUILD_DIR} && \
+	chmod -R g=u ${BUILD_DIR}
+
+USER www-data
+
+# Check if composer.json exists and output its contents
+RUN if [ -f "composer.json" ]; then \
+		echo "composer.json found in ${BUILD_DIR}"; \
+		cat composer.json; \
+else \
+		echo "composer.json not found in ${BUILD_DIR}"; \
+		exit 1; \
+fi
+
+USER root
 
 # Create the "public" folder in /storage/app
 WORKDIR /
-RUN mkdir -p /var/www/html/storage/app/public
 
-# Set the working directory
-WORKDIR /var/www/html
+RUN mkdir -p ${STORAGE_DIR} \
+	&& mkdir -p ${APP_STORAGE_DIR} \
+	&& mkdir -p ${PUBLIC_STORAGE_DIR}
 
-# Set appropriate permissions for the /storage/app/public directory
-RUN chown -R www-data:www-data /var/www/html/storage/app/public
+# Set appropriate permissions for the /storage directories
+RUN chown -R www-data:www-data ${PUBLIC_STORAGE_DIR} && \
+	chown -R www-data:www-data  ${APP_STORAGE_DIR}
+
 # Copy the contents from your local ./storage/app/public directory to the target directory
-COPY ./storage/app/public /var/www/html/storage/app/public
-# Set permissions for the copied files and directories
-RUN chmod -R 755 /var/www/html/storage/app/public
-
-# Run php artisan storage:link to create the symbolic link
-RUN php artisan storage:link
-
-#Switch back to the root folder
-WORKDIR /
-
-# Copy Server Config files (Apache / PHP)
-COPY --chown=www-data:www-data server_files/apache2.conf /etc/apache2/apache2.conf
-COPY --chown=www-data:www-data server_files/ports.conf /etc/apache2/ports.conf
-COPY --chown=www-data:www-data server_files/.htaccess /var/www/html/public/.htaccess
-COPY --chown=www-data:www-data server_files/php.ini /usr/local/etc/php/php.ini
-COPY --chown=www-data:www-data server_files/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
-COPY --chown=www-data:www-data server_files/mods-enabled/expires.load /etc/apache2/mods-enabled/expires.load
-COPY --chown=www-data:www-data server_files/mods-enabled/headers.load /etc/apache2/mods-enabled/headers.load
-COPY --chown=www-data:www-data server_files/mods-enabled/rewrite.load /etc/apache2/mods-enabled/rewrite.load
-COPY --chown=www-data:www-data server_files/start.sh /usr/local/bin/start
-
-RUN chmod +x /usr/local/bin/start
+COPY ./storage ${STORAGE_DIR}
 
 # Create cache and session storage structure
-RUN bash -c 'mkdir -p /var/www/html/storage{app,framework,logs}'
-RUN chmod -R 755 /var/www/html/storage
-RUN chown -R www-data:www-data /var/www/html/storage/app /var/www/html/storage/framework /var/www/html/storage/logs
+RUN chmod -R 755 ${STORAGE_DIR} && \
+		chown -R www-data:www-data ${APP_STORAGE_DIR} ${STORAGE_DIR}/framework ${STORAGE_DIR}/logs
 
-RUN chmod 4111 /usr/bin/sudo 
-RUN chmod -R 755 /var/log/apache2 
-RUN chown -R www-data:www-data /var/log/apache2 
+# Copy Server Config files (Apache / PHP)
+RUN mv ${PHP_INI_DIR}/php.ini-production ${PHP_INI_FILE}
+COPY ./config_pods/php/php.ini ${PHP_CONF_DIR}/app-php.ini
+COPY ./config_pods/php/www.conf ${ETC_DIR}/php-fpm.d/www.conf
+COPY --chown=www-data:www-data ./config_pods/php/opcache.ini ${PHP_CONF_DIR}/opcache.ini
+COPY ./config_pods/php/info.php ${BUILD_DIR}/public/info/info.php
 
-#RUN useradd -l -u 1001510000 -c "1001510000" 1001510000 && \
- #   addgroup crond-users && \
- #   chgrp crond-users /var/run/crond.pid && \
- #   usermod -a -G crond-users 1001510000
+# Add Healthcheck
+RUN wget --progress=dot:giga -O /usr/local/bin/php-fpm-healthcheck \
+    https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck \
+  && chmod +x /usr/local/bin/php-fpm-healthcheck \
+  && wget -O $(which php-fpm-healthcheck) \
+    https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck \
+  && chmod +x $(which php-fpm-healthcheck)
 
+	# Add cron script
+COPY ./config_pods/cron/cron.sh /usr/local/bin/cron.sh
+# Convert line endings of the script to ensure compatibility
+RUN chmod +x /usr/local/bin/cron.sh && \
+	dos2unix /usr/local/bin/cron.sh
 
-EXPOSE 8000
+USER www-data
 
+WORKDIR ${BUILD_DIR}
 
+# Check if APP_KEY is set and valid
+RUN if [[ -z "$APP_KEY" || ! "$APP_KEY" =~ ^base64:[A-Za-z0-9+/=]{43}$ ]]; then \
+			echo "APP_KEY is not set or invalid. Generating a new APP_KEY..."; \
+			php artisan key:generate --ansi; \
+		else \
+			echo "APP_KEY has been generated and set to: $APP_KEY"; \
+		fi
 
-# Add a command to base-image entrypont script
-#RUN sed -i 's/^exec /service cron start\n\nexec /' /usr/local/bin/apache2-foreground
-
-CMD /usr/local/bin/apache2-foreground
-
-#RUN /usr/local/bin/apache2-foreground
+# This won't work here, as we're migrating files to www after deployment
+# WORKDIR /var/www
+# RUN php artisan storage:link
