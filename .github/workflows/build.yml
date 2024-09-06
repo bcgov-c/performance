@@ -86,14 +86,14 @@ jobs:
           ref: dev
           sparse-checkout: |
             openshift/config/mariadb
-            example.env
-            example.versions.env
+            .env.example
+            .env.versions.example
 
       - name: Setup Env Vars
         id: dotenv
         uses: falti/dotenv-action@v1
         with:
-          path: example.env
+          path: .env.example
           export-variables: true
           keys-case: upper
 
@@ -101,7 +101,7 @@ jobs:
         id: dotenv_versions
         uses: falti/dotenv-action@v1
         with:
-          path: example.versions.env
+          path: .env.versions.example
           export-variables: true
           keys-case: upper
 

@@ -24,8 +24,8 @@ jobs:
           sparse-checkout: |
             openshift/config/cron
             openshift/config/php
-            example.env
-            example.versions.env
+            .env.example
+            .env.versions.example
 
       # Login to Artifactory
       - name: 🔑 Login to Artifactory
@@ -39,7 +39,7 @@ jobs:
         id: dotenv
         uses: falti/dotenv-action@v1
         with:
-          path: example.env
+          path: .env.example
           export-variables: true
           keys-case: upper
 
@@ -47,7 +47,7 @@ jobs:
         id: dotenv_versions
         uses: falti/dotenv-action@v1
         with:
-          path: example.versions.env
+          path: .env.versions.example
           export-variables: true
           keys-case: upper
 
