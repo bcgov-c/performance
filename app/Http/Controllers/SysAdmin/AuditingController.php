@@ -41,7 +41,7 @@ class AuditingController extends Controller
                     return $query->where('audits.event', $request->event_type);
                 })
                 ->when($request->auditable_type, function($query) use($request) {
-                    return $query->where('audits.auditable_type', "App\\Models\\" . $request->auditable_type);
+                    return $query->where('audits.auditable_type', ($request->auditable_type == 'ViewProfileAs' ? 'ViewProfileAs' : "App\\Models\\" . $request->auditable_type));
                 })
                 ->when($request->start_time || $request->end_time, function($query) use($request) {
                     $from = $request->start_time ?? '1990-01-01';
