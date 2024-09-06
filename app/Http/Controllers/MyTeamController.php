@@ -28,6 +28,7 @@ use App\Http\Requests\MyTeams\UpdateProfileSharedWithRequest;
 use App\Models\UsersAnnex;
 use Carbon\Carbon;
 use App\Models\EmployeeDemo;
+use App\Models\Audit;
 
 class MyTeamController extends Controller
 {
@@ -40,12 +41,10 @@ class MyTeamController extends Controller
     {
         $tags = Tag::all()->sortBy("name")->toArray();
         $goaltypes = GoalType::all();
-        // $eReasons = ExcusedReason::all();
         $eReasons = ExcusedReason::where('id', '>', 2)->get();
         $eReasons2 = ExcusedReason::where('id', '<=', 2)->get();
         $yesOrNo = [0 =>'No', 1 => 'Yes'];
         $conversationTopics = ConversationTopic::all();
-        // $participants = Participant::all();
 
         $goals = Goal::where('user_id', Auth::id())
             ->where('status', 'active')
@@ -129,7 +128,6 @@ class MyTeamController extends Controller
         ];
 
         return view('my-team/my-employees',compact('goals', 'tags', 'employees', 'employees_list', 'goaltypes', 'type_desc_str', 'conversationTopics', 'type', 'myEmpTable', 'sharedEmpTable', 'eReasons', 'eReasons2', 'showSignoff', 'yesOrNo', 'yesOrNo2', 'ClassificationArray'));
-        // return $myEmployeesDataTable->render('my-team/my-employees',compact('goals', 'employees', 'goaltypes', 'conversationTopics', 'participants', 'type'));
     }
 
     public function myEmployeesTable(MyEmployeesDataTable $myEmployeesDataTable) {
@@ -156,7 +154,6 @@ class MyTeamController extends Controller
         session()->put('checking_user', $user_id);
 
         return view('my-team.partials.profile-shared-with', compact('sharedProfiles'));
-        // return $this->respondeWith($sharedProfiles);
     }
 
     public function updateProfileSharedWith($shared_profile_id, UpdateProfileSharedWithRequest $request) {
@@ -171,7 +168,6 @@ class MyTeamController extends Controller
                 $update['shared_item'] = $input['shared_item'];
             }
             $sharedProfile->update($update);
-            /// $sharedProfile->save();
             return $this->respondeWith($sharedProfile);
         }
         
@@ -197,11 +193,9 @@ class MyTeamController extends Controller
             ->select('id', 'name', 'excused_flag', 'excused_reason_id')
             ->get();
         return view('my-team.partials.employee-excused-modal', compact('excusedreasons', 'excusedprofile'));
-        // return $this->respondeWith($sharedProfiles);
     }
 
     public function updateExcuseDetails(UpdateExcuseRequest $request)
-    // public function updateExcuseDetails(Request $request)
     {
         $excused = User::find($request->user_id);
         $excused->excused_flag = $request->excused_flag;
@@ -215,9 +209,6 @@ class MyTeamController extends Controller
 
     public function shareProfile(ShareProfileRequest $request) {
         $input = $request->validated();
-        // dd($input);
-        // 
-        // 
         //check if shared_id is direct team member of shared with users
         $shared_id = $input['shared_id'];
         $skip_sharing = false;
@@ -246,7 +237,6 @@ class MyTeamController extends Controller
         //check shared with users, if user dont have supervisor role, assign to the user
         foreach ($input['share_with_users'] as $shared_with_user_id) {
             $shared_with_user = User::findOrFail($shared_with_user_id);
-            //$this->assignSupervisorRole($user);
             if (!($shared_with_user->hasRole('Supervisor'))) {
                 $shared_with_user->assignRole('Supervisor');
             } 
@@ -266,24 +256,6 @@ class MyTeamController extends Controller
                 $insert['shared_with'] = $user_id;
                 array_push($sharedProfile, SharedProfile::updateOrCreate($insert));
             }
-
-            // foreach ($sharedProfile as $result) {
-            //     // Dashboard message added when an shared employee's profile (goals, conversations, or both)
-            //     // DashboardNotification::create([
-            //     //     'user_id' => $result->shared_id,
-            //     //     'notification_type' => 'SP',         
-            //     //     'comment' => 'Your profile has been shared with ' . $result->sharedWith->name,
-            //     //     'related_id' => $result->id,
-            //     // ]);
-            //     // Use Class to create DashboardNotification
-            //                 $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-            //                 $notification->user_id = $result->shared_id;
-            //                 $notification->notification_type = 'SP';
-            //                 $notification->comment = 'Your profile has been shared with ' . $result->sharedWith->name;
-            //                 $notification->related_id =  $result->id;
-            //     $notification->notify_user_id = $result->shared_id;
-            //                 $notification->send(); 
-            // }
 
             // Send out email to the user when his profile was shared
             foreach ($sharedProfile as $result) {
@@ -354,7 +326,6 @@ class MyTeamController extends Controller
         }
         
         return $this->respondeWith($user_query);
-        // return $this->respondeWith(User::leftjoin('employee_demo', 'employee_demo.guid', '=', 'users.guid')->where('name', 'LIKE', "%{$search}%")->paginate());
     }
 
     public function userOptions(Request $request) {
@@ -384,7 +355,6 @@ class MyTeamController extends Controller
         }
         
         return $this->respondeWith($user_query);
-        // return $this->respondeWith(User::leftjoin('employee_demo', 'employee_demo.guid', '=', 'users.guid')->where('name', 'LIKE', "%{$search}%")->paginate());
     }
 
     public function performanceStatistics()
@@ -392,8 +362,6 @@ class MyTeamController extends Controller
         $goaltypes = GoalType::all();
         $eReasons = ExcusedReason::all();
         $conversationTopics = ConversationTopic::all();
-        // $participants = Participant::all();
-        // $participants = Participant::select('id', 'name')->get();
         $participants = [];
 
         $goals = Goal::where('user_id', Auth::id())
@@ -402,7 +370,6 @@ class MyTeamController extends Controller
             ->with('goalType')->get();
         $employees = $this->myEmployeesAjax();
         $type = 'upcoming';
-        // return view('my-team/performance-statistics', compact('goals','employees', 'goaltypes'));
         return view('my-team/performance-statistics', compact('goals', 'employees', 'goaltypes', 'conversationTopics', 'participants', 'type', 'eReasons'));
 
     }
@@ -433,7 +400,6 @@ class MyTeamController extends Controller
                     $goal->sharedWith()->detach();
                 }
             }
-            // dd((bool)$input['is_shared'][995]);
         }
         if (!$request->ajax()) {
             return redirect()->back();
@@ -442,8 +408,6 @@ class MyTeamController extends Controller
 
     public function viewProfileAs($id, $landingPage = null) {
         $actualAuthId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
-        //$hasAccess = User::with('reportingManagerRecursive')->find($id)->canBeSeenBy($actualAuthId);
-        //$hasAccess = true;
         // If it is shared with Logged In user.
         $hasAccess = false;
 
@@ -469,7 +433,6 @@ class MyTeamController extends Controller
             Auth::loginUsingId($id);
             if (SharedProfile::where('shared_with', $actualAuthId)->where('shared_id', $id)->count()) {
                 $sharedItems = SharedProfile::where('shared_with', $actualAuthId)->where('shared_id', $id)->pluck('shared_item')[0];
-                // $sharedItem[0];
                 $goalsAllowed = in_array(1, $sharedItems);
                 $conversationAllowed = in_array(2, $sharedItems);
                 session()->put('GOALS_ALLOWED', $goalsAllowed);
@@ -478,10 +441,24 @@ class MyTeamController extends Controller
                 session()->put('GOALS_ALLOWED', true);
                 session()->put('CONVERSATION_ALLOWED', true);
             }
+
+            // Insert audit entry for switching profile
+            $target = User::find($id);
+            $newAudit = new Audit;
+            $newAudit->user_type = 'App\Models\User';
+            $newAudit->user_id = $actualAuthId;
+            $newAudit->original_auth_id = $newAudit->user_id;
+            $newAudit->event = 'created';
+            $newAudit->auditable_type = 'ViewProfileAs';
+            $newAudit->auditable_id = $id;
+            $newAudit->new_values = '{"employee_id":"'.$target->employee_id.'","name":"'.$target->name.'"}';
+            $newAudit->url = $landingPage;
+            $newAudit->save();
+
             if ($landingPage) {
                 return redirect()->route($landingPage);
             }
-            return (url()->previous() === Route('my-team.my-employee') || url()->previous() === Route('my-team.view-profile-as.direct-report', User::find($id)->reportingManager->id))
+            return (url()->previous() === Route('my-team.my-employee') || url()->previous() === Route('my-team.view-profile-as.direct-report', $target->reportingManager->id))
                 ? ((session()->has('GOALS_ALLOWED') && session()->get('GOALS_ALLOWED')) ? redirect()->route('goal.current') : redirect()->route('conversation.upcoming'))
                 : redirect()->back();
         } else {
@@ -522,9 +499,6 @@ class MyTeamController extends Controller
             }
             $supervisorList = [];
             $supervisorList = User::find($id)->hierarchyParentNames($supervisorList, Auth::id());
-            /* if (in_array($id, [1,2,3])) {
-                array_push($supervisorList, 'Supervisor');
-            } */
             $directReports = $myEmployeesDataTable->html();
             $userName = User::find($id)->name;
             return view('my-team.direct-report', compact('directReports', 'userName', 'supervisorList'));
@@ -596,24 +570,6 @@ class MyTeamController extends Controller
             $add_tag_goal->tags()->sync($tags);
         }
 
-        // create Dashboard Notification displayed on Home page
-        // foreach ($request->itemsToShare as $user_id) {
-        //     // DashboardNotification::create([
-        //     //     'user_id' => $user_id,
-        //     //     'notification_type' => 'GB',        // Goal Bank
-        //     //     'comment' => $goal->user->name . ' added a new goal to your goal bank.',
-        //     //     'related_id' => $goal->id,
-        //     // ]);
-        //     // Use Class to create DashboardNotification
-		// 	$notification = new \App\MicrosoftGraph\SendDashboardNotification();
-		// 	$notification->user_id =  $user_id;
-		// 	$notification->notification_type = 'GB';
-		// 	$notification->comment = ($goal->display_name ? $goal->display_name : $goal->user->name) . ' added a new goal to your goal bank.';
-		// 	$notification->related_id = $goal->id;
-        //     $notification->notify_user_id = $user_id;
-		// 	$notification->send(); 
-        // }
-
         // Send out email to the user when the Goal Bank added
         foreach ($request->itemsToShare as $user_id) {
             if (!in_array($user_id, $existing_users)) {
@@ -673,8 +629,6 @@ class MyTeamController extends Controller
         $goaltypes = GoalType::all();
         $eReasons = ExcusedReason::all();
         $conversationTopics = ConversationTopic::all();
-        // $participants = Participant::all();
-        // $participants = Participant::select('id', 'name')->get();
         $participants = [];
         $tags = Tag::all()->sortBy("name")->toArray();
         $goals = Goal::where('user_id', Auth::id())

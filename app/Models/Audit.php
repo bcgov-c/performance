@@ -14,7 +14,6 @@ class Audit extends Model
         "created" => "created",
         "updated" => "updated",
         "deleted" => "deleted",
-        "restored" => "restored"    ,
     ];
 
     

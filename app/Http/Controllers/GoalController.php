@@ -23,6 +23,7 @@ use App\MicrosoftGraph\SendMail;
 use App\Models\Tag;
 use App\Models\GoalSharedWith;
 use App\Models\EmployeeDemo;
+use App\Models\Audit;
 
 class GoalController extends Controller
 {
@@ -282,7 +283,25 @@ class GoalController extends Controller
         
 
         if ($tags != '') {
+            $actualAuthId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
+            $arrayOrigTags = [];
             $goal->tags()->sync($tags);
+            $arrayNewTags = array_column($goal->tags->toArray(), 'id');
+            // Insert audits for Goal Tag changes
+            if(array_diff($arrayOrigTags, $arrayNewTags) or array_diff($arrayNewTags, $arrayOrigTags)) {
+                // $actualAuthId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
+                $newAudit = new Audit;
+                $newAudit->user_type = 'App\Models\User';
+                $newAudit->user_id = $actualAuthId;
+                $newAudit->original_auth_id = $newAudit->user_id;
+                $newAudit->event = 'created';
+                $newAudit->auditable_type = 'App\Models\GoalTags';
+                $newAudit->auditable_id = $goal->id;
+                $newAudit->old_values = json_encode(Tag::whereIn('id', $arrayOrigTags)->pluck('id', 'name'));
+                $newAudit->new_values = json_encode(Tag::whereIn('id', $arrayNewTags)->pluck('id', 'name'));
+                $newAudit->url = (empty($_SERVER['HTTPS']) ? 'http' : 'https')."://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+                $newAudit->save();
+            }
         }
         return response()->json(['success' => true, 'message' => 'Goal Created successfully', 'goal_id' => $goal_id]);
     }
@@ -337,9 +356,6 @@ class GoalController extends Controller
         if($can_access) {
             $linkedGoalsIds = LinkedGoal::where('user_goal_id', $id)->pluck('supervisor_goal_id');
 
-            /* $supervisorGoals = Goal::whereIn('id', [997, 998, 999])->with('goalType')
-            ->whereNotIn('id', $linkedGoalsIds)
-            ->with('comments')->get(); */
             $linkedGoals
             = Goal::with('goalType', 'comments')
             ->whereIn('id', $linkedGoalsIds)
@@ -351,12 +367,6 @@ class GoalController extends Controller
                 $goal->last_supervisor_comment = 'N';
                 $goal->save();
             };
-
-            // Commented by JP to avoid the new added message always marked as 'READ'
-            // $affected = DashboardNotification::wherein('notification_type', ['GC', 'GR'])
-            // ->where('related_id', $goal->id)
-            // ->wherenull('status')
-            // ->update(['status' => 'R']);
 
             return view('goal.show', compact('goal', 'linkedGoals', 'from'));
         } else {
@@ -454,22 +464,45 @@ class GoalController extends Controller
         } 
         unset($input['tag_ids']);        
         $goal->update($input);
+        $actualAuthId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
         if ($tags != '') {
+            $arrayOrigTags = array_column($goal->tags->toArray(), 'id');
             $goal->tags()->sync($tags);
+            // Insert audits for Goal Tag changes
+            if(array_diff($arrayOrigTags, $request->tag_ids) or array_diff($request->tag_ids, $arrayOrigTags)) {
+                $newAudit = new Audit;
+                $newAudit->user_type = 'App\Models\User';
+                $newAudit->user_id = $actualAuthId;
+                $newAudit->original_auth_id = $newAudit->user_id;
+                $newAudit->event = 'updated';
+                $newAudit->auditable_type = 'App\Models\GoalTags';
+                $newAudit->auditable_id = $id;
+                $newAudit->old_values = json_encode(Tag::whereIn('id', $arrayOrigTags)->pluck('id', 'name'));
+                $newAudit->new_values = json_encode(Tag::whereIn('id', $request->tag_ids)->pluck('id', 'name'));
+                $newAudit->url = (empty($_SERVER['HTTPS']) ? 'http' : 'https')."://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+                $newAudit->save();
+            }
         } else {
+            $arrayOrigTags = array_column($goal->tags->toArray(), 'id');
             DB::table('goal_tags')->where('goal_id', $id)->delete();
+            // Insert audits for Goal Tag changes
+            if(array_diff($arrayOrigTags, $request->tag_ids) or array_diff($request->tag_ids, $arrayOrigTags)) {
+                $newAudit = new Audit;
+                $newAudit->user_type = 'App\Models\User';
+                $newAudit->user_id = $actualAuthId;
+                $newAudit->original_auth_id = $newAudit->user_id;
+                $newAudit->event = 'updated';
+                $newAudit->auditable_type = 'App\Models\GoalTags';
+                $newAudit->auditable_id = $id;
+                $newAudit->old_values = json_encode(Tag::whereIn('id', $arrayOrigTags)->pluck('id', 'name'));
+                $newAudit->new_values = json_encode(Tag::whereIn('id', $request->tag_ids)->pluck('id', 'name'));
+                $newAudit->url = (empty($_SERVER['HTTPS']) ? 'http' : 'https')."://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+                $newAudit->save();
+            }
         }
         if($is_ajax){
             return response()->json(['success' => true, 'message' => 'Goal Updated successfully']);
         } else {
-            /*
-            if ($request->datatype != "auto") {
-                return redirect()->route($goal->is_library ? 'goal.library' : 'goal.index');
-            } else {
-                //return \Redirect::route('goal.edit', [$id]);
-                return \Redirect::route('goal.edit', [$id])->with('autosave', " Goal updated.");
-            }
-            */
             if ($request->datatype != "auto") {
                 if ($goal->is_library) {
                     return \Redirect::route('goal.library');
@@ -477,7 +510,6 @@ class GoalController extends Controller
                     return \Redirect::route('goal.show', [$id])->with('autosave', " Goal updated.");
                 }
             } else {
-                //return \Redirect::route('goal.edit', [$id]);
                 return \Redirect::route('goal.edit', [$id])->with('autosave', " Goal updated.");
             }
         }
@@ -512,8 +544,36 @@ class GoalController extends Controller
         if ($goal->user_id !== Auth::id()) {
             abort(403);
         }
-
+        $arrayOrigTags = array_column($goal->tags->toArray(), 'id');
+        $query1 = DB::table('goal_tags')
+            ->where('goal_id', '=', $goal->id)
+            ->delete();
+        // Insert audits for Goal Tag changes
+        $arrayNewTags = [];
+        if(array_diff($arrayOrigTags, $arrayNewTags) or array_diff($arrayNewTags, $arrayOrigTags)) {
+            $actualAuthId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
+            $newAudit = new Audit;
+            $newAudit->user_type = 'App\Models\User';
+            $newAudit->user_id = $actualAuthId;
+            $newAudit->original_auth_id = $newAudit->user_id;
+            $newAudit->event = 'deleted';
+            $newAudit->auditable_type = 'App\Models\GoalTags';
+            $newAudit->auditable_id = $id;
+            $newAudit->old_values = json_encode(Tag::whereIn('id', $arrayOrigTags)->pluck('id', 'name'));
+            $newAudit->new_values = json_encode(Tag::whereIn('id', $arrayNewTags)->pluck('id', 'name'));
+            $newAudit->url = (empty($_SERVER['HTTPS']) ? 'http' : 'https')."://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+            $newAudit->save();
+        }
+        $query2 = DB::table('goal_bank_orgs')
+            ->where('goal_id', '=', $goal->id)
+            ->delete();
+        $query3 = DB::table('goals_shared_with')
+            ->where('goal_id', '=', $goal->id)
+            ->delete();
         $goal->delete();
+        DashboardNotification::where('notification_type', 'GB')
+                                        ->where('related_id', $goal->id)
+                                        ->delete();
 
         return redirect()->back();
     }
@@ -571,7 +631,6 @@ class GoalController extends Controller
             });
         }
         if ($filter->has('goal_bank_tags') && $filter->goal_bank_tags) {
-            // $adminGoals = $adminGoals->where('goal_tags.tag_id', "=", "$filter->tag_id");
             $adminGoals = $adminGoals->whereRaw("EXISTS (SELECT 1 FROM goal_tags WHERE goal_tags.goal_id = goals.id AND goal_tags.tag_id = '{$filter->goal_bank_tags}')");
         }
         if ($filter->has('goal_bank_title') && $filter->goal_bank_title) {
@@ -583,7 +642,6 @@ class GoalController extends Controller
             $adminGoals = $adminGoals->whereDate('goals.created_at', '<=', $dateadded . " 23:59:59");
         }
         if ($filter->has('goal_bank_createdby') && $filter->goal_bank_createdby) {
-            // $query = $query->where('user_id', $filter->created_by);
             if(is_numeric($filter->goal_bank_createdby)) {
                 $adminGoals = $adminGoals->where('created_by', $filter->goal_bank_createdby)->whereNull('display_name');
             } else {
@@ -646,7 +704,6 @@ class GoalController extends Controller
             });
         }
         if ($filter->has('goal_bank_tags') && $filter->goal_bank_tags) {
-            // $adminGoalsInherited = $adminGoalsInherited->where('goal_tags.tag_id', "=", "$filter->tag_id");
             $adminGoalsInherited = $adminGoalsInherited->whereRaw("EXISTS (SELECT 1 FROM goal_tags WHERE goal_tags.goal_id = goals.id AND goal_tags.tag_id = '{$filter->goal_bank_tags}')");
         }
         if ($filter->has('goal_bank_title') && $filter->goal_bank_title) {
@@ -658,16 +715,12 @@ class GoalController extends Controller
             $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '<=', $dateadded . " 23:59:59");
         }
         if ($filter->has('goal_bank_createdby') && $filter->goal_bank_createdby) {
-            // $query = $query->where('user_id', $filter->created_by);
             if(is_numeric($filter->goal_bank_createdby)) {
                 $adminGoalsInherited = $adminGoalsInherited->where('created_by', $filter->goal_bank_createdby)->whereNull('display_name');
             } else {
                 $adminGoalsInherited = $adminGoalsInherited->where('display_name', 'like',$filter->goal_bank_createdby);
             }
         }
-
-
-        // $adminGoals = $adminGoals->union($adminGoalsInherited);
 
         $query = Goal::withoutGlobalScope(NonLibraryScope::class)
         ->where('is_library', true)    
@@ -723,7 +776,6 @@ class GoalController extends Controller
         }
 
         if ($filter->has('goal_bank_createdby') && $filter->goal_bank_createdby) {
-            // $query = $query->where('user_id', $filter->created_by);
             if(is_numeric($filter->goal_bank_createdby)) {
                 $query = $query->where('created_by', $filter->goal_bank_createdby)->whereNull('display_name');
             } else {
@@ -744,8 +796,6 @@ class GoalController extends Controller
         $sortorder = 'ASC';
         $query = $query->orderby($sortby, $sortorder);    
         
-        // $query = $query->groupBy('goals.id');
-        //$bankGoals = $query->paginate($perPage=10, $columns = ['*'], $pageName = 'Goal');
         $bankGoals = $query->get();
 
 
@@ -789,7 +839,6 @@ class GoalController extends Controller
             ->whereIn('goals.by_admin', [1, 2])
             ->where('goals.is_library', true)
             ->whereNull('goals.deleted_at')        
-            // ->whereRaw('employee_demo.pdp_excluded = 0')   
             ->groupBy('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id', 'u2.id', 'u2.name', 'goals.is_mandatory');
               
 
@@ -811,7 +860,6 @@ class GoalController extends Controller
             });
         }
         if ($filter->has('goal_bank_tags_hidden') && $filter->goal_bank_tags_hidden) {
-            // $adminGoals = $adminGoals->where('goal_tags.tag_id', "=", "$filter->tag_id");
             $adminGoals = $adminGoals->whereRaw("EXISTS (SELECT 1 FROM goal_tags WHERE goal_tags.goal_id = goals.id AND goal_tags.tag_id = '{$filter->goal_bank_tags_hidden}')");
         }
         if ($filter->has('goal_bank_title_hidden') && $filter->goal_bank_title_hidden) {
@@ -823,7 +871,6 @@ class GoalController extends Controller
             $adminGoals = $adminGoals->whereDate('goals.created_at', '<=', $dateadded_hidden . " 23:59:59");
         }
         if ($filter->has('goal_bank_createdby_hidden') && $filter->goal_bank_createdby_hidden) {
-            // $query = $query->where('user_id', $filter->created_by);
             if(is_numeric($filter->goal_bank_createdby_hidden)) {
                 $adminGoals = $adminGoals->where('created_by', $filter->goal_bank_createdby_hidden)->whereNull('display_name');
             } else {
@@ -876,7 +923,6 @@ class GoalController extends Controller
             });
         }
         if ($filter->has('goal_bank_tags_hidden') && $filter->goal_bank_tags_hidden) {
-            // $adminGoalsInherited = $adminGoalsInherited->where('goal_tags.tag_id', "=", "$filter->tag_id");
             $adminGoalsInherited = $adminGoalsInherited->whereRaw("EXISTS (SELECT 1 FROM goal_tags WHERE goal_tags.goal_id = goals.id AND goal_tags.tag_id = '{$filter->goal_bank_tags_hidden}')");
         }
         if ($filter->has('goal_bank_title_hidden') && $filter->goal_bank_title_hidden) {
@@ -888,16 +934,12 @@ class GoalController extends Controller
             $adminGoalsInherited = $adminGoalsInherited->whereDate('goals.created_at', '<=', $dateadded_hidden . " 23:59:59");
         }
         if ($filter->has('goal_bank_createdby_hidden') && $filter->goal_bank_createdby_hidden) {
-            // $query = $query->where('user_id', $filter->created_by);
             if(is_numeric($filter->goal_bank_createdby_hidden)) {
                 $adminGoalsInherited = $adminGoalsInherited->where('created_by', $filter->goal_bank_createdby_hidden)->whereNull('display_name');
             } else {
                 $adminGoalsInherited = $adminGoalsInherited->where('display_name', 'like',$filter->goal_bank_createdby_hidden);
             }
         }
-
-
-        // $adminGoals = $adminGoals->union($adminGoalsInherited);
 
         $query = Goal::withoutGlobalScope(NonLibraryScope::class)
         ->where('is_library', true)    
@@ -943,7 +985,6 @@ class GoalController extends Controller
         }
 
         if ($filter->has('goal_bank_createdby_hidden') && $filter->goal_bank_createdby_hidden) {
-            // $query = $query->where('user_id', $filter->created_by);
             if(is_numeric($filter->goal_bank_createdby_hidden)) {
                 $query = $query->where('created_by', $filter->goal_bank_createdby_hidden)->whereNull('display_name');
             } else {
@@ -964,8 +1005,6 @@ class GoalController extends Controller
         $sortorder = 'ASC';
         $query = $query->orderby($sortby, $sortorder);    
         
-        // $query = $query->groupBy('goals.id');
-        //$bankGoals = $query->paginate($perPage=10, $columns = ['*'], $pageName = 'Goal');
         $bankGoals = $query->get();
 
         $selectedGoals = array();
@@ -1157,10 +1196,6 @@ class GoalController extends Controller
             "id" => "0",
             "name" => "Any"
         ]);
-        
-
-        //$myTeamController = new MyTeamController();
-        //$suggestedGoalsData = $myTeamController->showSugggestedGoals('my-team.goals.bank', false);
 
         $suggestedGoalsData = DB::table('goals')
             ->select('goals.id', 'goals.title', 'goals.goal_type_id', 'goals.created_at', 'goals.user_id'
@@ -1211,7 +1246,6 @@ class GoalController extends Controller
             }
 
             if ($request->has('created_by') && $request->created_by) {
-                // $query = $query->where('user_id', $request->created_by);
                 $suggestedGoalsData = $suggestedGoalsData->where('created_by', $request->created_by);
             }    
                 
@@ -1248,11 +1282,6 @@ class GoalController extends Controller
 
         $json_team_goalbanks = json_encode($team_bankGoals_arr);
         
-
-        // $compacted = compact('bankGoals', 'tags', 'tagsList', 'goalTypes', 'mandatoryOrSuggested', 'createdBy');
-        // dd($compacted);
-        // $merged = array_merge(compact('bankGoals', 'tags', 'tagsList', 'goalTypes', 'mandatoryOrSuggested', 'createdBy'), $suggestedGoalsData);
-        // dd($merged);
         $type_desc_arr = array();
         foreach($goaltypes as $goalType) {
             if(isset($goalType['description']) && isset($goalType['name'])) {                
@@ -1306,16 +1335,6 @@ class GoalController extends Controller
                     ->where('shared_profiles.shared_with', Auth::id())
                     ->where('shared_profiles.shared_item', 'like', '%1%')
                     ->get();
-        /*
-        if(count($shared_employees)>0) {
-            foreach ($shared_employees as $shared_employee) {
-                $employees_list[$i]["id"] = $shared_employee->shared_id;
-                $employees_list[$i]["name"] = $shared_employee->name;
-                $i++;
-            }
-        }
-         * 
-         */
 
         $goaltypes = GoalType::where('name', '!=', 'private')->get()->toArray();
 
@@ -1410,15 +1429,6 @@ class GoalController extends Controller
             "id" => "0",
             "name" => "Any"
         ]);
-
-        // dd($goalTypes);
-        /* $goalTypes = [];
-        foreach($goalType as $id => $type) {
-            $goalTypes[] = [
-                "id" => $id,
-                "name" => $type
-            ];
-        } */
     }
 
     public function library(Request $request)
@@ -1430,15 +1440,12 @@ class GoalController extends Controller
         $expanded = false;
         $currentSearch = "";
         if($request->has('search') && $request->search != '') {
-            // $searchText = explode(' ', $request->search);
             $searchText = $request->search;
             $query->Where(function ($qq) use ($searchText) {
                 foreach ($searchText as $search) {
                     $qq->orWhere(function ($q) use ($search) {
                         $q->orWhere('title', 'LIKE', '%' . $search . '%');
                         $q->orWhere('what', 'LIKE', '%' . $search . '%');
-                        /* $q->orWhere('why', 'LIKE', '%' . $search . '%');
-                        $q->orWhere('how', 'LIKE', '%' . $search . '%'); */
                         $q->orWhere('measure_of_success', 'LIKE', '%' . $search . '%');
                     });
                 }
@@ -1449,13 +1456,10 @@ class GoalController extends Controller
         }
         $sQuery = clone $query;
 
-        /* $supervisorGoals = $sQuery->whereIn('id', [998])->with('goalType')
-        ->with('comments')->get(); */
         $organizationGoals = $query->whereIn('id', [997, 999])->with('goalType')
         ->with('comments')->get();
 
         $user = Auth::user();
-        // $sQuery = $user->sharedGoals()->withoutGlobalScope(NonLibraryScope::class);
         $sQuery = Goal::withoutGlobalScope(NonLibraryScope::class)->where('user_id', $user->reportingManager->id);
 
         // TODO: For User Experience
@@ -1469,8 +1473,6 @@ class GoalController extends Controller
                     $qq->orWhere(function ($q) use ($search) {
                         $q->orWhere('title', 'LIKE', '%' . $search . '%');
                         $q->orWhere('what', 'LIKE', '%' . $search . '%');
-                        /* $q->orWhere('why', 'LIKE', '%' . $search . '%');
-                        $q->orWhere('how', 'LIKE', '%' . $search . '%'); */
                         $q->orWhere('measure_of_success', 'LIKE', '%' . $search . '%');
                     });
                 }
@@ -1480,7 +1482,6 @@ class GoalController extends Controller
             $currentSearch = implode(' ', $request->search);
         };
         // TODO: For UserExperience Test
-        // $supervisorGoals = $sQuery->where('is_library', 1)->with('goalType')
         $supervisorGoals = $sQuery->with('goalType')
         ->with('comments')->get();
         return view('goal.library', compact('organizationGoals', 'supervisorGoals', 'currentSearch', 'expanded'));
@@ -1499,9 +1500,7 @@ class GoalController extends Controller
     private function copyFromLibrary(Goal $goal) {
         $newGoal = new Goal;
         $newGoal->title = $goal->title;
-        // $newGoal->why = $goal->why;
         $newGoal->what = $goal->what;
-        // $newGoal->how = $goal->how;
         $newGoal->measure_of_success = $goal->measure_of_success;
         $newGoal->start_date = $goal->start_date;
         $newGoal->target_date = $goal->target_date;
@@ -1535,6 +1534,23 @@ class GoalController extends Controller
                                'updated_at'   =>   date('Y-m-d h:i:s a', time())
                         )
                     );
+                }
+                $actualAuthId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
+                $arrayOrigTags = [];
+                $arrayNewTags = array_column($newGoal->tags->toArray(), 'id');
+                // Insert audits for Goal Tag changes
+                if(array_diff($arrayOrigTags, $arrayNewTags) or array_diff($arrayNewTags, $arrayOrigTags)) {
+                    $newAudit = new Audit;
+                    $newAudit->user_type = 'App\Models\User';
+                    $newAudit->user_id = $actualAuthId;
+                    $newAudit->original_auth_id = $newAudit->user_id;
+                    $newAudit->event = 'created';
+                    $newAudit->auditable_type = 'App\Models\GoalTags';
+                    $newAudit->auditable_id = $newGoal->id;
+                    $newAudit->old_values = json_encode(Tag::whereIn('id', $arrayOrigTags)->pluck('id', 'name'));
+                    $newAudit->new_values = json_encode(Tag::whereIn('id', $arrayNewTags)->pluck('id', 'name'));
+                    $newAudit->url = (empty($_SERVER['HTTPS']) ? 'http' : 'https')."://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+                    $newAudit->save();
                 }
             }             
         }
@@ -1587,6 +1603,23 @@ class GoalController extends Controller
                            'updated_at'   =>   date('Y-m-d h:i:s a', time())
                     )
                 );
+                $actualAuthId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
+                $arrayOrigTags = [];
+                $arrayNewTags = array_column($newGoal->tags->toArray(), 'id');
+                // Insert audits for Goal Tag changes
+                if(array_diff($arrayOrigTags, $arrayNewTags) or array_diff($arrayNewTags, $arrayOrigTags)) {
+                    $newAudit = new Audit;
+                    $newAudit->user_type = 'App\Models\User';
+                    $newAudit->user_id = $actualAuthId;
+                    $newAudit->original_auth_id = $newAudit->user_id;
+                    $newAudit->event = 'created';
+                    $newAudit->auditable_type = 'App\Models\GoalTags';
+                    $newAudit->auditable_id = $newGoal->id;
+                    $newAudit->old_values = json_encode(Tag::whereIn('id', $arrayOrigTags)->pluck('id', 'name'));
+                    $newAudit->new_values = json_encode(Tag::whereIn('id', $arrayNewTags)->pluck('id', 'name'));
+                    $newAudit->url = (empty($_SERVER['HTTPS']) ? 'http' : 'https')."://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+                    $newAudit->save();
+                }
             }
         }        
         
@@ -1669,7 +1702,6 @@ class GoalController extends Controller
                 $curr_supervisor_id = $curr_supervisor_default_id;
             }
 
-            // if (($goal->last_supervisor_comment != 'Y') and (session()->get('original-auth-id') != null) and ($user->reporting_to == session()->get('original-auth-id'))) {
             if (($goal->last_supervisor_comment != 'Y') and (session()->get('original-auth-id') != null) and ($user_supervisor_id == session()->get('original-auth-id'))) {
                     //update flag
                 $goal->last_supervisor_comment = 'Y';
@@ -1723,219 +1755,6 @@ class GoalController extends Controller
                 }
             }
 
-            /*
-            if ($request->parent_id != null) {
-                $original_comment = GoalComment::withTrashed()->findOrFail($request->parent_id);
-                if (($original_comment->user_id != Auth::id()) and ($goal->user_id != Auth::id())) {
-                    //user replying to somebody else's comment
-                    // $newNotify = new DashboardNotification;
-                    // $newNotify->user_id = Auth::id();
-                    // $newNotify->notification_type = 'GR';
-                    // $newNotify->comment = $user->name . ' replied to your Goal comment.';
-                    // $newNotify->related_id = $goal->id;
-                    // $newNotify->save();
-                    // Use Class to create DashboardNotification
-
-                    if ($user && $user->allow_inapp_notification) {
-                        if($comment_user->id != Auth::id()) {
-                            $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                            $notification->user_id = Auth::id();
-                            $notification->notification_type = 'GR';
-                            $notification->comment = $comment_user->name . ' replied to your Goal comment.';
-                            $notification->related_id = $goal->id;
-                            $notification->notify_user_id = Auth::id();
-                            $notification->send(); 
-                        }
-                    }
-
-                    // Send Out email notification
-                    if ($user && $user->allow_email_notification && $user->userPreference->goal_comment_flag == 'Y') {
-                        if($comment_user->id != $goal->user_id) {
-                            $sendMail = new SendMail();
-                            $sendMail->toRecipients = array( $goal->user_id );  
-                            $sendMail->sender_id = null;
-                            $sendMail->useQueue = true;
-                            $sendMail->saveToLog = true;
-                            $sendMail->alert_type = 'N';
-                            $sendMail->alert_format = 'E';
-                            $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
-
-                            array_push($sendMail->bindvariables, $goal->user->name);    // %1 Recipient of the email
-                            array_push($sendMail->bindvariables,  $comment_user->name );        // %2 Person who added the comment
-                            array_push($sendMail->bindvariables, $goal->title);         // %3 Goal title
-                            array_push($sendMail->bindvariables, $comment->comment );   // %4 added comment
-                            $response = $sendMail->sendMailWithGenericTemplate();
-                        }
-                    }
-
-                }
-            }
-            else {
-
-                // add a message when the commemt was added by Shared with  
-                $is_by_shared_with = $user->sharedWith->contains('shared_with', $comment->user_id);
-                                       
-                // if ((session()->get('original-auth-id') != null) and ($is_by_shared_with or ($user->reporting_to == session()->get('original-auth-id')))) {
-                if ((session()->get('original-auth-id') != null) and ($is_by_shared_with or ($user_supervisor_id == session()->get('original-auth-id')))) {
-                        //add dashboard notification
-                    // $newNotify = new DashboardNotification;
-                    // $newNotify->user_id = Auth::id();
-                    // $newNotify->notification_type = 'GC';
-                    // $newNotify->comment = $comment->user->name . ' added a comment to your goal.';
-                    // $newNotify->related_id = $goal->id;
-                    // $newNotify->save();
-                    // Use Class to create DashboardNotification
-
-                    if ($user && $user->allow_inapp_notification) {
-                        if($comment_user->id != Auth::id()) {
-                            $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                            $notification->user_id = Auth::id();
-                            $notification->notification_type = 'GC';
-                            $notification->comment =  $comment_user->name . ' added a comment to your goal.';
-                            $notification->related_id = $goal->id;
-                            $notification->notify_user_id = Auth::id();
-                            $notification->send(); 
-                        }
-                    }
-
-                    // Send Out Email Notification to Employee when his supervisor comment his goal
-                    if ($user && $user->allow_email_notification && $user->userPreference->goal_comment_flag == 'Y') {
-                        if($comment_user->id != $goal->user_id) {
-                            $sendMail = new SendMail();
-                            $sendMail->toRecipients = array( $goal->user_id );  
-                            $sendMail->sender_id = null;
-                            $sendMail->useQueue = true;
-                            $sendMail->saveToLog = true;
-                            $sendMail->alert_type = 'N';
-                            $sendMail->alert_format = 'E';
-                            $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
-
-                            array_push($sendMail->bindvariables, $goal->user->name);
-                            array_push($sendMail->bindvariables,  $comment_user->name );    // %2 Person who added the comment
-                            array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
-                            array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
-                            $response = $sendMail->sendMailWithGenericTemplate();
-                        }
-                    }
-                }
-            }
-
-
-            // if (($curr_user->reporting_to == $goal->user_id) and ($goal->user_id != Auth::id())) {
-            if (($curr_supervisor_id == $goal->user_id) and ($goal->user_id != Auth::id())) {
-                    //add notification in Supervisor's Dashboard
-                // $newNotify = new DashboardNotification;
-                // $newNotify->user_id = $curr_user->reporting_to;
-                // $newNotify->notification_type = 'GC';
-                // $newNotify->comment = $curr_user->name . ' added a comment to your goal.';
-                // $newNotify->related_id = $goal->id;
-                // $newNotify->save();
-                // Use Class to create DashboardNotification
-
-                if ($curr_user->reportingManager && $curr_user->reportingManager->allow_inapp_notification) {
-                    if($comment_user->id != $curr_supervisor_id) {
-                        $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                        $notification->user_id = $curr_supervisor_id;
-                        $notification->notification_type = 'GC';
-                        $notification->comment = $comment_user->name . ' added a comment to your goal.';
-                        $notification->related_id = $goal->id;
-                        $notification->notify_user_id = Auth::id();
-                        $notification->send(); 
-                    }
-                }
-
-                // Send Out Email Notification to Supervisor when Employee comments his supervisor's goal
-                if ($curr_user->reportingManager && 
-                    $curr_user->reportingManager->allow_email_notification && 
-                    $curr_user->reportingManager->userPreference->goal_comment_flag == 'Y') {                
-                    if($comment_user->id != $curr_supervisor_id) {
-                        $sendMail = new SendMail();
-                        $sendMail->toRecipients = array( $curr_supervisor_id );  
-                        $sendMail->sender_id = null;
-                        $sendMail->useQueue = true;
-                        $sendMail->saveToLog = true;
-                        $sendMail->alert_type = 'N';
-                        $sendMail->alert_format = 'E';
-
-                        $sendMail->template = 'EMPLOYEE_COMMENT_THE_GOAL';
-                        array_push($sendMail->bindvariables, $curr_user->reportingManager->name);  // %1 Recipient of the email
-                        array_push($sendMail->bindvariables, $comment_user->name);    // %2 Person who added the comment
-                        array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
-                        array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
-                        $response = $sendMail->sendMailWithGenericTemplate();
-                    }
-                }
-            }
-
-            //Get all shared_with
-            $sharedWithList = GoalSharedWith::from('goals_shared_with AS gsw')
-                ->where('gsw.goal_id', $goal->id)
-                ->where('gsw.user_id', '<>', $curr_user->id)
-                ->when($goal->user_id == Auth::id(), function($q) use($goal) {
-                    return $q->where('gsw.user_id', '<>', $goal->user_id);
-                })
-                ->get();
-            foreach($sharedWithList AS $shared) {
-                $userShared = User::with('userPreference')->findOrFail($shared->user_id);
-                if($userShared && $userShared->allow_inapp_notification) {
-                    if($comment_user->id != $shared->user_id) {
-                        $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-                        $notification->user_id = $shared->user_id;
-                        $notification->notification_type = 'GK';
-                        $notification->comment = $comment_user->name . ' added a comment to a shared goal.';
-                        $notification->related_id = $goal->id;
-                        $notification->notify_user_id = $shared->user_id;
-                        $notification->send(); 
-                    }
-                }
-                if($userShared && $userShared->allow_email_notification && $userShared->userPreference->goal_comment_flag == 'Y') {
-                    if($comment_user->id != $shared->user_id) {
-                        $sendMail = new SendMail();
-                        $sendMail->toRecipients = array( $shared->user_id );  
-                        $sendMail->sender_id = null;
-                        $sendMail->useQueue = true;
-                        $sendMail->saveToLog = true;
-                        $sendMail->alert_type = 'N';
-                        $sendMail->alert_format = 'E';
-                        $sendMail->template = 'GOAL_COMMENT_SHARED';
-                        array_push($sendMail->bindvariables, $shared->name);  // %1 Recipient of the email
-                        array_push($sendMail->bindvariables, $comment_user->name);    // %2 Person who added the comment
-                        array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
-                        array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
-                        $response = $sendMail->sendMailWithGenericTemplate();
-                    }
-                }
-            }
-            // //Notify Owner
-            // if($goal->user_id <> Auth::id()) {
-            //     $userShared = User::with('userPreference')->findOrFail($goal->user_id);
-            //     if($userShared && $userShared->allow_inapp_notification) {
-            //         $notification = new \App\MicrosoftGraph\SendDashboardNotification();
-            //         $notification->user_id = $goal->user_id;
-            //         $notification->notification_type = 'GK';
-            //         $notification->comment = $curr_user->name . ' added a comment to a shared goal.';
-            //         $notification->related_id = $goal->id;
-            //         $notification->notify_user_id = $goal->user_id;
-            //         $notification->send(); 
-            //     }
-            //     if($userShared && $userShared->allow_email_notification && $userShared->userPreference->goal_comment_flag == 'Y') {
-            //         $sendMail = new SendMail();
-            //         $sendMail->toRecipients = array( $goal->user_id );  
-            //         $sendMail->sender_id = null;
-            //         $sendMail->useQueue = true;
-            //         $sendMail->saveToLog = true;
-            //         $sendMail->alert_type = 'N';
-            //         $sendMail->alert_format = 'E';
-            //         $sendMail->template = 'GOAL_COMMENT_SHARED';
-            //         array_push($sendMail->bindvariables, $userShared->name);  // %1 Recipient of the email
-            //         array_push($sendMail->bindvariables, $curr_user->name);    // %2 Person who added the comment
-            //         array_push($sendMail->bindvariables, $goal->title);        // %3 Goal title
-            //         array_push($sendMail->bindvariables, $comment->comment );  // %4 added comment
-            //         $response = $sendMail->sendMailWithGenericTemplate();
-            //     }
-            // }
-
-            */
         }
         return redirect()->back();
     }
@@ -2004,6 +1823,23 @@ class GoalController extends Controller
                            'updated_at'   =>   date('Y-m-d h:i:s a', time())
                     )
                 );
+                $actualAuthId = session()->has('original-auth-id') ? session()->get('original-auth-id') : Auth::id();
+                $arrayOrigTags = [];
+                $arrayNewTags = array_column($newGoal->tags->toArray(), 'id');
+                // Insert audits for Goal Tag changes
+                if(array_diff($arrayOrigTags, $arrayNewTags) or array_diff($arrayNewTags, $arrayOrigTags)) {
+                    $newAudit = new Audit;
+                    $newAudit->user_type = 'App\Models\User';
+                    $newAudit->user_id = $actualAuthId;
+                    $newAudit->original_auth_id = $newAudit->user_id;
+                    $newAudit->event = 'created';
+                    $newAudit->auditable_type = 'App\Models\GoalTags';
+                    $newAudit->auditable_id = $newGoal->id;
+                    $newAudit->old_values = json_encode(Tag::whereIn('id', $arrayOrigTags)->pluck('id', 'name'));
+                    $newAudit->new_values = json_encode(Tag::whereIn('id', $arrayNewTags)->pluck('id', 'name'));
+                    $newAudit->url = (empty($_SERVER['HTTPS']) ? 'http' : 'https')."://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+                    $newAudit->save();
+                }
             }
         }        
 
@@ -2075,7 +1911,6 @@ class GoalController extends Controller
                 ->get();
                     
 
-        //Log::info('$user->allow_inapp_notification = '.$user->allow_inapp_notification);
         if ($user && $user->allow_inapp_notification) {
 
             $notification = new \App\MicrosoftGraph\SendDashboardNotification();
