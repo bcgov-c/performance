@@ -142,7 +142,7 @@ jobs:
     uses: ./.github/workflows/web.yml
     secrets: inherit
 
-  performance:
+  build:
     name: 🔨 Performance
     needs: [checkEnv]
     if: needs.checkEnv.outputs.SKIP_BUILDS == 'NO'
@@ -172,7 +172,7 @@ jobs:
     name: 🚀 Deploy
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
-    needs: [checkEnv, db, php, cron, moodle, web, call-cleanup-workflow]
+    needs: [checkEnv, db, php, cron, build, web]
     if: |
       (always() && needs.checkEnv.outputs.SKIP_DEPLOY == 'NO') &&
       needs.checkEnv.result == 'success' &&
@@ -232,8 +232,8 @@ jobs:
           `echo "LHRESULT=$(node openshift/config/lighthouse/lighthouse-auth.js)" >> $GITHUB_OUTPUT`
         env:
           APP_HOST_URL: ${{ needs.checkEnv.outputs.APP }}-${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}.apps.silver.devops.gov.bc.ca
-          USERNAME: ${{ secrets.MOODLE_TESTER_USERNAME }}
-          PASSWORD: ${{ secrets.MOODLE_TESTER_PASSWORD }}
+          USERNAME: ${{ secrets.TESTER_USERNAME }}
+          PASSWORD: ${{ secrets.TESTER_PASSWORD }}
       - name: Archive artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -289,7 +289,7 @@ jobs:
                 "title_link": "${{ env.INSPECT_JOB_URL }}",
                 "fields": [{
                   "title": "Verify Deployment",
-                  "value": "Verify that the site still works and updates have been completed (Admin access required) [Moodle Admin](https://${{ env.APP_HOST_URL }}/admin/index.php)"
+                  "value": "Verify that the site still works and updates have been completed (Admin access required) https://${{ env.APP_HOST_URL }}/admin/index.php"
                 },{
                   "title": "Build DB: ${{ needs.db.result }}"
                 },{
