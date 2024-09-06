@@ -1,21 +1,21 @@
 <x-side-layout title="{{ __('Employee List - Performance Development Platform') }}">
-    <div name="header" class="container-header p-n2 "> 
+    <div name="header" class="container-header p-n2 ">
         <div class="container-fluid">
             <h3>Employee List</h3>
             @include('shared.employeelists.partials.tabs')
         </div>
     </div>
-    @include('shared.employeelists.partials.reportees-modal') 
-    
+    @include('shared.employeelists.partials.reportees-modal')
+
     <div class="card">
         <div class="card-body">
             {{-- <div class="h4">{{__('Current Employees')}}</div>  --}}
             @include('shared.employeelists.partials.filter')
-            <div class="p-3"> 
+            <div class="p-3">
                 <table class="table table-bordered listtable table-striped" id="listtable" style="width: 100%; overflow-x: auto; "></table>
             </div>
-        </div>    
-    </div>   
+        </div>
+    </div>
 
     @push('css')
         <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet">
@@ -25,14 +25,14 @@
         <x-slot name="css">
             <style>
                 .text-truncate-30 {
-                    white-space: wrap; 
+                    white-space: wrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
                     width: 30em;
                 }
-            
+
                 .text-truncate-10 {
-                    white-space: wrap; 
+                    white-space: wrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
                     width: 5em;
@@ -62,7 +62,7 @@
         <script src="{{ asset('js/bootstrap-multiselect.min.js')}} "></script>
         <script type="text/javascript">
             $(document).ready(function() {
-                $('#listtable').DataTable ( {
+                $('#listtable').DataTable ({
                     dom: 'lfrtip',
                     serverSide: true,
                     searching: true,
@@ -74,10 +74,10 @@
                     scroller: true,
                     scrollX: true,
                     stateSave: true,
-                    ajax: 
+                    ajax:
                     {
                         url: "{{ route(request()->segment(1).'.employeelists.getcurrentlist') }}",
-                        data: function (d) 
+                        data: function (d)
                         {
                             d.dd_level0 = $('#dd_level0').val();
                             d.dd_level1 = $('#dd_level1').val();
@@ -88,7 +88,7 @@
                             d.search_text = $('#search_text').val();
                         }
                     },
-                    columns: 
+                    columns:
                     [
                         {title: 'ID', ariaTitle: 'ID', target: 0, type: 'string', data: 'employee_id', name: 'u.employee_id', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'u.employee_name', searchable: false, className: 'dt-nowrap show-modal'},
@@ -113,14 +113,14 @@
                         {title: 'Direct / Shared Reports', ariaTitle: 'Direct / Shared Reports', target: 0, type: 'string', data: 'reportees', name: 'reportees', searchable: false, className: 'dt-nowrap show-modal'},
                         {title: 'User ID', ariaTitle: 'User ID', target: 0, type: 'num', data: 'id', name: 'u.id', searchable: false, visible: false},
                     ],
-                } );
+                });
 
                 // add export button on right
                 $("#listtable_filter").append("<button id='export-btn' value='export' class='dt-button buttons-csv buttons-html5'>Export</button> ");
 
                 $('#export-btn').on('click', function() {
                     let parray = encodeURIComponent(JSON.stringify([
-                        $('#dd_level0').val(), 
+                        $('#dd_level0').val(),
                         $('#dd_level1').val(),
                         $('#dd_level2').val(),
                         $('#dd_level3').val(),
@@ -157,7 +157,7 @@
                         ajax: {
                             type: 'GET',
                             url: "/sysadmin/employeelists/reporteeslist/"+user_id+"/"+position_number,
-                        },                    
+                        },
                         fnDrawCallback: function() {
                         },
                         fnRowCallback: function( row, data ) {
@@ -167,7 +167,7 @@
                             {title: 'Name', ariaTitle: 'Name', target: 0, type: 'string', data: 'employee_name', name: 'employee_name', searchable: true},
                             {title: 'Email', ariaTitle: 'Email', target: 0, type: 'string', data: 'employee_email', name: 'employee_email', searchable: true},
                             {title: 'Type <i class="fa fa-info-circle" data-trigger="click" data-toggle="popover" data-placement="right" data-html="true" data-content="<b>Direct Reports</b> are employees that report directly to you in PeopleSoft. <br><br><b>Delegated Reports</b> are employees that report to a vacant position in PeopleSoft and have therefore been delegated to you as the next level supervisor in the org hierarchy. <br><br><b>Shared Reports</b> are employees that have been shared with you by another supervisor or administrator in the PDP. This is separate from any PeopleSoft data." ></i>', ariaTitle: 'Type', target: 0, type: 'string', data: 'reporteetype', name: 'reporteetype', searchable: true},
-                        ],  
+                        ],
                     });
                     if($.fn.DataTable.isDataTable( "#reporteesTable" )) {
                         $('#reporteesTable').DataTable().columns.adjust();

@@ -1,0 +1,6 @@
+CREATE USER 'repluser'@'%' IDENTIFIED BY 'replsecret';
+GRANT REPLICATION REPLICA ON *.* TO 'repluser'@'%';
+GRANT REPLICA MONITOR ON *.* TO 'repluser'@'%';
+GRANT SLAVE MONITOR ON *.* TO 'repluser'@'%';
+CREATE DATABASE IF NOT EXISTS moodle;
+FLUSH PRIVILEGES;

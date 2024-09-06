@@ -151,13 +151,52 @@ class EmployeeListController extends Controller {
         if ($request->ajax()) {
             $query = UserDemoJrView::from('user_demo_jr_view AS u')
                 ->whereNull('u.date_deleted')
-                ->when($request->dd_level0, function ($q) use ($request) { return $q->where('u.organization_key', $request->dd_level0); })
-                ->when($request->dd_level1, function ($q) use ($request) { return $q->where('u.level1_key', $request->dd_level1); })
-                ->when($request->dd_level2, function ($q) use ($request) { return $q->where('u.level2_key', $request->dd_level2); })
-                ->when($request->dd_level3, function ($q) use ($request) { return $q->where('u.level3_key', $request->dd_level3); })
-                ->when($request->dd_level4, function ($q) use ($request) { return $q->where('u.level4_key', $request->dd_level4); })
-                ->when($request->search_text && $request->criteria == 'u.employee_name', function ($q) use ($request) { return $q->whereRaw("(u.employee_name LIKE '%{$request->search_text}%' OR u.user_name LIKE '%{$request->search_text}%')"); })
-                ->when($request->search_text && $request->criteria != 'u.employee_name', function ($q) use ($request) { return $q->whereRaw("{$request->criteria} LIKE '%{$request->search_text}%'"); })
+                ->when(
+                    $request->dd_level0,
+                    function ($q) use ($request) {
+                        return $q->where('u.organization_key', $request->dd_level0);
+                    }
+                )
+                ->when(
+                    $request->dd_level1,
+                    function ($q) use ($request) {
+                        return $q->where('u.level1_key', $request->dd_level1);
+                    }
+                )
+                ->when(
+                    $request->dd_level2,
+                    function ($q) use ($request) {
+                        return $q->where('u.level2_key', $request->dd_level2);
+                    }
+                )
+                ->when(
+                    $request->dd_level3,
+                    function ($q) use ($request) {
+                        return $q->where('u.level3_key', $request->dd_level3);
+                    }
+                )
+                ->when(
+                    $request->dd_level4,
+                    function ($q) use ($request) {
+                        return $q->where('u.level4_key', $request->dd_level4);
+                    }
+                )
+                ->when(
+                    $request->search_text && $request->criteria == 'u.employee_name',
+                    function ($q) use ($request) {
+                        return $q->whereRaw(
+                            "(u.employee_name LIKE '%{$request->search_text}%' OR u.user_name LIKE '%{$request->search_text}%')"
+                        );
+                    }
+                )
+                ->when(
+                    $request->search_text && $request->criteria != 'u.employee_name',
+                    function ($q) use ($request) {
+                        return $q->whereRaw(
+                            "{$request->criteria} LIKE '%{$request->search_text}%'"
+                        );
+                    }
+                )
                 ->selectRaw(
                     "u.user_id AS id,
                     u.guid,

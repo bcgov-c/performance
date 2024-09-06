@@ -8,18 +8,18 @@ use App\Http\Controllers\MyTeamConversationController;
 use App\Http\Controllers\MyTeamStatisticsReportController;
 
 Route::group(['middleware' => ['role:Supervisor']], function () {
-    Route::get( 'my-team/my-employees', [MyTeamController::class, 'myEmployees'])->name('my-team.my-employee');
-    Route::get( 'my-team/my-employees-table', [MyTeamController::class, 'myEmployeesTable'])->name('my-team.my-employee-table');
-    Route::get( 'my-team/shared-employees-table', [MyTeamController::class, 'sharedEmployeesTable'])->name('my-team.shared-employee-table');
+    Route::get('my-team/my-employees', [MyTeamController::class, 'myEmployees'])->name('my-team.my-employee');
+    Route::get('my-team/my-employees-table', [MyTeamController::class, 'myEmployeesTable'])->name('my-team.my-employee-table');
+    Route::get('my-team/shared-employees-table', [MyTeamController::class, 'sharedEmployeesTable'])->name('my-team.shared-employee-table');
 
     Route::get('my-team/suggested-goals', [MyTeamController::class, 'showSugggestedGoals'])->name('my-team.suggested-goals');
     Route::get('my-team/suggested-goal/{id}', [GoalController::class, 'getSuggestedGoal'])->name('my-team.get-suggested-goal');
     Route::post('my-team/suggested-goal/{id}', [GoalController::class, 'updateSuggestedGoal'])->name('my-team.update-suggested-goal');
 
-    Route::get( 'my-team/performance-statistics', [MyTeamController::class, 'performanceStatistics'])->name('my-team.performance-statistics');
+    Route::get('my-team/performance-statistics', [MyTeamController::class, 'performanceStatistics'])->name('my-team.performance-statistics');
     Route::post('my-team/sync', [MyTeamController::class, 'syncGoals'])->name('my-team.sync-goals');
     Route::post('my-team/add-goal-to-library', [MyTeamController::class, 'addGoalToLibrary'])->name('my-team.add-goal-to-library');
-    
+
 
     Route::post('my-team/share-profile', [MyTeamController::class, 'shareProfile'])->name('my-team.share-profile');
     Route::get('profile-shared-with/{user_id}', [MyTeamController::class, 'getProfileSharedWith'])->name('my-team.profile-shared-with');
@@ -45,24 +45,22 @@ Route::group(['middleware' => ['role:Supervisor']], function () {
     });
 
 
-  // Statictics and Reporting 
-  Route::get('/my-team/statistics', [MyTeamStatisticsReportController::class, 'goalsummary'])->name('my-team.statistics');
-  Route::get('/my-team/statistics/goalsummary', [MyTeamStatisticsReportController::class, 'goalsummary'])->name('my-team.statistics.goalsummary');
-  Route::get('/my-team/statistics/goalsummary-export', [MyTeamStatisticsReportController::class, 'goalSummaryExport'])->name('my-team.statistics.goalsummary.export');
-  Route::get('/my-team/statistics/goalsummary-tag-export', [MyTeamStatisticsReportController::class, 'goalSummaryTagExport'])->name('my-team.statistics.goalsummary.tag.export');
-  Route::get('/my-team/statistics/conversationsummary', [MyTeamStatisticsReportController::class, 'conversationsummary'])->name('my-team.statistics.conversationsummary');
-  Route::get('/my-team/statistics/conversationsummary-export', [MyTeamStatisticsReportController::class, 'conversationSummaryExport'])->name('my-team.statistics.conversationsummary.export');
-  Route::get('/my-team/statistics/sharedsummary', [MyTeamStatisticsReportController::class, 'sharedsummary'])->name('my-team.statistics.sharedsummary');
-  Route::get('/my-team/statistics/sharedsummary-export', [MyTeamStatisticsReportController::class, 'sharedSummaryExport'])->name('my-team.statistics.sharedsummary.export');
-  Route::get('/my-team/statistics/excusedsummary', [MyTeamStatisticsReportController::class, 'excusedsummary'])->name('my-team.statistics.excusedsummary');
-  Route::get('/my-team/statistics/excusedsummary-export', [MyTeamStatisticsReportController::class, 'excusedSummaryExport'])->name('my-team.statistics.excusedsummary.export');
-  Route::get('/my-team/statistics/org-organizations', [MyTeamStatisticsReportController::class,'getOrganizations']);
-  Route::get('/my-team/statistics/org-programs', [MyTeamStatisticsReportController::class,'getPrograms']);
-  Route::get('/my-team/statistics/org-divisions', [MyTeamStatisticsReportController::class,'getDivisions']);
-  Route::get('/my-team/statistics/org-branches', [MyTeamStatisticsReportController::class,'getBranches']);
-  Route::get('/my-team/statistics/org-level4', [MyTeamStatisticsReportController::class,'getLevel4']);
-
-
+    // Statictics and Reporting
+    Route::get('/my-team/statistics', [MyTeamStatisticsReportController::class, 'goalsummary'])->name('my-team.statistics');
+    Route::get('/my-team/statistics/goalsummary', [MyTeamStatisticsReportController::class, 'goalsummary'])->name('my-team.statistics.goalsummary');
+    Route::get('/my-team/statistics/goalsummary-export', [MyTeamStatisticsReportController::class, 'goalSummaryExport'])->name('my-team.statistics.goalsummary.export');
+    Route::get('/my-team/statistics/goalsummary-tag-export', [MyTeamStatisticsReportController::class, 'goalSummaryTagExport'])->name('my-team.statistics.goalsummary.tag.export');
+    Route::get('/my-team/statistics/conversationsummary', [MyTeamStatisticsReportController::class, 'conversationsummary'])->name('my-team.statistics.conversationsummary');
+    Route::get('/my-team/statistics/conversationsummary-export', [MyTeamStatisticsReportController::class, 'conversationSummaryExport'])->name('my-team.statistics.conversationsummary.export');
+    Route::get('/my-team/statistics/sharedsummary', [MyTeamStatisticsReportController::class, 'sharedsummary'])->name('my-team.statistics.sharedsummary');
+    Route::get('/my-team/statistics/sharedsummary-export', [MyTeamStatisticsReportController::class, 'sharedSummaryExport'])->name('my-team.statistics.sharedsummary.export');
+    Route::get('/my-team/statistics/excusedsummary', [MyTeamStatisticsReportController::class, 'excusedsummary'])->name('my-team.statistics.excusedsummary');
+    Route::get('/my-team/statistics/excusedsummary-export', [MyTeamStatisticsReportController::class, 'excusedSummaryExport'])->name('my-team.statistics.excusedsummary.export');
+    Route::get('/my-team/statistics/org-organizations', [MyTeamStatisticsReportController::class,'getOrganizations']);
+    Route::get('/my-team/statistics/org-programs', [MyTeamStatisticsReportController::class,'getPrograms']);
+    Route::get('/my-team/statistics/org-divisions', [MyTeamStatisticsReportController::class,'getDivisions']);
+    Route::get('/my-team/statistics/org-branches', [MyTeamStatisticsReportController::class,'getBranches']);
+    Route::get('/my-team/statistics/org-level4', [MyTeamStatisticsReportController::class,'getLevel4']);
 });
 
 Route::group(['middleware' => ['ViewAsPermission']], function () {

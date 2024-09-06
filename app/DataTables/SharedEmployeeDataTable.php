@@ -20,18 +20,36 @@ class SharedEmployeeDataTable extends DataTable
     {
         return datatables()
             ->eloquent($query)
-            ->editColumn('name', function ($row) {
-                return view('my-team.partials.link-to-profile', compact(['row']));
-            })
-            ->addColumn('action', function ($row) {
-                return view('goal.partials.action', compact(["row"])); // $row['id'];
-            })->editColumn('active_goals_count', function ($row) {
-                if( !$row['is_goal_shared_with_auth_user']) {
-                    return "-";
+            ->editColumn(
+                'name',
+                function ($row) {
+                    return view(
+                        'my-team.partials.link-to-profile',
+                        compact(['row'])
+                    );
                 }
-                $text = $row['active_goals_count'] . " Goals";
-                return view('my-team.partials.link-to-profile', compact(['row', 'text']));
-            })->addColumn('nextConversationDue', function ($row) {
+            )
+            ->addColumn(
+                'action',
+                function ($row) {
+                    return view(
+                        'goal.partials.action',
+                        compact(["row"])
+                    );
+                }
+            )->editColumn(
+                'active_goals_count',
+                function ($row) {
+                    if (!$row['is_goal_shared_with_auth_user']) {
+                        return "-";
+                    }
+                    $text = $row['active_goals_count'] . " Goals";
+                    return view(
+                        'my-team.partials.link-to-profile',
+                        compact(['row', 'text'])
+                    );
+                }
+            )->addColumn('nextConversationDue', function ($row) {
                 $jr = EmployeeDemoJunior::where('employee_id', $row->employee_id)->getQuery()->orderBy('id', 'desc')->first();
                 if (isset($jr->excused_type) && $jr->excused_type) {
                     if ($jr->excused_type == 'A') {
@@ -91,15 +109,18 @@ class SharedEmployeeDataTable extends DataTable
     {
         return $model->newQuery()
             ->whereIn('id', SharedProfile::where('shared_with', Auth::id())->pluck('shared_id') )
-            ->where('reporting_to', '<>', Auth::id())     
+            ->where('reporting_to', '<>', Auth::id())
             ->withCount('activeGoals')
             ->with('upcomingConversation')
             ->with('employee_demo')
             ->with('employee_demo_jr')
             ->with('latestConversation')
-            ->whereHas('employee_demo', function($qed){
-                return $qed->whereNull('employee_demo.date_deleted');
-            });
+            ->whereHas(
+                'employee_demo',
+                function ($qed) {
+                    return $qed->whereNull('employee_demo.date_deleted');
+                }
+            );
     }
 
     /**
@@ -117,9 +138,11 @@ class SharedEmployeeDataTable extends DataTable
             ->orderBy(0, 'desc')
             ->searching(true)
             ->ordering(true)
-            ->parameters([
-                'autoWidth' => false
-            ]);
+            ->parameters(
+                [
+                    'autoWidth' => false
+                ]
+            );
     }
 
     /**
@@ -130,7 +153,7 @@ class SharedEmployeeDataTable extends DataTable
     protected function getColumns()
     {
         return [
-           
+
             new Column([
                 'title' => 'Employee name',
                 'data' => 'name',

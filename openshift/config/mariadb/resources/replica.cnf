@@ -1,0 +1,16 @@
+[mariadb]
+skip-ssl
+# disable-ssl-verify-server-cert
+slave_parallel_mode=optimistic
+slave_parallel_threads=2  # Adjust this value based on your system's capabilities
+relay-log=moodle-db-relay-bin
+max_allowed_packet=1073741824
+innodb_buffer_pool_size=800M
+net_read_timeout=3600
+net_write_timeout=3600
+slave_skip_errors=1062,1396
+innodb_ft_result_cache_limit = 1000000000
+# GTID settings
+gtid_domain_id=1                # Must match the primary's domain ID
+# enforce_gtid_consistency=1      # Ensure transactions are GTID-consistent
+gtid_strict_mode=1              # Prevents issues with non-deterministic statements

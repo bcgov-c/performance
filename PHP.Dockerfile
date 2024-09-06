@@ -148,8 +148,8 @@ RUN wget --progress=dot:giga -O /usr/local/bin/php-fpm-healthcheck \
   && chmod +x $(which php-fpm-healthcheck)
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_FILE"
-COPY ./config_pods/php/php.ini "$PHP_INI_DIR/conf.d/app-php.ini"
-COPY ./config_pods/php/www.conf "$ETC_DIR/php-fpm.d/www.conf"
+COPY ./openshift/config/php/php.ini "$PHP_INI_DIR/conf.d/app-php.ini"
+COPY ./openshift/config/php/www.conf "$ETC_DIR/php-fpm.d/www.conf"
 
 # Add commands for site upgrades / migrations
 COPY ./openshift/scripts/migrate-build-files.sh /usr/local/bin/migrate-build-files.sh

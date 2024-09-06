@@ -1,6 +1,11 @@
+if [[ `oc describe configmap $DB_DEPLOYMENT_NAME 2>&1` =~ "NotFound" ]]; then
+  # Create configmap from the resources directory
+  oc create configmap $DB_DEPLOYMENT_NAME --from-file=./openshift/config/mariadb/resources
+fi
+
 if [[ `oc describe sts $DB_DEPLOYMENT_NAME 2>&1` =~ "NotFound" ]]; then
   echo "$DB_DEPLOYMENT_NAME NOT FOUND: Beginning deployment..."
-  envsubst < ./config_pods/mariadb/config.yaml | oc create -f - -n $DEPLOY_NAMESPACE
+  envsubst < ./openshift/config/mariadb/config.yaml | oc create -f - -n $DEPLOY_NAMESPACE
 else
   echo "$DB_DEPLOYMENT_NAME Installation found...Scaling to 0..."
   oc scale sts/$DB_DEPLOYMENT_NAME --replicas=0
@@ -22,7 +27,7 @@ else
   oc delete configmap $DB_DEPLOYMENT_NAME-config -n $DEPLOY_NAMESPACE
   oc delete service $DB_DEPLOYMENT_NAME -n $DEPLOY_NAMESPACE
   # Substitute variables in the config.yaml file and create the deployment
-  envsubst < ./config_pods/mariadb/config.yaml | oc create -f - -n $DEPLOY_NAMESPACE
+  envsubst < ./openshift/config/mariadb/config.yaml | oc create -f - -n $DEPLOY_NAMESPACE
 
   sleep 10
 

@@ -8,10 +8,10 @@ fi
 
 # maintenance nginx config
 if [[ `oc describe configmap maintenance-config 2>&1` =~ "NotFound" ]]; then
-  oc create configmap maintenance-config --from-file=default.conf=./config_pods/nginx/maintenance.conf
+  oc create configmap maintenance-config --from-file=default.conf=./openshift/config/nginx/maintenance.conf
 else
   oc delete configmap maintenance-config
-  oc create configmap maintenance-config --from-file=default.conf=./config_pods/nginx/maintenance.conf
+  oc create configmap maintenance-config --from-file=default.conf=./openshift/config/nginx/maintenance.conf
 fi
 
 if [[ `oc describe dc $BUILD_NAME 2>&1` =~ "NotFound" ]]; then

@@ -278,7 +278,7 @@ return [
                 //     'text' => 'Statistic and Reports',
                 //     'url'  => 'my-team/statistics/sharedsummary',
                 //     'active' => ['my-team/statistics/*']
-                // ],                
+                // ],
                 // [
                 //     'text' => 'Notify Team Members',
                 //     'url'  => 'my-team/notify-team-members',
@@ -427,12 +427,12 @@ return [
             'icon' => 'fas fa-fw fa-cog',
             'active' => ['sysadmin/*'],
             'can' => ['service representative'],
-            'submenu' => [ 
+            'submenu' => [
                 [
                     'text' => 'Employee List',
                     'url'  => 'sysadmin/employeelists',
                     'active' => ['sysadmin/employeelists/*']
-                ],               
+                ],
                 [
                     'text' => 'Switch Identity',
                     'url'  => 'sysadmin/switch-identity',

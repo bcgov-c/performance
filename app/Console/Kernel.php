@@ -28,7 +28,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly(); 
+        // $schedule->command('inspire')->hourly();
         $schedule->command('command:ExportDatabaseToBI')
             ->timezone('America/Vancouver')
             ->sendOutputTo(storage_path('logs/ExportDatabaseToBI.log'))
@@ -50,12 +50,12 @@ class Kernel extends ConsoleKernel
             ->timezone('America/Vancouver')
             ->sendOutputTo(storage_path('logs/GetODSDeptHierarchy.log'))
             ->dailyAt('00:15');
-  
+
         $schedule->command('command:BuildOrgTree')
             ->timezone('America/Vancouver')
             ->sendOutputTo(storage_path('logs/BuildOrgTree.log'))
             ->dailyAt('00:20');
-  
+
         $schedule->command('command:SyncUserProfile')
             ->timezone('America/Vancouver')
             ->dailyAt('00:25')
@@ -75,12 +75,12 @@ class Kernel extends ConsoleKernel
             ->timezone('America/Vancouver')
             ->sendOutputTo(storage_path('logs/PopulateAuthUsers.log'))
             ->dailyAt('01:00');
-  
+
         $schedule->command('command:PopulateAuthOrgs')
             ->timezone('America/Vancouver')
             ->sendOutputTo(storage_path('logs/PopulateAuthOrgs.log'))
             ->dailyAt('01:05');
-  
+
         $schedule->command('command:SetNextLevelManager')
             ->timezone('America/Vancouver')
             ->sendOutputTo(storage_path('logs/SetNextLevelManager.log'))
@@ -100,42 +100,43 @@ class Kernel extends ConsoleKernel
             ->timezone('America/Vancouver')
             ->sendOutputTo(storage_path('logs/BuildEmployeeDemoTree.log'))
             ->dailyAt('03:00');
-  
+
         $schedule->command('command:PopulateEmployeeManagersTable')
             ->timezone('America/Vancouver')
             ->sendOutputTo(storage_path('logs/PopulateEmployeeManagersTable.log'))
             ->dailyAt('03:30');
-  
+
         $schedule->command('command:PopulateUsersAnnexTable')
             ->timezone('America/Vancouver')
             ->sendOutputTo(storage_path('logs/PopulateUsersAnnexTable.log'))
             ->dailyAt('04:00');
-  
+
         $schedule->command('command:PopulateOrganizationStatistics')
             ->timezone('America/Vancouver')
             ->sendOutputTo(storage_path('logs/PopulateOrganizationStatistics.log'))
             ->dailyAt('04:05');
-  
+
         $schedule->command('command:CleanShareProfile')
-            ->timezone('America/Vancouver')    
+            ->timezone('America/Vancouver')
             ->sendOutputTo(storage_path('logs/CleanShareProfile.log'))
             ->dailyAt('05:00');
-        
+
         $schedule->command('command:MaintainLogs')
-            ->timezone('America/Vancouver')  
+            ->timezone('America/Vancouver')
             ->sendOutputTo(storage_path('logs/MaintainLogs.log'))
             ->dailyAt('06:00');
 
         $schedule->command('command:NotifyConversationDue')
-            ->timezone('America/Vancouver')    
+            ->timezone('America/Vancouver')
             ->dailyAt('06:15')
             ->appendOutputTo(storage_path('logs/NotifyConversationDue.log'));
-        
+
         $schedule->command('notify:daily')
-            ->timezone('America/Vancouver')    
+            ->timezone('America/Vancouver')
             ->dailyAt('08:00')
             ->appendOutputTo(storage_path('logs/daily.log'));
 
+        $schedule->command('telescope:prune --hours=12')->daily();
     }
 
     /**

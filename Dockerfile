@@ -134,10 +134,10 @@ RUN chmod -R 755 ${STORAGE_DIR} && \
 
 # Copy Server Config files (Apache / PHP)
 RUN mv ${PHP_INI_DIR}/php.ini-production ${PHP_INI_FILE}
-COPY ./config_pods/php/php.ini ${PHP_CONF_DIR}/app-php.ini
-COPY ./config_pods/php/www.conf ${ETC_DIR}/php-fpm.d/www.conf
-COPY --chown=www-data:www-data ./config_pods/php/opcache.ini ${PHP_CONF_DIR}/opcache.ini
-COPY ./config_pods/php/info.php ${BUILD_DIR}/public/info/info.php
+COPY ./openshift/config/php/php.ini ${PHP_CONF_DIR}/app-php.ini
+COPY ./openshift/config/php/www.conf ${ETC_DIR}/php-fpm.d/www.conf
+COPY --chown=www-data:www-data ./openshift/config/php/opcache.ini ${PHP_CONF_DIR}/opcache.ini
+COPY ./openshift/config/php/info.php ${BUILD_DIR}/public/info/info.php
 
 # Add Healthcheck
 RUN wget --progress=dot:giga -O /usr/local/bin/php-fpm-healthcheck \
@@ -148,7 +148,7 @@ RUN wget --progress=dot:giga -O /usr/local/bin/php-fpm-healthcheck \
   && chmod +x $(which php-fpm-healthcheck)
 
 	# Add cron script
-COPY ./config_pods/cron/cron.sh /usr/local/bin/cron.sh
+COPY ./openshift/config/cron/cron.sh /usr/local/bin/cron.sh
 # Convert line endings of the script to ensure compatibility
 RUN chmod +x /usr/local/bin/cron.sh && \
 	dos2unix /usr/local/bin/cron.sh

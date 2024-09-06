@@ -34,8 +34,10 @@ class MyTeamController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function myEmployees(MyEmployeesDataTable $myEmployeesDataTable, SharedEmployeeDataTable $sharedEmployeeDataTable)
-    {
+    public function myEmployees(
+        MyEmployeesDataTable $myEmployeesDataTable,
+        SharedEmployeeDataTable $sharedEmployeeDataTable
+    ) {
         $tags = Tag::all()->sortBy("name")->toArray();
         $goaltypes = GoalType::all();
         // $eReasons = ExcusedReason::all();
@@ -53,20 +55,22 @@ class MyTeamController extends Controller
         $employees = $this->myEmployeesAjax();
 
         $adminShared=SharedProfile::select('shared_id')
-        ->join('users','users.id','shared_profiles.shared_id')
-        ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
-        ->whereNull('employee_demo.date_deleted')
-        ->where('shared_with', '=', Auth::id())
-        ->where(function ($sh) {
-            $sh->where('shared_item', 'like', '%1%')
-            ->orWhere('shared_item', 'like', '%2%');
-        })
-        ->pluck('shared_id');
+            ->join('users', 'users.id', 'shared_profiles.shared_id')
+            ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
+            ->whereNull('employee_demo.date_deleted')
+            ->where('shared_with', '=', Auth::id())
+            ->where(
+                function ($sh) {
+                    $sh->where('shared_item', 'like', '%1%')
+                        ->orWhere('shared_item', 'like', '%2%');
+                }
+            )
+            ->pluck('shared_id');
 
         $adminemps = User::select('users.*')
-        ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
-        ->whereNull('employee_demo.date_deleted')
-        ->whereIn('users.id', $adminShared)->get();
+            ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
+            ->whereNull('employee_demo.date_deleted')
+            ->whereIn('users.id', $adminShared)->get();
 
         $employees = $employees->merge($adminemps);
 
@@ -74,19 +78,19 @@ class MyTeamController extends Controller
         $showSignoff = false;
         $myEmpTable = $myEmployeesDataTable->html();
         $sharedEmpTable = $sharedEmployeeDataTable->html();
-        
+
         $type_desc_arr = array();
-        foreach($goaltypes as $goalType) {
-            if(isset($goalType['description']) && isset($goalType['name'])) {
-                $item = "<b>" . $goalType['name'] . " Goals</b> ". $goalType['description'];                
+        foreach ($goaltypes as $goalType) {
+            if (isset($goalType['description']) && isset($goalType['name'])) {
+                $item = "<b>" . $goalType['name'] . " Goals</b> ". $goalType['description'];
                 array_push($type_desc_arr, $item);
             }
         }
-        $type_desc_str = implode('<br/><br/>',$type_desc_arr);
-        
+        $type_desc_str = implode('<br/><br/>', $type_desc_arr);
+
         $employees_list = array();
         $i = 0;
-        if(count($employees)>0) {
+        if (count($employees)>0) {
             foreach ($employees as $employee) {
                 $employees_list[$i]["id"] = $employee->id;
                 $employees_list[$i]["name"] = $employee->name;
@@ -95,15 +99,15 @@ class MyTeamController extends Controller
         }
 
         $shared_employees = DB::table('shared_profiles')
-                    ->select('shared_profiles.shared_id', 'users.name')
-                    ->join('users', 'users.id', '=', 'shared_profiles.shared_id')
-                    ->join('employee_demo','employee_demo.employee_id', 'users.employee_id')
-                    ->whereNull('employee_demo.date_deleted')
-                    ->where('shared_profiles.shared_with', Auth::id())
-                    ->where('shared_profiles.shared_item', 'like', '%1%')
-                    ->get();
-        
-        if(count($shared_employees)>0) {
+            ->select('shared_profiles.shared_id', 'users.name')
+            ->join('users', 'users.id', '=', 'shared_profiles.shared_id')
+            ->join('employee_demo', 'employee_demo.employee_id', 'users.employee_id')
+            ->whereNull('employee_demo.date_deleted')
+            ->where('shared_profiles.shared_with', Auth::id())
+            ->where('shared_profiles.shared_item', 'like', '%1%')
+            ->get();
+
+        if (count($shared_employees)>0) {
             foreach ($shared_employees as $shared_employee) {
                 $employees_list[$i]["id"] = $shared_employee->shared_id;
                 $employees_list[$i]["name"] = $shared_employee->name;
@@ -111,7 +115,9 @@ class MyTeamController extends Controller
             }
         }
 
-        $ClassificationArray = ExcusedClassification::select('jobcode')->get()->toArray();
+        $ClassificationArray = ExcusedClassification::select('jobcode')
+            ->get()
+            ->toArray();
 
         $yesOrNo = [
             [ "id" => 0, "name" => 'No' ],
@@ -123,7 +129,27 @@ class MyTeamController extends Controller
             [ "id" => 1, "name" => 'Yes' ],
         ];
 
-        return view('my-team/my-employees',compact('goals', 'tags', 'employees', 'employees_list', 'goaltypes', 'type_desc_str', 'conversationTopics', 'type', 'myEmpTable', 'sharedEmpTable', 'eReasons', 'eReasons2', 'showSignoff', 'yesOrNo', 'yesOrNo2', 'ClassificationArray'));
+        return view(
+            'my-team/my-employees',
+            compact(
+                'goals',
+                'tags',
+                'employees',
+                'employees_list',
+                'goaltypes',
+                'type_desc_str',
+                'conversationTopics',
+                'type',
+                'myEmpTable',
+                'sharedEmpTable',
+                'eReasons',
+                'eReasons2',
+                'showSignoff',
+                'yesOrNo',
+                'yesOrNo2',
+                'ClassificationArray'
+            )
+        );
         // return $myEmployeesDataTable->render('my-team/my-employees',compact('goals', 'employees', 'goaltypes', 'conversationTopics', 'participants', 'type'));
     }
 
@@ -138,7 +164,7 @@ class MyTeamController extends Controller
     public function myEmployeesAjax() {
         return User::find(Auth::id())->avaliableReportees()->get();
     }
-    
+
     public function mySharedEmployeesAjax() {
         return SharedProfile::find(Auth::id())->sharedWithUser()->get();
     }
@@ -147,7 +173,7 @@ class MyTeamController extends Controller
         $sharedProfiles = SharedProfile::where('shared_id', $user_id)->with(['sharedWith' => function ($query) {
             $query->select('id', 'name');
         }])->get();
-        
+
         session()->put('checking_user', $user_id);
 
         return view('my-team.partials.profile-shared-with', compact('sharedProfiles'));
@@ -169,19 +195,19 @@ class MyTeamController extends Controller
             /// $sharedProfile->save();
             return $this->respondeWith($sharedProfile);
         }
-        
+
         //also clean up shared goals
         $shared_id = $sharedProfile->shared_id;
         $shared_with = $sharedProfile->shared_with;
-        
+
         DB::table('goals_shared_with')
                     ->where('user_id', $shared_id)
                     ->whereIn('goal_id', function ($query) use ($shared_with) {
                         $query->select('id')->from('goals')->where('user_id', $shared_with);
                     })
                     ->delete();
-        $sharedProfile->delete();        
-        
+        $sharedProfile->delete();
+
         return $this->respondeWith('');
     }
 
@@ -211,8 +237,8 @@ class MyTeamController extends Controller
     public function shareProfile(ShareProfileRequest $request) {
         $input = $request->validated();
         // dd($input);
-        // 
-        // 
+        //
+        //
         //check if shared_id is direct team member of shared with users
         $shared_id = $input['shared_id'];
         $skip_sharing = false;
@@ -222,29 +248,29 @@ class MyTeamController extends Controller
             $get_direct = User::select('id')
                            ->where('id', '=', $shared_id)
                            ->where('reporting_to', '=', $shared_with_user_id)
-                           ->count();                 
+                           ->count();
             if($get_direct > 0){
-                $skip_sharing = true;   
+                $skip_sharing = true;
                 $error_msg = 'The employee already reports directly to that supervisor. Employees cannot be shared with their direct supervisor.';
-            }    
-            //not allow exsiting shared team members be shared to the same 
+            }
+            //not allow exsiting shared team members be shared to the same
             $get_shared = sharedProfile::select('id')
                            ->where('shared_id', '=', $shared_id)
                            ->where('shared_with', '=', $shared_with_user_id)
-                           ->count(); 
+                           ->count();
             if($get_shared > 0){
-                $skip_sharing = true;  
+                $skip_sharing = true;
                 $error_msg = 'The employee has already been shared with that supervisor. They cannot be shared with the same supervisor more than once.';
-            }      
+            }
         }
-        
+
         //check shared with users, if user dont have supervisor role, assign to the user
         foreach ($input['share_with_users'] as $shared_with_user_id) {
             $shared_with_user = User::findOrFail($shared_with_user_id);
             //$this->assignSupervisorRole($user);
             if (!($shared_with_user->hasRole('Supervisor'))) {
                 $shared_with_user->assignRole('Supervisor');
-            } 
+            }
         }
 
         $insert = [
@@ -266,7 +292,7 @@ class MyTeamController extends Controller
             //     // Dashboard message added when an shared employee's profile (goals, conversations, or both)
             //     // DashboardNotification::create([
             //     //     'user_id' => $result->shared_id,
-            //     //     'notification_type' => 'SP',         
+            //     //     'notification_type' => 'SP',
             //     //     'comment' => 'Your profile has been shared with ' . $result->sharedWith->name,
             //     //     'related_id' => $result->id,
             //     // ]);
@@ -277,7 +303,7 @@ class MyTeamController extends Controller
             //                 $notification->comment = 'Your profile has been shared with ' . $result->sharedWith->name;
             //                 $notification->related_id =  $result->id;
             //     $notification->notify_user_id = $result->shared_id;
-            //                 $notification->send(); 
+            //                 $notification->send();
             // }
 
             // Send out email to the user when his profile was shared
@@ -295,15 +321,15 @@ class MyTeamController extends Controller
                     $notification->comment = 'Your profile has been shared with ' . $result->sharedWith->name;
                     $notification->related_id =  $result->id;
                     $notification->notify_user_id = $result->shared_id;
-                    $notification->send();                                 
+                    $notification->send();
                 }
 
                 if ($user && $user->allow_email_notification && $user->userPreference->share_profile_flag == 'Y') {
 
                     // Send Out Email Notification to Employee
                     $sendMail = new \App\MicrosoftGraph\SendMail();
-                    $sendMail->toRecipients = [ $user->id ];  
-                    $sendMail->sender_id = null; 
+                    $sendMail->toRecipients = [ $user->id ];
+                    $sendMail->sender_id = null;
                     $sendMail->useQueue = false;
                     $sendMail->saveToLog = true;
                     $sendMail->alert_type = 'N';
@@ -320,7 +346,7 @@ class MyTeamController extends Controller
 
             DB::commit();
             return $this->respondeWith($sharedProfile);
-        }                
+        }
         return response()->json(['success' => false, 'message' => $error_msg]);
     }
 
@@ -329,23 +355,23 @@ class MyTeamController extends Controller
         if(session()->has('checking_user') && session()->get('checking_user') != '') {
             $current_user = session()->get('checking_user');
         }
-        
-        
+
+
         $search = $request->search;
-        
+
         if ($current_user == '') {
             $user_query = User::where('name', 'LIKE', "%{$search}%")
                           ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
-                          ->whereNull('employee_demo.date_deleted')  
+                          ->whereNull('employee_demo.date_deleted')
                           ->paginate();
         } else {
             $user_query = User::where('name', 'LIKE', "%{$search}%")
                           ->where('id', '<>', $current_user)
                           ->join('employee_demo', 'employee_demo.employee_id','users.employee_id')
-                          ->whereNull('employee_demo.date_deleted')  
+                          ->whereNull('employee_demo.date_deleted')
                           ->paginate();
         }
-        
+
         return $this->respondeWith($user_query);
         // return $this->respondeWith(User::leftjoin('employee_demo', 'employee_demo.guid', '=', 'users.guid')->where('name', 'LIKE', "%{$search}%")->paginate());
     }
@@ -464,27 +490,27 @@ class MyTeamController extends Controller
         $input['created_by'] = Auth::id();
         $input['user_id'] = Auth::id();
         $input['is_library'] = true;
-        
+
         $share_with = '';
         if(isset($input['itemsToShare'])) {
             $share_with = $input['itemsToShare'];
             unset($input['itemsToShare']);
         }
-        
+
         $tags = '';
         if(isset($input['tag_ids'])) {
             $tags = $input['tag_ids'];
         unset($input['tag_ids']);
         }
-        
+
         DB::beginTransaction();
         $goal = Goal::create($input);
         if ($share_with) {
             $goal->sharedWith()->sync($share_with);
         }
-        
+
         DB::commit();
-        
+
         if ($tags) {
             $id = $goal->id;
             $add_tag_goal = Goal::withoutGlobalScope(NonLibraryScope::class)->findOrFail($id);
@@ -506,7 +532,7 @@ class MyTeamController extends Controller
 		// 	$notification->comment = ($goal->display_name ? $goal->display_name : $goal->user->name) . ' added a new goal to your goal bank.';
 		// 	$notification->related_id = $goal->id;
         //     $notification->notify_user_id = $user_id;
-		// 	$notification->send(); 
+		// 	$notification->send();
         // }
 
         // Send out email to the user when the Goal Bank added
@@ -532,8 +558,8 @@ class MyTeamController extends Controller
 
                 // Send Out Email Notification to Employee
                 $sendMail = new \App\MicrosoftGraph\SendMail();
-                $sendMail->toRecipients = [ $user->id ];  
-                $sendMail->sender_id = null; 
+                $sendMail->toRecipients = [ $user->id ];
+                $sendMail->sender_id = null;
                 $sendMail->useQueue = false;
                 $sendMail->saveToLog = true;
                 $sendMail->alert_type = 'N';
@@ -547,7 +573,7 @@ class MyTeamController extends Controller
                 $response = $sendMail->sendMailWithGenericTemplate();
             }
         }
-                
+
         return response()->json(['success' => true, 'message' => 'Goal added to library successfully']);
         // return redirect()->back();
     }
@@ -558,8 +584,8 @@ class MyTeamController extends Controller
         ]);
 
         $share_with = $request->itemsToShare;
-        $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->find($request->goal_id); 
-        
+        $goal = Goal::withoutGlobalScope(NonLibraryScope::class)->find($request->goal_id);
+
         $goal->sharedWith()->sync($share_with);
         return response()->json(['success' => true, 'message' => 'Goal synced successfully']);
     }
@@ -576,21 +602,21 @@ class MyTeamController extends Controller
             ->where('status', 'active')
             ->with('user')
             ->with('sharedWith')
-            ->with('tags')    
+            ->with('tags')
             ->with('goalType')->get();
         $employees = $this->myEmployeesAjax();
-       
+
         $type_desc_arr = array();
         foreach($goaltypes as $goalType) {
-            if(isset($goalType['description']) && isset($goalType['name'])) {                
+            if(isset($goalType['description']) && isset($goalType['name'])) {
                 $item = "<b>" . $goalType['name'] . " Goals</b> ". str_replace($goalType['name'] . " Goals","",$goalType['description']);
                 array_push($type_desc_arr, $item);
             }
         }
         $type_desc_str = implode('<br/><br/>',$type_desc_arr);
-        
+
         $employees_list = array();
-        
+
         $myself = DB::table('users')
                     ->select('id', 'name')
                     ->where('id', Auth::id())
@@ -598,7 +624,7 @@ class MyTeamController extends Controller
         $employees_list[0]["id"] = $myself->id;
         $employees_list[0]["name"] = $myself->name;
         $i = 1;
-        
+
         //$i = 0;
         if(count($employees)>0) {
             foreach ($employees as $employee) {
@@ -607,14 +633,14 @@ class MyTeamController extends Controller
                 $i++;
             }
         }
-        
+
         $shared_employees = DB::table('shared_profiles')
                     ->select('shared_profiles.shared_id', 'users.name')
                     ->join('users', 'users.id', '=', 'shared_profiles.shared_id')
                     ->where('shared_profiles.shared_with', Auth::id())
                     ->where('shared_profiles.shared_item', 'like', '%1%')
                     ->get();
-        
+
         if(count($shared_employees)>0) {
             foreach ($shared_employees as $shared_employee) {
                 $employees_list[$i]["id"] = $shared_employee->shared_id;
@@ -623,7 +649,7 @@ class MyTeamController extends Controller
             }
         }
         usort($employees_list, function($a, $b){ return strcmp($a["name"], $b["name"]); });
-        
+
         $type = 'upcoming';
         $disableEdit = false;
         $allowEditModal = true;
@@ -639,7 +665,7 @@ class MyTeamController extends Controller
         if (!$returnView) {
             return $viewData;
         }
-        
+
         return view($viewName, $viewData);
     }
 

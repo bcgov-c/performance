@@ -85,7 +85,7 @@ jobs:
         with:
           ref: dev
           sparse-checkout: |
-            config_pods/mariadb
+            openshift/config/mariadb
             example.env
             example.versions.env
 
@@ -229,7 +229,7 @@ jobs:
         id: lighthouse
         run: |
           sleep 120 # Wait for the deployment to be ready
-          `echo "LHRESULT=$(node config_pods/lighthouse/lighthouse-auth.js)" >> $GITHUB_OUTPUT`
+          `echo "LHRESULT=$(node openshift/config/lighthouse/lighthouse-auth.js)" >> $GITHUB_OUTPUT`
         env:
           APP_HOST_URL: ${{ needs.checkEnv.outputs.APP }}-${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}.apps.silver.devops.gov.bc.ca
           USERNAME: ${{ secrets.MOODLE_TESTER_USERNAME }}

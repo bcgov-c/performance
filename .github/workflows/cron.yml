@@ -22,8 +22,8 @@ jobs:
         with:
           ref: dev
           sparse-checkout: |
-            config_pods/cron
-            config_pods/php
+            openshift/config/cron
+            openshift/config/php
             example.env
             example.versions.env
 

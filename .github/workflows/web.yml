@@ -22,7 +22,7 @@ jobs:
         with:
           ref: dev
           sparse-checkout: |
-            config_pods/nginx
+            openshift/config/nginx
             example.env
             example.versions.env
 

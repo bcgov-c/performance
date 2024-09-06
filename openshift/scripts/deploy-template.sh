@@ -43,7 +43,7 @@ fi
 sleep 10
 
 echo "Creating configMap: $WEB_DEPLOYMENT_NAME-config"
-oc create configmap $WEB_DEPLOYMENT_NAME-config --from-file=./config_pods/nginx/default.conf
+oc create configmap $WEB_DEPLOYMENT_NAME-config --from-file=./openshift/config/nginx/default.conf
 
 if [[ ! `oc describe configmap $APP-config 2>&1` =~ "NotFound" ]]; then
   echo "ConfigMap exists... Deleting: $APP-config"
@@ -63,7 +63,7 @@ fi
 sleep 10
 
 # echo "Creating configMap: $CRON_DEPLOYMENT_NAME-config"
-# oc create configmap $CRON_DEPLOYMENT_NAME-config --from-file=config.php=./config_pods/cron/$DEPLOY_ENVIRONMENT.config.php
+# oc create configmap $CRON_DEPLOYMENT_NAME-config --from-file=config.php=./openshift/config/cron/$DEPLOY_ENVIRONMENT.config.php
 
 sleep 10
 

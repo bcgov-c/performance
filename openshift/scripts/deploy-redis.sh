@@ -56,10 +56,10 @@ else
 fi
 
 echo "Creating configMap: $REDIS_DEPLOYMENT_NAME-config"
-sed -e "s/\${REDIS_PASSWORD}/$REDIS_PASSWORD/g" < ./config_pods/redis/redis-config.yml | oc apply -f -
+sed -e "s/\${REDIS_PASSWORD}/$REDIS_PASSWORD/g" < ./openshift/config/redis/redis-config.yml | oc apply -f -
 
 echo "Creating configMap: $REDIS_DEPLOYMENT_NAME-stats"
-oc create configmap $REDIS_DEPLOYMENT_NAME-stats --from-file=./config_pods/redis/redis-stats.php
+oc create configmap $REDIS_DEPLOYMENT_NAME-stats --from-file=./openshift/config/redis/redis-stats.php
 
 # Create a headless service to control the domain of the Redis cluster
 oc create service clusterip $REDIS_DEPLOYMENT_NAME --tcp=6379:6379 -n $DEPLOY_NAMESPACE``

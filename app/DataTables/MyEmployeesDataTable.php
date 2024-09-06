@@ -21,7 +21,7 @@ class MyEmployeesDataTable extends DataTable
 
     public function __construct($id = null) {
         $this->id = $id;
-        if($this->id == null) {
+        if ($this->id == null) {
             $this->id = Auth::id();
         }
         $this->route = null;
@@ -35,9 +35,15 @@ class MyEmployeesDataTable extends DataTable
     {
         return datatables()
             ->eloquent($query)
-            ->editColumn('name', function ($row) {
-                return view('my-team.partials.link-to-profile', compact(['row']));
-            })
+            ->editColumn(
+                'name',
+                function ($row) {
+                    return view(
+                        'my-team.partials.link-to-profile',
+                        compact(['row'])
+                    );
+                }
+            )
             ->addColumn('action', function ($row) {
                 return view('goal.partials.action', compact(["row"])); // $row['id'];
             })->editColumn('active_goals_count', function ($row) {
@@ -58,7 +64,7 @@ class MyEmployeesDataTable extends DataTable
                     $landingPage = 'conversation.templates';
                     return view('my-team.partials.link-to-profile', compact(["row", "text", "landingPage"]));
                 }
-                if (isset($jr->next_conversation_date) && $jr->next_conversation_date) { 
+                if (isset($jr->next_conversation_date) && $jr->next_conversation_date) {
                     if ($jr->next_conversation_date) {
                         $text = Carbon::parse($jr->next_conversation_date)->format('M d, Y');
                         $landingPage = 'conversation.templates';

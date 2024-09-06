@@ -341,7 +341,9 @@ class EmployeeSharesController extends Controller {
 
     public function getUsers(Request $request) {
         $search = $request->search;
-        $users =  User::whereRaw("name like '%{ $search }%'")->whereNotNull('email')->paginate();
+        $users =  User::whereRaw("name like '%{ $search }%'")
+            ->whereNotNull('email')
+            ->paginate();
         return ['data' => $users];
     }
 

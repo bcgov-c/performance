@@ -25,7 +25,7 @@ jobs:
         with:
           ref: dev
           sparse-checkout: |
-            config_pods/mariadb
+            openshift/config/mariadb
             example.env
             example.versions.env
 
