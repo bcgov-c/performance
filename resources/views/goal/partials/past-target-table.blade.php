@@ -45,23 +45,22 @@
       <td  >{{ $goal->start_date_human }}
       </td>
       <td >{{ $goal->target_date_human }}</td>
-      <td> 
-            @php
-              $namesString = '';
-            @endphp
-            @php
-                  $share_user_id_arr = array_map('trim', explode('|', $goal->shared_user_id));
-                  $usernames = DB::table('employee_demo')
-                                  ->select('users.id', DB::raw("concat(employee_demo.employee_last_name, ', ', 
-                                                          employee_demo.employee_first_name, ' ', 
-                                                          ifnull(employee_demo.employee_middle_name, '')) as employee_name"))
-                                  ->join('users', 'employee_demo.employee_id', '=', 'users.employee_id')
-                                  ->whereIn('users.id', $share_user_id_arr)
-                                  ->pluck('employee_name', 'users.id'); // Pluck as associative array with user_id as key
-                  $namesString = $usernames->implode('<br>');                          
-            @endphp  
+      <td>  
+        <select multiple class="form-control share-with-users"  name="share_with_users[]" disabled>
+            <?php if ($goal->owner_id == $authId) { ?>
+                <?php if($goal->shared_user_id != '' && $goal->shared_user_name != ''){
+                  $share_user_id_arr = explode(',', $goal->shared_user_id);
+                  $share_user_name_arr = explode(',', $goal->shared_user_name);
+                  for ($i=0; $i<count($share_user_id_arr); $i++){
+                      echo "<option value='".$share_user_id_arr[$i]."'  selected>".$share_user_name_arr[$i]."</option>";                    
+                  }
+              }?>
+            <?php } else {?>
+                  <?php echo "<option value='".$goal->owner_id."'  selected>".$goal->owner_name."</option>";  ?>  
+            <?php } ?>
             
-            {!! $namesString !!}
+            
+        </select>
       </td>
       <td>
         @if($goal->login_role == 'owner') 
@@ -77,7 +76,7 @@
             @csrf
             @method('DELETE')
             <x-button :href="route('goal.show', $goal->id)" size='sm' class="mr-2">View</x-button>
-            @if($goal->login_role == 'owner' && !isset($viewingProfileAs)) 
+            @if($goal->login_role == 'owner') 
               <x-button size='sm' icon='trash' style="danger"></x-button>
             @endif
           </form>
