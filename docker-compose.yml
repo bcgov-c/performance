@@ -3,8 +3,8 @@ services:
     tty: true
     restart: "no"
     env_file:
-      - .env.example
-      - .env.versions.example
+      - example.env
+      - example.versions.env
     environment:
       http_proxy: http://198.161.14.25:8080
       https_proxy: http://198.161.14.25:8080
@@ -28,8 +28,8 @@ services:
   db:
     image: ${DB_IMAGE:-mariadb:10}
     env_file:
-      - .env.example
-      - .env.versions.example
+      - example.env
+      - example.versions.env
     environment:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: YES
       MARIADB_DATABASE: ${DB_NAME:-performance}
@@ -56,8 +56,8 @@ services:
     tty: true
     restart: "no"
     env_file:
-      - .env.example
-      - .env.versions.example
+      - example.env
+      - example.versions.env
     environment:
       XDEBUG_MODE: debug
       XDEBUG_CONFIG: client_host=host.docker.internal client_port=9003
@@ -100,8 +100,8 @@ services:
       db:
         condition: service_healthy
     env_file:
-      - .env.example
-      - .env.versions.example
+      - example.env
+      - example.versions.env
     build:
       context: .
       dockerfile: Dockerfile

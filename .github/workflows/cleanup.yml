@@ -77,7 +77,7 @@ jobs:
         id: dotenv
         uses: falti/dotenv-action@v1
         with:
-          path: .env.example
+          path: example.env
           export-variables: true
           log-variables: true
           keys-case: upper
