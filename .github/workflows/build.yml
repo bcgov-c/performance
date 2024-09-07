@@ -83,7 +83,7 @@ jobs:
       - name: 📤 Checkout Target Branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.BRANCH }}
+          ref: ${{ env.OPENSHIFT_DEPLOY_PROJECT }}-${{ env.BRANCH }}
           sparse-checkout: |
             openshift/config/mariadb
             example.env
