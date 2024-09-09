@@ -12,13 +12,13 @@ on:
       APP:
         required: true
         type: string
-      WEB_DEPLOYMENT_NAME:
+      WEB_NAME:
         required: true
         type: string
       WEB_IMAGE:
         required: true
         type: string
-      PHP_DEPLOYMENT_NAME:
+      PHP_NAME:
         required: true
         type: string
       DB_IMAGE:
@@ -30,19 +30,19 @@ on:
       DB_PORT:
         required: true
         type: string
-      DB_DEPLOYMENT_NAME:
+      DB_NAME:
         required: true
         type: string
       CRON_IMAGE:
         required: true
         type: string
-      CRON_DEPLOYMENT_NAME:
+      CRON_NAME:
         required: true
         type: string
       REDIS_IMAGE:
         required: true
         type: string
-      REDIS_DEPLOYMENT_NAME:
+      REDIS_NAME:
         required: true
         type: string
       APP_HOST_URL:
@@ -134,17 +134,17 @@ jobs:
           DB_PORT: ${{ inputs.DB_PORT }}
 
       # Deploy Redis
-      - name: Deploy Redis StatefulSet (${{ inputs.REDIS_DEPLOYMENT_NAME  }})
+      - name: Deploy Redis StatefulSet (${{ inputs.REDIS_NAME  }})
         if: success()
         run: bash ./openshift/scripts/deploy-redis.sh
         env:
           REDIS_IMAGE: ${{ inputs.REDIS_IMAGE }}
           DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
-          REDIS_DEPLOYMENT_NAME: ${{ inputs.REDIS_DEPLOYMENT_NAME }}
+          REDIS_NAME: ${{ inputs.REDIS_NAME }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           REPLICAS: 3
 
-      - name: Deploy Database StatefulSet (${{ inputs.DB_DEPLOYMENT_NAME  }})
+      - name: Deploy Database StatefulSet (${{ inputs.DB_NAME  }})
         id: deploy_database
         if: success()
         run: bash ./openshift/scripts/deploy-database.sh
@@ -152,7 +152,7 @@ jobs:
           IMAGE_REPO: ${{ inputs.IMAGE_REPO }}
           DB_IMAGE: ${{ inputs.DB_IMAGE }}
           DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
-          DB_DEPLOYMENT_NAME: ${{ inputs.DB_DEPLOYMENT_NAME }}
+          DB_NAME: ${{ inputs.DB_NAME }}
           DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
           DB_NAME: ${{ secrets.DB_NAME }}
 
@@ -169,13 +169,13 @@ jobs:
           BUILD_NAMESPACE: ${{ inputs.BUILD_NAMESPACE }}
           IMAGE_REPO: ${{ inputs.IMAGE_REPO }}
           DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
-          WEB_DEPLOYMENT_NAME: ${{ inputs.WEB_DEPLOYMENT_NAME }}
+          WEB_NAME: ${{ inputs.WEB_NAME }}
           WEB_IMAGE: ${{ secrets.ARTIFACTORY_URL }}/${{ inputs.WEB_IMAGE }}
-          PHP_DEPLOYMENT_NAME: ${{ inputs.PHP_DEPLOYMENT_NAME }}
-          DB_DEPLOYMENT_NAME: ${{ inputs.DB_DEPLOYMENT_NAME }}
-          CRON_DEPLOYMENT_NAME: ${{ inputs.CRON_DEPLOYMENT_NAME }}
+          PHP_NAME: ${{ inputs.PHP_NAME }}
+          DB_NAME: ${{ inputs.DB_NAME }}
+          CRON_NAME: ${{ inputs.CRON_NAME }}
           CRON_IMAGE: ${{ inputs.CRON_IMAGE }}
-          REDIS_DEPLOYMENT_NAME: ${{ inputs.REDIS_DEPLOYMENT_NAME }}
+          REDIS_NAME: ${{ inputs.REDIS_NAME }}
           BACKUP_HELM_CHART: ${{ inputs.BACKUP_HELM_CHART }}
           BACKUP_IMAGE: ${{ inputs.BACKUP_IMAGE }}
 

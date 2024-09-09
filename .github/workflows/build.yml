@@ -60,18 +60,18 @@ jobs:
       DEPLOY_NAMESPACE: ${{ env.OPENSHIFT_DEPLOY_PROJECT }}-${{ env.BRANCH }}
       IMAGE_REPO: ${{ env.IMAGE_REPO }}
       BUILD_NAMESPACE: ${{ env.OPENSHIFT_DEPLOY_PROJECT }}-${{ env.BRANCH }}
-      DB_DEPLOYMENT_NAME: ${{ env.DB_DEPLOYMENT_NAME }}
-      WEB_DEPLOYMENT_NAME: ${{ env.WEB_DEPLOYMENT_NAME }}
+      DB_NAME: ${{ env.DB_NAME }}
+      WEB_NAME: ${{ env.WEB_NAME }}
       WEB_IMAGE: ${{ env.WEB_IMAGE }}
       DB_HOST: ${{ env.DB_HOST }}
       DB_PORT: ${{ env.DB_PORT }}
       DB_NAME: ${{ env.DB_NAME }}
       DB_IMAGE: ${{ env.DB_IMAGE }}
-      PHP_DEPLOYMENT_NAME: ${{ env.PHP_DEPLOYMENT_NAME }}
-      CRON_DEPLOYMENT_NAME: ${{ env.CRON_DEPLOYMENT_NAME }}
+      PHP_NAME: ${{ env.PHP_NAME }}
+      CRON_NAME: ${{ env.CRON_NAME }}
       CRON_IMAGE: ${{ env.CRON_IMAGE}}
       REDIS_IMAGE: ${{ env.REDIS_IMAGE }}
-      REDIS_DEPLOYMENT_NAME: ${{ env.REDIS_DEPLOYMENT_NAME }}
+      REDIS_NAME: ${{ env.REDIS_NAME }}
       DB_BACKUP_DEPLOYMENT_NAME: ${{ env.DB_BACKUP_DEPLOYMENT_NAME }}
       DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ env.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
       BACKUP_IMAGE: ${{ env.BACKUP_IMAGE }}
@@ -162,11 +162,11 @@ jobs:
       BRANCH: ${{ needs.checkEnv.outputs.BRANCH }}
       BUILD_NAMESPACE: ${{ needs.checkEnv.outputs.BUILD_NAMESPACE }}
       DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}
-      DB_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.DB_DEPLOYMENT_NAME }}
-      WEB_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.WEB_DEPLOYMENT_NAME }}
-      PHP_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.PHP_DEPLOYMENT_NAME }}
-      CRON_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.CRON_DEPLOYMENT_NAME }}
-      REDIS_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.REDIS_DEPLOYMENT_NAME }}
+      DB_NAME: ${{ needs.checkEnv.outputs.DB_NAME }}
+      WEB_NAME: ${{ needs.checkEnv.outputs.WEB_NAME }}
+      PHP_NAME: ${{ needs.checkEnv.outputs.PHP_NAME }}
+      CRON_NAME: ${{ needs.checkEnv.outputs.CRON_NAME }}
+      REDIS_NAME: ${{ needs.checkEnv.outputs.REDIS_NAME }}
 
   call-deploy-workflow:
     name: 🚀 Deploy
@@ -180,21 +180,21 @@ jobs:
       !contains(needs.*.result, 'cancelled')
     with:
       APP: ${{ needs.checkEnv.outputs.APP }}
-      WEB_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.WEB_DEPLOYMENT_NAME }}
+      WEB_NAME: ${{ needs.checkEnv.outputs.WEB_NAME }}
       WEB_IMAGE: ${{ needs.checkEnv.outputs.WEB_IMAGE }}
-      PHP_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.PHP_DEPLOYMENT_NAME }}
+      PHP_NAME: ${{ needs.checkEnv.outputs.PHP_NAME }}
       DB_IMAGE: ${{ needs.checkEnv.outputs.DB_IMAGE }}
       DB_HOST: ${{ needs.checkEnv.outputs.DB_HOST }}
       DB_PORT: ${{ needs.checkEnv.outputs.DB_PORT }}
-      DB_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.DB_DEPLOYMENT_NAME }}
+      DB_NAME: ${{ needs.checkEnv.outputs.DB_NAME }}
       DB_BACKUP_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.DB_BACKUP_DEPLOYMENT_NAME }}
       DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ needs.checkEnv.outputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
       BACKUP_IMAGE: ${{ needs.checkEnv.outputs.BACKUP_IMAGE }}
       BACKUP_HELM_CHART: ${{ needs.checkEnv.outputs.BACKUP_HELM_CHART }}
       CRON_IMAGE: ${{ needs.checkEnv.outputs.CRON_IMAGE }}
-      CRON_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.CRON_DEPLOYMENT_NAME }}
+      CRON_NAME: ${{ needs.checkEnv.outputs.CRON_NAME }}
       REDIS_IMAGE: ${{ needs.checkEnv.outputs.REDIS_IMAGE }}
-      REDIS_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.REDIS_DEPLOYMENT_NAME }}
+      REDIS_NAME: ${{ needs.checkEnv.outputs.REDIS_NAME }}
       APP_HOST_URL: ${{ needs.checkEnv.outputs.APP }}-${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}.apps.silver.devops.gov.bc.ca
       BUILD_NAMESPACE: ${{ needs.checkEnv.outputs.BUILD_NAMESPACE }}
       DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}

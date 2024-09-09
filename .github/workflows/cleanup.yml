@@ -24,19 +24,19 @@ on:
       DEPLOY_NAMESPACE:
         required: true
         type: string
-      DB_DEPLOYMENT_NAME:
+      DB_NAME:
         required: true
         type: string
-      WEB_DEPLOYMENT_NAME:
+      WEB_NAME:
         required: true
         type: string
-      PHP_DEPLOYMENT_NAME:
+      PHP_NAME:
         required: true
         type: string
-      CRON_DEPLOYMENT_NAME:
+      CRON_NAME:
         required: true
         type: string
-      REDIS_DEPLOYMENT_NAME:
+      REDIS_NAME:
         required: true
         type: string
     secrets:
@@ -98,60 +98,60 @@ jobs:
             echo "No AUTH_TOKEN found for ${{ github.ref_name }} branch"
           fi
 
-      - name: 🧹️ Clean ${{ inputs.REDIS_DEPLOYMENT_NAME }}-redis-cluster
+      - name: 🧹️ Clean ${{ inputs.REDIS_NAME }}-redis-cluster
         run: |
-          if [[ `oc describe sts ${{ inputs.REDIS_DEPLOYMENT_NAME }} 2>&1` =~ "NotFound" ]]; then
-            echo "${{ inputs.REDIS_DEPLOYMENT_NAME }} NOT FOUND: Skipping..."
+          if [[ `oc describe sts ${{ inputs.REDIS_NAME }} 2>&1` =~ "NotFound" ]]; then
+            echo "${{ inputs.REDIS_NAME }} NOT FOUND: Skipping..."
           else
-            echo "${{ inputs.REDIS_DEPLOYMENT_NAME }} FOUND: Cleaning..."
-            helm uninstall ${{ inputs.REDIS_DEPLOYMENT_NAME }}
+            echo "${{ inputs.REDIS_NAME }} FOUND: Cleaning..."
+            helm uninstall ${{ inputs.REDIS_NAME }}
           fi
-          if [[ `oc describe configmap ${{ inputs.REDIS_DEPLOYMENT_NAME }}-redis-cluster-default 2>&1` =~ "NotFound" ]]; then
-            echo "${{ inputs.REDIS_DEPLOYMENT_NAME }}-redis-cluster-default NOT FOUND: Skipping..."
+          if [[ `oc describe configmap ${{ inputs.REDIS_NAME }}-redis-cluster-default 2>&1` =~ "NotFound" ]]; then
+            echo "${{ inputs.REDIS_NAME }}-redis-cluster-default NOT FOUND: Skipping..."
           else
-            oc delete configmap ${{ inputs.REDIS_DEPLOYMENT_NAME }}-redis-cluster-default
+            oc delete configmap ${{ inputs.REDIS_NAME }}-redis-cluster-default
           fi
-          if [[ `oc describe configmap ${{ inputs.REDIS_DEPLOYMENT_NAME }}-redis-cluster-scripts 2>&1` =~ "NotFound" ]]; then
-            echo "${{ inputs.REDIS_DEPLOYMENT_NAME }}-redis-cluster-scripts NOT FOUND: Skipping..."
+          if [[ `oc describe configmap ${{ inputs.REDIS_NAME }}-redis-cluster-scripts 2>&1` =~ "NotFound" ]]; then
+            echo "${{ inputs.REDIS_NAME }}-redis-cluster-scripts NOT FOUND: Skipping..."
           else
-            oc delete configmap ${{ inputs.REDIS_DEPLOYMENT_NAME }}-redis-cluster-scripts
+            oc delete configmap ${{ inputs.REDIS_NAME }}-redis-cluster-scripts
           fi
 
-      - name: 🧹️ Clean ${{ inputs.DB_DEPLOYMENT_NAME }}
+      - name: 🧹️ Clean ${{ inputs.DB_NAME }}
         run: |
-          configmap_name="${{ inputs.DB_DEPLOYMENT_NAME }}-config"
-          if [[ `oc describe sts ${{ inputs.DB_DEPLOYMENT_NAME }} 2>&1` =~ "NotFound" ]]; then
-            echo "${{ inputs.DB_DEPLOYMENT_NAME }} NOT FOUND: Skipping..."
+          configmap_name="${{ inputs.DB_NAME }}-config"
+          if [[ `oc describe sts ${{ inputs.DB_NAME }} 2>&1` =~ "NotFound" ]]; then
+            echo "${{ inputs.DB_NAME }} NOT FOUND: Skipping..."
           else
-            echo "${{ inputs.DB_DEPLOYMENT_NAME }} FOUND: Cleaning..."
-            oc scale sts/${{ inputs.DB_DEPLOYMENT_NAME }} --replicas=0
-            oc delete sts/${{ inputs.DB_DEPLOYMENT_NAME }}
+            echo "${{ inputs.DB_NAME }} FOUND: Cleaning..."
+            oc scale sts/${{ inputs.DB_NAME }} --replicas=0
+            oc delete sts/${{ inputs.DB_NAME }}
             # for i in 0 1 2; do
-            #   if ! [[ `oc describe pvc datadir-${{ inputs.DB_DEPLOYMENT_NAME }}-$i 2>&1` =~ "NotFound" ]]; then
-            #     kubectl delete pvc datadir-${{ inputs.DB_DEPLOYMENT_NAME }}-$i;
+            #   if ! [[ `oc describe pvc datadir-${{ inputs.DB_NAME }}-$i 2>&1` =~ "NotFound" ]]; then
+            #     kubectl delete pvc datadir-${{ inputs.DB_NAME }}-$i;
             #   else
-            #     echo "pvc datadir-${{ inputs.DB_DEPLOYMENT_NAME }}-$i NOT FOUND: Skipping..."
+            #     echo "pvc datadir-${{ inputs.DB_NAME }}-$i NOT FOUND: Skipping..."
             #   fi
             # done
           fi
           if ! [[ `oc describe configmap $configmap_name 2>&1` =~ "NotFound" ]]; then
             oc delete configmap $configmap_name
           fi
-          if ! [[ `oc describe service ${{ inputs.DB_DEPLOYMENT_NAME }} 2>&1` =~ "NotFound" ]]; then
-            oc delete service ${{ inputs.DB_DEPLOYMENT_NAME }}
+          if ! [[ `oc describe service ${{ inputs.DB_NAME }} 2>&1` =~ "NotFound" ]]; then
+            oc delete service ${{ inputs.DB_NAME }}
           fi
 
-      - name: 🧹️ Clean ${{ inputs.WEB_DEPLOYMENT_NAME }}
+      - name: 🧹️ Clean ${{ inputs.WEB_NAME }}
         id: clean-web
         run: |
-          configmap_name="${{ inputs.WEB_DEPLOYMENT_NAME }}-config"
-          if [[ `oc describe dc ${{ inputs.WEB_DEPLOYMENT_NAME }} 2>&1` =~ "NotFound" ]]; then
-            echo "${{ inputs.WEB_DEPLOYMENT_NAME }} NOT FOUND: Skipping..."
+          configmap_name="${{ inputs.WEB_NAME }}-config"
+          if [[ `oc describe dc ${{ inputs.WEB_NAME }} 2>&1` =~ "NotFound" ]]; then
+            echo "${{ inputs.WEB_NAME }} NOT FOUND: Skipping..."
           else
-            echo "${{ inputs.WEB_DEPLOYMENT_NAME }} FOUND: Cleaning resources..."
-            oc scale dc/${{ inputs.WEB_DEPLOYMENT_NAME }} --replicas=0
-            oc delete dc/${{ inputs.WEB_DEPLOYMENT_NAME }}
-            echo "DELETED dc ${{ inputs.WEB_DEPLOYMENT_NAME }}"
+            echo "${{ inputs.WEB_NAME }} FOUND: Cleaning resources..."
+            oc scale dc/${{ inputs.WEB_NAME }} --replicas=0
+            oc delete dc/${{ inputs.WEB_NAME }}
+            echo "DELETED dc ${{ inputs.WEB_NAME }}"
           fi
           if [[ `oc describe configmap $configmap_name 2>&1` =~ "NotFound" ]]; then
             echo "$configmap_name NOT FOUND: Skipping..."
@@ -165,24 +165,24 @@ jobs:
             oc delete configmap moodle-env
             echo "DELETED configmap moodle-env"
           fi
-          if ! [[ `oc describe service ${{ inputs.WEB_DEPLOYMENT_NAME }} 2>&1` =~ "NotFound" ]]; then
-            oc delete service ${{ inputs.WEB_DEPLOYMENT_NAME }}
-            echo "DELETED service: ${{ inputs.WEB_DEPLOYMENT_NAME }}"
+          if ! [[ `oc describe service ${{ inputs.WEB_NAME }} 2>&1` =~ "NotFound" ]]; then
+            oc delete service ${{ inputs.WEB_NAME }}
+            echo "DELETED service: ${{ inputs.WEB_NAME }}"
           fi
 
 
-      - name: 🧹️ Clean ${{ inputs.PHP_DEPLOYMENT_NAME }}
+      - name: 🧹️ Clean ${{ inputs.PHP_NAME }}
         id: clean-php
         run: |
-          configmap_name="${{ inputs.PHP_DEPLOYMENT_NAME }}-config"
+          configmap_name="${{ inputs.PHP_NAME }}-config"
           app_configmap_name="${{ inputs.APP }}-config"
-          if [[ `oc describe dc ${{ inputs.PHP_DEPLOYMENT_NAME }} 2>&1` =~ "NotFound" ]]; then
-            echo "${{ inputs.PHP_DEPLOYMENT_NAME }} NOT FOUND: Skipping..."
+          if [[ `oc describe dc ${{ inputs.PHP_NAME }} 2>&1` =~ "NotFound" ]]; then
+            echo "${{ inputs.PHP_NAME }} NOT FOUND: Skipping..."
           else
-            echo "${{ inputs.PHP_DEPLOYMENT_NAME }} FOUND: Cleaning resources..."
-            oc scale dc/${{ inputs.PHP_DEPLOYMENT_NAME }} --replicas=0
-            oc delete dc/${{ inputs.PHP_DEPLOYMENT_NAME }}
-            echo "DELETED dc ${{ inputs.PHP_DEPLOYMENT_NAME }}"
+            echo "${{ inputs.PHP_NAME }} FOUND: Cleaning resources..."
+            oc scale dc/${{ inputs.PHP_NAME }} --replicas=0
+            oc delete dc/${{ inputs.PHP_NAME }}
+            echo "DELETED dc ${{ inputs.PHP_NAME }}"
           fi
           if [[ `oc describe configmap $configmap_name 2>&1` =~ "NotFound" ]]; then
             echo "$configmap_name NOT FOUND: Skipping..."
@@ -200,9 +200,9 @@ jobs:
             oc delete pvc moodle-env
             echo "DELETED pvc moodle-env"
           fi
-          if ! [[ `oc describe service ${{ inputs.PHP_DEPLOYMENT_NAME }} 2>&1` =~ "NotFound" ]]; then
-            oc delete service ${{ inputs.PHP_DEPLOYMENT_NAME }}
-            echo "DELETED service: ${{ inputs.PHP_DEPLOYMENT_NAME }}"
+          if ! [[ `oc describe service ${{ inputs.PHP_NAME }} 2>&1` =~ "NotFound" ]]; then
+            oc delete service ${{ inputs.PHP_NAME }}
+            echo "DELETED service: ${{ inputs.PHP_NAME }}"
           fi
 
       - name: 🧹️ Clean Migrate-Build Job
@@ -226,40 +226,40 @@ jobs:
             oc delete deployment cron
             echo "DELETED deployment: cron"
           fi
-          if [[ `oc describe deployment ${{ inputs.CRON_DEPLOYMENT_NAME }} 2>&1` =~ "NotFound" ]]; then
-            echo "${{ inputs.CRON_DEPLOYMENT_NAME }} deployment NOT FOUND: Skipping..."
+          if [[ `oc describe deployment ${{ inputs.CRON_NAME }} 2>&1` =~ "NotFound" ]]; then
+            echo "${{ inputs.CRON_NAME }} deployment NOT FOUND: Skipping..."
           else
-            echo "${{ inputs.CRON_DEPLOYMENT_NAME }} FOUND: Cleaning resources..."
-            oc delete dc ${{ inputs.CRON_DEPLOYMENT_NAME }}
-            echo "DELETED deployment: ${{ inputs.CRON_DEPLOYMENT_NAME }}"
+            echo "${{ inputs.CRON_NAME }} FOUND: Cleaning resources..."
+            oc delete dc ${{ inputs.CRON_NAME }}
+            echo "DELETED deployment: ${{ inputs.CRON_NAME }}"
           fi
-          if [[ `oc describe configmap ${{ inputs.CRON_DEPLOYMENT_NAME }}-config 2>&1` =~ "NotFound" ]]; then
-            echo "${{ inputs.CRON_DEPLOYMENT_NAME }}-config NOT FOUND: Skipping..."
+          if [[ `oc describe configmap ${{ inputs.CRON_NAME }}-config 2>&1` =~ "NotFound" ]]; then
+            echo "${{ inputs.CRON_NAME }}-config NOT FOUND: Skipping..."
           else
-            oc delete configmap ${{ inputs.CRON_DEPLOYMENT_NAME }}-config
+            oc delete configmap ${{ inputs.CRON_NAME }}-config
           fi
 
       - name: 🧹️ Clean Redis
         id: clean-redis
         run: |
-          if [[ `oc describe sts/${{ inputs.REDIS_DEPLOYMENT_NAME }} 2>&1` =~ "NotFound" ]]; then
-            echo "${{ inputs.REDIS_DEPLOYMENT_NAME }} NOT FOUND: Skipping..."
+          if [[ `oc describe sts/${{ inputs.REDIS_NAME }} 2>&1` =~ "NotFound" ]]; then
+            echo "${{ inputs.REDIS_NAME }} NOT FOUND: Skipping..."
           else
-            echo "${{ inputs.REDIS_DEPLOYMENT_NAME }} FOUND: Cleaning resources..."
-            oc delete sts/${{ inputs.REDIS_DEPLOYMENT_NAME }}
-            echo "DELETED sts: ${{ inputs.REDIS_DEPLOYMENT_NAME }}"
+            echo "${{ inputs.REDIS_NAME }} FOUND: Cleaning resources..."
+            oc delete sts/${{ inputs.REDIS_NAME }}
+            echo "DELETED sts: ${{ inputs.REDIS_NAME }}"
           fi
-          if [[ `oc describe sts/${{ inputs.REDIS_DEPLOYMENT_NAME }} 2>&1` =~ "NotFound" ]]; then
-            echo "${{ inputs.REDIS_DEPLOYMENT_NAME }} sts NOT FOUND: Skipping..."
+          if [[ `oc describe sts/${{ inputs.REDIS_NAME }} 2>&1` =~ "NotFound" ]]; then
+            echo "${{ inputs.REDIS_NAME }} sts NOT FOUND: Skipping..."
           else
-            echo "${{ inputs.REDIS_DEPLOYMENT_NAME }} FOUND: Cleaning resources..."
-            oc delete sts/${{ inputs.REDIS_DEPLOYMENT_NAME }}
-            echo "DELETED sts: ${{ inputs.REDIS_DEPLOYMENT_NAME }}"
+            echo "${{ inputs.REDIS_NAME }} FOUND: Cleaning resources..."
+            oc delete sts/${{ inputs.REDIS_NAME }}
+            echo "DELETED sts: ${{ inputs.REDIS_NAME }}"
           fi
-          if [[ `oc describe configmap ${{ inputs.REDIS_DEPLOYMENT_NAME }}-config 2>&1` =~ "NotFound" ]]; then
-            echo "${{ inputs.REDIS_DEPLOYMENT_NAME }}-config NOT FOUND: Skipping..."
+          if [[ `oc describe configmap ${{ inputs.REDIS_NAME }}-config 2>&1` =~ "NotFound" ]]; then
+            echo "${{ inputs.REDIS_NAME }}-config NOT FOUND: Skipping..."
           else
-            oc delete configmap ${{ inputs.REDIS_DEPLOYMENT_NAME }}-config
+            oc delete configmap ${{ inputs.REDIS_NAME }}-config
           fi
 
       - name: 🧹️ Clean Upgrade Job
@@ -273,10 +273,10 @@ jobs:
             echo "DELETED job moodle-upgrade"
           fi
 
-      - name: 🧹️ Clean ${{ inputs.APP }}-${{ inputs.WEB_DEPLOYMENT_NAME }} | ${{ inputs.APP_HOST_URL }}
+      - name: 🧹️ Clean ${{ inputs.APP }}-${{ inputs.WEB_NAME }} | ${{ inputs.APP_HOST_URL }}
         id: clean-route
         run: |
-          route_name="${{ inputs.APP }}-${{ inputs.WEB_DEPLOYMENT_NAME }}"
+          route_name="${{ inputs.APP }}-${{ inputs.WEB_NAME }}"
           if [[ `oc describe route $route_name 2>&1` =~ "NotFound" ]]; then
             echo "Route NOT FOUND: $route_name - Skipping..."
           else

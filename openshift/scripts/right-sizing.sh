@@ -67,7 +67,7 @@ sleep 60
 # Add service for each redis pod
 echo "Deploy Redis Service for each pod ..."
 # Collect all pods related to the Redis StatefulSet
-PODS=$(oc get pods -l app=$REDIS_DEPLOYMENT_NAME -n $DEPLOY_NAMESPACE -o jsonpath='{.items[*].metadata.name}')
+PODS=$(oc get pods -l app=$REDIS_NAME -n $DEPLOY_NAMESPACE -o jsonpath='{.items[*].metadata.name}')
 
 # Loop through each pod
 for POD_NAME in $PODS; do
