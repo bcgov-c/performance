@@ -157,7 +157,7 @@ jobs:
           DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
           DB_POD_NAME: ${{ inputs.DB_POD_NAME }}
           DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
-          DB_POD_NAME: ${{ secrets.DB_POD_NAME }}
+          DATABASE_NAME: ${{ inputs.DATABASE_NAME }}
 
       - name: Deploy Moodle Template and Run Upgrades
         if: success()
@@ -165,6 +165,7 @@ jobs:
         env:
           APP: ${{ inputs.APP }}
           DB_POD_NAME: ${{ secrets.DB_POD_NAME }}
+          DATABASE_NAME: ${{ inputs.DATABASE_NAME }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           BUILD_TAG: ${{ inputs.OPENSHIFT_DEPLOY_PROJECT }}-${{ github.ref_name }}
@@ -175,7 +176,6 @@ jobs:
           WEB_NAME: ${{ inputs.WEB_NAME }}
           WEB_IMAGE: ${{ secrets.ARTIFACTORY_URL }}/${{ inputs.WEB_IMAGE }}
           PHP_NAME: ${{ inputs.PHP_NAME }}
-          DB_POD_NAME: ${{ inputs.DB_POD_NAME }}
           CRON_NAME: ${{ inputs.CRON_NAME }}
           CRON_IMAGE: ${{ inputs.CRON_IMAGE }}
           REDIS_NAME: ${{ inputs.REDIS_NAME }}

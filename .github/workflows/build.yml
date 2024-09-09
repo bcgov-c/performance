@@ -187,6 +187,7 @@ jobs:
       DB_HOST: ${{ needs.checkEnv.outputs.DB_HOST }}
       DB_PORT: ${{ needs.checkEnv.outputs.DB_PORT }}
       DB_POD_NAME: ${{ needs.checkEnv.outputs.DB_POD_NAME }}
+      DATABASE_NAME: ${{ needs.checkEnv.outputs.DATABASE_NAME }}
       DB_BACKUP_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.DB_BACKUP_DEPLOYMENT_NAME }}
       DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ needs.checkEnv.outputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
       BACKUP_IMAGE: ${{ needs.checkEnv.outputs.BACKUP_IMAGE }}
