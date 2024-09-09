@@ -84,7 +84,7 @@ jobs:
     if: |
       always()
       && (
-        github.ref_name == 'dev' || github.ref_name  == 'test' || github.ref_name  == 'prod'
+        github.ref_name == 'e66ac2-prod'
       ) || (
         contains(github.event.workflow_run.conclusion, 'success')
         && !contains(github.event.workflow_run.conclusion, 'failure')
@@ -103,15 +103,6 @@ jobs:
         run: |
           server=https://api.silver.devops.gov.bc.ca:6443
           oc login --token=${{ secrets.SA_TOKEN }} --server=$server
-
-      # - name: Deploy/Enable Maintenance Messaging
-      #   if: success()
-      #   run: bash ./openshift/scripts/deploy-maintenance-message.sh
-      #   env:
-      #     BUILD_NAME: "maintenance-message"
-      #     DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
-      #     IMAGE_REPO: ${{ inputs.IMAGE_REPO }}
-      #     WEB_IMAGE: ${{ inputs.WEB_IMAGE }}
 
       - name: Create ConfigMap
         if: success()
@@ -168,7 +159,7 @@ jobs:
           DATABASE_NAME: ${{ inputs.DATABASE_NAME }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          BUILD_TAG: ${{ inputs.OPENSHIFT_DEPLOY_PROJECT }}-${{ github.ref_name }}
+          BUILD_TAG: ${{ github.ref_name }}
           APP_HOST_URL: ${{ inputs.APP_HOST_URL }}
           BUILD_NAMESPACE: ${{ inputs.BUILD_NAMESPACE }}
           IMAGE_REPO: ${{ inputs.IMAGE_REPO }}
