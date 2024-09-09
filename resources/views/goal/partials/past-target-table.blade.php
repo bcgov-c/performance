@@ -46,21 +46,23 @@
       </td>
       <td >{{ $goal->target_date_human }}</td>
       <td>  
-        <select multiple class="form-control share-with-users"  name="share_with_users[]" disabled>
-            <?php if ($goal->owner_id == $authId) { ?>
-                <?php if($goal->shared_user_id != '' && $goal->shared_user_name != ''){
-                  $share_user_id_arr = explode(',', $goal->shared_user_id);
-                  $share_user_name_arr = explode(',', $goal->shared_user_name);
-                  for ($i=0; $i<count($share_user_id_arr); $i++){
-                      echo "<option value='".$share_user_id_arr[$i]."'  selected>".$share_user_name_arr[$i]."</option>";                    
-                  }
-              }?>
-            <?php } else {?>
-                  <?php echo "<option value='".$goal->owner_id."'  selected>".$goal->owner_name."</option>";  ?>  
-            <?php } ?>
+          @php
+              $namesString = '';
+            @endphp
+            @php
+                  $share_user_id_arr = array_map('trim', explode('|', $goal->shared_user_id));
+                  $share_user_id_arr = explode(',', $share_user_id_arr[0]);
+                  $usernames = DB::table('employee_demo')
+                                  ->select('users.id', DB::raw("concat(employee_demo.employee_last_name, ', ', 
+                                                          employee_demo.employee_first_name, ' ', 
+                                                          ifnull(employee_demo.employee_middle_name, '')) as employee_name"))
+                                  ->join('users', 'employee_demo.employee_id', '=', 'users.employee_id')
+                                  ->whereIn('users.id', $share_user_id_arr)
+                                  ->pluck('employee_name', 'users.id'); // Pluck as associative array with user_id as key
+                  $namesString = $usernames->implode('<br>');   
+            @endphp  
             
-            
-        </select>
+            {!! $namesString !!}
       </td>
       <td>
         @if($goal->login_role == 'owner') 
@@ -71,6 +73,7 @@
         
       </td>
       <td>
+        @if($goal->login_role == 'owner') 
         <div class="d-flex">          
           <form id="delete-goal-{{$goal->id}}" action="{{ route('goal.destroy', $goal->id)}}" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete this goal?')">
             @csrf
@@ -81,6 +84,7 @@
             @endif
           </form>
         </div>
+        @endif
       </td>
     </tr>
       @endforeach

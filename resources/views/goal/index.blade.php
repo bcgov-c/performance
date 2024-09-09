@@ -1,4 +1,11 @@
 <script src="https://cdn.ckeditor.com/4.20.1/standard-all/ckeditor.js"></script>
+<style>
+.p-3{
+    width:100%;
+    margin-left: 7.5;
+    margin-right: 7.5;
+}
+</style> 
 <x-side-layout title="{{ __('My Goals - Performance Development Platform') }}">
     <x-slot name="header">
         <h3>
@@ -29,44 +36,48 @@
 
         <div class="row">
             @if ($type != 'supervisor')   
-                <form action="" method="get" id="filter-menu">
-                    <div class="row">
-                        
-                        <div class="col-12"  id="msgdiv"></div>
-                        
-                        <div class="col">
-                            <label>
-                                Title
-                                <input type="text" name="title" class="form-control" value="{{request()->title}}">
-                            </label>
-                        </div>
-                        <div class="col">
-                            <x-dropdown :list="$goaltypes" label="Goal Type" name="goal_type" :selected="request()->goal_type"></x-dropdown>
-                        </div>
-                        @if ($type == 'past')
-                            <div class="col">
-                                <x-dropdown :list="$statusList" label="Status" name="status" :selected="request()->status"></x-dropdown>                      
+                <div class="card p-3">         
+                    <h3>Search Goals</h3>
+                    <form action="" method="get" id="filter-menu">    
+                        <div class="form-row">
+                            <div class="form-group col-md-2">
+                                <label for="title">Goal Title<br/>
+                                <input type="text" id="title" name="title" class="form-control" value="{{request()->title}}">
+                                </label>
                             </div>
-                        @endif
-                        <div class="col">
-                            <x-dropdown :list="$tagsList" label="Tags" name="tag_id" :selected="request()->tag_id"></x-dropdown>
-                        </div>
-                        <div class="col">
-                            <label>
-                                Start Date
-                                <input type="text" class="form-control" name="filter_start_date" value="{{request()->filter_start_date ?? 'Any'}}">
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label>
-                                End Date
-                                <input type="text" class="form-control" name="filter_target_date" value="{{request()->filter_target_date ?? 'Any'}}">
-                            </label>
-                        </div>
-                    </div>
-                    <input name="sortby" id="sortby" value="{{$sortby}}" type="hidden">
-                    <input name="sortorder" id="sortorder" value="{{$sortorder}}" type="hidden">
-                </form>    
+                            <div class="form-group col-md-2">
+                                <x-dropdown :list="$goaltypes" id="goal_type" label="Goal Type" name="goal_type" :selected="request()->goal_type"></x-dropdown>
+                            </div>
+                            @if ($type == 'past')
+                                <div class="form-group col-md-2">
+                                    <x-dropdown :list="$statusList" id="status" label="Status" name="status" :selected="request()->status"></x-dropdown>                      
+                                </div>
+                            @endif
+                            <div class="form-group col-md-2">
+                                <x-dropdown :list="$tagsList" label="Tags" id="tag_id" name="tag_id" :selected="request()->tag_id"></x-dropdown>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label for="filter_start_date">Start Date<br/>
+                                <input aria-label="Enter the goals start date in format MM/DD/YYYY" placeholder="MM/DD/YYYY" type="text" class="form-control" id="filter_start_date" name="filter_start_date" value="{{request()->filter_start_date ?? ''}}">
+                                </label>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label for="filter_target_date">End Date<br/>
+                                <input aria-label="Enter the goals target date in format MM/DD/YYYY" placeholder="MM/DD/YYYY" type="text" class="form-control" id="filter_target_date" name="filter_target_date" value="{{request()->filter_target_date ?? ''}}">
+                                </label>
+                            </div>
+                            <div class="form-group col-md-2 p-3 float-left float-bottom" style="display: flex;flex-direction: column;margin-left: 0px;">
+                                <div class="form-group row">
+                                    <span class="float-left float-bottom">  
+                                        <button type="submit" class="btn btn-primary mr-2" aria-label="Click the button to search goals">Search</button>
+                                        <button type="button" class="btn btn-secondary" onclick="resetForm()" aria-label="Click the button to reset the form">Reset</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>                    
+                    </form>    
+                </div>
+
             @endif    
             @if ($type == 'current' || $type == 'supervisor')
                 @if($type == 'supervisor')

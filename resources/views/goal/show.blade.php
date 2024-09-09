@@ -95,11 +95,13 @@
                                     <div class="comment-text">
                                         {!! (!$comment->trashed()) ? $comment->comment : '<i>Comment is deleted.</i>' !!}
                                     </div>
+                                    @if ($goal->status == 'active') 
                                     <x-button class="btn edit-save d-none" action="submit" :data-comment-id="$comment->id" size="sm">Save</x-button>
                                     <div>
                                         @if($comment->canBeEdited())<x-button icon='edit' style="link" class="comment-edit" :data-comment-id="$comment->id" size="sm">Edit</x-button>@endif
                                         @if(!$comment->trashed() && $comment->canBeDeleted())<x-button icon='trash' style="link" class="comment-delete" :data-comment-id="$comment->id" size="sm">Delete</x-button>@endif
                                     </div>
+                                    @endif
                                     <div>
                                         @foreach($comment->replies as $reply)
                                         <div class="card mt-2 p-2 d-flex flex-row bg-light">
@@ -115,14 +117,17 @@
                                                 <div class="comment-text">
                                                     {!! (!$reply->trashed()) ? $reply->comment : '<i>Comment is deleted.</i>' !!}
                                                 </div>
+                                                @if ($goal->status == 'active') 
                                                 <x-button class="btn edit-save d-none" action="submit" :data-comment-id="$reply->id" size="sm">Save</x-button>
                                                 <div>
                                                     @if($reply->canBeEdited())<x-button icon='edit' style="link" class="comment-edit" :data-comment-id="$reply->id" size="sm">Edit</x-button>@endif
                                                     @if(!$reply->trashed() && $reply->canBeDeleted())<x-button icon='trash' style="link" class="comment-delete" :data-comment-id="$reply->id" size="sm">Delete</x-button>@endif
                                                 </div>
+                                                @endif
                                             </div>
                                         </div>
                                         @endforeach
+                                        @if ($goal->status == 'active') 
                                         <x-button icon='reply' style="link" class="comment-reply" :data-comment-id="$comment->id" size="sm">Reply</x-button>
                                         <div class="reply-box d-none">
                                             <form action="{{route('goal.add-comment', $goal->id)}}" method="POST">
@@ -140,10 +145,12 @@
                                                 </div>
                                             </form>
                                         </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
                             @endforeach
+                            @if ($goal->status == 'active') 
                             <form action="{{route('goal.add-comment', $goal->id)}}" method="POST">
                                 @csrf
                                 <div class="d-flex flex-row my-2">
@@ -157,7 +164,7 @@
                                     </div>
                                 </div>
                             </form>
-
+                            @endif
                         </div>
                         @endif
                     </div>
