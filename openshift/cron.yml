@@ -92,6 +92,3 @@ parameters:
   - name: BUILD_NAME
     required: true
     value: "cron"
-  - name: BUILD_TAG
-    required: true
-    value: "dev"

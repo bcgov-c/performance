@@ -3,6 +3,7 @@ test -n "$BUILD_NAMESPACE"
 echo "BUILIDING $DEPLOYMENT_NAME:$BRANCH"
   oc -n $BUILD_NAMESPACE process -f ./openshift/docker-build.yml \
     -p NAME=$DEPLOYMENT_NAME \
+    -p BUILD_TAG=$BRANCH \
     -p DOCKER_FROM_IMAGE=$DOCKER_FROM_IMAGE \
     -p IMAGE_REPO=$IMAGE_REPO \
     -p IMAGE_NAME=$DEPLOYMENT_NAME \
