@@ -444,7 +444,7 @@ class User extends Authenticatable
         ->join('positions AS p', 'employee_demo.position_number', 'p.position_nbr')
         ->join('employee_demo AS e', function($join1){
             return $join1->on(function($on1){
-                return $on1->where('p.reports_to', 'e.position_number')
+                return $on1->whereColumn('p.reports_to', 'e.position_number')
                 ->whereRaw('e.pdp_excluded = 0');
             });
         })
@@ -460,11 +460,11 @@ class User extends Authenticatable
     }
 
     public function preferredSupervisor() {
-        if ($this->employee_demo && $this->employee_demo->position_number) {
+        if ($this->primaryJob() && $this->primaryJob()->position_number) {
             return PreferredSupervisor::join('users AS u', 'u.employee_id', 'preferred_supervisor.supv_empl_id')
             ->select('preferred_supervisor.supv_empl_id', 'u.name', 'u.id')
             ->where('preferred_supervisor.employee_id', '=', $this->employee_id)
-            ->where('preferred_supervisor.position_nbr', '=', $this->employee_demo->position_number)
+            ->where('preferred_supervisor.position_nbr', '=', $this->primaryJob()->position_number)
             ->first();
         } else {
             return null;
@@ -480,7 +480,7 @@ class User extends Authenticatable
             ->join('users AS u', 'u.id', 'employee_supervisor.supervisor_id')
             ->join('employee_demo AS ed', function($join1){
                 return $join1->on(function($on1){
-                    return $on1->where('ed.employee_id', 'u.employee_id')
+                    return $on1->whereColumn('ed.employee_id', 'u.employee_id')
                     ->whereRaw('ed.pdp_excluded = 0');
                 });
             })
@@ -572,7 +572,7 @@ class User extends Authenticatable
             })
             ->join('employee_demo_tree AS edt', 'edt.id', 'ed.orgid')
             ->where('pj.employee_id', $this->employee_id)
-            ->selectRaw("pj.employee_id, pj.empl_record, CONCAT(edt.deptid, ' ', ed.jobcode_desc) AS job")
+            ->selectRaw("pj.employee_id, pj.empl_record, CONCAT(edt.deptid, ' ', ed.jobcode_desc) AS job, ed.position_number")
             ->first();
     }
 

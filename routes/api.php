@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SystemStatusController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,5 +24,12 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     } else {
         return response()->json(['error' => 'User does not have the right roles'], 403);
     }
+});
+
+Route::middleware(['api_token'])->group(function () {
+
+    Route::get('/system/queue-status/{api_token}', [SystemStatusController::class, 'queueStatus']);
+    Route::get('/system/database-status/{api_token}', [SystemStatusController::class, 'databaseStatus']);
+
 });
 

@@ -136,9 +136,6 @@
                     <th>Old Value </th>
                     <th>New Value </th>
                     <th>Url</th>
-                    <th>IP Address</th>
-                    <th>User Agent</th>
-                    
 				</tr>
 			</thead>
 		</table>
@@ -191,10 +188,6 @@
     <link href="{{ asset('vendor/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}" rel="stylesheet">
 
 	<style>
-	/* #audit-table_filter label {
-		text-align: right !important;
-        padding-right: 10px;
-	} */
     
     #audit-table_filter {
         display: none;
@@ -233,7 +226,6 @@
             "searching": true,
             processing: true,
             serverSide: true,
-            // select: true,
             'order': [[ 0, 'desc']],
             fixedHeader: true,   
             fixedColumn: true, 
@@ -243,7 +235,6 @@
             ajax: {
                 url: '{!! route('sysadmin.auditing.index') !!}',
                 data: function (data) {
-                    // data.term = $('#user').val();
                     data.audit_user = $("input[name='audit_user']").val();
                     data.original_user = $("input[name='original_user']").val();
                     data.event_type = $("select[name='event_type']").val();
@@ -266,13 +257,6 @@
                 {data: 'old_values', name: 'old_values', orderable: false, searchable: false},
                 {data: 'new_values', name: 'new_values', orderable: false, searchable: false},
                 {data: 'url', name: 'url',},
-                {data: 'ip_address', name: 'ip_address', className: "dt-nowrap"},
-                {data: 'user_agent', name: 'user_agent', render: function (data, type, row) {
-                                return "<div style='width: 20em;'>" + data  + '</div>';
-                    }
-                },
-                // {data: 'deleted_by', name: 'delete_by', orderable: false, searchable: false, className: "dt-nowrap"},
-                // {data: 'deleted_at', name: 'delete_at', orderable: false, searchable: false, className: "dt-nowrap"},
             ],
             columnDefs: [
                     {
@@ -295,7 +279,6 @@
         });
 
         $('#refresh-btn').on('click', function() {
-            // oTable.ajax.reload(null, true);
             oTable.draw();
         });
 
@@ -313,29 +296,6 @@
 
             oTable.search( '' ).columns().search( '' ).draw();
         });
-
-        // // Model -- Show
-    	// $(document).on("click", ".more-link , .show-audit" , function(e) {
-		// 	e.preventDefault();
-
-        //     id =  $(this).attr('data-id');
-        //     $.ajax({
-        //         method: "GET",
-        //         url:  '/sysadmin/job-schedule-audit/' + id,
-        //         dataType: 'json',
-        //         success: function(data)
-        //         {
-        //             $('#auditModalLabel').html('Job : ' + data.id + ' (' + data.job_name + ')' );
-        //             //  started at ' + data.start_time);
-        //             $('#modal-status').html(data.status);
-        //             $('#modal-message').html(data.details);
-        //             $('#audit-show-modal').modal('show');
-        //         },
-        //         error: function(response) {
-        //             console.log('Error');
-        //         }
-        //     });
-    	// });
 
     });
 

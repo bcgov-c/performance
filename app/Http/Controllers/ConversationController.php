@@ -23,6 +23,7 @@ use App\Http\Requests\Conversation\ConversationRequest;
 use Illuminate\Support\Facades\Log;
 use App\Models\EmployeeSupervisor;
 use App\Models\EmployeeManager;
+use App\Models\PreferredSupervisor;
 
 class ConversationController extends Controller
 {
@@ -618,6 +619,7 @@ class ConversationController extends Controller
                         'conversation_id' => $conversation->id,
                         'participant_id' => $value,
                         'role' => 'emp',
+                        'position_number' => $this->getPositionNumber($value),
                     ]);
 
                     ConversationParticipant::updateOrCreate([
@@ -640,6 +642,7 @@ class ConversationController extends Controller
                         'conversation_id' => $conversation->id,
                         'participant_id' => $actualOwner,
                         'role' => 'emp',
+                        'position_number' => $this->getPositionNumber($actualOwner),
                     ]);
 
                     ConversationParticipant::updateOrCreate([
@@ -661,6 +664,7 @@ class ConversationController extends Controller
                             'conversation_id' => $conversation->id,
                             'participant_id' => $value,
                             'role' => 'emp',
+                            'position_number' => $this->getPositionNumber($value),
                         ]);
     
                         ConversationParticipant::updateOrCreate([
@@ -682,6 +686,7 @@ class ConversationController extends Controller
                             'conversation_id' => $conversation->id,
                             'participant_id' => $actualOwner,
                             'role' => 'emp',
+                            'position_number' => $this->getPositionNumber($actualOwner),
                         ]);
     
                         ConversationParticipant::updateOrCreate([
@@ -735,6 +740,7 @@ class ConversationController extends Controller
                                 'conversation_id' => $conversation->id,
                                 'participant_id' => $actualOwner,
                                 'role' => 'emp',
+                                'position_number' => $this->getPositionNumber($actualOwner),
                             ]);
                         }
 
@@ -755,6 +761,7 @@ class ConversationController extends Controller
                         'conversation_id' => $conversation->id,
                         'participant_id' => $value,
                         'role' => 'emp',
+                        'position_number' => $this->getPositionNumber($value),
                     ]);
 
                     ConversationParticipant::updateOrCreate([
@@ -778,6 +785,7 @@ class ConversationController extends Controller
                         'conversation_id' => $conversation->id,
                         'participant_id' => $actualOwner,
                         'role' => 'emp',
+                        'position_number' => $this->getPositionNumber($actualOwner),
                     ]);
 
                     ConversationParticipant::updateOrCreate([
@@ -800,6 +808,7 @@ class ConversationController extends Controller
                             'conversation_id' => $conversation->id,
                             'participant_id' => $value,
                             'role' => 'emp',
+                            'position_number' => $this->getPositionNumber($value),
                         ]);
     
                         ConversationParticipant::updateOrCreate([
@@ -822,6 +831,7 @@ class ConversationController extends Controller
                             'conversation_id' => $conversation->id,
                             'participant_id' => $actualOwner,
                             'role' => 'emp',
+                            'position_number' => $this->getPositionNumber($actualOwner),
                         ]);
     
                         ConversationParticipant::updateOrCreate([
@@ -853,6 +863,7 @@ class ConversationController extends Controller
                                 'conversation_id' => $conversation->id,
                                 'participant_id' => $value,
                                 'role' => 'emp',
+                                'position_number' => $this->getPositionNumber($value),
                             ]);
                             $actualOwnerRole = 'mgr';
                         }
@@ -875,6 +886,7 @@ class ConversationController extends Controller
                                 'conversation_id' => $conversation->id,
                                 'participant_id' => $actualOwner,
                                 'role' => 'emp',
+                                'position_number' => $this->getPositionNumber($actualOwner),
                             ]);
                         }
 
@@ -1029,6 +1041,7 @@ class ConversationController extends Controller
         
         $conversation_participants = DB::table('conversation_participants')                        
                             ->where('conversation_id', $conversation_id)
+                            ->orderBy('role','desc')
                             ->get();    
         $conversation->participants = $conversation_participants;
         $is_viewer = false;
@@ -1036,29 +1049,26 @@ class ConversationController extends Controller
         $disable_signoff = false;
         $mgr = '';
         $emp = '';
-        
-        if(session()->has('view-profile-as')) {
-            $original_user = $request->session()->get('original-auth-id');
+
+        if(session()->has('view-profile-as')) {            
+            $is_viewer = true;
+            $disable_signoff = true;
+            $original_user =  $request->session()->get('view-profile-as');
             foreach($conversation_participants as $participant) {
                 if($participant->role == 'mgr' && $participant->participant_id == $original_user) {
                     $mgr = $participant->participant_id;
                     $view_as_supervisor = true;
-                }elseif($participant->role == 'emp'  && $participant->participant_id == $original_user) {
+                } else {
                     $emp = $participant->participant_id;
                 }
             } 
-            if ($mgr == '' && $emp == ''){
-                $is_viewer = true;
-                $disable_signoff = true;
-            }
         }else {
             foreach($conversation_participants as $participant) {
                 $current_user = auth()->user()->id;
                 if($participant->role == 'mgr' && $participant->participant_id == $current_user) {
                     $mgr = $participant->participant_id;
                     $view_as_supervisor = true;
-                }
-                if($participant->role == 'emp'  && $participant->participant_id == $current_user) {
+                } else {
                     $emp = $participant->participant_id;
                 }
             }        
@@ -1541,6 +1551,35 @@ class ConversationController extends Controller
             }       
         }
         return null;
+    }
+
+    public function getPositionNumber($id)
+    {
+        $position_number = null;
+        $position_array = [];
+        $users = User::where('id', $id)->select('id', 'employee_id')->first();
+        if($users){
+            $demo = EmployeeDemo::where('employee_id', $users->employee_id)->whereNull('date_deleted')->get();
+            if(!$demo){ return $position_number; }
+            if($demo->count() == 1){ 
+                // use only employee demo position number
+                $position_number = $demo[0]->position_number;
+            } else {
+                $position_array = array_column($demo->toArray(), 'position_number');
+                $preferred = PreferredSupervisor::where('employee_id', $users->employee_id)->first();
+                if($preferred && in_array($preferred->position_number, $position_array, true)){
+                    // use preferred position number, if matching 1 in the array
+                    $position_number = $preferred->position_number;
+                } else {
+                    $first = EmployeeDemo::where('employee_id', $users->employee_id)->whereNull('date_deleted')->orderBy('empl_record')->first();
+                    if($first){
+                        // use position number from lowest empl record in employee demo
+                        $position_number = $first->position_number;
+                    }
+                };
+            };
+        }
+        return $position_number;
     }
     
 }

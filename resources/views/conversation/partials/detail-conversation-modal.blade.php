@@ -146,8 +146,9 @@ function updateConversation(conversation_id) {
 
                         $("#locked-message").addClass("d-none");
                         
-                        user1 = result.conversation_participants.find((p) => p.participant_id === currentUser);
-                        user2 = result.conversation_participants.find((p) => p.participant_id !== currentUser);
+                        user1 = result.conversation_participants.find((p) => p.role === 'emp');
+                        user2 = result.conversation_participants.find((p) => p.role === 'mgr');
+                        
                         let isNotThirdPerson = true;
                         if (!user1 || !user2) {
                             user1 = result.conversation_participants[0];
@@ -165,11 +166,11 @@ function updateConversation(conversation_id) {
                         }
                         $('#employee-signoff-questions').removeClass('d-none');
                         if (isSupervisor) {
-                            $('#employee-signoff-message').find('.name').html(user2.participant.name);
-                            $('#supervisor-signoff-message').find('.name').html(user1.participant.name);
+                            $('#employee-signoff-message').find('.name').html(user1.participant.name);
+                            $('#supervisor-signoff-message').find('.name').html(user2.participant.name);
                             
-                            $('#employee-unsignoff-message').find('.name').html(user2.participant.name);
-                            $('#supervisor-unsignoff-message').find('.name').html(user1.participant.name);
+                            $('#employee-unsignoff-message').find('.name').html(user1.participant.name);
+                            $('#supervisor-unsignoff-message').find('.name').html(user2.participant.name);
                         } else {
                             $('#employee-signoff-message').find('.name').html(user1.participant.name);
                             $('#supervisor-signoff-message').find('.name').html(user2.participant.name);
@@ -263,6 +264,12 @@ function updateConversation(conversation_id) {
                                 
                                 $('.employee-sign-off').prop('disabled', true);
                                 $('.team_member_agreement').prop('disabled', true);
+
+                                
+                                $('.saveAllComments').prop('disabled', true);
+                                $('.notifyParticipants').prop('disabled', true);
+                                $('.saveAllComments').hide();
+                                $('.notifyParticipants').hide();
                                 
                                 $('#unsign-off-block').html('');
                         }

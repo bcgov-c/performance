@@ -372,7 +372,50 @@ class SyncUserProfile extends Command
             ->whereRaw('users.acctlock = 0')
             ->update(['users.acctlock' => true, 'users.last_sync_at' => $new_sync_at]);
 
-        $this->info( now() );         
+        $this->info( now() );    
+        
+        // Step 5 : Update Invalid Preferred Job In User Profile
+        $this->info( now() );
+        $this->info('Step 5 - Update Invalid Preferred Job In User Profile');
+
+        $users = User::where('users.acctlock', \DB::raw(0))
+        ->whereNotExists(function($active_demo) {
+            return $active_demo->select(\DB::raw(1))
+            ->from('employee_demo AS eda')
+            ->whereRaw('eda.employee_id = users.employee_id')
+            ->whereRaw("eda.empl_record = users.empl_record")
+            ->whereNull('eda.date_deleted')
+            ->whereRaw("eda.pdp_excluded = 0");
+        })
+        ->whereExists(function($any_demo) {
+            return $any_demo->select(\DB::raw(2))
+            ->from('employee_demo AS edo')
+            ->whereRaw('edo.employee_id = users.employee_id')
+            ->whereRaw('edo.empl_record <> users.empl_record')
+            ->whereNull('edo.date_deleted')
+            ->whereRaw('edo.pdp_excluded = 0');
+        })
+        ->select('users.id', 'users.employee_id', 'users.empl_record')
+        ->orderBy('users.id')
+        ->get();
+
+        foreach($users as $user){
+            $minDemo = EmployeeDemo::where('employee_id', $user->employee_id)
+            ->where('empl_record', '<>', $user->empl_record)
+            ->whereNull('date_deleted')
+            ->where('pdp_excluded', 0)
+            ->select('empl_record')
+            ->orderBy('empl_record')
+            ->first();
+            if($minDemo){
+                User::where('id', $user->id)->update(['empl_record' => $minDemo->empl_record]);
+                $this->info(" - EE{$user->employee_id} - Assigned record {$minDemo->empl_record} for Preferred Job.");
+            } else {
+                $this->info(" - EE{$user->employee_id} - No available active Job for Preferred Job.");
+            }
+        }
+
+        $this->info( now() );    
  
         return null; 
     }
