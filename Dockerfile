@@ -125,7 +125,7 @@ RUN mkdir -p ${STORAGE_DIR} \
 RUN chown -R www-data:www-data ${PUBLIC_STORAGE_DIR} && \
 	chown -R www-data:www-data  ${APP_STORAGE_DIR}
 
-# Copy the contents from your local ./storage/app/public directory to the target directory
+# Copy the contents from local ./storage/app/public directory to the target directory
 COPY ./storage ${STORAGE_DIR}
 
 # Create cache and session storage structure

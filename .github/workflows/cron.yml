@@ -26,6 +26,7 @@ jobs:
             openshift/config/php
             example.env
             example.versions.env
+            storage
 
       # Login to Artifactory
       - name: 🔑 Login to Artifactory
