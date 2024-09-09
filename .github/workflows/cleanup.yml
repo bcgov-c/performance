@@ -24,7 +24,7 @@ on:
       DEPLOY_NAMESPACE:
         required: true
         type: string
-      DB_NAME:
+      DB_POD_NAME:
         required: true
         type: string
       WEB_NAME:
@@ -117,28 +117,28 @@ jobs:
             oc delete configmap ${{ inputs.REDIS_NAME }}-redis-cluster-scripts
           fi
 
-      - name: 🧹️ Clean ${{ inputs.DB_NAME }}
+      - name: 🧹️ Clean ${{ inputs.DB_POD_NAME }}
         run: |
-          configmap_name="${{ inputs.DB_NAME }}-config"
-          if [[ `oc describe sts ${{ inputs.DB_NAME }} 2>&1` =~ "NotFound" ]]; then
-            echo "${{ inputs.DB_NAME }} NOT FOUND: Skipping..."
+          configmap_name="${{ inputs.DB_POD_NAME }}-config"
+          if [[ `oc describe sts ${{ inputs.DB_POD_NAME }} 2>&1` =~ "NotFound" ]]; then
+            echo "${{ inputs.DB_POD_NAME }} NOT FOUND: Skipping..."
           else
-            echo "${{ inputs.DB_NAME }} FOUND: Cleaning..."
-            oc scale sts/${{ inputs.DB_NAME }} --replicas=0
-            oc delete sts/${{ inputs.DB_NAME }}
+            echo "${{ inputs.DB_POD_NAME }} FOUND: Cleaning..."
+            oc scale sts/${{ inputs.DB_POD_NAME }} --replicas=0
+            oc delete sts/${{ inputs.DB_POD_NAME }}
             # for i in 0 1 2; do
-            #   if ! [[ `oc describe pvc datadir-${{ inputs.DB_NAME }}-$i 2>&1` =~ "NotFound" ]]; then
-            #     kubectl delete pvc datadir-${{ inputs.DB_NAME }}-$i;
+            #   if ! [[ `oc describe pvc datadir-${{ inputs.DB_POD_NAME }}-$i 2>&1` =~ "NotFound" ]]; then
+            #     kubectl delete pvc datadir-${{ inputs.DB_POD_NAME }}-$i;
             #   else
-            #     echo "pvc datadir-${{ inputs.DB_NAME }}-$i NOT FOUND: Skipping..."
+            #     echo "pvc datadir-${{ inputs.DB_POD_NAME }}-$i NOT FOUND: Skipping..."
             #   fi
             # done
           fi
           if ! [[ `oc describe configmap $configmap_name 2>&1` =~ "NotFound" ]]; then
             oc delete configmap $configmap_name
           fi
-          if ! [[ `oc describe service ${{ inputs.DB_NAME }} 2>&1` =~ "NotFound" ]]; then
-            oc delete service ${{ inputs.DB_NAME }}
+          if ! [[ `oc describe service ${{ inputs.DB_POD_NAME }} 2>&1` =~ "NotFound" ]]; then
+            oc delete service ${{ inputs.DB_POD_NAME }}
           fi
 
       - name: 🧹️ Clean ${{ inputs.WEB_NAME }}

@@ -10,7 +10,7 @@ if helm list -q | grep -q "^$DB_BACKUP_DEPLOYMENT_NAME$"; then
   # Create a temporary values file with the updated backupConfig
   cat <<EOF > temp-values.yaml
 backupConfig: |
-  mariadb=$DB_HOST:$DB_PORT/$DB_NAME
+  mariadb=$DB_HOST:$DB_PORT/$DATABASE_NAME
   0 1 * * * default ./backup.sh -s
   0 4 * * * default ./backup.sh -s -v all
 EOF
@@ -48,7 +48,7 @@ else
         storageClassName: netapp-file-standard
 
     backupConfig: |
-      mariadb=$DB_HOST:$DB_PORT/$DB_NAME
+      mariadb=$DB_HOST:$DB_PORT/$DATABASE_NAME
       0 1 * * * default ./backup.sh -s
       0 4 * * * default ./backup.sh -s -v all
 

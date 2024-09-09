@@ -13,7 +13,7 @@ export TEMPLATE_FILE_NAME := $(or $(TEMPLATE_FILE_NAME), $$FILE)
 export BRANCH := $(or $(BRANCH), dev)
 export BUILD_NAMESPACE := $(or $(BUILD_NAMESPACE), $$BUILD_NS)
 export DOMAIN := $(or $(DOMAIN), apps.silver.devops.gov.bc.ca)
-export DB_NAME := $(or $(DB_NAME), court-interpreter-scheduling)
+export DB_POD_NAME := $(or $(DB_POD_NAME), court-interpreter-scheduling)
 export KC_AUTH_URL := $(or $(KC_AUTH_URL), https://oidc.gov.bc.ca/auth/)
 export KC_REALM := $(or $(KC_REALM), joxo7v8f)
 
@@ -47,7 +47,7 @@ define DB_SERVICE_NAME
 "patroni-master"
 endef
 
-define TEMPLATE_PATH 
+define TEMPLATE_PATH
 "./openshift/$(TEMPLATE_FILE_NAME)"
 endef
 
@@ -68,7 +68,7 @@ define APP
 endef
 
 # The front-end when routed through the justice proxy
-define APP_PROXIED 
+define APP_PROXIED
 "proxied-app-$(APP_NAME)"
 endef
 
@@ -136,7 +136,7 @@ print-status:
 	@echo " +---------------------------------------------------------+ "
 
 init-project:
-	@echo "Run initial set-up for the project, including network security\n" 
+	@echo "Run initial set-up for the project, including network security\n"
 	@oc process -f openshift/networkpolicy.yml -p NAMESPACE=$$(oc project --short) | oc apply -f -
 	@oc -n $(BUILD_NAMESPACE) policy add-role-to-group system:image-puller system:serviceaccounts:$$(oc project --short)
 

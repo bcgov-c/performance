@@ -30,7 +30,10 @@ on:
       DB_PORT:
         required: true
         type: string
-      DB_NAME:
+      DB_POD_NAME:
+        required: true
+        type: string
+      DATABASE_NAME:
         required: true
         type: string
       CRON_IMAGE:
@@ -130,7 +133,7 @@ jobs:
           BACKUP_HELM_CHART: ${{ inputs.BACKUP_HELM_CHART }}
           DB_BACKUP_IMAGE: ${{ inputs.BACKUP_IMAGE }}
           DB_HOST: ${{ inputs.DB_HOST }}
-          DB_NAME: ${{ secrets.DB_NAME }}
+          DATABASE_NAME: ${{ inputs.DATABASE_NAME }}
           DB_PORT: ${{ inputs.DB_PORT }}
 
       # Deploy Redis
@@ -144,7 +147,7 @@ jobs:
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           REPLICAS: 3
 
-      - name: Deploy Database StatefulSet (${{ inputs.DB_NAME  }})
+      - name: Deploy Database StatefulSet (${{ inputs.DB_POD_NAME  }})
         id: deploy_database
         if: success()
         run: bash ./openshift/scripts/deploy-database.sh
@@ -152,16 +155,16 @@ jobs:
           IMAGE_REPO: ${{ inputs.IMAGE_REPO }}
           DB_IMAGE: ${{ inputs.DB_IMAGE }}
           DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
-          DB_NAME: ${{ inputs.DB_NAME }}
+          DB_POD_NAME: ${{ inputs.DB_POD_NAME }}
           DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
-          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_POD_NAME: ${{ secrets.DB_POD_NAME }}
 
       - name: Deploy Moodle Template and Run Upgrades
         if: success()
         run: bash ./openshift/scripts/deploy-template.sh
         env:
           APP: ${{ inputs.APP }}
-          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_POD_NAME: ${{ secrets.DB_POD_NAME }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           BUILD_TAG: ${{ inputs.OPENSHIFT_DEPLOY_PROJECT }}-${{ github.ref_name }}
@@ -172,7 +175,7 @@ jobs:
           WEB_NAME: ${{ inputs.WEB_NAME }}
           WEB_IMAGE: ${{ secrets.ARTIFACTORY_URL }}/${{ inputs.WEB_IMAGE }}
           PHP_NAME: ${{ inputs.PHP_NAME }}
-          DB_NAME: ${{ inputs.DB_NAME }}
+          DB_POD_NAME: ${{ inputs.DB_POD_NAME }}
           CRON_NAME: ${{ inputs.CRON_NAME }}
           CRON_IMAGE: ${{ inputs.CRON_IMAGE }}
           REDIS_NAME: ${{ inputs.REDIS_NAME }}

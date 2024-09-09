@@ -39,7 +39,7 @@ return [
             // 'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST', 'db'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_NAME', 'performance'),
+            'database' => env('DATABASE_NAME', 'performance'),
             'username' => env('DB_USER', 'performance'),
             'password' => env('DB_PASSWORD', 'performance'),
             'unix_socket' => env('DB_SOCKET', ''),
