@@ -21,12 +21,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: e66ac2-prod
-          sparse-checkout: |
-            openshift/config/cron
-            openshift/config/php
-            example.env
-            example.versions.env
-            storage
 
       # Login to Artifactory
       - name: 🔑 Login to Artifactory
