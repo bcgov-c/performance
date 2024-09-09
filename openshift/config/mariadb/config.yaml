@@ -108,17 +108,17 @@ spec:
         - name: MYSQL_USER
           valueFrom:
             secretKeyRef:
-              name: moodle-secrets
+              name: ${APP_NAME}-secrets
               key: database-user
         - name: MARIADB_DATABASE
           valueFrom:
             secretKeyRef:
-              name: moodle-secrets
+              name: ${APP_NAME}-secrets
               key: database-name
         - name: MYSQL_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: moodle-secrets
+              name: ${APP_NAME}-secrets
               key: database-password
         - name: MYSQL_INITDB_SKIP_TZINFO
           value: "1"

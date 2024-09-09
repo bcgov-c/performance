@@ -77,7 +77,7 @@ echo "Copying files..."
 rsync -a --no-perms --no-owner --no-times ${src_dir}/ ${dest_dir}/
 
 echo "Setting permissions..."
-# Set permissions for moodle directory
+# Set permissions for app directory
 find $dest_dir -mindepth 1 -type d -exec chmod 755 {} \;
 find $dest_dir -mindepth 1 -type f -exec chmod 644 {} \;
 

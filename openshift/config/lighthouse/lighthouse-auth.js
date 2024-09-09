@@ -4,7 +4,7 @@ const options = {
   chromeFlags: ['--headless'],
   output: 'json'
 };
-const testURL = 'https://' + process.env.APP_HOST_URL + '/login/index.php'
+const testURL = 'https://' + process.env.APP_HOST_URL + '/login'
 
 async function runLighthouse(url, options, config = null) {
   // Import chrome-launcher
@@ -28,8 +28,8 @@ async function runLighthouse(url, options, config = null) {
   // Use Puppeteer to launch a browser and perform the login
   const browser = await puppeteer.connect({browserURL: `http://127.0.0.1:${chrome.port}`});
   const page = await browser.newPage();
-  const username = process.env.USERNAME; // Use the MOODLE_TESTER_USERNAME environment variable
-  const password = sanitizeInput(process.env.PASSWORD); // Use the MOODLE_TESTER_PASSWORD environment variable
+  const username = process.env.TESTER_USERNAME;
+  const password = sanitizeInput(process.env.TESTER_PASSWORD);
 
   // Import Lighthouse
   const lighthouse = (await import('lighthouse')).default;
@@ -40,25 +40,22 @@ async function runLighthouse(url, options, config = null) {
 
   // Check that the username and password are set and are strings
   if (typeof username !== 'string' || typeof password !== 'string') {
-    throw new Error('MOODLE_TESTER_USERNAME (' + username + ') and MOODLE_TESTER_PASSWORD must be set and must be strings');
+    throw new Error('TESTER_USERNAME (' + username + ') and TESTER_PASSWORD must be set and must be strings');
   }
 
   // Check if the username field exists
-  const usernameField = await page.$('#username');
+  const usernameField = await page.$('input[name="email"]');
   if (!usernameField) {
     throw new Error('No element found for selector: #username');
   }
   await usernameField.type(username);
 
   // Check if the password field exists
-  const passwordField = await page.$('#password');
+  const passwordField = await page.$('input[name="password"]');
   if (!passwordField) {
     throw new Error('No element found for selector: #password');
   }
   await page.type('#password', password);
-
-  // console.log('Current working directory:', process.cwd());
-  // Resule: /home/runner/work/moodle-nginx/moodle-nginx
 
   await page.screenshot({path: 'before_login_click.png'}); // Take a screenshot before clicking the login button
   const content = await page.content();
@@ -66,7 +63,7 @@ async function runLighthouse(url, options, config = null) {
 
   // Wait for both the click and navigation
   await Promise.all([
-    page.click('#loginbtn'),
+    page.click('button[type="submit"]'),
     page.waitForNavigation({timeout: 60000}),
   ]);
 
@@ -84,11 +81,11 @@ async function runLighthouse(url, options, config = null) {
 
   // Define the paths you want to navigate
   const paths = [
-    '/course/view.php?id=60',
-    '/mod/book/view.php?id=3078',
-    '/mod/page/view.php?id=3079',
-    '/course/view.php?id=60&section=2#module-3080',
-    '/mod/url/view.php?id=3143'
+    '/dashboard',
+    '/goal/current',
+    '/goal/20011',
+    '/conversation/upcoming',
+    '/my-team/my-employees'
   ];
 
   const pathCount = paths.length;

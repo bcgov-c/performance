@@ -60,7 +60,7 @@ echo ""
 
 # Check if any files were found
 if [ -n "$incorrect_permissions_files" ]; then
-  echo "The following files in the moodle directory do not have the correct permissions:"
+  echo "The following files in the application directory do not have the correct permissions:"
   echo "$incorrect_permissions_files"
   # exit 1 # Don't exit here
 else

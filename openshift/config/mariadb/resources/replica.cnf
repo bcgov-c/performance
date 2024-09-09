@@ -3,7 +3,7 @@ skip-ssl
 # disable-ssl-verify-server-cert
 slave_parallel_mode=optimistic
 slave_parallel_threads=2  # Adjust this value based on your system's capabilities
-relay-log=moodle-db-relay-bin
+relay-log=db-relay-bin
 max_allowed_packet=1073741824
 innodb_buffer_pool_size=800M
 net_read_timeout=3600

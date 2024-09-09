@@ -53,7 +53,7 @@ else
       0 4 * * * default ./backup.sh -s -v all
 
     db:
-      secretName: moodle-secrets
+      secretName: $APP_NAME-secrets
       usernameKey: database-user
       passwordKey: database-password
 
@@ -61,7 +61,7 @@ else
       DATABASE_SERVICE_NAME:
         value: \"$DB_HOST\"
       ENVIRONMENT_FRIENDLY_NAME:
-        value: \"Moodle Backups\"
+        value: \"$APP_NAME Backups\"
     " > config.yaml
   helm install $DB_BACKUP_DEPLOYMENT_NAME $BACKUP_HELM_CHART --atomic --wait --timeout 30 -f config.yaml
   oc set image deployment/$DB_BACKUP_DEPLOYMENT_NAME backup-storage=$DB_BACKUP_IMAGE

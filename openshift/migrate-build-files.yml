@@ -1,0 +1,80 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: migrate-build-files
+objects:
+ - apiVersion: batch/v1
+   kind: Job
+   metadata:
+     name: migrate-build-files
+     namespace: ${BUILD_NAMESPACE}
+   spec:
+     parallelism: 1
+     completions: 1
+     backoffLimit: 80
+     template:
+       metadata:
+         name: migrate-build-files
+       spec:
+         terminationGracePeriodSeconds: 108000
+         volumes:
+           - name: ${APP_NAME}-data
+             persistentVolumeClaim:
+               claimName: ${APP_NAME}-data
+           - name: ${APP_NAME}-app-data
+             persistentVolumeClaim:
+               claimName: ${APP_NAME}-app-data
+           - name: ${APP_NAME}-env
+             configMap:
+               name: ${APP_NAME}-env
+               items:
+                 - key: .env
+                   path: ./.env
+               defaultMode: 420
+         imagePullSecrets:
+           - name: artifactory-m950-learning
+         containers:
+           - name: migrate-build-files-job
+             image: ${IMAGE_REPO}${BUILD_NAME}:${BUILD_NAMESPACE}
+             volumeMounts:
+               - name: ${APP_NAME}-app-data
+                 mountPath: /var/www/html
+               - name: ${APP_NAME}-data
+                 mountPath: /var/www/storage
+               - name: ${APP_NAME}-env
+                 mountPath: .env
+                 subPath: .env
+             env:
+               - name: DB_USER
+                 valueFrom:
+                   secretKeyRef:
+                     name: ${APP_NAME}-secrets
+                     key: database-user
+               - name: DB_NAME
+                 valueFrom:
+                   secretKeyRef:
+                     name: ${APP_NAME}-secrets
+                     key: database-name
+               - name: DB_PASSWORD
+                 valueFrom:
+                   secretKeyRef:
+                     name: ${APP_NAME}-secrets
+                     key: database-password
+             command:
+               - bash
+               - "-c"
+               - |
+                echo "Migrating build files from /app/public to /var/www/html..."
+                sh /usr/local/bin/migrate-build-files.sh
+             imagePullPolicy: Always
+         restartPolicy: Never
+parameters:
+  - name: IMAGE_REPO
+    required: true
+    value: ""
+  - name: BUILD_NAMESPACE
+    required: true
+    value: "dev"
+  - name: BUILD_NAME
+    required: true
+    value: "app"

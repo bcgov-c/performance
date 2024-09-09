@@ -5,7 +5,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  APP: performance
+  APP_NAME: performance
   USER: ${{ github.actor }}
 
 on:
@@ -47,5 +47,5 @@ jobs:
           keys-case: upper
 
       - name: 🐸 Buld to JFrog
-        run: docker buildx build --cache-from type=gha --cache-to type=gha,mode=max --build-arg DOCKER_FROM_IMAGE=${{ secrets.ARTIFACTORY_URL }}/${{ env.PHP_NAME }}:${{ env.DEPLOY_NAMESPACE }} --tag ${{ secrets.ARTIFACTORY_URL }}/${{ env.MOODLE_DEPLOYMENT_NAME }}:${{ env.DEPLOY_NAMESPACE }} --output=type=image,push=true --push -f ${{ env.DOCKER_FILE_PATH }} .
+        run: docker buildx build --cache-from type=gha --cache-to type=gha,mode=max --build-arg DOCKER_FROM_IMAGE=${{ secrets.ARTIFACTORY_URL }}/${{ env.PHP_IMAGE }} --tag ${{ secrets.ARTIFACTORY_URL }}/${{ env.APP_NAME }}:${{ env.DEPLOY_NAMESPACE }} --output=type=image,push=true --push -f ${{ env.DOCKER_FILE_PATH }} .
 

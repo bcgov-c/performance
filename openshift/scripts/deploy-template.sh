@@ -8,14 +8,14 @@ echo "Current namespace is $DEPLOY_NAMESPACE"
 # Ensure secrets are linked for pulling from Artifactory
 oc secrets link default artifactory-m950-learning --for=pull
 
-# Enable Moodle maintenance mode
+# Enable maintenance mode
 sh ./openshift/scripts/enable-maintenance.sh
 
 sleep 10
 
 # Redirect traffic to maintenance-message
 echo "Redirecting traffic to maintenance-message..."
-oc patch route moodle-web --type=json -p '[{"op": "replace", "path": "/spec/to/name", "value": "maintenance-message"}]'
+oc patch route $APP_NAME-web --type=json -p '[{"op": "replace", "path": "/spec/to/name", "value": "maintenance-message"}]'
 
 sleep 60
 
@@ -52,8 +52,7 @@ fi
 
 sleep 10
 
-# echo "Creating configMap: $APP-config"
-# oc create configmap $APP-config --from-file=config.php=./config/moodle/$DEPLOY_ENVIRONMENT.config.php
+# echo "Creating configMap: $CRON_NAME-config"
 
 if [[ ! `oc describe configmap $CRON_NAME-config 2>&1` =~ "NotFound" ]]; then
   echo "ConfigMap exists... Deleting: $CRON_NAME-config"
@@ -92,8 +91,7 @@ oc process -f ./openshift/template.json \
   -p WEB_NAME=$WEB_NAME \
   -p WEB_IMAGE=$WEB_IMAGE \
   -p CRON_NAME=$CRON_NAME \
-  -p PHP_NAME=$PHP_NAME \
-  -p MOODLE_DEPLOYMENT_NAME=$MOODLE_DEPLOYMENT_NAME | \
+  -p PHP_NAME=$PHP_NAME | \
 oc apply -f -
 
 # Only use 1 db replica for deployment / upgrade to avoid conflicts
@@ -102,7 +100,7 @@ oc scale sts/$DB_POD_NAME --replicas=1
 
 # Redirect traffic to maintenance-message
 echo "Redirecting traffic to maintenance-message..."
-oc patch route moodle-web --type=json -p '[{"op": "replace", "path": "/spec/to/name", "value": "maintenance-message"}]'
+oc patch route $APP_NAME-web --type=json -p '[{"op": "replace", "path": "/spec/to/name", "value": "maintenance-message"}]'
 
 sleep 60
 
@@ -120,12 +118,12 @@ until $ROLLOUT_STATUS_CMD || [ $ATTEMPTS -eq 6 ]; do
   sleep $WAIT_TIME
 done
 
-# Check if the moodle-upgrade exists, if so, delete it
-if [[ `oc describe job moodle-upgrade 2>&1` =~ "NotFound" ]]; then
-  echo "moodle-upgrade job NOT FOUND..."
+# Check if the upgrade job exists, if so, delete it
+if [[ `oc describe job $APP_NAME-upgrade 2>&1` =~ "NotFound" ]]; then
+  echo "$APP_NAME-upgrade job NOT FOUND..."
 else
-  echo "moodle-upgrade job found... deleting..."
-  oc delete job moodle-upgrade
+  echo "$APP_NAME-upgrade job found... deleting..."
+  oc delete job $APP_NAME-upgrade
 fi
 
 # Check if the migrate-build-files job exists, if so, delete it
@@ -181,8 +179,8 @@ echo "migrate-build-files job has completed."
 
 sleep 15
 
-echo "Create and run Moodle upgrade job..."
-oc process -f ./openshift/moodle-upgrade.yml \
+echo "Create and run upgrade job..."
+oc process -f ./openshift/upgrade.yml \
   -p IMAGE_REPO=$IMAGE_REPO \
   -p DEPLOY_NAMESPACE=$DEPLOY_NAMESPACE \
   -p BUILD_NAME=$PHP_NAME \
@@ -191,7 +189,7 @@ oc process -f ./openshift/moodle-upgrade.yml \
 sleep 15
 
 # Get the name of the pod created by the job
-pod_name=$(oc get pods --selector=job-name=moodle-upgrade -o jsonpath='{.items[0].metadata.name}')
+pod_name=$(oc get pods --selector=job-name=upgrade -o jsonpath='{.items[0].metadata.name}')
 
 # Wait until the pod is in the "Running" state
 while [[ $(oc get pod $pod_name -o 'jsonpath={..status.phase}') != "Running" ]]; do
@@ -201,14 +199,14 @@ done
 
 sleep 30
 
-echo "Waiting formoodle-upgrade job to complete..."
+echo "Waiting forupgrade job to complete..."
 COUNT=0
-while [[ $(oc get jobs moodle-upgrade -o 'jsonpath={..status.active}') == "1" ]]; do
-  echo "moodle-upgrade job is still running..."
+while [[ $(oc get jobs upgrade -o 'jsonpath={..status.active}') == "1" ]]; do
+  echo "upgrade job is still running..."
   COUNT=$((COUNT + 1))
   sleep $SLEEP
 done
-echo "moodle-upgrade job has completed."
+echo "upgrade job has completed."
 
 # Wait for the "File copy complete." message
 oc logs -f $pod_name | while read line
@@ -230,9 +228,9 @@ echo "Result: $plugin_purge"
 
 sleep 10
 
-echo "Running Moodle upgrades..."
-moodle_upgrade_result=$(oc exec dc/$PHP_NAME -- bash -c 'php /var/www/html/admin/cli/upgrade.php --non-interactive')
-echo "Result: $moodle_upgrade_result"
+echo "Running upgrades..."
+upgrade_result=$(oc exec dc/$PHP_NAME -- bash -c 'php /var/www/html/admin/cli/upgrade.php --non-interactive')
+echo "Result: $upgrade_result"
 
 sleep 10
 
@@ -248,8 +246,8 @@ sleep 10
 echo "Disabling maintenance mode..."
 oc exec dc/$PHP_NAME -- bash -c 'php /var/www/html/admin/cli/maintenance.php --disable'
 
-echo "Disabling maintenance-message and redirecting traffic [back] to Moodle..."
-oc patch route moodle-web --type=json -p '[{"op": "replace", "path": "/spec/to/name", "value": "web"}]'
+echo "Disabling maintenance-message and redirecting traffic [back] to applicaton..."
+oc patch route $APP_NAME-web --type=json -p '[{"op": "replace", "path": "/spec/to/name", "value": "web"}]'
 
 sleep 30
 

@@ -5,7 +5,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  APP: performance
+  APP_NAME: performance
   USER: ${{ github.actor }}
 
   # Skip builds for faster deployments / testing ("YES" or build)
@@ -55,7 +55,7 @@ jobs:
     name: 📋 Environment Check
     runs-on: ubuntu-latest
     outputs: # Define the output parameter
-      APP: ${{ env.APP_NAME }}
+      APP_NAME: ${{ env.APP_NAME }}
       BRANCH: ${{ env.BRANCH }}
       DEPLOY_NAMESPACE: ${{ env.OPENSHIFT_DEPLOY_PROJECT }}-${{ env.BRANCH }}
       IMAGE_REPO: ${{ env.IMAGE_REPO }}
@@ -107,9 +107,9 @@ jobs:
 
       - name: Print Env Vars
         run: |
-          echo Deploying ${{ env.PROJECT }} > ${{ env.APP }} on ${{ env.OPENSHIFT_DEPLOY_PROJECT }}-${{ env.BRANCH }}
+          echo Deploying ${{ env.PROJECT }} > ${{ env.APP_NAME }} on ${{ env.OPENSHIFT_DEPLOY_PROJECT }}-${{ env.BRANCH }}
           echo "-----------------------"
-          echo URL: https://${{ env.APP }}-${{ env.DEPLOY_NAMESPACE }}.apps.silver.devops.gov.bc.ca
+          echo URL: https://${{ env.APP_NAME }}-${{ env.DEPLOY_NAMESPACE }}.apps.silver.devops.gov.bc.ca
 
   # Build Images and deploy to JFrog
   db:
@@ -157,7 +157,7 @@ jobs:
     # if: success()
     if: needs.checkEnv.outputs.CLEAN_BUILDS == 'YES'
     with:
-      APP: ${{ needs.checkEnv.outputs.APP }}
+      APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
       APP_HOST_URL: ${{ needs.checkEnv.outputs.APP }}-${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}.apps.silver.devops.gov.bc.ca
       BRANCH: ${{ needs.checkEnv.outputs.BRANCH }}
       BUILD_NAMESPACE: ${{ needs.checkEnv.outputs.BUILD_NAMESPACE }}
@@ -179,7 +179,7 @@ jobs:
       !contains(needs.*.result, 'failure') &&
       !contains(needs.*.result, 'cancelled')
     with:
-      APP: ${{ needs.checkEnv.outputs.APP }}
+      APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
       WEB_NAME: ${{ needs.checkEnv.outputs.WEB_NAME }}
       WEB_IMAGE: ${{ needs.checkEnv.outputs.WEB_IMAGE }}
       PHP_NAME: ${{ needs.checkEnv.outputs.PHP_NAME }}
@@ -232,9 +232,9 @@ jobs:
           sleep 120 # Wait for the deployment to be ready
           `echo "LHRESULT=$(node openshift/config/lighthouse/lighthouse-auth.js)" >> $GITHUB_OUTPUT`
         env:
-          APP_HOST_URL: ${{ needs.checkEnv.outputs.APP }}-${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}.apps.silver.devops.gov.bc.ca
-          USERNAME: ${{ secrets.TESTER_USERNAME }}
-          PASSWORD: ${{ secrets.TESTER_PASSWORD }}
+          APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_NAME }}-${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}.apps.silver.devops.gov.bc.ca
+          TESTER_USERNAME: ${{ secrets.TESTER_USERNAME }}
+          TESTER_PASSWORD: ${{ secrets.TESTER_PASSWORD }}
       - name: Archive artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -278,7 +278,7 @@ jobs:
       - name: 📫 Send Notification
         uses: muinmomin/webhook-action@v1.0.0
         env:
-          APP_HOST_URL: ${{ needs.checkEnv.outputs.APP }}-${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}.apps.silver.devops.gov.bc.ca
+          APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_NAME }}-${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}.apps.silver.devops.gov.bc.ca
         with:
           url: ${{ secrets.ROCKETCHAT_WEBHOOK_URL }}
           data: >

@@ -1,0 +1,103 @@
+
+# Generalised template for building from Dockerfile in a git repo.
+# Includes importing the base image as an imagestream.
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: ${NAME}
+objects:
+  - apiVersion: image.openshift.io/v1
+    kind: ImageStream
+    metadata:
+      name: ${IMAGE_NAME}
+    spec:
+      lookupPolicy:
+        local: false
+  - apiVersion: v1
+    kind: ImageStreamTag
+    lookupPolicy:
+      local: false
+    metadata:
+      name: ${IMAGE_NAME}:${IMAGE_TAG}
+    tag:
+      annotations: null
+      from:
+        kind: DockerImage
+        name: ${IMAGE_REPO}${IMAGE_NAME}:${BUILD_TAG}
+      importPolicy:
+        scheduled: true
+      referencePolicy:
+        type: Source
+  - kind: ImageStream
+    apiVersion: v1
+    metadata:
+      name: ${NAME}
+    spec:
+      lookupPolicy:
+        local: false
+  - apiVersion: v1
+    kind: BuildConfig
+    metadata:
+      name: ${NAME}
+    spec:
+      resources:
+        limits:
+          cpu: ${CPU_LIMIT}
+          memory: ${MEMORY_LIMIT}
+        requests:
+          cpu: ${CPU_REQUEST}
+          memory: ${MEMORY_REQUEST}
+      output:
+        to:
+          kind: ImageStreamTag
+          name: "${NAME}:${IMAGE_TAG}"
+      runPolicy: SerialLatestOnly
+      source:
+        contextDir: "${SOURCE_CONTEXT_DIR}"
+        git:
+          uri: "${SOURCE_REPOSITORY_URL}"
+          ref: "${IMAGE_TAG}"
+        type: Git
+      strategy:
+        dockerStrategy:
+          dockerfilePath: "${DOCKER_FILE_PATH}"
+          incremental: true
+          buildArgs:
+            - name: "DOCKER_FROM_IMAGE"
+              value: "${DOCKER_FROM_IMAGE}"
+            - name: "PHP_INI_ENVIRONMENT"
+              value: "${PHP_INI_ENVIRONMENT}"
+            - name: "APP_BRANCH_VERSION"
+              value: "${APP_BRANCH_VERSION}"
+        type: Docker
+parameters:
+  - name: DOCKER_FROM_IMAGE
+    required: true
+  - name: NAME
+    required: true
+  - name: SOURCE_CONTEXT_DIR
+    value: \
+  - name: DOCKER_FILE_PATH
+    value: "dockerfile"
+  - name: SOURCE_REPOSITORY_URL
+    value: ""
+  - name: IMAGE_REPO
+    value: ""
+  - name: IMAGE_NAME
+    required: true
+    value: "app-image-name"
+  - name: IMAGE_TAG
+    required: true
+    value: "latest"
+  - name: CPU_LIMIT
+    value: "4"
+  - name: MEMORY_LIMIT
+    value: "8Gi"
+  - name: CPU_REQUEST
+    value: "2"
+  - name: MEMORY_REQUEST
+    value: "8Gi"
+  - name: PHP_INI_ENVIRONMENT
+    value: "production"
+  - name: APP_BRANCH_VERSION
+    value: ""

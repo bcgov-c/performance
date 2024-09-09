@@ -1,0 +1,86 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: upgrade
+objects:
+ - apiVersion: batch/v1
+   kind: Job
+   metadata:
+     name: upgrade
+   spec:
+     parallelism: 1
+     completions: 1
+     backoffLimit: 6
+     template:
+       metadata:
+         name: upgrade
+       spec:
+         volumes:
+           - name: ${APP_NAME}-app-data
+             persistentVolumeClaim:
+               claimName: ${APP_NAME}-app-data
+           - name: ${APP_NAME}-data
+             persistentVolumeClaim:
+               claimName: ${APP_NAME}-data
+           - name: cron-config
+             configMap:
+               name: cron-config
+               defaultMode: 420
+               items:
+                 - key: config.php
+                   path: config.php
+           - name: ${APP_NAME}-env
+             configMap:
+               name: ${APP_NAME}-env
+               items:
+                 - key: .env
+                   path: ./.env
+               defaultMode: 420
+         containers:
+           - name: upgrade-job
+             image: ${IMAGE_REPO}${BUILD_NAME}:${DEPLOY_NAMESPACE}
+             env:
+               - name: DB_USER
+                 valueFrom:
+                   secretKeyRef:
+                     name: ${APP_NAME}-secrets
+                     key: database-user
+               - name: DB_NAME
+                 valueFrom:
+                   secretKeyRef:
+                     name: ${APP_NAME}-secrets
+                     key: database-name
+               - name: DB_PASSWORD
+                 valueFrom:
+                   secretKeyRef:
+                     name: ${APP_NAME}-secrets
+                     key: database-password
+             volumeMounts:
+               - name: ${APP_NAME}-app-data
+                 mountPath: /var/www/html
+               - name: ${APP_NAME}-data
+                 mountPath: /var/www/storage
+               - name: ${APP_NAME}-env
+                 mountPath: .env
+                 subPath: .env
+               - name: cron-config
+                 mountPath: /var/www/html/config.php
+                 subPath: config.php
+             command:
+               - bash
+               - "-c"
+               - |
+                echo "Upgrading application..."
+                sh /usr/local/bin/upgrade.sh
+             imagePullPolicy: Always
+         restartPolicy: Never
+parameters:
+  - name: IMAGE_REPO
+    required: true
+    value: "image-registry.openshift-image-registry.svc:5000/"
+  - name: DEPLOY_NAMESPACE
+    required: true
+    value: "e66ac2-dev"
+  - name: BUILD_NAME
+    required: true
+    value: "php"

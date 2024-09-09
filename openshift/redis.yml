@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ${REDIS_DEPLOYMENT_NAME}
+spec:
+  serviceName: ${REDIS_DEPLOYMENT_NAME}
+  replicas: ${REPLICAS}
+  selector:
+    matchLabels:
+      app: ${REDIS_DEPLOYMENT_NAME}
+  template:
+    metadata:
+      labels:
+        app: ${REDIS_DEPLOYMENT_NAME}
+    spec:
+      containers:
+      - name: ${REDIS_DEPLOYMENT_NAME}
+        image: ${REDIS_IMAGE}
+        ports:
+        - containerPort: 6379
+          name: ${REDIS_DEPLOYMENT_NAME}

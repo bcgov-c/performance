@@ -1,0 +1,88 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: ${BUILD_NAME}
+objects:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: ${BUILD_NAME}
+    spec:
+      selector:
+        deploymentconfig: ${BUILD_NAME}
+      ports:
+      - port: 8080
+        targetPort: 8080
+
+  - apiVersion: apps.openshift.io/v1
+    kind: DeploymentConfig
+    metadata:
+      name: ${BUILD_NAME}
+      namespace: ${DEPLOY_NAMESPACE}
+      annotations:
+        template.alpha.openshift.io/wait-for-ready: "true"
+      labels:
+        service: ${BUILD_NAME}
+    spec:
+      replicas: 1
+      selector:
+        deploymentconfig: ${BUILD_NAME}
+      template:
+        metadata:
+          name: ${BUILD_NAME}
+          labels:
+            deploymentconfig: ${BUILD_NAME}
+        spec:
+          imagePullSecrets:
+            - name: artifactory-m950-learning
+          volumes:
+            - name: maintenance-page
+              configMap:
+                name: maintenance-page
+                defaultMode: 420
+                items:
+                  - key: index.html
+                    path: index.html
+            - name: maintenance-config
+              configMap:
+                name: maintenance-config
+                defaultMode: 420
+                items:
+                  - key: default.conf
+                    path: default.conf
+            - name: nginx-cache
+              emptyDir: {}
+          containers:
+            - name: ${BUILD_NAME}
+              image: ${WEB_IMAGE}
+              volumeMounts:
+                - name: maintenance-page
+                  mountPath: usr/share/nginx/html/index.html
+                  subPath: index.html
+                - name: nginx-cache
+                  mountPath: /var/cache/nginx
+                - name: maintenance-config
+                  mountPath: /etc/nginx/conf.d/default.conf
+                  subPath: default.conf
+              imagePullPolicy: Always
+              resources:
+                limits:
+                  memory: '0'
+                  cpu: '0'
+                requests:
+                  memory: '0'
+                  cpu: '0'
+              restartPolicy: OnFailure
+parameters:
+  - name: IMAGE_REPO
+    required: true
+    value: "image-registry.openshift-image-registry.svc:5000/"
+  - name: DEPLOY_NAMESPACE
+    required: true
+    value: "e66ac2-dev"
+  - name: BUILD_NAME
+    required: true
+    value: "maintenance-message"
+  - name: WEB_IMAGE
+    required: true
+    value: "nginxinc/nginx-unprivileged:1.25.4-alpine-slim"

@@ -49,7 +49,7 @@ else
   fi
 fi
 
-echo "Checking if the database is online and contains expected Moodle data..."
+echo "Checking if the database is online and contains expected data..."
 ATTEMPTS=0
 WAIT_TIME=10
 MAX_ATTEMPTS=30 # wait up to 5 minutes

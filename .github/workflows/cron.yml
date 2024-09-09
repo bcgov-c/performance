@@ -5,7 +5,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  APP: performance
+  APP_NAME: performance
   USER: ${{ github.actor }}
 
 on:
