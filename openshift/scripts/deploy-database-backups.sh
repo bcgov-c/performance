@@ -57,7 +57,7 @@ else
       usernameKey: database-user
       passwordKey: database-password
 
-    env:config-vol
+    env:
       DATABASE_SERVICE_NAME:
         value: \"$DB_HOST\"
       ENVIRONMENT_FRIENDLY_NAME:
