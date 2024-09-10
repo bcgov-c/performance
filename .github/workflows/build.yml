@@ -9,7 +9,7 @@ env:
   USER: ${{ github.actor }}
 
   # Skip builds for faster deployments / testing ("YES" or build)
-  SKIP_BUILDS: "NO"
+  SKIP_BUILDS: "YES"
   SKIP_DEPLOY: "NO"
   # Clean builds before deployments (delete all resources, other than backups) ("YES" or allow collisions)
   CLEAN_BUILDS: "NO"
@@ -143,7 +143,7 @@ jobs:
     secrets: inherit
 
   build:
-    name: 🔨 Build App
+    name: 🔨 App
     needs: [checkEnv]
     if: needs.checkEnv.outputs.SKIP_BUILDS == 'NO'
     uses: ./.github/workflows/performance.yml

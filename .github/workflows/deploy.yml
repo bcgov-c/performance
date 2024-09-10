@@ -80,6 +80,7 @@ jobs:
   # Deploy to Openshift
   deploy:
     name: OpenShift (${{ github.ref_name }})
+    environment: E66AC2-PROD
     runs-on: ubuntu-latest
     if: |
       always()
