@@ -18,7 +18,7 @@ on:
       APP_HOST_URL:
         required: true
         type: string
-      BUILD_NAMESPACE:
+      DEPLOY_NAMESPACE:
         required: true
         type: string
       DB_POD_NAME:
@@ -85,15 +85,8 @@ jobs:
       - name: 🔑 Log in to OpenShift ( ${{ github.ref_name }} )
         run: |
           server=https://api.silver.devops.gov.bc.ca:6443
-          if [[ ${{ github.ref_name == 'test' }} ]]; then
-            oc login --token=${{ secrets.AUTH_TOKEN_DEV }} --server=$server
-          elif [[ ${{ github.ref_name == 'test' }} ]]; then
-            oc login --token=${{ secrets.AUTH_TOKEN_TEST }} --server=$server
-          elif [[ ${{ github.ref_name == 'prod' }} ]]; then
-            oc login --token=${{ secrets.AUTH_TOKEN_PROD }} --server=$server
-          else
-            echo "No AUTH_TOKEN found for ${{ github.ref_name }} branch"
-          fi
+          oc login --token=${{ secrets.SA_TOKEN }} --server=$server
+          oc project ${{ inputs.DEPLOY_NAMESPACE }}
 
       - name: 🧹️ Clean ${{ inputs.REDIS_NAME }}-redis-cluster
         run: |
