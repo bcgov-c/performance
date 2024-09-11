@@ -64,11 +64,11 @@ echo "Creating configMap: $REDIS_NAME-stats"
 oc create configmap $REDIS_NAME-stats --from-file=./openshift/config/redis/redis-stats.php
 
 # Create a headless service to control the domain of the Redis cluster
-oc create service clusterip $REDIS_NAME --tcp=6379:6379 -n $DEPLOY_NAMESPACE``
+oc create service clusterip $REDIS_NAME --tcp=6379:6379``
 
 # Create a StatefulSet for Redis
 echo "Deploy Redis to OpenShift ($REDIS_IMAGE) ..."
 sed -e "s/\${REDIS_NAME}/$REDIS_NAME/g" -e "s/\${REDIS_IMAGE}/$REDIS_IMAGE/g" -e "s/\${REDIS_REPLICAS}/$REDIS_REPLICAS/g" < ./openshift/redis-sts.yml | oc apply -f -
 
 # Expose the service
-oc expose svc/$REDIS_NAME -n $DEPLOY_NAMESPACE
+oc expose svc/$REDIS_NAME

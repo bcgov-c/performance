@@ -118,16 +118,12 @@ jobs:
             DB_USER: ${{ inputs.DB_USER }}
             SECRET_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
-      - name: Create ConfigMap
+      - name: Create Environment ConfigMap
         if: success()
-        run: |
-          oc project ${{ github.ref_name }}
-          if [[ `oc describe configmap ${{ inputs.APP_NAME }}-env 2>&1` =~ "NotFound" ]]; then
-            oc create configmap ${{ inputs.APP_NAME }}-env --from-file=.env=./example.env
-          else
-            oc delete configmap ${{ inputs.APP_NAME }}-env
-            oc create configmap ${{ inputs.APP_NAME }}-env --from-file=.env=./example.env
-          fi
+        run: bash ./openshift/scripts/deploy-env-configmap.sh
+        env:
+          OC_PROJECT: ${{ github.ref_name }}
+          APP_NAME: ${{ inputs.APP_NAME }}
 
       - name: Deploy Backups via Helm
         uses: WyriHaximus/github-action-helm3@v3
