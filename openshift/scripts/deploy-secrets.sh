@@ -14,7 +14,7 @@ if oc get secret $APP_NAME-secrets | grep -q "NotFound"; then
       namespace: $OC_PROJECT
       labels:
         template: $APP_NAME
-      data:
+      stringData:
         database-name: $DATABASE_NAME
         database-password: $SECRET_DB_PASSWORD
         database-user: $DB_USER
