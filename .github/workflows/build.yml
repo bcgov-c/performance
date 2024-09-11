@@ -185,6 +185,7 @@ jobs:
       PHP_NAME: ${{ needs.checkEnv.outputs.PHP_NAME }}
       DB_IMAGE: ${{ needs.checkEnv.outputs.DB_IMAGE }}
       DB_HOST: ${{ needs.checkEnv.outputs.DB_HOST }}
+      DB_USER: ${{ needs.checkEnv.outputs.DB_USER }}
       DB_PORT: ${{ needs.checkEnv.outputs.DB_PORT }}
       DB_POD_NAME: ${{ needs.checkEnv.outputs.DB_POD_NAME }}
       DATABASE_NAME: ${{ needs.checkEnv.outputs.DATABASE_NAME }}
