@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e # Exit on error
 
+oc project $OC_PROJECT
+
 route_name=$REDIS_NAME
 if [[ `oc describe route $route_name 2>&1` =~ "NotFound" ]]; then
   echo "Route NOT FOUND: $route_name - Skipping..."

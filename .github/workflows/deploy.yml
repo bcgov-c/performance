@@ -94,7 +94,7 @@ jobs:
       - name: 📤 Checkout Target Branch
         uses: actions/checkout@v4
         with:
-          ref: e66ac2-prod
+          ref: ${{ github.ref_name }}
 
       # Log in to OpenShift.
       # Note: The secrets needed to log in are NOT available if the PR comes from a FORK.
@@ -108,6 +108,7 @@ jobs:
       - name: Create ConfigMap
         if: success()
         run: |
+          oc project ${{ github.ref_name }}
           if [[ `oc describe configmap ${{ inputs.APP_NAME }}-env 2>&1` =~ "NotFound" ]]; then
             oc create configmap ${{ inputs.APP_NAME }}-env --from-file=.env=./example.env
           else
@@ -127,6 +128,7 @@ jobs:
           DB_HOST: ${{ inputs.DB_HOST }}
           DATABASE_NAME: ${{ inputs.DATABASE_NAME }}
           DB_PORT: ${{ inputs.DB_PORT }}
+          OC_PROJECT: ${{ github.ref_name }}
 
       # Deploy Redis
       - name: Deploy Redis StatefulSet (${{ inputs.REDIS_NAME  }})
@@ -138,6 +140,7 @@ jobs:
           REDIS_NAME: ${{ inputs.REDIS_NAME }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           REPLICAS: 3
+          OC_PROJECT: ${{ github.ref_name }}
 
       - name: Deploy Database StatefulSet (${{ inputs.DB_POD_NAME  }})
         id: deploy_database
@@ -150,6 +153,7 @@ jobs:
           DB_POD_NAME: ${{ inputs.DB_POD_NAME }}
           DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
           DATABASE_NAME: ${{ inputs.DATABASE_NAME }}
+          OC_PROJECT: ${{ github.ref_name }}
 
       - name: Deploy Template and Run Upgrades
         if: success()

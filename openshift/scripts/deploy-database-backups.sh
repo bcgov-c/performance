@@ -1,3 +1,5 @@
+oc project $OC_PROJECT
+
 helm repo add bcgov http://bcgov.github.io/helm-charts
 helm repo update
 

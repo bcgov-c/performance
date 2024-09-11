@@ -1,3 +1,5 @@
+oc project $OC_PROJECT
+
 if [[ `oc describe configmap $DB_POD_NAME 2>&1` =~ "NotFound" ]]; then
   # Create configmap from the resources directory
   oc create configmap $DB_POD_NAME --from-file=./openshift/config/mariadb/resources

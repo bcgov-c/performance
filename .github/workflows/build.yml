@@ -57,9 +57,9 @@ jobs:
     outputs: # Define the output parameter
       APP_NAME: ${{ env.APP_NAME }}
       BRANCH: ${{ env.BRANCH }}
-      DEPLOY_NAMESPACE: ${{ env.OPENSHIFT_DEPLOY_PROJECT }}-${{ env.BRANCH }}
+      DEPLOY_NAMESPACE: ${{ github.ref_name }}
       IMAGE_REPO: ${{ env.IMAGE_REPO }}
-      BUILD_NAMESPACE: ${{ env.OPENSHIFT_DEPLOY_PROJECT }}-${{ env.BRANCH }}
+      BUILD_NAMESPACE: ${{ github.ref_name }}
       DB_POD_NAME: ${{ env.DB_POD_NAME }}
       DATABASE_NAME: ${{ env.DATABASE_NAME }}
       WEB_NAME: ${{ env.WEB_NAME }}
@@ -109,7 +109,7 @@ jobs:
         run: |
           echo Deploying ${{ env.PROJECT }} > ${{ env.APP_NAME }} on ${{ env.OPENSHIFT_DEPLOY_PROJECT }}-${{ env.BRANCH }}
           echo "-----------------------"
-          echo URL: https://${{ env.APP_NAME }}-${{ env.DEPLOY_NAMESPACE }}.apps.silver.devops.gov.bc.ca
+          echo URL: https://${{ env.APP_NAME }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
 
   # Build Images and deploy to JFrog
   db:
@@ -158,10 +158,10 @@ jobs:
     if: needs.checkEnv.outputs.CLEAN_BUILDS == 'YES'
     with:
       APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
-      APP_HOST_URL: ${{ needs.checkEnv.outputs.APP }}-${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}.apps.silver.devops.gov.bc.ca
+      APP_HOST_URL: ${{ needs.checkEnv.outputs.APP }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
       BRANCH: ${{ needs.checkEnv.outputs.BRANCH }}
       BUILD_NAMESPACE: ${{ needs.checkEnv.outputs.BUILD_NAMESPACE }}
-      DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}
+      DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.ref_name }}
       DB_POD_NAME: ${{ needs.checkEnv.outputs.DB_POD_NAME }}
       WEB_NAME: ${{ needs.checkEnv.outputs.WEB_NAME }}
       PHP_NAME: ${{ needs.checkEnv.outputs.PHP_NAME }}
@@ -196,9 +196,9 @@ jobs:
       CRON_NAME: ${{ needs.checkEnv.outputs.CRON_NAME }}
       REDIS_IMAGE: ${{ needs.checkEnv.outputs.REDIS_IMAGE }}
       REDIS_NAME: ${{ needs.checkEnv.outputs.REDIS_NAME }}
-      APP_HOST_URL: ${{ needs.checkEnv.outputs.APP }}-${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}.apps.silver.devops.gov.bc.ca
+      APP_HOST_URL: ${{ needs.checkEnv.outputs.APP }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
       BUILD_NAMESPACE: ${{ needs.checkEnv.outputs.BUILD_NAMESPACE }}
-      DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}
+      DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.ref_name }}
       IMAGE_REPO: ${{ needs.checkEnv.outputs.IMAGE_REPO }}
 
   lighthouse-check:
@@ -232,7 +232,7 @@ jobs:
           sleep 120 # Wait for the deployment to be ready
           `echo "LHRESULT=$(node openshift/config/lighthouse/lighthouse-auth.js)" >> $GITHUB_OUTPUT`
         env:
-          APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_NAME }}-${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}.apps.silver.devops.gov.bc.ca
+          APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_NAME }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
           TESTER_USERNAME: ${{ secrets.TESTER_USERNAME }}
           TESTER_PASSWORD: ${{ secrets.TESTER_PASSWORD }}
       - name: Archive artifacts
@@ -278,13 +278,13 @@ jobs:
       - name: 📫 Send Notification
         uses: muinmomin/webhook-action@v1.0.0
         env:
-          APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_NAME }}-${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}.apps.silver.devops.gov.bc.ca
+          APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_NAME }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
         with:
           url: ${{ secrets.ROCKETCHAT_WEBHOOK_URL }}
           data: >
             {
               "emoji": "${{ steps.notification-emoji.outputs.EMOJI }}",
-              "text": "Deployment to: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}, status: ${{ needs.call-deploy-workflow.result }}",
+              "text": "Deployment to: ${{ github.ref_name }}, status: ${{ needs.call-deploy-workflow.result }}",
               "attachments": [{
                 "title": "View Job on GitHub",
                 "title_link": "${{ env.INSPECT_JOB_URL }}",

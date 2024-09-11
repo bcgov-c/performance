@@ -21,9 +21,6 @@ on:
       BUILD_NAMESPACE:
         required: true
         type: string
-      DEPLOY_NAMESPACE:
-        required: true
-        type: string
       DB_POD_NAME:
         required: true
         type: string
