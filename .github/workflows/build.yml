@@ -55,7 +55,6 @@ jobs:
     outputs: # Define the output parameter
       APP_NAME: ${{ env.APP_NAME }}
       DEPLOY_NAMESPACE: ${{ github.ref_name }}
-      IMAGE_REPO: ${{ env.IMAGE_REPO }}
       IMAGE_REPO_URL: ${{ env.IMAGE_REPO_URL }}
       BUILD_NAMESPACE: ${{ github.ref_name }}
       DB_POD_NAME: ${{ env.DB_POD_NAME }}
@@ -197,7 +196,6 @@ jobs:
       APP_HOST_URL: ${{ needs.checkEnv.outputs.APP }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
       BUILD_NAMESPACE: ${{ needs.checkEnv.outputs.BUILD_NAMESPACE }}
       DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.ref_name }}
-      IMAGE_REPO: ${{ needs.checkEnv.outputs.IMAGE_REPO }}
       IMAGE_REPO_URL: ${{ needs.checkEnv.outputs.IMAGE_REPO_URL }}
 
   lighthouse-check:

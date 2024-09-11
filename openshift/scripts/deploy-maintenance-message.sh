@@ -17,7 +17,6 @@ fi
 if [[ `oc describe dc $BUILD_NAME 2>&1` =~ "NotFound" ]]; then
   echo "$BUILD_NAME NOT FOUND: Beginning dc..."
   oc process -f ./openshift/maintenance.yml \
-    -p IMAGE_REPO=$IMAGE_REPO \
     -p DEPLOY_NAMESPACE=$DEPLOY_NAMESPACE \
     -p BUILD_NAME=$BUILD_NAME \
     | oc create -f -
@@ -44,7 +43,6 @@ else
   sleep 10
 
   oc process -f ./openshift/maintenance.yml \
-    -p IMAGE_REPO=$IMAGE_REPO \
     -p DEPLOY_NAMESPACE=$DEPLOY_NAMESPACE \
     -p BUILD_NAME=$BUILD_NAME \
     | oc create -f -

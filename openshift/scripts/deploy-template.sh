@@ -87,7 +87,7 @@ oc process -f ./openshift/template.json \
   -p SITE_URL=$APP_HOST_URL \
   -p BUILD_NAMESPACE=$BUILD_NAMESPACE \
   -p DEPLOY_NAMESPACE=$DEPLOY_NAMESPACE \
-  -p IMAGE_REPO=$IMAGE_REPO \
+  -p IMAGE_REPO_URL=$IMAGE_REPO_URL \
   -p WEB_NAME=$WEB_NAME \
   -p WEB_IMAGE=$WEB_IMAGE \
   -p CRON_NAME=$CRON_NAME \
@@ -181,7 +181,7 @@ sleep 15
 
 echo "Create and run upgrade job..."
 oc process -f ./openshift/upgrade.yml \
-  -p IMAGE_REPO=$IMAGE_REPO \
+  -p IMAGE_REPO_URL=$IMAGE_REPO_URL \
   -p DEPLOY_NAMESPACE=$DEPLOY_NAMESPACE \
   -p BUILD_NAME=$PHP_NAME \
   | oc create -f -

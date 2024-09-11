@@ -35,7 +35,7 @@ objects:
            - name: artifactory-m950-learning
          containers:
            - name: migrate-build-files-job
-             image: ${IMAGE_REPO}${BUILD_NAME}:${BUILD_NAMESPACE}
+             image: ${IMAGE_REPO_URL}${BUILD_NAME}:${BUILD_NAMESPACE}
              volumeMounts:
                - name: ${APP_NAME}-app-data
                  mountPath: /var/www/html
@@ -69,7 +69,7 @@ objects:
              imagePullPolicy: Always
          restartPolicy: Never
 parameters:
-  - name: IMAGE_REPO
+  - name: IMAGE_REPO_URL
     required: true
     value: ""
   - name: BUILD_NAMESPACE

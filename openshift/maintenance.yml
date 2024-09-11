@@ -74,9 +74,6 @@ objects:
                   cpu: '0'
               restartPolicy: OnFailure
 parameters:
-  - name: IMAGE_REPO
-    required: true
-    value: "image-registry.openshift-image-registry.svc:5000/"
   - name: DEPLOY_NAMESPACE
     required: true
     value: "e66ac2-dev"

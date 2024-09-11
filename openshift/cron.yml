@@ -39,7 +39,7 @@ objects:
                defaultMode: 420
          containers:
            - name: ${BUILD_NAME}
-             image: ${IMAGE_REPO}${BUILD_NAME}:${DEPLOY_NAMESPACE}
+             image: ${IMAGE_REPO_URL}${BUILD_NAME}:${DEPLOY_NAMESPACE}
              env:
                - name: DB_USER
                  valueFrom:
@@ -83,9 +83,9 @@ objects:
                  cpu: '0'
          restartPolicy: OnFailure
 parameters:
-  - name: IMAGE_REPO
+  - name: IMAGE_REPO_URL
     required: true
-    value: "image-registry.openshift-image-registry.svc:5000/"
+    value: "http://artifacts.developer.gov.bc.ca/m950-performance/"
   - name: DEPLOY_NAMESPACE
     required: true
     value: "e66ac2-prod"

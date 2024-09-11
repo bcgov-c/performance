@@ -60,9 +60,6 @@ on:
       DEPLOY_NAMESPACE:
         required: true
         type: string
-      IMAGE_REPO:
-        required: true
-        type: string
       IMAGE_REPO_URL:
         required: true
         type: string
@@ -159,7 +156,6 @@ jobs:
         if: success()
         run: bash ./openshift/scripts/deploy-database.sh
         env:
-          IMAGE_REPO: ${{ inputs.IMAGE_REPO }}
           IMAGE_REPO_URL: ${{ inputs.IMAGE_REPO_URL }}
           DB_IMAGE: ${{ inputs.DB_IMAGE }}
           DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
@@ -179,7 +175,7 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           APP_HOST_URL: ${{ inputs.APP_HOST_URL }}
           BUILD_NAMESPACE: ${{ inputs.BUILD_NAMESPACE }}
-          IMAGE_REPO: ${{ inputs.IMAGE_REPO }}
+          IMAGE_REPO_URL: ${{ inputs.IMAGE_REPO_URL }}
           DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
           WEB_NAME: ${{ inputs.WEB_NAME }}
           WEB_IMAGE: ${{ secrets.ARTIFACTORY_URL }}/${{ inputs.WEB_IMAGE }}

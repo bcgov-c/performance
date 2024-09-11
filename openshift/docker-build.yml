@@ -23,7 +23,7 @@ objects:
       annotations: null
       from:
         kind: DockerImage
-        name: ${IMAGE_REPO}${IMAGE_NAME}:${BUILD_TAG}
+        name: ${IMAGE_REPO_URL}${IMAGE_NAME}:${BUILD_TAG}
       importPolicy:
         scheduled: true
       referencePolicy:
@@ -81,7 +81,7 @@ parameters:
     value: "dockerfile"
   - name: SOURCE_REPOSITORY_URL
     value: ""
-  - name: IMAGE_REPO
+  - name: IMAGE_REPO_URL
     value: ""
   - name: IMAGE_NAME
     required: true

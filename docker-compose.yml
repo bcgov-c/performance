@@ -14,7 +14,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        DOCKER_FROM_IMAGE: ${REPO:-}${IMAGE_REPO:-}${CRON_IMAGE:-php:8.3-cli}
+        DOCKER_FROM_IMAGE: ${IMAGE_REPO_URL:-}${CRON_IMAGE:-php:8.3-cli}
         PHP_INI_ENVIRONMENT: ${PHP_INI_ENVIRONMENT:-production}
     links:
       - db
@@ -67,7 +67,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        DOCKER_FROM_IMAGE: ${REPO:-}${IMAGE_REPO:-}${PHP_IMAGE:-php:8.3-fpm}
+        DOCKER_FROM_IMAGE: ${IMAGE_REPO_URL:-}${PHP_IMAGE:-php:8.3-fpm}
         PHP_INI_ENVIRONMENT: ${PHP_INI_ENVIRONMENT:-production}
     volumes:
       - ./temp/var/www:/var/www:delegated
@@ -106,7 +106,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        DOCKER_FROM_IMAGE: ${REPO:-}${IMAGE_REPO:-}${PHP_IMAGE:-php:8.3-cli}
+        DOCKER_FROM_IMAGE: ${IMAGE_REPO_URL:-}${PHP_IMAGE:-php:8.3-cli}
         PHP_INI_ENVIRONMENT: ${PHP_INI_ENVIRONMENT:-production}
     volumes:
       - ./temp/var/www:/var/www:delegated

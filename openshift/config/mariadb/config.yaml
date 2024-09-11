@@ -33,7 +33,7 @@ spec:
     spec:
       initContainers:
       - name: init-db
-        image: ${IMAGE_REPO_URL}${IMAGE_REPO}${DB_IMAGE}
+        image: ${IMAGE_REPO_URL}${DB_IMAGE}
         imagePullPolicy: Always
         command:
         - bash
@@ -74,7 +74,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: db
-        image: ${IMAGE_REPO}${DB_IMAGE}
+        image: ${IMAGE_REPO_URL}${DB_IMAGE}
         ports:
         - containerPort: 3306
           name: db-port

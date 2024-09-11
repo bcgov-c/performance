@@ -198,7 +198,7 @@
             ],
             "containers": [
               {
-                "image": "${IMAGE_REPO}${PHP_DEPLOYMENT_NAME}:${DEPLOY_NAMESPACE}",
+                "image": "${IMAGE_REPO_URL}${PHP_DEPLOYMENT_NAME}:${DEPLOY_NAMESPACE}",
                 "name": "${PHP_DEPLOYMENT_NAME}",
                 "restartPolicy": "Always",
                 "imagePullPolicy": "Always",
@@ -399,7 +399,7 @@
             ],
             "containers": [
               {
-                "image": "${IMAGE_REPO}${CRON_DEPLOYMENT_NAME}:${DEPLOY_NAMESPACE}",
+                "image": "${IMAGE_REPO_URL}${CRON_DEPLOYMENT_NAME}:${DEPLOY_NAMESPACE}",
                 "name": "${CRON_DEPLOYMENT_NAME}",
                 "restartPolicy": "Always",
                 "imagePullPolicy": "Always",
@@ -686,8 +686,8 @@
     {
       "description": "Image registry",
       "displayName": "Image Registry",
-      "name": "IMAGE_REPO",
-      "value": "artifacts.developer.gov.bc.ca/m950-learning/"
+      "name": "IMAGE_REPO_URL",
+      "value": "artifacts.developer.gov.bc.ca/m950-performance/"
     },
     {
       "description": "Build namespace.",

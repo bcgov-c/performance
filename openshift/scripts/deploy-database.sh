@@ -24,7 +24,7 @@ else
     exit 1
   fi
 
-  echo "Recreating $DB_POD_NAME from image: $IMAGE_REPO_URL$IMAGE_REPO$DB_IMAGE"
+  echo "Recreating $DB_POD_NAME from image: $IMAGE_REPO_URL$DB_IMAGE"
   oc delete sts $DB_POD_NAME
   oc delete configmap $DB_POD_NAME-config
   oc delete service $DB_POD_NAME
