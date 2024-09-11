@@ -19,9 +19,8 @@ if oc get secret $APP_NAME-secrets | grep -q "NotFound"; then
         database-password: $SECRET_DB_PASSWORD
         database-user: $DB_USER
       type: Opaque
-    " > secrets.yaml
-  oc create secret generic $APP_NAME-secrets --from-file=secrets.yaml
-
+    " > secrets.yml
+  oc create -f secrets.yml
 else
   echo "Secrets already exist. Moving on..."
 fi
