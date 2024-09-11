@@ -4,8 +4,6 @@ echo "Deploying secrets to: $OC_PROJECT ($APP_NAME-secrets)..."
 
 # Check if the Helm deployment exists
 if [[ `oc describe secret $APP_NAME-secrets 2>&1` =~ "NotFound" ]]; then
-  echo "Secrets already exist. Moving on..."
-else
   echo "Secrets not found... creating..."
 
   echo "
@@ -23,4 +21,6 @@ else
       type: Opaque
     " > secrets.yml
   oc create -f secrets.yml
+else
+  echo "Secrets already exist. Moving on..."
 fi
