@@ -126,7 +126,7 @@ jobs:
         run: bash ./openshift/scripts/deploy-secrets.sh
         env:
             APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
-            OC_PROJECT: ${{ github.ref }}
+            OC_PROJECT: ${{ github.ref_name }}
             DATABASE_NAME: ${{ needs.checkEnv.outputs.DATABASE_NAME }}
             DB_USER: ${{ needs.checkEnv.outputs.DB_USER }}
             SECRET_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
