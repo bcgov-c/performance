@@ -7,7 +7,7 @@ fi
 
 if [[ `oc describe sts $DB_POD_NAME 2>&1` =~ "NotFound" ]]; then
   echo "$DB_POD_NAME NOT FOUND: Beginning deployment..."
-  envsubst < ./openshift/config/mariadb/config.yaml | oc create -f - -n $DEPLOY_NAMESPACE
+  envsubst < ./openshift/config/mariadb/config.yaml | oc create -f -
 else
   echo "$DB_POD_NAME Installation found...Scaling to 0..."
   oc scale sts/$DB_POD_NAME --replicas=0
@@ -25,11 +25,11 @@ else
   fi
 
   echo "Recreating $DB_POD_NAME from image: $IMAGE_REPO$DB_IMAGE"
-  oc delete sts $DB_POD_NAME -n $DEPLOY_NAMESPACE
-  oc delete configmap $DB_POD_NAME-config -n $DEPLOY_NAMESPACE
-  oc delete service $DB_POD_NAME -n $DEPLOY_NAMESPACE
+  oc delete sts $DB_POD_NAME
+  oc delete configmap $DB_POD_NAME-config
+  oc delete service $DB_POD_NAME
   # Substitute variables in the config.yaml file and create the deployment
-  envsubst < ./openshift/config/mariadb/config.yaml | oc create -f - -n $DEPLOY_NAMESPACE
+  envsubst < ./openshift/config/mariadb/config.yaml | oc create -f -
 
   sleep 10
 
