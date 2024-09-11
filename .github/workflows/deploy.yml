@@ -63,6 +63,9 @@ on:
       IMAGE_REPO:
         required: true
         type: string
+      IMAGE_REPO_URL:
+        required: true
+        type: string
       DB_BACKUP_DEPLOYMENT_NAME:
         required: true
         type: string
@@ -157,6 +160,7 @@ jobs:
         run: bash ./openshift/scripts/deploy-database.sh
         env:
           IMAGE_REPO: ${{ inputs.IMAGE_REPO }}
+          IMAGE_REPO_URL: ${{ inputs.IMAGE_REPO_URL }}
           DB_IMAGE: ${{ inputs.DB_IMAGE }}
           DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
           DB_POD_NAME: ${{ inputs.DB_POD_NAME }}

@@ -14,8 +14,6 @@ env:
   # Clean builds before deployments (delete all resources, other than backups) ("YES" or allow collisions)
   CLEAN_BUILDS: "NO"
   BUILD_ID: ${{ github.event.number }}
-  # BRANCH: ${{ env.BRANCH }}
-  BRANCH: prod
   INSPECT_JOB_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
   BUILD_ICON_URL: https://cdn-icons-png.flaticon.com/128/5110/5110294.png
@@ -56,9 +54,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs: # Define the output parameter
       APP_NAME: ${{ env.APP_NAME }}
-      BRANCH: ${{ env.BRANCH }}
       DEPLOY_NAMESPACE: ${{ github.ref_name }}
       IMAGE_REPO: ${{ env.IMAGE_REPO }}
+      IMAGE_REPO_URL: ${{ env.IMAGE_REPO_URL }}
       BUILD_NAMESPACE: ${{ github.ref_name }}
       DB_POD_NAME: ${{ env.DB_POD_NAME }}
       DATABASE_NAME: ${{ env.DATABASE_NAME }}
@@ -84,7 +82,7 @@ jobs:
       - name: 📤 Checkout Target Branch
         uses: actions/checkout@v4
         with:
-          ref: e66ac2-prod
+          ref: ${{ github.ref_name }}
           sparse-checkout: |
             openshift/config/mariadb
             example.env
@@ -108,7 +106,7 @@ jobs:
 
       - name: Print Env Vars
         run: |
-          echo Deploying ${{ env.PROJECT }} > ${{ env.APP_NAME }} on ${{ env.OPENSHIFT_DEPLOY_PROJECT }}-${{ env.BRANCH }}
+          echo Deploying ${{ env.PROJECT }} > ${{ env.APP_NAME }} on ${{ github.ref_name }}
           echo "-----------------------"
           echo URL: https://${{ env.APP_NAME }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
 
@@ -160,7 +158,6 @@ jobs:
     with:
       APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
       APP_HOST_URL: ${{ needs.checkEnv.outputs.APP }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
-      BRANCH: ${{ needs.checkEnv.outputs.BRANCH }}
       DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}
       DB_POD_NAME: ${{ needs.checkEnv.outputs.DB_POD_NAME }}
       WEB_NAME: ${{ needs.checkEnv.outputs.WEB_NAME }}
@@ -201,6 +198,7 @@ jobs:
       BUILD_NAMESPACE: ${{ needs.checkEnv.outputs.BUILD_NAMESPACE }}
       DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.ref_name }}
       IMAGE_REPO: ${{ needs.checkEnv.outputs.IMAGE_REPO }}
+      IMAGE_REPO_URL: ${{ needs.checkEnv.outputs.IMAGE_REPO_URL }}
 
   lighthouse-check:
     name: 🚦 Audit
