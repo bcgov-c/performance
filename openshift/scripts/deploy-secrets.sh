@@ -1,6 +1,6 @@
 oc project $OC_PROJECT
 
-echo "Deploying secrets to: $OC_PROJECT..."
+echo "Deploying secrets to: $OC_PROJECT ($APP_NAME-secrets)..."
 
 # Check if the Helm deployment exists
 if [[ `oc describe sts $APP_NAME-secrets 2>&1` =~ "NotFound" ]]; then

@@ -109,10 +109,10 @@ jobs:
       - name: Deploy secrets
         run: bash ./openshift/scripts/deploy-secrets.sh
         env:
-            APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
+            APP_NAME: ${{ inputs.APP_NAME }}
             OC_PROJECT: ${{ github.ref_name }}
-            DATABASE_NAME: ${{ needs.checkEnv.outputs.DATABASE_NAME }}
-            DB_USER: ${{ needs.checkEnv.outputs.DB_USER }}
+            DATABASE_NAME: ${{ inputs.DATABASE_NAME }}
+            DB_USER: ${{ inputs.DB_USER }}
             SECRET_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
       - name: Create ConfigMap
