@@ -118,6 +118,10 @@ jobs:
     needs: [checkEnv]
     runs-on: ubuntu-latest
     steps:
+      - name: 📤 Checkout Target Branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
       - name: Deploy secrets
         run: bash ./openshift/scripts/deploy-secrets.sh
         env:
