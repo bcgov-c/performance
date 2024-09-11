@@ -62,6 +62,7 @@ jobs:
       BUILD_NAMESPACE: ${{ github.ref_name }}
       DB_POD_NAME: ${{ env.DB_POD_NAME }}
       DATABASE_NAME: ${{ env.DATABASE_NAME }}
+      SECRET_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       WEB_NAME: ${{ env.WEB_NAME }}
       WEB_IMAGE: ${{ env.WEB_IMAGE }}
       DB_HOST: ${{ env.DB_HOST }}
@@ -110,6 +111,21 @@ jobs:
           echo Deploying ${{ env.PROJECT }} > ${{ env.APP_NAME }} on ${{ env.OPENSHIFT_DEPLOY_PROJECT }}-${{ env.BRANCH }}
           echo "-----------------------"
           echo URL: https://${{ env.APP_NAME }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
+
+  # Deploy secrets for DB connection
+  secrets:
+    name: 🔨 Secrets
+    needs: [checkEnv]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy secrets
+        run: bash ./openshift/scripts/deploy-secrets.sh
+        env:
+            APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
+            OC_PROJECT: ${{ github.ref }}
+            DATABASE_NAME: ${{ needs.checkEnv.outputs.DATABASE_NAME }}
+            DB_USER: ${{ needs.checkEnv.outputs.DB_USER }}
+            SECRET_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
   # Build Images and deploy to JFrog
   db:

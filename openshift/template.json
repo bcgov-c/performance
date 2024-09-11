@@ -28,7 +28,7 @@
 			"stringData": {
         "database-user": "${DB_USER}",
 				"database-password": "${DB_PASSWORD}",
-        "database-name": "${DB_NAME}"
+        "database-name": "${DATABASE_NAME}"
 			}
     },
     {
@@ -274,7 +274,7 @@
                     }
                   },
                   {
-                    "name": "DB_NAME",
+                    "name": "DATABASE_NAME",
                     "valueFrom": {
                       "secretKeyRef": {
                         "name": "${APP_NAME}-secrets",
@@ -465,7 +465,7 @@
                     }
                   },
                   {
-                    "name": "DB_NAME",
+                    "name": "DATABASE_NAME",
                     "valueFrom": {
                       "secretKeyRef": {
                         "name": "${APP_NAME}-secrets",
@@ -804,7 +804,7 @@
     {
       "description": "Database name.",
       "displayName": "DB Name",
-      "name": "DB_NAME",
+      "name": "DATABASE_NAME",
       "value": "app"
     }
   ]

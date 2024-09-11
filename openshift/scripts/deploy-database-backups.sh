@@ -66,5 +66,5 @@ else
         value: \"$APP_NAME Backups\"
     " > config.yaml
   helm install $DB_BACKUP_DEPLOYMENT_NAME $BACKUP_HELM_CHART --atomic --wait -f config.yaml
-  oc set image deployment/$DB_BACKUP_DEPLOYMENT_NAME backup-storage=$DB_BACKUP_IMAGE
+  oc set image deployment/$DB_BACKUP_DEPLOYMENT_FULL_NAME backup-storage=$BACKUP_IMAGE
 fi

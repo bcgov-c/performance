@@ -1,0 +1,27 @@
+image:
+  repository: "bcgov/backup-storage"
+  pullPolicy: Always
+  tag: dev
+
+persistence:
+  backup:
+    accessModes: [\"ReadWriteMany\"]
+    storageClassName: netapp-file-standard
+  verification:
+    storageClassName: netapp-file-standard
+
+backupConfig: |
+  mariadb=db:3306/performance
+  0 1 * * * default ./backup.sh -s
+  0 4 * * * default ./backup.sh -s -v all
+
+db:
+  secretName: performance-secrets
+  usernameKey: database-user
+  passwordKey: database-password
+
+env:
+  DATABASE_SERVICE_NAME:
+    value: "db"
+  ENVIRONMENT_FRIENDLY_NAME:
+    value: "Performance Backups"
