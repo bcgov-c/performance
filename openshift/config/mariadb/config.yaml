@@ -143,7 +143,7 @@ spec:
       volumes:
       - name: db-config-map
         configMap:
-          name: db-config
+          name: db
           #defaultMode: 0544
       - name: db-config
         emptyDir: {}
