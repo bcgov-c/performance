@@ -160,7 +160,6 @@ jobs:
       APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
       APP_HOST_URL: ${{ needs.checkEnv.outputs.APP }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
       BRANCH: ${{ needs.checkEnv.outputs.BRANCH }}
-      BUILD_NAMESPACE: ${{ needs.checkEnv.outputs.BUILD_NAMESPACE }}
       DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}
       DB_POD_NAME: ${{ needs.checkEnv.outputs.DB_POD_NAME }}
       WEB_NAME: ${{ needs.checkEnv.outputs.WEB_NAME }}
