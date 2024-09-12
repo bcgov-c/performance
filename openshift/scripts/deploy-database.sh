@@ -28,6 +28,10 @@ else
   oc delete sts $DB_POD_NAME
   oc delete configmap $DB_POD_NAME
   oc delete service $DB_POD_NAME
+
+  # Create configmap from the resources directory
+  oc create configmap $DB_POD_NAME --from-file=./openshift/config/mariadb/resources
+
   # Substitute variables in the config.yaml file and create the deployment
   envsubst < ./openshift/config/mariadb/config.yaml | oc create -f -
 
