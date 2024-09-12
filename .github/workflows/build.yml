@@ -38,7 +38,7 @@ on:
 
   workflow_call:
     secrets:
-      DB_POD_NAME:
+      DB_NAME:
         required: true
       DB_USER:
         required: true
@@ -57,8 +57,8 @@ jobs:
       DEPLOY_NAMESPACE: ${{ github.ref_name }}
       IMAGE_REPO_URL: ${{ env.IMAGE_REPO_URL }}
       BUILD_NAMESPACE: ${{ github.ref_name }}
-      DB_POD_NAME: ${{ env.DB_POD_NAME }}
-      DATABASE_NAME: ${{ env.DATABASE_NAME }}
+      DB_NAME: ${{ env.DB_NAME }}
+      DB_DATABASE: ${{ env.DB_DATABASE }}
       SECRET_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       WEB_NAME: ${{ env.WEB_NAME }}
       WEB_IMAGE: ${{ env.WEB_IMAGE }}
@@ -158,7 +158,7 @@ jobs:
       APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
       APP_HOST_URL: ${{ needs.checkEnv.outputs.APP }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
       DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}
-      DB_POD_NAME: ${{ needs.checkEnv.outputs.DB_POD_NAME }}
+      DB_NAME: ${{ needs.checkEnv.outputs.DB_NAME }}
       WEB_NAME: ${{ needs.checkEnv.outputs.WEB_NAME }}
       PHP_NAME: ${{ needs.checkEnv.outputs.PHP_NAME }}
       CRON_NAME: ${{ needs.checkEnv.outputs.CRON_NAME }}
@@ -183,8 +183,8 @@ jobs:
       DB_HOST: ${{ needs.checkEnv.outputs.DB_HOST }}
       DB_USER: ${{ needs.checkEnv.outputs.DB_USER }}
       DB_PORT: ${{ needs.checkEnv.outputs.DB_PORT }}
-      DB_POD_NAME: ${{ needs.checkEnv.outputs.DB_POD_NAME }}
-      DATABASE_NAME: ${{ needs.checkEnv.outputs.DATABASE_NAME }}
+      DB_NAME: ${{ needs.checkEnv.outputs.DB_NAME }}
+      DB_DATABASE: ${{ needs.checkEnv.outputs.DB_DATABASE }}
       DB_BACKUP_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.DB_BACKUP_DEPLOYMENT_NAME }}
       DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ needs.checkEnv.outputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
       BACKUP_IMAGE: ${{ needs.checkEnv.outputs.BACKUP_IMAGE }}

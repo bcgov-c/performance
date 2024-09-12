@@ -17,7 +17,7 @@ if [[ `oc describe secret $APP_NAME-secrets 2>&1` =~ "NotFound" ]]; then
       labels:
         template: $APP_NAME
       stringData:
-        database-name: $DATABASE_NAME
+        database-name: $DB_DATABASE
         database-password: $SECRET_DB_PASSWORD
         database-user: $DB_USER
       type: Opaque

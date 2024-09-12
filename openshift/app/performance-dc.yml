@@ -10,7 +10,7 @@ objects:
     metadata:
       name: '${APP_NAME}-secrets'
     stringData:
-      database-name: '${DATABASE_NAME}'
+      database-name: '${DB_DATABASE}'
       database-password: '${DB_PASSWORD}'
       database-root-password: '${DB_ROOT_PASSWORD}'
       database-user: '${DB_USER}'
@@ -140,10 +140,10 @@ objects:
                   value: '${DB_PORT}'
                 - name: PROJECT_NAMESPACE
                   value: '${PROJECT_NAMESPACE}'
-                - name: DB_POD_NAME
-                  value: '${DB_POD_NAME}'
-                - name: DATABASE_NAME
-                  value: '${DATABASE_NAME}'
+                - name: DB_NAME
+                  value: '${DB_NAME}'
+                - name: DB_DATABASE
+                  value: '${DB_DATABASE}'
                 - name: DB_USER
                   valueFrom:
                     secretKeyRef:
@@ -265,9 +265,9 @@ parameters:
     value: '${PROJECT_NAMESPACE}'
   - description: Name of the MySQL database accessed.
     displayName: MySQL Database Name
-    name: DB_POD_NAME
+    name: DB_NAME
     required: true
-    value: '${DB_POD_NAME}'
+    value: '${DB_NAME}'
   - description: Username for MySQL user that will be used for accessing the database.
     displayName: MySQL Connection Username
     name: DB_USER

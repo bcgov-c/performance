@@ -27,8 +27,8 @@ if oc get deployment $CRON_NAME; then
 fi
 
 # Only use 1 db replica for deployment / upgrade to avoid conflicts
-echo "Scale down $DB_POD_NAME to 1 replica..."
-oc scale sts/$DB_POD_NAME --replicas=1
+echo "Scale down $DB_NAME to 1 replica..."
+oc scale sts/$DB_NAME --replicas=1
 
 # Only use 1 redis replica for deployment / upgrade to avoid conflicts
 echo "Scale down $REDIS_NAME to 1 replica..."
@@ -82,7 +82,7 @@ echo "Deploy Template to OpenShift ..."
 oc process -f ./openshift/template.json \
   -p APP_NAME=$APP \
   -p DB_USER=$DB_USER \
-  -p DB_POD_NAME=$DB_POD_NAME \
+  -p DB_NAME=$DB_NAME \
   -p DB_PASSWORD=$DB_PASSWORD \
   -p SITE_URL=$APP_HOST_URL \
   -p BUILD_NAMESPACE=$BUILD_NAMESPACE \
@@ -95,8 +95,8 @@ oc process -f ./openshift/template.json \
 oc apply -f -
 
 # Only use 1 db replica for deployment / upgrade to avoid conflicts
-echo "Scale down $DB_POD_NAME to 1 replica..."
-oc scale sts/$DB_POD_NAME --replicas=1
+echo "Scale down $DB_NAME to 1 replica..."
+oc scale sts/$DB_NAME --replicas=1
 
 # Redirect traffic to maintenance-message
 echo "Redirecting traffic to maintenance-message..."
@@ -235,8 +235,8 @@ echo "Result: $upgrade_result"
 sleep 10
 
 # DB was scaled-down for deployment and maintenance, scale it back up
-echo "Scaling up $DB_POD_NAME to 3 replicas..."
-oc scale sts/$DB_POD_NAME --replicas=3
+echo "Scaling up $DB_NAME to 3 replicas..."
+oc scale sts/$DB_NAME --replicas=3
 
 # Right-sizing cluster, according to environment
 bash ./openshift/scripts/right-sizing.sh

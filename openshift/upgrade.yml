@@ -45,7 +45,7 @@ objects:
                    secretKeyRef:
                      name: ${APP_NAME}-secrets
                      key: database-user
-               - name: DATABASE_NAME
+               - name: DB_DATABASE
                  valueFrom:
                    secretKeyRef:
                      name: ${APP_NAME}-secrets
