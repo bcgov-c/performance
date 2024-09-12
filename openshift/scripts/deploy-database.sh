@@ -64,7 +64,7 @@ MAX_ATTEMPTS=30 # wait up to 5 minutes
 DB_POD_NAME=""
 until [ -n "$DB_POD_NAME" ]; do
   ATTEMPTS=$(( $ATTEMPTS + 1 ))
-  DB_POD_NAME=$(oc get pods -l app=$DB_POD_NAME -o jsonpath='{.items[?(@.status.phase=="Running")].metadata.name}')
+  DB_POD_NAME=$(oc get pods -l app=$DB_POD_NAME --field-selector=status.phase=Running -o jsonpath='{.items[0].metadata.name}')
 
   if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
     echo "Timeout waiting for the pod to have status.phase:Running. Exiting..."
