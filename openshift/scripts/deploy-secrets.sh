@@ -20,7 +20,7 @@ echo "
       namespace: $OC_PROJECT
       labels:
         template: $APP_NAME
-      data:
+      stringData:
         database-name: $DATABASE_NAME
         database-password: $SECRET_DB_PASSWORD
         database-user: $DB_USER
