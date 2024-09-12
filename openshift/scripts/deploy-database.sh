@@ -61,19 +61,21 @@ WAIT_TIME=10
 MAX_ATTEMPTS=30 # wait up to 5 minutes
 
 # Get the name of the first pod in the StatefulSet
-DB_NAME=""
-until [ -n "$DB_NAME" ]; do
+DB_POD_NAME=""
+until [ -n "$DB_POD" ]; do
   ATTEMPTS=$(( $ATTEMPTS + 1 ))
-  DB_NAME=$(oc get pods -l app=$DB_NAME -o jsonpath='{.items[?(@.status.phase=="Running")].metadata.name}')
+  PODS=$(oc get pods -l app=$DB_NAME --field-selector=status.phase=Running -o jsonpath='{.items[*].metadata.name}')
 
   if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
     echo "Timeout waiting for the pod to have status.phase:Running. Exiting..."
     exit 1
   fi
 
-  if [ -z "$DB_NAME" ]; then
-    echo "Waiting for the database pod [$DB_NAME] to be ready... $(($ATTEMPTS * $WAIT_TIME)) seconds..."
+  if [ -z "$PODS" ]; then
+    echo "No pods in Running state found. Retrying in $WAIT_TIME seconds..."
     sleep $WAIT_TIME
+  else
+    DB_POD_NAME=$(echo $PODS | awk '{print $1}')
   fi
 done
 
