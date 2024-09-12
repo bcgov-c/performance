@@ -9,11 +9,14 @@ data:
     # Apply this config only on the primary.
     [mysqld]
     log-bin
-    max_allowed_packet=500M
+    max_allowed_packet=1073741824
+    wait_timeout = 28800
+    net_read_timeout = 120
     expire_logs_days=1
-    binlog_format = ROW 
+    binlog_format = ROW
   replica.cnf: |
     # Apply this config only on replicas.
     [mysqld]
-    super-read-only    
-    binlog_format = ROW   
+    super-read-only
+    binlog_format = ROW
+    max_allowed_packet=1073741824

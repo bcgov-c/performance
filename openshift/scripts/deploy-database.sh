@@ -72,7 +72,7 @@ until [ -n "$DB_POD_NAME" ]; do
   fi
 
   if [ -z "$DB_POD_NAME" ]; then
-    echo "Waiting for the database pod to be ready... $(($ATTEMPTS * $WAIT_TIME)) seconds..."
+    echo "Waiting for the database pod [$DB_POD_NAME] to be ready... $(($ATTEMPTS * $WAIT_TIME)) seconds..."
     sleep $WAIT_TIME
   fi
 done
