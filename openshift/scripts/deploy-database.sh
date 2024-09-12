@@ -62,7 +62,7 @@ MAX_ATTEMPTS=30 # wait up to 5 minutes
 
 # Get the name of the first pod in the StatefulSet
 DB_POD_NAME=""
-until [ -n "$DB_POD" ]; do
+until [ -n "$DB_POD_NAME" ]; do
   ATTEMPTS=$(( $ATTEMPTS + 1 ))
   PODS=$(oc get pods -l app=$DB_NAME --field-selector=status.phase=Running -o jsonpath='{.items[*].metadata.name}')
 
@@ -79,7 +79,7 @@ until [ -n "$DB_POD" ]; do
   fi
 done
 
-echo "Database pod found: $DB_POD_NAME."
+echo "Database pod found and running: $DB_POD_NAME."
 
 ATTEMPTS=0
 until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
