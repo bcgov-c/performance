@@ -63,6 +63,9 @@ on:
       IMAGE_REPO_URL:
         required: true
         type: string
+      DB_HEALTH_QUERY:
+        required: true
+        type: string
       DB_BACKUP_DEPLOYMENT_NAME:
         required: true
         type: string
@@ -158,6 +161,7 @@ jobs:
         env:
           IMAGE_REPO_URL: ${{ inputs.IMAGE_REPO_URL }}
           DB_IMAGE: ${{ inputs.DB_IMAGE }}
+          DB_HEALTH_QUERY: ${{ inputs.DB_HEALTH_QUERY }}
           DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
           DB_NAME: ${{ inputs.DB_NAME }}
           DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
