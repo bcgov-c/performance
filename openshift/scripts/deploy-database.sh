@@ -26,7 +26,7 @@ else
 
   echo "Recreating $DB_POD_NAME from image: $IMAGE_REPO_URL$DB_IMAGE"
   oc delete sts $DB_POD_NAME
-  oc delete configmap $DB_POD_NAME-config
+  oc delete configmap $DB_POD_NAME
   oc delete service $DB_POD_NAME
   # Substitute variables in the config.yaml file and create the deployment
   envsubst < ./openshift/config/mariadb/config.yaml | oc create -f -
