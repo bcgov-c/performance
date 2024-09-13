@@ -199,7 +199,7 @@ jobs:
       REDIS_NAME: ${{ needs.checkEnv.outputs.REDIS_NAME }}
       APP_HOST_URL: ${{ needs.checkEnv.outputs.APP }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
       BUILD_NAMESPACE: ${{ needs.checkEnv.outputs.BUILD_NAMESPACE }}
-      DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.ref_name }}
+      DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}
       IMAGE_REPO_URL: ${{ needs.checkEnv.outputs.IMAGE_REPO_URL }}
       IMAGE_REPO_DOMAIN: ${{ needs.checkEnv.outputs.IMAGE_REPO_DOMAIN }}
       IMAGE_PULL_SECRET_NAME: ${{ needs.checkEnv.outputs.IMAGE_PULL_SECRET_NAME }}
