@@ -11,17 +11,6 @@ oc create secret docker-registry $IMAGE_PULL_SECRET_NAME --docker-server=$IMAGE_
 # Ensure secrets are linked for pulling from Artifactory
 oc secrets link default $IMAGE_PULL_SECRET_NAME --for=pull
 
-# Enable maintenance mode
-sh ./openshift/scripts/enable-maintenance.sh
-
-sleep 10
-
-# Redirect traffic to maintenance-message
-echo "Redirecting traffic to maintenance-message..."
-oc patch route $APP_NAME-web --type=json -p '[{"op": "replace", "path": "/spec/to/name", "value": "maintenance-message"}]'
-
-sleep 60
-
 echo "Delete cron job if it exists..."
 # Check if cron exists
 if oc get deployment $CRON_NAME; then
@@ -43,17 +32,17 @@ if [[ ! `oc describe configmap $WEB_NAME-config 2>&1` =~ "NotFound" ]]; then
   oc delete configmap $WEB_NAME-config
 fi
 
-sleep 10
+sleep 5
 
 echo "Creating configMap: $WEB_NAME-config"
 oc create configmap $WEB_NAME-config --from-file=./openshift/config/nginx/default.conf
 
-if [[ ! `oc describe configmap $APP-config 2>&1` =~ "NotFound" ]]; then
-  echo "ConfigMap exists... Deleting: $APP-config"
-  oc delete configmap $APP-config
+if [[ ! `oc describe configmap $APP_NAME-config 2>&1` =~ "NotFound" ]]; then
+  echo "ConfigMap exists... Deleting: $APP_NAME-config"
+  oc delete configmap $APP_NAME-config
 fi
 
-sleep 10
+sleep 5
 
 # echo "Creating configMap: $CRON_NAME-config"
 
@@ -62,12 +51,7 @@ if [[ ! `oc describe configmap $CRON_NAME-config 2>&1` =~ "NotFound" ]]; then
   oc delete configmap $CRON_NAME-config
 fi
 
-sleep 10
-
-# echo "Creating configMap: $CRON_NAME-config"
-# oc create configmap $CRON_NAME-config --from-file=config.php=./openshift/config/cron/$DEPLOY_ENVIRONMENT.config.php
-
-sleep 10
+sleep 5
 
 echo "Checking for: dc/$WEB_NAME in $DEPLOY_NAMESPACE"
 
