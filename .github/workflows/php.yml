@@ -19,7 +19,7 @@ jobs:
   build-images:
     name: '🐸 Build to JFrog'
     runs-on: ubuntu-latest
-    if: (github.ref_name == 'e66ac2-prod' || github.ref_name == 'dev' || github.ref_name == 'test' || github.ref_name == 'prod')
+    if: (github.ref_name == 'e66ac2-prod')
     steps:
       # Checkout the PR branch
       - name: 📤 Checkout Target Branch
@@ -60,4 +60,4 @@ jobs:
 
       # Build PHP Image and push to Artifactory
       - name: 🛠️ Build PHP Image and push to Artifactory
-        run: docker buildx build --cache-from type=gha --cache-to type=gha,mode=max --build-arg DOCKER_FROM_IMAGE=${{ secrets.ARTIFACTORY_URL }}/${{ env.PHP_IMAGE }} --tag ${{ secrets.ARTIFACTORY_URL }}/${{ env.PHP_IMAGE }} --output=type=image,push=true --push -f ${{ env.PHP_DOCKER_FILE_PATH }} .
+        run: docker buildx build --cache-from type=gha --cache-to type=gha,mode=max --build-arg APP_KEY=${{ env.APP_KEY }} --build-arg DOCKER_FROM_IMAGE=${{ secrets.ARTIFACTORY_URL }}/${{ env.PHP_IMAGE }} --tag ${{ secrets.ARTIFACTORY_URL }}/${{ env.PHP_IMAGE }} --output=type=image,push=true --push -f ${{ env.PHP_DOCKER_FILE_PATH }} .

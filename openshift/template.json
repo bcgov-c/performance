@@ -760,6 +760,12 @@
       "displayName": "DB Name",
       "name": "DB_DATABASE",
       "value": "app"
+    },
+    {
+      "description": "Image Pull Secret Name",
+      "displayName": "Image Pull Secret",
+      "name": "IMAGE_PULL_SECRET_NAME",
+      "value": "unset"
     }
   ]
 }

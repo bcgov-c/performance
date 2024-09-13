@@ -59,6 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs: # Define the output parameter
       APP_NAME: ${{ env.APP_NAME }}
+      APP_KEY: ${{ env.APP_KEY }}
       DEPLOY_NAMESPACE: ${{ github.ref_name }}
       IMAGE_REPO_DOMAIN: ${{ env.IMAGE_REPO_DOMAIN }}
       IMAGE_PULL_SECRET_NAME: ${{ env.IMAGE_PULL_SECRET_NAME }}
