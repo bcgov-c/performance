@@ -98,11 +98,13 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
   # Extract the user count from the output
   CURRENT_USER_COUNT=$(echo "$OUTPUT" | grep -oP '\d+')
 
-  if [ $CURRENT_USER_COUNT -gt 0 ]; then
+  # Check if CURRENT_USER_COUNT is set and greater than 0
+  if [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -gt 0 ]; then
     echo "Database is online and contains $CURRENT_USER_COUNT users."
     break
   else
-    echo "Database is offline. Attempt $ATTEMPTS out of $MAX_ATTEMPTS."
+    # Current user count is 0 or not set
+    echo "Database appears to be offline. Attempt $ATTEMPTS of $MAX_ATTEMPTS."
     sleep $WAIT_TIME
   fi
 done
