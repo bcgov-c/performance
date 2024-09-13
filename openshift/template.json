@@ -115,7 +115,9 @@
           }
         ],
         "selector": {
-          "deployment": "${PHP_NAME}"
+          "matchLabels": {
+            "deployment": "${PHP_NAME}"
+          }
         }
       }
     },
@@ -536,7 +538,9 @@
       "spec": {
         "replicas": 3,
         "selector": {
-          "deployment": "${WEB_NAME}"
+          "matchLabels": {
+            "deployment": "${WEB_NAME}"
+          }
         },
         "strategy": {
           "type": "RollingUpdate"
