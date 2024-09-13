@@ -38,13 +38,19 @@ on:
 
   workflow_call:
     secrets:
-      DB_NAME:
+      ARTIFACTORY_PASSWORD:
+        required: true
+      ARTIFACTORY_USER:
         required: true
       DB_USER:
         required: true
       DB_PASSWORD:
         required: true
       ARTIFACTORY_URL:
+        required: true
+      ARTIFACTORY_EMAIL:
+        required: true
+      ROCKETCHAT_WEBHOOK_URL:
         required: true
 
 jobs:
