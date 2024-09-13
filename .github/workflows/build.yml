@@ -202,6 +202,7 @@ jobs:
       BUILD_NAMESPACE: ${{ needs.checkEnv.outputs.BUILD_NAMESPACE }}
       DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.ref_name }}
       IMAGE_REPO_URL: ${{ needs.checkEnv.outputs.IMAGE_REPO_URL }}
+      IMAGE_REPO_DOMAIN: ${{ needs.checkEnv.outputs.IMAGE_REPO_DOMAIN }}
 
   lighthouse-check:
     name: 🚦 Audit
