@@ -164,6 +164,7 @@ jobs:
         if: success()
         run: bash ./openshift/scripts/deploy-database.sh
         env:
+          APP_NAME: ${{ inputs.APP_NAME }}
           IMAGE_REPO_URL: ${{ inputs.IMAGE_REPO_URL }}
           DB_IMAGE: ${{ inputs.DB_IMAGE }}
           DB_HEALTH_QUERY: ${{ inputs.DB_HEALTH_QUERY }}
