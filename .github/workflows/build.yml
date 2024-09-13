@@ -55,6 +55,9 @@ jobs:
     outputs: # Define the output parameter
       APP_NAME: ${{ env.APP_NAME }}
       DEPLOY_NAMESPACE: ${{ github.ref_name }}
+      IMAGE_REPO: ${{ env.IMAGE_REPO }}
+      IMAGE_REPO_DOMAIN: ${{ env.IMAGE_REPO_DOMAIN }}
+      IMAGE_PULL_SECRET_NAME: ${{ env.IMAGE_PULL_SECRET_NAME }}
       IMAGE_REPO_URL: ${{ env.IMAGE_REPO_URL }}
       BUILD_NAMESPACE: ${{ github.ref_name }}
       DB_NAME: ${{ env.DB_NAME }}

@@ -93,9 +93,6 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
   if echo "$OUTPUT" | grep -qi "error"; then
     echo "❌ Database error: $OUTPUT"
     # exit 1
-  else
-    echo "DB query: $DB_HEALTH_QUERY"
-    echo "Output: $OUTPUT"
   fi
 
   # Extract the user count from the output

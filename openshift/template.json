@@ -193,7 +193,7 @@
           "spec": {
             "imagePullSecrets": [
               {
-                "name": "artifactory-m950-learning"
+                "name": "${IMAGE_PULL_SECRET_NAME}"
               }
             ],
             "containers": [
@@ -394,7 +394,7 @@
           "spec": {
             "imagePullSecrets": [
               {
-                "name": "artifactory-m950-learning"
+                "name": "${IMAGE_PULL_SECRET_NAME}"
               }
             ],
             "containers": [
@@ -557,7 +557,7 @@
           "spec": {
             "imagePullSecrets": [
               {
-                "name": "artifactory-m950-learning"
+                "name": "${IMAGE_PULL_SECRET_NAME}"
               }
             ],
             "containers": [

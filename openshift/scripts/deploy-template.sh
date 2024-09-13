@@ -5,8 +5,11 @@ test -n $DEPLOY_NAMESPACE
 oc project $DEPLOY_NAMESPACE
 echo "Current namespace is $DEPLOY_NAMESPACE"
 
+# Create secret, if it doesn't exist yet
+oc create secret docker-registry $IMAGE_PULL_SECRET_NAME --docker-server=$IMAGE_REPO_DOMAIN --docker-username=$SECRET_DOCKER_USERNAME --docker-password=$SECRET_DOCKER_PASSWORD --docker-email=$SECRET_DOCKER_EMAIL
+
 # Ensure secrets are linked for pulling from Artifactory
-oc secrets link default artifactory-m950-learning --for=pull
+oc secrets link default $IMAGE_PULL_SECRET_NAME --for=pull
 
 # Enable maintenance mode
 sh ./openshift/scripts/enable-maintenance.sh
