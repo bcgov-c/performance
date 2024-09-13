@@ -544,7 +544,7 @@
         "template": {
           "metadata": {
             "labels": {
-              "deploymentconfig": "${WEB_NAME}"
+              "deployment": "${WEB_NAME}"
             }
           },
           "spec": {
@@ -657,12 +657,6 @@
       "name": "SITE_URL",
       "required": true,
       "value": "${SITE_URL}"
-    },
-    {
-      "description": "Application Build Name",
-      "displayName": "Application Build Name",
-      "name": "APP_NAME",
-      "value": "app"
     },
     {
       "description": "Web Service Name",

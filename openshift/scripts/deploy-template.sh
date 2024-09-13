@@ -84,11 +84,7 @@ oc apply -f -
 echo "Scale down $DB_NAME to 1 replica..."
 oc scale sts/$DB_NAME --replicas=1
 
-# Redirect traffic to maintenance-message
-echo "Redirecting traffic to maintenance-message..."
-oc patch route $APP_NAME-web --type=json -p '[{"op": "replace", "path": "/spec/to/name", "value": "maintenance-message"}]'
-
-sleep 60
+sleep 30
 
 echo "Rolling out $PHP_NAME..."
 oc rollout latest deployment/$PHP_NAME
@@ -227,17 +223,7 @@ oc scale sts/$DB_NAME --replicas=3
 # Right-sizing cluster, according to environment
 bash ./openshift/scripts/right-sizing.sh
 
-sleep 10
-
-echo "Disabling maintenance mode..."
-oc exec deployment/$PHP_NAME -- bash -c 'php /var/www/html/admin/cli/maintenance.php --disable'
-
-echo "Disabling maintenance-message and redirecting traffic [back] to applicaton..."
-oc patch route $APP_NAME-web --type=json -p '[{"op": "replace", "path": "/spec/to/name", "value": "web"}]'
-
 sleep 30
-
-oc scale dc/maintenance-message --replicas=0
 
 echo "Deployment complete."
 

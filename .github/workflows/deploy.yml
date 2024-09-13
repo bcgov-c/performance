@@ -179,7 +179,7 @@ jobs:
         run: bash ./openshift/scripts/deploy-template.sh
         env:
           APP_NAME: ${{ inputs.APP_NAME }}
-          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_NAME: ${{ inputs.DB_NAME }}
           DB_DATABASE: ${{ inputs.DB_DATABASE }}
           DB_USER: ${{ inputs.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}

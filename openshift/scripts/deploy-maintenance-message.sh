@@ -67,6 +67,6 @@ sleep 20
 
 # Redirect traffic to $BUILD_NAME
 echo "Redirecting traffic to $BUILD_NAME..."
-oc patch route $APP_NAME-web --type=json -p "[{\"op\": \"replace\", \"path\": \"/spec/to/name\", \"value\": \"$BUILD_NAME\"}]"
+oc patch route web --type=json -p "[{\"op\": \"replace\", \"path\": \"/spec/to/name\", \"value\": \"$BUILD_NAME\"}]"
 
 sleep 30
