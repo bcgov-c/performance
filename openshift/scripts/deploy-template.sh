@@ -69,12 +69,11 @@ echo "Checking for: deployment/$WEB_NAME in $DEPLOY_NAMESPACE"
 if [[ `oc describe deployment/$WEB_NAME 2>&1` =~ "NotFound" ]]; then
   echo "$WEB_NAME NOT FOUND..."
 else
-  echo "$WEB_NAME Installation FOUND...UPDATING..."
+  echo "$WEB_NAME installation found...updating..."
   oc annotate --overwrite  deployment/$WEB_NAME kubectl.kubernetes.io/restartedAt=`date +%FT%T`
-  oc rollout latest deployment/$WEB_NAME
 fi
 
-sleep 30
+sleep 10
 
 echo "Deploy Template to OpenShift ..."
 
@@ -96,10 +95,7 @@ oc apply -f -
 echo "Scale down $DB_NAME to 1 replica..."
 oc scale sts/$DB_NAME --replicas=1
 
-sleep 30
-
-echo "Rolling out $PHP_NAME..."
-oc rollout latest deployment/$PHP_NAME
+sleep 15
 
 # Check PHP deployment rollout status until complete.
 ATTEMPTS=0

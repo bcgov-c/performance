@@ -185,9 +185,6 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           APP_HOST_URL: ${{ inputs.APP_HOST_URL }}
           BUILD_NAMESPACE: ${{ inputs.BUILD_NAMESPACE }}
-          IMAGE_REPO_URL: ${{ inputs.IMAGE_REPO_URL }}
-          IMAGE_REPO_DOMAIN: ${{ inputs.IMAGE_REPO_DOMAIN }}
-          IMAGE_PULL_SECRET_NAME: ${{ inputs.IMAGE_PULL_SECRET_NAME }}
           DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
           WEB_NAME: ${{ inputs.WEB_NAME }}
           WEB_IMAGE: ${{ secrets.ARTIFACTORY_URL }}/${{ inputs.WEB_IMAGE }}
@@ -197,6 +194,9 @@ jobs:
           REDIS_NAME: ${{ inputs.REDIS_NAME }}
           BACKUP_HELM_CHART: ${{ inputs.BACKUP_HELM_CHART }}
           BACKUP_IMAGE: ${{ inputs.BACKUP_IMAGE }}
+          IMAGE_REPO_URL: ${{ inputs.IMAGE_REPO_URL }}
+          IMAGE_REPO_DOMAIN: ${{ inputs.IMAGE_REPO_DOMAIN }}
+          IMAGE_PULL_SECRET_NAME: ${{ inputs.IMAGE_PULL_SECRET_NAME }}
           SECRET_DOCKER_USERNAME: ${{ secrets.ARTIFACTORY_USER }}
           SECRET_DOCKER_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
           SECRET_DOCKER_EMAIL: ${{ secrets.ARTIFACTORY_EMAIL }}
