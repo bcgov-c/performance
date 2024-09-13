@@ -97,9 +97,7 @@
           }
         ],
         "selector": {
-          "matchLabels": {
-            "deployment": "${WEB_NAME}"
-          }
+          "deployment": "${WEB_NAME}"
         }
       }
     },
@@ -117,9 +115,7 @@
           }
         ],
         "selector": {
-          "matchLabels": {
-            "deployment": "${PHP_NAME}"
-          }
+          "deployment": "${PHP_NAME}"
         }
       }
     },
