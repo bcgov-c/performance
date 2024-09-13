@@ -60,6 +60,7 @@ jobs:
       DB_NAME: ${{ env.DB_NAME }}
       DB_DATABASE: ${{ env.DB_DATABASE }}
       SECRET_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_HEALTH_QUERY: ${{ env.DB_HEALTH_QUERY }}
       WEB_NAME: ${{ env.WEB_NAME }}
       WEB_IMAGE: ${{ env.WEB_IMAGE }}
       DB_HOST: ${{ env.DB_HOST }}
