@@ -93,6 +93,9 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
   if echo "$OUTPUT" | grep -qi "error"; then
     echo "❌ Database error: $OUTPUT"
     # exit 1
+  else
+    echo "DB query: $DB_HEALTH_QUERY"
+    echo "Output: $OUTPUT"
   fi
 
   # Extract the user count from the output
@@ -104,7 +107,7 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
     break
   else
     # Current user count is 0 or not set
-    echo "Database appears to be offline. Attempt $ATTEMPTS of $MAX_ATTEMPTS."
+    # echo "Database appears to be offline. Attempt $ATTEMPTS of $MAX_ATTEMPTS."
     sleep $WAIT_TIME
   fi
 done
