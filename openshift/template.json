@@ -383,7 +383,7 @@
         "template": {
           "metadata": {
             "labels": {
-              "app": "${CRON_NAME}"
+              "deployment": "${CRON_NAME}"
             }
           },
           "spec": {
