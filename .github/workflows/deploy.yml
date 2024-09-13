@@ -63,9 +63,6 @@ on:
       IMAGE_REPO_DOMAIN:
         required: true
         type: string
-      IMAGE_REPO:
-        required: true
-        type: string
       IMAGE_REPO_URL:
         required: true
         type: string
