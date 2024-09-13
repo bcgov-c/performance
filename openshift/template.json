@@ -174,7 +174,9 @@
       "spec": {
         "replicas": 3,
         "selector": {
-          "deployment": "${PHP_NAME}"
+          "matchLabels": {
+            "deployment": "${PHP_NAME}"
+          }
         },
         "strategy": {
           "type": "RollingUpdate"
