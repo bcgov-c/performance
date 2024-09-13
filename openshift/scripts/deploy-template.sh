@@ -6,7 +6,11 @@ oc project $DEPLOY_NAMESPACE
 echo "Current namespace is $DEPLOY_NAMESPACE"
 
 # Create secret, if it doesn't exist yet
-oc create secret docker-registry $IMAGE_PULL_SECRET_NAME --docker-server=$IMAGE_REPO_DOMAIN --docker-username=$SECRET_DOCKER_USERNAME --docker-password=$SECRET_DOCKER_PASSWORD --docker-email=$SECRET_DOCKER_EMAIL
+oc create secret docker-registry $IMAGE_PULL_SECRET_NAME \
+  --docker-server=$IMAGE_REPO_DOMAIN \
+  --docker-username=$SECRET_DOCKER_USERNAME \
+  --docker-password=$SECRET_DOCKER_PASSWORD \
+  --docker-email=$SECRET_DOCKER_EMAIL
 
 # Ensure secrets are linked for pulling from Artifactory
 oc secrets link default $IMAGE_PULL_SECRET_NAME --for=pull
@@ -93,11 +97,11 @@ oc rollout latest deployment/$PHP_NAME
 # Check PHP deployment rollout status until complete.
 ATTEMPTS=0
 WAIT_TIME=30
-ROLLOUT_STATUS_CMD="oc rollout status deployment/$PHP_NAME"
+ROLLOUT_STATUS_CMD="oc rollout status deployments/$PHP_NAME"
 until $ROLLOUT_STATUS_CMD || [ $ATTEMPTS -eq 6 ]; do
   $ROLLOUT_STATUS_CMD
   ATTEMPTS=$((attempts + 1))
-  echo "Waiting for deployment/$PHP_NAME: $(($ATTEMPTS * $WAIT_TIME)) seconds..."
+  echo "Waiting for deployments/$PHP_NAME: $(($ATTEMPTS * $WAIT_TIME)) seconds..."
   sleep $WAIT_TIME
 done
 
