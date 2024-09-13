@@ -136,8 +136,8 @@ jobs:
             echo "${{ inputs.WEB_NAME }} NOT FOUND: Skipping..."
           else
             echo "${{ inputs.WEB_NAME }} FOUND: Cleaning resources..."
-            oc scale dc/${{ inputs.WEB_NAME }} --replicas=0
-            oc delete dc/${{ inputs.WEB_NAME }}
+            oc scale deployment/${{ inputs.WEB_NAME }} --replicas=0
+            oc delete deployment/${{ inputs.WEB_NAME }}
             echo "DELETED dc ${{ inputs.WEB_NAME }}"
           fi
           if [[ `oc describe configmap $configmap_name 2>&1` =~ "NotFound" ]]; then
@@ -167,8 +167,8 @@ jobs:
             echo "${{ inputs.PHP_NAME }} NOT FOUND: Skipping..."
           else
             echo "${{ inputs.PHP_NAME }} FOUND: Cleaning resources..."
-            oc scale dc/${{ inputs.PHP_NAME }} --replicas=0
-            oc delete dc/${{ inputs.PHP_NAME }}
+            oc scale deployment/${{ inputs.PHP_NAME }} --replicas=0
+            oc delete deployment/${{ inputs.PHP_NAME }}
             echo "DELETED dc ${{ inputs.PHP_NAME }}"
           fi
           if [[ `oc describe configmap $configmap_name 2>&1` =~ "NotFound" ]]; then

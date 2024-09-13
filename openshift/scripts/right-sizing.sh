@@ -48,7 +48,7 @@ do
       diff=$((MaxPods - PodCount))
       if [[ $diff -gt 0 ]]; then
         # If MaxPods > PodCount, add HorizontalPodAutoscaler
-        cmd="oc autoscale dc/$Deployment --min $PodCount --max $MaxPods --cpu-percent=80"
+        cmd="oc autoscale deployment/$Deployment --min $PodCount --max $MaxPods --cpu-percent=80"
         echo "Executing: $cmd"
         $cmd
       fi

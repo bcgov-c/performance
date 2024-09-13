@@ -53,14 +53,14 @@ fi
 
 sleep 5
 
-echo "Checking for: dc/$WEB_NAME in $DEPLOY_NAMESPACE"
+echo "Checking for: deployment/$WEB_NAME in $DEPLOY_NAMESPACE"
 
-if [[ `oc describe dc/$WEB_NAME 2>&1` =~ "NotFound" ]]; then
+if [[ `oc describe deployment/$WEB_NAME 2>&1` =~ "NotFound" ]]; then
   echo "$WEB_NAME NOT FOUND..."
 else
   echo "$WEB_NAME Installation FOUND...UPDATING..."
-  oc annotate --overwrite  dc/$WEB_NAME kubectl.kubernetes.io/restartedAt=`date +%FT%T`
-  oc rollout latest dc/$WEB_NAME
+  oc annotate --overwrite  deployment/$WEB_NAME kubectl.kubernetes.io/restartedAt=`date +%FT%T`
+  oc rollout latest deployment/$WEB_NAME
 fi
 
 sleep 30
@@ -92,16 +92,16 @@ oc patch route $APP_NAME-web --type=json -p '[{"op": "replace", "path": "/spec/t
 sleep 60
 
 echo "Rolling out $PHP_NAME..."
-oc rollout latest dc/$PHP_NAME
+oc rollout latest deployment/$PHP_NAME
 
 # Check PHP deployment rollout status until complete.
 ATTEMPTS=0
 WAIT_TIME=30
-ROLLOUT_STATUS_CMD="oc rollout status dc/$PHP_NAME"
+ROLLOUT_STATUS_CMD="oc rollout status deployment/$PHP_NAME"
 until $ROLLOUT_STATUS_CMD || [ $ATTEMPTS -eq 6 ]; do
   $ROLLOUT_STATUS_CMD
   ATTEMPTS=$((attempts + 1))
-  echo "Waiting for dc/$PHP_NAME: $(($ATTEMPTS * $WAIT_TIME)) seconds..."
+  echo "Waiting for deployment/$PHP_NAME: $(($ATTEMPTS * $WAIT_TIME)) seconds..."
   sleep $WAIT_TIME
 done
 
@@ -205,18 +205,18 @@ do
 done
 
 echo "Purging caches..."
-oc exec dc/$PHP_NAME -- bash -c 'php /var/www/html/admin/cli/purge_caches.php'
+oc exec deployment/$PHP_NAME -- bash -c 'php /var/www/html/admin/cli/purge_caches.php'
 
 sleep 10
 
 echo "Purging missing plugins..."
-plugin_purge=$(oc exec dc/$PHP_NAME -- bash -c 'php /var/www/html/admin/cli/uninstall_plugins.php --purge-missing --run')
+plugin_purge=$(oc exec deployment/$PHP_NAME -- bash -c 'php /var/www/html/admin/cli/uninstall_plugins.php --purge-missing --run')
 echo "Result: $plugin_purge"
 
 sleep 10
 
 echo "Running upgrades..."
-upgrade_result=$(oc exec dc/$PHP_NAME -- bash -c 'php /var/www/html/admin/cli/upgrade.php --non-interactive')
+upgrade_result=$(oc exec deployment/$PHP_NAME -- bash -c 'php /var/www/html/admin/cli/upgrade.php --non-interactive')
 echo "Result: $upgrade_result"
 
 sleep 10
@@ -231,7 +231,7 @@ bash ./openshift/scripts/right-sizing.sh
 sleep 10
 
 echo "Disabling maintenance mode..."
-oc exec dc/$PHP_NAME -- bash -c 'php /var/www/html/admin/cli/maintenance.php --disable'
+oc exec deployment/$PHP_NAME -- bash -c 'php /var/www/html/admin/cli/maintenance.php --disable'
 
 echo "Disabling maintenance-message and redirecting traffic [back] to applicaton..."
 oc patch route $APP_NAME-web --type=json -p '[{"op": "replace", "path": "/spec/to/name", "value": "web"}]'
