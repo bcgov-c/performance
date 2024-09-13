@@ -61,6 +61,7 @@ RUN set -eux; \
   && rm -rf /var/lib/apt/lists/*
 
 # Install PHPRedis
+RUN rm -rf /phpredis
 RUN git clone https://github.com/phpredis/phpredis.git /phpredis
 WORKDIR /phpredis
 RUN	phpize && ./configure && make && make install

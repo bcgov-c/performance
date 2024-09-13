@@ -8,4 +8,4 @@
 
 Run local developent version using Docker [Desktop]
 
-`$ docker compose up --build --force-recreate --no-deps -d`
+`$ docker compose up --build -d`
