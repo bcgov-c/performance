@@ -81,7 +81,8 @@ oc process -f ./openshift/template.json \
   -p WEB_NAME=$WEB_NAME \
   -p WEB_IMAGE=$WEB_IMAGE \
   -p CRON_NAME=$CRON_NAME \
-  -p PHP_NAME=$PHP_NAME | \
+  -p PHP_NAME=$PHP_NAME \
+  -p IMAGE_PULL_SECRET_NAME=$IMAGE_PULL_SECRET_NAME | \
 oc apply -f -
 
 # Only use 1 db replica for deployment / upgrade to avoid conflicts
