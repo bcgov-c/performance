@@ -98,7 +98,7 @@
         ],
         "selector": {
           "matchLabels": {
-            "service": "${WEB_NAME}"
+            "deployment": "${WEB_NAME}"
           }
         }
       }
