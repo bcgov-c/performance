@@ -67,7 +67,7 @@ sleep 30
 
 echo "Deploy Template to OpenShift ..."
 oc process -f ./openshift/template.json \
-  -p APP_NAME=$APP \
+  -p APP_NAME=$APP_NAME \
   -p DB_USER=$DB_USER \
   -p DB_PASSWORD=$DB_PASSWORD \
   -p SITE_URL=$APP_HOST_URL \
