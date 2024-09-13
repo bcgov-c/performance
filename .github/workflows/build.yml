@@ -164,7 +164,7 @@ jobs:
     if: needs.checkEnv.outputs.CLEAN_BUILDS == 'YES'
     with:
       APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
-      APP_HOST_URL: ${{ needs.checkEnv.outputs.APP }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
+      APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_NAME }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
       DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}
       DB_NAME: ${{ needs.checkEnv.outputs.DB_NAME }}
       WEB_NAME: ${{ needs.checkEnv.outputs.WEB_NAME }}
@@ -202,7 +202,7 @@ jobs:
       CRON_NAME: ${{ needs.checkEnv.outputs.CRON_NAME }}
       REDIS_IMAGE: ${{ needs.checkEnv.outputs.REDIS_IMAGE }}
       REDIS_NAME: ${{ needs.checkEnv.outputs.REDIS_NAME }}
-      APP_HOST_URL: ${{ needs.checkEnv.outputs.APP }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
+      APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_NAME }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
       BUILD_NAMESPACE: ${{ needs.checkEnv.outputs.BUILD_NAMESPACE }}
       DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}
       IMAGE_REPO_URL: ${{ needs.checkEnv.outputs.IMAGE_REPO_URL }}

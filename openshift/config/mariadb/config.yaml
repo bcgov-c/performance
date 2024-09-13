@@ -98,13 +98,6 @@ spec:
           successThreshold: 1
           failureThreshold: 300
         env:
-        # Using Secrets
-        - name: MARIADB_ALLOW_EMPTY_ROOT_PASSWORD
-          value: "yes"
-        - name: MARIADB_AUTO_UPGRADE
-          value: "yes"
-        - name: ALLOW_EMPTY_PASSWORD
-          value: "yes"
         - name: MYSQL_USER
           valueFrom:
             secretKeyRef:
@@ -120,6 +113,12 @@ spec:
             secretKeyRef:
               name: ${APP_NAME}-secrets
               key: database-password
+        - name: MARIADB_ALLOW_EMPTY_ROOT_PASSWORD
+          value: "yes"
+        - name: MARIADB_AUTO_UPGRADE
+          value: "yes"
+        - name: ALLOW_EMPTY_PASSWORD
+          value: "yes"
         - name: MYSQL_INITDB_SKIP_TZINFO
           value: "1"
         # Create mysql user for healthcheck.sh
