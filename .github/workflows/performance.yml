@@ -7,6 +7,7 @@ concurrency:
 env:
   APP_NAME: performance
   USER: ${{ github.actor }}
+  DEPLOY_NAMESPACE: ${{ github.ref_name }}
 
 on:
   workflow_call:
