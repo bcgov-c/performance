@@ -193,8 +193,8 @@
             ],
             "containers": [
               {
-                "image": "${IMAGE_REPO_URL}${PHP_NAME}:${DEPLOY_NAMESPACE}",
-                "name": "${PHP_NAME}",
+                "image": "${IMAGE_REPO_URL}${APP_NAME}:${DEPLOY_NAMESPACE}",
+                "name": "${APP_NAME}",
                 "restartPolicy": "Always",
                 "imagePullPolicy": "Always",
                 "ports": [
