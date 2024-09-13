@@ -97,7 +97,7 @@
           }
         ],
         "selector": {
-          "deploymentconfig": "${WEB_NAME}"
+          "deployment": "${WEB_NAME}"
         }
       }
     },
@@ -115,7 +115,7 @@
           }
         ],
         "selector": {
-          "deploymentconfig": "${PHP_NAME}"
+          "deployment": "${PHP_NAME}"
         }
       }
     },
@@ -123,7 +123,7 @@
 			"apiVersion": "v1",
 			"kind": "Route",
 			"metadata": {
-        "name": "${APP_NAME}-${WEB_NAME}",
+        "name": "${WEB_NAME}",
         "namespace": "${DEPLOY_NAMESPACE}",
         "labels": {
           "service": "${WEB_NAME}"
@@ -172,7 +172,7 @@
       "spec": {
         "replicas": 3,
         "selector": {
-          "deploymentconfig": "${PHP_NAME}"
+          "deployment": "${PHP_NAME}"
         },
         "strategy": {
           "type": "RollingUpdate"
@@ -180,7 +180,7 @@
         "template": {
           "metadata": {
             "labels": {
-              "deploymentconfig": "${PHP_NAME}"
+              "deployment": "${PHP_NAME}"
             }
           },
           "spec": {
@@ -536,7 +536,7 @@
       "spec": {
         "replicas": 3,
         "selector": {
-          "deploymentconfig": "${WEB_NAME}"
+          "deployment": "${WEB_NAME}"
         },
         "strategy": {
           "type": "RollingUpdate"
