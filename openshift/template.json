@@ -87,17 +87,17 @@
       "apiVersion": "v1",
       "kind": "Service",
       "metadata": {
-        "name": "${WEB_DEPLOYMENT_NAME}"
+        "name": "${WEB_NAME}"
       },
       "spec": {
         "ports": [
           {
-            "name": "${WEB_DEPLOYMENT_NAME}",
+            "name": "${WEB_NAME}",
             "port": 8080
           }
         ],
         "selector": {
-          "deploymentconfig": "${WEB_DEPLOYMENT_NAME}"
+          "deploymentconfig": "${WEB_NAME}"
         }
       }
     },
@@ -105,17 +105,17 @@
       "apiVersion": "v1",
       "kind": "Service",
       "metadata": {
-        "name": "${PHP_DEPLOYMENT_NAME}"
+        "name": "${PHP_NAME}"
       },
       "spec": {
         "ports": [
           {
-            "name": "${PHP_DEPLOYMENT_NAME}",
+            "name": "${PHP_NAME}",
             "port": 9000
           }
         ],
         "selector": {
-          "deploymentconfig": "${PHP_DEPLOYMENT_NAME}"
+          "deploymentconfig": "${PHP_NAME}"
         }
       }
     },
@@ -123,10 +123,10 @@
 			"apiVersion": "v1",
 			"kind": "Route",
 			"metadata": {
-        "name": "${APP_NAME}-${WEB_DEPLOYMENT_NAME}",
+        "name": "${APP_NAME}-${WEB_NAME}",
         "namespace": "${DEPLOY_NAMESPACE}",
         "labels": {
-          "service": "${WEB_DEPLOYMENT_NAME}"
+          "service": "${WEB_NAME}"
         },
         "annotations": {
           "haproxy.router.openshift.io/timeout": "600s"
@@ -136,7 +136,7 @@
         "host": "${SITE_URL}",
         "to": {
           "kind": "Service",
-          "name": "${WEB_DEPLOYMENT_NAME}",
+          "name": "${WEB_NAME}",
           "weight": 100
         },
         "conditions": [
@@ -163,16 +163,16 @@
         "annotations": {
           "template.alpha.openshift.io/wait-for-ready": "true"
         },
-        "name": "${PHP_DEPLOYMENT_NAME}",
+        "name": "${PHP_NAME}",
         "namespace": "${DEPLOY_NAMESPACE}",
         "labels": {
-          "service": "${PHP_DEPLOYMENT_NAME}"
+          "service": "${PHP_NAME}"
         }
       },
       "spec": {
         "replicas": 3,
         "selector": {
-          "deploymentconfig": "${PHP_DEPLOYMENT_NAME}"
+          "deploymentconfig": "${PHP_NAME}"
         },
         "strategy": {
           "type": "Rolling",
@@ -187,7 +187,7 @@
         "template": {
           "metadata": {
             "labels": {
-              "deploymentconfig": "${PHP_DEPLOYMENT_NAME}"
+              "deploymentconfig": "${PHP_NAME}"
             }
           },
           "spec": {
@@ -198,8 +198,8 @@
             ],
             "containers": [
               {
-                "image": "${IMAGE_REPO_URL}${PHP_DEPLOYMENT_NAME}:${DEPLOY_NAMESPACE}",
-                "name": "${PHP_DEPLOYMENT_NAME}",
+                "image": "${IMAGE_REPO_URL}${PHP_NAME}:${DEPLOY_NAMESPACE}",
+                "name": "${PHP_NAME}",
                 "restartPolicy": "Always",
                 "imagePullPolicy": "Always",
                 "ports": [
@@ -334,9 +334,9 @@
                 }
               },
               {
-                "name": "${PHP_DEPLOYMENT_NAME}-config",
+                "name": "${PHP_NAME}-config",
                 "configMap": {
-                  "name": "${PHP_DEPLOYMENT_NAME}-config",
+                  "name": "${PHP_NAME}-config",
                   "defaultMode": 420
                 }
               },
@@ -372,14 +372,14 @@
         "annotations": {
           "template.alpha.openshift.io/wait-for-ready": "true"
         },
-        "name": "${CRON_DEPLOYMENT_NAME}",
+        "name": "${CRON_NAME}",
         "namespace": "${DEPLOY_NAMESPACE}"
       },
       "spec": {
         "replicas": 1,
         "selector": {
           "matchLabels": {
-            "app": "${CRON_DEPLOYMENT_NAME}"
+            "app": "${CRON_NAME}"
           }
         },
         "strategy": {
@@ -388,7 +388,7 @@
         "template": {
           "metadata": {
             "labels": {
-              "app": "${CRON_DEPLOYMENT_NAME}"
+              "app": "${CRON_NAME}"
             }
           },
           "spec": {
@@ -399,8 +399,8 @@
             ],
             "containers": [
               {
-                "image": "${IMAGE_REPO_URL}${CRON_DEPLOYMENT_NAME}:${DEPLOY_NAMESPACE}",
-                "name": "${CRON_DEPLOYMENT_NAME}",
+                "image": "${IMAGE_REPO_URL}${CRON_NAME}:${DEPLOY_NAMESPACE}",
+                "name": "${CRON_NAME}",
                 "restartPolicy": "Always",
                 "imagePullPolicy": "Always",
                 "volumeMounts": [
@@ -422,7 +422,7 @@
                     "subPath": ".env"
                   },
                   {
-                    "name": "${CRON_DEPLOYMENT_NAME}-config",
+                    "name": "${CRON_NAME}-config",
                     "mountPath": "/var/www/html/config.php",
                     "subPath": "config.php"
                   }
@@ -499,9 +499,9 @@
                 }
               },
               {
-                "name": "${CRON_DEPLOYMENT_NAME}-config",
+                "name": "${CRON_NAME}-config",
                 "configMap": {
-                  "name": "${CRON_DEPLOYMENT_NAME}-config",
+                  "name": "${CRON_NAME}-config",
                   "defaultMode": 420
                 }
               },
@@ -537,13 +537,13 @@
         "annotations": {
           "template.alpha.openshift.io/wait-for-ready": "true"
         },
-        "name": "${WEB_DEPLOYMENT_NAME}",
+        "name": "${WEB_NAME}",
         "namespace": "${DEPLOY_NAMESPACE}"
       },
       "spec": {
         "replicas": 3,
         "selector": {
-          "deploymentconfig": "${WEB_DEPLOYMENT_NAME}"
+          "deploymentconfig": "${WEB_NAME}"
         },
         "strategy": {
           "type": "Recreate"
@@ -551,7 +551,7 @@
         "template": {
           "metadata": {
             "labels": {
-              "deploymentconfig": "${WEB_DEPLOYMENT_NAME}"
+              "deploymentconfig": "${WEB_NAME}"
             }
           },
           "spec": {
@@ -563,7 +563,7 @@
             "containers": [
               {
                 "image": "${WEB_IMAGE}",
-                "name": "${WEB_DEPLOYMENT_NAME}",
+                "name": "${WEB_NAME}",
                 "restartPolicy": "Always",
                 "imagePullPolicy": "Always",
                 "ports": [
@@ -586,7 +586,7 @@
                     "subPath": ".env"
                   },
                   {
-                    "name": "${WEB_DEPLOYMENT_NAME}-config",
+                    "name": "${WEB_NAME}-config",
                     "mountPath": "/etc/nginx/conf.d/default.conf",
                     "subPath": "default.conf"
                   }
@@ -619,9 +619,9 @@
                 }
               },
               {
-                "name": "${WEB_DEPLOYMENT_NAME}-config",
+                "name": "${WEB_NAME}-config",
                 "configMap": {
-                  "name": "${WEB_DEPLOYMENT_NAME}-config",
+                  "name": "${WEB_NAME}-config",
                   "defaultMode": 420
                 }
               },
@@ -668,13 +668,13 @@
     {
       "description": "Application Build Name",
       "displayName": "Application Build Name",
-      "name": "APP_DEPLOYMENT_NAME",
+      "name": "APP_NAME",
       "value": "app"
     },
     {
       "description": "Web Service Name",
       "displayName": "Web Service",
-      "name": "WEB_DEPLOYMENT_NAME",
+      "name": "WEB_NAME",
       "value": "web"
     },
     {
@@ -699,13 +699,13 @@
       "description": "PHP Image",
       "displayName": "PHP Image",
       "required": true,
-      "name": "PHP_DEPLOYMENT_NAME"
+      "name": "PHP_NAME"
     },
     {
       "description": "Cron Deployment Name",
       "displayName": "Cron Deployment",
       "required": true,
-      "name": "CRON_DEPLOYMENT_NAME"
+      "name": "CRON_NAME"
     },
     {
       "description": "Volume space available for application data",
