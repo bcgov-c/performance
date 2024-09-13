@@ -132,7 +132,7 @@ RUN chmod -R 755 ${STORAGE_DIR} && \
 		chown -R www-data:www-data ${APP_STORAGE_DIR} ${STORAGE_DIR}/framework ${STORAGE_DIR}/logs
 
 # Copy Server Config files (Apache / PHP)
-RUN mv ${PHP_INI_DIR}/php.ini-production ${PHP_INI_FILE}
+RUN cp ${PHP_INI_DIR}/php.ini-production ${PHP_INI_FILE}
 COPY ./openshift/config/php/php.ini ${PHP_CONF_DIR}/app-php.ini
 COPY ./openshift/config/php/www.conf ${ETC_DIR}/php-fpm.d/www.conf
 COPY --chown=www-data:www-data ./openshift/config/php/opcache.ini ${PHP_CONF_DIR}/opcache.ini
