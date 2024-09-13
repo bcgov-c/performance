@@ -97,7 +97,9 @@
           }
         ],
         "selector": {
-          "deployment": "${WEB_NAME}"
+          "matchLabels": {
+            "service": "${WEB_NAME}"
+          }
         }
       }
     },
@@ -376,7 +378,7 @@
         "replicas": 1,
         "selector": {
           "matchLabels": {
-            "app": "${CRON_NAME}"
+            "deployment": "${CRON_NAME}"
           }
         },
         "strategy": {
