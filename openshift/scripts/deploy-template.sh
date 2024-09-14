@@ -121,7 +121,11 @@ fi
 sleep 10
 
 echo "Create and run migrate-build-files job..."
-oc process -f ./openshift/migrate-build-files.yml | oc create -f -
+oc process -f ./openshift/migrate-build-files.yml \
+  -p IMAGE_REPO_URL=$IMAGE_REPO_URL \
+  -p BUILD_NAME=$PHP_NAME \
+  -p BUILD_NAMESPACE=$BUILD_NAMESPACE \
+  | oc create -f -
 
 sleep 10
 
