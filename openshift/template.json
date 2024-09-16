@@ -373,6 +373,11 @@
                 "name": "${CRON_NAME}",
                 "restartPolicy": "Always",
                 "imagePullPolicy": "Always",
+                "command": [
+                  "/bin/sh",
+                  "-c",
+                  "/usr/local/bin/cron.sh"
+                ],
                 "volumeMounts": [
                   {
                     "mountPath": "${APP_DATA_MOUNT_PATH}",

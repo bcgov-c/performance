@@ -160,6 +160,12 @@ COPY ./openshift/scripts/migrate-build-files.sh /usr/local/bin/migrate-build-fil
 RUN chmod +x /usr/local/bin/migrate-build-files.sh && \
 	dos2unix /usr/local/bin/migrate-build-files.sh
 
+# Add migration test script
+COPY ./openshift/scripts/test-migration-complete.sh /usr/local/bin/test-migration-complete.sh
+# Convert line endings of the script to ensure compatibility
+RUN chmod +x /usr/local/bin/test-migration-complete.sh && \
+	dos2unix /usr/local/bin/test-migration-complete.sh
+
 USER www-data
 
 WORKDIR ${BUILD_DIR}

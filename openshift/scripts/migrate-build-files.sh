@@ -1,5 +1,5 @@
 src_dir='/tmp/build'
-dest_dir='/var/www'
+dest_dir='/var/www/html'
 storage_dir='/var/www/storage'
 
 # rsync -a --no-perms --no-owner --no-times /tmp/build/ /var/www/
