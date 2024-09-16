@@ -72,6 +72,9 @@ parameters:
   - name: IMAGE_REPO_URL
     required: true
     value: ""
+  - name: IMAGE_PULL_SECRET_NAME
+    required: true
+    value: ""
   - name: BUILD_NAMESPACE
     required: true
     value: "dev"

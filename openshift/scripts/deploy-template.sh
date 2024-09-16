@@ -124,6 +124,7 @@ echo "Create and run migrate-build-files job..."
 oc process -f ./openshift/migrate-build-files.yml \
   -p APP_NAME=$APP_NAME \
   -p IMAGE_REPO_URL=$IMAGE_REPO_URL \
+  -p IMAGE_PULL_SECRET_NAME=$IMAGE_PULL_SECRET_NAME \
   -p BUILD_NAME=$PHP_NAME \
   -p BUILD_NAMESPACE=$BUILD_NAMESPACE \
   | oc create -f -
