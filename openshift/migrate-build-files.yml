@@ -64,7 +64,7 @@ objects:
                - bash
                - "-c"
                - |
-                echo "Migrating build files from /app/public to /var/www/html..."
+                echo "Migrating build files from /tmp/build to /var/www/html..."
                 sh /usr/local/bin/migrate-build-files.sh
              imagePullPolicy: Always
          restartPolicy: Never
@@ -76,5 +76,8 @@ parameters:
     required: true
     value: "dev"
   - name: BUILD_NAME
+    required: true
+    value: "app"
+  - name: APP_NAME
     required: true
     value: "app"
