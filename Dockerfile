@@ -148,11 +148,17 @@ RUN wget --progress=dot:giga -O /usr/local/bin/php-fpm-healthcheck \
     https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck \
   && chmod +x $(which php-fpm-healthcheck)
 
-	# Add cron script
+# Add cron script
 COPY ./openshift/config/cron/cron.sh /usr/local/bin/cron.sh
 # Convert line endings of the script to ensure compatibility
 RUN chmod +x /usr/local/bin/cron.sh && \
 	dos2unix /usr/local/bin/cron.sh
+
+# Add migration script
+COPY ./openshift/scripts/migrate-build-files.sh /usr/local/bin/migrate-build-files.sh
+# Convert line endings of the script to ensure compatibility
+RUN chmod +x /usr/local/bin/migrate-build-files.sh && \
+	dos2unix /usr/local/bin/migrate-build-files.sh
 
 USER www-data
 
