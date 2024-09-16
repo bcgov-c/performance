@@ -376,7 +376,7 @@
                 "command": [
                   "/bin/sh",
                   "-c",
-                  "/usr/local/bin/cron.sh"
+                  "nohup /usr/local/bin/cron.sh"
                 ],
                 "volumeMounts": [
                   {
