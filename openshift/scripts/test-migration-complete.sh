@@ -1,7 +1,7 @@
 #!/bin/bash
 
 text_to_find='LARAVEL_START'
-file='/var/www/public/index.php'
+file='/var/www/html/public/index.php'
 src_dir='/tmp/build'
 dest_dir='/var/www'
 
