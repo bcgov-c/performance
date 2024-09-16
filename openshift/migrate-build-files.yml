@@ -35,7 +35,7 @@ objects:
            - name: ${IMAGE_PULL_SECRET_NAME}
          containers:
            - name: migrate-build-files-job
-             image: ${IMAGE_REPO_URL}${BUILD_NAME}:${BUILD_NAMESPACE}
+             image: ${IMAGE_REPO_URL}${APP_NAME}:${BUILD_NAMESPACE}
              volumeMounts:
                - name: ${APP_NAME}-app-data
                  mountPath: /var/www/html
