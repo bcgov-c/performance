@@ -93,7 +93,7 @@ RUN chmod +x /usr/local/bin/install-php-extensions && \
 			exif
 
 # Ensure the www-data user has the necessary permissions
-RUN chown -R www-data:www-data ${WWW_DIR}
+RUN chown -R www-data:www-data ${BUILD_DIR}
 
 # Install dependencies
 RUN --mount=type=cache,target=/tmp/cache composer install --working-dir=${BUILD_DIR} --no-scripts --no-autoloader --prefer-dist --no-dev && \
@@ -171,11 +171,11 @@ USER www-data
 WORKDIR ${BUILD_DIR}
 
 # Check if APP_KEY is set and valid
-RUN if [[ -z "$APP_KEY" || ! "$APP_KEY" =~ ^base64:[A-Za-z0-9+/=]{43}$ ]]; then \
+RUN if [ -z "$APP_KEY" || ! "$APP_KEY" =~ ^base64:[A-Za-z0-9+/=]{43}$ ]; then \
 			echo "APP_KEY is not set or invalid. Generating a new APP_KEY..."; \
 			php artisan key:generate --ansi; \
 		else \
-			echo "APP_KEY has been generated and set to: $APP_KEY"; \
+			echo "APP_KEY already exists."; \
 		fi
 
 # This won't work here, as we're migrating files to www after deployment
