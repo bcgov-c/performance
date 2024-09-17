@@ -126,12 +126,6 @@ jobs:
             DB_USER: ${{ inputs.DB_USER }}
             SECRET_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
-      - name: Deploy Network Ingress Policy
-        if: success()
-        uses: ./openshift/network-ingress.yml
-        with:
-          DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
-
       - name: Create Environment ConfigMap
         if: success()
         run: bash ./openshift/scripts/deploy-env-configmap.sh
