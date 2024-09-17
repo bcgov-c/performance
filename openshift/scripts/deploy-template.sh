@@ -169,61 +169,6 @@ echo "migrate-build-files job has completed."
 
 sleep 15
 
-echo "Create and run upgrade job..."
-oc process -f ./openshift/upgrade.yml \
-  -p IMAGE_REPO_URL=$IMAGE_REPO_URL \
-  -p DEPLOY_NAMESPACE=$DEPLOY_NAMESPACE \
-  -p BUILD_NAME=$PHP_NAME \
-  | oc create -f -
-
-sleep 15
-
-# Get the name of the pod created by the job
-pod_name=$(oc get pods --selector=job-name=upgrade -o jsonpath='{.items[0].metadata.name}')
-
-# Wait until the pod is in the "Running" state
-while [[ $(oc get pod $pod_name -o 'jsonpath={..status.phase}') != "Running" ]]; do
-  echo "Waiting for pod $pod_name to be running."
-  sleep 10
-done
-
-sleep 30
-
-echo "Waiting forupgrade job to complete..."
-COUNT=0
-while [[ $(oc get jobs upgrade -o 'jsonpath={..status.active}') == "1" ]]; do
-  echo "upgrade job is still running..."
-  COUNT=$((COUNT + 1))
-  sleep $SLEEP
-done
-echo "upgrade job has completed."
-
-# Wait for the "File copy complete." message
-oc logs -f $pod_name | while read line
-do
-  echo $line
-  if [[ $line == *"Maintenance mode has been disabled and the site is running normally again"* ]]; then
-    pkill -P $$ oc
-  fi
-done
-
-echo "Purging caches..."
-oc exec deployment/$PHP_NAME -- bash -c 'php /var/www/html/admin/cli/purge_caches.php'
-
-sleep 10
-
-echo "Purging missing plugins..."
-plugin_purge=$(oc exec deployment/$PHP_NAME -- bash -c 'php /var/www/html/admin/cli/uninstall_plugins.php --purge-missing --run')
-echo "Result: $plugin_purge"
-
-sleep 10
-
-echo "Running upgrades..."
-upgrade_result=$(oc exec deployment/$PHP_NAME -- bash -c 'php /var/www/html/admin/cli/upgrade.php --non-interactive')
-echo "Result: $upgrade_result"
-
-sleep 10
-
 # DB was scaled-down for deployment and maintenance, scale it back up
 echo "Scaling up $DB_NAME to 3 replicas..."
 oc scale sts/$DB_NAME --replicas=3
