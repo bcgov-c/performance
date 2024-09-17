@@ -11,7 +11,6 @@ FROM composer:2.2 AS composer
 # trunk-ignore(hadolint/DL3006)
 FROM ${DOCKER_FROM_IMAGE}
 
-ARG PHP_INI_ENVIRONMENT=production
 ARG APP_KEY
 
 USER www-data
