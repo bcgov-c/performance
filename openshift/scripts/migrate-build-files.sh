@@ -2,18 +2,9 @@ src_dir='/tmp/build'
 dest_dir='/var/www/html'
 storage_dir='/var/www/storage'
 
-# rsync -a --no-perms --no-owner --no-times /tmp/build/ /var/www/
-
 echo "Starting migration..."
 
 echo "Comparing file modification dates..."
-# Compare the modification dates of the source and destination directories
-# src_date=$(stat -c %Y ${src_dir})
-# dest_date=$(stat -c %Y ${dest_dir})
-
-# echo "Source directory modification date: $src_date"
-# echo "Destination directory modification date: $dest_date"
-
 # Get latest modified date from all files in the source directory
 src_date_latest=$(find ${src_dir} -type f -exec stat -c %Y {} \; | sort | tail -n 1)
 src_date_latest=${src_date_latest:-0}

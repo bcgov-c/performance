@@ -31,7 +31,7 @@ if (file_exists('/var/www/storage/framework/maintenance.php')) {
 |
 */
 
-require '/var/www/vendor/autoload.php';
+require '/var/www/html/vendor/autoload.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -44,7 +44,7 @@ require '/var/www/vendor/autoload.php';
 |
 */
 
-$app = include_once '/var/www/bootstrap/app.php';
+$app = include_once '/var/www/html/bootstrap/app.php';
 
 $kernel = $app->make(Kernel::class);
 
