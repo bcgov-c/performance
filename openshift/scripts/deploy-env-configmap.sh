@@ -6,6 +6,7 @@ envsubst < ./example.env > $TEMP_ENV_FILE
 
 if [[ `oc describe configmap $APP_NAME-env 2>&1` =~ "NotFound" ]]; then
   # Nothing to delete
+  echo "ConfigMap does not exist..."
 else
   echo "ConfigMap exists... Deleting: $APP_NAME-env"
   oc delete configmap $APP_NAME-env

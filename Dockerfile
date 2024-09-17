@@ -172,7 +172,7 @@ USER www-data
 WORKDIR ${BUILD_DIR}
 
 # Check if APP_KEY is set and valid
-RUN if [ -z "$APP_KEY" || ! "$APP_KEY" =~ ^base64:[A-Za-z0-9+/=]{43}$ ]; then \
+RUN if [ -z "$APP_KEY" ] || ! echo "$APP_KEY" | grep -Eq '^base64:[A-Za-z0-9+/=]{43}$'; then \:
 			echo "APP_KEY is not set or invalid. Generating a new APP_KEY..."; \
 			php artisan key:generate --ansi; \
 		else \
