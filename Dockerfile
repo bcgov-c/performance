@@ -72,6 +72,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 # Copy application files
 WORKDIR ${BUILD_DIR}
 COPY . ${BUILD_DIR}
+COPY example.env ${BUILD_DIR}/.env
+RUN chmod 644 ${BUILD_DIR}/.env
 
 # COPY the PHP extension installer with curl using root permissions
 RUN curl -L https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions -o /usr/local/bin/install-php-extensions
