@@ -116,7 +116,7 @@ jobs:
           server=https://api.silver.devops.gov.bc.ca:6443
           oc login --token=${{ secrets.SA_TOKEN }} --server=$server
 
-      # Deploy secrets for DB connection
+      # Deploy Secrets for DB Connection
       - name: Deploy secrets
         run: bash ./openshift/scripts/deploy-secrets.sh
         env:
@@ -125,6 +125,12 @@ jobs:
             DB_DATABASE: ${{ inputs.DB_DATABASE }}
             DB_USER: ${{ inputs.DB_USER }}
             SECRET_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+      # Deploy Network Ingress Policy
+      - name: Deploy Network Ingress Policy
+        run: bash ./openshift/scripts/deploy-network-ingress.sh
+        env:
+            DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
 
       - name: Create Environment ConfigMap
         if: success()

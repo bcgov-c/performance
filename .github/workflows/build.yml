@@ -118,13 +118,6 @@ jobs:
           echo "-----------------------"
           echo URL: https://${{ env.APP_NAME }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
 
-  network:
-    name: Network Ingress Policy
-    needs: [checkEnv]
-    uses: ./openshift/network-ingress.yml
-    with:
-      DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
-
   # Build Images and deploy to JFrog
   db:
     name: 🔨 DB
