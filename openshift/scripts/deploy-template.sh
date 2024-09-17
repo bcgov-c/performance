@@ -48,15 +48,6 @@ fi
 
 sleep 5
 
-# echo "Creating configMap: $CRON_NAME-config"
-
-if [[ ! `oc describe configmap $CRON_NAME-config 2>&1` =~ "NotFound" ]]; then
-  echo "ConfigMap exists... Deleting: $CRON_NAME-config"
-  oc delete configmap $CRON_NAME-config
-fi
-
-sleep 5
-
 echo "Checking for: deployment/$WEB_NAME in $DEPLOY_NAMESPACE"
 
 if [[ `oc describe deployment/$WEB_NAME 2>&1` =~ "NotFound" ]]; then
