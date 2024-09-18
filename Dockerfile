@@ -172,14 +172,14 @@ USER www-data
 WORKDIR ${BUILD_DIR}
 
 # Debugging output
-RUN echo "APP_KEY_ARG: $APP_KEY_ARG"
-RUN echo "APP_KEY_ARG length: ${#APP_KEY_ARG}"
-RUN echo "APP_KEY from .env: $(grep APP_KEY .env)"
+# RUN echo "APP_KEY_ARG: $APP_KEY_ARG"
+# RUN echo "APP_KEY_ARG length: ${#APP_KEY_ARG}"
+# RUN echo "APP_KEY from .env: $(grep APP_KEY .env)"
 
 # Check if APP_KEY_ARG or APP_KEY is set and valid
-RUN if [ -z "$APP_KEY_ARG" ] || ! echo "$APP_KEY_ARG" | grep -Eq '^base64:[A-Za-z0-9+/=]{43}$'; then \
+RUN if [ -z "$APP_KEY_ARG" ] || ! echo "$APP_KEY_ARG" | grep -Eq '^base64:[A-Za-z0-9+/=]{44}$'; then \
         echo "APP_KEY_ARG is not set or invalid ($APP_KEY_ARG). Checking APP_KEY..."; \
-        if [ -z "$APP_KEY" ] || ! echo "$APP_KEY" | grep -Eq '^base64:[A-Za-z0-9+/=]{43}$'; then \
+        if [ -z "$APP_KEY" ] || ! echo "$APP_KEY" | grep -Eq '^base64:[A-Za-z0-9+/=]{44}$'; then \
             echo "APP_KEY is not set or invalid ($APP_KEY). Generating a new APP_KEY..."; \
             php artisan key:generate --ansi; \
         else \
