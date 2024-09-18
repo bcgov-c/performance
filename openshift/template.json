@@ -242,7 +242,7 @@
                     "value": "${APP_NAME}"
                   },
                   {
-                    "name": "SITE_URL",
+                    "name": "APP_URL",
                     "value": "https://${SITE_URL}"
                   },
                   {
