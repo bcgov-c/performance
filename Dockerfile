@@ -11,7 +11,7 @@ FROM composer:2.2 AS composer
 # trunk-ignore(hadolint/DL3006)
 FROM ${DOCKER_FROM_IMAGE}
 
-ARG APP_KEY
+ARG APP_KEY_ARG
 
 USER www-data
 
@@ -171,13 +171,20 @@ USER www-data
 
 WORKDIR ${BUILD_DIR}
 
-# Check if APP_KEY is set and valid
-RUN if [ -z "$APP_KEY" ] || ! echo "$APP_KEY" | grep -Eq '^base64:[A-Za-z0-9+/=]{43}$'; then \
-			echo "APP_KEY is not set or invalid. Generating a new APP_KEY..."; \
-			php artisan key:generate --ansi; \
-		else \
-			echo "APP_KEY already exists."; \
-		fi
+# Check if APP_KEY_ARG or APP_KEY is set and valid
+RUN if [ -z "$APP_KEY_ARG" ] || ! echo "$APP_KEY_ARG" | grep -Eq '^base64:[A-Za-z0-9+/=]{43}$'; then \
+        echo "APP_KEY_ARG is not set or invalid ($APP_KEY_ARG). Checking APP_KEY..."; \
+        if [ -z "$APP_KEY" ] || ! echo "$APP_KEY" | grep -Eq '^base64:[A-Za-z0-9+/=]{43}$'; then \
+            echo "APP_KEY is not set or invalid ($APP_KEY). Generating a new APP_KEY..."; \
+            php artisan key:generate --ansi; \
+        else \
+            echo "APP_KEY is valid in env. Using existing APP_KEY."; \
+            echo "APP_KEY=$APP_KEY" >> .env; \
+        fi; \
+    else \
+        echo "APP_KEY_ARG is valid. Using APP_KEY_ARG as APP_KEY."; \
+        echo "APP_KEY=$APP_KEY_ARG" >> .env; \
+    fi
 
 # This won't work here, as we're migrating files to www after deployment
 # WORKDIR /var/www
