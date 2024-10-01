@@ -55,7 +55,7 @@ async function runLighthouse(url, options, config = null) {
   if (!passwordField) {
     throw new Error('No element found for selector: #admin-login input[name="password"]');
   }
-  await page.type('#password', password);
+  await page.type('#admin-login', password);
 
   await page.screenshot({path: 'before_login_click.png'}); // Take a screenshot before clicking the login button
   const content = await page.content();
