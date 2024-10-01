@@ -7,12 +7,33 @@ const options = {
 };
 const testURL = 'https://' + process.env.APP_HOST_URL + '/login'
 
+async function isSiteAvailable(url, timeout = 300000, interval = 10000) {
+  const startTime = Date.now();
+  while (Date.now() - startTime < timeout) {
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        return true;
+      }
+    } catch (error) {
+      // Ignore errors and continue retrying
+    }
+    await new Promise(resolve => setTimeout(resolve, interval));
+  }
+  throw new Error(`Site ${url} is not available after ${timeout / 1000} seconds`);
+}
+
 async function runLighthouse(url, options, config = null) {
-  // Import chrome-launcher
+  // Wait for the site to be available
+  await isSiteAvailable(url);
+
+  // Use Puppeteer to launch a browser and perform the login
+  const { launch } = await import('chrome-launcher');
+
+  // Detect encoding issues/warnings in returned HTML
   const detectEncodingIssues = ['â', '€', '™', 'Â', 'œ', ''];
   let errors = new Array();
   let warnings = new Array();
-  const { launch } = await import('chrome-launcher');
 
   // Launch a new Chrome instance
   const chrome = await launch({chromeFlags: ['--headless']});
