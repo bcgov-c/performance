@@ -59,7 +59,7 @@ class AuthenticatedSessionController extends Controller
         // Write to access log
         \App\Models\AccessLog::create([
             'user_id' => $user->id,
-            'login_at' => Carbon::now(), 
+            'login_at' => Carbon::now(),
             'login_ip' => $request->getClientIp(),
             'login_method' => 'Laravel UI',
        ]);
@@ -112,7 +112,7 @@ class AuthenticatedSessionController extends Controller
             }
         }
 
-        // Step 1: find the Authenicated User by GUID 
+        // Step 1: find the Authenicated User by GUID
         // $isUser = User::where('source_type', 'HCM')
         //                 ->where('guid', $guid)
         //                 ->where('acctlock', 0)->first();
@@ -132,7 +132,7 @@ class AuthenticatedSessionController extends Controller
         } else {
             return false;
         }
-        
+
     }
 
     protected function assignSupervisorRole(User $user)
@@ -143,7 +143,7 @@ class AuthenticatedSessionController extends Controller
         $isManager = false;
         $hasSharedProfile = false;
 
-        // To determine the login user whether is manager or not 
+        // To determine the login user whether is manager or not
         $mgr = User::where('reporting_to', $user->id)->first();
         if ($mgr) {
             $isManager = true;

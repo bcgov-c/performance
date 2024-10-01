@@ -44,16 +44,16 @@ async function runLighthouse(url, options, config = null) {
   }
 
   // Check if the username field exists
-  const usernameField = await page.$('input[name="email"]');
+  const usernameField = await page.$('#admin-login input[name="email"]');
   if (!usernameField) {
-    throw new Error('No element found for selector: #username');
+    throw new Error('No element found for selector: #admin-login input[name="email"]');
   }
   await usernameField.type(username);
 
   // Check if the password field exists
-  const passwordField = await page.$('input[name="password"]');
+  const passwordField = await page.$('#admin-login input[name="password"]');
   if (!passwordField) {
-    throw new Error('No element found for selector: #password');
+    throw new Error('No element found for selector: #admin-login input[name="password"]');
   }
   await page.type('#password', password);
 
@@ -63,7 +63,7 @@ async function runLighthouse(url, options, config = null) {
 
   // Wait for both the click and navigation
   await Promise.all([
-    page.click('button[type="submit"]'),
+    page.click('#admin-login button[type="submit"]'),
     page.waitForNavigation({timeout: 60000}),
   ]);
 

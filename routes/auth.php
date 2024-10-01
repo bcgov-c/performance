@@ -16,13 +16,11 @@ use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\KeycloakLoginController;
 
-
-
 Route::get('login/{provider}', [KeycloakLoginController::class, 'redirectToProvider'])
-                 ->middleware('guest')->name('keycloak-login');
+    ->middleware('guest')->name('keycloak-login');
 Route::get('login/{provider}/callback', [KeycloakLoginController::class, 'handleProviderCallback']);
 Route::post('/logout', [KeycloakLoginController::class, 'destroy'])
-                ->middleware('auth')->name('logout');
+    ->middleware('auth')->name('logout');
 
 //Route::get('/login/microsoft', [AzureLoginController::class, 'login'])->name('ms-login');
 
@@ -37,22 +35,22 @@ Route::post('/logout', [KeycloakLoginController::class, 'destroy'])
 //                 //->middleware('auth')
 //                 ->name('logout');
 
-/* 
+/*
 Route::get('/register', [RegisteredUserController::class, 'create'])
                 ->middleware('guest')
                 ->name('register');
 
 Route::post('/register', [RegisteredUserController::class, 'store'])
-                ->middleware('guest'); 
+                ->middleware('guest');
 */
 
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])
-                ->middleware('guest')
-                ->name('login');
+    ->middleware('guest')
+    ->name('login');
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])
-                ->middleware('guest');
-/* 
+    ->middleware('guest');
+/*
 Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
                 ->middleware('guest')
                 ->name('password.request');

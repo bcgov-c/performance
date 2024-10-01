@@ -233,7 +233,7 @@ jobs:
         uses: browser-actions/setup-chrome@latest
         with:
           install-dependencies: false
-      - name: Lighthouse
+      - name: Run Lighthouse Tests
         id: lighthouse
         run: |
           sleep 120 # Wait for the deployment to be ready
