@@ -63,6 +63,7 @@ jobs:
       IMAGE_PULL_SECRET_NAME: ${{ env.IMAGE_PULL_SECRET_NAME }}
       IMAGE_REPO_URL: ${{ env.IMAGE_REPO_URL }}
       BUILD_NAMESPACE: ${{ github.ref_name }}
+      DB_USER: ${{ env.DB_USER }}
       DB_NAME: ${{ env.DB_NAME }}
       DB_DATABASE: ${{ env.DB_DATABASE }}
       SECRET_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
