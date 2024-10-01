@@ -60,6 +60,8 @@ async function runLighthouse(url, options, config = null) {
 
   await page.goto(url, { waitUntil: 'networkidle0' }); // Use the APP_HOST_URL environment variable
 
+  page.click('a.sysadmin-login');
+
   // Check that the username and password are set and are strings
   if (typeof username !== 'string' || typeof password !== 'string') {
     throw new Error('TESTER_USERNAME (' + username + ') and TESTER_PASSWORD must be set and must be strings');
@@ -85,7 +87,6 @@ async function runLighthouse(url, options, config = null) {
 
   // Wait for both the click and navigation
   await Promise.all([
-    page.click('a.sysadmin-login'),
     page.click('#admin-login button[type="submit"]'),
     page.waitForNavigation({timeout: 60000}),
   ]);
