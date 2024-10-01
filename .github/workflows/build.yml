@@ -244,6 +244,8 @@ jobs:
           TESTER_PASSWORD: ${{ secrets.TESTER_PASSWORD }}
       - name: Run SSL Certificate Test
         id: ssl-test
+        env:
+          APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_NAME }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
         run: |
           # Perform SSL check
           SSL_EXPIRY_DAYS=$(node -e "
@@ -253,8 +255,6 @@ jobs:
               .catch(err => console.error(err));
           ")
           echo "SSL_EXPIRY_DAYS=$SSL_EXPIRY_DAYS" >> $GITHUB_ENV
-        env:
-          APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_NAME }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
       - name: Set SSL Check Output
         id: ssl-output
         run: echo "SSL_EXPIRY_DAYS=${{ env.SSL_EXPIRY_DAYS }}" >> $GITHUB_OUTPUT
