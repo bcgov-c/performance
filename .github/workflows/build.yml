@@ -214,6 +214,7 @@ jobs:
     needs: [checkEnv, call-deploy-workflow]
     outputs:
       LHRESULT: ${{ steps.lighthouse.outputs.LHRESULT }}
+      SSL_EXPIRY_DAYS: ${{ steps.ssl-output.outputs.SSL_EXPIRY_DAYS }}
     if: |
       always() &&
       (
@@ -224,8 +225,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: mkdir -p tmp/artifacts
-      - name: Install Puppeteer and Lighthouse
-        run: npm install puppeteer lighthouse
+      - name: Install Puppeteer and Lighthouse and SSL Checker
+        run: npm install puppeteer lighthouse node-fetch ssl-checker
       - name: Install dependencies
         run: sudo apt-get install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget libgbm-dev
       - name: Setup Chrome
@@ -242,6 +243,26 @@ jobs:
           APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_NAME }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
           TESTER_USERNAME: ${{ secrets.TESTER_USERNAME }}
           TESTER_PASSWORD: ${{ secrets.TESTER_PASSWORD }}
+      - name: Run SSL Certificate Test
+        id: ssl-test
+        run: |
+          # Run your existing Lighthouse checks
+          node lighthouse-auth.js
+
+          # Perform SSL check
+          SSL_EXPIRY_DAYS=$(node -e "
+            const sslChecker = require('ssl-checker');
+            sslChecker(process.env.APP_HOST_URL, { method: 'GET', port: 443 })
+              .then(info => console.log(info.daysRemaining))
+              .catch(err => console.error(err));
+          ")
+
+          echo "SSL_EXPIRY_DAYS=$SSL_EXPIRY_DAYS" >> $GITHUB_ENV
+        env:
+          APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_NAME }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
+      - name: Set SSL Check Output
+        id: ssl-output
+        run: echo "SSL_EXPIRY_DAYS=${{ env.SSL_EXPIRY_DAYS }}" >> $GITHUB_OUTPUT
       - name: Archive artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -315,6 +336,9 @@ jobs:
                 },{
                   "title": "Lighthouse Test Results:",
                   "value": "${{ needs.lighthouse-check.outputs.LHRESULT }}"
+                },{
+                  "title": "SSL Certificate Expiry",
+                  "value": "SSL certificate will expire in ${{ needs.lighthouse-check.outputs.SSL_EXPIRY_DAYS }} days."
                 }]
               }]
             }
