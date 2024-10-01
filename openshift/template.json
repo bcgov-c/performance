@@ -17,21 +17,6 @@
   },
   "objects": [
     {
-			"apiVersion": "v1",
-			"kind": "Secret",
-			"metadata": {
-				"annotations": {
-					"template.openshift.io/expose-password": "{.data['database-password']}"
-				},
-				"name": "${APP_NAME}-secrets"
-			},
-			"stringData": {
-        "database-user": "${DB_USER}",
-				"database-password": "${DB_PASSWORD}",
-        "database-name": "${DB_DATABASE}"
-			}
-    },
-    {
       "apiVersion": "v1",
       "kind": "PersistentVolumeClaim",
       "metadata": {
