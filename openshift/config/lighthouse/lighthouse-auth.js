@@ -1,8 +1,4 @@
 const puppeteer = require('puppeteer');
-const fetch = require('node-fetch');
-const sslChecker = require('ssl-checker');
-
-const fs = require('fs').promises;
 const {URL} = require('url');
 const options = {
   chromeFlags: ['--headless'],
@@ -84,15 +80,6 @@ async function runLighthouse(url, options, config = null) {
   }
 
   await page.screenshot({path: 'after_login_click.png'}); // Take a screenshot after clicking the login button
-
-  // SSL Certificate Check
-  const sslInfo = await sslChecker(process.env.APP_HOST_URL, { method: 'GET', port: 443 });
-  const daysRemaining = sslInfo.daysRemaining;
-  if (daysRemaining < 90) {
-    console.log(`⚠️ SSL certificate for ${process.env.APP_HOST_URL} will expire in ${daysRemaining} days.`);
-  } else {
-    console.log(`✔️ SSL certificate for ${process.env.APP_HOST_URL} will expire in ${daysRemaining} days.`);
-  }
 
   // Define the paths you want to navigate
   const paths = [
