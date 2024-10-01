@@ -298,9 +298,9 @@ jobs:
         id: ssl-status-emoji
         run: |
           if [[ "${{ needs.lighthouse-check.outputs.SSL_EXPIRY_DAYS }}" -lt ${{ env.SSL_EXPIRY_NOTICE_DAYS }} ]]; then
-            echo "SSL_TEST_RESULT=:warn: Warning! SSL Certificate will EXPIRE in ${{ needs.lighthouse-check.outputs.SSL_EXPIRY_DAYS }} days." >> $GITHUB_OUTPUT
+            echo "SSL_TEST_RESULT=:warn: Warning! SSL Certificate will EXPIRE in ${{ needs.lighthouse-check.outputs.SSL_EXPIRY_DAYS }} days." >> $GITHUB_ENV
           else
-            echo "SSL_TEST_RESULT=:check: SSL Certificat EXPIRES in ${{ needs.lighthouse-check.outputs.SSL_EXPIRY_DAYS }} days." >> $GITHUB_OUTPUT
+            echo "SSL_TEST_RESULT=:check: SSL Certificat EXPIRES in ${{ needs.lighthouse-check.outputs.SSL_EXPIRY_DAYS }} days." >> $GITHUB_ENV
           fi
       - name: 📫 Send Notification
         uses: muinmomin/webhook-action@v1.0.0
@@ -337,7 +337,7 @@ jobs:
                   "value": "${{ needs.lighthouse-check.outputs.LHRESULT }}"
                 },{
                   "title": "SSL Certificate Expiry:",
-                  "value": "${{ steps.notification-emoji.outputs.SSL_TEST_RESULT }}"
+                  "value": "${{ env.SSL_TEST_RESULT }}"
                 }]
               }]
             }
