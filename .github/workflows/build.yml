@@ -7,6 +7,9 @@ concurrency:
 env:
   USER: ${{ github.actor }}
 
+  # Number of days in Advance to warn of SSL certificate expiry
+  SSL_EXPIRY_NOTICE_DAYS: 200 # Using long period to test notification on issue detected
+
   # Skip builds for faster deployments / testing ("YES" or build)
   SKIP_BUILDS: "YES"
   SKIP_DEPLOY: "YES"
@@ -14,10 +17,6 @@ env:
   CLEAN_BUILDS: "NO"
   BUILD_ID: ${{ github.event.number }}
   INSPECT_JOB_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-
-  BUILD_ICON_URL: https://cdn-icons-png.flaticon.com/128/5110/5110294.png
-  SUCCESS_ICON_URL: https://cdn-icons-png.flaticon.com/128/1356/1356479.png
-  FAIL_ICON_URL: https://www.flaticon.com/free-icon/rocket_6818114
 
 on:
   schedule:
@@ -291,13 +290,21 @@ jobs:
         with:
           name: lighthouse-artifacts
           path: artifacts
-      - name: Set Emoji for Notification Status Icon
+      - name: Set Emoji for SSL Status Icon
         id: notification-emoji
         run: |
-          if [[ "${{ needs.call-deploy-workflow.result }}" == "success" ]]; then
+          if [[ "${{ needs.lighthouse-check.result }}" == "success" ]]; then
             `echo "EMOJI=:rocket:" >> $GITHUB_OUTPUT`
+            else
+              `echo "EMOJI=:boom:" >> $GITHUB_OUTPUT`
+            fi
+      - name: Set Emoji for Notification Status Icon
+        id: ssl-status-emoji
+        run: |
+          if [[ "${{ needs.lighthouse-check.outputs.SSL_EXPIRY_DAYS }}" < ${{ env.SSL_EXPIRY_NOTICE_DAYS }} ]]; then
+            `echo "SSL_TEST_RESULT=:warn: Warning! SSL Certificate will EXPIRE in ${{ needs.lighthouse-check.outputs.SSL_EXPIRY_DAYS }} days." >> $GITHUB_OUTPUT`
           else
-            `echo "EMOJI=:boom:" >> $GITHUB_OUTPUT`
+            `echo "SSL_TEST_RESULT=:check: SSL Certificat EXPIRES in ${{ needs.lighthouse-check.outputs.SSL_EXPIRY_DAYS }} days." >> $GITHUB_OUTPUT`
           fi
       - name: 📫 Send Notification
         uses: muinmomin/webhook-action@v1.0.0
@@ -333,8 +340,8 @@ jobs:
                   "title": "Lighthouse Test Results:",
                   "value": "${{ needs.lighthouse-check.outputs.LHRESULT }}"
                 },{
-                  "title": "SSL Certificate Expiry",
-                  "value": "SSL certificate will expire in ${{ needs.lighthouse-check.outputs.SSL_EXPIRY_DAYS }} days."
+                  "title": "SSL Certificate Expiry:",
+                  "value": "${{ steps.notification-emoji.outputs.SSL_TEST_RESULT }}"
                 }]
               }]
             }
