@@ -64,7 +64,7 @@ async function runLighthouse(url, options, config = null) {
   // Wait for both the click and navigation
   await Promise.all([
     page.click('a.sysadmin-login'),
-    page.waitForNavigation({timeout: 100}),
+    page.waitForNavigation({timeout: 10000}),
     page.click('#admin-login button[type="submit"]'),
     page.waitForNavigation({timeout: 60000}),
   ]);
