@@ -8,11 +8,11 @@ env:
   USER: ${{ github.actor }}
 
   # Number of days in Advance to warn of SSL certificate expiry
-  SSL_EXPIRY_NOTICE_DAYS: 200 # Using long period to test notification on issue detected
+  SSL_EXPIRY_NOTICE_DAYS: 15
 
   # Skip builds for faster deployments / testing ("YES" or build)
-  SKIP_BUILDS: "YES"
-  SKIP_DEPLOY: "YES"
+  SKIP_BUILDS: "No"
+  SKIP_DEPLOY: "No"
   # Clean builds before deployments (delete all resources, other than backups) ("YES" or allow collisions)
   CLEAN_BUILDS: "NO"
   BUILD_ID: ${{ github.event.number }}
