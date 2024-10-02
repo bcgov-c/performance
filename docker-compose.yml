@@ -80,12 +80,12 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "php-fpm-healthcheck"]
       interval: 10s
-      timeout: 5s
-      retries: 5
+      timeout: 10s
+      retries: 20
   web:
     depends_on:
       php:
-        condition: service_healthy
+        condition: service_started
     image: ${WEB_IMAGE:-nginxinc/nginx-unprivileged:1.27.1-alpine-slim}
     ports:
       - "8080:8080"
