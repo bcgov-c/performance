@@ -8,7 +8,7 @@ if [[ `oc describe secret $APP_NAME-secrets 2>&1` =~ "NotFound" ]]; then
 
   echo "Creating... $APP_NAME-secrets"
 
-  ecat <<EOF > secrets.yml
+  cat <<EOF > secrets.yml
   kind: Secret
   apiVersion: v1
   metadata:
