@@ -656,7 +656,7 @@
       "displayName": "Volume Capacity",
       "name": "VOLUME_CAPACITY",
       "required": true,
-      "value": "10Gi"
+      "value": "1Gi"
     },
     {
       "description": "Volume for storing file backups",

@@ -28,4 +28,12 @@ Ensure the following environment variables are set (included in .env.example):
 - TESTER_USERNAME,
 - TESTER_PASSWORD
 
+Note that NODE_ENV=development is required for local tetsing
+Prerequisites are installed as devDependencies for node in package.json
+Or use:
+
+`$ npm config set -g production false`
+
+Run lighthouse test script
+
 `$ node ./openshift/config/lighthouse/lighthouse-auth.js`
