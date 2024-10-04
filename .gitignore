@@ -3,7 +3,8 @@ public/hot
 storage/*.key
 vendor
 temp/var/www/*
-temp/db-backups/*
+tmp
+temp
 .env.backup
 .env
 .phpunit.result.cache

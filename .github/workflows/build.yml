@@ -93,7 +93,7 @@ jobs:
           sparse-checkout: |
             openshift/config/mariadb
             example.env
-            example.versions.env
+            .env.example.versions
 
       - name: Setup Env Vars
         id: dotenv
@@ -107,7 +107,7 @@ jobs:
         id: dotenv_versions
         uses: falti/dotenv-action@v1
         with:
-          path: example.versions.env
+          path: .env.example.versions
           export-variables: true
           keys-case: upper
 
@@ -299,9 +299,9 @@ jobs:
         id: ssl-status-emoji
         run: |
           if [[ "${{ needs.lighthouse-check.outputs.SSL_EXPIRY_DAYS }}" -lt ${{ env.SSL_EXPIRY_NOTICE_DAYS }} ]]; then
-            echo "SSL_TEST_RESULT=:warning: Warning! SSL Certificate will EXPIRE in ${{ needs.lighthouse-check.outputs.SSL_EXPIRY_DAYS }} days." >> $GITHUB_ENV
+            echo "SSL_TEST_RESULT=:warning: Warning! SSL Certificate EXPIRES in ${{ needs.lighthouse-check.outputs.SSL_EXPIRY_DAYS }} days." >> $GITHUB_ENV
           else
-            echo "SSL_TEST_RESULT=:white_check_mark: SSL Certificat EXPIRES in ${{ needs.lighthouse-check.outputs.SSL_EXPIRY_DAYS }} days." >> $GITHUB_ENV
+            echo "SSL_TEST_RESULT=:white_check_mark: SSL Certificate expires in ${{ needs.lighthouse-check.outputs.SSL_EXPIRY_DAYS }} days." >> $GITHUB_ENV
           fi
       - name: 📫 Send Notification
         uses: muinmomin/webhook-action@v1.0.0

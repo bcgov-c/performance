@@ -42,7 +42,7 @@ jobs:
         id: dotenv_versions
         uses: falti/dotenv-action@v1
         with:
-          path: example.versions.env
+          path: .env.example.versions
           export-variables: true
           keys-case: upper
 
