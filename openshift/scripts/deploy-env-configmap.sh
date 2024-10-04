@@ -2,7 +2,7 @@ oc project $OC_PROJECT
 
 # Create a temporary file with substituted environment variables
 TEMP_ENV_FILE=$(mktemp)
-envsubst < ./example.env > $TEMP_ENV_FILE
+envsubst < ./.env.example > $TEMP_ENV_FILE
 
 if [[ `oc describe configmap $APP_NAME-env 2>&1` =~ "NotFound" ]]; then
   # Nothing to delete

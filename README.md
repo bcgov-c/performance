@@ -22,7 +22,7 @@ Create a temporary directory:
 `$ mkdir -p tmp/artifacts`
 
 To run lighthouse test(s) using puppeteer in node locally,
-Ensure the following environment variables are set (included in example.env):
+Ensure the following environment variables are set (included in .env.example):
 
 - APP_HOST_URL,
 - TESTER_USERNAME,

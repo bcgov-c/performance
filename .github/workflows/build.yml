@@ -92,14 +92,14 @@ jobs:
           ref: ${{ github.ref_name }}
           sparse-checkout: |
             openshift/config/mariadb
-            example.env
+            .env.example
             .env.example.versions
 
       - name: Setup Env Vars
         id: dotenv
         uses: falti/dotenv-action@v1
         with:
-          path: example.env
+          path: .env.example
           export-variables: true
           keys-case: upper
 

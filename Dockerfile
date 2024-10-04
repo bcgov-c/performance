@@ -72,7 +72,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 # Copy application files
 WORKDIR ${BUILD_DIR}
 COPY . ${BUILD_DIR}
-COPY example.env ${BUILD_DIR}/.env
+COPY .env.example ${BUILD_DIR}/.env
 RUN chmod 644 ${BUILD_DIR}/.env
 
 # COPY the PHP extension installer with curl using root permissions

@@ -23,7 +23,7 @@ jobs:
           ref: ${{ github.ref_name }}
           sparse-checkout: |
             openshift/config/nginx
-            example.env
+            .env.example
             .env.example.versions
 
       # Login to Artifactory
@@ -38,7 +38,7 @@ jobs:
         id: dotenv
         uses: falti/dotenv-action@v1
         with:
-          path: example.env
+          path: .env.example
           export-variables: true
           keys-case: upper
 
