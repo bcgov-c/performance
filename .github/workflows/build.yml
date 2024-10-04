@@ -18,6 +18,8 @@ env:
   BUILD_ID: ${{ github.event.number }}
   INSPECT_JOB_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
+  APP_HOST_URL: ${{ vars.APP_HOST_URL }}
+
 on:
   schedule:
     - cron: "0 3 * * 6"
@@ -163,7 +165,7 @@ jobs:
     if: needs.checkEnv.outputs.CLEAN_BUILDS == 'YES'
     with:
       APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
-      APP_HOST_URL: ${{ env.APP_HOST_URL }}
+      APP_HOST_URL: ${{ vars.APP_HOST_URL }}
       DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}
       DB_NAME: ${{ needs.checkEnv.outputs.DB_NAME }}
       WEB_NAME: ${{ needs.checkEnv.outputs.WEB_NAME }}
@@ -201,7 +203,7 @@ jobs:
       CRON_NAME: ${{ needs.checkEnv.outputs.CRON_NAME }}
       REDIS_IMAGE: ${{ needs.checkEnv.outputs.REDIS_IMAGE }}
       REDIS_NAME: ${{ needs.checkEnv.outputs.REDIS_NAME }}
-      APP_HOST_URL: ${{ env.APP_HOST_URL }}
+      APP_HOST_URL: ${{ vars.APP_HOST_URL }}
       BUILD_NAMESPACE: ${{ needs.checkEnv.outputs.BUILD_NAMESPACE }}
       DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}
       IMAGE_REPO_URL: ${{ needs.checkEnv.outputs.IMAGE_REPO_URL }}
