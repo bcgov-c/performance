@@ -32,6 +32,9 @@ on:
       REDIS_NAME:
         required: true
         type: string
+      DB_BACKUP_DEPLOYMENT_NAME:
+        required: true
+        type: string
     secrets:
       SA_TOKEN:
         required: true
@@ -277,10 +280,10 @@ jobs:
       - name: 🧹️ Clean Backups
         id: clean-backups
         run: |
-          if [[ `helm status ${{ DB_BACKUP_DEPLOYMENT_NAME }} 2>&1` =~ "STATUS: deployed" ]] || [[ `helm status ${{ DB_BACKUP_DEPLOYMENT_NAME }} 2>&1` =~ "Error: release: not found" ]]; then
+          if [[ `helm status ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }} 2>&1` =~ "STATUS: deployed" ]] || [[ `helm status ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }} 2>&1` =~ "Error: release: not found" ]]; then
             echo "backup NOT FOUND: Skipping..."
           else
             echo "backup FOUND: Cleaning resources..."
-            helm uninstall ${{ DB_BACKUP_DEPLOYMENT_NAME }}
+            helm uninstall ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}
             # echo "UNINSTALLED backup"
           fi
