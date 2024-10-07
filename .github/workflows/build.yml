@@ -11,8 +11,8 @@ env:
   SSL_EXPIRY_NOTICE_DAYS: 15
 
   # Skip builds for faster deployments / testing ("YES" or build)
-  SKIP_BUILDS: "No"
-  SKIP_DEPLOY: "No"
+  SKIP_BUILDS: "YES"
+  SKIP_DEPLOY: "NO"
   # Clean builds before deployments (delete all resources, other than backups) ("YES" or allow collisions)
   CLEAN_BUILDS: "NO"
   BUILD_ID: ${{ github.event.number }}
