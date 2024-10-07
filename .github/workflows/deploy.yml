@@ -192,7 +192,6 @@ jobs:
           DB_DATABASE: ${{ inputs.DB_DATABASE }}
           DB_USER: ${{ inputs.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          APP_HOST_URL: ${{ inputs.APP_HOST_URL }}
           BUILD_NAMESPACE: ${{ inputs.BUILD_NAMESPACE }}
           DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
           WEB_NAME: ${{ inputs.WEB_NAME }}
