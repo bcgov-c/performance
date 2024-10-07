@@ -228,7 +228,7 @@
                   },
                   {
                     "name": "APP_URL",
-                    "value": "https://${SITE_URL}"
+                    "value": "${SITE_URL}"
                   },
                   {
                     "name": "DB_USER",
@@ -399,7 +399,7 @@
                   },
                   {
                     "name": "SITE_URL",
-                    "value": "https://${SITE_URL}"
+                    "value": "${SITE_URL}"
                   },
                   {
                     "name": "DB_USER",

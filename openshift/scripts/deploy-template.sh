@@ -4,6 +4,7 @@
 test -n $DEPLOY_NAMESPACE
 oc project $DEPLOY_NAMESPACE
 echo "Current namespace is $DEPLOY_NAMESPACE"
+echo "Deploying site: $SITE_URL"
 
 # Create secret, if it doesn't exist yet
 oc create secret docker-registry $IMAGE_PULL_SECRET_NAME \
