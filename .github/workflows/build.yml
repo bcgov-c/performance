@@ -18,9 +18,6 @@ env:
   BUILD_ID: ${{ github.event.number }}
   INSPECT_JOB_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-  # Set in GitHub: settings/environments/[environment] -> environment variables
-  APP_HOST_URL: ${{ vars.APP_HOST_URL }}
-
 on:
   schedule:
     - cron: "0 3 * * 6"
@@ -60,6 +57,9 @@ jobs:
     name: 📋 Environment Check
     runs-on: ubuntu-latest
     outputs: # Define the output parameter
+      # Set in GitHub: settings/environments/[environment] -> environment variables
+      APP_HOST_URL: ${{ vars.APP_HOST_URL }}
+
       APP_NAME: ${{ env.APP_NAME }}
       DEPLOY_NAMESPACE: ${{ github.ref_name }}
       IMAGE_REPO_DOMAIN: ${{ env.IMAGE_REPO_DOMAIN }}
@@ -166,7 +166,7 @@ jobs:
     if: needs.checkEnv.outputs.CLEAN_BUILDS == 'YES'
     with:
       APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
-      APP_HOST_URL: ${{ vars.APP_HOST_URL }}
+      APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_HOST_URL }}
       DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}
       DB_NAME: ${{ needs.checkEnv.outputs.DB_NAME }}
       WEB_NAME: ${{ needs.checkEnv.outputs.WEB_NAME }}
@@ -186,7 +186,7 @@ jobs:
       !contains(needs.*.result, 'cancelled')
     with:
       APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
-      SITE_URL: ${{ vars.APP_HOST_URL }}
+      SITE_URL: ${{ needs.checkEnv.outputs.APP_HOST_URL }}
       WEB_NAME: ${{ needs.checkEnv.outputs.WEB_NAME }}
       WEB_IMAGE: ${{ needs.checkEnv.outputs.WEB_IMAGE }}
       PHP_NAME: ${{ needs.checkEnv.outputs.PHP_NAME }}
@@ -242,13 +242,13 @@ jobs:
         run: |
           `echo "LHRESULT=$(node openshift/config/lighthouse/lighthouse-auth.js)" >> $GITHUB_OUTPUT`
         env:
-          APP_HOST_URL: ${{ env.APP_HOST_URL }}
+          APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_HOST_URL }}
           TESTER_USERNAME: ${{ secrets.TESTER_USERNAME }}
           TESTER_PASSWORD: ${{ secrets.TESTER_PASSWORD }}
       - name: Run SSL Certificate Test
         id: ssl-test
         env:
-          APP_HOST_URL: ${{ env.APP_HOST_URL }}
+          APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_HOST_URL }}
         run: |
           # Perform SSL check
           SSL_EXPIRY_DAYS=$(node -e "
@@ -309,7 +309,7 @@ jobs:
       - name: 📫 Send Notification
         uses: muinmomin/webhook-action@v1.0.0
         env:
-          APP_HOST_URL: ${{ env.APP_HOST_URL }}
+          APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_HOST_URL }}
         with:
           url: ${{ secrets.ROCKETCHAT_WEBHOOK_URL }}
           data: >
@@ -321,7 +321,7 @@ jobs:
                 "title_link": "${{ env.INSPECT_JOB_URL }}",
                 "fields": [{
                   "title": "Verify Deployment",
-                  "value": "Verify that the site still works and updates have been completed (Admin access required) https://${{ env.APP_HOST_URL }}/admin/index.php"
+                  "value": "Verify that the site still works and updates have been completed (Admin access required) https://${{ needs.checkEnv.outputs.APP_HOST_URL }}/admin/index.php"
                 },{
                   "title": "Build DB: ${{ needs.db.result }}"
                 },{
