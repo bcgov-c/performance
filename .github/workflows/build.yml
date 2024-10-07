@@ -205,7 +205,6 @@ jobs:
       CRON_NAME: ${{ needs.checkEnv.outputs.CRON_NAME }}
       REDIS_IMAGE: ${{ needs.checkEnv.outputs.REDIS_IMAGE }}
       REDIS_NAME: ${{ needs.checkEnv.outputs.REDIS_NAME }}
-      APP_HOST_URL: ${{ vars.APP_HOST_URL }}
       BUILD_NAMESPACE: ${{ needs.checkEnv.outputs.BUILD_NAMESPACE }}
       DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}
       IMAGE_REPO_URL: ${{ needs.checkEnv.outputs.IMAGE_REPO_URL }}
