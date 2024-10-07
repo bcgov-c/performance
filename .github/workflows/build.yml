@@ -13,8 +13,10 @@ env:
   # Skip builds for faster deployments / testing ("YES" or build)
   SKIP_BUILDS: "YES"
   SKIP_DEPLOY: "NO"
-  # Clean builds before deployments (delete all resources, other than backups) ("YES" or allow collisions)
+  # Clean builds before deployments will delete all resources (other than backups)
+  # Select "YES" or allow collisions and PVC persistence
   CLEAN_BUILDS: "YES"
+  CLEAN_PVC: "YES" # Careful, this one wil delete all PVCs, except for backups
   BUILD_ID: ${{ github.event.number }}
   INSPECT_JOB_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
@@ -61,6 +63,7 @@ jobs:
       # Set in GitHub: settings/environments/[environment] -> environment variables
       APP_HOST_URL: ${{ vars.APP_HOST_URL }}
 
+      CLEAN_PVC: ${{ env.CLEAN_PVC }}
       APP_NAME: ${{ env.APP_NAME }}
       DEPLOY_NAMESPACE: ${{ github.ref_name }}
       IMAGE_REPO_DOMAIN: ${{ env.IMAGE_REPO_DOMAIN }}
@@ -175,6 +178,7 @@ jobs:
       CRON_NAME: ${{ needs.checkEnv.outputs.CRON_NAME }}
       REDIS_NAME: ${{ needs.checkEnv.outputs.REDIS_NAME }}
       DB_BACKUP_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.DB_BACKUP_DEPLOYMENT_NAME }}
+      CLEAN_PVC: ${{ needs.checkEnv.outputs.CLEAN_PVC }}
 
   call-deploy-workflow:
     name: 🚀 Deploy

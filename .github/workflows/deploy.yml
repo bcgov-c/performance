@@ -185,6 +185,7 @@ jobs:
           DB_DATABASE: ${{ inputs.DB_DATABASE }}
           DB_PORT: ${{ inputs.DB_PORT }}
           OC_PROJECT: ${{ github.ref_name }}
+          CLEAN_PVC: ${{ inputs.CLEAN_PVC }}
 
       - name: Deploy Template and Run Upgrades
         if: success()

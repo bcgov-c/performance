@@ -8,6 +8,9 @@ env:
 on:
   workflow_call:
     inputs:
+      CLEAN_PVC:
+        required: true
+        type: string
       APP_NAME:
         required: true
         type: string
@@ -107,20 +110,33 @@ jobs:
             oc scale sts/${{ inputs.DB_NAME }} --replicas=0
             sleep 10
             oc delete sts/${{ inputs.DB_NAME }}
-            # for i in 0 1 2; do
-            #   if ! [[ `oc describe pvc datadir-${{ inputs.DB_NAME }}-$i 2>&1` =~ "NotFound" ]]; then
-            #     kubectl delete pvc datadir-${{ inputs.DB_NAME }}-$i;
-            #   else
-            #     echo "pvc datadir-${{ inputs.DB_NAME }}-$i NOT FOUND: Skipping..."
-            #   fi
-            # done
           fi
-          if ! [[ `oc describe configmap $configmap_name 2>&1` =~ "NotFound" ]]; then
-            oc delete configmap $configmap_name
+          if ! [[ `oc describe configmap/$configmap_name 2>&1` =~ "NotFound" ]]; then
+            oc delete configmap/$configmap_name
           fi
-          if ! [[ `oc describe service ${{ inputs.DB_NAME }} 2>&1` =~ "NotFound" ]]; then
+          if ! [[ `oc describe service/${{ inputs.DB_NAME }} 2>&1` =~ "NotFound" ]]; then
             oc delete service ${{ inputs.DB_NAME }}
           fi
+
+      - name: Clean Database PVCs if CLEAN_PVCs == YES"
+        if: inputs.CLEAN_PVC == 'YES'
+        run: |
+          echo "Cleaning up PVCs associated with StatefulSet '${{ inputs.DB_NAME }}'..."
+          # Get the list of pods associated with the StatefulSet '${{ inputs.DB_NAME }}'
+          PODS=$(oc get pods -l app=${{ inputs.DB_NAME }} -o jsonpath='{.items[*].metadata.name}')
+
+          # Loop through each pod and delete associated PVCs
+          for POD in $PODS; do
+            # Get the list of PVCs associated with the pod
+            PVCS=$(oc get pvc -o jsonpath="{.items[?(@.metadata.annotations['volume.beta.kubernetes.io/storage-provisioner']=='kubernetes.io/aws-ebs')].metadata.name}")
+
+            # Loop through each PVC and delete it
+            for PVC in $PVCS; do
+              echo "Deleting PVC: $PVC"
+              oc delete pvc $PVC
+            done
+          done
+          echo "PVC cleanup completed."
 
       - name: 🧹️ Clean ${{ inputs.WEB_NAME }}
         id: clean-web
