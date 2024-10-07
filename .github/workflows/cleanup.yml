@@ -56,7 +56,9 @@ jobs:
     if: |
       always()
       && (
-        github.ref_name == 'dev' || github.ref_name  == 'test'
+        github.ref_name == 'e66ac2-prod' ||
+        github.ref_name  == '332842-dev' ||
+        github.ref_name  == '332842-test'
       )
     outputs:
       clean1: ${{ steps.delete-from-os.outputs.clean1 }}

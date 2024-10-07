@@ -186,7 +186,8 @@ jobs:
       !contains(needs.*.result, 'failure') &&
       !contains(needs.*.result, 'cancelled') &&
       (
-        (needs.checkEnv.outputs.CLEAN_BUILDS.CLEAN_BUILDS == 'YES' && needs.call-cleanup-workflow.result == 'success') ||
+        (needs.checkEnv.outputs.CLEAN_BUILDS.CLEAN_BUILDS == 'YES' &&
+        needs.call-cleanup-workflow.result == 'success') ||
         needs.checkEnv.outputs.CLEAN_BUILDS.CLEAN_BUILDS != 'YES'
       )
     with:
