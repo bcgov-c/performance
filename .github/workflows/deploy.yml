@@ -144,20 +144,6 @@ jobs:
           APP_KEY: ${{ secrets.APP_KEY }}
           APP_URL: ${{ inputs.SITE_URL }}
 
-      - name: Deploy Backups via Helm
-        uses: WyriHaximus/github-action-helm3@v3
-        with:
-          exec: bash ./openshift/scripts/deploy-database-backups.sh
-        env:
-          DB_BACKUP_DEPLOYMENT_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}
-          DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
-          BACKUP_HELM_CHART: ${{ inputs.BACKUP_HELM_CHART }}
-          DB_BACKUP_IMAGE: ${{ inputs.BACKUP_IMAGE }}
-          DB_HOST: ${{ inputs.DB_HOST }}
-          DB_DATABASE: ${{ inputs.DB_DATABASE }}
-          DB_PORT: ${{ inputs.DB_PORT }}
-          OC_PROJECT: ${{ github.ref_name }}
-
       # Deploy Redis
       - name: Deploy Redis StatefulSet (${{ inputs.REDIS_NAME  }})
         if: success()
@@ -183,6 +169,21 @@ jobs:
           DB_NAME: ${{ inputs.DB_NAME }}
           DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
           DB_DATABASE: ${{ inputs.DB_DATABASE }}
+          OC_PROJECT: ${{ github.ref_name }}
+
+      - name: Deploy Backups via Helm
+        uses: WyriHaximus/github-action-helm3@v3
+        if: success()
+        with:
+          exec: bash ./openshift/scripts/deploy-database-backups.sh
+        env:
+          DB_BACKUP_DEPLOYMENT_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}
+          DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
+          BACKUP_HELM_CHART: ${{ inputs.BACKUP_HELM_CHART }}
+          DB_BACKUP_IMAGE: ${{ inputs.BACKUP_IMAGE }}
+          DB_HOST: ${{ inputs.DB_HOST }}
+          DB_DATABASE: ${{ inputs.DB_DATABASE }}
+          DB_PORT: ${{ inputs.DB_PORT }}
           OC_PROJECT: ${{ github.ref_name }}
 
       - name: Deploy Template and Run Upgrades

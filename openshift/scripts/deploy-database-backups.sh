@@ -1,3 +1,65 @@
+#!/bin/bash
+
+# Function to list available backups
+list_backups() {
+  echo "Listing available backups..."
+
+  # Connect to the backup pod and list available backups
+  BACKUP_LIST=$(oc exec $(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}') -- ./backup.sh -l)
+
+  # Parse the backup list into an array
+  IFS=$'\n' read -rd '' -a BACKUP_ARRAY <<< "$BACKUP_LIST"
+
+  # Filter and sort backups
+  FILTERED_SORTED_BACKUPS=$(for line in "${BACKUP_ARRAY[@]}"; do
+    # Extract size, date, and filename
+    SIZE=$(echo "$line" | awk '{print $1}')
+    DATE=$(echo "$line" | awk '{print $2 " " $3}')
+    FILENAME=$(echo "$line" | awk '{print $4}')
+
+    # Convert size to bytes for comparison
+    SIZE_IN_BYTES=$(echo "$SIZE" | awk '
+      /M$/ { printf "%.0f\n", $1 * 1024 * 1024 }
+      /K$/ { printf "%.0f\n", $1 * 1024 }
+      /G$/ { printf "%.0f\n", $1 * 1024 * 1024 * 1024 }
+      !/[KMG]$/ { print $1 }
+    ')
+
+    # Only include entries with size > 1M
+    if [ "$SIZE_IN_BYTES" -gt $((1 * 1024 * 1024)) ]; then
+      echo "$SIZE $DATE $FILENAME"
+    fi
+  done | sort -k2,3r)
+
+  # Select the latest backup
+  LATEST_BACKUP=$(echo "$FILTERED_SORTED_BACKUPS" | head -n 1)
+
+  # Output the size, date, and filename for the selected entry
+  echo "Selected Backup:"
+  echo "$LATEST_BACKUP"
+
+  # Return the filename of the selected backup
+  echo "$LATEST_BACKUP" | awk '{print $3}'
+}
+
+# Function to restore the backup by filename
+restore_backup() {
+  local FILENAME=$1
+  echo "Restoring backup from file: $FILENAME"
+
+  # Check the file extension and run the appropriate restore command
+  if [[ "$FILENAME" == *.gz ]]; then
+    # Run the restore command for .gz files
+    oc exec $(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}') -- ./backup.sh -r mariadb/$DB_DATABASE -f "$FILENAME"
+  elif [[ "$FILENAME" == *.sql ]]; then
+    # Run the SQL restore command for .sql files
+    oc exec $(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}') -- bash -c "mysql -h $DB_NAME -u root performance < $FILENAME"
+  else
+    echo "Unsupported file type: $FILENAME"
+    exit 1
+  fi
+}
+
 oc project $OC_PROJECT
 
 helm repo add bcgov http://bcgov.github.io/helm-charts
@@ -68,3 +130,120 @@ else
   helm install $DB_BACKUP_DEPLOYMENT_NAME $BACKUP_HELM_CHART --atomic --wait -f backup-config.yaml
   oc set image deployment/$DB_BACKUP_DEPLOYMENT_FULL_NAME backup-storage=$BACKUP_IMAGE
 fi
+
+if [[ `oc describe sts $DB_NAME 2>&1` =~ "NotFound" ]]; then
+  echo "$DB_NAME NOT FOUND: Beginning deployment..."
+  envsubst < ./openshift/config/mariadb/config.yaml | oc create -f -
+else
+  echo "$DB_NAME Installation found...Scaling to 0..."
+  oc scale sts/$DB_NAME --replicas=0
+
+  ATTEMPTS=0
+  MAX_ATTEMPTS=60
+  while [[ $(oc get sts $DB_NAME -o jsonpath='{.status.replicas}') -ne 0 && $ATTEMPTS -ne $MAX_ATTEMPTS ]]; do
+    echo "Waiting for $DB_NAME to scale to 0..."
+    sleep 10
+    ATTEMPTS=$((ATTEMPTS + 1))
+  done
+  if [[ $ATTEMPTS -eq $MAX_ATTEMPTS ]]; then
+    echo "Timeout waiting for $DB_NAME to scale to 0"
+    exit 1
+  fi
+
+  echo "Recreating $DB_NAME from image: $IMAGE_REPO_URL$DB_IMAGE"
+  oc delete sts $DB_NAME
+  oc delete configmap $DB_NAME
+  oc delete service $DB_NAME
+
+  # Create configmap from the resources directory
+  oc create configmap $DB_NAME --from-file=./openshift/config/mariadb/resources
+
+  # Substitute variables in the config.yaml file and create the deployment
+  envsubst < ./openshift/config/mariadb/config.yaml | oc create -f -
+
+  sleep 10
+
+  oc scale sts/$DB_NAME --replicas=1
+
+  sleep 15
+
+  # Wait for the deployment to scale to 1
+  ATTEMPTS=0
+  MAX_ATTEMPTS=60
+  while [[ $(oc get sts $DB_NAME -o jsonpath='{.status.replicas}') -ne 1 && $ATTEMPTS -ne $MAX_ATTEMPTS ]]; do
+    echo "Waiting for $DB_NAME to scale to 1..."
+    sleep 10
+    ATTEMPTS=$((ATTEMPTS + 1))
+  done
+  if [[ $ATTEMPTS -eq $MAX_ATTEMPTS ]]; then
+    echo "Timeout waiting for $DB_NAME to scale to 1"
+    exit 1
+  fi
+fi
+
+echo "Checking if the database is online and contains expected data..."
+ATTEMPTS=0
+WAIT_TIME=10
+MAX_ATTEMPTS=30 # wait up to 5 minutes
+
+# Get the name of the first pod in the StatefulSet
+DB_POD_NAME=""
+until [ -n "$DB_POD_NAME" ]; do
+  ATTEMPTS=$(( $ATTEMPTS + 1 ))
+  PODS=$(oc get pods -l app=$DB_NAME --field-selector=status.phase=Running -o jsonpath='{.items[*].metadata.name}')
+
+  if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
+    echo "Timeout waiting for the pod to have status.phase:Running. Exiting..."
+    exit 1
+  fi
+
+  if [ -z "$PODS" ]; then
+    echo "No pods in Running state found. Retrying in $WAIT_TIME seconds..."
+    sleep $WAIT_TIME
+  else
+    DB_POD_NAME=$(echo $PODS | awk '{print $1}')
+  fi
+done
+
+echo "Database pod found and running: $DB_POD_NAME."
+
+ATTEMPTS=0
+until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
+  ATTEMPTS=$(( $ATTEMPTS + 1 ))
+  echo "Waiting for database to come online... $(($ATTEMPTS * $WAIT_TIME)) seconds..."
+
+  # Capture the output of the mariadb command
+  OUTPUT=$(oc exec $DB_POD_NAME -- bash -c "mariadb -u root -e 'USE $DB_DATABASE; $DB_HEALTH_QUERY;'" 2>&1)
+
+  # Check if the output contains an error
+  if echo "$OUTPUT" | grep -qi "error"; then
+    echo "❌ Database error: $OUTPUT"
+    # exit 1
+  fi
+
+  # Extract the user count from the output
+  CURRENT_USER_COUNT=$(echo "$OUTPUT" | grep -oP '\d+')
+
+  # Check if CURRENT_USER_COUNT is set and greater than 0
+  if [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -gt 0 ]; then
+    echo "Database is online and contains $CURRENT_USER_COUNT users."
+    echo "No further action required."
+    break
+  else if [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -eq 0 ]; then
+    echo "Database is online but contains no users."
+
+    # Main script execution
+    echo "Starting backup restoration process..."
+    # List backups and get the filename of the latest backup
+    LATEST_BACKUP_FILENAME=$(list_backups)
+    # Restore the backup using the filename
+    restore_backup "$LATEST_BACKUP_FILENAME"
+    echo "Backup restoration process completed."
+
+    break
+  else
+    # Current user count is 0 or not set
+    # echo "Database appears to be offline. Attempt $ATTEMPTS of $MAX_ATTEMPTS."
+    sleep $WAIT_TIME
+  fi
+done
