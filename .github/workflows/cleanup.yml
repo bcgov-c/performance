@@ -33,11 +33,7 @@ on:
         required: true
         type: string
     secrets:
-      AUTH_TOKEN_DEV:
-        required: true
-      AUTH_TOKEN_TEST:
-        required: true
-      AUTH_TOKEN_PROD:
+      SA_TOKEN:
         required: true
 
 jobs:
