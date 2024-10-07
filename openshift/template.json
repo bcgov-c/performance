@@ -108,7 +108,7 @@
 			"apiVersion": "v1",
 			"kind": "Route",
 			"metadata": {
-        "name": "${WEB_NAME}",
+        "name": "${APP_NAME}-${WEB_NAME}",
         "namespace": "${DEPLOY_NAMESPACE}",
         "labels": {
           "service": "${WEB_NAME}"
@@ -118,7 +118,7 @@
         }
       },
       "spec": {
-        "host": "${SITE_URL}",
+        "host": "${APP_HOST_URL}",
         "to": {
           "kind": "Service",
           "name": "${WEB_NAME}",
@@ -614,6 +614,13 @@
       "name": "SITE_URL",
       "required": true,
       "value": "${SITE_URL}"
+    },
+    {
+      "description": "Application domain name.",
+      "displayName": "App Host URL",
+      "name": "APP_HOST_URL",
+      "required": true,
+      "value": "localhost"
     },
     {
       "description": "Web Service Name",
