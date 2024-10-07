@@ -14,7 +14,7 @@ env:
   SKIP_BUILDS: "YES"
   SKIP_DEPLOY: "NO"
   # Clean builds before deployments (delete all resources, other than backups) ("YES" or allow collisions)
-  CLEAN_BUILDS: "NO"
+  CLEAN_BUILDS: "YES"
   BUILD_ID: ${{ github.event.number }}
   INSPECT_JOB_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
