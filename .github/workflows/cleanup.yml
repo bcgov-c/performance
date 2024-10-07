@@ -3,7 +3,6 @@
 name: 🧹️ Clean-up
 
 env:
-  APP_NAME: ${{ github.repository }}
   USER: ${{ github.actor }}
 
 on:
@@ -40,12 +39,6 @@ on:
         required: true
       AUTH_TOKEN_PROD:
         required: true
-    outputs:
-      # This is the name of the output set by the workflow_dispatch action.
-      # The value is the ID of the workflow run that was triggered.
-      clean1:
-        description: "Clean log"
-        value: ${{ jobs.clean.outputs.output1 }}
 
 jobs:
   # Clean Openshift
@@ -60,8 +53,6 @@ jobs:
         github.ref_name  == '332842-dev' ||
         github.ref_name  == '332842-test'
       )
-    outputs:
-      clean1: ${{ steps.delete-from-os.outputs.clean1 }}
     steps:
       - name: 📤 Checkout Target Branch
         uses: actions/checkout@v4
@@ -164,7 +155,7 @@ jobs:
         id: clean-php
         run: |
           configmap_name="${{ inputs.PHP_NAME }}-config"
-          app_configmap_name="${{ inputs.APP }}-config"
+          app_configmap_name="${{ inputs.APP_NAME}}-config"
           if [[ `oc describe dc ${{ inputs.PHP_NAME }} 2>&1` =~ "NotFound" ]]; then
             echo "${{ inputs.PHP_NAME }} NOT FOUND: Skipping..."
           else
@@ -262,10 +253,10 @@ jobs:
             echo "DELETED job ${{ inputs.APP_NAME }}-upgrade"
           fi
 
-      - name: 🧹️ Clean ${{ inputs.APP }}-${{ inputs.WEB_NAME }} | ${{ inputs.APP_HOST_URL }}
+      - name: 🧹️ Clean ${{ inputs.APP_NAME}}-${{ inputs.WEB_NAME }} | ${{ inputs.APP_HOST_URL }}
         id: clean-route
         run: |
-          route_name="${{ inputs.APP }}-${{ inputs.WEB_NAME }}"
+          route_name="${{ inputs.APP_NAME}}-${{ inputs.WEB_NAME }}"
           if [[ `oc describe route $route_name 2>&1` =~ "NotFound" ]]; then
             echo "Route NOT FOUND: $route_name - Skipping..."
           else
@@ -274,15 +265,15 @@ jobs:
             echo "DELETED route:  $route_name"
           fi
 
-      - name: 🧹️ Clean ${{ inputs.APP }}-secrets
+      - name: 🧹️ Clean ${{ inputs.APP_NAME}}-secrets
         id: clean-secrets
         run: |
-          if [[ `oc describe secret ${{ inputs.APP }}-secrets 2>&1` =~ "NotFound" ]]; then
-            echo "${{ inputs.APP }} NOT FOUND: Skipping..."
+          if [[ `oc describe secret ${{ inputs.APP_NAME}}-secrets 2>&1` =~ "NotFound" ]]; then
+            echo "${{ inputs.APP_NAME}} NOT FOUND: Skipping..."
           else
-            echo "${{ inputs.APP }} FOUND: Cleaning resources..."
-            oc delete secret ${{ inputs.APP }}-secrets
-            echo "DELETED secret ${{ inputs.APP }}-secrets"
+            echo "${{ inputs.APP_NAME}} FOUND: Cleaning resources..."
+            oc delete secret ${{ inputs.APP_NAME}}-secrets
+            echo "DELETED secret ${{ inputs.APP_NAME}}-secrets"
           fi
 
       - name: 🧹️ Clean Backups
