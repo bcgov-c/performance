@@ -56,6 +56,7 @@ jobs:
   checkEnv:
     name: 📋 Environment Check
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
     outputs: # Define the output parameter
       # Set in GitHub: settings/environments/[environment] -> environment variables
       APP_HOST_URL: ${{ vars.APP_HOST_URL }}
