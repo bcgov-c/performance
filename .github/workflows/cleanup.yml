@@ -147,24 +147,21 @@ jobs:
           else
             echo "${{ inputs.WEB_NAME }} FOUND: Cleaning resources..."
             oc scale deployment/${{ inputs.WEB_NAME }} --replicas=0
+            sleep 10
             oc delete deployment/${{ inputs.WEB_NAME }}
-            echo "DELETED deployment ${{ inputs.WEB_NAME }}"
           fi
           if [[ `oc describe configmap $configmap_name 2>&1` =~ "NotFound" ]]; then
             echo "$configmap_name NOT FOUND: Skipping..."
           else
             oc delete configmap $configmap_name
-            echo "DELETED configmap $configmap_name"
           fi
           if [[ `oc describe configmap ${{ inputs.APP_NAME }}-env 2>&1` =~ "NotFound" ]]; then
             echo "Configmap ${{ inputs.APP_NAME }}-env NOT FOUND: Skipping..."
           else
             oc delete configmap ${{ inputs.APP_NAME }}-env
-            echo "DELETED configmap ${{ inputs.APP_NAME }}-env"
           fi
           if ! [[ `oc describe service ${{ inputs.WEB_NAME }} 2>&1` =~ "NotFound" ]]; then
             oc delete service ${{ inputs.WEB_NAME }}
-            echo "DELETED service: ${{ inputs.WEB_NAME }}"
           fi
 
 
@@ -178,28 +175,24 @@ jobs:
           else
             echo "${{ inputs.PHP_NAME }} FOUND: Cleaning resources..."
             oc scale deployment/${{ inputs.PHP_NAME }} --replicas=0
+            sleep 10
             oc delete deployment/${{ inputs.PHP_NAME }}
-            echo "DELETED deployment ${{ inputs.PHP_NAME }}"
           fi
           if [[ `oc describe configmap $configmap_name 2>&1` =~ "NotFound" ]]; then
             echo "$configmap_name NOT FOUND: Skipping..."
           else
             oc delete configmap $configmap_name
-            echo "DELETED configmap $configmap_name"
           fi
-          if [[ `oc describe configmap $app_configmap_name 2>&1` =~ "NotFound" ]]; then
-            echo "$app_configmap_name NOT FOUND: Skipping..."
+          if [[ `oc describe configmap/$app_configmap_name 2>&1` =~ "NotFound" ]]; then
+            echo "configmap/$app_configmap_name NOT FOUND: Skipping..."
           else
-            oc delete configmap $app_configmap_name
-            echo "DELETED configmap $app_configmap_name"
+            oc delete configmap/$app_configmap_name
           fi
           if ! [[ `oc describe pvc ${{ inputs.APP_NAME }}-env 2>&1` =~ "NotFound" ]]; then
-            oc delete pvc ${{ inputs.APP_NAME }}-env
-            echo "DELETED pvc ${{ inputs.APP_NAME }}-env"
+            oc delete pvc/${{ inputs.APP_NAME }}-env
           fi
           if ! [[ `oc describe service ${{ inputs.PHP_NAME }} 2>&1` =~ "NotFound" ]]; then
-            oc delete service ${{ inputs.PHP_NAME }}
-            echo "DELETED service: ${{ inputs.PHP_NAME }}"
+            oc delete service/${{ inputs.PHP_NAME }}
           fi
 
       - name: 🧹️ Clean Migrate-Build Job
@@ -210,7 +203,6 @@ jobs:
           else
             echo "migrate-build-files FOUND: Cleaning resources..."
             oc delete job migrate-build-files
-            echo "DELETED job migrate-build-files"
           fi
 
       - name: 🧹️ Clean Cron
@@ -221,14 +213,12 @@ jobs:
           else
             echo "cron FOUND: Cleaning resources..."
             oc delete deployment/cron
-            echo "DELETED deployment/cron"
           fi
           if [[ `oc describe deployment/${{ inputs.CRON_NAME }} 2>&1` =~ "NotFound" ]]; then
             echo "deployment/${{ inputs.CRON_NAME }} NOT FOUND: Skipping..."
           else
             echo "deployment/${{ inputs.CRON_NAME }} FOUND: Cleaning resources..."
             oc delete deployment/${{ inputs.CRON_NAME }}
-            echo "DELETED deployment: ${{ inputs.CRON_NAME }}"
           fi
           if [[ `oc describe configmap/${{ inputs.CRON_NAME }}-config 2>&1` =~ "NotFound" ]]; then
             echo "configmap/${{ inputs.CRON_NAME }}-config NOT FOUND: Skipping..."
@@ -244,14 +234,6 @@ jobs:
           else
             echo "sts/${{ inputs.REDIS_NAME }} FOUND: Cleaning resources..."
             oc delete sts/${{ inputs.REDIS_NAME }}
-            echo "DELETED sts: ${{ inputs.REDIS_NAME }}"
-          fi
-          if [[ `oc describe sts/${{ inputs.REDIS_NAME }} 2>&1` =~ "NotFound" ]]; then
-            echo "sts/${{ inputs.REDIS_NAME }} sts NOT FOUND: Skipping..."
-          else
-            echo "sts/${{ inputs.REDIS_NAME }} FOUND: Cleaning resources..."
-            oc delete sts/${{ inputs.REDIS_NAME }}
-            echo "DELETED sts/${{ inputs.REDIS_NAME }}"
           fi
           if [[ `oc describe configmap/${{ inputs.REDIS_NAME }}-config 2>&1` =~ "NotFound" ]]; then
             echo "configmap/${{ inputs.REDIS_NAME }}-config NOT FOUND: Skipping..."
@@ -279,7 +261,6 @@ jobs:
           else
             echo "route/$route_name FOUND: Cleaning resources..."
             oc delete route/$route_name
-            echo "DELETED:  route/$route_name"
           fi
 
       - name: 🧹️ Clean ${{ inputs.APP_NAME}}-secrets
@@ -290,7 +271,6 @@ jobs:
           else
             echo "secret/${{ inputs.APP_NAME}} FOUND: Cleaning resources..."
             oc delete secret/${{ inputs.APP_NAME}}-secrets
-            echo "DELETED secret/${{ inputs.APP_NAME}}-secrets"
           fi
 
       - name: 🧹️ Clean Backups

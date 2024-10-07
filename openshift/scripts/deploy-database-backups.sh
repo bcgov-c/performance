@@ -131,55 +131,7 @@ else
   oc set image deployment/$DB_BACKUP_DEPLOYMENT_FULL_NAME backup-storage=$BACKUP_IMAGE
 fi
 
-if [[ `oc describe sts $DB_NAME 2>&1` =~ "NotFound" ]]; then
-  echo "$DB_NAME NOT FOUND: Beginning deployment..."
-  envsubst < ./openshift/config/mariadb/config.yaml | oc create -f -
-else
-  echo "$DB_NAME Installation found...Scaling to 0..."
-  oc scale sts/$DB_NAME --replicas=0
-
-  ATTEMPTS=0
-  MAX_ATTEMPTS=60
-  while [[ $(oc get sts $DB_NAME -o jsonpath='{.status.replicas}') -ne 0 && $ATTEMPTS -ne $MAX_ATTEMPTS ]]; do
-    echo "Waiting for $DB_NAME to scale to 0..."
-    sleep 10
-    ATTEMPTS=$((ATTEMPTS + 1))
-  done
-  if [[ $ATTEMPTS -eq $MAX_ATTEMPTS ]]; then
-    echo "Timeout waiting for $DB_NAME to scale to 0"
-    exit 1
-  fi
-
-  echo "Recreating $DB_NAME from image: $IMAGE_REPO_URL$DB_IMAGE"
-  oc delete sts $DB_NAME
-  oc delete configmap $DB_NAME
-  oc delete service $DB_NAME
-
-  # Create configmap from the resources directory
-  oc create configmap $DB_NAME --from-file=./openshift/config/mariadb/resources
-
-  # Substitute variables in the config.yaml file and create the deployment
-  envsubst < ./openshift/config/mariadb/config.yaml | oc create -f -
-
-  sleep 10
-
-  oc scale sts/$DB_NAME --replicas=1
-
-  sleep 15
-
-  # Wait for the deployment to scale to 1
-  ATTEMPTS=0
-  MAX_ATTEMPTS=60
-  while [[ $(oc get sts $DB_NAME -o jsonpath='{.status.replicas}') -ne 1 && $ATTEMPTS -ne $MAX_ATTEMPTS ]]; do
-    echo "Waiting for $DB_NAME to scale to 1..."
-    sleep 10
-    ATTEMPTS=$((ATTEMPTS + 1))
-  done
-  if [[ $ATTEMPTS -eq $MAX_ATTEMPTS ]]; then
-    echo "Timeout waiting for $DB_NAME to scale to 1"
-    exit 1
-  fi
-fi
+sleep 15
 
 echo "Checking if the database is online and contains expected data..."
 ATTEMPTS=0
