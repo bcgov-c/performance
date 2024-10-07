@@ -187,6 +187,7 @@ jobs:
     with:
       APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
       APP_HOST_URL: ${{ vars.APP_HOST_URL }}
+      SITE_URL: ${{ vars.APP_HOST_URL }}
       WEB_NAME: ${{ needs.checkEnv.outputs.WEB_NAME }}
       WEB_IMAGE: ${{ needs.checkEnv.outputs.WEB_IMAGE }}
       PHP_NAME: ${{ needs.checkEnv.outputs.PHP_NAME }}
