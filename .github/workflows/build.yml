@@ -18,6 +18,7 @@ env:
   BUILD_ID: ${{ github.event.number }}
   INSPECT_JOB_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
+  # Set in GitHub: settings/environments/[environment] -> environment variables
   APP_HOST_URL: ${{ vars.APP_HOST_URL }}
 
 on:
