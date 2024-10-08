@@ -100,25 +100,7 @@ jobs:
             oc delete configmap ${{ inputs.REDIS_NAME }}-redis-cluster-scripts
           fi
 
-      - name: 🧹️ Clean ${{ inputs.DB_NAME }}
-        run: |
-          configmap_name="${{ inputs.DB_NAME }}-config"
-          if [[ `oc describe sts/${{ inputs.DB_NAME }} 2>&1` =~ "NotFound" ]]; then
-            echo "sts/${{ inputs.DB_NAME }} NOT FOUND: Skipping..."
-          else
-            echo "sts/${{ inputs.DB_NAME }} FOUND: Cleaning..."
-            oc scale sts/${{ inputs.DB_NAME }} --replicas=0
-            sleep 10
-            oc delete sts/${{ inputs.DB_NAME }}
-          fi
-          if ! [[ `oc describe configmap/$configmap_name 2>&1` =~ "NotFound" ]]; then
-            oc delete configmap/$configmap_name
-          fi
-          if ! [[ `oc describe service/${{ inputs.DB_NAME }} 2>&1` =~ "NotFound" ]]; then
-            oc delete service ${{ inputs.DB_NAME }}
-          fi
-
-      - name: Clean Database PVCs if CLEAN_PVCs == YES"
+      - name: Clean Database PVCs
         if: inputs.CLEAN_PVC == 'YES'
         run: |
           echo "Cleaning up PVCs associated with StatefulSet '${{ inputs.DB_NAME }}'..."
@@ -137,6 +119,24 @@ jobs:
             done
           done
           echo "PVC cleanup completed."
+
+      - name: 🧹️ Clean ${{ inputs.DB_NAME }}
+        run: |
+          configmap_name="${{ inputs.DB_NAME }}-config"
+          if [[ `oc describe sts/${{ inputs.DB_NAME }} 2>&1` =~ "NotFound" ]]; then
+            echo "sts/${{ inputs.DB_NAME }} NOT FOUND: Skipping..."
+          else
+            echo "sts/${{ inputs.DB_NAME }} FOUND: Cleaning..."
+            oc scale sts/${{ inputs.DB_NAME }} --replicas=0
+            sleep 10
+            oc delete sts/${{ inputs.DB_NAME }}
+          fi
+          if ! [[ `oc describe configmap/$configmap_name 2>&1` =~ "NotFound" ]]; then
+            oc delete configmap/$configmap_name
+          fi
+          if ! [[ `oc describe service/${{ inputs.DB_NAME }} 2>&1` =~ "NotFound" ]]; then
+            oc delete service ${{ inputs.DB_NAME }}
+          fi
 
       - name: 🧹️ Clean ${{ inputs.WEB_NAME }}
         id: clean-web

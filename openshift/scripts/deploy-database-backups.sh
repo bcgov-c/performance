@@ -133,7 +133,7 @@ fi
 
 sleep 15
 
-echo "Checking if the database is online and contains expected data..."
+echo "Checking if the database ($DB_NAME) is online and contains expected data..."
 ATTEMPTS=0
 WAIT_TIME=10
 MAX_ATTEMPTS=30 # wait up to 5 minutes
@@ -150,7 +150,7 @@ until [ -n "$DB_POD_NAME" ]; do
   fi
 
   if [ -z "$PODS" ]; then
-    echo "No pods in Running state found. Retrying in $WAIT_TIME seconds..."
+    echo "No pods found in Running state ($PODS). Retrying in $WAIT_TIME seconds..."
     sleep $WAIT_TIME
   else
     DB_POD_NAME=$(echo $PODS | awk '{print $1}')
