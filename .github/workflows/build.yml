@@ -196,6 +196,7 @@ jobs:
         needs.checkEnv.outputs.CLEAN_BUILDS.CLEAN_BUILDS != 'YES'
       )
     with:
+      CLEAN_PVC: ${{ needs.checkEnv.outputs.CLEAN_PVC }}
       APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
       APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_HOST_URL }}
       SITE_URL: "https://${{ needs.checkEnv.outputs.APP_HOST_URL }}"
