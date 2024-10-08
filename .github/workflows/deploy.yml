@@ -187,6 +187,7 @@ jobs:
           DB_HOST: ${{ inputs.DB_HOST }}
           DB_DATABASE: ${{ inputs.DB_DATABASE }}
           DB_PORT: ${{ inputs.DB_PORT }}
+          DB_HEALTH_QUERY: ${{ inputs.DB_HEALTH_QUERY }}
           OC_PROJECT: ${{ github.ref_name }}
           CLEAN_PVC: ${{ inputs.CLEAN_PVC }}
 
