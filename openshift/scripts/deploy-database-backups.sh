@@ -53,7 +53,7 @@ restore_backup() {
     oc exec $(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}') -- ./backup.sh -r mariadb/$DB_DATABASE -f "$FILENAME"
   elif [[ "$FILENAME" == *.sql ]]; then
     # Run the SQL restore command for .sql files
-    oc exec $(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}') -- bash -c "mysql -h $DB_NAME -u root performance < $FILENAME"
+    oc exec $(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}') -- bash -c "mysql -h $DB_HOST -u root performance < $FILENAME"
   else
     echo "Unsupported file type: $FILENAME"
     exit 1
@@ -133,7 +133,7 @@ fi
 
 sleep 15
 
-echo "Checking if the database ($DB_NAME) is online and contains expected data..."
+echo "Checking if the database ($DB_HOST) is online and contains expected data..."
 ATTEMPTS=0
 WAIT_TIME=10
 MAX_ATTEMPTS=30 # wait up to 5 minutes
@@ -142,7 +142,7 @@ MAX_ATTEMPTS=30 # wait up to 5 minutes
 DB_POD_NAME=""
 until [ -n "$DB_POD_NAME" ]; do
   ATTEMPTS=$(( $ATTEMPTS + 1 ))
-  PODS=$(oc get pods -l app=$DB_NAME --field-selector=status.phase=Running -o jsonpath='{.items[*].metadata.name}')
+  PODS=$(oc get pods -l app=$DB_HOST --field-selector=status.phase=Running -o jsonpath='{.items[*].metadata.name}')
 
   if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
     echo "Timeout waiting for the pod to have status.phase:Running. Exiting..."
