@@ -181,7 +181,7 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
     echo "Database is online and contains $CURRENT_USER_COUNT users."
     echo "No further action required."
     break
-  elseif [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -eq 0 ]; then
+  elif [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -eq 0 ]; then
     echo "Database is online but contains no users."
 
     # Main script execution
