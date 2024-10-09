@@ -99,34 +99,6 @@ async function main() {
         ...options,
         port: chrome.port
       };
-      //   // chrome = await attempt();
-
-      // console.log(`Chrome debugging port running on ${chrome.port}`);
-
-      // Fetch the WebSocket URL
-      // const response = await fetch(`https://127.0.0.1:${chrome.port}/json/version`);
-      // const data = await response.json();
-      // const webSocketDebuggerUrl = data.webSocketDebuggerUrl;
-
-      // if (!webSocketDebuggerUrl) {
-      //   throw new Error('Failed to fetch browser webSocket URL');
-      // }
-
-      // console.log(`WebSocket URL: ${webSocketDebuggerUrl}`);
-
-      // // Attempt to connect to the WebSocket URL
-      // try {
-      //   const ws = new WebSocket(webSocketDebuggerUrl);
-      //   ws.on('open', () => {
-      //     console.log('WebSocket connection established');
-      //     ws.close();
-      //   });
-      //   ws.on('error', (error) => {
-      //     console.error('WebSocket connection error:', error);
-      //   });
-      // } catch (error) {
-      //   console.error('Error connecting to WebSocket URL:', error);
-      // }
 
     } catch (error) {
       console.error('Error launching Chrome:', error);
@@ -156,8 +128,12 @@ async function main() {
     const fs = (await import('fs')).default;
     const fsp = (await import('fs')).promises;
 
+    const http_https = url.indexOf('localhost') === 0 ? 'http' : 'https';
     console.log('Go to URL: ', url);
-    await page.goto(url, { waitUntil: 'networkidle0' });
+    await page.goto(
+      http_https + '://' + url,
+      { waitUntil: 'networkidle0' }
+    );
 
     console.log('Capture screenshot of initial load');
     await page.screenshot({path: fileDir + '00_initial_load.png'});

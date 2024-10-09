@@ -60,9 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
     outputs: # Define the output parameter
-      # Set in GitHub: settings/environments/[environment] -> environment variables
-      APP_HOST_URL: ${{ vars.APP_HOST_URL }}
-
+      APP_HOST_URL: ${{ env.APP_HOST_URL }}
       CLEAN_PVC: ${{ env.CLEAN_PVC }}
       APP_NAME: ${{ env.APP_NAME }}
       DEPLOY_NAMESPACE: ${{ github.ref_name }}
@@ -117,6 +115,15 @@ jobs:
           path: .env.example.versions
           export-variables: true
           keys-case: upper
+
+      - name: Set APP_HOST_URL
+        run: |
+          if [ -n "${{ vars.APP_HOST_URL }}" ]; then
+            echo "Using environment-specific APP_HOST_URL from GitHub Environment"
+            echo "APP_HOST_URL=${{ vars.APP_HOST_URL }}" >> $GITHUB_ENV
+          else
+            echo "Using default APP_HOST_URL from .env.example"
+          fi
 
       - name: Print Env Vars
         run: |
@@ -249,7 +256,12 @@ jobs:
       - name: Run Lighthouse Tests
         id: lighthouse
         run: |
-          `echo "LHRESULT=$(node openshift/config/lighthouse/lighthouse-auth.js)" >> $GITHUB_OUTPUT`
+          LHRESULT=$(node openshift/config/lighthouse/lighthouse-auth.js)
+          echo "LHRESULT=$LHRESULT" >> $GITHUB_OUTPUT
+          if echo "$LHRESULT" | grep -qi "error"; then
+            echo "Error detected in Lighthouse Test Result: $LHRESULT"
+            exit 1
+          fi
         env:
           APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_HOST_URL }}
           TESTER_USERNAME: ${{ secrets.TESTER_USERNAME }}

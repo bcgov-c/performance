@@ -188,6 +188,15 @@ jobs:
 
           echo "${{ inputs.WEB_NAME }} cleanup completed."
 
+      - name: 🧹️ Clean Migrate-Build Job
+        id: clean-migrate-build
+        run: |
+          if [[ `oc describe job migrate-build-files 2>&1` =~ "NotFound" ]]; then
+            echo "migrate-build-files NOT FOUND: Skipping..."
+          else
+            echo "migrate-build-files FOUND: Cleaning resources..."
+            oc delete job migrate-build-files
+          fi
 
       - name: 🧹️ Clean ${{ inputs.PHP_NAME }}
         id: clean-php
@@ -217,16 +226,6 @@ jobs:
           fi
 
           echo "${{ inputs.PHP_NAME }} cleanup completed."
-
-      - name: 🧹️ Clean Migrate-Build Job
-        id: clean-migrate-build
-        run: |
-          if [[ `oc describe job migrate-build-files 2>&1` =~ "NotFound" ]]; then
-            echo "migrate-build-files NOT FOUND: Skipping..."
-          else
-            echo "migrate-build-files FOUND: Cleaning resources..."
-            oc delete job migrate-build-files
-          fi
 
       - name: 🧹️ Clean Cron
         id: clean-cron-job
@@ -306,10 +305,18 @@ jobs:
       - name: 🧹️ Clean Backups
         id: clean-backups
         run: |
-          if [[ `helm status ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }} 2>&1` =~ "STATUS: deployed" ]] || [[ `helm status ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }} 2>&1` =~ "Error: release: not found" ]]; then
-            echo "backup NOT FOUND: Skipping..."
-          else
-            echo "backup FOUND: Cleaning resources..."
+          echo "Checking Helm release status for '${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}'..."
+
+          # Capture the output of the helm status command
+          HELM_STATUS_OUTPUT=$(helm status ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }} 2>&1)
+          echo "Helm status output: $HELM_STATUS_OUTPUT"
+
+          # Check if the Helm release is deployed or not found
+          if [[ "$HELM_STATUS_OUTPUT" =~ "STATUS: deployed" ]]; then
+            echo "Helm release '${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}' is deployed or not found. Proceeding with uninstallation..."
             helm uninstall ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}
-            # echo "UNINSTALLED backup"
+          elif [[ "$HELM_STATUS_OUTPUT" =~ "Error: release: not found" ]]; then
+            echo "Helm release '${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}' NOT FOUND: Skipping..."
+          else
+            echo "Helm release '${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}' is in an unknown state. Skipping..."
           fi

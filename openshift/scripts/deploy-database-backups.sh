@@ -1,47 +1,5 @@
 #!/bin/bash
 
-# Function to list available backups
-list_backups() {
-  echo "Listing available backups..."
-
-  # Connect to the backup pod and list available backups
-  BACKUP_LIST=$(oc exec $(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}') -- ./backup.sh -l)
-
-  # Parse the backup list into an array
-  IFS=$'\n' read -rd '' -a BACKUP_ARRAY <<< "$BACKUP_LIST"
-
-  # Filter and sort backups
-  FILTERED_SORTED_BACKUPS=$(for line in "${BACKUP_ARRAY[@]}"; do
-    # Extract size, date, and filename
-    SIZE=$(echo "$line" | awk '{print $1}')
-    DATE=$(echo "$line" | awk '{print $2 " " $3}')
-    FILENAME=$(echo "$line" | awk '{print $4}')
-
-    # Convert size to bytes for comparison
-    SIZE_IN_BYTES=$(echo "$SIZE" | awk '
-      /M$/ { printf "%.0f\n", $1 * 1024 * 1024 }
-      /K$/ { printf "%.0f\n", $1 * 1024 }
-      /G$/ { printf "%.0f\n", $1 * 1024 * 1024 * 1024 }
-      !/[KMG]$/ { print $1 }
-    ')
-
-    # Only include entries with size > 1M
-    if [ "$SIZE_IN_BYTES" -gt $((1 * 1024 * 1024)) ]; then
-      echo "$SIZE $DATE $FILENAME"
-    fi
-  done | sort -k2,3r)
-
-  # Select the latest backup
-  LATEST_BACKUP=$(echo "$FILTERED_SORTED_BACKUPS" | head -n 1)
-
-  # Output the size, date, and filename for the selected entry
-  echo "Selected Backup:"
-  echo "$LATEST_BACKUP"
-
-  # Return the filename of the selected backup
-  echo "$LATEST_BACKUP" | awk '{print $3}'
-}
-
 # Function to restore the backup by filename
 restore_backup_from_file() {
   local FILENAME=$1
@@ -63,8 +21,6 @@ restore_backup_from_file() {
 
 # Function to list available backups
 list_backups() {
-  echo "Listing available backups..."
-
   # Connect to the backup pod and list available backups
   BACKUP_LIST=$(oc exec $(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}') -- ./backup.sh -l)
 
@@ -107,6 +63,7 @@ restore_database_from_backup() {
   echo "Attempting to restore the database from the latest backup..."
 
   # List backups and get the filename of the latest backup
+  echo "Listing available backups..."
   LATEST_BACKUP_FILENAME=$(list_backups)
 
   # Check if the file exists and has a .gz or .sql extension
@@ -251,6 +208,5 @@ done
 
 if [ $TOTAL_USER_COUNT -eq 0 ]; then
   echo "Database is offline or does not contain any users."
-  echo "Attempting to restore the database from the latest backup..."
   restore_database_from_backup
 fi
