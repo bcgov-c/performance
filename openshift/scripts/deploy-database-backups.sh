@@ -43,7 +43,7 @@ list_backups() {
 }
 
 # Function to restore the backup by filename
-restore_backup() {
+restore_backup_from_file() {
   local FILENAME=$1
   echo "Restoring backup from file: $FILENAME"
 
@@ -56,7 +56,65 @@ restore_backup() {
     oc exec $(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}') -- bash -c "mysql -h $DB_HOST -u root performance < $FILENAME"
   else
     echo "Unsupported file type: $FILENAME"
-    exit 1
+  fi
+
+  echo "Backup restoration process completed."
+}
+
+# Function to list available backups
+list_backups() {
+  echo "Listing available backups..."
+
+  # Connect to the backup pod and list available backups
+  BACKUP_LIST=$(oc exec $(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}') -- ./backup.sh -l)
+
+  # Parse the backup list into an array
+  IFS=$'\n' read -rd '' -a BACKUP_ARRAY <<< "$BACKUP_LIST"
+
+  # Filter and sort backups
+  FILTERED_SORTED_BACKUPS=$(for line in "${BACKUP_ARRAY[@]}"; do
+    # Extract size, date, and filename
+    SIZE=$(echo "$line" | awk '{print $1}')
+    DATE=$(echo "$line" | awk '{print $2 " " $3}')
+    FILENAME=$(echo "$line" | awk '{print $4}')
+
+    # Convert size to bytes for comparison
+    SIZE_IN_BYTES=$(echo "$SIZE" | awk '
+      /M$/ { printf "%.0f\n", $1 * 1024 * 1024 }
+      /K$/ { printf "%.0f\n", $1 * 1024 }
+      /G$/ { printf "%.0f\n", $1 * 1024 * 1024 * 1024 }
+      !/[KMG]$/ { print $1 }
+    ')
+
+    # Only include entries with size > 1M
+    if [ "$SIZE_IN_BYTES" -gt $((1 * 1024 * 1024)) ]; then
+      echo "$SIZE $DATE $FILENAME"
+    fi
+  done | sort -k2,3r)
+
+  # Select the latest backup
+  LATEST_BACKUP=$(echo "$FILTERED_SORTED_BACKUPS" | head -n 1)
+
+  # Output the size, date, and filename for the selected entry
+  echo "Selected Backup:"
+  echo "$LATEST_BACKUP"
+
+  # Return the filename of the selected backup
+  echo "$LATEST_BACKUP" | awk '{print $3}'
+}
+
+restore_database_from_backup() {
+  echo "Attempting to restore the database from the latest backup..."
+
+  # List backups and get the filename of the latest backup
+  LATEST_BACKUP_FILENAME=$(list_backups)
+
+  # Check if the file exists and has a .gz or .sql extension
+  if [[ -f "$LATEST_BACKUP_FILENAME" ]]; then
+    # Restore the backup using the filename
+    restore_backup_from_file "$LATEST_BACKUP_FILENAME"
+  else
+    echo "Backup file: $LATEST_BACKUP_FILENAME does not exist. Skipping restore."
   fi
 }
 
@@ -159,7 +217,9 @@ done
 
 echo "Database pod found and running: $DB_POD_NAME."
 
+TOTAL_USER_COUNT=0
 ATTEMPTS=0
+OUTPUT=""
 until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
   ATTEMPTS=$(( $ATTEMPTS + 1 ))
   echo "Waiting for database to come online... $(($ATTEMPTS * $WAIT_TIME)) seconds..."
@@ -170,32 +230,27 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
   # Check if the output contains an error
   if echo "$OUTPUT" | grep -qi "error"; then
     echo "❌ Database error: $OUTPUT"
-    # exit 1
-  fi
-
-  # Extract the user count from the output
-  CURRENT_USER_COUNT=$(echo "$OUTPUT" | grep -oP '\d+')
-
-  # Check if CURRENT_USER_COUNT is set and greater than 0
-  if [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -gt 0 ]; then
-    echo "Database is online and contains $CURRENT_USER_COUNT users."
-    echo "No further action required."
-    break
-  elif [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -eq 0 ]; then
-    echo "Database is online but contains no users."
-
-    # Main script execution
-    echo "Starting backup restoration process..."
-    # List backups and get the filename of the latest backup
-    LATEST_BACKUP_FILENAME=$(list_backups)
-    # Restore the backup using the filename
-    restore_backup "$LATEST_BACKUP_FILENAME"
-    echo "Backup restoration process completed."
-
     break
   else
-    # Current user count is 0 or not set
-    # echo "Database appears to be offline. Attempt $ATTEMPTS of $MAX_ATTEMPTS."
-    sleep $WAIT_TIME
+    # Extract the user count from the output
+    CURRENT_USER_COUNT=$(echo "$OUTPUT" | grep -oP '\d+')
+
+    # Check if CURRENT_USER_COUNT is set and greater than 0
+    if [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -gt 0 ]; then
+      echo "Database is online and contains $CURRENT_USER_COUNT users."
+      echo "No further action required."
+      TOTAL_USER_COUNT=$CURRENT_USER_COUNT
+      break
+    else
+      # Current user count is 0 or not set
+      echo "Database appears to be offline. Attempt $ATTEMPTS of $MAX_ATTEMPTS."
+    fi
   fi
+  sleep $WAIT_TIME
 done
+
+if [ $TOTAL_USER_COUNT -eq 0 ]; then
+  echo "Database is offline or does not contain any users."
+  echo "Attempting to restore the database from the latest backup..."
+  restore_database_from_backup
+fi

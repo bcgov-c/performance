@@ -16,11 +16,16 @@ dest_date_latest=${dest_date_latest:-0}
 src_date_readable=$(date -d @$src_date_latest +"%Y-%m-%d %H:%M:%S")
 dest_date_readable=$(date -d @$dest_date_latest +"%Y-%m-%d %H:%M:%S")
 
+# Use find with -not -name to exclude directories from the file count
+initial_file_count=$(find ${dest_dir} -not -name '.*' | wc -l)
+echo "Initial file count: $initial_file_count"
+
 echo "Latest source file modification date: $src_date_readable"
 echo "Latest destination file modification date: $dest_date_readable"
 
-# If the source directory has been modified more recently than the destination directory, proceed with the migration
-if [ $src_date_latest -gt $dest_date_latest ]; then
+# Check if src_date_latest is greater than dest_date_latest
+# OR initial_file_count is less than 100 (project was likely uninstalled)
+if [ $src_date_latest -gt $dest_date_latest ] || [ $initial_file_count -lt 100 ]; then
   echo "Source directory has been modified more recently than the destination directory."
   echo "Proceeding with migration..."
 else
@@ -36,9 +41,6 @@ sleep 10
 
 # Delete all files - including hidden ones
 echo "Deleting all files in ${dest_dir}..."
-# Use find with -not -name to exclude directories from the file count
-initial_count=$(find ${dest_dir} -not -name '.*' | wc -l)
-echo "Initial file count: $initial_count"
 # Delate all files, excluding hidden files and directories
 find ${dest_dir} -mindepth 1 -delete
 
@@ -49,11 +51,11 @@ final_count=$(find ${dest_dir} -not -name '.*' | wc -l)
 echo "Final file count: $final_count"
 
 # Calculate the number of files deleted
-deleted_count=$((initial_count - final_count))
-echo "Deleted $deleted_count of $initial_count files."
+deleted_count=$((initial_file_count - final_count))
+echo "Deleted $deleted_count of $initial_file_count files."
 
 # Count the number of files remaining in the destination directory
-remaining_count=$((initial_count - deleted_count))
+remaining_count=$((initial_file_count - deleted_count))
 
 # Check if all files have been deleted
 if [ $((remaining_count)) -eq 0 ]; then

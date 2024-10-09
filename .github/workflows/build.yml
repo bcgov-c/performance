@@ -124,6 +124,25 @@ jobs:
           echo "-----------------------"
           echo URL: https://${{ env.APP_NAME }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
 
+  # Clean up resources if CLEAN_BUILDS is set to "YES"
+  call-cleanup-workflow:
+    name: 🧹️ Clean-up
+    uses: ./.github/workflows/cleanup.yml
+    secrets: inherit
+    needs: [checkEnv]
+    if: needs.checkEnv.outputs.CLEAN_BUILDS == 'YES'
+    with:
+      APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
+      APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_HOST_URL }}
+      DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}
+      DB_NAME: ${{ needs.checkEnv.outputs.DB_NAME }}
+      WEB_NAME: ${{ needs.checkEnv.outputs.WEB_NAME }}
+      PHP_NAME: ${{ needs.checkEnv.outputs.PHP_NAME }}
+      CRON_NAME: ${{ needs.checkEnv.outputs.CRON_NAME }}
+      REDIS_NAME: ${{ needs.checkEnv.outputs.REDIS_NAME }}
+      DB_BACKUP_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.DB_BACKUP_DEPLOYMENT_NAME }}
+      CLEAN_PVC: ${{ needs.checkEnv.outputs.CLEAN_PVC }}
+
   # Build Images and deploy to JFrog
   db:
     name: 🔨 DB
@@ -162,39 +181,16 @@ jobs:
     uses: ./.github/workflows/performance.yml
     secrets: inherit
 
-  call-cleanup-workflow:
-    name: 🧹️ Clean-up
-    uses: ./.github/workflows/cleanup.yml
-    secrets: inherit
-    needs: [checkEnv]
-    if: needs.checkEnv.outputs.CLEAN_BUILDS == 'YES'
-    with:
-      APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
-      APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_HOST_URL }}
-      DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}
-      DB_NAME: ${{ needs.checkEnv.outputs.DB_NAME }}
-      WEB_NAME: ${{ needs.checkEnv.outputs.WEB_NAME }}
-      PHP_NAME: ${{ needs.checkEnv.outputs.PHP_NAME }}
-      CRON_NAME: ${{ needs.checkEnv.outputs.CRON_NAME }}
-      REDIS_NAME: ${{ needs.checkEnv.outputs.REDIS_NAME }}
-      DB_BACKUP_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.DB_BACKUP_DEPLOYMENT_NAME }}
-      CLEAN_PVC: ${{ needs.checkEnv.outputs.CLEAN_PVC }}
-
   call-deploy-workflow:
     name: 🚀 Deploy
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
-    needs: [checkEnv, db, php, cron, build, web, call-cleanup-workflow]
+    needs: [checkEnv, db, php, cron, build, web]
     if: |
       (always() && needs.checkEnv.outputs.SKIP_DEPLOY == 'NO') &&
       needs.checkEnv.result == 'success' &&
       !contains(needs.*.result, 'failure') &&
-      !contains(needs.*.result, 'cancelled') &&
-      (
-        (needs.checkEnv.outputs.CLEAN_BUILDS.CLEAN_BUILDS == 'YES' &&
-        needs.call-cleanup-workflow.result == 'success') ||
-        needs.checkEnv.outputs.CLEAN_BUILDS.CLEAN_BUILDS != 'YES'
-      )
+      !contains(needs.*.result, 'cancelled')
     with:
       CLEAN_PVC: ${{ needs.checkEnv.outputs.CLEAN_PVC }}
       APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
