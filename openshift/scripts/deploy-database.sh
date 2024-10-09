@@ -92,7 +92,7 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
   # Check if the output contains an error
   if echo "$OUTPUT" | grep -qi "error"; then
     echo "❌ Database error: $OUTPUT"
-    # exit 1
+    exit 1
   fi
 
   # Extract the user count from the output

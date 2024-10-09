@@ -106,7 +106,7 @@ jobs:
           echo "Cleaning up PVCs associated with StatefulSet '${{ inputs.DB_NAME }}'..."
           # Get the list of pods associated with the StatefulSet '${{ inputs.DB_NAME }}'
           PODS=$(oc get pods -l app=${{ inputs.DB_NAME }} -o jsonpath='{.items[*].metadata.name}')
-
+          echo "PODS found: $PODS"
           # Loop through each pod and delete associated PVCs
           for POD in $PODS; do
             # Get the list of PVCs associated with the pod
