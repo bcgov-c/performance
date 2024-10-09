@@ -11,8 +11,8 @@ env:
   SSL_EXPIRY_NOTICE_DAYS: 15
 
   # Skip builds for faster deployments / testing ("YES" or build)
-  SKIP_BUILDS: "YES"
-  SKIP_DEPLOY: "YES"
+  SKIP_BUILDS: "NO"
+  SKIP_DEPLOY: "NO"
   # Clean builds before deployments will delete all resources (other than backups)
   # Select "YES" or allow collisions and PVC persistence
   CLEAN_BUILDS: "YES"
