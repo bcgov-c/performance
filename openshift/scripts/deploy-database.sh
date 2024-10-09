@@ -1,3 +1,17 @@
+#!/bin/bash
+
+# Set environment variables
+export DB_BACKUP_DEPLOYMENT_NAME="${DB_BACKUP_DEPLOYMENT_NAME}"
+export DB_BACKUP_DEPLOYMENT_FULL_NAME="${DB_BACKUP_DEPLOYMENT_FULL_NAME}"
+export BACKUP_HELM_CHART="${BACKUP_HELM_CHART}"
+export DB_BACKUP_IMAGE="${DB_BACKUP_IMAGE}"
+export DB_HOST="${DB_HOST}"
+export DB_DATABASE="${DB_DATABASE}"
+export DB_PORT="${DB_PORT}"
+export DB_HEALTH_QUERY="${DB_HEALTH_QUERY}"
+export OC_PROJECT="${OC_PROJECT}"
+export CLEAN_PVC="${CLEAN_PVC}"
+
 oc project $OC_PROJECT
 
 if [[ `oc describe configmap $DB_NAME 2>&1` =~ "NotFound" ]]; then
@@ -53,65 +67,6 @@ else
     echo "Timeout waiting for $DB_NAME to scale to 1"
     exit 1
   fi
-fi
-
-echo "Checking if the database ($DB_NAME) is online and contains expected data..."
-ATTEMPTS=0
-WAIT_TIME=10
-MAX_ATTEMPTS=30 # wait up to 5 minutes
-
-# Get the name of the first pod in the StatefulSet
-DB_POD_NAME=""
-until [ -n "$DB_POD_NAME" ]; do
-  ATTEMPTS=$(( $ATTEMPTS + 1 ))
-  PODS=$(oc get pods -l app=$DB_NAME --field-selector=status.phase=Running -o jsonpath='{.items[*].metadata.name}')
-
-  if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
-    echo "Timeout waiting for the pod to have status.phase:Running. Exiting..."
-    exit 1
-  fi
-
-  if [ -z "$PODS" ]; then
-    echo "No pods in Running state found. Retrying in $WAIT_TIME seconds..."
-    sleep $WAIT_TIME
-  else
-    DB_POD_NAME=$(echo $PODS | awk '{print $1}')
-  fi
-done
-
-echo "Database pod found and running: $DB_POD_NAME."
-
-ATTEMPTS=0
-until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
-  ATTEMPTS=$(( $ATTEMPTS + 1 ))
-  echo "Waiting for database to come online... $(($ATTEMPTS * $WAIT_TIME)) seconds..."
-
-  # Capture the output of the mariadb command
-  OUTPUT=$(oc exec $DB_POD_NAME -- bash -c "mariadb -u root -e 'USE $DB_DATABASE; $DB_HEALTH_QUERY;'" 2>&1)
-
-  # Check if the output contains an error
-  if echo "$OUTPUT" | grep -qi "error"; then
-    echo "❌ Database error: $OUTPUT"
-    exit 1
-  fi
-
-  # Extract the user count from the output
-  CURRENT_USER_COUNT=$(echo "$OUTPUT" | grep -oP '\d+')
-
-  # Check if CURRENT_USER_COUNT is set and greater than 0
-  if [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -gt 0 ]; then
-    echo "Database is online and contains $CURRENT_USER_COUNT users."
-    break
-  else
-    # Current user count is 0 or not set
-    # echo "Database appears to be offline. Attempt $ATTEMPTS of $MAX_ATTEMPTS."
-    sleep $WAIT_TIME
-  fi
-done
-
-if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
-  echo "❌ Timeout waiting for the database to be online. Exiting..."
-  exit 1
 fi
 
 echo "$DB_NAME Database deployment is complete."

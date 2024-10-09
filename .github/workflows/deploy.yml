@@ -165,14 +165,20 @@ jobs:
         run: bash ./openshift/scripts/deploy-database.sh
         env:
           APP_NAME: ${{ inputs.APP_NAME }}
+          OC_PROJECT: ${{ github.ref_name }}
           IMAGE_REPO_URL: ${{ inputs.IMAGE_REPO_URL }}
           DB_IMAGE: ${{ inputs.DB_IMAGE }}
-          DB_HEALTH_QUERY: ${{ inputs.DB_HEALTH_QUERY }}
           DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
           DB_NAME: ${{ inputs.DB_NAME }}
-          DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
+          DB_HOST: ${{ inputs.DB_HOST }}
+          DB_PORT: ${{ inputs.DB_PORT }}
           DB_DATABASE: ${{ inputs.DB_DATABASE }}
-          OC_PROJECT: ${{ github.ref_name }}
+          DB_BACKUP_DEPLOYMENT_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}
+          DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
+          BACKUP_HELM_CHART: ${{ inputs.BACKUP_HELM_CHART }}
+          DB_BACKUP_IMAGE: ${{ inputs.BACKUP_IMAGE }}
+          DB_HEALTH_QUERY: ${{ inputs.DB_HEALTH_QUERY }}
+          CLEAN_PVC: ${{ inputs.CLEAN_PVC }}
 
       - name: Deploy Backups via Helm
         uses: WyriHaximus/github-action-helm3@v3
