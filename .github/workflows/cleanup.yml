@@ -109,24 +109,29 @@ jobs:
           PVCS=$(oc get pvc -l app=${{ inputs.DB_NAME }} -o jsonpath='{.items[*].metadata.name}')
           echo "PVCs found: $PVCS"
 
-          ## ONLY DO THIS IF $PVCS != "No resources found in e66ac2-prod namespace."
+          # Check if the StatefulSet exists
+          if [[ `oc describe sts/${{ inputs.DB_NAME }} 2>&1` =~ "NotFound" ]]; then
+            echo "sts/${{ inputs.DB_NAME }} NOT FOUND: Skipping..."
+          else
+            # Scale down the StatefulSet to 0 replicas
+            echo "Scaling down StatefulSet '${{ inputs.DB_NAME }}' to 0 replicas..."
+            oc scale sts/${{ inputs.DB_NAME }} --replicas=0
 
-          # Scale down the StatefulSet to 0 replicas
-          echo "Scaling down StatefulSet '${{ inputs.DB_NAME }}' to 0 replicas..."
-          oc scale sts/${{ inputs.DB_NAME }} --replicas=0
+            # Wait for the StatefulSet to scale down
+            echo "Waiting for StatefulSet '${{ inputs.DB_NAME }}' to scale down..."
+            while [[ $(oc get pods -l app=${{ inputs.DB_NAME }} -o jsonpath='{.items[*].status.phase}' | grep -v "Terminating") ]]; do
+              echo "Waiting for pods to terminate..."
+              sleep 5
+            done
 
-          # Wait for the StatefulSet to scale down
-          echo "Waiting for StatefulSet '${{ inputs.DB_NAME }}' to scale down..."
-          while [[ $(oc get pods -l app=${{ inputs.DB_NAME }} -o jsonpath='{.items[*].status.phase}' | grep -v "Terminating") ]]; do
-            echo "Waiting for pods to terminate..."
-            sleep 5
-          done
-
-          # Loop through each PVC and delete it
-          for PVC in $PVCS; do
-            echo "Deleting PVC: $PVC"
-            oc delete pvc $PVC
-          done
+            # Loop through each PVC and delete it
+            for PVC in $PVCS; do
+              echo "Deleting PVC: $PVC"
+              oc delete pvc $PVC
+            done
+          else
+            echo "StatefulSet '${{ inputs.DB_NAME }}' not found. Skipping StatefulSet deletion."
+          fi
 
           echo "PVC cleanup completed."
 
