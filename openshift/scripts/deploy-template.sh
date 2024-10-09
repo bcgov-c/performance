@@ -6,16 +6,6 @@ oc project $DEPLOY_NAMESPACE
 echo "Current namespace is $DEPLOY_NAMESPACE"
 echo "Deploying site: $SITE_URL"
 
-# Create secret, if it doesn't exist yet
-oc create secret docker-registry $IMAGE_PULL_SECRET_NAME \
-  --docker-server=$IMAGE_REPO_DOMAIN \
-  --docker-username=$SECRET_DOCKER_USERNAME \
-  --docker-password=$SECRET_DOCKER_PASSWORD \
-  --docker-email=$SECRET_DOCKER_EMAIL
-# Ensure secrets are linked for pulling from Artifactory
-oc secrets link default $IMAGE_PULL_SECRET_NAME --for=pull
-oc secrets link builder $IMAGE_PULL_SECRET_NAME --for=pull
-
 echo "Delete cron job if it exists..."
 # Check if cron exists
 if oc get deployment $CRON_NAME; then

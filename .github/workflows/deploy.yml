@@ -129,8 +129,13 @@ jobs:
             APP_NAME: ${{ inputs.APP_NAME }}
             OC_PROJECT: ${{ github.ref_name }}
             DB_DATABASE: ${{ inputs.DB_DATABASE }}
-            DB_USER: ${{ inputs.DB_USER }}
+            DB_USER: ${{ secrets.DB_USER }}
             SECRET_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+            SECRET_DOCKER_USERNAME: ${{ secrets.ARTIFACTORY_USER }}
+            SECRET_DOCKER_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+            SECRET_DOCKER_EMAIL: ${{ secrets.ARTIFACTORY_EMAIL }}
+            IMAGE_PULL_SECRET_NAME: ${{ inputs.IMAGE_PULL_SECRET_NAME }}
+            IMAGE_REPO_DOMAIN: ${{ inputs.IMAGE_REPO_DOMAIN }}
 
       # Deploy Network Ingress Policy
       - name: Deploy Network Ingress Policy
@@ -206,7 +211,7 @@ jobs:
           SITE_URL: ${{ inputs.SITE_URL }}
           DB_NAME: ${{ inputs.DB_NAME }}
           DB_DATABASE: ${{ inputs.DB_DATABASE }}
-          DB_USER: ${{ inputs.DB_USER }}
+          DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           BUILD_NAMESPACE: ${{ inputs.BUILD_NAMESPACE }}
           DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
