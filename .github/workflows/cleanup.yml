@@ -310,7 +310,9 @@ jobs:
           # Capture the output and exit code of the helm status command
           HELM_STATUS_OUTPUT=$(helm status ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }} 2>&1)
           HELM_STATUS_EXIT_CODE=$?
+
           echo "Helm status output: $HELM_STATUS_OUTPUT"
+          echo "Helm status exit code: $HELM_STATUS_EXIT_CODE"
 
           # Check if the Helm release is deployed or not found
           if [ $HELM_STATUS_EXIT_CODE -eq 0 ]; then
