@@ -307,9 +307,15 @@ jobs:
         run: |
           echo "Checking Helm release status for '${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}'..."
 
+          # Temporarily disable exit on error
+          set +e
+
           # Capture the output and exit code of the helm status command
           HELM_STATUS_OUTPUT=$(helm status ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }} 2>&1)
           HELM_STATUS_EXIT_CODE=$?
+
+          # Re-enable exit on error
+          set -e
 
           echo "Helm status output: $HELM_STATUS_OUTPUT"
           echo "Helm status exit code: $HELM_STATUS_EXIT_CODE"
