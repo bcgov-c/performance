@@ -185,7 +185,7 @@ jobs:
     name: 🚀 Deploy
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
-    needs: [checkEnv, db, php, cron, build, web]
+    needs: [checkEnv, call-cleanup-workflow, db, php, cron, build, web]
     if: |
       (always() && needs.checkEnv.outputs.SKIP_DEPLOY == 'NO') &&
       needs.checkEnv.result == 'success' &&
