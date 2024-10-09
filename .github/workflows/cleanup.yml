@@ -135,7 +135,7 @@ jobs:
 
       - name: 🧹️ Clean ${{ inputs.DB_NAME }}
         run: |
-          configmap_name="${{ inputs.DB_NAME }}-config"
+          configmap_name="${{ inputs.DB_NAME }}"
           if [[ `oc describe sts/${{ inputs.DB_NAME }} 2>&1` =~ "NotFound" ]]; then
             echo "sts/${{ inputs.DB_NAME }} NOT FOUND: Skipping..."
           else
@@ -192,8 +192,7 @@ jobs:
       - name: 🧹️ Clean ${{ inputs.PHP_NAME }}
         id: clean-php
         run: |
-          configmap_name="${{ inputs.PHP_NAME }}-config"
-          app_configmap_name="${{ inputs.APP_NAME}}-config"
+          configmap_name="${{ inputs.APP_NAME }}-env"
           if [[ `oc describe deployment/${{ inputs.PHP_NAME }} 2>&1` =~ "NotFound" ]]; then
             echo "${{ inputs.PHP_NAME }} NOT FOUND: Skipping..."
           else
@@ -202,21 +201,19 @@ jobs:
             sleep 10
             oc delete deployment/${{ inputs.PHP_NAME }}
           fi
-          if [[ `oc describe configmap $configmap_name 2>&1` =~ "NotFound" ]]; then
-            echo "$configmap_name NOT FOUND: Skipping..."
+          if [[ `oc describe configmap/$configmap_name 2>&1` =~ "NotFound" ]]; then
+            echo "configmap/$configmap_name NOT FOUND: Skipping..."
           else
-            oc delete configmap $configmap_name
+            oc delete configmap/$configmap_name
           fi
-          if [[ `oc describe configmap/$app_configmap_name 2>&1` =~ "NotFound" ]]; then
-            echo "configmap/$app_configmap_name NOT FOUND: Skipping..."
-          else
-            oc delete configmap/$app_configmap_name
-          fi
-          if ! [[ `oc describe pvc ${{ inputs.APP_NAME }}-env 2>&1` =~ "NotFound" ]]; then
-            oc delete pvc/${{ inputs.APP_NAME }}-env
-          fi
-          if ! [[ `oc describe service ${{ inputs.PHP_NAME }} 2>&1` =~ "NotFound" ]]; then
+          if ! [[ `oc describe service/${{ inputs.PHP_NAME }} 2>&1` =~ "NotFound" ]]; then
             oc delete service/${{ inputs.PHP_NAME }}
+          fi
+          if ! [[ `oc describe pvc/${{ inputs.APP_NAME }}-data 2>&1` =~ "NotFound" ]]; then
+            oc delete pvc/${{ inputs.APP_NAME }}-data
+          fi
+          if ! [[ `oc describe pvc/${{ inputs.APP_NAME }}-app-data 2>&1` =~ "NotFound" ]]; then
+            oc delete pvc/${{ inputs.APP_NAME }}-app-data
           fi
 
           echo "${{ inputs.PHP_NAME }} cleanup completed."
@@ -255,16 +252,23 @@ jobs:
       - name: 🧹️ Clean Redis
         id: clean-redis
         run: |
+          redis_config_map="${{ inputs.REDIS_NAME }}-config-map"
+          redis_stats_config_map="${{ inputs.REDIS_NAME }}-stats"
           if [[ `oc describe sts/${{ inputs.REDIS_NAME }} 2>&1` =~ "NotFound" ]]; then
             echo "sts/${{ inputs.REDIS_NAME }} NOT FOUND: Skipping..."
           else
             echo "sts/${{ inputs.REDIS_NAME }} FOUND: Cleaning resources..."
             oc delete sts/${{ inputs.REDIS_NAME }}
           fi
-          if [[ `oc describe configmap/${{ inputs.REDIS_NAME }}-config 2>&1` =~ "NotFound" ]]; then
-            echo "configmap/${{ inputs.REDIS_NAME }}-config NOT FOUND: Skipping..."
+          if [[ `oc describe configmap/$redis_config_map 2>&1` =~ "NotFound" ]]; then
+            echo "configmap/$redis_config_map NOT FOUND: Skipping..."
           else
-            oc delete configmap/${{ inputs.REDIS_NAME }}-config
+            oc delete configmap/$redis_config_map
+          fi
+          if [[ `oc describe configmap/$redis_stats_config_map 2>&1` =~ "NotFound" ]]; then
+            echo "configmap/$redis_stats_config_map NOT FOUND: Skipping..."
+          else
+            oc delete configmap/$redis_stats_config_map
           fi
 
       - name: 🧹️ Clean Upgrade Job
