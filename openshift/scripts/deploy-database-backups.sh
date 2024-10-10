@@ -158,7 +158,8 @@ else
       ENVIRONMENT_FRIENDLY_NAME:
         value: \"$APP_NAME Backups\"
     " > backup-config.yaml
-  helm install $DB_BACKUP_DEPLOYMENT_NAME $BACKUP_HELM_CHART --atomic --wait -f backup-config.yaml
+  # helm install $DB_BACKUP_DEPLOYMENT_NAME $BACKUP_HELM_CHART --atomic --wait -f backup-config.yaml
+  helm install $DB_BACKUP_DEPLOYMENT_NAME $BACKUP_HELM_CHART --wait -f backup-config.yaml
   # Set best-effort resource limits for the backup deployment
   oc set resources deployment/$DB_BACKUP_DEPLOYMENT_FULL_NAME --limits=cpu=0,memory=0 --requests=cpu=0,memory=0
   # For some reason the defaault image doesn't work, and we prefer the mariadb image
