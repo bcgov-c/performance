@@ -63,15 +63,13 @@ list_backups() {
     # Only include entries with size > 1M
     if [ "$SIZE_IN_BYTES" -gt $((1 * 1024 * 1024)) ]; then
       echo "$SIZE $DATE $FILENAME"
+    else
+      echo "Skipped small backup: $FILENAME"
     fi
   done | sort -k2,3r)
 
   # Select the latest backup
   LATEST_BACKUP=$(echo "$FILTERED_SORTED_BACKUPS" | head -n 1)
-
-  # Output the size, date, and filename for the selected entry
-  echo "Selected Backup:"
-  echo "$LATEST_BACKUP"
 
   # Return the filename of the selected backup
   echo "$LATEST_BACKUP" | awk '{print $3}'
@@ -232,5 +230,6 @@ done
 
 if [ $TOTAL_USER_COUNT -eq 0 ]; then
   echo "Database is offline or does not contain any users."
+  sleep 10
   restore_database_from_backup
 fi
