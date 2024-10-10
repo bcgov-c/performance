@@ -159,15 +159,15 @@ else
         value: \"$APP_NAME Backups\"
     " > backup-config.yaml
   # helm install $DB_BACKUP_DEPLOYMENT_NAME $BACKUP_HELM_CHART --atomic --wait -f backup-config.yaml
-  helm install $DB_BACKUP_DEPLOYMENT_NAME $BACKUP_HELM_CHART --wait -f backup-config.yaml
+  helm install $DB_BACKUP_DEPLOYMENT_NAME $BACKUP_HELM_CHART -f backup-config.yaml
   echo "Waiting for backup installation..."
-  sleep 15
-  # Set best-effort resource limits for the backup deployment
-  echo "Setting best-effort resource limits for the backup deployment..."
-  oc set resources deployment/$DB_BACKUP_DEPLOYMENT_FULL_NAME --limits=cpu=0,memory=0 --requests=cpu=0,memory=0
+  sleep 5
   # For some reason the defaault image doesn't work, and we prefer the mariadb image
   echo "Setting backup deployment image to: $BACKUP_IMAGE ..."
   oc set image deployment/$DB_BACKUP_DEPLOYMENT_FULL_NAME backup-storage=$BACKUP_IMAGE
+  # Set best-effort resource limits for the backup deployment
+  echo "Setting best-effort resource limits for the backup deployment..."
+  oc set resources deployment/$DB_BACKUP_DEPLOYMENT_FULL_NAME --limits=cpu=0,memory=0 --requests=cpu=0,memory=0
 fi
 
 sleep 15
