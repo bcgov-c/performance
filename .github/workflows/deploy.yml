@@ -181,7 +181,7 @@ jobs:
           DB_BACKUP_DEPLOYMENT_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}
           DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
           BACKUP_HELM_CHART: ${{ inputs.BACKUP_HELM_CHART }}
-          DB_BACKUP_IMAGE: ${{ inputs.BACKUP_IMAGE }}
+          BACKUP_IMAGE: ${{ inputs.BACKUP_IMAGE }}
           DB_HEALTH_QUERY: ${{ inputs.DB_HEALTH_QUERY }}
           CLEAN_PVC: ${{ inputs.CLEAN_PVC }}
 
@@ -195,7 +195,7 @@ jobs:
           DB_BACKUP_DEPLOYMENT_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}
           DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
           BACKUP_HELM_CHART: ${{ inputs.BACKUP_HELM_CHART }}
-          DB_BACKUP_IMAGE: ${{ inputs.BACKUP_IMAGE }}
+          BACKUP_IMAGE: ${{ inputs.BACKUP_IMAGE }}
           DB_HOST: ${{ inputs.DB_HOST }}
           DB_DATABASE: ${{ inputs.DB_DATABASE }}
           DB_PORT: ${{ inputs.DB_PORT }}

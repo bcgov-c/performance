@@ -7,7 +7,7 @@ echo "DB_HOST: $DB_HOST"
 echo "DB_PORT: $DB_PORT"
 echo "DB_DATABASE: $DB_DATABASE"
 echo "BACKUP_HELM_CHART: $BACKUP_HELM_CHART"
-echo "DB_BACKUP_IMAGE: $DB_BACKUP_IMAGE"
+echo "BACKUP_IMAGE: $BACKUP_IMAGE"
 echo "DB_BACKUP_DEPLOYMENT_FULL_NAME: $DB_BACKUP_DEPLOYMENT_FULL_NAME"
 
 # Ensure APP_NAME is set
@@ -124,7 +124,7 @@ EOF
     exit 1
   else
     echo "Backup deployment FOUND. Updating..."
-    oc set image deployment/$DB_BACKUP_DEPLOYMENT_FULL_NAME backup-storage=$DB_BACKUP_IMAGE
+    oc set image deployment/$DB_BACKUP_DEPLOYMENT_FULL_NAME backup-storage=$BACKUP_IMAGE
   fi
   echo "Backup container updates completed."
 else
