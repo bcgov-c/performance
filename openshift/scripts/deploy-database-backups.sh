@@ -40,7 +40,28 @@ restore_backup_from_file() {
 # Function to list available backups
 list_backups() {
   # Connect to the backup pod and list available backups
-  BACKUP_LIST=$(oc exec $(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}') -- ./backup.sh -l)
+  echo "Checking if the database ($DB_HOST) is online and contains expected data..."
+  ATTEMPTS=0
+  WAIT_TIME=10
+  MAX_ATTEMPTS=30 # wait up to 5 minutes
+  BACKUP_POD=""
+
+  until [ -n "$BACKUP_POD" ]; do
+    ATTEMPTS=$(( $ATTEMPTS + 1 ))
+    BACKUP_POD=$(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}')
+
+    if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
+      echo "Timeout waiting for the backup pod ($BACKUP_POD) to have status.phase: Running. Exiting."
+      exit 1
+    fi
+
+    if [ -z "$BACKUP_POD" ]; then
+      # echo "No pods found in Running state ($BACKUP_POD). Retrying in $WAIT_TIME seconds..."
+      sleep $WAIT_TIME
+    fi
+  done
+
+  BACKUP_LIST=$(oc exec $BACKUP_POD) -- ./backup.sh -l)
 
   # Parse the backup list into an array
   IFS=$'\n' read -rd '' -a BACKUP_ARRAY <<< "$BACKUP_LIST"
@@ -159,7 +180,6 @@ else
   # helm install $DB_BACKUP_DEPLOYMENT_NAME $BACKUP_HELM_CHART --atomic --wait -f backup-config.yaml
   helm install $DB_BACKUP_DEPLOYMENT_NAME $BACKUP_HELM_CHART -f backup-config.yaml
   echo "Waiting for backup installation..."
-  sleep 5
   # For some reason the defaault image doesn't work, and we prefer the mariadb image
   echo "Setting backup deployment image to: $BACKUP_IMAGE ..."
   oc set image deployment/$DB_BACKUP_DEPLOYMENT_FULL_NAME backup-storage=$BACKUP_IMAGE
