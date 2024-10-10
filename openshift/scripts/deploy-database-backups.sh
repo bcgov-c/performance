@@ -1,5 +1,23 @@
 #!/bin/bash
 
+# Debugging: Print environment variables
+echo "DB_BACKUP_DEPLOYMENT_NAME: $DB_BACKUP_DEPLOYMENT_NAME"
+echo "APP_NAME: $APP_NAME"
+echo "DB_HOST: $DB_HOST"
+echo "DB_PORT: $DB_PORT"
+echo "DB_DATABASE: $DB_DATABASE"
+echo "BACKUP_HELM_CHART: $BACKUP_HELM_CHART"
+echo "DB_BACKUP_IMAGE: $DB_BACKUP_IMAGE"
+echo "DB_BACKUP_DEPLOYMENT_FULL_NAME: $DB_BACKUP_DEPLOYMENT_FULL_NAME"
+
+# Ensure APP_NAME is set
+if [ -z "$APP_NAME" ]; then
+  echo "Error: APP_NAME is not set."
+  exit 1
+fi
+
+echo "Deploying database backups for $APP_NAME to: $DB_BACKUP_DEPLOYMENT_NAME..."
+
 # Function to restore the backup by filename
 restore_backup_from_file() {
   local FILENAME=$1
@@ -79,8 +97,6 @@ oc project $OC_PROJECT
 
 helm repo add bcgov http://bcgov.github.io/helm-charts
 helm repo update
-
-echo "Deploying database backups to: $DB_BACKUP_DEPLOYMENT_NAME..."
 
 # Check if the Helm deployment exists
 if helm list -q | grep -q "^$DB_BACKUP_DEPLOYMENT_NAME$"; then
