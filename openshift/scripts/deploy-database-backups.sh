@@ -61,7 +61,7 @@ list_backups() {
     fi
   done
 
-  BACKUP_LIST=$(oc exec $BACKUP_POD) -- ./backup.sh -l
+  BACKUP_LIST=$(oc exec $BACKUP_POD -- ./backup.sh -l)
 
   # Parse the backup list into an array
   IFS=$'\n' read -rd '' -a BACKUP_ARRAY <<< "$BACKUP_LIST"
