@@ -40,7 +40,7 @@ restore_backup_from_file() {
 # Function to list available backups
 list_backups() {
   # Connect to the backup pod and list available backups
-  echo "Checking if the database ($DB_HOST) is online and contains expected data..."
+  # echo "Checking if the database ($DB_HOST) is online and contains expected data..."
   ATTEMPTS=0
   WAIT_TIME=10
   MAX_ATTEMPTS=30 # wait up to 5 minutes
@@ -56,7 +56,7 @@ list_backups() {
     fi
 
     if [ -z "$BACKUP_POD" ]; then
-      # echo "No pods found in Running state ($BACKUP_POD). Retrying in $WAIT_TIME seconds..."
+      echo "No pods found in Running state ($BACKUP_POD). Retrying in $WAIT_TIME seconds..."
       sleep $WAIT_TIME
     fi
   done
