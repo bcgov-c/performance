@@ -52,9 +52,9 @@ extract_backup_info() {
   echo "Use%: $USE_PERCENT"
   echo "Mounted on: $MOUNTED_ON"
 
-  # Prepend mounted on value to REMOTE_BACKUP_FILE_LOCATION
-  REMOTE_BACKUP_FILE_LOCATION="$MOUNTED_ON/$REMOTE_BACKUP_FILE_LOCATION"
-  echo "Updated REMOTE_BACKUP_FILE_LOCATION: $REMOTE_BACKUP_FILE_LOCATION"
+  # Prepend mounted on value to DB_INIT_FILE_LOCATION
+  DB_INIT_FILE_LOCATION="$MOUNTED_ON/$DB_INIT_FILE_LOCATION"
+  echo "Updated DB_INIT_FILE_LOCATION: $DB_INIT_FILE_LOCATION"
 
   # Add notice if Use% is greater than 70% or less than 1%
   USE_PERCENT_VALUE=$(echo "$USE_PERCENT" | tr -d '%')
@@ -102,7 +102,7 @@ list_backups() {
     fi
 
     if [ -z "$BACKUP_POD" ]; then
-      echo "No pods found in Running state ($BACKUP_POD). Retrying in $WAIT_TIME seconds..."
+      # echo "No pods found in Running state ($BACKUP_POD). Retrying in $WAIT_TIME seconds..."
       sleep $WAIT_TIME
     fi
   done
@@ -113,18 +113,11 @@ list_backups() {
   extract_backup_info "$BACKUP_LIST"
 
   # Check if the backup list contains the remote backup file location
-  #!!! Also ensure local backuup file exists as wwell
-  if ! echo "$BACKUP_LIST" | grep -q "$REMOTE_BACKUP_FILE_LOCATION"; then
-    echo "Remote backup file not found in the backup list. Copying the local file to the backup pod..."
-    if [[ -f "$DB_LOCAL_SQL_INIT_FILE" ]]; then
-      if ! oc cp --retries=25 "$DB_LOCAL_SQL_INIT_FILE" "$BACKUP_POD:$REMOTE_BACKUP_FILE_LOCATION"; then
-        echo "Error: Failed to copy the local file to the backup pod."
-        exit 1
-      fi
-    else
-      echo "Local SQL backup file not found. Please check your file exists and path is valid in env: DB_LOCAL_SQL_INIT_FILE"
-    fi
-    echo "File copied successfully."
+  if ! echo "$BACKUP_LIST" | grep -q "$DB_INIT_FILE_LOCATION"; then
+    echo "Remote backup file location NOT FOUND in the backup list."
+    echo "Backup file location: $DB_INIT_FILE_LOCATION"
+    echo "Backup list: $BACKUP_LIST"
+    exit 1
   fi
 
   # Parse the backup list into an array
@@ -148,8 +141,8 @@ list_backups() {
     # Only include entries with size > 1M
     if [ "$SIZE_IN_BYTES" -gt $((1 * 1024 * 1024)) ]; then
       echo "$SIZE $DATE $FILENAME"
-    else
-      echo "Skipped small backup: $FILENAME"
+    # else
+      # echo "Skipped small backup: $FILENAME"
     fi
   done | sort -k2,3r)
 
@@ -167,7 +160,7 @@ restore_database_from_backup() {
   echo "Listing available backups..."
   LATEST_BACKUP_FILENAME=$(list_backups)
 
-  # Check if the file exists and has a .gz or .sql extension
+  # Check if the file exists
   if [[ -f "$LATEST_BACKUP_FILENAME" ]]; then
     # Restore the backup using the filename
     restore_backup_from_file "$LATEST_BACKUP_FILENAME"

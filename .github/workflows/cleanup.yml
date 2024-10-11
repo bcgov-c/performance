@@ -307,26 +307,30 @@ jobs:
         run: |
           echo "Checking Helm release status for '${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}'..."
 
-          # Temporarily disable exit on error
-          set +e
+          if [ ${{ inputs.CLEAN_PVC }} -eq "YES"  ]; then
+            # Temporarily disable exit on error
+            set +e
 
-          # Capture the output and exit code of the helm status command
-          HELM_STATUS_OUTPUT=$(helm status ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }} 2>&1)
-          HELM_STATUS_EXIT_CODE=$?
+            # Capture the output and exit code of the helm status command
+            HELM_STATUS_OUTPUT=$(helm status ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }} 2>&1)
+            HELM_STATUS_EXIT_CODE=$?
 
-          # Re-enable exit on error
-          set -e
+            # Re-enable exit on error
+            set -e
 
-          echo "Helm status output: $HELM_STATUS_OUTPUT"
-          echo "Helm status exit code: $HELM_STATUS_EXIT_CODE"
+            echo "Helm status output: $HELM_STATUS_OUTPUT"
+            echo "Helm status exit code: $HELM_STATUS_EXIT_CODE"
 
-          # Check if the Helm release is deployed or not found
-          if [ $HELM_STATUS_EXIT_CODE -eq 0 ]; then
-            echo "Helm release '${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}' is deployed. Proceeding with uninstallation..."
-            helm uninstall ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}
-          elif echo "$HELM_STATUS_OUTPUT" | grep -qi "release: not found"; then
-            echo "Helm release '${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}' not found. Skipping uninstallation..."
+            # Check if the Helm release is deployed or not found
+            if [ $HELM_STATUS_EXIT_CODE -eq 0 ]; then
+              echo "Helm release '${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}' is deployed. Proceeding with uninstallation..."
+              helm uninstall ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}
+            elif echo "$HELM_STATUS_OUTPUT" | grep -qi "release: not found"; then
+              echo "Helm release '${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}' not found. Skipping uninstallation..."
+            else
+              echo "Unexpected error checking Helm release status: $HELM_STATUS_OUTPUT"
+              exit 1
+            fi
           else
-            echo "Unexpected error checking Helm release status: $HELM_STATUS_OUTPUT"
-            exit 1
+            echo "Cleaning backups skipped due to PVC cleanup being disabled."
           fi

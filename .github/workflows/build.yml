@@ -83,8 +83,7 @@ jobs:
       CRON_IMAGE: ${{ env.CRON_IMAGE}}
       REDIS_IMAGE: ${{ env.REDIS_IMAGE }}
       REDIS_NAME: ${{ env.REDIS_NAME }}
-      DB_LOCAL_SQL_INIT_FILE: ${{ env.DB_LOCAL_SQL_INIT_FILE }}
-      REMOTE_BACKUP_FILE_LOCATION: ${{ env.REMOTE_BACKUP_FILE_LOCATION }}
+      DB_INIT_FILE_LOCATION: ${{ env.DB_INIT_FILE_LOCATION }}
       DB_BACKUP_DEPLOYMENT_NAME: ${{ env.DB_BACKUP_DEPLOYMENT_NAME }}
       DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ env.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
       BACKUP_IMAGE: ${{ env.BACKUP_IMAGE }}
@@ -214,8 +213,7 @@ jobs:
       DB_PORT: ${{ needs.checkEnv.outputs.DB_PORT }}
       DB_NAME: ${{ needs.checkEnv.outputs.DB_NAME }}
       DB_DATABASE: ${{ needs.checkEnv.outputs.DB_DATABASE }}
-      DB_LOCAL_SQL_INIT_FILE: ${{ needs.checkEnv.outputs.DB_LOCAL_SQL_INIT_FILE }}
-      REMOTE_BACKUP_FILE_LOCATION: ${{ needs.checkEnv.outputs.REMOTE_BACKUP_FILE_LOCATION }}
+      DB_INIT_FILE_LOCATION: ${{ needs.checkEnv.outputs.DB_INIT_FILE_LOCATION }}
       DB_HEALTH_QUERY: ${{ needs.checkEnv.outputs.DB_HEALTH_QUERY }}
       DB_BACKUP_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.DB_BACKUP_DEPLOYMENT_NAME }}
       DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ needs.checkEnv.outputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
