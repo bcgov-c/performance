@@ -267,7 +267,31 @@ wait_for_statefulset() {
   echo "Statefulset $STATEFULSET_NAME is ready."
 }
 
+# Function to wait for a deployment to be ready
+wait_for_rollout() {
+  local DEPLOYMENT_NAME=$1
+  local DEPLOYMENT_TYPE=$2
+  local ATTEMPTS=0
+  local MAX_ATTEMPTS=30
+  local WAIT_TIME=10
+
+  until oc rollout status $DEPLOYMENT_TYPE/$DEPLOYMENT_NAME | grep -q "successfully rolled out"; do
+    ATTEMPTS=$((ATTEMPTS + 1))
+
+    if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
+      echo "Timeout waiting for the $DEPLOYMENT_NAME deployment to be ready."
+      exit 1
+    fi
+
+    echo "Waiting for $DEPLOYMENT_TYPE/$DEPLOYMENT_NAME to be ready. Retrying in $WAIT_TIME seconds..."
+    sleep $WAIT_TIME
+  done
+
+  echo "Roll-out of $DEPLOYMENT_NAME is ready."
+}
+
 echo "Checking if the database ($DB_HOST) is online and contains expected data..."
+
 ATTEMPTS=0
 WAIT_TIME=10
 MAX_ATTEMPTS=30 # wait up to 5 minutes
@@ -342,10 +366,14 @@ if [ $TOTAL_USER_COUNT -eq 0 ]; then
   if [ $DATABASE_IS_ONLINE -eq 1 ]; then
     # Database does not contain any users (likley empty)
     # Restore from backup...
-    echo "Restoring from backup: DB_INIT_FILE_LOCATION: $DB_INIT_FILE_LOCATION"
+    echo "Restoring from backup: DB_INIT_FILE_LOCATION: $DB_INIT_FILE_LOCATION ..."
 
-    # Wait for the database statefulset to be ready
-    wait_for_statefulset "$DB_NAME"
+    sleep 10
+
+    # Wait for the database backup deployment to be ready (DB_BACKUP_DEPLOYMENT_FULL_NAME)
+    wait_for_rollout "$DB_BACKUP_DEPLOYMENT_FULL_NAME" "deployment"
+
+    sleep 15
 
     # Restore the database from the latest backup
     restore_database_from_backup
