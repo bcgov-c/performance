@@ -110,7 +110,7 @@ list_backups() {
   BACKUP_LIST=$(oc exec $BACKUP_POD -- ./backup.sh -l)
 
   # Extract and display backup information
-  extract_backup_info "$BACKUP_LIST"
+  # extract_backup_info "$BACKUP_LIST"
 
   # Check if the backup list contains the remote backup file location
   if ! echo "$BACKUP_LIST" | grep -q "$DB_INIT_FILE_LOCATION"; then
@@ -237,7 +237,7 @@ else
   # helm install $DB_BACKUP_DEPLOYMENT_NAME $BACKUP_HELM_CHART --atomic --wait -f backup-config.yaml
   helm install $DB_BACKUP_DEPLOYMENT_NAME $BACKUP_HELM_CHART -f backup-config.yaml
   echo "Waiting for backup installation..."
-  # For some reason the defaault image doesn't work, and we prefer the mariadb image
+  # For some reason the defaault image doesn't work, and we prefer the mariadb image anyway
   echo "Setting backup deployment image to: $BACKUP_IMAGE ..."
   oc set image deployment/$DB_BACKUP_DEPLOYMENT_FULL_NAME backup-storage=$BACKUP_IMAGE
   # Set best-effort resource limits for the backup deployment
@@ -264,7 +264,7 @@ until [ -n "$DB_POD_NAME" ]; do
   fi
 
   if [ -z "$PODS" ]; then
-    echo "No pods found in Running state ($PODS). Retrying in $WAIT_TIME seconds..."
+    echo "No [app=$DB_HOST] pods found in Running state. Retrying in $WAIT_TIME seconds..."
     sleep $WAIT_TIME
   else
     DB_POD_NAME=$(echo $PODS | awk '{print $1}')
@@ -285,7 +285,7 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
   # Capture the output of the mariadb command
   OUTPUT=$(oc exec $DB_POD_NAME -- bash -c "mariadb -u root -e 'USE $DB_DATABASE; $DB_HEALTH_QUERY;'" 2>&1)
   # Debugging: Print the output of the mariadb command
-  echo "Mariadb command output: $OUTPUT"
+  # echo "Mariadb command output: $OUTPUT"
 
   # Check if the output contains an error
   if echo "$OUTPUT" | grep -qi "error"; then
@@ -306,7 +306,6 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
   # Check if CURRENT_USER_COUNT is set and greater than 0
   if [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -gt 0 ]; then
     echo "Database is online and contains $CURRENT_USER_COUNT users."
-    echo "No further action required."
     TOTAL_USER_COUNT=$CURRENT_USER_COUNT
     break
   elif [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -eq 0 ]; then
@@ -323,8 +322,11 @@ if [ $TOTAL_USER_COUNT -eq 0 ]; then
   if [ $DATABASE_IS_ONLINE -eq 1 ]; then
     # Database does not contain any users (likley empty)
     # Restore from backup...
+    echo "Restoring from backup: DB_INIT_FILE_LOCATION: $DB_INIT_FILE_LOCATION"
     restore_database_from_backup
   else
     echo "Database is offline."
   fi
+else
+  echo "Database appears to be healthy. No further action required."
 fi
