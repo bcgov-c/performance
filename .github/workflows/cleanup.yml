@@ -307,7 +307,7 @@ jobs:
         run: |
           echo "Checking Helm release status for '${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}'..."
 
-          if [ ${{ inputs.CLEAN_PVC }} -eq "YES"  ]; then
+          if [ "${{ inputs.CLEAN_PVC }}" = "YES"  ]; then
             # Temporarily disable exit on error
             set +e
 
