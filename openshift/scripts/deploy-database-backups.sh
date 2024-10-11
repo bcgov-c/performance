@@ -51,8 +51,7 @@ list_backups() {
     BACKUP_POD=$(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}')
 
     if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
-      echo "Timeout waiting for the backup pod ($BACKUP_POD) to have status.phase: Running. Exiting."
-      exit 1
+      BACKUP_POD="Timeout waiting for the backup pod to be running."
     fi
 
     if [ -z "$BACKUP_POD" ]; then
@@ -217,6 +216,7 @@ done
 echo "Database pod found and running: $DB_POD_NAME."
 
 TOTAL_USER_COUNT=0
+CURRENT_USER_COUNT=0
 ATTEMPTS=0
 OUTPUT=""
 until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
@@ -225,27 +225,43 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
 
   # Capture the output of the mariadb command
   OUTPUT=$(oc exec $DB_POD_NAME -- bash -c "mariadb -u root -e 'USE $DB_DATABASE; $DB_HEALTH_QUERY;'" 2>&1)
+  # Debugging: Print the output of the mariadb command
+  echo "Mariadb command output: $OUTPUT"
 
   # Check if the output contains an error
   if echo "$OUTPUT" | grep -qi "error"; then
     echo "❌ Database error: $OUTPUT"
     # break
-  else
-    # Extract the user count from the output
-    CURRENT_USER_COUNT=$(echo "$OUTPUT" | grep -oP '\d+')
-
-    # Check if CURRENT_USER_COUNT is set and greater than 0
-    if [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -gt 0 ]; then
-      echo "Database is online and contains $CURRENT_USER_COUNT users."
-      echo "No further action required."
-      TOTAL_USER_COUNT=$CURRENT_USER_COUNT
-      break
-    else
-      # Current user count is 0 or not set
-      echo "Database appears to be offline. Attempt $ATTEMPTS of $MAX_ATTEMPTS."
-    fi
   fi
-  sleep $WAIT_TIME
+
+  # Extract the user count from the output
+  CURRENT_USER_COUNT=$(echo "$OUTPUT" | grep -oP '\d+')
+  # Debugging: Print the current user count
+  echo "Current user count: $CURRENT_USER_COUNT"
+
+  # Check if CURRENT_USER_COUNT is set and greater than 0
+  if [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -gt 0 ]; then
+    echo "Database is online and contains $CURRENT_USER_COUNT users."
+    echo "No further action required."
+    TOTAL_USER_COUNT=$CURRENT_USER_COUNT
+    break
+  elif [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -eq 0 ]; then
+    echo "Database is online but contains no users."
+
+    # Main script execution
+    echo "Starting backup restoration process..."
+    # List backups and get the filename of the latest backup
+    LATEST_BACKUP_FILENAME=$(list_backups)
+    # Restore the backup using the filename
+    restore_backup "$LATEST_BACKUP_FILENAME"
+    echo "Backup restoration process completed."
+
+    break
+  else
+    # Current user count is 0 or not set
+    # echo "Database appears to be offline. Attempt $ATTEMPTS of $MAX_ATTEMPTS."
+    sleep $WAIT_TIME
+  fi
 done
 
 if [ $TOTAL_USER_COUNT -eq 0 ]; then
