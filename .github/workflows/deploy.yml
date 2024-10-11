@@ -11,6 +11,12 @@ on:
       APP_NAME:
         required: true
         type: string
+      DB_LOCAL_SQL_INIT_FILE:
+        required: true
+        type: string
+      REMOTE_BACKUP_FILE_LOCATION:
+        required: true
+        type: string
       WEB_NAME:
         required: true
         type: string
@@ -192,6 +198,8 @@ jobs:
           exec: bash ./openshift/scripts/deploy-database-backups.sh
         env:
           APP_NAME: ${{ inputs.APP_NAME }}
+          DB_LOCAL_SQL_INIT_FILE: ${{ inputs.DB_LOCAL_SQL_INIT_FILE }}
+          REMOTE_BACKUP_FILE_LOCATION: ${{ inputs.REMOTE_BACKUP_FILE_LOCATION }}
           DB_BACKUP_DEPLOYMENT_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}
           DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
           BACKUP_HELM_CHART: ${{ inputs.BACKUP_HELM_CHART }}

@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# Ensure APP_NAME is set
+if [ -z "$APP_NAME" ]; then
+  echo "Error: APP_NAME is not set."
+  exit 1
+fi
+
+echo "Deploying database backups for $APP_NAME to: $DB_BACKUP_DEPLOYMENT_NAME..."
+
+#!/bin/bash
+
 # Debugging: Print environment variables
 echo "DB_BACKUP_DEPLOYMENT_NAME: $DB_BACKUP_DEPLOYMENT_NAME"
 echo "APP_NAME: $APP_NAME"
@@ -7,7 +17,7 @@ echo "DB_HOST: $DB_HOST"
 echo "DB_PORT: $DB_PORT"
 echo "DB_DATABASE: $DB_DATABASE"
 echo "BACKUP_HELM_CHART: $BACKUP_HELM_CHART"
-echo "BACKUP_IMAGE: $BACKUP_IMAGE"
+echo "DB_BACKUP_IMAGE: $DB_BACKUP_IMAGE"
 echo "DB_BACKUP_DEPLOYMENT_FULL_NAME: $DB_BACKUP_DEPLOYMENT_FULL_NAME"
 
 # Ensure APP_NAME is set
@@ -16,7 +26,44 @@ if [ -z "$APP_NAME" ]; then
   exit 1
 fi
 
-echo "Deploying database backups for $APP_NAME to: $DB_BACKUP_DEPLOYMENT_NAME..."
+echo "Deploying database backups to: $DB_BACKUP_DEPLOYMENT_NAME..."
+
+# Function to extract and display backup information
+extract_backup_info() {
+  local BACKUP_LIST=$1
+
+  # Extract database name and current size
+  DATABASE_NAME=$(echo "$BACKUP_LIST" | grep -oP 'Database:\s+\K\S+')
+  CURRENT_SIZE=$(echo "$BACKUP_LIST" | grep -oP 'Current Size:\s+\K\S+')
+
+  # Extract size, used, avail, use%, and mounted on
+  SIZE=$(echo "$BACKUP_LIST" | grep -oP 'Size:\s+\K\S+')
+  USED=$(echo "$BACKUP_LIST" | grep -oP 'Used:\s+\K\S+')
+  AVAIL=$(echo "$BACKUP_LIST" | grep -oP 'Avail:\s+\K\S+')
+  USE_PERCENT=$(echo "$BACKUP_LIST" | grep -oP 'Use%:\s+\K\S+')
+  MOUNTED_ON=$(echo "$BACKUP_LIST" | grep -oP 'Mounted on:\s+\K\S+')
+
+  # Display extracted information
+  echo "Database: $DATABASE_NAME"
+  echo "Current Size: $CURRENT_SIZE"
+  echo "Size: $SIZE"
+  echo "Used: $USED"
+  echo "Avail: $AVAIL"
+  echo "Use%: $USE_PERCENT"
+  echo "Mounted on: $MOUNTED_ON"
+
+  # Prepend mounted on value to REMOTE_BACKUP_FILE_LOCATION
+  REMOTE_BACKUP_FILE_LOCATION="$MOUNTED_ON/$REMOTE_BACKUP_FILE_LOCATION"
+  echo "Updated REMOTE_BACKUP_FILE_LOCATION: $REMOTE_BACKUP_FILE_LOCATION"
+
+  # Add notice if Use% is greater than 70% or less than 1%
+  USE_PERCENT_VALUE=$(echo "$USE_PERCENT" | tr -d '%')
+  if [ "$USE_PERCENT_VALUE" -gt 70 ]; then
+    echo "Notice: Use% is greater than 70%."
+  elif [ "$USE_PERCENT_VALUE" -lt 1 ]; then
+    echo "Notice: Use% is less than 1%."
+  fi
+}
 
 # Function to restore the backup by filename
 restore_backup_from_file() {
@@ -61,6 +108,24 @@ list_backups() {
   done
 
   BACKUP_LIST=$(oc exec $BACKUP_POD -- ./backup.sh -l)
+
+  # Extract and display backup information
+  extract_backup_info "$BACKUP_LIST"
+
+  # Check if the backup list contains the remote backup file location
+  #!!! Also ensure local backuup file exists as wwell
+  if ! echo "$BACKUP_LIST" | grep -q "$REMOTE_BACKUP_FILE_LOCATION"; then
+    echo "Remote backup file not found in the backup list. Copying the local file to the backup pod..."
+    if [[ -f "$DB_LOCAL_SQL_INIT_FILE" ]]; then
+      if ! oc cp --retries=25 "$DB_LOCAL_SQL_INIT_FILE" "$BACKUP_POD:$REMOTE_BACKUP_FILE_LOCATION"; then
+        echo "Error: Failed to copy the local file to the backup pod."
+        exit 1
+      fi
+    else
+      echo "Local SQL backup file not found. Please check your file exists and path is valid in env: DB_LOCAL_SQL_INIT_FILE"
+    fi
+    echo "File copied successfully."
+  fi
 
   # Parse the backup list into an array
   IFS=$'\n' read -rd '' -a BACKUP_ARRAY <<< "$BACKUP_LIST"
@@ -231,7 +296,10 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
   # Check if the output contains an error
   if echo "$OUTPUT" | grep -qi "error"; then
     echo "❌ Database error: $OUTPUT"
-    # break
+
+    if echo "$OUTPUT" | grep -qi "doesn't exist"; then
+
+    fi
   fi
 
   # Extract the user count from the output
@@ -253,7 +321,7 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
     # List backups and get the filename of the latest backup
     LATEST_BACKUP_FILENAME=$(list_backups)
     # Restore the backup using the filename
-    restore_backup "$LATEST_BACKUP_FILENAME"
+    restore_backup_from_file "$LATEST_BACKUP_FILENAME"
     echo "Backup restoration process completed."
 
     break

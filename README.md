@@ -8,6 +8,14 @@
 
 Run local developent version using Docker [Desktop]
 
+## Initialize database
+
+The automated deployment will attempt to initialize the database using the backup script.
+
+For example, from the backup (temp) file: ./temp/db-backups/dev-mysql-performance-db_2024-09-04_12-00-34.sql.gz
+
+Which would get copied to: performance-db-backup-storage-[DEPLOYED_POD_ID]:/backups/init.sql.gz
+
 `$ docker compose up --build -d`
 
 ## Test puppeteer / lighthouse scripts locally
