@@ -16,7 +16,7 @@ env:
   # Clean builds before deployments will delete all resources (other than backups)
   # Select "YES" or allow collisions and PVC persistence
   CLEAN_BUILDS: "YES"
-  CLEAN_PVC: "NO" # Careful, this one wil delete all PVCs, except for backups
+  CLEAN_PVC: "NO" # Careful, this one wil delete all PVCs, including backups
   BUILD_ID: ${{ github.event.number }}
   INSPECT_JOB_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
