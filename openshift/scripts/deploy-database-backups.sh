@@ -295,10 +295,10 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
 
   # Check if the output contains an error
   if echo "$OUTPUT" | grep -qi "error"; then
-    echo "❌ Database error: $OUTPUT"
-
     if echo "$OUTPUT" | grep -qi "doesn't exist"; then
-
+      echo "Database not found."
+    else
+      echo "❌ Database error: $OUTPUT"
     fi
   fi
 
