@@ -245,7 +245,27 @@ else
   oc set resources deployment/$DB_BACKUP_DEPLOYMENT_FULL_NAME --limits=cpu=0,memory=0 --requests=cpu=0,memory=0
 fi
 
-sleep 15
+# Function to wait for a statefulset to be ready
+wait_for_statefulset() {
+  local STATEFULSET_NAME=$1
+  local ATTEMPTS=0
+  local MAX_ATTEMPTS=30
+  local WAIT_TIME=10
+
+  until oc rollout status statefulset/$STATEFULSET_NAME | grep -q "successfully rolled out"; do
+    ATTEMPTS=$((ATTEMPTS + 1))
+
+    if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
+      echo "Timeout waiting for the $STATEFULSET_NAME statefulset to be ready."
+      exit 1
+    fi
+
+    echo "Waiting for statefulset $STATEFULSET_NAME to be ready. Retrying in $WAIT_TIME seconds..."
+    sleep $WAIT_TIME
+  done
+
+  echo "Statefulset $STATEFULSET_NAME is ready."
+}
 
 echo "Checking if the database ($DB_HOST) is online and contains expected data..."
 ATTEMPTS=0
@@ -323,6 +343,11 @@ if [ $TOTAL_USER_COUNT -eq 0 ]; then
     # Database does not contain any users (likley empty)
     # Restore from backup...
     echo "Restoring from backup: DB_INIT_FILE_LOCATION: $DB_INIT_FILE_LOCATION"
+
+    # Wait for the database statefulset to be ready
+    wait_for_statefulset "$DB_NAME"
+
+    # Restore the database from the latest backup
     restore_database_from_backup
   else
     echo "Database is offline."
