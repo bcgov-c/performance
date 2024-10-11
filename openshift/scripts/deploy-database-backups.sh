@@ -300,12 +300,14 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
     else
       echo "❌ Database error: $OUTPUT"
     fi
-  fi
 
-  # Extract the user count from the output
-  CURRENT_USER_COUNT=$(echo "$OUTPUT" | grep -oP '\d+')
-  # Debugging: Print the current user count
-  echo "Current user count: $CURRENT_USER_COUNT"
+    CURRENT_USER_COUNT=0
+  else
+    # Extract the user count from the output
+    CURRENT_USER_COUNT=$(echo "$OUTPUT" | grep -oP '\d+')
+    # Debugging: Print the current user count
+    echo "Current user count: $CURRENT_USER_COUNT"
+  fi
 
   # Check if CURRENT_USER_COUNT is set and greater than 0
   if [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -gt 0 ]; then
