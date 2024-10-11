@@ -282,6 +282,7 @@ echo "Database pod found and running: $DB_POD_NAME."
 
 TOTAL_USER_COUNT=0
 CURRENT_USER_COUNT=0
+DATABASE_IS_ONLINE=0
 ATTEMPTS=0
 OUTPUT=""
 until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
@@ -317,25 +318,20 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
     break
   elif [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -eq 0 ]; then
     echo "Database is online but contains no users."
-
-    # Main script execution
-    echo "Starting backup restoration process..."
-    # List backups and get the filename of the latest backup
-    LATEST_BACKUP_FILENAME=$(list_backups)
-    # Restore the backup using the filename
-    restore_backup_from_file "$LATEST_BACKUP_FILENAME"
-    echo "Backup restoration process completed."
-
+    DATABASE_IS_ONLINE=1
     break
   else
-    # Current user count is 0 or not set
-    # echo "Database appears to be offline. Attempt $ATTEMPTS of $MAX_ATTEMPTS."
+    # Current user count is 0 or not set, wait longer...
     sleep $WAIT_TIME
   fi
 done
 
 if [ $TOTAL_USER_COUNT -eq 0 ]; then
-  echo "Database is offline or does not contain any users."
-  sleep 10
-  restore_database_from_backup
+  if [ $DATABASE_IS_ONLINE -eq 1 ]; then
+    # Database does not contain any users (likley empty)
+    # Restore from backup...
+    restore_database_from_backup
+  else
+    echo "Database is offline."
+  fi
 fi
