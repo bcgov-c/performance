@@ -27,15 +27,15 @@ extract_backup_info() {
   local BACKUP_LIST=$1
 
   # Extract database name and current size
-  DATABASE_NAME=$(echo "$BACKUP_LIST" | grep -oP 'Database:\s+\K\S+')
-  CURRENT_SIZE=$(echo "$BACKUP_LIST" | grep -oP 'Current Size:\s+\K\S+')
+  DATABASE_NAME=$(echo "$BACKUP_LIST" | awk '/Database/ {getline; print $1}')
+  CURRENT_SIZE=$(echo "$BACKUP_LIST" | awk '/Database/ {getline; print $2}')
 
   # Extract size, used, avail, use%, and mounted on
-  SIZE=$(echo "$BACKUP_LIST" | grep -oP 'Size:\s+\K\S+')
-  USED=$(echo "$BACKUP_LIST" | grep -oP 'Used:\s+\K\S+')
-  AVAIL=$(echo "$BACKUP_LIST" | grep -oP 'Avail:\s+\K\S+')
-  USE_PERCENT=$(echo "$BACKUP_LIST" | grep -oP 'Use%:\s+\K\S+')
-  MOUNTED_ON=$(echo "$BACKUP_LIST" | grep -oP 'Mounted on:\s+\K\S+')
+  SIZE=$(echo "$BACKUP_LIST" | awk '/Filesystem/ {getline; print $2}')
+  USED=$(echo "$BACKUP_LIST" | awk '/Filesystem/ {getline; print $3}')
+  AVAIL=$(echo "$BACKUP_LIST" | awk '/Filesystem/ {getline; print $4}')
+  USE_PERCENT=$(echo "$BACKUP_LIST" | awk '/Filesystem/ {getline; print $5}')
+  MOUNTED_ON=$(echo "$BACKUP_LIST" | awk '/Filesystem/ {getline; print $6}')
 
   # Display extracted information
   echo "Database: $DATABASE_NAME" >&2
@@ -103,13 +103,17 @@ list_backups() {
     fi
   done
 
-  echo "Backup pod found and running: $BACKUP_POD." >&2
-  echo "Testing backup file location: $DB_INIT_FILE_LOCATION" >&2
+  echo "Backup pod is running: $BACKUP_POD." >&2
 
   BACKUP_LIST=$(oc exec $BACKUP_POD -- ./backup.sh -l)
 
+  echo "Backup list: $BACKUP_LIST" >&2
+
   # Extract and display backup information
   extract_backup_info "$BACKUP_LIST"
+
+  echo "Testing backup file location: $DB_INIT_FILE_LOCATION" >&2
+
 
   # Check if the backup list contains the remote backup file location
   if ! echo "$BACKUP_LIST" | grep -q "$DB_INIT_FILE_LOCATION"; then
