@@ -95,10 +95,11 @@ list_backups() {
 
   until [ -n "$BACKUP_POD" ]; do
     ATTEMPTS=$(( $ATTEMPTS + 1 ))
-    BACKUP_POD=$(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}')
+    BACKUP_POD=$(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name} 2>/dev/null')
 
     if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
       BACKUP_POD="Timeout waiting for the backup pod to be running."
+      exit 1
     fi
 
     if [ -z "$BACKUP_POD" ]; then
@@ -347,6 +348,8 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
     echo "Current user count: $CURRENT_USER_COUNT"
   fi
 
+  echo "Validate user count: $CURRENT_USER_COUNT"
+
   # Check if CURRENT_USER_COUNT is set and greater than 0
   if [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -gt 0 ]; then
     echo "Database is online and contains $CURRENT_USER_COUNT users."
@@ -361,6 +364,8 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
     sleep $WAIT_TIME
   fi
 done
+
+echo "Validate total user count: $TOTAL_USER_COUNT"
 
 if [ $TOTAL_USER_COUNT -eq 0 ]; then
   if [ $DATABASE_IS_ONLINE -eq 1 ]; then
