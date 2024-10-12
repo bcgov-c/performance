@@ -109,6 +109,8 @@ list_backups() {
     fi
   done
 
+  echo "Backup pod found and running: $BACKUP_POD." >&2
+
   BACKUP_LIST=$(oc exec $BACKUP_POD -- ./backup.sh -l)
 
   # Extract and display backup information
@@ -116,10 +118,13 @@ list_backups() {
 
   # Check if the backup list contains the remote backup file location
   if ! echo "$BACKUP_LIST" | grep -q "$DB_INIT_FILE_LOCATION"; then
-    echo "Remote backup file location NOT FOUND in the backup list."
-    echo "Backup file location: $DB_INIT_FILE_LOCATION"
-    echo "Backup list: $BACKUP_LIST"
-    exit 1
+    echo "Database initialization file NOT FOUND in the backup list." >&2
+    # echo "Copying the local file to the backup pod..." >&2
+    # if ! oc cp --retries=25 "$LOCAL_SQL_INIT_FILE" "$BACKUP_POD:$REMOTE_BACKUP_FILE_LOCATION"; then
+    #   echo "Error: Failed to copy the local file to the backup pod." >&2
+    #   exit 1
+    # fi
+    # echo "File copied successfully." >&2
   fi
 
   # Parse the backup list into an array
@@ -132,6 +137,9 @@ list_backups() {
     DATE=$(echo "$line" | awk '{print $2 " " $3}')
     FILENAME=$(echo "$line" | awk '{print $4}')
 
+    # Debugging: Print extracted values
+    echo "Extracted values - SIZE: $SIZE, DATE: $DATE, FILENAME: $FILENAME" >&2
+
     # Convert size to bytes for comparison
     SIZE_IN_BYTES=$(echo "$SIZE" | awk '
       /M$/ { printf "%.0f\n", $1 * 1024 * 1024 }
@@ -140,16 +148,27 @@ list_backups() {
       !/[KMG]$/ { print $1 }
     ')
 
+    # Debugging: Print size in bytes
+    echo "Size in bytes: $SIZE_IN_BYTES" >&2
+
     # Only include entries with size > 1M
     if [ "$SIZE_IN_BYTES" -gt $((1 * 1024 * 1024)) ]; then
       echo "$SIZE $DATE $FILENAME"
-    # else
-      # echo "Skipped small backup: $FILENAME"
+    else
+      echo "Skipped small backup: $FILENAME" >&2
     fi
   done | sort -k2,3r)
 
   # Select the latest backup
   LATEST_BACKUP=$(echo "$FILTERED_SORTED_BACKUPS" | head -n 1)
+
+  # Debugging: Print latest backup
+  echo "Latest backup: $LATEST_BACKUP" >&2
+
+  # Check if the remote backup file location is newer
+  if [[ -n "$REMOTE_BACKUP_FILE_LOCATION" && "$REMOTE_BACKUP_FILE_LOCATION" -nt "$LATEST_BACKUP" ]]; then
+    LATEST_BACKUP="$REMOTE_BACKUP_FILE_LOCATION"
+  fi
 
   # Return the filename of the selected backup
   echo "$LATEST_BACKUP" | awk '{print $3}'
