@@ -92,6 +92,7 @@ list_backups() {
   WAIT_TIME=10
   MAX_ATTEMPTS=30 # wait up to 5 minutes
   BACKUP_POD=""
+  DB_INIT_FILE_LOCATION="/backups/$DB_INIT_FILE_LOCATION"
 
   until [ -n "$BACKUP_POD" ]; do
     ATTEMPTS=$(( $ATTEMPTS + 1 ))
