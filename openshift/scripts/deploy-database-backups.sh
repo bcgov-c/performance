@@ -2,7 +2,7 @@
 
 # Ensure APP_NAME is set
 if [ -z "$APP_NAME" ]; then
-  echo "Error: APP_NAME is not set."
+  echo "❌ Error: APP_NAME is not set. Cannot deploy database-backups."
   exit 1
 fi
 
@@ -19,12 +19,6 @@ echo "DB_DATABASE: $DB_DATABASE"
 echo "BACKUP_HELM_CHART: $BACKUP_HELM_CHART"
 echo "DB_BACKUP_IMAGE: $DB_BACKUP_IMAGE"
 echo "DB_BACKUP_DEPLOYMENT_FULL_NAME: $DB_BACKUP_DEPLOYMENT_FULL_NAME"
-
-# Ensure APP_NAME is set
-if [ -z "$APP_NAME" ]; then
-  echo "Error: APP_NAME is not set."
-  exit 1
-fi
 
 echo "Deploying database backups to: $DB_BACKUP_DEPLOYMENT_NAME..."
 
@@ -44,24 +38,24 @@ extract_backup_info() {
   MOUNTED_ON=$(echo "$BACKUP_LIST" | grep -oP 'Mounted on:\s+\K\S+')
 
   # Display extracted information
-  echo "Database: $DATABASE_NAME"
-  echo "Current Size: $CURRENT_SIZE"
-  echo "Size: $SIZE"
-  echo "Used: $USED"
-  echo "Avail: $AVAIL"
-  echo "Use%: $USE_PERCENT"
-  echo "Mounted on: $MOUNTED_ON"
+  echo "Database: $DATABASE_NAME" >&2
+  echo "Current Size: $CURRENT_SIZE" >&2
+  echo "Size: $SIZE" >&2
+  echo "Used: $USED" >&2
+  echo "Avail: $AVAIL" >&2
+  echo "Use%: $USE_PERCENT" >&2
+  echo "Mounted on: $MOUNTED_ON" >&2
 
   # Prepend mounted on value to DB_INIT_FILE_LOCATION
   DB_INIT_FILE_LOCATION="$MOUNTED_ON/$DB_INIT_FILE_LOCATION"
-  echo "Updated DB_INIT_FILE_LOCATION: $DB_INIT_FILE_LOCATION"
+  echo "Updated DB_INIT_FILE_LOCATION: $DB_INIT_FILE_LOCATION" >&2
 
   # Add notice if Use% is greater than 70% or less than 1%
   USE_PERCENT_VALUE=$(echo "$USE_PERCENT" | tr -d '%')
   if [ "$USE_PERCENT_VALUE" -gt 70 ]; then
-    echo "Notice: Use% is greater than 70%."
+    echo "⚠️ Warning: Use% is greater than 70%." >&2
   elif [ "$USE_PERCENT_VALUE" -lt 1 ]; then
-    echo "Notice: Use% is less than 1%."
+    echo "🚫 Notice: Use% is less than 1%." >&2
   fi
 }
 
@@ -81,7 +75,7 @@ restore_backup_from_file() {
     echo "Unsupported file type: $FILENAME"
   fi
 
-  echo "Backup restoration process completed."
+  echo "✔️ Backup restoration process completed."
 }
 
 # Function to list available backups
@@ -92,7 +86,7 @@ list_backups() {
   WAIT_TIME=10
   MAX_ATTEMPTS=30 # wait up to 5 minutes
   BACKUP_POD=""
-  DB_INIT_FILE_LOCATION="/backups/$DB_INIT_FILE_LOCATION"
+  # DB_INIT_FILE_LOCATION="/backups/$DB_INIT_FILE_LOCATION"
 
   until [ -n "$BACKUP_POD" ]; do
     ATTEMPTS=$(( $ATTEMPTS + 1 ))
@@ -110,11 +104,12 @@ list_backups() {
   done
 
   echo "Backup pod found and running: $BACKUP_POD." >&2
+  echo "Testing backup file location: $DB_INIT_FILE_LOCATION" >&2
 
   BACKUP_LIST=$(oc exec $BACKUP_POD -- ./backup.sh -l)
 
   # Extract and display backup information
-  # extract_backup_info "$BACKUP_LIST"
+  extract_backup_info "$BACKUP_LIST"
 
   # Check if the backup list contains the remote backup file location
   if ! echo "$BACKUP_LIST" | grep -q "$DB_INIT_FILE_LOCATION"; then
@@ -188,7 +183,7 @@ EOF
 
   # Upgrade the Helm deployment with the new values
   if [[ `helm upgrade $DB_BACKUP_DEPLOYMENT_NAME $BACKUP_HELM_CHART --reuse-values -f temp-values.yaml 2>&1` =~ "Error" ]]; then
-    echo "Backup container update FAILED."
+    echo "❌ Backup container update FAILED."
     exit 1
   fi
 
@@ -202,7 +197,7 @@ EOF
     echo "Backup deployment FOUND. Updating..."
     oc set image deployment/$DB_BACKUP_DEPLOYMENT_FULL_NAME backup-storage=$BACKUP_IMAGE
   fi
-  echo "Backup container updates completed."
+  echo "✔️ Backup container updates completed."
 else
   echo "Helm $DB_BACKUP_DEPLOYMENT_NAME NOT FOUND. Beginning deployment..."
   echo "
@@ -264,7 +259,7 @@ wait_for_statefulset() {
     sleep $WAIT_TIME
   done
 
-  echo "Statefulset $STATEFULSET_NAME is ready."
+  echo "✔️ Statefulset $STATEFULSET_NAME is ready."
 }
 
 # Function to wait for a deployment to be ready
@@ -287,7 +282,7 @@ wait_for_rollout() {
     sleep $WAIT_TIME
   done
 
-  echo "Roll-out of $DEPLOYMENT_NAME is ready."
+  echo "✔️ Roll-out of $DEPLOYMENT_NAME is ready."
 }
 
 echo "Checking if the database ($DB_HOST) is online and contains expected data..."
