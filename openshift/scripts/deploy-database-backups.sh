@@ -73,7 +73,7 @@ restore_backup_from_file() {
   # Check the file extension and run the appropriate restore command
   if [[ "$FILENAME" == *.gz ]]; then
     # Run the restore command for .gz files
-    oc exec $(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}') -- ./backup.sh -r mariadb/$DB_DATABASE -f "$FILENAME"
+    oc exec $(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}') -- ./backup.sh -r $DB_NAME/$DB_DATABASE -f "$FILENAME"
   elif [[ "$FILENAME" == *.sql ]]; then
     # Run the SQL restore command for .sql files
     oc exec $(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}') -- bash -c "mysql -h $DB_HOST -u root performance < $FILENAME"

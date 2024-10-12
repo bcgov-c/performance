@@ -323,8 +323,9 @@ jobs:
 
             # Check if the Helm release is deployed or not found
             if [ $HELM_STATUS_EXIT_CODE -eq 0 ]; then
-              echo "Helm release '${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}' is deployed. Proceeding with uninstallation..."
-              helm uninstall ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}
+              # echo "Helm release '${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}' is deployed. Proceeding with uninstallation..."
+              # helm uninstall ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}
+              echo "Helm release '${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}' is deployed. Let's leave it in place to avoid any catastrophes..."
             elif echo "$HELM_STATUS_OUTPUT" | grep -qi "release: not found"; then
               echo "Helm release '${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}' not found. Skipping uninstallation..."
             else
