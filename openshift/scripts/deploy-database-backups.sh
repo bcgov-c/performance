@@ -118,7 +118,7 @@ list_backups() {
 
   # Check if the backup list contains the remote backup file location
   if ! echo "$BACKUP_LIST" | grep -q "$DB_INIT_FILE_LOCATION"; then
-    echo "Database initialization file NOT FOUND in the backup list." >&2
+    echo "Database initialization file NOT FOUND in the backup list ($DB_INIT_FILE_LOCATION)." >&2
     # echo "Copying the local file to the backup pod..." >&2
     # if ! oc cp --retries=25 "$LOCAL_SQL_INIT_FILE" "$BACKUP_POD:$REMOTE_BACKUP_FILE_LOCATION"; then
     #   echo "Error: Failed to copy the local file to the backup pod." >&2
@@ -130,34 +130,13 @@ list_backups() {
   # Parse the backup list into an array
   IFS=$'\n' read -rd '' -a BACKUP_ARRAY <<< "$BACKUP_LIST"
 
-  # Filter and sort backups
-  FILTERED_SORTED_BACKUPS=$(for line in "${BACKUP_ARRAY[@]}"; do
-    # Extract size, date, and filename
-    SIZE=$(echo "$line" | awk '{print $1}')
-    DATE=$(echo "$line" | awk '{print $2 " " $3}')
-    FILENAME=$(echo "$line" | awk '{print $4}')
-
-    # Debugging: Print extracted values
-    echo "Extracted values - SIZE: $SIZE, DATE: $DATE, FILENAME: $FILENAME" >&2
-
-    # Convert size to bytes for comparison
-    SIZE_IN_BYTES=$(echo "$SIZE" | awk '
-      /M$/ { printf "%.0f\n", $1 * 1024 * 1024 }
-      /K$/ { printf "%.0f\n", $1 * 1024 }
-      /G$/ { printf "%.0f\n", $1 * 1024 * 1024 * 1024 }
-      !/[KMG]$/ { print $1 }
-    ')
-
-    # Debugging: Print size in bytes
-    echo "Size in bytes: $SIZE_IN_BYTES" >&2
-
-    # Only include entries with size > 1M
-    if [ "$SIZE_IN_BYTES" -gt $((1 * 1024 * 1024)) ]; then
-      echo "$SIZE $DATE $FILENAME"
-    else
-      echo "Skipped small backup: $FILENAME" >&2
-    fi
-  done | sort -k2,3r)
+  # Filter and process the backup list
+  FILTERED_SORTED_BACKUPS=$(echo "$BACKUP_LIST" | awk '
+    BEGIN { skip = 1 }
+    /^--------------------------------------------------------------------------------------------------------------------------------$/ { skip = 0; next }
+    skip { next }
+    NF == 4 { print $0 }
+  ' | sort -k2,3r)
 
   # Select the latest backup
   LATEST_BACKUP=$(echo "$FILTERED_SORTED_BACKUPS" | head -n 1)
@@ -171,7 +150,7 @@ list_backups() {
   fi
 
   # Return the filename of the selected backup
-  echo "$LATEST_BACKUP" | awk '{print $3}'
+  echo "$LATEST_BACKUP" | awk '{print $4}'
 }
 
 restore_database_from_backup() {
