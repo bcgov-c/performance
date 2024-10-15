@@ -122,8 +122,11 @@ jobs:
       - name: 🔑 Log in to OpenShift ( ${{ github.ref_name }} )
         if: success()
         run: |
-          server=https://api.silver.devops.gov.bc.ca:6443
-          oc login --token=${{ secrets.SA_TOKEN }} --server=$server
+          curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz
+          tar -xvf oc.tar.gz
+          sudo mv oc /usr/local/bin/
+          oc version
+          oc login --token=${{ secrets.SA_TOKEN }} --server=${{ secrets.SA_SERVER }}
 
       # Deploy Secrets for DB Connection
       - name: Deploy secrets
