@@ -119,8 +119,7 @@ list_backups() {
 
   # Parse each line of the backup list
   echo "$BACKUP_LIST" | while IFS= read -r line; do
-    echo "Line: '$line'" >&2
-
+    # echo "Line: '$line'" >&2
     # Extract size, date-time, and file path
     SIZE=$(echo "$line" | awk '{print $1}')
     DATE_TIME=$(echo "$line" | awk '{print $2, $3}')
@@ -130,11 +129,12 @@ list_backups() {
     SIZE_IN_BYTES=$(numfmt --from=iec "$SIZE")
 
     # Check if size is greater than 1M (1048576 bytes)
-    if [[ "$SIZE_IN_BYTES" -gt 1048576 ]]; then
+    if [[ "$SIZE_IN_BYTES" -gt 1048576 ]] && [[ -f "$FILE_PATH" ]] && [[ "$FILE_PATH" =~ \.(gz|sql|sql\.gz)$ ]]; then
+      echo "Line: '$line'" >&2
       echo "Valid backup found: Size=$SIZE, Date-Time=$DATE_TIME, File-Path=$FILE_PATH" >&2
       VALID_BACKUPS+=("$SIZE $DATE_TIME $FILE_PATH")
     else
-      echo "❌ Invalid backup (size <= 1M): $line" >&2
+      # echo "❌ Invalid backup (size <= 1M): $line" >&2
     fi
   done
 
