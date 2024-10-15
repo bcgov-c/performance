@@ -64,8 +64,12 @@ jobs:
         with:
           ref: ${{ github.ref_name }}
 
-      - name: Setup OpenShift CLI
-        uses: ./.github/workflows/setup-oc-cli.yml
+      - name: Install OpenShift CLI
+        run: |
+          curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz
+          tar -xvf oc.tar.gz
+          sudo mv oc /usr/local/bin/
+          oc version
 
       # Get Environment Variables from file
       - name: 📋 Setup Environment from File
