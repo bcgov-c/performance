@@ -114,9 +114,8 @@ list_backups() {
 
   echo "Testing backup file location: $DB_INIT_FILE_LOCATION" >&2
 
-
   # Check if the backup list contains the remote backup file location
-  if ! echo "$BACKUP_LIST" | grep -q "$DB_INIT_FILE_LOCATION"; then
+  if ! echo "$BACKUP_LIST" | grep -qF "$DB_INIT_FILE_LOCATION"; then
     echo "Database initialization file NOT FOUND in the backup list ($DB_INIT_FILE_LOCATION)." >&2
     # echo "Copying the local file to the backup pod..." >&2
     # if ! oc cp --retries=25 "$LOCAL_SQL_INIT_FILE" "$BACKUP_POD:$REMOTE_BACKUP_FILE_LOCATION"; then
@@ -137,8 +136,8 @@ list_backups() {
     NF == 4 { print $0 }
   ' | sort -k2,3r)
 
-  # Select the latest backup
-  LATEST_BACKUP=$(echo "$FILTERED_SORTED_BACKUPS" | head -n 1)
+  # Extract the latest backup file location
+  LATEST_BACKUP=$(echo "$BACKUP_LIST" | awk '/^[0-9]+[KMG]/{print $3}' | sort -r | head -n 1)
 
   # Debugging: Print latest backup
   echo "Latest backup: $LATEST_BACKUP" >&2
@@ -148,8 +147,13 @@ list_backups() {
     LATEST_BACKUP="$REMOTE_BACKUP_FILE_LOCATION"
   fi
 
-  # Return the filename of the selected backup
-  echo "$LATEST_BACKUP" | awk '{print $4}'
+  # Check if the latest backup file exists
+  if [ -z "$LATEST_BACKUP" ]; then
+    echo "Backup file: $LATEST_BACKUP does not exist. Skipping restore." >&2
+  else
+    echo "Restoring from backup file: $LATEST_BACKUP" >&2
+    echo $LATEST_BACKUP
+  fi
 }
 
 restore_database_from_backup() {
