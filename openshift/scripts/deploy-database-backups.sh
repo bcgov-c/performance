@@ -27,13 +27,13 @@ convert_to_bytes() {
 
   case "${SIZE: -1}" in
     K|k)
-      SIZE_IN_BYTES=$(( ${SIZE%?} * 1024 ))
+      SIZE_IN_BYTES=$(echo "${SIZE%?} * 1024" | bc)
       ;;
     M|m)
-      SIZE_IN_BYTES=$(( ${SIZE%?} * 1024 * 1024 ))
+      SIZE_IN_BYTES=$(echo "${SIZE%?} * 1024 * 1024" | bc)
       ;;
     G|g)
-      SIZE_IN_BYTES=$(( ${SIZE%?} * 1024 * 1024 * 1024 ))
+      SIZE_IN_BYTES=$(echo "${SIZE%?} * 1024 * 1024 * 1024" | bc)
       ;;
     *)
       SIZE_IN_BYTES=$SIZE
@@ -152,19 +152,23 @@ list_backups() {
     echo "File-Path: $FILE_PATH, Size: $SIZE, Date-Time: $DATE_TIME" >&2
 
     # Check if size is greater than 1M (1048576 bytes)
-    if [[ "$SIZE_IN_BYTES" -gt 1048576 ]]; then
-      echo "Backup size looks good: $SIZE" >&2
-      if [[ -f "$FILE_PATH" ]] && [[ "$FILE_PATH" =~ \.(gz|sql|sql\.gz)$ ]]; then
-        echo "Line: '$line'" >&2
+
+    if [[ -f "$FILE_PATH" ]] && [[ "$FILE_PATH" =~ \.(gz|sql|sql\.gz)$ ]]; then
+      echo "Backup file exists at: $FILE_PATH" >&2
+
+      if [[ "$SIZE_IN_BYTES" -gt 1048576 ]]; then
+        # echo "Line: '$line'" >&2
+        echo "Backup size looks good: $SIZE" >&2
         echo "Valid backup found: Size=$SIZE, Date-Time=$DATE_TIME, File-Path=$FILE_PATH" >&2
-        echo "Backup file exists: $FILE_PATH" >&2
         VALID_BACKUPS+=("$SIZE $DATE_TIME $FILE_PATH")
       else
-        echo "❌ Backup file not found: $FILE_PATH" >&2
-        continue
+        echo "❌ Invalid backup size: $line" >&2
       fi
     else
-      echo "❌ Invalid backup: $line" >&2
+      if [[ "$FILE_PATH" =~ \.(gz|sql|sql\.gz)$ ]]; then
+        echo "❌ Backup file not found: $FILE_PATH" >&2
+      fi
+      continue
     fi
   done
 
