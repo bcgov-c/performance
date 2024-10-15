@@ -57,6 +57,9 @@ jobs:
         github.ref_name  == '332842-test'
       )
     steps:
+      - name: Setup OpenShift CLI
+        uses: ./.github/workflows/build.yml@main
+
       - name: 📤 Checkout Target Branch
         uses: actions/checkout@v4
         with:
