@@ -137,7 +137,7 @@ list_backups() {
   ' | sort -k2,3r)
 
   # Extract the latest backup file location
-  LATEST_BACKUP=$(echo "$BACKUP_LIST" | awk '/^[0-9]+[KMG]/{print $3}' | sort -r | head -n 1)
+  LATEST_BACKUP=$(echo "$BACKUP_LIST" | awk '/^[0-9]+[KMG]/{print $4}' | sort -r | head -n 1)
 
   # Debugging: Print latest backup
   echo "Latest backup: $LATEST_BACKUP" >&2
