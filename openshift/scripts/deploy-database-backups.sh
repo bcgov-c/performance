@@ -149,8 +149,11 @@ list_backups() {
     # Convert size to bytes for comparison
     SIZE_IN_BYTES=$(convert_to_bytes "$SIZE")
 
+    echo "File-Path: $FILE_PATH, Size: $SIZE, Date-Time: $DATE_TIME" >&2
+
     # Check if size is greater than 1M (1048576 bytes)
     if [[ "$SIZE_IN_BYTES" -gt 1048576 ]]; then
+      echo "Backup size looks good: $SIZE" >&2
       if [[ -f "$FILE_PATH" ]] && [[ "$FILE_PATH" =~ \.(gz|sql|sql\.gz)$ ]]; then
         echo "Line: '$line'" >&2
         echo "Valid backup found: Size=$SIZE, Date-Time=$DATE_TIME, File-Path=$FILE_PATH" >&2
