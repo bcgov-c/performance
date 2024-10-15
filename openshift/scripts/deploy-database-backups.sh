@@ -134,7 +134,7 @@ list_backups() {
       echo "Valid backup found: Size=$SIZE, Date-Time=$DATE_TIME, File-Path=$FILE_PATH" >&2
       VALID_BACKUPS+=("$SIZE $DATE_TIME $FILE_PATH")
     else
-      # echo "❌ Invalid backup (size <= 1M): $line" >&2
+      echo "❌ Invalid backup (size <= 1M): $line" >&2
     fi
   done
 
