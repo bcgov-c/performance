@@ -114,8 +114,14 @@ list_backups() {
 
   echo "Testing backup file location: $DB_INIT_FILE_LOCATION" >&2
 
+  # Debugging output to see the exact match attempt
+  echo "Checking if $DB_INIT_FILE_LOCATION is in the backup list..." >&2
+  echo "$BACKUP_LIST" | while IFS= read -r line; do
+    echo "Line: '$line'" >&2
+  done
+
   # Check if the backup list contains the remote backup file location
-  if ! echo "$BACKUP_LIST" | grep -qF "$DB_INIT_FILE_LOCATION"; then
+  if ! echo "$BACKUP_LIST" | grep -Fxq "$DB_INIT_FILE_LOCATION"; then
     echo "Database initialization file NOT FOUND in the backup list ($DB_INIT_FILE_LOCATION)." >&2
     # echo "Copying the local file to the backup pod..." >&2
     # if ! oc cp --retries=25 "$LOCAL_SQL_INIT_FILE" "$BACKUP_POD:$REMOTE_BACKUP_FILE_LOCATION"; then
@@ -123,6 +129,8 @@ list_backups() {
     #   exit 1
     # fi
     # echo "File copied successfully." >&2
+  else
+    echo "Database initialization file FOUND in the backup list ($DB_INIT_FILE_LOCATION)." >&2
   fi
 
   # Parse the backup list into an array
@@ -137,7 +145,7 @@ list_backups() {
   ' | sort -k2,3r)
 
   # Extract the latest backup file location
-  LATEST_BACKUP=$(echo "$BACKUP_LIST" | awk '/^[0-9]+[KMG]/{print $4}' | sort -r | head -n 1)
+  LATEST_BACKUP=$(echo "$BACKUP_LIST" | awk '/^[0-9]+[KMG]/{print $3}' | sort -r | head -n 1)
 
   # Debugging: Print latest backup
   echo "Latest backup: $LATEST_BACKUP" >&2
