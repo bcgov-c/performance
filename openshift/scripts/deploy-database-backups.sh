@@ -8,8 +8,6 @@ fi
 
 echo "Deploying database backups for $APP_NAME to: $DB_BACKUP_DEPLOYMENT_NAME..."
 
-#!/bin/bash
-
 # Debugging: Print environment variables
 echo "DB_BACKUP_DEPLOYMENT_NAME: $DB_BACKUP_DEPLOYMENT_NAME"
 echo "APP_NAME: $APP_NAME"
@@ -21,6 +19,29 @@ echo "DB_BACKUP_IMAGE: $DB_BACKUP_IMAGE"
 echo "DB_BACKUP_DEPLOYMENT_FULL_NAME: $DB_BACKUP_DEPLOYMENT_FULL_NAME"
 
 echo "Deploying database backups to: $DB_BACKUP_DEPLOYMENT_NAME..."
+
+# Function to convert human-readable size to bytes
+convert_to_bytes() {
+  local SIZE=$1
+  local SIZE_IN_BYTES
+
+  case "${SIZE: -1}" in
+    K|k)
+      SIZE_IN_BYTES=$(( ${SIZE%?} * 1024 ))
+      ;;
+    M|m)
+      SIZE_IN_BYTES=$(( ${SIZE%?} * 1024 * 1024 ))
+      ;;
+    G|g)
+      SIZE_IN_BYTES=$(( ${SIZE%?} * 1024 * 1024 * 1024 ))
+      ;;
+    *)
+      SIZE_IN_BYTES=$SIZE
+      ;;
+  esac
+
+  echo $SIZE_IN_BYTES
+}
 
 # Function to extract and display backup information
 extract_backup_info() {
@@ -126,15 +147,21 @@ list_backups() {
     FILE_PATH=$(echo "$line" | awk '{print $4}')
 
     # Convert size to bytes for comparison
-    SIZE_IN_BYTES=$(numfmt --from=iec "$SIZE")
+    SIZE_IN_BYTES=$(convert_to_bytes "$SIZE")
 
     # Check if size is greater than 1M (1048576 bytes)
-    if [[ "$SIZE_IN_BYTES" -gt 1048576 ]] && [[ -f "$FILE_PATH" ]] && [[ "$FILE_PATH" =~ \.(gz|sql|sql\.gz)$ ]]; then
-      echo "Line: '$line'" >&2
-      echo "Valid backup found: Size=$SIZE, Date-Time=$DATE_TIME, File-Path=$FILE_PATH" >&2
-      VALID_BACKUPS+=("$SIZE $DATE_TIME $FILE_PATH")
+    if [[ "$SIZE_IN_BYTES" -gt 1048576 ]]; then
+      if [[ -f "$FILE_PATH" ]] && [[ "$FILE_PATH" =~ \.(gz|sql|sql\.gz)$ ]]; then
+        echo "Line: '$line'" >&2
+        echo "Valid backup found: Size=$SIZE, Date-Time=$DATE_TIME, File-Path=$FILE_PATH" >&2
+        echo "Backup file exists: $FILE_PATH" >&2
+        VALID_BACKUPS+=("$SIZE $DATE_TIME $FILE_PATH")
+      else
+        echo "❌ Backup file not found: $FILE_PATH" >&2
+        continue
+      fi
     else
-      echo "❌ Invalid backup (size <= 1M): $line" >&2
+      echo "❌ Invalid backup: $line" >&2
     fi
   done
 
