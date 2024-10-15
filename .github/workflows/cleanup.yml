@@ -59,13 +59,13 @@ jobs:
         github.ref_name  == '332842-test'
       )
     steps:
-      - name: Setup OpenShift CLI
-        uses: ./.github/workflows/setup-oc-cli.yml
-
       - name: 📤 Checkout Target Branch
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
+
+      - name: Setup OpenShift CLI
+        uses: ./.github/workflows/setup-oc-cli.yml
 
       # Get Environment Variables from file
       - name: 📋 Setup Environment from File
