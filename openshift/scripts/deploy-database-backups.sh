@@ -114,54 +114,41 @@ list_backups() {
 
   echo "Testing backup file location: $DB_INIT_FILE_LOCATION" >&2
 
-  # Debugging output to see the exact match attempt
-  echo "Checking if $DB_INIT_FILE_LOCATION is in the backup list..." >&2
+  # Initialize an array to store valid backup entries
+  declare -a VALID_BACKUPS
+
+  # Parse each line of the backup list
   echo "$BACKUP_LIST" | while IFS= read -r line; do
     echo "Line: '$line'" >&2
+
+    # Extract size, date-time, and file path
+    SIZE=$(echo "$line" | awk '{print $1}')
+    DATE_TIME=$(echo "$line" | awk '{print $2, $3}')
+    FILE_PATH=$(echo "$line" | awk '{print $4}')
+
+    # Convert size to bytes for comparison
+    SIZE_IN_BYTES=$(numfmt --from=iec "$SIZE")
+
+    # Check if size is greater than 1M (1048576 bytes)
+    if [[ "$SIZE_IN_BYTES" -gt 1048576 ]]; then
+      echo "Valid backup found: Size=$SIZE, Date-Time=$DATE_TIME, File-Path=$FILE_PATH" >&2
+      VALID_BACKUPS+=("$SIZE $DATE_TIME $FILE_PATH")
+    else
+      echo "❌ Invalid backup (size <= 1M): $line" >&2
+    fi
   done
 
-  # Check if the backup list contains the remote backup file location
-  if ! echo "$BACKUP_LIST" | grep -Fxq "$DB_INIT_FILE_LOCATION"; then
-    echo "Database initialization file NOT FOUND in the backup list ($DB_INIT_FILE_LOCATION)." >&2
-    # echo "Copying the local file to the backup pod..." >&2
-    # if ! oc cp --retries=25 "$LOCAL_SQL_INIT_FILE" "$BACKUP_POD:$REMOTE_BACKUP_FILE_LOCATION"; then
-    #   echo "Error: Failed to copy the local file to the backup pod." >&2
-    #   exit 1
-    # fi
-    # echo "File copied successfully." >&2
-  else
-    echo "Database initialization file FOUND in the backup list ($DB_INIT_FILE_LOCATION)." >&2
-  fi
+  # Sort the valid backups array by date-time
+  IFS=$'\n' sorted_backups=($(sort -k2,3 <<<"${VALID_BACKUPS[*]}"))
+  unset IFS
 
-  # Parse the backup list into an array
-  IFS=$'\n' read -rd '' -a BACKUP_ARRAY <<< "$BACKUP_LIST"
+  # Get the latest valid backup file path
+  LATEST_BACKUP=$(echo "${sorted_backups[-1]}" | awk '{print $3}')
 
-  # Filter and process the backup list
-  FILTERED_SORTED_BACKUPS=$(echo "$BACKUP_LIST" | awk '
-    BEGIN { skip = 1 }
-    /^--------------------------------------------------------------------------------------------------------------------------------$/ { skip = 0; next }
-    skip { next }
-    NF == 4 { print $0 }
-  ' | sort -k2,3r)
+  echo "Latest valid backup: $LATEST_BACKUP" >&2
 
-  # Extract the latest backup file location
-  LATEST_BACKUP=$(echo "$BACKUP_LIST" | awk '/^[0-9]+[KMG]/{print $3}' | sort -r | head -n 1)
-
-  # Debugging: Print latest backup
-  echo "Latest backup: $LATEST_BACKUP" >&2
-
-  # Check if the remote backup file location is newer
-  if [[ -n "$REMOTE_BACKUP_FILE_LOCATION" && "$REMOTE_BACKUP_FILE_LOCATION" -nt "$LATEST_BACKUP" ]]; then
-    LATEST_BACKUP="$REMOTE_BACKUP_FILE_LOCATION"
-  fi
-
-  # Check if the latest backup file exists
-  if [ -z "$LATEST_BACKUP" ]; then
-    echo "Backup file: $LATEST_BACKUP does not exist. Skipping restore." >&2
-  else
-    echo "Restoring from backup file: $LATEST_BACKUP" >&2
-    echo $LATEST_BACKUP
-  fi
+  # Return the latest valid backup file path
+  echo "$LATEST_BACKUP"
 }
 
 restore_database_from_backup() {
