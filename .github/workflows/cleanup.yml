@@ -49,6 +49,8 @@ jobs:
     name: OpenShift
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
+    env:
+      REF: ${{ github.ref_name }}
     if: |
       always()
       && (
@@ -58,7 +60,7 @@ jobs:
       )
     steps:
       - name: Setup OpenShift CLI
-        uses: ./.github/workflows/setup-oc.yml@${{ github.ref_name }}
+        uses: ./.github/workflows/setup-oc-cli.yml
 
       - name: 📤 Checkout Target Branch
         uses: actions/checkout@v4
