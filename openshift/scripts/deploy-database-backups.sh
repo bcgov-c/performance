@@ -128,7 +128,7 @@ list_backups() {
 
   BACKUP_LIST=$(oc exec $BACKUP_POD -- ./backup.sh -l)
 
-  echo "Backup list: $BACKUP_LIST" >&2
+  # echo "Backup list: $BACKUP_LIST" >&2
 
   # Extract and display backup information
   extract_backup_info "$BACKUP_LIST"
@@ -149,17 +149,17 @@ list_backups() {
     # Convert size to bytes for comparison
     SIZE_IN_BYTES=$(convert_to_bytes "$SIZE")
 
-    echo "File-Path: $FILE_PATH, Size: $SIZE, Date-Time: $DATE_TIME" >&2
+    # echo "File-Path: $FILE_PATH, Size: $SIZE, Date-Time: $DATE_TIME" >&2
 
     # Check if size is greater than 1M (1048576 bytes)
 
-    if [[ -f "$FILE_PATH" ]] && [[ "$FILE_PATH" =~ \.(gz|sql|sql\.gz)$ ]]; then
-      echo "Backup file exists at: $FILE_PATH" >&2
+    if [[ "$FILE_PATH" =~ \.(gz|sql|sql\.gz)$ ]]; then
+      echo "✔️Backup file found: $FILE_PATH" >&2
 
       if [[ "$SIZE_IN_BYTES" -gt 1048576 ]]; then
         # echo "Line: '$line'" >&2
-        echo "Backup size looks good: $SIZE" >&2
-        echo "Valid backup found: Size=$SIZE, Date-Time=$DATE_TIME, File-Path=$FILE_PATH" >&2
+        echo "✔️ Backup size looks good: $SIZE" >&2
+        echo "✔️ Valid backup found: Size=$SIZE, Date-Time=$DATE_TIME, File-Path=$FILE_PATH" >&2
         VALID_BACKUPS+=("$SIZE $DATE_TIME $FILE_PATH")
       else
         echo "❌ Invalid backup size: $line" >&2
@@ -193,7 +193,7 @@ restore_database_from_backup() {
   LATEST_BACKUP_FILENAME=$(list_backups)
 
   # Check if the file exists
-  if [[ -f "$LATEST_BACKUP_FILENAME" ]]; then
+  if oc exec $BACKUP_POD -- test -f "$LATEST_BACKUP_FILENAME"; then
     # Restore the backup using the filename
     restore_backup_from_file "$LATEST_BACKUP_FILENAME"
   else
