@@ -213,7 +213,7 @@ restore_database_from_backup() {
 
   # Check if the file exists
 
-  FILE_TEST=$(oc exec $BACKUP_POD -- test -f "$LATEST_BACKUP_FILENAME" 2>&1)
+  FILE_TEST=$(oc exec $BACKUP_POD -- ls "$LATEST_BACKUP_FILENAME" 2>&1)
   # oc exec performance-db-backup-storage-78dfdbf898-jzkdl -- test -f "/backups/init.sql.gz"
   if echo "$FILE_TEST" | grep -qi "terminated"; then
     if echo "$FILE_TEST" | grep -qi "No such file"; then
