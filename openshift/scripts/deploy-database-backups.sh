@@ -138,19 +138,18 @@ list_backups() {
   # Initialize an array to store valid backup entries
   declare -a VALID_BACKUPS
 
-  # Parse each line of the backup list
-  echo "$BACKUP_LIST" | while IFS= read -r line; do
+  # Parse each line of the backup list using a here string to avoid subshell issues
+  while IFS= read -r line; do
     # Extract size, date-time, and file path
     SIZE=$(echo "$line" | awk '{print $1}')
     DATE_TIME=$(echo "$line" | awk '{print $2, $3}')
     FILE_PATH=$(echo "$line" | awk '{print $4}')
 
-    # Convert size to bytes for comparison
-    SIZE_IN_BYTES=$(convert_to_bytes "$SIZE")
-
-    # Check if size is greater than 1M (1048576 bytes)
-
     if [[ "$FILE_PATH" =~ \.(gz|sql|sql\.gz)$ ]]; then
+      # Convert size to bytes for comparison
+      SIZE_IN_BYTES=$(convert_to_bytes "$SIZE")
+
+      # Check if size is greater than 1M (1048576 bytes)
       if [[ "$SIZE_IN_BYTES" -gt 1048576 ]]; then
         echo "✔️ Valid backup found: Size=$SIZE, Date-Time=$DATE_TIME, File-Path=$FILE_PATH" >&2
         VALID_BACKUPS+=("$SIZE $DATE_TIME $FILE_PATH")
@@ -158,7 +157,7 @@ list_backups() {
     else
       continue
     fi
-  done
+  done <<< "$BACKUP_LIST"
 
   # Echo the value of VALID_BACKUPS
   echo "VALID_BACKUPS: ${VALID_BACKUPS[*]}" >&2
