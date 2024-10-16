@@ -42,7 +42,7 @@ convert_to_bytes() {
 
   # Check if SIZE_IN_BYTES is a valid number
   if ! [[ "$SIZE_IN_BYTES" =~ ^[0-9]+$ ]]; then
-    echo "Invalid size: $SIZE" >&2
+    # echo "❌ Invalid file size: $SIZE" >&2
     SIZE_IN_BYTES=0
   fi
 
@@ -89,20 +89,47 @@ extract_backup_info() {
 # Function to restore the backup by filename
 restore_backup_from_file() {
   local FILENAME=$1
+  local POD_NAME=$2
   echo "Restoring backup from file: $FILENAME"
 
   # Check the file extension and run the appropriate restore command
   if [[ "$FILENAME" == *.gz ]]; then
     # Run the restore command for .gz files
-    oc exec $(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}') -- ./backup.sh -r $DB_NAME/$DB_DATABASE -f "$FILENAME"
+    oc exec $(oc get pod -l app.kubernetes.io/name=$POD_NAME -o jsonpath='{.items[0].metadata.name}') -- ./backup.sh -r $DB_NAME/$DB_DATABASE -f "$FILENAME"
   elif [[ "$FILENAME" == *.sql ]]; then
     # Run the SQL restore command for .sql files
-    oc exec $(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name}') -- bash -c "mysql -h $DB_HOST -u root performance < $FILENAME"
+    oc exec $(oc get pod -l app.kubernetes.io/name=$POD_NAME -o jsonpath='{.items[0].metadata.name}') -- bash -c "mysql -h $DB_HOST -u root $DB_DATABASE < $FILENAME"
   else
     echo "Unsupported file type: $FILENAME"
   fi
 
   echo "✔️ Backup restoration process completed."
+}
+
+# Function to get the backup pod name
+get_pod() {
+  local POD_NAME=$1
+  local POD=""
+  local WAIT_TIME=10
+  local ATTEMPTS=0
+  local MAX_ATTEMPTS=30
+
+  until [ -n "$POD" ]; do
+    ATTEMPTS=$(( $ATTEMPTS + 1 ))
+    POD=$(oc get pod -l app.kubernetes.io/name=$POD_NAME -o jsonpath='{.items[0].metadata.name} 2>/dev/null')
+
+    if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
+      echo "Timeout waiting for the [$POD_NAME] pod to be running." >&2
+      exit 1
+    fi
+
+    if [ -z "$POD" ]; then
+      # echo "No pods found in Running state ($POD). Retrying in $WAIT_TIME seconds..."
+      sleep $WAIT_TIME
+    fi
+  done
+
+  echo "$POD"
 }
 
 # Function to list available backups and return the latest valid backup file path
@@ -112,24 +139,8 @@ list_backups() {
   ATTEMPTS=0
   WAIT_TIME=10
   MAX_ATTEMPTS=30 # wait up to 5 minutes
-  BACKUP_POD=""
-  # DB_INIT_FILE_LOCATION="/backups/$DB_INIT_FILE_LOCATION"
 
-  until [ -n "$BACKUP_POD" ]; do
-    ATTEMPTS=$(( $ATTEMPTS + 1 ))
-    BACKUP_POD=$(oc get pod -l app.kubernetes.io/name=backup-storage -o jsonpath='{.items[0].metadata.name} 2>/dev/null')
-
-    if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
-      BACKUP_POD="Timeout waiting for the backup pod to be running."
-      exit 1
-    fi
-
-    if [ -z "$BACKUP_POD" ]; then
-      # echo "No pods found in Running state ($BACKUP_POD). Retrying in $WAIT_TIME seconds..."
-      sleep $WAIT_TIME
-    fi
-  done
-
+  BACKUP_POD=get_pod backup-storage
   echo "Backup pod is running: $BACKUP_POD." >&2
 
   BACKUP_LIST=$(oc exec $BACKUP_POD -- ./backup.sh -l)
@@ -201,11 +212,13 @@ restore_database_from_backup() {
   LATEST_BACKUP_FILENAME=$(list_backups)
 
   # Check if the file exists
-  if oc exec $BACKUP_POD -- test -f "$LATEST_BACKUP_FILENAME"; then
+
+  FILE_TEST=$(oc exec $BACKUP_POD -- test -f "$LATEST_BACKUP_FILENAME" 2>&1)
+  if ; then
     # Restore the backup using the filename
-    restore_backup_from_file "$LATEST_BACKUP_FILENAME"
+    restore_backup_from_file "$LATEST_BACKUP_FILENAME" backup-storage
   else
-    echo "Backup file: $LATEST_BACKUP_FILENAME does not exist. Skipping restore."
+    echo "Backup file: $LATEST_BACKUP_FILENAME does not exist on pod (backup-storage). Skipping restore."
   fi
 }
 
