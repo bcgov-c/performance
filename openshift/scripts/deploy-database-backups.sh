@@ -36,7 +36,7 @@ convert_to_bytes() {
       SIZE_IN_BYTES=$(echo "${SIZE%?} * 1024 * 1024 * 1024" | bc)
       ;;
     *)
-      SIZE_IN_BYTES=$SIZE
+      SIZE_IN_BYTES=$(echo "$SIZE" | bc)
       ;;
   esac
 
@@ -99,7 +99,7 @@ restore_backup_from_file() {
   echo "✔️ Backup restoration process completed."
 }
 
-# Function to list available backups
+# Function to list available backups and return the latest valid backup file path
 list_backups() {
   # Connect to the backup pod and list available backups
   # echo "Checking if the database ($DB_HOST) is online and contains expected data..."
@@ -154,25 +154,23 @@ list_backups() {
     # Check if size is greater than 1M (1048576 bytes)
 
     if [[ "$FILE_PATH" =~ \.(gz|sql|sql\.gz)$ ]]; then
-      echo "✔️Backup file found: $FILE_PATH" >&2
-
       if [[ "$SIZE_IN_BYTES" -gt 1048576 ]]; then
-        # echo "Line: '$line'" >&2
-        echo "✔️ Backup size looks good: $SIZE" >&2
         echo "✔️ Valid backup found: Size=$SIZE, Date-Time=$DATE_TIME, File-Path=$FILE_PATH" >&2
         VALID_BACKUPS+=("$SIZE $DATE_TIME $FILE_PATH")
       else
         echo "❌ Invalid backup size: $line" >&2
       fi
     else
-      if [[ "$FILE_PATH" =~ \.(gz|sql|sql\.gz)$ ]]; then
-        echo "❌ Backup file not found: $FILE_PATH" >&2
-      fi
       continue
     fi
   done
 
   # Sort the valid backups array by date-time
+   if [ ${#VALID_BACKUPS[@]} -eq 0 ]; then
+    echo "No valid backups found." >&2
+    return 1
+  fi
+
   IFS=$'\n' sorted_backups=($(sort -k2,3 <<<"${VALID_BACKUPS[*]}"))
   unset IFS
 
