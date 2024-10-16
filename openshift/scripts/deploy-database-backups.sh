@@ -27,18 +27,24 @@ convert_to_bytes() {
 
   case "${SIZE: -1}" in
     K|k)
-      SIZE_IN_BYTES=$(echo "${SIZE%?} * 1024" | bc)
+      SIZE_IN_BYTES=$(echo "${SIZE%?} * 1024" | bc 2>/dev/null)
       ;;
     M|m)
-      SIZE_IN_BYTES=$(echo "${SIZE%?} * 1024 * 1024" | bc)
+      SIZE_IN_BYTES=$(echo "${SIZE%?} * 1024 * 1024" | bc 2>/dev/null)
       ;;
     G|g)
-      SIZE_IN_BYTES=$(echo "${SIZE%?} * 1024 * 1024 * 1024" | bc)
+      SIZE_IN_BYTES=$(echo "${SIZE%?} * 1024 * 1024 * 1024" | bc 2>/dev/null)
       ;;
     *)
-      SIZE_IN_BYTES=$(echo "$SIZE" | bc)
+      SIZE_IN_BYTES=$(echo "$SIZE" | bc 2>/dev/null)
       ;;
   esac
+
+  # Check if SIZE_IN_BYTES is a valid number
+  if ! [[ "$SIZE_IN_BYTES" =~ ^[0-9]+$ ]]; then
+    echo "Invalid size: $SIZE" >&2
+    SIZE_IN_BYTES=0
+  fi
 
   echo $SIZE_IN_BYTES
 }
@@ -142,8 +148,12 @@ list_backups() {
   while IFS= read -r line; do
     # Extract size, date-time, and file path
     SIZE=$(echo "$line" | awk '{print $1}')
-    DATE_TIME=$(echo "$line" | awk '{print $2, $3}')
+    DATE=$(echo "$line" | awk '{print $2}')
+    TIME=$(echo "$line" | awk '{print $3}')
     FILE_PATH=$(echo "$line" | awk '{print $4}')
+
+    # Concatenate date and time with a colon
+    DATE_TIME="${DATE}:${TIME}"
 
     if [[ "$FILE_PATH" =~ \.(gz|sql|sql\.gz)$ ]]; then
       # Convert size to bytes for comparison
