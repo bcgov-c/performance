@@ -140,7 +140,6 @@ list_backups() {
 
   # Parse each line of the backup list
   echo "$BACKUP_LIST" | while IFS= read -r line; do
-    # echo "Line: '$line'" >&2
     # Extract size, date-time, and file path
     SIZE=$(echo "$line" | awk '{print $1}')
     DATE_TIME=$(echo "$line" | awk '{print $2, $3}')
@@ -149,21 +148,20 @@ list_backups() {
     # Convert size to bytes for comparison
     SIZE_IN_BYTES=$(convert_to_bytes "$SIZE")
 
-    # echo "File-Path: $FILE_PATH, Size: $SIZE, Date-Time: $DATE_TIME" >&2
-
     # Check if size is greater than 1M (1048576 bytes)
 
     if [[ "$FILE_PATH" =~ \.(gz|sql|sql\.gz)$ ]]; then
       if [[ "$SIZE_IN_BYTES" -gt 1048576 ]]; then
         echo "✔️ Valid backup found: Size=$SIZE, Date-Time=$DATE_TIME, File-Path=$FILE_PATH" >&2
         VALID_BACKUPS+=("$SIZE $DATE_TIME $FILE_PATH")
-      else
-        echo "❌ Invalid backup size: $line" >&2
       fi
     else
       continue
     fi
   done
+
+  # Echo the value of VALID_BACKUPS
+  echo "VALID_BACKUPS: ${VALID_BACKUPS[*]}" >&2
 
   # Sort the valid backups array by date-time
    if [ ${#VALID_BACKUPS[@]} -eq 0 ]; then
@@ -173,6 +171,9 @@ list_backups() {
 
   IFS=$'\n' sorted_backups=($(sort -k2,3 <<<"${VALID_BACKUPS[*]}"))
   unset IFS
+
+  # Debugging output
+  echo "Sorted backups: ${sorted_backups[*]}" >&2
 
   # Get the latest valid backup file path
   LATEST_BACKUP=$(echo "${sorted_backups[-1]}" | awk '{print $3}')
