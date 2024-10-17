@@ -16,6 +16,10 @@ dest_date_latest=${dest_date_latest:-0}
 src_date_readable=$(date -d @$src_date_latest +"%Y-%m-%d %H:%M:%S")
 dest_date_readable=$(date -d @$dest_date_latest +"%Y-%m-%d %H:%M:%S")
 
+# Convert readable dates to Unix timestamps
+src_date_timestamp=$(date -d "$src_date_readable" +%s)
+dest_date_timestamp=$(date -d "$dest_date_readable" +%s)
+
 # Use find with -not -name to exclude directories from the file count
 initial_dest_file_count=$(find ${dest_dir} -not -name '.*' | wc -l)
 echo "Initial file count: $initial_dest_file_count"
@@ -23,9 +27,9 @@ echo "Initial file count: $initial_dest_file_count"
 echo "Latest source file modification date: $src_date_readable"
 echo "Latest destination file modification date: $dest_date_readable"
 
-# Check if src_date_latest is greater than dest_date_latest
+# Check if src_date_timestamp is greater than dest_date_timestamp
 # OR initial_dest_file_count is less than 100 (project was likely uninstalled)
-if [ $src_date_latest -gt $dest_date_latest ]; then
+if [ $src_date_timestamp -gt $dest_date_timestamp ]; then
   echo "Source directory has been modified more recently than the destination directory."
   echo "Proceeding with migration..."
 elif [ $initial_dest_file_count -lt 100 ]; then

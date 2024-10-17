@@ -377,7 +377,6 @@ test_db_health() {
   echo "Database pod found and running: $DB_POD_NAME."
 
   CURRENT_USER_COUNT=0
-  DATABASE_IS_ONLINE=0
   ATTEMPTS=0
   OUTPUT=""
   until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
@@ -415,14 +414,17 @@ test_db_health() {
 
     # Check if CURRENT_USER_COUNT is set and greater than 0
     if [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -gt 0 ]; then
-      echo "Database is online and contains $CURRENT_USER_COUNT users."
       TOTAL_USER_COUNT=$CURRENT_USER_COUNT
+      DATABASE_IS_ONLINE=1
+      echo "Database is online and contains $TOTAL_USER_COUNT users."
+      echo "✔️ Database health check passed."
       break
     elif [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -eq 0 ]; then
       echo "Database is online but contains no users."
       DATABASE_IS_ONLINE=1
     else
       echo "Database is offline."
+      DATABASE_IS_ONLINE=0
     fi
 
     # Current user count is 0 or not set, wait longer...
@@ -431,8 +433,10 @@ test_db_health() {
   done
 }
 
+DATABASE_IS_ONLINE=0
 TOTAL_USER_COUNT=0
 DB_HEALTH=$(test_db_health "$DB_HOST")
+
 echo "Database health check: $DB_HEALTH"
 
 # Ensure TOTAL_USER_COUNT is set and not empty
@@ -460,5 +464,5 @@ if [ $TOTAL_USER_COUNT -eq 0 ]; then
     echo "Database is offline."
   fi
 else
-  echo "Database appears to be healthy. No further action required."
+  echo "No further action required."
 fi
