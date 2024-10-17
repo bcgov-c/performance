@@ -263,39 +263,43 @@ EOF
   echo "✔️ Backup container updates completed."
 else
   echo "Helm $DB_BACKUP_DEPLOYMENT_NAME NOT FOUND. Beginning deployment..."
-  echo "
-    image:
-      repository: \"$BACKUP_HELM_CHART\"
-      pullPolicy: Always
-      tag: dev
 
-    persistence:
-      backup:
-        accessModes: [\"ReadWriteMany\"]
-        storageClassName: netapp-file-standard
-      verification:
-        storageClassName: netapp-file-standard
+  # Create a temporary values file for backupConfig
+  cat <<EOF > backup-config.yaml
+image:
+  repository: \"$BACKUP_HELM_CHART\"
+  pullPolicy: Always
+  tag: dev
 
-    backupConfig: |
-      mariadb=$DB_HOST:$DB_PORT/$DB_DATABASE
-      0 1 * * * default ./backup.sh -s
-      0 4 * * * default ./backup.sh -s -v all
+persistence:
+  backup:
+    accessModes: [\"ReadWriteMany\"]
+    storageClassName: netapp-file-standard
+  verification:
+    storageClassName: netapp-file-standard
 
-    db:
-      secretName: $APP_NAME-secrets
-      usernameKey: database-user
-      passwordKey: database-password
-      databaseKey: database-name
+backupConfig: |
+  mariadb=$DB_HOST:$DB_PORT/$DB_DATABASE
+  0 1 * * * default ./backup.sh -s
+  0 4 * * * default ./backup.sh -s -v all
 
-    env:
-      DATABASE_SERVICE_NAME:
-        value: \"$DB_HOST\"
-      ENVIRONMENT_FRIENDLY_NAME:
-        value: \"$APP_NAME Backups\"
-    " > backup-config.yaml
+db:
+  secretName: $APP_NAME-secrets
+  usernameKey: database-user
+  passwordKey: database-password
+  databaseKey: database-name
+
+env:
+  DATABASE_SERVICE_NAME:
+    value: \"$DB_HOST\"
+  ENVIRONMENT_FRIENDLY_NAME:
+    value: \"$APP_NAME Backups\"
+EOF
   # helm install $DB_BACKUP_DEPLOYMENT_NAME $BACKUP_HELM_CHART --atomic --wait -f backup-config.yaml
   helm install $DB_BACKUP_DEPLOYMENT_NAME $BACKUP_HELM_CHART -f backup-config.yaml
   echo "Waiting for backup installation..."
+  # Clean up the temporary values file
+  rm backup-config.yaml
   # For some reason the defaault image doesn't work, and we prefer the mariadb image anyway
   echo "Setting backup deployment image to: $BACKUP_IMAGE ..."
   oc set image deployment/$DB_BACKUP_DEPLOYMENT_FULL_NAME backup-storage=$BACKUP_IMAGE
