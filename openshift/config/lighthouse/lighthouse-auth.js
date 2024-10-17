@@ -12,7 +12,7 @@ async function main() {
   dotenv.config();
 
   // Setup test variables from .env file
-  const testURL = process.env.APP_HOST_URL + '/login';
+  let testURL = process.env.APP_HOST_URL + '/login';
   const username = process.env.TESTER_USERNAME;
   const password = process.env.TESTER_PASSWORD;
 
@@ -23,6 +23,10 @@ async function main() {
   } else if (!password) {
     throw new Error(`TESTER_PASSWORD is not defined`);
   }
+
+  const http_https = testURL.indexOf('local') === 0 ? 'http' : 'https';
+  testURL = http_https + '://' + testURL
+  console.log('Test URL: ', testURL);
 
   const options = {
     chromeFlags: [
@@ -128,10 +132,9 @@ async function main() {
     const fs = (await import('fs')).default;
     const fsp = (await import('fs')).promises;
 
-    const http_https = url.indexOf('localhost') === 0 ? 'http' : 'https';
-    console.log('Go to URL: ', http_https + '://' + url);
+
     await page.goto(
-      http_https + '://' + url,
+      url,
       { waitUntil: 'networkidle0' }
     );
 
@@ -211,10 +214,8 @@ async function main() {
     for (const path of paths) {
       await page.setCookie(...cookies);
 
-      const http_https = url.indexOf('localhost') === 0 ? 'http' : 'https';
-      console.log('Go to URL: ', http_https + '://' + url);
       await page.goto(
-        http_https + '://' + url,
+        url,
         { waitUntil: 'networkidle0' }
       );
       // Run Lighthouse
