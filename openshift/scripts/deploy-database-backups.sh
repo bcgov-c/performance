@@ -367,82 +367,93 @@ wait_for_rollout() {
   echo "✔️ Roll-out of $DEPLOYMENT_NAME is ready."
 }
 
-echo "Checking if the database ($DB_HOST) is online and contains expected data..."
+test_db_health() {
+  local DB_HOST=$1
+  echo "Checking if the database ($DB_HOST) is online and contains expected data..."
 
-ATTEMPTS=0
-WAIT_TIME=10
-MAX_ATTEMPTS=30 # wait up to 5 minutes
+  ATTEMPTS=0
+  WAIT_TIME=10
+  MAX_ATTEMPTS=30 # wait up to 5 minutes
 
-# Get the name of the first pod in the StatefulSet
-DB_POD_NAME=""
-until [ -n "$DB_POD_NAME" ]; do
-  ATTEMPTS=$(( $ATTEMPTS + 1 ))
-  PODS=$(oc get pods -l app=$DB_HOST --field-selector=status.phase=Running -o jsonpath='{.items[*].metadata.name}')
+  # Get the name of the first pod in the StatefulSet
+  DB_POD_NAME=""
+  until [ -n "$DB_POD_NAME" ]; do
+    ATTEMPTS=$(( $ATTEMPTS + 1 ))
+    PODS=$(oc get pods -l app=$DB_HOST --field-selector=status.phase=Running -o jsonpath='{.items[*].metadata.name}')
 
-  if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
-    echo "Timeout waiting for the pod to have status.phase:Running. Exiting..."
-    exit 1
-  fi
-
-  if [ -z "$PODS" ]; then
-    echo "No [app=$DB_HOST] pods found in Running state. Retrying in $WAIT_TIME seconds..."
-    sleep $WAIT_TIME
-  else
-    DB_POD_NAME=$(echo $PODS | awk '{print $1}')
-  fi
-done
-
-echo "Database pod found and running: $DB_POD_NAME."
-
-TOTAL_USER_COUNT=0
-CURRENT_USER_COUNT=0
-DATABASE_IS_ONLINE=0
-ATTEMPTS=0
-OUTPUT=""
-until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
-  ATTEMPTS=$(( $ATTEMPTS + 1 ))
-  echo "Waiting for database ($DB_POD_NAME) to come online... $(($ATTEMPTS * $WAIT_TIME)) seconds..."
-
-  # Capture the output of the mariadb command
-  OUTPUT=$(oc exec $DB_POD_NAME -- bash -c "mariadb -u root -e 'USE $DB_NAME; $DB_HEALTH_QUERY;'" 2>&1)
-  # Debugging: Print the output of the mariadb command
-  echo "DB Health Check: $OUTPUT"
-
-  # Check if the output contains an error
-  if echo "$OUTPUT" | grep -qi "error"; then
-    if echo "$OUTPUT" | grep -qi "doesn't exist"; then
-      echo "Database not found."
-    else
-      echo "❌ Database error: $OUTPUT"
+    if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
+      echo "Timeout waiting for the pod to have status.phase:Running. Exiting..."
+      exit 1
     fi
 
-    CURRENT_USER_COUNT=0
-  else
-    # Extract the user count from the output
-    CURRENT_USER_COUNT=$(echo "$OUTPUT" | grep -oP '\d+')
-    # Debugging: Print the current user count
-    echo "Current user count: $CURRENT_USER_COUNT"
-  fi
+    if [ -z "$PODS" ]; then
+      echo "No [app=$DB_HOST] pods found in Running state. Retrying in $WAIT_TIME seconds..."
+      sleep $WAIT_TIME
+    else
+      DB_POD_NAME=$(echo $PODS | awk '{print $1}')
+    fi
+  done
 
-  echo "Validate user count: $CURRENT_USER_COUNT"
+  echo "Database pod found and running: $DB_POD_NAME."
 
-  # Check if CURRENT_USER_COUNT is set and greater than 0
-  if [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -gt 0 ]; then
-    echo "Database is online and contains $CURRENT_USER_COUNT users."
-    TOTAL_USER_COUNT=$CURRENT_USER_COUNT
-    break
-  elif [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -eq 0 ]; then
-    echo "Database is online but contains no users."
-    DATABASE_IS_ONLINE=1
-  else
-    echo "Database is offline."
-  fi
+  TOTAL_USER_COUNT=0
+  CURRENT_USER_COUNT=0
+  DATABASE_IS_ONLINE=0
+  ATTEMPTS=0
+  OUTPUT=""
+  until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
+    ATTEMPTS=$(( $ATTEMPTS + 1 ))
 
-  # Current user count is 0 or not set, wait longer...
-  sleep $WAIT_TIME
-done
+    if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]' then'
+      echo "Timeout waiting for database ($DB_POD_NAME) to come online after $(($ATTEMPTS * $WAIT_TIME)) seconds. Exiting..."
+      exit 1
+    fi
 
-echo "Validate total user count: $TOTAL_USER_COUNT"
+    echo "Waiting for database ($DB_POD_NAME) to come online... $(($ATTEMPTS * $WAIT_TIME)) seconds..."
+
+    # Capture the output of the mariadb command
+    OUTPUT=$(oc exec $DB_POD_NAME -- bash -c "mariadb -u root -e 'USE $DB_NAME; $DB_HEALTH_QUERY;'" 2>&1)
+    # Debugging: Print the output of the mariadb command
+    echo "DB Health Check: $OUTPUT"
+
+    # Check if the output contains an error
+    if echo "$OUTPUT" | grep -qi "error"; then
+      if echo "$OUTPUT" | grep -qi "doesn't exist"; then
+        echo "Database or table not found."
+      else
+        echo "❌ Database error: $OUTPUT"
+      fi
+
+      CURRENT_USER_COUNT=0
+    else
+      # Extract the user count from the output
+      CURRENT_USER_COUNT=$(echo "$OUTPUT" | grep -oP '\d+')
+      # Debugging: Print the current user count
+      echo "Current user count: $CURRENT_USER_COUNT"
+    fi
+
+    echo "Validate user count: $CURRENT_USER_COUNT"
+
+    # Check if CURRENT_USER_COUNT is set and greater than 0
+    if [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -gt 0 ]; then
+      echo "Database is online and contains $CURRENT_USER_COUNT users."
+      TOTAL_USER_COUNT=$CURRENT_USER_COUNT
+      break
+    elif [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -eq 0 ]; then
+      echo "Database is online but contains no users."
+      DATABASE_IS_ONLINE=1
+    else
+      echo "Database is offline."
+    fi
+
+    # Current user count is 0 or not set, wait longer...
+    echo "..."
+    sleep $WAIT_TIME
+  done
+}
+
+DB_HEALTH=test_db_health "$DB_HOST"
+echo "Database health check: $DB_HEALTH"
 
 if [ $TOTAL_USER_COUNT -eq 0 ]; then
   if [ $DATABASE_IS_ONLINE -eq 1 ]; then
