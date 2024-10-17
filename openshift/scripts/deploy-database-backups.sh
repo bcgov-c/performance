@@ -285,6 +285,7 @@ else
       secretName: $APP_NAME-secrets
       usernameKey: database-user
       passwordKey: database-password
+      databaseKey: database-name
 
     env:
       DATABASE_SERVICE_NAME:
