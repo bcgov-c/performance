@@ -140,7 +140,7 @@ list_backups() {
   WAIT_TIME=10
   MAX_ATTEMPTS=30 # wait up to 5 minutes
 
-  BACKUP_POD=get_pod "backup-storage"
+  BACKUP_POD=$(get_pod backup-storage)
   echo "Backup pod is running: $BACKUP_POD." >&2
 
   BACKUP_LIST=$(oc exec $BACKUP_POD -- ./backup.sh -l)
