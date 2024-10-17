@@ -404,7 +404,7 @@ test_db_health() {
   until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
     ATTEMPTS=$(( $ATTEMPTS + 1 ))
 
-    if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]' then'
+    if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
       echo "Timeout waiting for database ($DB_POD_NAME) to come online after $(($ATTEMPTS * $WAIT_TIME)) seconds. Exiting..."
       exit 1
     fi
