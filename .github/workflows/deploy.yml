@@ -38,7 +38,7 @@ on:
       DB_SERVICE:
         required: true
         type: string
-      DB_DATABASE:
+      DB_NAME:
         required: true
         type: string
       CRON_IMAGE:
@@ -134,7 +134,7 @@ jobs:
         env:
             APP_NAME: ${{ inputs.APP_NAME }}
             OC_PROJECT: ${{ github.ref_name }}
-            DB_DATABASE: ${{ inputs.DB_DATABASE }}
+            DB_NAME: ${{ inputs.DB_NAME }}
             DB_USER: ${{ secrets.DB_USER }}
             SECRET_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
             SECRET_DOCKER_USERNAME: ${{ secrets.ARTIFACTORY_USER }}
@@ -183,7 +183,7 @@ jobs:
           DB_SERVICE: ${{ inputs.DB_SERVICE }}
           DB_HOST: ${{ inputs.DB_HOST }}
           DB_PORT: ${{ inputs.DB_PORT }}
-          DB_DATABASE: ${{ inputs.DB_DATABASE }}
+          DB_NAME: ${{ inputs.DB_NAME }}
           DB_BACKUP_DEPLOYMENT_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_NAME }}
           DB_BACKUP_DEPLOYMENT_FULL_NAME: ${{ inputs.DB_BACKUP_DEPLOYMENT_FULL_NAME }}
           BACKUP_HELM_CHART: ${{ inputs.BACKUP_HELM_CHART }}
@@ -205,7 +205,7 @@ jobs:
           BACKUP_IMAGE: ${{ inputs.BACKUP_IMAGE }}
           DB_SERVICE: ${{ inputs.DB_SERVICE }}
           DB_HOST: ${{ inputs.DB_HOST }}
-          DB_DATABASE: ${{ inputs.DB_DATABASE }}
+          DB_NAME: ${{ inputs.DB_NAME }}
           DB_PORT: ${{ inputs.DB_PORT }}
           DB_HEALTH_QUERY: ${{ inputs.DB_HEALTH_QUERY }}
           OC_PROJECT: ${{ github.ref_name }}
@@ -219,7 +219,7 @@ jobs:
           APP_HOST_URL: ${{ inputs.APP_HOST_URL }}
           SITE_URL: ${{ inputs.SITE_URL }}
           DB_SERVICE: ${{ inputs.DB_SERVICE }}
-          DB_DATABASE: ${{ inputs.DB_DATABASE }}
+          DB_NAME: ${{ inputs.DB_NAME }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           BUILD_NAMESPACE: ${{ inputs.BUILD_NAMESPACE }}

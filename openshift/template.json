@@ -249,7 +249,7 @@
                     }
                   },
                   {
-                    "name": "DB_DATABASE",
+                    "name": "DB_NAME",
                     "valueFrom": {
                       "secretKeyRef": {
                         "name": "${APP_NAME}-secrets",
@@ -420,7 +420,7 @@
                     }
                   },
                   {
-                    "name": "DB_DATABASE",
+                    "name": "DB_NAME",
                     "valueFrom": {
                       "secretKeyRef": {
                         "name": "${APP_NAME}-secrets",
@@ -755,7 +755,7 @@
     {
       "description": "Database name.",
       "displayName": "DB Name",
-      "name": "DB_DATABASE",
+      "name": "DB_NAME",
       "value": "app"
     },
     {

@@ -50,7 +50,7 @@ objects:
                    secretKeyRef:
                      name: ${APP_NAME}-secrets
                      key: database-user
-               - name: DB_DATABASE
+               - name: DB_NAME
                  valueFrom:
                    secretKeyRef:
                      name: ${APP_NAME}-secrets

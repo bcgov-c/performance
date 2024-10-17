@@ -70,7 +70,7 @@ jobs:
       BUILD_NAMESPACE: ${{ github.ref_name }}
       DB_USER: ${{ env.DB_USER }}
       DB_SERVICE: ${{ env.DB_SERVICE }}
-      DB_DATABASE: ${{ env.DB_DATABASE }}
+      DB_NAME: ${{ env.DB_NAME }}
       SECRET_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       DB_HEALTH_QUERY: ${{ env.DB_HEALTH_QUERY }}
       WEB_NAME: ${{ env.WEB_NAME }}
@@ -131,7 +131,7 @@ jobs:
           echo Deploying ${{ env.PROJECT }} > ${{ env.APP_NAME }} on ${{ github.ref_name }}
           echo "-----------------------"
           echo URL: https://${{ env.APP_NAME }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
-          echo DB service/database: ${{ env.DB_SERVICE }}/${{ env.DB_DATABASE }}
+          echo DB service/database: ${{ env.DB_SERVICE }}/${{ env.DB_NAME }}
 
   setup-oc:
     runs-on: ubuntu-latest
@@ -220,7 +220,7 @@ jobs:
       DB_USER: ${{ needs.checkEnv.outputs.DB_USER }}
       DB_PORT: ${{ needs.checkEnv.outputs.DB_PORT }}
       DB_SERVICE: ${{ needs.checkEnv.outputs.DB_SERVICE }}
-      DB_DATABASE: ${{ needs.checkEnv.outputs.DB_DATABASE }}
+      DB_NAME: ${{ needs.checkEnv.outputs.DB_NAME }}
       DB_INIT_FILE_LOCATION: ${{ needs.checkEnv.outputs.DB_INIT_FILE_LOCATION }}
       DB_HEALTH_QUERY: ${{ needs.checkEnv.outputs.DB_HEALTH_QUERY }}
       DB_BACKUP_DEPLOYMENT_NAME: ${{ needs.checkEnv.outputs.DB_BACKUP_DEPLOYMENT_NAME }}

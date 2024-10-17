@@ -23,7 +23,7 @@ metadata:
   labels:
     template: $APP_NAME
 stringData:
-  database-name: $DB_DATABASE
+  database-name: $DB_NAME
   database-password: $SECRET_DB_PASSWORD
   database-user: $DB_USER
 type: Opaque
