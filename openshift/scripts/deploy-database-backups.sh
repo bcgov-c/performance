@@ -7,18 +7,18 @@ if [ -z "$APP_NAME" ]; then
 fi
 
 # Ensure the environment variables are set
-if [ -z "performance" ]; then
+if [ -z "$DB_NAME" ]; then
   echo "Error: DB_NAME environment variable is not set."
   exit 1
 fi
 
 # Write the value of DB_NAME to a temporary file for debugging
 TEMP_FILE=$(mktemp)
-echo "performance" > "$TEMP_FILE"
-echo "DB_NAME: performance"
+echo "$DB_NAME" > "$TEMP_FILE"
+echo "DB_NAME: $DB_NAME"
 echo "DB_NAME value written to temporary file: $TEMP_FILE"
 DB_NAME_TEST=$(cat "$TEMP_FILE")
-echo "Restoring database to: performance_TEST"
+echo "Restoring database to: $DB_NAME_TEST"
 
 echo "Deploying database backups for $APP_NAME to: $DB_BACKUP_DEPLOYMENT_NAME..."
 
@@ -27,7 +27,7 @@ echo "DB_BACKUP_DEPLOYMENT_NAME: $DB_BACKUP_DEPLOYMENT_NAME"
 echo "APP_NAME: $APP_NAME"
 echo "DB_HOST: $DB_HOST"
 echo "DB_PORT: $DB_PORT"
-echo "DB_NAME: performance"
+echo "DB_NAME: $DB_NAME"
 echo "BACKUP_HELM_CHART: $BACKUP_HELM_CHART"
 echo "DB_BACKUP_IMAGE: $DB_BACKUP_IMAGE"
 echo "DB_BACKUP_DEPLOYMENT_FULL_NAME: $DB_BACKUP_DEPLOYMENT_FULL_NAME"
@@ -109,10 +109,10 @@ restore_backup_from_file() {
   # Check the file extension and run the appropriate restore command
   if [[ "$FILENAME" == *.gz ]]; then
     # Run the restore command for .gz files
-    oc exec $(oc get pod -l app.kubernetes.io/name=$POD_NAME -o jsonpath='{.items[0].metadata.name}') -- ./backup.sh -r $DB_SERVICE/performance -f "$FILENAME"
+    oc exec $(oc get pod -l app.kubernetes.io/name=$POD_NAME -o jsonpath='{.items[0].metadata.name}') -- ./backup.sh -r $DB_SERVICE/$DB_NAME -f "$FILENAME"
   elif [[ "$FILENAME" == *.sql ]]; then
     # Run the SQL restore command for .sql files
-    oc exec $(oc get pod -l app.kubernetes.io/name=$POD_NAME -o jsonpath='{.items[0].metadata.name}') -- bash -c "mysql -h $DB_HOST -u root performance < $FILENAME"
+    oc exec $(oc get pod -l app.kubernetes.io/name=$POD_NAME -o jsonpath='{.items[0].metadata.name}') -- bash -c "mysql -h $DB_HOST -u root $DB_NAME < $FILENAME"
   else
     echo "❌ Unsupported file type: $FILENAME. Restore DB failed."
   fi
@@ -253,7 +253,7 @@ if helm list -q | grep -q "^$DB_BACKUP_DEPLOYMENT_NAME$"; then
   # Create a temporary values file with the updated backupConfig
   cat <<EOF > temp-values.yaml
 backupConfig: |
-  mariadb=$DB_HOST:$DB_PORT/performance
+  mariadb=$DB_HOST:$DB_PORT/$DB_NAME
   0 1 * * * default ./backup.sh -s
   0 4 * * * default ./backup.sh -s -v all
 EOF
@@ -293,7 +293,7 @@ persistence:
     storageClassName: netapp-file-standard
 
 backupConfig: |
-  mariadb=$DB_HOST:$DB_PORT/performance
+  mariadb=$DB_HOST:$DB_PORT/$DB_NAME
   0 1 * * * default ./backup.sh -s
   0 4 * * * default ./backup.sh -s -v all
 
@@ -404,7 +404,7 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
   echo "Waiting for database ($DB_POD_NAME) to come online... $(($ATTEMPTS * $WAIT_TIME)) seconds..."
 
   # Capture the output of the mariadb command
-  OUTPUT=$(oc exec $DB_POD_NAME -- bash -c "mariadb -u root -e 'USE performance; $DB_HEALTH_QUERY;'" 2>&1)
+  OUTPUT=$(oc exec $DB_POD_NAME -- bash -c "mariadb -u root -e 'USE $DB_NAME; $DB_HEALTH_QUERY;'" 2>&1)
   # Debugging: Print the output of the mariadb command
   echo "DB Health Check: $OUTPUT"
 
@@ -434,11 +434,12 @@ until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
   elif [ -n "$CURRENT_USER_COUNT" ] && [ "$CURRENT_USER_COUNT" -eq 0 ]; then
     echo "Database is online but contains no users."
     DATABASE_IS_ONLINE=1
-    break
   else
-    # Current user count is 0 or not set, wait longer...
-    sleep $WAIT_TIME
+    echo "Database is offline."
   fi
+
+  # Current user count is 0 or not set, wait longer...
+  sleep $WAIT_TIME
 done
 
 echo "Validate total user count: $TOTAL_USER_COUNT"

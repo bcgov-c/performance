@@ -129,7 +129,7 @@ async function main() {
     const fsp = (await import('fs')).promises;
 
     const http_https = url.indexOf('localhost') === 0 ? 'http' : 'https';
-    console.log('Go to URL: ', url);
+    console.log('Go to URL: ', http_https + '://' + url);
     await page.goto(
       http_https + '://' + url,
       { waitUntil: 'networkidle0' }
@@ -209,21 +209,14 @@ async function main() {
 
     // Loop over the paths and run Lighthouse on each one
     for (const path of paths) {
-
-      let url = process.env.APP_HOST_URL + path;
-      if (url.indexOf('http') !== 0) {
-        if (url.indexOf('local') !== 0) {
-          url = 'http://' + url;
-        } else {
-          url = 'https://' + url;
-        }
-      }
-      console.log(`Go to URL: ${url}`);
-
       await page.setCookie(...cookies);
-      // const {lhr} = await lighthouse(url, options, config);
-      await page.goto(url, { waitUntil: 'networkidle0' }); // Navigate to the new URL
 
+      const http_https = url.indexOf('localhost') === 0 ? 'http' : 'https';
+      console.log('Go to URL: ', http_https + '://' + url);
+      await page.goto(
+        http_https + '://' + url,
+        { waitUntil: 'networkidle0' }
+      );
       // Run Lighthouse
       try {
         console.log(`Running Lighthouse for URL: ${url}`);
