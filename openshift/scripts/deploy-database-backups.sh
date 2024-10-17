@@ -15,6 +15,7 @@ fi
 # Write the value of DB_NAME to a temporary file for debugging
 TEMP_FILE=$(mktemp)
 echo "$DB_NAME" > "$TEMP_FILE"
+echo "DB_NAME: $DB_NAME"
 echo "DB_NAME value written to temporary file: $TEMP_FILE"
 DB_NAME_TEST=$(cat "$TEMP_FILE")
 echo "Restoring database to: $DB_NAME_TEST"
@@ -224,10 +225,10 @@ restore_database_from_backup() {
   echo "Listing available backups..."
   LATEST_BACKUP_FILENAME=$(list_backups)
 
-  # Check if the file exists
+  # Check if the file exists on the pod
+  BACKUP_POD=$(get_pod backup-storage)
 
   FILE_TEST=$(oc exec $BACKUP_POD -- ls "$LATEST_BACKUP_FILENAME" 2>&1)
-  # oc exec performance-db-backup-storage-78dfdbf898-jzkdl -- test -f "/backups/init.sql.gz"
   if echo "$FILE_TEST" | grep -qi "terminated"; then
     if echo "$FILE_TEST" | grep -qi "No such file"; then
       echo "File ($LATEST_BACKUP_FILENAME) not found on pod: $BACKUP_POD." >&2

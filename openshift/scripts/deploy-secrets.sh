@@ -6,7 +6,6 @@ echo "Deploying secrets to: $OC_PROJECT..."
 if [[ `oc describe secret $APP_NAME-secrets 2>&1` =~ "NotFound" ]]; then
   echo "Secrets not found."
   echo "Creating... $APP_NAME-secrets"
-
 else
   echo "Secrets already exist ($APP_NAME-secrets)."
   echo "Deleting secrets..."
@@ -32,6 +31,15 @@ EOF
 oc create -f secrets.yml
 
 # Create docker registry secret, if it doesn't exist yet
+if [[ `oc describe secret docker-registry 2>&1` =~ "NotFound" ]]; then
+  echo "Docker registry secrets not found."
+  echo "Creating docker-registry secrets..."
+else
+  echo "Docker registry secrets already exist (docker-registry)."
+  echo "Deleting secrets..."
+  oc delete secret docker-registry
+  echo "Recreating docker-registry..."
+fi
 oc create secret docker-registry $IMAGE_PULL_SECRET_NAME \
   --docker-server=$IMAGE_REPO_DOMAIN \
   --docker-username=$SECRET_DOCKER_USERNAME \
