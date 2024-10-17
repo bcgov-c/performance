@@ -69,7 +69,7 @@ jobs:
       IMAGE_REPO_URL: ${{ env.IMAGE_REPO_URL }}
       BUILD_NAMESPACE: ${{ github.ref_name }}
       DB_USER: ${{ env.DB_USER }}
-      DB_NAME: ${{ env.DB_NAME }}
+      DB_SERVICE: ${{ env.DB_SERVICE }}
       DB_DATABASE: ${{ env.DB_DATABASE }}
       SECRET_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       DB_HEALTH_QUERY: ${{ env.DB_HEALTH_QUERY }}
@@ -131,6 +131,7 @@ jobs:
           echo Deploying ${{ env.PROJECT }} > ${{ env.APP_NAME }} on ${{ github.ref_name }}
           echo "-----------------------"
           echo URL: https://${{ env.APP_NAME }}-${{ github.ref_name }}.apps.silver.devops.gov.bc.ca
+          echo DB service/database: ${{ env.DB_SERVICE }}/${{ env.DB_DATABASE }}
 
   setup-oc:
     runs-on: ubuntu-latest
@@ -150,7 +151,7 @@ jobs:
       APP_NAME: ${{ needs.checkEnv.outputs.APP_NAME }}
       APP_HOST_URL: ${{ needs.checkEnv.outputs.APP_HOST_URL }}
       DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}
-      DB_NAME: ${{ needs.checkEnv.outputs.DB_NAME }}
+      DB_SERVICE: ${{ needs.checkEnv.outputs.DB_SERVICE }}
       WEB_NAME: ${{ needs.checkEnv.outputs.WEB_NAME }}
       PHP_NAME: ${{ needs.checkEnv.outputs.PHP_NAME }}
       CRON_NAME: ${{ needs.checkEnv.outputs.CRON_NAME }}
@@ -218,7 +219,7 @@ jobs:
       DB_HOST: ${{ needs.checkEnv.outputs.DB_HOST }}
       DB_USER: ${{ needs.checkEnv.outputs.DB_USER }}
       DB_PORT: ${{ needs.checkEnv.outputs.DB_PORT }}
-      DB_NAME: ${{ needs.checkEnv.outputs.DB_NAME }}
+      DB_SERVICE: ${{ needs.checkEnv.outputs.DB_SERVICE }}
       DB_DATABASE: ${{ needs.checkEnv.outputs.DB_DATABASE }}
       DB_INIT_FILE_LOCATION: ${{ needs.checkEnv.outputs.DB_INIT_FILE_LOCATION }}
       DB_HEALTH_QUERY: ${{ needs.checkEnv.outputs.DB_HEALTH_QUERY }}

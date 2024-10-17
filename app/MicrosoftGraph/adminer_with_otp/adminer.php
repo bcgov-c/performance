@@ -981,7 +981,7 @@ indexes($Q,$h=null){global$g;$I=array();foreach($g->_db->selectCollection($Q)->g
 fields($Q){return
 fields_from_edit();}function
 found_rows($R,$Z){global$g;return$g->_db->selectCollection($_GET["select"])->count($Z);}$uf=array("=");}elseif(class_exists('MongoDB\Driver\Manager')){class
-Min_DB{var$extension="MongoDB",$server_info=MONGODB_VERSION,$affected_rows,$error,$last_id;var$_link;var$_db,$_DB_NAME;function
+Min_DB{var$extension="MongoDB",$server_info=MONGODB_VERSION,$affected_rows,$error,$last_id;var$_link;var$_db,$_DB_SERVICE;function
 connect($Ji,$xf){$gb='MongoDB\Driver\Manager';$this->_link=new$gb($Ji,$xf);$this->executeCommand('admin',array('ping'=>1));}function
 executeCommand($l,$pb){$gb='MongoDB\Driver\Command';try{return$this->_link->executeCommand($l,new$gb($pb));}catch(Exception$pc){$this->error=$pc->getMessage();return
 array();}}function
@@ -990,7 +990,7 @@ true;}catch(Exception$pc){$this->error=$pc->getMessage();return
 false;}}function
 query($G){return
 false;}function
-select_db($j){$this->_DB_NAME=$j;return
+select_db($j){$this->_DB_SERVICE=$j;return
 true;}function
 quote($P){return$P;}}class
 Min_Result{var$num_rows,$_rows=array(),$_offset=0,$_charset=array();function
@@ -1008,22 +1008,22 @@ Min_SQL{public$kg="_id";function
 select($Q,$L,$Z,$qd,$zf=array(),$_=1,$E=0,$mg=false){global$g;$L=($L==array("*")?array():array_fill_keys($L,1));if(count($L)&&!isset($L['_id']))$L['_id']=0;$Z=where_to_query($Z);$uh=array();foreach($zf
 as$X){$X=preg_replace('~ DESC$~','',$X,1,$Gb);$uh[$X]=($Gb?-1:1);}if(isset($_GET['limit'])&&is_numeric($_GET['limit'])&&$_GET['limit']>0)$_=$_GET['limit'];$_=min(200,max(1,(int)$_));$rh=$E*$_;$gb='MongoDB\Driver\Query';try{return
 new
-Min_Result($g->_link->executeQuery("$g->_DB_NAME.$Q",new$gb($Z,array('projection'=>$L,'limit'=>$_,'skip'=>$rh,'sort'=>$uh))));}catch(Exception$pc){$g->error=$pc->getMessage();return
+Min_Result($g->_link->executeQuery("$g->_DB_SERVICE.$Q",new$gb($Z,array('projection'=>$L,'limit'=>$_,'skip'=>$rh,'sort'=>$uh))));}catch(Exception$pc){$g->error=$pc->getMessage();return
 false;}}function
-update($Q,$N,$wg,$_=0,$hh="\n"){global$g;$l=$g->_DB_NAME;$Z=sql_query_where_parser($wg);$gb='MongoDB\Driver\BulkWrite';$Wa=new$gb(array());if(isset($N['_id']))unset($N['_id']);$Ig=array();foreach($N
+update($Q,$N,$wg,$_=0,$hh="\n"){global$g;$l=$g->_DB_SERVICE;$Z=sql_query_where_parser($wg);$gb='MongoDB\Driver\BulkWrite';$Wa=new$gb(array());if(isset($N['_id']))unset($N['_id']);$Ig=array();foreach($N
 as$z=>$Y){if($Y=='NULL'){$Ig[$z]=1;unset($N[$z]);}}$Ii=array('$set'=>$N);if(count($Ig))$Ii['$unset']=$Ig;$Wa->update($Z,$Ii,array('upsert'=>false));return$g->executeBulkWrite("$l.$Q",$Wa,'getModifiedCount');}function
-delete($Q,$wg,$_=0){global$g;$l=$g->_DB_NAME;$Z=sql_query_where_parser($wg);$gb='MongoDB\Driver\BulkWrite';$Wa=new$gb(array());$Wa->delete($Z,array('limit'=>$_));return$g->executeBulkWrite("$l.$Q",$Wa,'getDeletedCount');}function
-insert($Q,$N){global$g;$l=$g->_DB_NAME;$gb='MongoDB\Driver\BulkWrite';$Wa=new$gb(array());if($N['_id']=='')unset($N['_id']);$Wa->insert($N);return$g->executeBulkWrite("$l.$Q",$Wa,'getInsertedCount');}}function
+delete($Q,$wg,$_=0){global$g;$l=$g->_DB_SERVICE;$Z=sql_query_where_parser($wg);$gb='MongoDB\Driver\BulkWrite';$Wa=new$gb(array());$Wa->delete($Z,array('limit'=>$_));return$g->executeBulkWrite("$l.$Q",$Wa,'getDeletedCount');}function
+insert($Q,$N){global$g;$l=$g->_DB_SERVICE;$gb='MongoDB\Driver\BulkWrite';$Wa=new$gb(array());if($N['_id']=='')unset($N['_id']);$Wa->insert($N);return$g->executeBulkWrite("$l.$Q",$Wa,'getInsertedCount');}}function
 get_databases($dd){global$g;$I=array();foreach($g->executeCommand('admin',array('listDatabases'=>1))as$Ub){foreach($Ub->databases
 as$l)$I[]=$l->name;}return$I;}function
 count_tables($k){$I=array();return$I;}function
-tables_list(){global$g;$mb=array();foreach($g->executeCommand($g->_DB_NAME,array('listCollections'=>1))as$H)$mb[$H->name]='table';return$mb;}function
+tables_list(){global$g;$mb=array();foreach($g->executeCommand($g->_DB_SERVICE,array('listCollections'=>1))as$H)$mb[$H->name]='table';return$mb;}function
 drop_databases($k){return
 false;}function
-indexes($Q,$h=null){global$g;$I=array();foreach($g->executeCommand($g->_DB_NAME,array('listIndexes'=>$Q))as$w){$cc=array();$f=array();foreach(get_object_vars($w->key)as$e=>$T){$cc[]=($T==-1?'1':null);$f[]=$e;}$I[$w->name]=array("type"=>($w->name=="_id_"?"PRIMARY":(isset($w->unique)?"UNIQUE":"INDEX")),"columns"=>$f,"lengths"=>array(),"descs"=>$cc,);}return$I;}function
+indexes($Q,$h=null){global$g;$I=array();foreach($g->executeCommand($g->_DB_SERVICE,array('listIndexes'=>$Q))as$w){$cc=array();$f=array();foreach(get_object_vars($w->key)as$e=>$T){$cc[]=($T==-1?'1':null);$f[]=$e;}$I[$w->name]=array("type"=>($w->name=="_id_"?"PRIMARY":(isset($w->unique)?"UNIQUE":"INDEX")),"columns"=>$f,"lengths"=>array(),"descs"=>$cc,);}return$I;}function
 fields($Q){global$m;$p=fields_from_edit();if(!$p){$H=$m->select($Q,array("*"),null,null,array(),10);if($H){while($J=$H->fetch_assoc()){foreach($J
 as$z=>$X){$J[$z]=null;$p[$z]=array("field"=>$z,"type"=>"string","null"=>($z!=$m->primary),"auto_increment"=>($z==$m->primary),"privileges"=>array("insert"=>1,"select"=>1,"update"=>1,),);}}}}return$p;}function
-found_rows($R,$Z){global$g;$Z=where_to_query($Z);$mi=$g->executeCommand($g->_DB_NAME,array('count'=>$R['Name'],'query'=>$Z))->toArray();return$mi[0]->n;}function
+found_rows($R,$Z){global$g;$Z=where_to_query($Z);$mi=$g->executeCommand($g->_DB_SERVICE,array('count'=>$R['Name'],'query'=>$Z))->toArray();return$mi[0]->n;}function
 sql_query_where_parser($wg){$wg=preg_replace('~^\sWHERE \(?\(?(.+?)\)?\)?$~','\1',$wg);$ij=explode(' AND ',$wg);$jj=explode(') OR (',$wg);$Z=array();foreach($ij
 as$gj)$Z[]=trim($gj);if(count($jj)==1)$jj=array();elseif(count($jj)>1)$Z=array();return
 where_to_query($Z,$jj);}function

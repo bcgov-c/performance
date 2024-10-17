@@ -14,8 +14,8 @@ if oc get deployment $CRON_NAME; then
 fi
 
 # Only use 1 db replica for deployment / upgrade to avoid conflicts
-echo "Scale down $DB_NAME to 1 replica..."
-oc scale sts/$DB_NAME --replicas=1
+echo "Scale down $DB_SERVICE to 1 replica..."
+oc scale sts/$DB_SERVICE --replicas=1
 
 # Only use 1 redis replica for deployment / upgrade to avoid conflicts
 echo "Scale down $REDIS_NAME to 1 replica..."
@@ -69,8 +69,8 @@ oc process -f ./openshift/template.json \
 oc apply -f -
 
 # Only use 1 db replica for deployment / upgrade to avoid conflicts
-echo "Scale down $DB_NAME to 1 replica..."
-oc scale sts/$DB_NAME --replicas=1
+echo "Scale down $DB_SERVICE to 1 replica..."
+oc scale sts/$DB_SERVICE --replicas=1
 
 sleep 15
 
@@ -153,8 +153,8 @@ echo "migrate-build-files job has completed."
 sleep 15
 
 # DB was scaled-down for deployment and maintenance, scale it back up
-echo "Scaling up $DB_NAME to 3 replicas..."
-oc scale sts/$DB_NAME --replicas=3
+echo "Scaling up $DB_SERVICE to 3 replicas..."
+oc scale sts/$DB_SERVICE --replicas=3
 
 # Right-sizing cluster, according to environment
 bash ./openshift/scripts/right-sizing.sh

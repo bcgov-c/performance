@@ -32,7 +32,7 @@ services:
       - .env.example.versions
     environment:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: YES
-      MARIADB_DATABASE: ${DB_NAME:-performance}
+      MARIADB_DATABASE: ${DB_SERVICE:-performance}
       MARIADB_USER: ${DB_USER:-performance}
       MARIADB_PASSWORD: ${DB_PASSWORD:-performance}
       MARIADB_AUTO_UPGRADE: 1

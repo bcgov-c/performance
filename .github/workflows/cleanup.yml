@@ -20,7 +20,7 @@ on:
       DEPLOY_NAMESPACE:
         required: true
         type: string
-      DB_NAME:
+      DB_SERVICE:
         required: true
         type: string
       WEB_NAME:
@@ -133,23 +133,23 @@ jobs:
       - name: Clean Database PVCs
         if: inputs.CLEAN_PVC == 'YES'
         run: |
-          echo "Cleaning up PVCs associated with StatefulSet '${{ inputs.DB_NAME }}'..."
+          echo "Cleaning up PVCs associated with StatefulSet '${{ inputs.DB_SERVICE }}'..."
 
-          # Get the list of PVCs associated with the StatefulSet '${{ inputs.DB_NAME }}'
-          PVCS=$(oc get pvc -l app=${{ inputs.DB_NAME }} -o jsonpath='{.items[*].metadata.name}')
+          # Get the list of PVCs associated with the StatefulSet '${{ inputs.DB_SERVICE }}'
+          PVCS=$(oc get pvc -l app=${{ inputs.DB_SERVICE }} -o jsonpath='{.items[*].metadata.name}')
           echo "PVCs found: $PVCS"
 
           # Check if the StatefulSet exists
-          if [[ `oc describe sts/${{ inputs.DB_NAME }} 2>&1` =~ "NotFound" ]]; then
-            echo "sts/${{ inputs.DB_NAME }} NOT FOUND: Skipping..."
+          if [[ `oc describe sts/${{ inputs.DB_SERVICE }} 2>&1` =~ "NotFound" ]]; then
+            echo "sts/${{ inputs.DB_SERVICE }} NOT FOUND: Skipping..."
           else
             # Scale down the StatefulSet to 0 replicas
-            echo "Scaling down StatefulSet '${{ inputs.DB_NAME }}' to 0 replicas..."
-            oc scale sts/${{ inputs.DB_NAME }} --replicas=0
+            echo "Scaling down StatefulSet '${{ inputs.DB_SERVICE }}' to 0 replicas..."
+            oc scale sts/${{ inputs.DB_SERVICE }} --replicas=0
 
             # Wait for the StatefulSet to scale down
-            echo "Waiting for StatefulSet '${{ inputs.DB_NAME }}' to scale down..."
-            while [[ $(oc get pods -l app=${{ inputs.DB_NAME }} -o jsonpath='{.items[*].status.phase}' | grep -v "Terminating") ]]; do
+            echo "Waiting for StatefulSet '${{ inputs.DB_SERVICE }}' to scale down..."
+            while [[ $(oc get pods -l app=${{ inputs.DB_SERVICE }} -o jsonpath='{.items[*].status.phase}' | grep -v "Terminating") ]]; do
               echo "Waiting for pods to terminate..."
               sleep 5
             done
@@ -163,32 +163,32 @@ jobs:
 
           echo "PVC cleanup completed."
 
-      - name: 🧹️ Clean ${{ inputs.DB_NAME }}
+      - name: 🧹️ Clean ${{ inputs.DB_SERVICE }}
         run: |
-          configmap_name="${{ inputs.DB_NAME }}"
-          if [[ `oc describe sts/${{ inputs.DB_NAME }} 2>&1` =~ "NotFound" ]]; then
-            echo "sts/${{ inputs.DB_NAME }} NOT FOUND: Skipping..."
+          configmap_name="${{ inputs.DB_SERVICE }}"
+          if [[ `oc describe sts/${{ inputs.DB_SERVICE }} 2>&1` =~ "NotFound" ]]; then
+            echo "sts/${{ inputs.DB_SERVICE }} NOT FOUND: Skipping..."
           else
-            echo "sts/${{ inputs.DB_NAME }} FOUND: Cleaning..."
-            oc scale sts/${{ inputs.DB_NAME }} --replicas=0
+            echo "sts/${{ inputs.DB_SERVICE }} FOUND: Cleaning..."
+            oc scale sts/${{ inputs.DB_SERVICE }} --replicas=0
 
             # Wait for the StatefulSet to scale down
-            echo "Waiting for StatefulSet '${{ inputs.DB_NAME }}' to scale down..."
-            while [[ $(oc get pods -l app=${{ inputs.DB_NAME }} -o jsonpath='{.items[*].status.phase}' | grep -v "Terminating") ]]; do
+            echo "Waiting for StatefulSet '${{ inputs.DB_SERVICE }}' to scale down..."
+            while [[ $(oc get pods -l app=${{ inputs.DB_SERVICE }} -o jsonpath='{.items[*].status.phase}' | grep -v "Terminating") ]]; do
               echo "Waiting for pods to terminate..."
               sleep 5
             done
 
-            oc delete sts/${{ inputs.DB_NAME }}
+            oc delete sts/${{ inputs.DB_SERVICE }}
           fi
           if ! [[ `oc describe configmap/$configmap_name 2>&1` =~ "NotFound" ]]; then
             oc delete configmap/$configmap_name
           fi
-          if ! [[ `oc describe service/${{ inputs.DB_NAME }} 2>&1` =~ "NotFound" ]]; then
-            oc delete service ${{ inputs.DB_NAME }}
+          if ! [[ `oc describe service/${{ inputs.DB_SERVICE }} 2>&1` =~ "NotFound" ]]; then
+            oc delete service ${{ inputs.DB_SERVICE }}
           fi
 
-          echo "${{ inputs.DB_NAME }} cleanup completed."
+          echo "${{ inputs.DB_SERVICE }} cleanup completed."
 
       - name: 🧹️ Clean ${{ inputs.WEB_NAME }}
         id: clean-web
