@@ -6,6 +6,15 @@ if [ -z "$APP_NAME" ]; then
   exit 1
 fi
 
+# Ensure the environment variables are set
+if [ -z "$DB_DATABASE" ]; then
+  echo "Error: DB_DATABASE environment variable is not set."
+  exit 1
+fi
+
+# Print the value of DB_DATABASE for debugging
+echo "DB_DATABASE (unobfuscated): $DB_DATABASE"
+
 echo "Deploying database backups for $APP_NAME to: $DB_BACKUP_DEPLOYMENT_NAME..."
 
 # Debugging: Print environment variables
@@ -100,10 +109,10 @@ restore_backup_from_file() {
     # Run the SQL restore command for .sql files
     oc exec $(oc get pod -l app.kubernetes.io/name=$POD_NAME -o jsonpath='{.items[0].metadata.name}') -- bash -c "mysql -h $DB_HOST -u root $DB_DATABASE < $FILENAME"
   else
-    echo "Unsupported file type: $FILENAME"
+    echo "❌ Unsupported file type: $FILENAME. Restore DB failed."
   fi
 
-  echo "✔️ Backup restoration process completed."
+  echo "Restore database from file process complete."
 }
 
 # Function to get the backup pod name
