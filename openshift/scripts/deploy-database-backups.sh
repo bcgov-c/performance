@@ -12,8 +12,12 @@ if [ -z "$DB_DATABASE" ]; then
   exit 1
 fi
 
-# Print the value of DB_DATABASE for debugging
-echo "DB_DATABASE (unobfuscated): $DB_DATABASE"
+# Write the value of DB_DATABASE to a temporary file for debugging
+TEMP_FILE=$(mktemp)
+echo "$DB_DATABASE" > "$TEMP_FILE"
+echo "DB_DATABASE value written to temporary file: $TEMP_FILE"
+DB_DATABASE_TEST=$(cat "$TEMP_FILE")
+echo "Restoring database to: $DB_DATABASE_TEST"
 
 echo "Deploying database backups for $APP_NAME to: $DB_BACKUP_DEPLOYMENT_NAME..."
 
