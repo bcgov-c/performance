@@ -16,7 +16,7 @@ async function main() {
   const username = process.env.TESTER_USERNAME;
   const password = process.env.TESTER_PASSWORD;
 
-  if (!testURL || !username || !password) {
+  if (!testURL) {
     throw new Error(`APP_HOST_URL is not defined`);
   } else if (!username) {
     throw new Error(`TESTER_USERNAME is not defined`);

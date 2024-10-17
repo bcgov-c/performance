@@ -241,6 +241,7 @@ jobs:
     name: 🚦 Audit
     runs-on: ubuntu-latest
     needs: [checkEnv, call-deploy-workflow]
+    environment: ${{ github.ref_name }}
     outputs:
       LHRESULT: ${{ steps.lighthouse.outputs.LHRESULT }}
       SSL_EXPIRY_DAYS: ${{ steps.ssl-test.outputs.SSL_EXPIRY_DAYS }}
