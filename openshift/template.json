@@ -124,12 +124,6 @@
           "name": "${WEB_NAME}",
           "weight": 100
         },
-        "conditions": [
-          {
-            "type": "Admitted",
-            "status": "True"
-          }
-        ],
         "tls": {
           "termination": "edge",
           "insecureEdgeTerminationPolicy": "Redirect"
@@ -180,7 +174,6 @@
               {
                 "image": "${IMAGE_REPO_URL}${APP_NAME}:${DEPLOY_NAMESPACE}",
                 "name": "${APP_NAME}",
-                "restartPolicy": "Always",
                 "imagePullPolicy": "Always",
                 "ports": [
                   {
@@ -310,11 +303,6 @@
             ]
           }
         },
-        "triggers": [
-          {
-            "type": "ConfigChange"
-          }
-        ],
         "revisionHistoryLimit": 10,
         "test": false
       }
@@ -356,7 +344,6 @@
               {
                 "image": "${IMAGE_REPO_URL}${CRON_NAME}:${DEPLOY_NAMESPACE}",
                 "name": "${CRON_NAME}",
-                "restartPolicy": "Always",
                 "imagePullPolicy": "Always",
                 "command": [
                   "/bin/sh",
@@ -468,11 +455,6 @@
             ]
           }
         },
-        "triggers": [
-          {
-            "type": "ConfigChange"
-          }
-        ],
         "revisionHistoryLimit": 10,
         "test": false
       }
@@ -514,7 +496,6 @@
               {
                 "image": "${WEB_IMAGE}",
                 "name": "${WEB_NAME}",
-                "restartPolicy": "Always",
                 "imagePullPolicy": "Always",
                 "ports": [
                   {
@@ -557,22 +538,19 @@
               {
                 "name": "${APP_NAME}-data",
                 "persistentVolumeClaim": {
-                  "claimName": "${APP_NAME}-data",
-                  "defaultMode": 755
+                  "claimName": "${APP_NAME}-data"
                 }
               },
               {
                 "name": "${APP_NAME}-app-data",
                 "persistentVolumeClaim": {
-                  "claimName": "${APP_NAME}-app-data",
-                  "defaultMode": 755
+                  "claimName": "${APP_NAME}-app-data"
                 }
               },
               {
                 "name": "${WEB_NAME}-config",
                 "configMap": {
-                  "name": "${WEB_NAME}-config",
-                  "defaultMode": 420
+                  "name": "${WEB_NAME}-config"
                 }
               },
               {
@@ -590,11 +568,6 @@
             ]
           }
         },
-        "triggers": [
-          {
-            "type": "ConfigChange"
-          }
-        ],
         "revisionHistoryLimit": 10,
         "test": false
       }

@@ -12,27 +12,7 @@ if [ -z "$DB_NAME" ]; then
   exit 1
 fi
 
-# Write the value of DB_NAME to a temporary file for debugging
-TEMP_FILE=$(mktemp)
-echo "$DB_NAME" > "$TEMP_FILE"
-echo "DB_NAME: $DB_NAME"
-echo "DB_NAME value written to temporary file: $TEMP_FILE"
-DB_NAME_TEST=$(cat "$TEMP_FILE")
-echo "Restoring database to: $DB_NAME_TEST"
-
 echo "Deploying database backups for $APP_NAME to: $DB_BACKUP_DEPLOYMENT_NAME..."
-
-# Debugging: Print environment variables
-echo "DB_BACKUP_DEPLOYMENT_NAME: $DB_BACKUP_DEPLOYMENT_NAME"
-echo "APP_NAME: $APP_NAME"
-echo "DB_HOST: $DB_HOST"
-echo "DB_PORT: $DB_PORT"
-echo "DB_NAME: $DB_NAME"
-echo "BACKUP_HELM_CHART: $BACKUP_HELM_CHART"
-echo "DB_BACKUP_IMAGE: $DB_BACKUP_IMAGE"
-echo "DB_BACKUP_DEPLOYMENT_FULL_NAME: $DB_BACKUP_DEPLOYMENT_FULL_NAME"
-
-echo "Deploying database backups to: $DB_BACKUP_DEPLOYMENT_NAME..."
 
 # Function to convert human-readable size to bytes
 convert_to_bytes() {
@@ -396,7 +376,6 @@ test_db_health() {
 
   echo "Database pod found and running: $DB_POD_NAME."
 
-  TOTAL_USER_COUNT=0
   CURRENT_USER_COUNT=0
   DATABASE_IS_ONLINE=0
   ATTEMPTS=0
@@ -452,8 +431,15 @@ test_db_health() {
   done
 }
 
-DB_HEALTH=test_db_health "$DB_HOST"
+TOTAL_USER_COUNT=0
+DB_HEALTH=$(test_db_health "$DB_HOST")
 echo "Database health check: $DB_HEALTH"
+
+# Ensure TOTAL_USER_COUNT is set and not empty
+if [ -z "$TOTAL_USER_COUNT" ]; then
+  echo "Error: TOTAL_USER_COUNT is not set or empty."
+  exit 1
+fi
 
 if [ $TOTAL_USER_COUNT -eq 0 ]; then
   if [ $DATABASE_IS_ONLINE -eq 1 ]; then
