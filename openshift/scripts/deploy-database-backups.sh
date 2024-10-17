@@ -401,12 +401,12 @@ ATTEMPTS=0
 OUTPUT=""
 until [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
   ATTEMPTS=$(( $ATTEMPTS + 1 ))
-  echo "Waiting for database to come online... $(($ATTEMPTS * $WAIT_TIME)) seconds..."
+  echo "Waiting for database ($DB_POD_NAME) to come online... $(($ATTEMPTS * $WAIT_TIME)) seconds..."
 
   # Capture the output of the mariadb command
   OUTPUT=$(oc exec $DB_POD_NAME -- bash -c "mariadb -u root -e 'USE $DB_NAME; $DB_HEALTH_QUERY;'" 2>&1)
   # Debugging: Print the output of the mariadb command
-  # echo "Mariadb command output: $OUTPUT"
+  echo "DB Health Check: $OUTPUT"
 
   # Check if the output contains an error
   if echo "$OUTPUT" | grep -qi "error"; then
