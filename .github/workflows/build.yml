@@ -159,13 +159,6 @@ jobs:
               }]
             }
 
-  setup-oc:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
   # Clean up resources if CLEAN_BUILDS is set to "YES"
   call-cleanup-workflow:
     name: 🧹️ Clean-up
