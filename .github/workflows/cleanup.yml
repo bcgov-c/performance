@@ -265,24 +265,7 @@ jobs:
       - name: 🧹️ Clean Redis
         id: clean-redis
         run: |
-          redis_config_map="${{ inputs.REDIS_NAME }}-config-map"
-          redis_stats_config_map="${{ inputs.REDIS_NAME }}-stats"
-          if [[ `oc describe sts/${{ inputs.REDIS_NAME }} 2>&1` =~ "NotFound" ]]; then
-            echo "sts/${{ inputs.REDIS_NAME }} NOT FOUND: Skipping..."
-          else
-            echo "sts/${{ inputs.REDIS_NAME }} FOUND: Cleaning resources..."
-            oc delete sts/${{ inputs.REDIS_NAME }}
-          fi
-          if [[ `oc describe configmap/$redis_config_map 2>&1` =~ "NotFound" ]]; then
-            echo "configmap/$redis_config_map NOT FOUND: Skipping..."
-          else
-            oc delete configmap/$redis_config_map
-          fi
-          if [[ `oc describe configmap/$redis_stats_config_map 2>&1` =~ "NotFound" ]]; then
-            echo "configmap/$redis_stats_config_map NOT FOUND: Skipping..."
-          else
-            oc delete configmap/$redis_stats_config_map
-          fi
+          helm uninstall ${{ inputs.REDIS_NAME }}
 
       - name: 🧹️ Clean Upgrade Job
         id: clean-upgrade-job
