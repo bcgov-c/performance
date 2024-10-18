@@ -81,7 +81,7 @@ jobs:
       PHP_NAME: ${{ env.PHP_NAME }}
       CRON_NAME: ${{ env.CRON_NAME }}
       CRON_IMAGE: ${{ env.CRON_IMAGE}}
-      REDIS_IMAGE: ${{ env.REDIS_IMAGE }}
+      REDIS_HELM_CHART: ${{ env.REDIS_HELM_CHART }}
       REDIS_NAME: ${{ env.REDIS_NAME }}
       REDIS_REPLICAS: ${{ env.REDIS_REPLICAS }}
       DB_INIT_FILE_LOCATION: ${{ env.DB_INIT_FILE_LOCATION }}
@@ -255,7 +255,7 @@ jobs:
       BACKUP_HELM_CHART: ${{ needs.checkEnv.outputs.BACKUP_HELM_CHART }}
       CRON_IMAGE: ${{ needs.checkEnv.outputs.CRON_IMAGE }}
       CRON_NAME: ${{ needs.checkEnv.outputs.CRON_NAME }}
-      REDIS_IMAGE: ${{ needs.checkEnv.outputs.REDIS_IMAGE }}
+      REDIS_HELM_CHART: ${{ needs.checkEnv.outputs.REDIS_HELM_CHART }}
       REDIS_NAME: ${{ needs.checkEnv.outputs.REDIS_NAME }}
       REDIS_REPLICAS: ${{ needs.checkEnv.outputs.REDIS_REPLICAS }}
       BUILD_NAMESPACE: ${{ needs.checkEnv.outputs.BUILD_NAMESPACE }}
