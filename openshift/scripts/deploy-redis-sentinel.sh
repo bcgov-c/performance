@@ -6,7 +6,7 @@ oc project $OC_PROJECT
 helm repo add bitnami https://charts.bitnami.com/bitnami
 
 # Create a temporary values file
-cat > values.yml<<EOF
+cat <<EOF > values.yml
 global:
   redis:
     password: $REDIS_PASSWORD
