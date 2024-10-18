@@ -25,6 +25,7 @@ services:
     command: /usr/local/bin/migrate-build-files.sh
     healthcheck:
       test: ["NONE"]
+
   db:
     image: ${DB_IMAGE:-mariadb:10}
     env_file:
@@ -47,11 +48,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
   php:
     depends_on:
       db:
-        condition: service_healthy
-      redis:
         condition: service_healthy
     tty: true
     restart: "no"
@@ -77,12 +77,12 @@ services:
     command: php-fpm
     links:
       - db
-      - redis
     healthcheck:
       test: ["CMD-SHELL", "php-fpm-healthcheck"]
       interval: 10s
       timeout: 10s
       retries: 20
+
   web:
     depends_on:
       php:
@@ -96,6 +96,7 @@ services:
     links:
       - php
     command: [nginx-debug, '-g', 'daemon off;']
+
   cron:
     depends_on:
       db:
@@ -112,15 +113,153 @@ services:
     volumes:
       - ./temp/var/www:/var/www:delegated
     command: /usr/local/bin/cron.sh
-  redis:
-    image: ${REDIS_IMAGE:-redis:latest}
-    healthcheck:
-      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+
+  # redis:
+  #   image: ${REDIS_IMAGE:-redis:latest}
+  #   healthcheck:
+  #     test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - ./openshift/config/redis/dokcer-redis.conf:/usr/local/etc/redis/redis.conf:ro
+  #     - ./temp/data/:/data
+  #   command: [redis-server, /usr/local/etc/redis/redis.conf]
+
+  redis-primary:
+    image: redis:latest
+    container_name: redis-primary
+    hostname: redis-primary
     ports:
       - "6379:6379"
     volumes:
-      - ./openshift/config/redis/dokcer-redis.conf:/usr/local/etc/redis/redis.conf:ro
-      - ./temp/data/:/data
-    command: [redis-server, /usr/local/etc/redis/redis.conf]
+      - ./data/primary:/data
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--repl-diskless-load",
+        "on-empty-db",
+        "--replica-announce-ip",
+        "${REDIS_HOST_IP}",
+        "--replica-announce-port",
+        "6379",
+        "--protected-mode",
+        "no"
+      ]
+
+  redis-secondary-1:
+    image: redis:latest
+    container_name: redis-secondary-1
+    hostname: redis-secondary-1
+    depends_on:
+      - redis-primary
+    ports:
+      - "6380:6379"
+    volumes:
+      - ./data/secondary1:/data
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--replicaof",
+        "redis-primary",
+        "6379",
+        "--repl-diskless-load",
+        "on-empty-db",
+        "--replica-announce-ip",
+        "${REDIS_HOST_IP}",
+        "--replica-announce-port",
+        "6380",
+        "--protected-mode",
+        "no"
+      ]
+
+  redis-secondary-2:
+    image: redis:latest
+    container_name: redis-secondary-2
+    hostname: redis-secondary-2
+    depends_on:
+      - redis-primary
+    ports:
+      - "6381:6379"
+    volumes:
+      - ./data/secondary2:/data
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--replicaof",
+        "redis-primary",
+        "6379",
+        "--repl-diskless-load",
+        "on-empty-db",
+        "--replica-announce-ip",
+        "${REDIS_HOST_IP}",
+        "--replica-announce-port",
+        "6381",
+        "--protected-mode",
+        "no"
+      ]
+
+  sentinel-1:
+    image: redis:latest
+    container_name: sentinel-1
+    hostname: sentinel-1
+    depends_on:
+      - redis-primary
+    ports:
+      - "26379:26379"
+    command: >
+      sh -c 'echo "bind 0.0.0.0" > /etc/sentinel.conf &&
+            echo "sentinel monitor mymaster ${REDIS_HOST_IP} 6379 2" >> /etc/sentinel.conf &&
+            echo "sentinel resolve-hostnames yes" >> /etc/sentinel.conf &&
+            echo "sentinel down-after-milliseconds mymaster 10000" >> /etc/sentinel.conf &&
+            echo "sentinel failover-timeout mymaster 10000" >> /etc/sentinel.conf &&
+            echo "sentinel parallel-syncs mymaster 1" >> /etc/sentinel.conf &&
+            redis-sentinel /etc/sentinel.conf'
+
+  sentinel-2:
+    image: redis:latest
+    container_name: sentinel-2
+    hostname: sentinel-2
+    depends_on:
+      - redis-primary
+    ports:
+      - "26380:26379"
+    command: >
+      sh -c 'echo "bind 0.0.0.0" > /etc/sentinel.conf &&
+            echo "sentinel monitor mymaster ${REDIS_HOST_IP} 6379 2" >> /etc/sentinel.conf &&
+            echo "sentinel resolve-hostnames yes" >> /etc/sentinel.conf &&
+            echo "sentinel down-after-milliseconds mymaster 10000" >> /etc/sentinel.conf &&
+            echo "sentinel failover-timeout mymaster 10000" >> /etc/sentinel.conf &&
+            echo "sentinel parallel-syncs mymaster 1" >> /etc/sentinel.conf &&
+            redis-sentinel /etc/sentinel.conf'
+
+  sentinel-3:
+    image: redis:latest
+    container_name: sentinel-3
+    hostname: sentinel-3
+    depends_on:
+      - redis-primary
+    ports:
+      - "26381:26379"
+    command: >
+      sh -c 'echo "bind 0.0.0.0" > /etc/sentinel.conf &&
+            echo "sentinel monitor mymaster ${REDIS_HOST_IP} 6379 2" >> /etc/sentinel.conf &&
+            echo "sentinel resolve-hostnames yes" >> /etc/sentinel.conf &&
+            echo "sentinel down-after-milliseconds mymaster 10000" >> /etc/sentinel.conf &&
+            echo "sentinel failover-timeout mymaster 10000" >> /etc/sentinel.conf &&
+            echo "sentinel parallel-syncs mymaster 1" >> /etc/sentinel.conf &&
+            redis-sentinel /etc/sentinel.conf'
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
+    ports:
+      - "5540:5540"
+
 volumes:
   mysqldata: {}

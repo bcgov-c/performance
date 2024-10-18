@@ -161,13 +161,13 @@ jobs:
       # Deploy Redis
       - name: Deploy Redis StatefulSet (${{ inputs.REDIS_NAME  }})
         if: success()
-        run: bash ./openshift/scripts/deploy-redis.sh
+        run: bash ./openshift/scripts/deploy-redis-sentinel.sh
         env:
           REDIS_IMAGE: ${{ inputs.REDIS_IMAGE }}
           DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
           REDIS_NAME: ${{ inputs.REDIS_NAME }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
-          REPLICAS: 3
+          REPLICAS: 2
           OC_PROJECT: ${{ github.ref_name }}
 
       - name: Deploy Database StatefulSet (${{ inputs.DB_SERVICE  }})

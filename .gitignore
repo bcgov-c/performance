@@ -4,6 +4,7 @@ storage/*.key
 vendor
 temp/var/www/*
 tmp
+data
 temp
 .env.backup
 .env

@@ -81,21 +81,33 @@ async function main() {
     const chromeLauncherModule = await importModule('chrome-launcher');
     const chromeLauncher = chromeLauncherModule.default || chromeLauncherModule;
 
+    const os = await importModule('os');
+
     let chrome;
     let lighthouseOptions;
 
     try {
+      // Determine the Chrome path based on the operating system
+      let chromePath;
+      if (os.platform() === 'win32') {
+        chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+      } else if (os.platform() === 'darwin') {
+        chromePath = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+      } else {
+        chromePath = '/usr/bin/google-chrome';
+      }
+
       // Launch Chrome using chrome-launcher
       console.log('Launching Chrome...');
       chrome = await chromeLauncher.launch({
-        chromePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', // Update this path if necessary
+        chromePath: chromePath,
         chromeFlags: [
           '--headless',
           '--disable-gpu'
         ]
       });
 
-      console.log(`Chrome launched with PID: ${chrome.pid}`);
+      console.log(`Chrome launched from [${chromePath}] with PID: ${chrome.pid}`);
       console.log(`Chrome debugging port running on ${chrome.port}`);
 
       // Use the dynamically assigned port for Lighthouse

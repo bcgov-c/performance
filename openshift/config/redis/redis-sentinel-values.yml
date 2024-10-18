@@ -1,0 +1,21 @@
+global:
+  redis:
+    password: redis-password
+replica:
+  replicaCount: 2
+sentinel:
+  enabled: true
+master:
+  resources:
+    requests:
+      memory: '0'
+      cpu: '0'
+  persistence:
+    size: 1Gi
+slave:
+  resources:
+    requests:
+      memory: '0'
+      cpu: '0'
+  persistence:
+    size: 1Gi
