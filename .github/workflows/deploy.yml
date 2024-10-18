@@ -170,7 +170,7 @@ jobs:
           DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
           REDIS_NAME: ${{ inputs.REDIS_NAME }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
-          REPLICAS: ${{ inputs.REDIS_REPLICAS }}
+          REDIS_REPLICAS: ${{ inputs.REDIS_REPLICAS }}
           OC_PROJECT: ${{ github.ref_name }}
 
       - name: Deploy Database StatefulSet (${{ inputs.DB_SERVICE  }})

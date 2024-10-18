@@ -9,9 +9,9 @@ helm repo add bitnami https://charts.bitnami.com/bitnami
 cat <<EOF > values.yml
 global:
   redis:
-    password: $REDIS_PASSWORD
+    password: "$REDIS_PASSWORD"
 replica:
-  replicaCount: $REPLICAS
+  replicaCount: $REDIS_REPLICAS
 sentinel:
   enabled: true
 EOF
@@ -34,13 +34,13 @@ else
   echo "Helm $REDIS_NAME NOT FOUND. Beginning deployment..."
 
   helm install $REDIS_NAME-sentinel $REDIS_HELM_CHART --values values.yml
-
-  # Set best-effort resource limits for the deployment
-  echo "Setting best-effort resource limits for the deployment..."
-  oc set resources deployment/$REDIS_NAME --limits=cpu=0,memory=0 --requests=cpu=0,memory=0
 fi
 
 echo "Helm updates completed for $REDIS_NAME."
+
+# Set best-effort resource limits for the deployment
+echo "Setting best-effort resource limits for the deployment..."
+oc set resources deployment/$REDIS_NAME --limits=cpu=0,memory=0 --requests=cpu=0,memory=0
 
 # Clean up the temporary values file
 rm values.yaml
