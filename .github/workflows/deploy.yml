@@ -47,7 +47,7 @@ on:
       CRON_NAME:
         required: true
         type: string
-      REDIS_IMAGE:
+      REDIS_HELM_CHART:
         required: true
         type: string
       REDIS_NAME:
