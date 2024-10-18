@@ -5,7 +5,7 @@ oc project $OC_PROJECT
 
 helm repo add bitnami https://charts.bitnami.com/bitnami
 
-cat > values.yaml<<EOF
+cat > values.yml<<EOF
 global:
   redis:
     password: $REDIS_PASSWORD
