@@ -12,8 +12,14 @@ global:
     password: "$REDIS_PASSWORD"
 replica:
   replicaCount: $REDIS_REPLICAS
+  persistence:
+    enabled: true
+    size: 5Gi
 sentinel:
   enabled: true
+  persistence:
+    enabled: true
+    size: 100Mi
 EOF
 
 # Check if the Helm deployment exists
@@ -33,7 +39,7 @@ if helm list -q | grep -q "^$REDIS_NAME$"; then
 else
   echo "Helm $REDIS_NAME NOT FOUND. Beginning deployment..."
 
-  helm install $REDIS_NAME-sentinel $REDIS_HELM_CHART --values values.yml
+  helm install $REDIS_NAME $REDIS_HELM_CHART --values values.yml
 fi
 
 echo "Helm updates completed for $REDIS_NAME."
@@ -42,8 +48,10 @@ echo "Helm updates completed for $REDIS_NAME."
 echo "Setting best-effort resource limits for the deployment..."
 oc set resources deployment/$REDIS_NAME --limits=cpu=0,memory=0 --requests=cpu=0,memory=0
 
+
+
 # Clean up the temporary values file
 rm values.yaml
 
-e ho "Deploying Redis Insight..."
+echo "Deploying Redis Insight..."
 oc apply -f ./openshift/redis-insight.yml
