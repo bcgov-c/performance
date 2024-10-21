@@ -282,6 +282,7 @@ db:
   usernameKey: database-user
   passwordKey: database-password
   databaseKey: database-name
+  redisPasswordKey: redis-password
 
 env:
   DATABASE_SERVICE_NAME:

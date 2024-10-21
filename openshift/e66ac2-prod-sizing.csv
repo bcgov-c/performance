@@ -2,7 +2,7 @@ Deployment,Type,Pod Count,Max Pods,PVC Count,PVC Capacity (MiB),CPU Request (m),
 cron,deployment,1,1,0,0,0,0,0,0
 db,sts,3,3,3,15360,10,250,256,1024
 php,deployment,3,3,1,5120,20,1800,15,800
-redis,sts,3,3,1,1024,25,200,15,182
+redis-node,sts,3,3,3,1024,0,0,0,0
 web,deployment,3,3,0,0,5,60,10,40
 migrate-build-files,job,1,1,0,0,0,0,0,0
 upgrade,job,1,1,0,0,0,0,0,0

@@ -124,6 +124,11 @@ jobs:
           else
             oc delete configmap ${{ inputs.REDIS_NAME }}-configuration
           fi
+          if [[ `oc describe configmap ${{ inputs.REDIS_NAME }}-config 2>&1` =~ "NotFound" ]]; then
+            echo "${{ inputs.REDIS_NAME }}-config NOT FOUND: Skipping..."
+          else
+            oc delete configmap ${{ inputs.REDIS_NAME }}-config
+          fi
           if [[ `oc describe configmap ${{ inputs.REDIS_NAME }}-scripts 2>&1` =~ "NotFound" ]]; then
             echo "${{ inputs.REDIS_NAME }}-scripts NOT FOUND: Skipping..."
           else

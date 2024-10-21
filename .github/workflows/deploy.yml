@@ -143,6 +143,7 @@ jobs:
             SECRET_DOCKER_USERNAME: ${{ secrets.ARTIFACTORY_USER }}
             SECRET_DOCKER_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
             SECRET_DOCKER_EMAIL: ${{ secrets.ARTIFACTORY_EMAIL }}
+            SECRET_REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
             IMAGE_PULL_SECRET_NAME: ${{ inputs.IMAGE_PULL_SECRET_NAME }}
             IMAGE_REPO_DOMAIN: ${{ inputs.IMAGE_REPO_DOMAIN }}
 
