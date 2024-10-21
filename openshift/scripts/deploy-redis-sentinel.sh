@@ -3,6 +3,8 @@ set -e # Exit on error
 
 oc project $OC_PROJECT
 
+export REDIS_STS_NAME="$REDIS_NAME-node"
+
 helm repo add bitnami https://charts.bitnami.com/bitnami
 
 # Create a temporary values file
@@ -42,16 +44,14 @@ else
   helm install $REDIS_NAME $REDIS_HELM_CHART --values values.yml
 fi
 
+# Clean up the temporary values file
+rm values.yaml
+
 echo "Helm updates completed for $REDIS_NAME."
 
 # Set best-effort resource limits for the deployment
 echo "Setting best-effort resource limits for the deployment..."
-oc set resources deployment/$REDIS_NAME --limits=cpu=0,memory=0 --requests=cpu=0,memory=0
-
-
-
-# Clean up the temporary values file
-rm values.yaml
+oc set resources sts/$REDIS_STS_NAME --limits=cpu=0,memory=0 --requests=cpu=0,memory=0
 
 echo "Deploying Redis Insight..."
 oc apply -f ./openshift/redis-insight.yml
