@@ -22,10 +22,10 @@ metadata:
   labels:
     template: $APP_NAME
 stringData:
-  database-name: $DB_NAME
-  database-password: $SECRET_DB_PASSWORD
-  database-user: $DB_USER
-  redis-password: $SECRET_REDIS_PASSWORD
+  database-name: "$DB_NAME"
+  database-password: "$SECRET_DB_PASSWORD"
+  database-user: "$DB_USER"
+  redis-password: "$SECRET_REDIS_PASSWORD"
 type: Opaque
 EOF
 

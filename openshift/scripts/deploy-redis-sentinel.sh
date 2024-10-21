@@ -61,8 +61,8 @@ rm values.yaml
 echo "Helm updates completed for $REDIS_NAME."
 
 # Set best-effort resource limits for the deployment
-echo "Setting best-effort resource limits for the deployment..."
-oc set resources sts/$REDIS_STS_NAME --limits=cpu=0,memory=0 --requests=cpu=0,memory=0
+# echo "Setting best-effort resource limits for the deployment..."
+# oc set resources sts/$REDIS_STS_NAME --limits=cpu=0,memory=0 --requests=cpu=0,memory=0
 
 echo "Deploying Redis Insight..."
 oc apply -f ./openshift/redis-insight.yml
