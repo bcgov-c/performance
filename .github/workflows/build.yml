@@ -83,6 +83,7 @@ jobs:
       CRON_IMAGE: ${{ env.CRON_IMAGE}}
       REDIS_HELM_CHART: ${{ env.REDIS_HELM_CHART }}
       REDIS_NAME: ${{ env.REDIS_NAME }}
+      REDIS_PORT: ${{ env.REDIS_PORT }}
       REDIS_REPLICAS: ${{ env.REDIS_REPLICAS }}
       DB_INIT_FILE_LOCATION: ${{ env.DB_INIT_FILE_LOCATION }}
       DB_BACKUP_DEPLOYMENT_NAME: ${{ env.DB_BACKUP_DEPLOYMENT_NAME }}
@@ -250,6 +251,7 @@ jobs:
       CRON_NAME: ${{ needs.checkEnv.outputs.CRON_NAME }}
       REDIS_HELM_CHART: ${{ needs.checkEnv.outputs.REDIS_HELM_CHART }}
       REDIS_NAME: ${{ needs.checkEnv.outputs.REDIS_NAME }}
+      REDIS_PORT: ${{ needs.checkEnv.outputs.REDIS_PORT }}
       REDIS_REPLICAS: ${{ needs.checkEnv.outputs.REDIS_REPLICAS }}
       BUILD_NAMESPACE: ${{ needs.checkEnv.outputs.BUILD_NAMESPACE }}
       DEPLOY_NAMESPACE: ${{ needs.checkEnv.outputs.DEPLOY_NAMESPACE }}

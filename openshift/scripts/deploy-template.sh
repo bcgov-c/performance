@@ -65,6 +65,7 @@ oc process -f ./openshift/template.json \
   -p WEB_IMAGE=$WEB_IMAGE \
   -p CRON_NAME=$CRON_NAME \
   -p PHP_NAME=$PHP_NAME \
+  -p REDIS_PORT=$REDIS_PORT \
   -p IMAGE_PULL_SECRET_NAME=$IMAGE_PULL_SECRET_NAME | \
 oc apply -f -
 

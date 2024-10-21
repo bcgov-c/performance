@@ -261,12 +261,7 @@
                   },
                   {
                     "name": "REDIS_PORT",
-                    "valueFrom": {
-                      "secretKeyRef": {
-                        "name": "${APP_NAME}-secrets",
-                        "key": "redis-port"
-                      }
-                    }
+                    "value": "${REDIS_PORT}"
                   },
                   {
                     "name": "REDIS_PASSWORD",
@@ -766,6 +761,12 @@
       "displayName": "Image Pull Secret",
       "name": "IMAGE_PULL_SECRET_NAME",
       "value": "unset"
+    },
+    {
+      "description": "Redis port.",
+      "displayName": "Redis Port",
+      "name": "REDIS_PORT",
+      "value": "6379"
     }
   ]
 }

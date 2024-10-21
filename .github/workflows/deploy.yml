@@ -53,6 +53,9 @@ on:
       REDIS_NAME:
         required: true
         type: string
+      REDIS_PORT:
+        required: true
+        type: string
       REDIS_REPLICAS:
         required: true
         type: string
@@ -234,6 +237,7 @@ jobs:
           CRON_NAME: ${{ inputs.CRON_NAME }}
           CRON_IMAGE: ${{ inputs.CRON_IMAGE }}
           REDIS_NAME: ${{ inputs.REDIS_NAME }}
+          REDIS_PORT: ${{ inputs.REDIS_PORT }}
           BACKUP_HELM_CHART: ${{ inputs.BACKUP_HELM_CHART }}
           BACKUP_IMAGE: ${{ inputs.BACKUP_IMAGE }}
           IMAGE_REPO_URL: ${{ inputs.IMAGE_REPO_URL }}
