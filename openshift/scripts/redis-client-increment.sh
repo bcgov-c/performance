@@ -1,5 +1,5 @@
 #!/bin/bash
-export REDISCLI_AUTH=$REDIS_PASSWORD
+export REDISCLI_AUTH=$SECRET_REDIS_PASSWORD
 export REDIS_HOST=$(oc get svc redis-sentinel -o jsonpath='{.spec.clusterIP}')
 while true
 do

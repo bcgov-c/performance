@@ -58,7 +58,7 @@ else
 fi
 
 echo "Creating configMap: $REDIS_NAME-config"
-sed -e "s/\${REDIS_PASSWORD}/$REDIS_PASSWORD/g" < ./openshift/config/redis/redis-config.yml | oc apply -f -
+sed -e "s/\${REDIS_PASSWORD}/$SECRET_REDIS_PASSWORD/g" < ./openshift/config/redis/redis-config.yml | oc apply -f -
 
 echo "Creating configMap: $REDIS_NAME-stats"
 oc create configmap $REDIS_NAME-stats --from-file=./openshift/config/redis/redis-stats.php

@@ -15,6 +15,6 @@ data:
     pidfile /var/run/redis_6379.pid
     loglevel notice
     logfile ""
-    # requirepass ${REDIS_PASSWORD}
+    requirepass ${SECRET_REDIS_PASSWORD}
   secondary.conf: |
     slaveof redis-0.redis 6379

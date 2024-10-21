@@ -22,7 +22,7 @@ helm repo add bitnami https://charts.bitnami.com/bitnami
 cat <<EOF > values.yaml
 global:
   redis:
-    password: "$REDIS_PASSWORD"
+    password: "$SECRET_REDIS_PASSWORD"
 replica:
   replicaCount: $REDIS_REPLICAS
   persistence:

@@ -173,7 +173,7 @@ jobs:
           REDIS_HELM_CHART: ${{ inputs.REDIS_HELM_CHART }}
           DEPLOY_NAMESPACE: ${{ inputs.DEPLOY_NAMESPACE }}
           REDIS_NAME: ${{ inputs.REDIS_NAME }}
-          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          SECRET_REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           REDIS_REPLICAS: ${{ inputs.REDIS_REPLICAS }}
           OC_PROJECT: ${{ github.ref_name }}
 
