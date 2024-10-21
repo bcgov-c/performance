@@ -270,22 +270,19 @@
               {
                 "name": "${APP_NAME}-data",
                 "persistentVolumeClaim": {
-                  "claimName": "${APP_NAME}-data",
-                  "defaultMode": 755
+                  "claimName": "${APP_NAME}-data"
                 }
               },
               {
                 "name": "${APP_NAME}-app-data",
                 "persistentVolumeClaim": {
-                  "claimName": "${APP_NAME}-app-data",
-                  "defaultMode": 755
+                  "claimName": "${APP_NAME}-app-data"
                 }
               },
               {
                 "name": "file-backup-data",
                 "persistentVolumeClaim": {
-                  "claimName": "file-backup-data",
-                  "defaultMode": 755
+                  "claimName": "file-backup-data"
                 }
               },
               {
@@ -422,22 +419,19 @@
               {
                 "name": "${APP_NAME}-data",
                 "persistentVolumeClaim": {
-                  "claimName": "${APP_NAME}-data",
-                  "defaultMode": 755
+                  "claimName": "${APP_NAME}-data"
                 }
               },
               {
                 "name": "${APP_NAME}-app-data",
                 "persistentVolumeClaim": {
-                  "claimName": "${APP_NAME}-app-data",
-                  "defaultMode": 755
+                  "claimName": "${APP_NAME}-app-data"
                 }
               },
               {
                 "name": "file-backup-data",
                 "persistentVolumeClaim": {
-                  "claimName": "file-backup-data",
-                  "defaultMode": 755
+                  "claimName": "file-backup-data"
                 }
               },
               {
