@@ -18,26 +18,6 @@ spec:
     app: redisinsight
 
 ---
-# Redis Insight PVC
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: redisinsight
-  kind: PersistentVolumeClaim
-  labels:
-    app.kubernetes.io/component: node
-    app.kubernetes.io/instance: redisinsight
-    app.kubernetes.io/name: redisinsight
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: netapp-file-standard
-  volumeMode: Filesystem
-
----
 # Redis Insight deployment with name 'redisinsight'
 apiVersion: apps/v1
 kind: Deployment
@@ -55,6 +35,9 @@ spec:
       labels:
         app: redisinsight #label for pod/s
     spec:
+      volumes:
+        - name: redisinsight
+          emptyDir: {} # node-ephemeral volume https://kubernetes.io/docs/concepts/storage/volumes/#emptydir
       containers:
         - name:  redisinsight #Container name (DNS_LABEL, unique)
           image: redis/redisinsight:latest #repo/image
@@ -65,9 +48,14 @@ spec:
           ports:
             - containerPort: 5540 #exposed container port and protocol
               protocol: TCP
-          volumes:
-            - name: redisinsight
-              emptyDir: {} # node-ephemeral volume https://kubernetes.io/docs/concepts/storage/volumes/#emptydir
+          resources:
+            limits:
+              memory: '0'
+              cpu: '0'
+            requests:
+              memory: '0'
+              cpu: '0'
+          restartPolicy: OnFailure
 
 ---
 # Redis Insight Route
