@@ -5,6 +5,9 @@ oc project $OC_PROJECT
 
 export REDIS_STS_NAME="$REDIS_NAME-node"
 
+echo "Creating configMap: $REDIS_NAME-stats"
+oc create configmap $REDIS_NAME-stats --from-file=./openshift/config/redis/redis-stats.php
+
 helm repo add bitnami https://charts.bitnami.com/bitnami
 
 # Create a temporary values file
