@@ -4,9 +4,17 @@ set -e # Exit on error
 oc project $OC_PROJECT
 
 export REDIS_STS_NAME="$REDIS_NAME-node"
+export REDIS_STATS_NAME="$REDIS_NAME-stats"
 
-echo "Creating configMap: $REDIS_NAME-stats"
-oc create configmap $REDIS_NAME-stats --from-file=./openshift/config/redis/redis-stats.php
+if [[ `oc describe configmap/$REDIS_STATS_NAME 2>&1` =~ "NotFound" ]]; then
+  echo "ConfigMap NOT FOUND: $REDIS_STATS_NAME"
+else
+  echo "$REDIS_STATS_NAME ConfigMap FOUND: Cleaning resources..."
+  oc delete configmap/$REDIS_STATS_NAME
+  echo "DELETED ConfigMap: $REDIS_STATS_NAME"
+fi
+echo "Creating ConfigMap: $REDIS_STATS_NAME"
+oc create configmap $REDIS_STATS_NAME --from-file=./openshift/config/redis/redis-stats.php
 
 helm repo add bitnami https://charts.bitnami.com/bitnami
 
