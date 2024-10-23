@@ -52,7 +52,7 @@ if helm list -q | grep -q "^$REDIS_NAME$"; then
 else
   echo "Helm $REDIS_NAME NOT FOUND. Beginning deployment..."
 
-  helm install $REDIS_NAME $REDIS_HELM_CHART --values values.yaml
+  helm install $REDIS_NAME $REDIS_HELM_CHART --set auth.password="$SECRET_REDIS_PASSWORD" --values values.yaml
 fi
 
 # Clean up the temporary values file

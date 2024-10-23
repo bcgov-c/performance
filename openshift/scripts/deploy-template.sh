@@ -18,8 +18,9 @@ echo "Scale down $DB_SERVICE to 1 replica..."
 oc scale sts/$DB_SERVICE --replicas=1
 
 # Only use 1 redis replica for deployment / upgrade to avoid conflicts
-echo "Scale down $REDIS_NAME to 1 replica..."
-oc scale sts/$REDIS_NAME --replicas=1
+export REDIS_STS_NAME="$REDIS_NAME-node"
+echo "Scale down $REDIS_STS_NAME to 1 replica..."
+oc scale sts/$REDIS_STS_NAME --replicas=1
 
 # Create ConfigMaps (first delete, if necessary)
 if [[ ! `oc describe configmap $WEB_NAME-config 2>&1` =~ "NotFound" ]]; then

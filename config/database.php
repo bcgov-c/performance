@@ -105,7 +105,7 @@ return [
         // ],
 
         'default' => [
-            'url' => env('REDIS_URL', 'tcp://redis-0:6379'),
+            'url' => env('REDIS_URL', 'tcp://redis:6379'),
             'host' => env('REDIS_HOST', 'redis-0'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', '6379'),
@@ -113,7 +113,7 @@ return [
         ],
 
         'redis' => [
-            'url' => env('REDIS_URL', 'tcp://redis-0:6379'),
+            'url' => env('REDIS_URL', 'tcp://redis:6379'),
             'cluster' => false,
             'default' => [
                 'host' => env('REDIS_HOST', 'redis-0'),
@@ -124,18 +124,21 @@ return [
         ],
 
         'predis' => [
-            'url' => env('REDIS_URL', 'tcp://redis-0:6379'),
+            'url' => env('REDIS_URL', 'tcp://redis:6379'),
             'cluster' => false,
             'default' => [
                 'host' => env('REDIS_HOST', 'redis-0'),
                 'password' => env('REDIS_PASSWORD', null),
                 'port' => env('REDIS_PORT', '6379'),
                 'database' => env('REDIS_DATABASE', 0)
+            ],
+            'options' => [
+                'parameters' => ['password' => env('REDIS_PASSWORD', null)],
             ]
         ],
 
         'session' => [
-            // 'url' => env('REDIS_URL'),
+            // 'url' => env('REDIS_URL', 'tcp://redis:6379'),
             'host' => env('REDIS_HOST', 'redis-0'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', '6379'),
@@ -144,7 +147,7 @@ return [
         ],
 
         'cache' => [
-            // 'url' => env('REDIS_URL'),
+            // 'url' => env('REDIS_URL', 'tcp://redis:6379'),
             'host' => env('REDIS_HOST', 'redis-0'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', '6379'),

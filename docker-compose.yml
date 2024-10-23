@@ -142,7 +142,7 @@ services:
         "--repl-diskless-load",
         "on-empty-db",
         "--replica-announce-ip",
-        "${REDIS_HOST_IP}",
+        "$${REDIS_HOST_IP}",
         "--replica-announce-port",
         "6379",
         "--protected-mode",
@@ -170,7 +170,7 @@ services:
         "--repl-diskless-load",
         "on-empty-db",
         "--replica-announce-ip",
-        "${REDIS_HOST_IP}",
+        "$${REDIS_HOST_IP}",
         "--replica-announce-port",
         "6380",
         "--protected-mode",
@@ -198,7 +198,7 @@ services:
         "--repl-diskless-load",
         "on-empty-db",
         "--replica-announce-ip",
-        "${REDIS_HOST_IP}",
+        "$${REDIS_HOST_IP}",
         "--replica-announce-port",
         "6381",
         "--protected-mode",
@@ -215,7 +215,7 @@ services:
       - "26379:26379"
     command: >
       sh -c 'echo "bind 0.0.0.0" > /etc/sentinel.conf &&
-            echo "sentinel monitor mymaster ${REDIS_HOST_IP} 6379 2" >> /etc/sentinel.conf &&
+            echo "sentinel monitor mymaster $${REDIS_HOST_IP} 6379 2" >> /etc/sentinel.conf &&
             echo "sentinel resolve-hostnames yes" >> /etc/sentinel.conf &&
             echo "sentinel down-after-milliseconds mymaster 10000" >> /etc/sentinel.conf &&
             echo "sentinel failover-timeout mymaster 10000" >> /etc/sentinel.conf &&
@@ -232,7 +232,7 @@ services:
       - "26380:26379"
     command: >
       sh -c 'echo "bind 0.0.0.0" > /etc/sentinel.conf &&
-            echo "sentinel monitor mymaster ${REDIS_HOST_IP} 6379 2" >> /etc/sentinel.conf &&
+            echo "sentinel monitor mymaster $${REDIS_HOST_IP} 6379 2" >> /etc/sentinel.conf &&
             echo "sentinel resolve-hostnames yes" >> /etc/sentinel.conf &&
             echo "sentinel down-after-milliseconds mymaster 10000" >> /etc/sentinel.conf &&
             echo "sentinel failover-timeout mymaster 10000" >> /etc/sentinel.conf &&
@@ -249,7 +249,7 @@ services:
       - "26381:26379"
     command: >
       sh -c 'echo "bind 0.0.0.0" > /etc/sentinel.conf &&
-            echo "sentinel monitor mymaster ${REDIS_HOST_IP} 6379 2" >> /etc/sentinel.conf &&
+            echo "sentinel monitor mymaster $${REDIS_HOST_IP} 6379 2" >> /etc/sentinel.conf &&
             echo "sentinel resolve-hostnames yes" >> /etc/sentinel.conf &&
             echo "sentinel down-after-milliseconds mymaster 10000" >> /etc/sentinel.conf &&
             echo "sentinel failover-timeout mymaster 10000" >> /etc/sentinel.conf &&

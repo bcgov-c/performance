@@ -313,8 +313,7 @@
             ]
           }
         },
-        "revisionHistoryLimit": 10,
-        "test": false
+        "revisionHistoryLimit": 10
       }
     },
 
@@ -471,8 +470,7 @@
             ]
           }
         },
-        "revisionHistoryLimit": 10,
-        "test": false
+        "revisionHistoryLimit": 10
       }
     },
 
@@ -584,8 +582,7 @@
             ]
           }
         },
-        "revisionHistoryLimit": 10,
-        "test": false
+        "revisionHistoryLimit": 10
       }
     }
   ],
