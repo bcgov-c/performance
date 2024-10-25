@@ -50,7 +50,7 @@ if helm list -q | grep -q "^$REDIS_NAME$"; then
     exit 1
   fi
 else
-  echo "StatefulSet ($REDIS_STS_NAME) NOT FOUND. Beginning deployment..."
+  echo "Helm deployment ($REDIS_NAME) NOT FOUND. Beginning deployment..."
 
   helm install $REDIS_NAME $REDIS_HELM_CHART --set auth.password="$SECRET_REDIS_PASSWORD" --values values.yaml
 fi
