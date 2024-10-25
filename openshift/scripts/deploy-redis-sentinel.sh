@@ -27,7 +27,7 @@ replica:
   replicaCount: $REDIS_REPLICAS
   persistence:
     enabled: true
-    size: 5Gi
+    size: 1Gi
 sentinel:
   enabled: true
   persistence:
@@ -40,7 +40,7 @@ if helm list -q | grep -q "^$REDIS_NAME$"; then
   echo "Helm deployment found. Updating..."
 
   # Upgrade the Helm deployment with the new values
-  if [[ `helm upgrade $REDIS_NAME $REDIS_HELM_CHART --reuse-values -f values.yaml 2>&1` =~ "Error" ]]; then
+  if [[ `helm upgrade $REDIS_NAME $REDIS_HELM_CHART --debug --reuse-values -f values.yaml 2>&1` =~ "Error" ]]; then
     echo "❌ Helm upgrade FAILED."
     exit 1
   fi
