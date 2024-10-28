@@ -113,7 +113,7 @@ jobs:
 
       - name: 🧹️ Clean ${{ inputs.REDIS_NAME }}
         run: |
-          if [[ `oc describe sts ${{ inputs.REDIS_NAME }}-node 2>&1` =~ "NotFound" ]]; then
+          if [[ `oc describe sts/${{ inputs.REDIS_NAME }}-node 2>&1` =~ "NotFound" ]]; then
             echo "${{ inputs.REDIS_NAME }} NOT FOUND: Skipping..."
           else
             echo "${{ inputs.REDIS_NAME }}-node FOUND: Cleaning..."

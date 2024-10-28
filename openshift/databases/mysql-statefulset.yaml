@@ -66,9 +66,9 @@ spec:
         image: aro.jfrog.io/performance-app/mysql:5.7
         env:
         - name: MYSQL_ALLOW_EMPTY_PASSWORD
-          value: "1"
+          value: "no"
         - name: ALLOW_EMPTY_PASSWORD
-          value: "yes"
+          value: "no"
         ports:
         - name: mysql
           containerPort: 3306
