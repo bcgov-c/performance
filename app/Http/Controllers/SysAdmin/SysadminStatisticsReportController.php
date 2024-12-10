@@ -2667,7 +2667,7 @@ class SysadminStatisticsReportController extends Controller
                 ->leftJoin('users as employee', 'employee.id', '=', 'conversations.signoff_user_id')   
                 ->where('conversation_participants.role','=','emp')
                 ->where('conversations.id','=',$conversation_id)
-                ->whereNull('employee_demo.date_deleted')        
+                // ->whereNull('employee_demo.date_deleted')        
                 ->whereRaw('employee_demo.pdp_excluded = 0')  
                 ->get();
                 
