@@ -36,7 +36,9 @@ jobs:
       BUILD_TAG: ${{ github.ref_name }}
       APP: performance
     steps:
-      # Checkout the PR branch
+      - name: Set up OpenShift CLI
+        uses: redhat-actions/oc-cli@v1
+       # Checkout the PR branch
       - name: Print env
         run: |
           echo BUILD ID: $BUILD_ID
@@ -83,6 +85,8 @@ jobs:
     needs:
       - build
     steps:
+      - name: Set up OpenShift CLI
+        uses: redhat-actions/oc-cli@v1
       - name: Print env
         run: |
          echo BUILD ID: $BUILD_ID
@@ -159,6 +163,8 @@ jobs:
     needs:
       - build
     steps:
+      - name: Set up OpenShift CLI
+        uses: redhat-actions/oc-cli@v1
       - name: Print env
         run: |
          echo BUILD ID: $BUILD_ID
@@ -234,6 +240,8 @@ jobs:
     needs:
       - build
     steps:
+      - name: Set up OpenShift CLI
+        uses: redhat-actions/oc-cli@v1
       - name: Print env
         run: |
          echo BUILD ID: $BUILD_ID
