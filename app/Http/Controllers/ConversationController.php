@@ -718,6 +718,7 @@ class ConversationController extends Controller
                                 'conversation_id' => $conversation->id,
                                 'participant_id' => $value,
                                 'role' => 'emp',
+                                'position_number' => $this->getPositionNumber($value),
                             ]);
                             $actualOwnerRole = 'mgr';
                         }
