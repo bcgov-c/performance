@@ -73,7 +73,7 @@ class ConversationController extends Controller
             ->select('shared_id AS id')
             ->pluck('id');
 
-        $reporteeNshared = $reporteeIds->union($sharedIds)->toArray();
+        $reporteeNshared = $reporteeIds->merge($sharedIds)->toArray();
         
 
         //get historic team members
