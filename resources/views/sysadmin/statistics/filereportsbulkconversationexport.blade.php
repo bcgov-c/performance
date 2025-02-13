@@ -66,8 +66,8 @@
                         
                         <li><b>Employee Attestation</b>
                             <ul>
-                                <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if ($item->empl_agree1 != '') {?>
+                                <li><b>We have reviewed goals and adjusted as necessary.  </b>
+                                    <?php if($item->empl_agree1 != '') {?>
                                         <?php if($item->empl_agree1 == 1){?>
                                             <p>Yes</p>
                                         <?php }else{ ?>
@@ -77,16 +77,27 @@
                                         <p>N/A</p>
                                     <?php } ?>    
                                 </li>
-                                <li><b>Performance expectations have been clearly communicated.  </b>
+                                <li><b>Performance expectations are clear.  </b>
                                     <?php if($item->empl_agree2 != '') {?>
-                                    <?php if($item->empl_agree2 == 1){?>
-                                        <p>Yes</p>
-                                    <?php }else{ ?>
-                                        <p>No</p>    
-                                    <?php } ?>  
+                                        <?php if($item->empl_agree2 == 1){?>
+                                            <p>Yes</p>
+                                        <?php }else{ ?>
+                                            <p>No</p>    
+                                        <?php } ?>  
                                     <?php }else{ ?> 
                                         <p>N/A</p>
                                     <?php } ?>      
+                                </li>
+                                <li><b>Team member disagrees with the information contained in this performance review.  </b>
+                                    <?php if($item->team_member_agreement != '') {?>
+                                        <?php if($item->team_member_agreement == 1){?>
+                                            <p>Yes</p>
+                                        <?php }else{ ?>
+                                            <p>No</p>      
+                                        <?php } ?> 
+                                    <?php }else{ ?> 
+                                        <p>N/A</p>
+                                    <?php } ?>     
                                 </li>
                             </ul>
                         </li>
@@ -104,8 +115,8 @@
                         
                         <li><b>Supervisor Attestation</b>
                             <ul>
-                                <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if ($item->supv_agree1 != '') {?>
+                                <li><b>We have reviewed goals and adjusted as necessary.  </b>
+                                    <?php if($item->supv_agree1 != '') {?>
                                         <?php if($item->supv_agree1 == 1){?>
                                             <p>Yes</p>
                                         <?php }else{ ?>
@@ -115,8 +126,8 @@
                                         <p>N/A</p>
                                     <?php } ?>     
                                 </li>
-                                <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if ($item->supv_agree2 != '') {?>
+                                <li><b>Performance expectations are clear.  </b>
+                                    <?php if($item->supv_agree2 != '') {?>
                                         <?php if($item->supv_agree2 == 1){?>
                                             <p>Yes</p>
                                         <?php }else{ ?>
@@ -143,8 +154,8 @@
                         
                         <li><b>Employee Attestation</b>
                             <ul>
-                                <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if ($item->empl_agree1 != '') {?>
+                                <li><b>We have reviewed goals and adjusted as necessary.  </b>
+                                    <?php if($item->empl_agree1 != '') {?>
                                         <?php if($item->empl_agree1 == 1){?>
                                             <p>Yes</p>
                                         <?php }else{ ?>
@@ -154,13 +165,24 @@
                                         <p>N/A</p>
                                     <?php } ?>     
                                 </li>
-                                <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if ($item->empl_agree2 != '') {?>
+                                <li><b>Performance expectations are clear.  </b>
+                                    <?php if($item->empl_agree2 != '') {?>
                                         <?php if($item->empl_agree2 == 1){?>
                                             <p>Yes</p>
                                         <?php }else{ ?>
                                             <p>No</p>       
                                         <?php } ?>
+                                    <?php }else{ ?> 
+                                        <p>N/A</p>
+                                    <?php } ?>     
+                                </li>
+                                <li><b>Team member disagrees with the information contained in this performance review.  </b>
+                                    <?php if($item->team_member_agreement != '') {?>
+                                        <?php if($item->team_member_agreement == 1){?>
+                                            <p>Yes</p>
+                                        <?php }else{ ?>
+                                            <p>No</p>      
+                                        <?php } ?> 
                                     <?php }else{ ?> 
                                         <p>N/A</p>
                                     <?php } ?>     
@@ -178,8 +200,8 @@
                         
                         <li><b>Supervisor Attestation</b>
                             <ul>
-                                <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if ($item->supv_agree1 != '') {?>
+                                <li><b>We have reviewed goals and adjusted as necessary.  </b>
+                                    <?php if($item->supv_agree1 != '') {?>
                                         <?php if($item->supv_agree1 == 1){?>
                                             <p>Yes</p>
                                         <?php }else{ ?>
@@ -189,8 +211,8 @@
                                         <p>N/A</p>
                                     <?php } ?>      
                                 </li>
-                                <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if ($item->supv_agree2 != '') {?>
+                                <li><b>Performance expectations are clear.  </b>
+                                    <?php if($item->supv_agree2 != '') {?>
                                         <?php if($item->supv_agree2 == 1){?>
                                             <p>Yes</p>
                                         <?php }else{ ?>
@@ -220,8 +242,8 @@
                         
                         <li><b>Employee Attestation</b>
                             <ul>
-                                <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if ($item->empl_agree1 != '') {?>
+                                <li><b>We have reviewed goals and adjusted as necessary.  </b>
+                                    <?php if($item->empl_agree1 != '') {?>
                                         <?php if($item->empl_agree1 == 1){?>
                                             <p>Yes</p>
                                         <?php }else{ ?>
@@ -231,8 +253,8 @@
                                         <p>N/A</p>
                                     <?php } ?>      
                                 </li>
-                                <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if ($item->empl_agree2 != '') {?>
+                                <li><b>Performance expectations are clear.  </b>
+                                    <?php if($item->empl_agree2 != '') {?>
                                         <?php if($item->empl_agree2 == 1){?>
                                             <p>Yes</p>
                                         <?php }else{ ?>
@@ -241,6 +263,17 @@
                                     <?php }else{ ?> 
                                         <p>N/A</p>
                                     <?php } ?>      
+                                </li>
+                                <li><b>Team member disagrees with the information contained in this performance review.  </b>
+                                    <?php if($item->team_member_agreement != '') {?>
+                                        <?php if($item->team_member_agreement == 1){?>
+                                            <p>Yes</p>
+                                        <?php }else{ ?>
+                                            <p>No</p>      
+                                        <?php } ?> 
+                                    <?php }else{ ?> 
+                                        <p>N/A</p>
+                                    <?php } ?>     
                                 </li>
                             </ul>
                         </li>
@@ -257,8 +290,8 @@
                         
                         <li><b>Supervisor Attestation</b>
                             <ul>
-                                <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if ($item->supv_agree1 != '') {?>
+                                <li><b>We have reviewed goals and adjusted as necessary.  </b>
+                                    <?php if($item->supv_agree1 != '') {?>
                                         <?php if($item->supv_agree1 == 1){?>
                                             <p>Yes</p>
                                         <?php }else{ ?>
@@ -268,8 +301,8 @@
                                         <p>N/A</p>
                                     <?php } ?>     
                                 </li>
-                                <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if ($item->supv_agree2 != '') {?>
+                                <li><b>Performance expectations are clear.  </b>
+                                    <?php if($item->supv_agree2 != '') {?>
                                         <?php if($item->supv_agree2 == 1){?>
                                             <p>Yes</p>
                                         <?php }else{ ?>
@@ -297,8 +330,8 @@
                         
                         <li><b>Employee Attestation</b>
                             <ul>
-                                <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if ($item->empl_agree1 != '') {?>
+                                <li><b>We have reviewed goals and adjusted as necessary.  </b>
+                                    <?php if($item->empl_agree1 != '') {?>
                                         <?php if($item->empl_agree1 == 1){?>
                                             <p>Yes</p>
                                         <?php }else{ ?>
@@ -308,9 +341,20 @@
                                         <p>N/A</p>
                                     <?php } ?>     
                                 </li>
-                                <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if ($item->empl_agree2 != '') {?>
+                                <li><b>Performance expectations are clear.  </b>
+                                    <?php if($item->empl_agree2 != '') {?>
                                         <?php if($item->empl_agree2 == 1){?>
+                                            <p>Yes</p>
+                                        <?php }else{ ?>
+                                            <p>No</p>      
+                                        <?php } ?> 
+                                    <?php }else{ ?> 
+                                        <p>N/A</p>
+                                    <?php } ?>     
+                                </li>
+                                <li><b>Team member disagrees with the information contained in this performance review.  </b>
+                                    <?php if($item->team_member_agreement != '') {?>
+                                        <?php if($item->team_member_agreement == 1){?>
                                             <p>Yes</p>
                                         <?php }else{ ?>
                                             <p>No</p>      
@@ -334,8 +378,8 @@
                         
                         <li><b>Supervisor Attestation</b>
                             <ul>
-                                <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if ($item->supv_agree1 != '') {?>
+                                <li><b>We have reviewed goals and adjusted as necessary.  </b>
+                                    <?php if($item->supv_agree1 != '') {?>
                                         <?php if($item->supv_agree1 == 1){?>
                                             <p>Yes</p>
                                         <?php }else{ ?>
@@ -345,8 +389,8 @@
                                         <p>N/A</p>
                                     <?php } ?>     
                                 </li>
-                                <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if ($item->supv_agree2 != '') {?>
+                                <li><b>Performance expectations are clear.  </b>
+                                    <?php if($item->supv_agree2 != '') {?>
                                         <?php if($item->supv_agree2 == 1){?>
                                             <p>Yes</p>
                                         <?php }else{ ?>
@@ -373,27 +417,38 @@
                         
                         <li><b>Employee Attestation</b>
                             <ul>
-                                <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if ($item->empl_agree1 != '') {?>
-                                    <?php if($item->empl_agree1 == 1){?>
-                                        <p>Yes</p>
-                                    <?php }else{ ?>
-                                        <p>No</p>    
-                                    <?php } ?>   
+                                <li><b>We have reviewed goals and adjusted as necessary.  </b>
+                                    <?php if($item->empl_agree1 != '') {?>
+                                        <?php if($item->empl_agree1 == 1){?>
+                                            <p>Yes</p>
+                                        <?php }else{ ?>
+                                            <p>No</p>    
+                                        <?php } ?>   
                                     <?php }else{ ?> 
                                         <p>N/A</p>
                                     <?php } ?>    
                                 </li>
-                                <li><b>Performance expectations have been clearly communicated.  </b>
+                                <li><b>Performance expectations are clear.  </b>
                                     <?php if ($item->empl_agree2 != '') {?>
-                                    <?php if($item->empl_agree2 == 1){?>
-                                        <p>Yes</p>
-                                    <?php }else{ ?>
-                                        <p>No</p>    
-                                    <?php } ?>    
+                                        <?php if($item->empl_agree2 == 1){?>
+                                            <p>Yes</p>
+                                        <?php }else{ ?>
+                                            <p>No</p>    
+                                        <?php } ?>    
                                     <?php }else{ ?> 
                                         <p>N/A</p>
                                     <?php } ?>    
+                                </li>
+                                <li><b>Team member disagrees with the information contained in this performance review.  </b>
+                                    <?php if($item->team_member_agreement != '') {?>
+                                        <?php if($item->team_member_agreement == 1){?>
+                                            <p>Yes</p>
+                                        <?php }else{ ?>
+                                            <p>No</p>      
+                                        <?php } ?> 
+                                    <?php }else{ ?> 
+                                        <p>N/A</p>
+                                    <?php } ?>     
                                 </li>
                             </ul>
                         </li>
@@ -408,8 +463,8 @@
                         
                         <li><b>Supervisor Attestation</b>
                             <ul>
-                                <li><b>We have reviewed progress of goals and adjusted as necessary.  </b>
-                                    <?php if ($item->supv_agree1 != '') {?>
+                                <li><b>We have reviewed goals and adjusted as necessary.  </b>
+                                    <?php if($item->supv_agree1 != '') {?>
                                         <?php if($item->supv_agree1 == 1){?>
                                             <p>Yes</p>
                                         <?php }else{ ?>
@@ -419,8 +474,8 @@
                                         <p>N/A</p>
                                     <?php } ?>     
                                 </li>
-                                <li><b>Performance expectations have been clearly communicated.  </b>
-                                    <?php if ($item->supv_agree2 != '') {?>
+                                <li><b>Performance expectations are clear.  </b>
+                                    <?php if($item->supv_agree2 != '') {?>
                                         <?php if($item->supv_agree2 == 1){?>
                                             <p>Yes</p>
                                         <?php }else{ ?>
